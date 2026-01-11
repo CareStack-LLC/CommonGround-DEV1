@@ -794,7 +794,11 @@ function PaymentsContent() {
         <PayObligationModal
           obligation={selectedObligation}
           wallet={wallet}
-          userShare={parseFloat(selectedObligation.petitioner_amount || selectedObligation.respondent_amount || '0')}
+          userShare={parseFloat(
+            balanceSummary?.petitioner_id === user?.id
+              ? selectedObligation.petitioner_share
+              : selectedObligation.respondent_share
+          )}
           onSuccess={() => {
             setShowPayModal(false);
             setSelectedObligation(null);
