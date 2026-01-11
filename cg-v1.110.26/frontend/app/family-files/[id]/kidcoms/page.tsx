@@ -334,7 +334,7 @@ export default function KidComsPage() {
                     <span className="mt-2 text-sm font-medium text-cg-sage">Voice</span>
                   </button>
                   <button
-                    onClick={() => router.push(`/family-files/${familyFileId}/kidcoms/circle`)}
+                    onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
                     className={cn(
                       'flex flex-col items-center p-4 rounded-xl transition-all',
                       'bg-teal-50 hover:bg-teal-100 active:scale-95'
@@ -366,7 +366,7 @@ export default function KidComsPage() {
                 <CGButton
                   variant="ghost"
                   size="sm"
-                  onClick={() => router.push(`/family-files/${familyFileId}/kidcoms/circle`)}
+                  onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
                 >
                   <Plus className="h-4 w-4 mr-1" />
                   Manage
@@ -380,7 +380,7 @@ export default function KidComsPage() {
                     description="Add trusted contacts to your circle"
                     action={{
                       label: "Add Contacts",
-                      onClick: () => router.push(`/family-files/${familyFileId}/kidcoms/circle`),
+                      onClick: () => router.push(`/family-files/${familyFileId}/my-circle`),
                     }}
                     size="sm"
                   />
