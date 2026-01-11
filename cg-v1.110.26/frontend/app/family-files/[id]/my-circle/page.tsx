@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Users,
   Plus,
@@ -25,8 +25,10 @@ import {
   ExternalLink,
   ArrowLeft,
   Sparkles,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
-import { myCircleAPI, familyFilesAPI, KidComsRoom, CirclePermission, FamilyFileChild } from '@/lib/api';
+import { myCircleAPI, familyFilesAPI, circleAPI, KidComsRoom, CirclePermission, FamilyFileChild, CircleContact } from '@/lib/api';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
 import { PageContainer } from '@/components/layout';
@@ -67,9 +69,13 @@ export default function MyCircleManagementPage({ params }: PageParams) {
   const resolvedParams = use(params);
   const familyFileId = resolvedParams.id;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'rooms';
 
+  const [activeTab, setActiveTab] = useState<'rooms' | 'contacts'>(initialTab as 'rooms' | 'contacts');
   const [isLoading, setIsLoading] = useState(true);
   const [rooms, setRooms] = useState<KidComsRoom[]>([]);
+  const [contacts, setContacts] = useState<CircleContact[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<KidComsRoom | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
@@ -106,25 +112,34 @@ export default function MyCircleManagementPage({ params }: PageParams) {
   const [isSettingUpChild, setIsSettingUpChild] = useState(false);
 
   useEffect(() => {
-    loadRooms();
+    loadData();
   }, [familyFileId]);
 
-  async function loadRooms() {
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'contacts' || tab === 'rooms') {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  async function loadData() {
     try {
       setIsLoading(true);
-      const [roomList, childrenList] = await Promise.all([
+      const [roomList, childrenList, contactsList] = await Promise.all([
         myCircleAPI.getRooms(familyFileId),
         familyFilesAPI.getChildren(familyFileId),
+        circleAPI.list(familyFileId),
       ]);
       setRooms(roomList.items);
       setChildren(childrenList.items);
+      setContacts(contactsList.items);
       // Pre-select first child if available
       if (childrenList.items.length > 0 && !selectedChildId) {
         setSelectedChildId(childrenList.items[0].id);
       }
     } catch (err) {
-      console.error('Error loading rooms:', err);
-      setError('Failed to load rooms');
+      console.error('Error loading data:', err);
+      setError('Failed to load data');
     } finally {
       setIsLoading(false);
     }
@@ -152,8 +167,8 @@ export default function MyCircleManagementPage({ params }: PageParams) {
         token: response.invite_token,
       });
 
-      // Reload rooms to show the new pending invite
-      await loadRooms();
+      // Reload data to show the new pending invite
+      await loadData();
     } catch (err) {
       console.error('Error sending invite:', err);
       setError(err instanceof Error ? err.message : 'Failed to send invitation');
@@ -195,7 +210,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
 
       setShowPermissionModal(false);
       setEditingPermission(null);
-      await loadRooms();
+      await loadData();
     } catch (err) {
       console.error('Error updating permission:', err);
       setError(err instanceof Error ? err.message : 'Failed to update permissions');
@@ -346,6 +361,38 @@ export default function MyCircleManagementPage({ params }: PageParams) {
               </div>
             )}
 
+            {/* Tab Switcher */}
+            <div className="flex gap-2 p-1 bg-muted/50 rounded-xl w-fit">
+              <button
+                onClick={() => {
+                  setActiveTab('rooms');
+                  router.replace(`/family-files/${familyFileId}/my-circle?tab=rooms`);
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  activeTab === 'rooms'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <LayoutGrid className="h-4 w-4" />
+                Rooms
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('contacts');
+                  router.replace(`/family-files/${familyFileId}/my-circle?tab=contacts`);
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  activeTab === 'contacts'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <List className="h-4 w-4" />
+                Contacts
+              </button>
+            </div>
+
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
@@ -391,85 +438,221 @@ export default function MyCircleManagementPage({ params }: PageParams) {
               </button>
             </div>
 
-            {/* Rooms Grid */}
-            <div>
-              <h2 className="text-lg font-semibold text-foreground mb-4">Communication Rooms</h2>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {rooms.map((room) => (
-                  <div
-                    key={room.id}
-                    className={`relative rounded-xl border-2 p-4 transition-all ${
-                      room.is_assigned
-                        ? ROOM_COLORS[(room.room_number - 1) % ROOM_COLORS.length]
-                        : 'bg-muted/30 border-border text-muted-foreground'
-                    }`}
-                  >
-                    {/* Room Number */}
-                    <div className="absolute top-2 right-2 w-6 h-6 bg-white/50 rounded-full flex items-center justify-center text-xs font-bold">
-                      {room.room_number}
-                    </div>
-
-                    {room.is_assigned ? (
-                      <>
-                        <div className="text-3xl mb-2">
-                          {room.room_type === 'parent_a' ? '👩' :
-                           room.room_type === 'parent_b' ? '👨' :
-                           room.assigned_contact_relationship ? (
-                             { grandparent: '👴', aunt: '👩', uncle: '👨', cousin: '🧒', family_friend: '🤗', godparent: '💝', step_parent: '💕', sibling: '👦', therapist: '🧠', tutor: '📚', coach: '⚽' }[room.assigned_contact_relationship] || '💜'
-                           ) : '💜'}
+            {/* Tab Content */}
+            {activeTab === 'rooms' ? (
+              <>
+                {/* Rooms Grid */}
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground mb-4">Communication Rooms</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {rooms.map((room) => (
+                      <div
+                        key={room.id}
+                        className={`relative rounded-xl border-2 p-4 transition-all ${
+                          room.is_assigned
+                            ? ROOM_COLORS[(room.room_number - 1) % ROOM_COLORS.length]
+                            : 'bg-muted/30 border-border text-muted-foreground'
+                        }`}
+                      >
+                        {/* Room Number */}
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-white/50 rounded-full flex items-center justify-center text-xs font-bold">
+                          {room.room_number}
                         </div>
-                        <h3 className="font-semibold truncate">{room.room_name || room.assigned_contact_name}</h3>
-                        <p className="text-xs opacity-75 capitalize">
-                          {room.room_type?.replace('_', ' ') || room.assigned_contact_relationship?.replace('_', ' ')}
-                        </p>
 
-                        {/* Room type indicator */}
-                        {room.room_type === 'circle' && (
-                          <div className="flex gap-1 mt-2">
-                            <Settings className="h-3 w-3 opacity-50" />
+                        {room.is_assigned ? (
+                          <>
+                            <div className="text-3xl mb-2">
+                              {room.room_type === 'parent_a' ? '👩' :
+                               room.room_type === 'parent_b' ? '👨' :
+                               room.assigned_contact_relationship ? (
+                                 { grandparent: '👴', aunt: '👩', uncle: '👨', cousin: '🧒', family_friend: '🤗', godparent: '💝', step_parent: '💕', sibling: '👦', therapist: '🧠', tutor: '📚', coach: '⚽' }[room.assigned_contact_relationship] || '💜'
+                               ) : '💜'}
+                            </div>
+                            <h3 className="font-semibold truncate">{room.room_name || room.assigned_contact_name}</h3>
+                            <p className="text-xs opacity-75 capitalize">
+                              {room.room_type?.replace('_', ' ') || room.assigned_contact_relationship?.replace('_', ' ')}
+                            </p>
+
+                            {/* Room type indicator */}
+                            {room.room_type === 'circle' && (
+                              <div className="flex gap-1 mt-2">
+                                <Settings className="h-3 w-3 opacity-50" />
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="text-center py-2">
+                            <div className="text-2xl mb-2">🏠</div>
+                            <p className="text-sm">Empty Room</p>
+                            <button
+                              onClick={() => {
+                                setInviteRoomNumber(room.room_number);
+                                setShowInviteModal(true);
+                              }}
+                              className="mt-2 text-xs text-cg-sage hover:text-cg-sage/80 flex items-center gap-1 mx-auto"
+                            >
+                              <Plus className="h-3 w-3" />
+                              Assign
+                            </button>
                           </div>
                         )}
-                      </>
-                    ) : (
-                      <div className="text-center py-2">
-                        <div className="text-2xl mb-2">🏠</div>
-                        <p className="text-sm">Empty Room</p>
-                        <button
-                          onClick={() => {
-                            setInviteRoomNumber(room.room_number);
-                            setShowInviteModal(true);
-                          }}
-                          className="mt-2 text-xs text-cg-sage hover:text-cg-sage/80 flex items-center gap-1 mx-auto"
-                        >
-                          <Plus className="h-3 w-3" />
-                          Assign
-                        </button>
                       </div>
-                    )}
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
 
-            {/* Legend */}
-            <div className="cg-card p-6">
-              <h3 className="font-semibold text-foreground mb-3">How Rooms Work</h3>
-              <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
-                <div>
-                  <p className="mb-2"><strong className="text-foreground">Rooms 1-2:</strong> Reserved for parents (auto-assigned)</p>
-                  <p><strong className="text-foreground">Rooms 3-10:</strong> Available for grandparents, aunts, uncles, friends, etc.</p>
-                </div>
-                <div>
-                  <p className="mb-2">Each contact can have customized permissions for:</p>
-                  <div className="flex gap-4">
-                    <span className="flex items-center gap-1"><Video className="h-4 w-4" /> Video</span>
-                    <span className="flex items-center gap-1"><Phone className="h-4 w-4" /> Voice</span>
-                    <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> Chat</span>
-                    <span className="flex items-center gap-1"><Film className="h-4 w-4" /> Theater</span>
+                {/* Legend */}
+                <div className="cg-card p-6">
+                  <h3 className="font-semibold text-foreground mb-3">How Rooms Work</h3>
+                  <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
+                    <div>
+                      <p className="mb-2"><strong className="text-foreground">Rooms 1-2:</strong> Reserved for parents (auto-assigned)</p>
+                      <p><strong className="text-foreground">Rooms 3-10:</strong> Available for grandparents, aunts, uncles, friends, etc.</p>
+                    </div>
+                    <div>
+                      <p className="mb-2">Each contact can have customized permissions for:</p>
+                      <div className="flex gap-4">
+                        <span className="flex items-center gap-1"><Video className="h-4 w-4" /> Video</span>
+                        <span className="flex items-center gap-1"><Phone className="h-4 w-4" /> Voice</span>
+                        <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> Chat</span>
+                        <span className="flex items-center gap-1"><Film className="h-4 w-4" /> Theater</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </>
+            ) : (
+              /* Contacts List View */
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-foreground">Circle Contacts</h2>
+                  <span className="text-sm text-muted-foreground">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</span>
+                </div>
+
+                {contacts.length === 0 ? (
+                  <div className="cg-card p-8 text-center">
+                    <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                      <Users className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-2">No contacts yet</h3>
+                    <p className="text-muted-foreground text-sm mb-4">Invite trusted people to your circle</p>
+                    <button
+                      onClick={() => setShowInviteModal(true)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/90 transition-colors"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      Invite Contact
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {contacts.map((contact) => {
+                      const relationshipEmoji: Record<string, string> = {
+                        grandparent: '👴',
+                        aunt: '👩',
+                        uncle: '👨',
+                        cousin: '🧒',
+                        family_friend: '🤗',
+                        godparent: '💝',
+                        step_parent: '💕',
+                        sibling: '👦',
+                        therapist: '🧠',
+                        tutor: '📚',
+                        coach: '⚽',
+                      };
+
+                      return (
+                        <div
+                          key={contact.id}
+                          className="cg-card p-4 hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center gap-4">
+                            {/* Avatar */}
+                            <div className="w-12 h-12 rounded-xl bg-cg-sage-subtle flex items-center justify-center text-2xl">
+                              {relationshipEmoji[contact.relationship_type] || '💜'}
+                            </div>
+
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-foreground truncate">{contact.contact_name}</h3>
+                              <p className="text-sm text-muted-foreground capitalize">
+                                {contact.relationship_type.replace('_', ' ')}
+                              </p>
+                            </div>
+
+                            {/* Status & Permissions */}
+                            <div className="flex items-center gap-3">
+                              {/* Approval Status */}
+                              <div className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                                contact.can_communicate
+                                  ? 'bg-cg-success-subtle text-cg-success'
+                                  : contact.parent_a_approved || contact.parent_b_approved
+                                    ? 'bg-amber-100 text-amber-700'
+                                    : 'bg-muted text-muted-foreground'
+                              }`}>
+                                {contact.can_communicate
+                                  ? 'Approved'
+                                  : contact.parent_a_approved || contact.parent_b_approved
+                                    ? 'Pending'
+                                    : 'Not Approved'}
+                              </div>
+
+                              {/* Permission Icons */}
+                              <div className="flex items-center gap-1">
+                                <div className={`p-1.5 rounded-lg ${contact.can_communicate ? 'bg-green-100 text-green-600' : 'bg-muted text-muted-foreground'}`}>
+                                  <Video className="h-4 w-4" />
+                                </div>
+                                <div className={`p-1.5 rounded-lg ${contact.can_communicate ? 'bg-blue-100 text-blue-600' : 'bg-muted text-muted-foreground'}`}>
+                                  <Phone className="h-4 w-4" />
+                                </div>
+                              </div>
+
+                              {/* Edit Button */}
+                              <button
+                                onClick={() => {
+                                  // For now, redirect to a future detail page or show edit modal
+                                  // This could be expanded to show a permission editing modal
+                                  alert('Permission editing coming soon!');
+                                }}
+                                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Parent Approval Details */}
+                          <div className="mt-3 pt-3 border-t border-border flex items-center gap-4 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              {contact.parent_a_approved ? (
+                                <Check className="h-3 w-3 text-cg-success" />
+                              ) : (
+                                <X className="h-3 w-3 text-muted-foreground" />
+                              )}
+                              Parent A
+                            </span>
+                            <span className="flex items-center gap-1">
+                              {contact.parent_b_approved ? (
+                                <Check className="h-3 w-3 text-cg-success" />
+                              ) : (
+                                <X className="h-3 w-3 text-muted-foreground" />
+                              )}
+                              Parent B
+                            </span>
+                            {contact.email && (
+                              <span className="flex items-center gap-1 ml-auto">
+                                <Mail className="h-3 w-3" />
+                                {contact.email}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </div>
         </PageContainer>
 

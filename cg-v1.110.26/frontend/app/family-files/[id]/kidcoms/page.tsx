@@ -366,9 +366,9 @@ export default function KidComsPage() {
                 <CGButton
                   variant="ghost"
                   size="sm"
-                  onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
+                  onClick={() => router.push(`/family-files/${familyFileId}/my-circle?tab=contacts`)}
                 >
-                  <Plus className="h-4 w-4 mr-1" />
+                  <Settings className="h-4 w-4 mr-1" />
                   Manage
                 </CGButton>
               </CGCardHeader>
