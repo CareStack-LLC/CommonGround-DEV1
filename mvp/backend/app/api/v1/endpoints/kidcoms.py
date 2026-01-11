@@ -496,9 +496,15 @@ async def join_session(
             name=f"{current_user.first_name} {current_user.last_name}"
         )
 
-    # Mark session as active if first join
+    # Only mark session as active if:
+    # 1. It's already waiting AND
+    # 2. The person joining is NOT the one who initiated the call
+    # This keeps the session in WAITING status so the recipient can see the incoming call
     if session.status == SessionStatus.WAITING.value:
-        session.start()
+        user_id_str = str(current_user.id)
+        if session.initiated_by_id != user_id_str:
+            # Recipient is joining - mark as active
+            session.start()
 
     await db.commit()
 
@@ -865,10 +871,17 @@ async def child_join_session(
     child = child_result.scalar_one_or_none()
     child_name = child.display_name if child else "Child"
 
-    # Mark session as active if first join
+    # Only mark session as active if:
+    # 1. It's currently waiting AND
+    # 2. The child joining is NOT the one who initiated the call
+    # This keeps the session in WAITING status so the recipient can see the incoming call
     if session.status == SessionStatus.WAITING.value:
-        session.start()
-        await db.commit()
+        child_id_str = str(current_child.child_id)
+        # If child initiated the call, they're waiting for someone else - don't mark as active
+        # If someone else initiated (parent/circle), child is answering - mark as active
+        if session.initiated_by_id != child_id_str:
+            session.start()
+            await db.commit()
 
     # Generate Daily.co meeting token
     try:

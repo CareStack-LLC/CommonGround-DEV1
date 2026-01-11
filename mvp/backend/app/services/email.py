@@ -1,28 +1,35 @@
 """
-Email notification service for sending transactional emails.
+Email notification service for sending transactional emails via SendGrid.
 """
 
-import os
-from typing import Optional, Dict, Any, List
+import logging
+from typing import Optional, List
 from datetime import datetime
-from jinja2 import Template
 
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class EmailService:
     """
-    Service for sending email notifications.
+    Service for sending email notifications via SendGrid.
 
-    Note: In production, integrate with SendGrid, AWS SES, or similar.
-    For development, this logs emails instead of sending them.
+    In development mode (EMAIL_ENABLED=False), emails are logged to console.
+    In production (EMAIL_ENABLED=True), emails are sent via SendGrid API.
     """
 
     def __init__(self):
         """Initialize email service."""
-        self.enabled = settings.EMAIL_ENABLED if hasattr(settings, 'EMAIL_ENABLED') else False
-        self.from_email = getattr(settings, 'FROM_EMAIL', 'noreply@commonground.app')
-        self.from_name = "CommonGround"
+        self.enabled = settings.EMAIL_ENABLED
+        self.from_email = settings.FROM_EMAIL
+        self.from_name = getattr(settings, 'FROM_NAME', 'CommonGround')
+        self.api_key = settings.SENDGRID_API_KEY
+
+        # Validate configuration
+        if self.enabled and not self.api_key:
+            logger.warning("EMAIL_ENABLED is True but SENDGRID_API_KEY is not set. Emails will be logged only.")
+            self.enabled = False
 
     async def send_case_invitation(
         self,
@@ -47,7 +54,7 @@ class EmailService:
         Returns:
             Success status
         """
-        subject = f"{inviter_name} invited you to collaborate on {case_name}"
+        subject = f"{inviter_name} invited you to collaborate on CommonGround"
 
         children_list = ", ".join(children_names) if children_names else "your children"
 
@@ -55,21 +62,28 @@ class EmailService:
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
                 .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: #2563EB; color: white; padding: 20px; text-align: center; }}
-                .content {{ background: #f9fafb; padding: 30px; }}
+                .header {{ background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .header h1 {{ margin: 0; font-size: 28px; font-weight: 600; }}
+                .header p {{ margin: 10px 0 0; opacity: 0.9; }}
+                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
                 .button {{
                     display: inline-block;
-                    background: #10B981;
+                    background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%);
                     color: white;
-                    padding: 12px 30px;
+                    padding: 14px 32px;
                     text-decoration: none;
-                    border-radius: 5px;
+                    border-radius: 6px;
                     margin: 20px 0;
+                    font-weight: 600;
                 }}
-                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; }}
+                .feature-list {{ background: #f9fafb; padding: 20px; border-radius: 6px; margin: 20px 0; }}
+                .feature-list li {{ margin: 8px 0; }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
             </style>
         </head>
         <body>
@@ -79,26 +93,28 @@ class EmailService:
                     <p>Co-Parenting Made Easier</p>
                 </div>
                 <div class="content">
-                    <h2>Hi {to_name},</h2>
-                    <p>{inviter_name} has invited you to collaborate on <strong>{case_name}</strong> regarding {children_list}.</p>
+                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
+                    <p><strong>{inviter_name}</strong> has invited you to collaborate on <strong>{case_name}</strong> regarding {children_list}.</p>
 
-                    <p>CommonGround helps co-parents:</p>
-                    <ul>
-                        <li>📋 Create custody agreements together</li>
-                        <li>💬 Communicate with AI-powered conflict prevention</li>
-                        <li>📅 Track parenting time and exchanges</li>
-                        <li>📊 Maintain objective records for court</li>
-                    </ul>
+                    <div class="feature-list">
+                        <p style="margin-top: 0; font-weight: 600;">CommonGround helps co-parents:</p>
+                        <ul style="margin-bottom: 0;">
+                            <li>Create custody agreements together</li>
+                            <li>Communicate with AI-powered conflict prevention</li>
+                            <li>Track parenting time and exchanges</li>
+                            <li>Maintain objective records for court</li>
+                        </ul>
+                    </div>
 
                     <p style="text-align: center;">
                         <a href="{invitation_link}" class="button">Accept Invitation</a>
                     </p>
 
-                    <p><small>This link will expire in 7 days.</small></p>
+                    <p style="color: #666; font-size: 14px;"><em>This invitation link will expire in 7 days.</em></p>
                 </div>
                 <div class="footer">
-                    <p>CommonGround - Where co-parents find common ground</p>
-                    <p>You received this email because {inviter_name} invited you to collaborate.</p>
+                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
+                    <p style="margin: 10px 0 0;">You received this email because {inviter_name} invited you to collaborate.</p>
                 </div>
             </div>
         </body>
@@ -128,26 +144,32 @@ class EmailService:
         Returns:
             Success status
         """
-        subject = f"Agreement ready for your approval: {case_name}"
+        subject = f"Agreement ready for your approval: {agreement_title}"
 
         html_body = f"""
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
                 .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: #2563EB; color: white; padding: 20px; text-align: center; }}
-                .content {{ background: #f9fafb; padding: 30px; }}
+                .header {{ background: linear-gradient(135deg, #D4A574 0%, #C4956A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
+                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
                 .button {{
                     display: inline-block;
-                    background: #10B981;
+                    background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%);
                     color: white;
-                    padding: 12px 30px;
+                    padding: 14px 32px;
                     text-decoration: none;
-                    border-radius: 5px;
+                    border-radius: 6px;
                     margin: 20px 0;
+                    font-weight: 600;
                 }}
+                .agreement-box {{ background: #f9fafb; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #D4A574; }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
             </style>
         </head>
         <body>
@@ -156,16 +178,21 @@ class EmailService:
                     <h1>Agreement Ready for Approval</h1>
                 </div>
                 <div class="content">
-                    <h2>Hi {to_name},</h2>
+                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
                     <p>The parenting agreement for <strong>{case_name}</strong> is ready for your review and approval.</p>
 
-                    <p><strong>Agreement:</strong> {agreement_title}</p>
+                    <div class="agreement-box">
+                        <p style="margin: 0;"><strong>Agreement:</strong> {agreement_title}</p>
+                    </div>
 
-                    <p>Please review the agreement carefully before approving. Once both parents approve, it will become active.</p>
+                    <p>Please review the agreement carefully before approving. Once both parents approve, it will become active and can be used to generate your parenting schedule.</p>
 
                     <p style="text-align: center;">
                         <a href="{approval_link}" class="button">Review & Approve</a>
                     </p>
+                </div>
+                <div class="footer">
+                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
                 </div>
             </div>
         </body>
@@ -199,13 +226,13 @@ class EmailService:
         Returns:
             Success status
         """
-        subject = f"New message from {sender_name} - {case_name}"
+        subject = f"New message from {sender_name}"
 
         aria_note = ""
         if was_flagged:
             aria_note = """
-            <div style="background: #FEF3C7; padding: 15px; border-left: 4px solid #F59E0B; margin: 15px 0;">
-                <strong>🛡️ ARIA Note:</strong> This message was reviewed by our AI assistant for tone.
+            <div style="background: #FEF3C7; padding: 15px; border-radius: 6px; border-left: 4px solid #F59E0B; margin: 15px 0;">
+                <strong>ARIA Note:</strong> This message was reviewed by our AI assistant for tone to help maintain constructive communication.
             </div>
             """
 
@@ -213,26 +240,32 @@ class EmailService:
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
                 .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: #2563EB; color: white; padding: 20px; text-align: center; }}
-                .content {{ background: #f9fafb; padding: 30px; }}
+                .header {{ background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
+                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
                 .message-preview {{
-                    background: white;
+                    background: #f9fafb;
                     padding: 20px;
-                    border-left: 4px solid #2563EB;
+                    border-left: 4px solid #6B8E6B;
                     margin: 20px 0;
+                    border-radius: 0 6px 6px 0;
                 }}
                 .button {{
                     display: inline-block;
-                    background: #2563EB;
+                    background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%);
                     color: white;
-                    padding: 12px 30px;
+                    padding: 14px 32px;
                     text-decoration: none;
-                    border-radius: 5px;
+                    border-radius: 6px;
                     margin: 20px 0;
+                    font-weight: 600;
                 }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
             </style>
         </head>
         <body>
@@ -241,18 +274,21 @@ class EmailService:
                     <h1>New Message</h1>
                 </div>
                 <div class="content">
-                    <h2>Hi {to_name},</h2>
-                    <p>{sender_name} sent you a message regarding <strong>{case_name}</strong>.</p>
+                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
+                    <p><strong>{sender_name}</strong> sent you a message regarding <strong>{case_name}</strong>.</p>
 
                     {aria_note}
 
                     <div class="message-preview">
-                        <p>{message_preview}...</p>
+                        <p style="margin: 0; color: #555;">{message_preview}...</p>
                     </div>
 
                     <p style="text-align: center;">
                         <a href="{message_link}" class="button">View Full Message</a>
                     </p>
+                </div>
+                <div class="footer">
+                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
                 </div>
             </div>
         </body>
@@ -286,35 +322,43 @@ class EmailService:
         Returns:
             Success status
         """
-        subject = f"Reminder: {event_title} in {hours_before} hours"
+        time_label = f"{hours_before} hours" if hours_before > 1 else "1 hour"
+        subject = f"Reminder: Exchange in {time_label}"
 
         time_str = event_time.strftime("%A, %B %d at %I:%M %p")
-        children_list = ", ".join(children_names)
+        children_list = ", ".join(children_names) if children_names else "your children"
 
         html_body = f"""
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
                 .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: #10B981; color: white; padding: 20px; text-align: center; }}
-                .content {{ background: #f9fafb; padding: 30px; }}
+                .header {{ background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
+                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
                 .event-details {{
-                    background: white;
+                    background: #f9fafb;
                     padding: 20px;
-                    border-left: 4px solid #10B981;
+                    border-left: 4px solid #6B8E6B;
                     margin: 20px 0;
+                    border-radius: 0 6px 6px 0;
                 }}
+                .event-details p {{ margin: 8px 0; }}
+                .tip {{ background: #EFF6FF; padding: 15px; border-radius: 6px; margin: 20px 0; }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>📅 Exchange Reminder</h1>
+                    <h1>Exchange Reminder</h1>
                 </div>
                 <div class="content">
-                    <h2>Hi {to_name},</h2>
+                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
                     <p>This is a reminder about your upcoming parenting time exchange.</p>
 
                     <div class="event-details">
@@ -324,7 +368,12 @@ class EmailService:
                         <p><strong>Children:</strong> {children_list}</p>
                     </div>
 
-                    <p>💡 <strong>Tip:</strong> Check in when you arrive to maintain your on-time record.</p>
+                    <div class="tip">
+                        <strong>Tip:</strong> Check in when you arrive to maintain your on-time compliance record.
+                    </div>
+                </div>
+                <div class="footer">
+                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
                 </div>
             </div>
         </body>
@@ -359,26 +408,51 @@ class EmailService:
         subject = f"Monthly Compliance Report - {case_name}"
 
         on_time_pct = int(on_time_rate * 100)
-        status_emoji = "🟢" if on_time_pct >= 90 else "🟡" if on_time_pct >= 70 else "🔴"
+
+        # Determine status color
+        if on_time_pct >= 90:
+            status_color = "#10B981"  # Green
+            status_text = "Excellent"
+        elif on_time_pct >= 70:
+            status_color = "#F59E0B"  # Amber
+            status_text = "Good"
+        else:
+            status_color = "#EF4444"  # Red
+            status_text = "Needs Improvement"
 
         html_body = f"""
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
                 .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: #2563EB; color: white; padding: 20px; text-align: center; }}
-                .content {{ background: #f9fafb; padding: 30px; }}
+                .header {{ background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
+                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
+                .stats {{ display: flex; gap: 20px; margin: 20px 0; }}
                 .stat {{
-                    background: white;
+                    flex: 1;
+                    background: #f9fafb;
                     padding: 20px;
-                    margin: 10px 0;
                     text-align: center;
-                    border-radius: 5px;
+                    border-radius: 8px;
                 }}
-                .stat h3 {{ margin: 0; color: #2563EB; font-size: 36px; }}
-                .stat p {{ margin: 5px 0; color: #666; }}
+                .stat h3 {{ margin: 0; font-size: 32px; }}
+                .stat p {{ margin: 5px 0 0; color: #666; font-size: 14px; }}
+                .button {{
+                    display: inline-block;
+                    background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%);
+                    color: white;
+                    padding: 14px 32px;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    margin: 20px 0;
+                    font-weight: 600;
+                }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
             </style>
         </head>
         <body>
@@ -387,26 +461,190 @@ class EmailService:
                     <h1>Monthly Compliance Report</h1>
                 </div>
                 <div class="content">
-                    <h2>Hi {to_name},</h2>
+                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
                     <p>Here's your monthly compliance summary for <strong>{case_name}</strong>.</p>
 
-                    <div class="stat">
-                        <h3>{status_emoji} {on_time_pct}%</h3>
-                        <p>On-Time Rate</p>
-                    </div>
-
-                    <div class="stat">
-                        <h3>{total_exchanges}</h3>
-                        <p>Total Exchanges</p>
+                    <div class="stats">
+                        <div class="stat">
+                            <h3 style="color: {status_color};">{on_time_pct}%</h3>
+                            <p>On-Time Rate</p>
+                            <p style="color: {status_color}; font-weight: 600;">{status_text}</p>
+                        </div>
+                        <div class="stat">
+                            <h3 style="color: #6B8E6B;">{total_exchanges}</h3>
+                            <p>Total Exchanges</p>
+                        </div>
                     </div>
 
                     <p style="text-align: center;">
-                        <a href="{report_link}" style="display: inline-block; background: #2563EB; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0;">
-                            View Full Report
-                        </a>
+                        <a href="{report_link}" class="button">View Full Report</a>
                     </p>
 
-                    <p><small>These metrics are court-admissible and can be used to demonstrate good faith compliance.</small></p>
+                    <p style="color: #666; font-size: 13px; text-align: center;"><em>These metrics are court-admissible and demonstrate good faith compliance.</em></p>
+                </div>
+                <div class="footer">
+                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_circle_invitation(
+        self,
+        to_email: str,
+        to_name: str,
+        inviter_name: str,
+        child_name: str,
+        invitation_link: str,
+        relationship: str
+    ) -> bool:
+        """
+        Send My Circle invitation email.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            inviter_name: Name of parent sending invitation
+            child_name: Name of the child
+            invitation_link: Link to accept invitation
+            relationship: Relationship to child (grandparent, aunt, etc.)
+
+        Returns:
+            Success status
+        """
+        subject = f"{inviter_name} invited you to connect with {child_name} on CommonGround"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
+                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
+                .button {{
+                    display: inline-block;
+                    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+                    color: white;
+                    padding: 14px 32px;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    margin: 20px 0;
+                    font-weight: 600;
+                }}
+                .feature-list {{ background: #f9fafb; padding: 20px; border-radius: 6px; margin: 20px 0; }}
+                .feature-list li {{ margin: 8px 0; }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>My Circle Invitation</h1>
+                </div>
+                <div class="content">
+                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
+                    <p><strong>{inviter_name}</strong> has invited you to join <strong>{child_name}'s</strong> Circle as their <strong>{relationship}</strong>.</p>
+
+                    <div class="feature-list">
+                        <p style="margin-top: 0; font-weight: 600;">As a Circle member, you can:</p>
+                        <ul style="margin-bottom: 0;">
+                            <li>Video call with {child_name} (with parental approval)</li>
+                            <li>Send monitored messages</li>
+                            <li>Stay connected with your family</li>
+                        </ul>
+                    </div>
+
+                    <p style="text-align: center;">
+                        <a href="{invitation_link}" class="button">Accept Invitation</a>
+                    </p>
+
+                    <p style="color: #666; font-size: 14px;"><em>This invitation link will expire in 7 days.</em></p>
+                </div>
+                <div class="footer">
+                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
+                    <p style="margin: 10px 0 0;">You received this email because {inviter_name} invited you to join their family's Circle.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_kidcoms_call_notification(
+        self,
+        to_email: str,
+        to_name: str,
+        caller_name: str,
+        child_name: str,
+        call_link: str
+    ) -> bool:
+        """
+        Send notification about incoming KidComs call.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            caller_name: Name of person calling
+            child_name: Name of child involved
+            call_link: Link to join call
+
+        Returns:
+            Success status
+        """
+        subject = f"{caller_name} is calling on CommonGround"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .header {{ background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
+                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; text-align: center; }}
+                .button {{
+                    display: inline-block;
+                    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+                    color: white;
+                    padding: 16px 40px;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    margin: 20px 0;
+                    font-weight: 600;
+                    font-size: 18px;
+                }}
+                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Incoming Call</h1>
+                </div>
+                <div class="content">
+                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
+                    <p style="font-size: 18px;"><strong>{caller_name}</strong> is trying to reach <strong>{child_name}</strong> on KidComs.</p>
+
+                    <p>
+                        <a href="{call_link}" class="button">Join Call</a>
+                    </p>
+
+                    <p style="color: #666; font-size: 14px;">If you can't join now, the caller will be notified.</p>
+                </div>
+                <div class="footer">
+                    <p style="margin: 0;">CommonGround KidComs - Safe communication for families</p>
                 </div>
             </div>
         </body>
@@ -423,21 +661,22 @@ class EmailService:
         text_body: Optional[str] = None
     ) -> bool:
         """
-        Send email via configured provider.
+        Send email via SendGrid or log in development mode.
 
         Args:
             to_email: Recipient email
             subject: Email subject
             html_body: HTML email body
-            text_body: Plain text fallback
+            text_body: Plain text fallback (auto-generated if not provided)
 
         Returns:
             Success status
         """
+        # Development mode - log to console
         if not self.enabled:
-            # In development, log instead of sending
+            logger.info(f"[EMAIL DEV MODE] To: {to_email} | Subject: {subject}")
             print(f"\n{'='*60}")
-            print(f"📧 EMAIL (Development Mode - Not Sent)")
+            print(f"EMAIL (Development Mode - Not Sent)")
             print(f"{'='*60}")
             print(f"To: {to_email}")
             print(f"From: {self.from_name} <{self.from_email}>")
@@ -445,23 +684,35 @@ class EmailService:
             print(f"{'='*60}\n")
             return True
 
-        # TODO: Integrate with SendGrid, AWS SES, or similar
-        # Example for SendGrid:
-        # from sendgrid import SendGridAPIClient
-        # from sendgrid.helpers.mail import Mail
-        #
-        # message = Mail(
-        #     from_email=self.from_email,
-        #     to_emails=to_email,
-        #     subject=subject,
-        #     html_content=html_body
-        # )
-        # try:
-        #     sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-        #     response = sg.send(message)
-        #     return response.status_code == 202
-        # except Exception as e:
-        #     print(f"Error sending email: {e}")
-        #     return False
+        # Production mode - send via SendGrid
+        try:
+            from sendgrid import SendGridAPIClient
+            from sendgrid.helpers.mail import Mail, Email, To, Content
 
-        return True
+            message = Mail(
+                from_email=Email(self.from_email, self.from_name),
+                to_emails=To(to_email),
+                subject=subject,
+                html_content=Content("text/html", html_body)
+            )
+
+            sg = SendGridAPIClient(self.api_key)
+            response = sg.send(message)
+
+            if response.status_code in [200, 201, 202]:
+                logger.info(f"Email sent successfully to {to_email}: {subject}")
+                return True
+            else:
+                logger.error(f"SendGrid returned status {response.status_code} for {to_email}")
+                return False
+
+        except ImportError:
+            logger.error("SendGrid library not installed. Run: pip install sendgrid")
+            return False
+        except Exception as e:
+            logger.error(f"Failed to send email to {to_email}: {str(e)}")
+            return False
+
+
+# Create a singleton instance
+email_service = EmailService()

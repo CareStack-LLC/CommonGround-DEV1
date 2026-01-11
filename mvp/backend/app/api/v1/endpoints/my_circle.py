@@ -65,6 +65,7 @@ from app.schemas.kidcoms import (
     CHILD_AVATARS,
 )
 from app.services import my_circle as my_circle_service
+from app.services.email import email_service
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -447,6 +448,25 @@ async def invite_circle_user(
         # Build invite URL
         invite_url = f"{base_url}/my-circle/accept-invite?token={circle_user.invite_token}"
 
+        # Get children names for email
+        children_result = await db.execute(
+            select(Child).where(Child.family_file_id == contact.family_file_id)
+        )
+        children = children_result.scalars().all()
+        child_name = children[0].display_name if children else "your family's children"
+
+        # Send invitation email
+        inviter_name = f"{current_user.first_name} {current_user.last_name}".strip() or "A parent"
+        await email_service.send_circle_invitation(
+            to_email=circle_user.email,
+            to_name=contact.contact_name,
+            inviter_name=inviter_name,
+            child_name=child_name,
+            invitation_link=invite_url,
+            relationship=contact.relationship_type or "family member",
+        )
+        logger.info(f"Circle invitation email sent to {circle_user.email}")
+
         return CircleUserInviteResponse(
             id=circle_user.id,
             circle_contact_id=circle_user.circle_contact_id,
@@ -565,7 +585,20 @@ async def create_and_invite_circle_user(
         # Build invite URL
         invite_url = f"{base_url}/my-circle/accept-invite?token={circle_user.invite_token}"
 
-        # TODO: Send email with invite link
+        # Get child name for email (use first child or generic)
+        child_name = children[0].display_name if children else "your family's children"
+
+        # Send invitation email
+        inviter_name = f"{current_user.first_name} {current_user.last_name}".strip() or "A parent"
+        await email_service.send_circle_invitation(
+            to_email=invite_data.email,
+            to_name=invite_data.contact_name,
+            inviter_name=inviter_name,
+            child_name=child_name,
+            invitation_link=invite_url,
+            relationship=invite_data.relationship_type or "family member",
+        )
+        logger.info(f"Circle invitation email sent to {invite_data.email}")
 
         return CircleUserInviteResponse(
             id=circle_user.id,
@@ -583,6 +616,98 @@ async def create_and_invite_circle_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+
+
+@router.post(
+    "/circle-users/{circle_contact_id}/resend-invite",
+    response_model=CircleUserInviteResponse,
+    summary="Resend circle invitation",
+    description="Resend the invitation email to a circle contact."
+)
+async def resend_circle_invite(
+    circle_contact_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Resend an invitation email to a circle contact.
+
+    - Generates a new invite token if expired
+    - Sends a fresh invitation email
+    """
+    # Get the contact
+    contact_result = await db.execute(
+        select(CircleContact).where(CircleContact.id == circle_contact_id)
+    )
+    contact = contact_result.scalar_one_or_none()
+
+    if not contact:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Circle contact not found"
+        )
+
+    # Verify parent has access
+    await get_family_file_with_access(db, contact.family_file_id, current_user.id)
+
+    # Get the circle user
+    circle_user_result = await db.execute(
+        select(CircleUser).where(CircleUser.circle_contact_id == circle_contact_id)
+    )
+    circle_user = circle_user_result.scalar_one_or_none()
+
+    if not circle_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No invitation found for this contact. Create a new invite first."
+        )
+
+    if circle_user.invite_accepted_at:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This contact has already accepted their invitation and can log in."
+        )
+
+    # Generate new token if expired
+    if circle_user.is_invite_expired:
+        import secrets
+        circle_user.invite_token = secrets.token_urlsafe(32)
+        circle_user.invite_expires_at = datetime.utcnow() + timedelta(days=7)
+        await db.commit()
+
+    base_url = settings.FRONTEND_URL
+    invite_url = f"{base_url}/my-circle/accept-invite?token={circle_user.invite_token}"
+
+    # Get child name for email
+    children_result = await db.execute(
+        select(Child).where(Child.family_file_id == contact.family_file_id)
+    )
+    children = children_result.scalars().all()
+    child_name = children[0].display_name if children else "your family's children"
+
+    # Send invitation email
+    inviter_name = f"{current_user.first_name} {current_user.last_name}".strip() or "A parent"
+    await email_service.send_circle_invitation(
+        to_email=circle_user.email,
+        to_name=contact.contact_name,
+        inviter_name=inviter_name,
+        child_name=child_name,
+        invitation_link=invite_url,
+        relationship=contact.relationship_type or "family member",
+    )
+    logger.info(f"Circle invitation email resent to {circle_user.email}")
+
+    return CircleUserInviteResponse(
+        id=circle_user.id,
+        circle_contact_id=circle_user.circle_contact_id,
+        email=circle_user.email,
+        invite_token=circle_user.invite_token,
+        invite_url=invite_url,
+        invite_expires_at=circle_user.invite_expires_at,
+        contact_name=contact.contact_name,
+        relationship_type=contact.relationship_type,
+        room_number=contact.room_number,
+    )
 
 
 @router.post(

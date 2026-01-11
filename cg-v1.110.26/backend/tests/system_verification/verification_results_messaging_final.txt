@@ -1,0 +1,390 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.9, pytest-9.0.2, pluggy-1.6.0 -- /Users/tj/Desktop/CommonGround/mvp/backend/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/tj/Desktop/CommonGround
+plugins: anyio-4.12.0, asyncio-1.3.0, langsmith-0.5.1, cov-7.0.0
+asyncio: mode=strict, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 1 item
+
+mvp/backend/tests/system_verification/test_messaging_flow.py::test_messaging_flow_complete FAILED [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_messaging_flow_complete _________________________
+
+test_client = <httpx.AsyncClient object at 0x7f81779a69b0>
+
+    @pytest.mark.asyncio
+    async def test_messaging_flow_complete(test_client: AsyncClient):
+        """
+        End-to-End Messaging Verification Flow.
+    
+        Sequence:
+        1. Setup: Register A & B, Create Case, B Joins.
+        2. A creates a Thread.
+        3. A sends a Message to B (ARIA analysis checked implicitly or explicitly).
+        4. B lists messages and sees the new message.
+        5. B replies to the message.
+        """
+    
+        def get_headers(token):
+            return {"Authorization": f"Bearer {token}"}
+    
+        # ==========================================
+        # 1. Setup: Auth & Case
+        # ==========================================
+        # Register A
+        res = await test_client.post("/api/v1/auth/register", json={
+            "email": context.parent_a_email, "password": "Password123!",
+            "first_name": "MsgParent", "last_name": "A", "phone": "+15550000001"
+        })
+        assert res.status_code == 201
+        context.parent_a_token = res.json()["access_token"]
+        context.parent_a_id = res.json()["user"]["id"]
+    
+        # Register B
+        res = await test_client.post("/api/v1/auth/register", json={
+            "email": context.parent_b_email, "password": "Password123!",
+            "first_name": "MsgParent", "last_name": "B", "phone": "+15550000002"
+        })
+        assert res.status_code == 201
+        context.parent_b_token = res.json()["access_token"]
+        context.parent_b_id = res.json()["user"]["id"]
+    
+        # Valid Case Schema requires children and other_parent_email
+        case_data = {
+            "case_name": "Messaging Test Case",
+            "state": "CA",
+            "other_parent_email": context.parent_b_email,
+            "children": [{"first_name": "Kid", "last_name": "Msg", "date_of_birth": "2015-01-01"}]
+        }
+    
+        # A Creates Case
+        res = await test_client.post("/api/v1/cases/", json=case_data, headers=get_headers(context.parent_a_token))
+        assert res.status_code == 201
+        context.case_id = res.json()["id"]
+        invite_token = res.json()["invitation_token"]
+    
+        # B Joins Case
+        res = await test_client.post(
+            f"/api/v1/cases/{context.case_id}/accept",
+            json={"invitation_token": invite_token},
+            headers=get_headers(context.parent_b_token)
+        )
+        assert res.status_code == 200
+        print("\n[PASS] Setup Complete: Case created and both parents joined.")
+    
+        # ==========================================
+        # 2. A Analyzes Message (Preview ARIA)
+        # ==========================================
+        analyze_params = {
+            "case_id": context.case_id,
+            "content": "You are being difficult again.",
+            "use_ai": False # Use regex for speed/mock
+        }
+        res = await test_client.post(
+            "/api/v1/messages/analyze",
+            params=analyze_params,
+            headers=get_headers(context.parent_a_token)
+        )
+        assert res.status_code == 200
+        analysis = res.json()
+        assert "toxicity_score" in analysis
+        print(f"[PASS] ARIA Analysis Ran: Score={analysis['toxicity_score']}")
+    
+        # ==========================================
+        # 3. A Sends Message
+        # ==========================================
+        # Note: Threads might be optional or auto-created, but let's try sending without thread_id first
+        # or create one if there's an endpoint.
+        # Based on schemas, thread_id is optional in MessageCreate. Let's send a direct message.
+        msg_data = {
+            "case_id": context.case_id,
+            "recipient_id": context.parent_b_id,
+            "content": "Hey, can we swap weekends?",
+            "message_type": "text"
+        }
+        res = await test_client.post(
+            "/api/v1/messages/",
+            json=msg_data,
+            headers=get_headers(context.parent_a_token)
+        )
+        assert res.status_code == 201, f"Send message failed: {res.text}"
+        context.message_id = res.json()["id"]
+        print("[PASS] Message Sent by Parent A.")
+    
+        # ==========================================
+        # 4. B Lists Messages
+        # ==========================================
+        res = await test_client.get(
+            f"/api/v1/messages/case/{context.case_id}",
+            headers=get_headers(context.parent_b_token)
+        )
+        assert res.status_code == 200
+        messages = res.json()
+        assert len(messages) >= 1
+        recent_msg = messages[0]
+        assert recent_msg["content"] == "Hey, can we swap weekends?"
+        assert recent_msg["sender_id"] == context.parent_a_id
+        print("[PASS] Parent B received the message.")
+    
+        # ==========================================
+        # 5. Reply from B
+        # ==========================================
+        reply_data = {
+            "case_id": context.case_id,
+            "thread_id": context.thread_id,
+            "recipient_id": context.parent_a_id,
+            "content": "Sounds good, thanks.",
+            "message_type": "text"
+        }
+    
+        res = await test_client.post(
+            "/api/v1/messages/",
+            json=reply_data,
+            headers=get_headers(context.parent_b_token)
+        )
+        assert res.status_code == 201
+        print("[PASS] Reply sent successfully.")
+    
+        # ==========================================
+        # 6. ARIA Intervention Flow
+        # ==========================================
+        # Send a toxic message from A
+        toxic_data = {
+            "case_id": context.case_id,
+            "thread_id": context.thread_id,
+            "recipient_id": context.parent_b_id,
+            "content": "You are a stupid idiot.", # Triggers INSULT_PATTERNS
+            "message_type": "text"
+        }
+    
+>       res = await test_client.post(
+            "/api/v1/messages/",
+            json=toxic_data,
+            headers=get_headers(context.parent_a_token)
+        )
+
+mvp/backend/tests/system_verification/test_messaging_flow.py:168: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1859: in post
+    return await self.request(
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1629: in send
+    response = await self._send_handling_auth(
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_transports/asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/applications.py:1135: in __call__
+    await super().__call__(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/applications.py:107: in __call__
+    await self.middleware_stack(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/gzip.py:29: in __call__
+    await responder(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/gzip.py:130: in __call__
+    await super().__call__(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/gzip.py:46: in __call__
+    await self.app(scope, receive, self.send_with_compression)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/cors.py:85: in __call__
+    await self.app(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+mvp/backend/venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/routing.py:716: in __call__
+    await self.middleware_stack(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/routing.py:736: in app
+    await route.handle(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/routing.py:290: in handle
+    await self.app(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/routing.py:115: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+mvp/backend/venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/routing.py:101: in app
+    response = await f(request)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/routing.py:355: in app
+    raw_response = await run_endpoint_function(
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/routing.py:243: in run_endpoint_function
+    return await dependant.call(**values)
+mvp/backend/app/api/v1/endpoints/messages.py:241: in send_message
+    message_flag = MessageFlag(
+<string>:4: in __init__
+    ???
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/state.py:596: in _initialize_instance
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/state.py:594: in _initialize_instance
+    manager.original_init(*mixed[1:], **kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <MessageFlag None on 04d62ba7-fd73-45de-bfd2-33ab8f3beb45>
+kwargs = {'created_at': datetime.datetime(2025, 12, 31, 0, 20, 45, 744128), 'final_content_hash': '348d42583122edc0667a74e271784ff1b7d4b6af2c91e884ed96d513d33d268a', 'flag_type': 'toxicity_detected', 'flagged_by': 'aria_auto', ...}
+cls_ = <class 'app.models.message.MessageFlag'>, k = 'flagged_by'
+
+    def _declarative_constructor(self: Any, **kwargs: Any) -> None:
+        """A simple constructor that allows initialization from kwargs.
+    
+        Sets attributes on the constructed instance using the names and
+        values in ``kwargs``.
+    
+        Only keys that are present as
+        attributes of the instance's class are allowed. These could be,
+        for example, any mapped columns or relationships.
+        """
+        cls_ = type(self)
+        for k in kwargs:
+            if not hasattr(cls_, k):
+>               raise TypeError(
+                    "%r is an invalid keyword argument for %s" % (k, cls_.__name__)
+                )
+E               TypeError: 'flagged_by' is an invalid keyword argument for MessageFlag
+
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/decl_base.py:2179: TypeError
+----------------------------- Captured stdout call -----------------------------
+
+============================================================
+📧 EMAIL (Development Mode - Not Sent)
+============================================================
+To: msg_parent_b_f1a515f4@example.com
+From: CommonGround <noreply@commonground.app>
+Subject: MsgParent A invited you to collaborate on Messaging Test Case
+============================================================
+
+
+[PASS] Setup Complete: Case created and both parents joined.
+[PASS] ARIA Analysis Ran: Score=0.0
+WebSocket broadcast failed: 'ConnectionManager' object has no attribute 'send_message'
+[PASS] Message Sent by Parent A.
+[PASS] Parent B received the message.
+WebSocket broadcast failed: 'ConnectionManager' object has no attribute 'send_message'
+[PASS] Reply sent successfully.
+=============================== warnings summary ===============================
+mvp/backend/app/schemas/auth.py:78
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/auth.py:78: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UserResponse(BaseModel):
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:72
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:72: DeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85: DeprecationWarning: 'escChar' argument is deprecated, use 'esc_char'
+    quoted_identifier = QuotedString('"', escChar="\\", unquoteResults=True)
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85: DeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    quoted_identifier = QuotedString('"', escChar="\\", unquoteResults=True)
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:366
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:366: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, data: TableMetadataV1) -> TableMetadataV1:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:495
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:495: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_schemas(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:499
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:499: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_partition_specs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:503
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:503: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_sort_orders(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:507
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:507: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:539
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:539: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_schemas(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:543
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:543: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_partition_specs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:547
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:547: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_sort_orders(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:551
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:551: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/app/schemas/user.py:7
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/user.py:7: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UserProfileResponse(BaseModel):
+
+mvp/backend/app/schemas/case.py:15
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/case.py:15: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    children: list[dict] = Field(..., min_items=1, max_items=20)
+
+mvp/backend/app/schemas/case.py:15
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/case.py:15: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    children: list[dict] = Field(..., min_items=1, max_items=20)
+
+mvp/backend/app/schemas/case.py:77
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/case.py:77: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class CaseResponse(BaseModel):
+
+mvp/backend/app/schemas/agreement.py:25
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/agreement.py:25: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class AgreementResponse(BaseModel):
+
+mvp/backend/app/schemas/agreement.py:44
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/agreement.py:44: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class AgreementSectionResponse(BaseModel):
+
+mvp/backend/app/schemas/message.py:108
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:108: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class MessageFlagResponse(BaseModel):
+
+mvp/backend/app/schemas/message.py:125
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:125: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class MessageResponse(BaseModel):
+
+mvp/backend/app/schemas/message.py:157
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:157: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    participants: List[str] = Field(..., min_items=2, max_items=10)
+
+mvp/backend/app/schemas/message.py:157
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:157: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    participants: List[str] = Field(..., min_items=2, max_items=10)
+
+mvp/backend/app/schemas/message.py:184
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:184: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ThreadResponse(BaseModel):
+
+mvp/backend/app/api/v1/endpoints/messages.py:43
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/api/v1/endpoints/messages.py:43: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    ai_provider: str = Query(default="claude", regex="^(claude|openai|regex)$"),
+
+mvp/backend/app/schemas/schedule.py:41
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/schedule.py:41: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ScheduleEventResponse(BaseModel):
+
+mvp/backend/app/schemas/schedule.py:83
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/schedule.py:83: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ExchangeCheckInResponse(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED mvp/backend/tests/system_verification/test_messaging_flow.py::test_messaging_flow_complete
+======================== 1 failed, 27 warnings in 9.71s ========================

@@ -82,3 +82,5 @@ out/
 
 # Alembic
 # Keep alembic/ folder but ignore specific generated files if needed
+.vercel
+.env*.local

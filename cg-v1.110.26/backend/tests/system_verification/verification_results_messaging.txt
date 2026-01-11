@@ -1,0 +1,566 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.9, pytest-9.0.2, pluggy-1.6.0 -- /Users/tj/Desktop/CommonGround/mvp/backend/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/tj/Desktop/CommonGround
+plugins: anyio-4.12.0, asyncio-1.3.0, langsmith-0.5.1, cov-7.0.0
+asyncio: mode=strict, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 1 item
+
+mvp/backend/tests/system_verification/test_messaging_flow.py::test_messaging_flow_complete FAILED [100%]
+
+=================================== FAILURES ===================================
+_________________________ test_messaging_flow_complete _________________________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fcc3a43d4e0>
+dialect = <sqlalchemy.dialects.sqlite.aiosqlite.SQLiteDialect_aiosqlite object at 0x7fcc3a213700>
+context = <sqlalchemy.dialects.sqlite.aiosqlite.SQLiteExecutionContext_aiosqlite object at 0x7fcc3a9a0d30>
+statement = <sqlalchemy.dialects.sqlite.base.SQLiteCompiler object at 0x7fcc3a9a3ca0>
+parameters = [('f62ca694-c09e-4803-9bfe-d1d3009c9f1e', None, '90eb2e37-71e2-4f01-af56-e0e1dc0ced5a', '44d91f8f-bcab-4aa2-aa3a-bc8497d3ff49', 'Hey, can we swap weekends?', None, ...)]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Any]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        if self._has_events or self.engine._has_events:
+            for fn in self.dispatch.before_cursor_execute:
+                str_statement, effective_parameters = fn(
+                    self,
+                    cursor,
+                    str_statement,
+                    effective_parameters,
+                    context,
+                    context.executemany,
+                )
+    
+        if self._echo:
+            self._log_info(str_statement)
+    
+            stats = context._get_cache_stats()
+    
+            if not self.engine.hide_parameters:
+                self._log_info(
+                    "[%s] %r",
+                    stats,
+                    sql_util._repr_params(
+                        effective_parameters,
+                        batches=10,
+                        ismulti=context.executemany,
+                    ),
+                )
+            else:
+                self._log_info(
+                    "[%s] [SQL parameters hidden due to hide_parameters=True]",
+                    stats,
+                )
+    
+        evt_handled: bool = False
+        try:
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1967: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:180: in execute
+    self._adapt_connection._handle_exception(error)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:340: in _handle_exception
+    raise error
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:162: in execute
+    self.await_(_cursor.execute(operation, parameters))
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/aiosqlite/cursor.py:40: in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+mvp/backend/venv/lib/python3.10/site-packages/aiosqlite/cursor.py:32: in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+mvp/backend/venv/lib/python3.10/site-packages/aiosqlite/core.py:160: in _execute
+    return await future
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: in __wakeup
+    future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tx = <_queue.SimpleQueue object at 0x7fcc3a2cd440>
+
+    def _connection_worker_thread(tx: _TxQueue):
+        """
+        Execute function calls on a separate thread.
+    
+        :meta private:
+        """
+        while True:
+            # Continues running until all queue items are processed,
+            # even after connection is closed (so we can finalize all
+            # futures)
+    
+            future, function = tx.get()
+    
+            try:
+                LOG.debug("executing %s", function)
+>               result = function()
+E               sqlite3.IntegrityError: NOT NULL constraint failed: messages.content_hash
+
+mvp/backend/venv/lib/python3.10/site-packages/aiosqlite/core.py:63: IntegrityError
+
+The above exception was the direct cause of the following exception:
+
+test_client = <httpx.AsyncClient object at 0x7fcc3a2853f0>
+
+    @pytest.mark.asyncio
+    async def test_messaging_flow_complete(test_client: AsyncClient):
+        """
+        End-to-End Messaging Verification Flow.
+    
+        Sequence:
+        1. Setup: Register A & B, Create Case, B Joins.
+        2. A creates a Thread.
+        3. A sends a Message to B (ARIA analysis checked implicitly or explicitly).
+        4. B lists messages and sees the new message.
+        5. B replies to the message.
+        """
+    
+        def get_headers(token):
+            return {"Authorization": f"Bearer {token}"}
+    
+        # ==========================================
+        # 1. Setup: Auth & Case
+        # ==========================================
+        # Register A
+        res = await test_client.post("/api/v1/auth/register", json={
+            "email": context.parent_a_email, "password": "Password123!",
+            "first_name": "MsgParent", "last_name": "A", "phone": "+15550000001"
+        })
+        assert res.status_code == 201
+        context.parent_a_token = res.json()["access_token"]
+        context.parent_a_id = res.json()["user"]["id"]
+    
+        # Register B
+        res = await test_client.post("/api/v1/auth/register", json={
+            "email": context.parent_b_email, "password": "Password123!",
+            "first_name": "MsgParent", "last_name": "B", "phone": "+15550000002"
+        })
+        assert res.status_code == 201
+        context.parent_b_token = res.json()["access_token"]
+        context.parent_b_id = res.json()["user"]["id"]
+    
+        # Valid Case Schema requires children and other_parent_email
+        case_data = {
+            "case_name": "Messaging Test Case",
+            "state": "CA",
+            "other_parent_email": context.parent_b_email,
+            "children": [{"first_name": "Kid", "last_name": "Msg", "date_of_birth": "2015-01-01"}]
+        }
+    
+        # A Creates Case
+        res = await test_client.post("/api/v1/cases/", json=case_data, headers=get_headers(context.parent_a_token))
+        assert res.status_code == 201
+        context.case_id = res.json()["id"]
+        invite_token = res.json()["invitation_token"]
+    
+        # B Joins Case
+        res = await test_client.post(
+            f"/api/v1/cases/{context.case_id}/accept",
+            json={"invitation_token": invite_token},
+            headers=get_headers(context.parent_b_token)
+        )
+        assert res.status_code == 200
+        print("\n[PASS] Setup Complete: Case created and both parents joined.")
+    
+        # ==========================================
+        # 2. A Analyzes Message (Preview ARIA)
+        # ==========================================
+        analyze_params = {
+            "case_id": context.case_id,
+            "content": "You are being difficult again.",
+            "use_ai": False # Use regex for speed/mock
+        }
+        res = await test_client.post(
+            "/api/v1/messages/analyze",
+            params=analyze_params,
+            headers=get_headers(context.parent_a_token)
+        )
+        assert res.status_code == 200
+        analysis = res.json()
+        assert "toxicity_score" in analysis
+        print(f"[PASS] ARIA Analysis Ran: Score={analysis['toxicity_score']}")
+    
+        # ==========================================
+        # 3. A Sends Message
+        # ==========================================
+        # Note: Threads might be optional or auto-created, but let's try sending without thread_id first
+        # or create one if there's an endpoint.
+        # Based on schemas, thread_id is optional in MessageCreate. Let's send a direct message.
+        msg_data = {
+            "case_id": context.case_id,
+            "recipient_id": context.parent_b_id,
+            "content": "Hey, can we swap weekends?",
+            "message_type": "text"
+        }
+>       res = await test_client.post(
+            "/api/v1/messages/",
+            json=msg_data,
+            headers=get_headers(context.parent_a_token)
+        )
+
+mvp/backend/tests/system_verification/test_messaging_flow.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1859: in post
+    return await self.request(
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1540: in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1629: in send
+    response = await self._send_handling_auth(
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1657: in _send_handling_auth
+    response = await self._send_handling_redirects(
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1694: in _send_handling_redirects
+    response = await self._send_single_request(request)
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_client.py:1730: in _send_single_request
+    response = await transport.handle_async_request(request)
+mvp/backend/venv/lib/python3.10/site-packages/httpx/_transports/asgi.py:170: in handle_async_request
+    await self.app(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/applications.py:1135: in __call__
+    await super().__call__(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/applications.py:107: in __call__
+    await self.middleware_stack(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/gzip.py:29: in __call__
+    await responder(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/gzip.py:130: in __call__
+    await super().__call__(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/gzip.py:46: in __call__
+    await self.app(scope, receive, self.send_with_compression)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/cors.py:85: in __call__
+    await self.app(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+mvp/backend/venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/routing.py:716: in __call__
+    await self.middleware_stack(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/routing.py:736: in app
+    await route.handle(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/routing.py:290: in handle
+    await self.app(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/routing.py:115: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+mvp/backend/venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+mvp/backend/venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/routing.py:101: in app
+    response = await f(request)
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/routing.py:355: in app
+    raw_response = await run_endpoint_function(
+mvp/backend/venv/lib/python3.10/site-packages/fastapi/routing.py:243: in run_endpoint_function
+    return await dependant.call(**values)
+mvp/backend/app/api/v1/endpoints/messages.py:251: in send_message
+    await db.commit()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/session.py:1000: in commit
+    await greenlet_spawn(self.sync_session.commit)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:203: in greenlet_spawn
+    result = context.switch(value)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py:2030: in commit
+    trans.commit(_to_root=True)
+<string>:2: in commit
+    ???
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py:1311: in commit
+    self._prepare_impl()
+<string>:2: in _prepare_impl
+    ???
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/state_changes.py:137: in _go
+    ret_value = fn(self, *arg, **kw)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py:1286: in _prepare_impl
+    self.session.flush()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py:4331: in flush
+    self._flush(objects)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py:4466: in _flush
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/session.py:4427: in _flush
+    flush_context.execute()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/unitofwork.py:466: in execute
+    rec.execute(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/unitofwork.py:642: in execute
+    util.preloaded.orm_persistence.save_obj(
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/persistence.py:93: in save_obj
+    _emit_insert_statements(
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/orm/persistence.py:1048: in _emit_insert_statements
+    result = connection.execute(
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1419: in execute
+    return meth(
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/sql/elements.py:527: in _execute_on_connection
+    return connection._execute_clauseelement(
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1641: in _execute_clauseelement
+    ret = self._execute_context(
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1846: in _execute_context
+    return self._exec_single_context(
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1986: in _exec_single_context
+    self._handle_dbapi_exception(
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:2363: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:1967: in _exec_single_context
+    self.dialect.do_execute(
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:952: in do_execute
+    cursor.execute(statement, parameters)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:180: in execute
+    self._adapt_connection._handle_exception(error)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:340: in _handle_exception
+    raise error
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py:162: in execute
+    self.await_(_cursor.execute(operation, parameters))
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/aiosqlite/cursor.py:40: in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+mvp/backend/venv/lib/python3.10/site-packages/aiosqlite/cursor.py:32: in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+mvp/backend/venv/lib/python3.10/site-packages/aiosqlite/core.py:160: in _execute
+    return await future
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: in __wakeup
+    future.result()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tx = <_queue.SimpleQueue object at 0x7fcc3a2cd440>
+
+    def _connection_worker_thread(tx: _TxQueue):
+        """
+        Execute function calls on a separate thread.
+    
+        :meta private:
+        """
+        while True:
+            # Continues running until all queue items are processed,
+            # even after connection is closed (so we can finalize all
+            # futures)
+    
+            future, function = tx.get()
+    
+            try:
+                LOG.debug("executing %s", function)
+>               result = function()
+E               sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: messages.content_hash
+E               [SQL: INSERT INTO messages (case_id, thread_id, sender_id, recipient_id, content, content_hash, message_type, has_attachments, sent_at, delivered_at, read_at, is_hidden_by_sender, is_hidden_by_recipient, is_starred_by_sender, is_starred_by_recipient, was_flagged, original_content, id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]
+E               [parameters: ('f62ca694-c09e-4803-9bfe-d1d3009c9f1e', None, '90eb2e37-71e2-4f01-af56-e0e1dc0ced5a', '44d91f8f-bcab-4aa2-aa3a-bc8497d3ff49', 'Hey, can we swap weekends?', None, 'text', 0, '2025-12-31 00:15:26.394203', None, None, 0, 0, 0, 0, 0, None, '2ee58d12-36ba-4241-9cc2-03864bd2531f', '2025-12-31 00:15:26.398706', '2025-12-31 00:15:26.398712')]
+E               (Background on this error at: https://sqlalche.me/e/20/gkpj)
+
+mvp/backend/venv/lib/python3.10/site-packages/aiosqlite/core.py:63: IntegrityError
+----------------------------- Captured stdout call -----------------------------
+
+============================================================
+📧 EMAIL (Development Mode - Not Sent)
+============================================================
+To: msg_parent_b_ddf638b9@example.com
+From: CommonGround <noreply@commonground.app>
+Subject: MsgParent A invited you to collaborate on Messaging Test Case
+============================================================
+
+
+[PASS] Setup Complete: Case created and both parents joined.
+[PASS] ARIA Analysis Ran: Score=0.0
+=============================== warnings summary ===============================
+mvp/backend/app/schemas/auth.py:78
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/auth.py:78: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UserResponse(BaseModel):
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:72
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:72: DeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85: DeprecationWarning: 'escChar' argument is deprecated, use 'esc_char'
+    quoted_identifier = QuotedString('"', escChar="\\", unquoteResults=True)
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85: DeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    quoted_identifier = QuotedString('"', escChar="\\", unquoteResults=True)
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:366
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:366: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, data: TableMetadataV1) -> TableMetadataV1:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:495
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:495: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_schemas(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:499
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:499: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_partition_specs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:503
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:503: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_sort_orders(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:507
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:507: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:539
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:539: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_schemas(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:543
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:543: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_partition_specs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:547
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:547: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_sort_orders(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:551
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:551: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/app/schemas/user.py:7
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/user.py:7: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UserProfileResponse(BaseModel):
+
+mvp/backend/app/schemas/case.py:15
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/case.py:15: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    children: list[dict] = Field(..., min_items=1, max_items=20)
+
+mvp/backend/app/schemas/case.py:15
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/case.py:15: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    children: list[dict] = Field(..., min_items=1, max_items=20)
+
+mvp/backend/app/schemas/case.py:77
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/case.py:77: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class CaseResponse(BaseModel):
+
+mvp/backend/app/schemas/agreement.py:25
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/agreement.py:25: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class AgreementResponse(BaseModel):
+
+mvp/backend/app/schemas/agreement.py:44
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/agreement.py:44: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class AgreementSectionResponse(BaseModel):
+
+mvp/backend/app/schemas/message.py:108
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:108: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class MessageFlagResponse(BaseModel):
+
+mvp/backend/app/schemas/message.py:125
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:125: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class MessageResponse(BaseModel):
+
+mvp/backend/app/schemas/message.py:157
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:157: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    participants: List[str] = Field(..., min_items=2, max_items=10)
+
+mvp/backend/app/schemas/message.py:157
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:157: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    participants: List[str] = Field(..., min_items=2, max_items=10)
+
+mvp/backend/app/schemas/message.py:184
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:184: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ThreadResponse(BaseModel):
+
+mvp/backend/app/api/v1/endpoints/messages.py:42
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/api/v1/endpoints/messages.py:42: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    ai_provider: str = Query(default="claude", regex="^(claude|openai|regex)$"),
+
+mvp/backend/app/schemas/schedule.py:41
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/schedule.py:41: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ScheduleEventResponse(BaseModel):
+
+mvp/backend/app/schemas/schedule.py:83
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/schedule.py:83: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ExchangeCheckInResponse(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED mvp/backend/tests/system_verification/test_messaging_flow.py::test_messaging_flow_complete
+======================== 1 failed, 27 warnings in 4.13s ========================
