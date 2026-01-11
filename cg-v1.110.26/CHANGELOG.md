@@ -5,6 +5,44 @@ All notable changes to CommonGround will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2025-01-11
+
+### Added
+
+#### ClearFund Stripe Payment Integration
+- **Obligation Card Payments** - Pay obligations directly with credit/debit card via Stripe
+- **Stripe Elements Integration** - CardElement with real-time validation and error handling
+- **3D Secure Support** - Automatic handling of 3D Secure authentication when required
+- **Payment Source Selection** - Choose between wallet balance (no fees) or card (2.9% + $0.30)
+- **Dynamic Fee Calculation** - Real-time fee display for card payments
+- **Payment Method Creation** - Creates Stripe PaymentMethod before processing
+
+#### Parent Wallet Enhancements
+- **Wallet Balance Display** - Shows available balance for obligation payments
+- **Insufficient Balance Warning** - Clear indication when wallet balance is insufficient
+- **No-Fee Wallet Payments** - Wallet payments bypass card processing fees
+
+#### Room Number Tracking
+- **CircleContactResponse** - Added `room_number` field to schema for direct room lookup
+- **CircleContact Interface** - Added `room_number` to frontend TypeScript interface
+- **Auto Room Assignment** - Contacts created via invite are automatically assigned to available rooms (3-10)
+
+### Changed
+
+#### My Circle Page Refactor
+- **Simplified Contacts View** - Removed tabs system, contacts now display directly with room info
+- **Room Info on Contact Cards** - Each contact card shows assigned room number and name
+- **Edit Button Integration** - Edit button now opens permission modal directly
+- **Invite Link Enhancement** - Link icon copies login URL to clipboard with email pre-filled
+- **Login URL Fix** - Changed from broken `/my-circle/login?contact=...` to `/my-circle/contact?email=...`
+- **Email Pre-fill** - Circle contact login page pre-fills email from URL parameter
+
+### Fixed
+- **Suspense Boundary** - Added Suspense wrapper for useSearchParams on circle contact login page (Next.js requirement)
+- **Room Lookup Logic** - Changed from name-based matching to direct room_number lookup for reliability
+
+---
+
 ## [1.1.1] - 2025-01-10
 
 ### Added
@@ -319,6 +357,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.1.2 | 2025-01-11 | Stripe obligation payments, My Circle refactor, room tracking |
 | 1.1.1 | 2025-01-10 | My Circle email invitations, KidComs notification fix |
 | 1.1.0 | 2025-01-10 | KidComs video calling, My Circle, Activity Feed |
 | 1.0.0 | 2025-01-05 | ARIA enhancements, Family File invitations, Marketing pages |

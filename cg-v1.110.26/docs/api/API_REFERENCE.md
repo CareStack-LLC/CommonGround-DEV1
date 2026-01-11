@@ -1,7 +1,7 @@
 # CommonGround V1 - Complete API Reference
 
-**Last Updated:** January 10, 2026
-**API Version:** 1.0.0
+**Last Updated:** January 11, 2026
+**API Version:** 1.1.2
 **Base URL:** `https://api.commonground.app/api/v1`
 **Local Development:** `http://localhost:8000/api/v1`
 
@@ -22,6 +22,7 @@
    - [ARIA](#aria-endpoints)
    - [Agreements](#agreements-endpoints)
    - [ClearFund](#clearfund-endpoints)
+   - [Wallet](#wallet-endpoints-v112)
    - [Schedule](#schedule-endpoints)
    - [Exchanges](#exchanges-endpoints)
    - [KidComs](#kidcoms-endpoints)
@@ -1573,6 +1574,81 @@ Get full transaction ledger.
 
 ---
 
+### Wallet Endpoints (v1.1.2)
+
+#### GET /wallets/me
+Get current user's wallet.
+
+**Response (200):**
+```json
+{
+  "data": {
+    "id": "wallet-uuid",
+    "user_id": "user-uuid",
+    "available_balance": "500.00",
+    "pending_balance": "0.00",
+    "currency": "usd",
+    "onboarding_completed": true
+  }
+}
+```
+
+---
+
+#### POST /wallets/pay-obligation
+Pay an obligation from wallet or card.
+
+**Request:**
+```json
+{
+  "obligation_id": "obligation-uuid",
+  "amount": 150.00,
+  "payment_source": "card",
+  "payment_method_id": "pm_xxx"
+}
+```
+
+**Payment Sources:**
+- `wallet` - Pay from wallet balance (no fees)
+- `card` - Pay with credit/debit card (2.9% + $0.30 fee)
+
+**Response (200):**
+```json
+{
+  "data": {
+    "id": "payment-uuid",
+    "obligation_id": "obligation-uuid",
+    "payer_id": "user-uuid",
+    "amount": "150.00",
+    "payment_source": "card",
+    "status": "completed",
+    "wallet_transaction_id": null,
+    "stripe_payment_intent_id": "pi_xxx",
+    "requires_action": false,
+    "client_secret": null,
+    "created_at": "2026-01-11T12:00:00Z",
+    "completed_at": "2026-01-11T12:00:01Z"
+  }
+}
+```
+
+**3D Secure Response (200):**
+When 3D Secure authentication is required:
+```json
+{
+  "data": {
+    "id": "payment-uuid",
+    "status": "pending",
+    "requires_action": true,
+    "client_secret": "pi_xxx_secret_xxx"
+  }
+}
+```
+
+> **v1.1.2:** Added `requires_action` and `client_secret` fields for 3D Secure support
+
+---
+
 ### Schedule Endpoints
 
 #### POST /schedule/events
@@ -2014,11 +2090,14 @@ List circle contacts.
       "email": "mary@example.com",
       "permission_level": "emergency",
       "can_use_kidcoms": true,
-      "approved_by_both": true
+      "approved_by_both": true,
+      "room_number": 3
     }
   ]
 }
 ```
+
+> **v1.1.2:** Added `room_number` field for direct room assignment tracking
 
 ---
 

@@ -5,6 +5,28 @@ All notable changes to the CommonGround Backend API will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2025-01-11
+
+### Added
+
+#### ClearFund Stripe Payment Integration
+- **Card Payment for Obligations** - `POST /api/v1/wallets/pay-obligation` now accepts `payment_method_id` for card payments
+- **3D Secure Support** - Returns `requires_action` and `client_secret` when additional authentication needed
+- **ObligationPaymentResponse** - Enhanced response schema with 3D Secure fields:
+  - `client_secret: Optional[str]` - For Stripe confirmCardPayment
+  - `requires_action: bool` - Indicates if 3D Secure confirmation required
+
+#### Room Number Tracking
+- **CircleContactResponse Schema** - Added `room_number: Optional[int]` field for direct room assignment tracking
+- **Room Assignment in Responses** - Circle contacts now include their assigned room number in API responses
+
+### Changed
+- Room lookup now uses `room_number` field directly instead of name-based matching
+- `create-and-invite` endpoint continues to auto-assign rooms (3-10) to new contacts
+- Obligation payment endpoint supports both wallet and card payment sources
+
+---
+
 ## [1.1.1] - 2025-01-10
 
 ### Added
@@ -451,6 +473,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Endpoints | Models | Key Features |
 |---------|-----------|--------|--------------|
+| 1.1.2 | 122+ | 35+ | Room tracking, Stripe obligation payments |
 | 1.1.1 | 121+ | 35+ | Circle email invites, KidComs fix |
 | 1.1.0 | 120+ | 35+ | KidComs, My Circle, Activities |
 | 1.0.0 | 100+ | 32+ | ARIA enhancements, Family invites |

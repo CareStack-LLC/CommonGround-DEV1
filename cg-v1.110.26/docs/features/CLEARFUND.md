@@ -1,7 +1,7 @@
 # ClearFund - Purpose-Locked Financial Obligations System
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
+**Last Updated:** January 11, 2026
+**Version:** 1.1.0
 **Module:** Financial Tracking & Expense Management
 
 ---
@@ -1273,7 +1273,67 @@ components/
 │   ├── LedgerView.tsx            // Transaction history
 │   ├── BalanceSummary.tsx        // Who owes whom
 │   └── ComplianceChart.tsx       // Compliance visualization
+├── wallet/
+│   ├── PayObligationModal.tsx    // Stripe payment modal (v1.1.2)
+│   ├── DepositForm.tsx           // Wallet deposit with Stripe
+│   ├── WalletBalanceCard.tsx     // Balance display
+│   └── TransactionList.tsx       // Transaction history
 ```
+
+### Pay Obligation Modal (v1.1.2)
+
+The PayObligationModal provides a seamless payment experience with two funding sources:
+
+```typescript
+// components/wallet/pay-obligation-modal.tsx
+interface PayObligationModalProps {
+  obligation: Obligation;
+  wallet: WalletWithBalance | null;
+  userShare: number;        // Amount this user owes
+  onSuccess?: () => void;
+  onClose: () => void;
+}
+
+// Payment Sources:
+// 1. Wallet Balance - No processing fees
+// 2. Credit/Debit Card - 2.9% + $0.30 fee (via Stripe)
+```
+
+**Key Features:**
+- **Stripe Elements Integration** - Secure card input with real-time validation
+- **3D Secure Support** - Automatic handling when additional authentication required
+- **Fee Transparency** - Shows card processing fees before confirmation
+- **Wallet Priority** - Defaults to wallet if balance sufficient
+
+**Payment Flow:**
+```typescript
+// 1. Select payment source (wallet or card)
+// 2. For card: Create PaymentMethod via Stripe
+const { paymentMethod } = await stripe.createPaymentMethod({
+  type: 'card',
+  card: cardElement,
+});
+
+// 3. Call backend API
+const result = await walletAPI.payObligation({
+  obligation_id: obligation.id,
+  amount: paymentAmount,
+  payment_source: paymentSource,
+  payment_method_id: paymentMethod?.id,
+});
+
+// 4. Handle 3D Secure if required
+if (result.requires_action && result.client_secret) {
+  await stripe.confirmCardPayment(result.client_secret);
+}
+```
+
+**Test Cards:**
+| Card Number | Scenario |
+|-------------|----------|
+| 4242 4242 4242 4242 | Success |
+| 4000 0025 0000 3155 | 3D Secure Required |
+| 4000 0000 0000 0002 | Declined |
 
 ### API Client Functions
 

@@ -1,7 +1,7 @@
 # KidComs - Child Communication System
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
+**Last Updated:** January 11, 2026
+**Version:** 1.1.0
 **Status:** Production Ready
 
 ---
@@ -361,6 +361,41 @@ class CircleUser(Base):
     invite_accepted_at: Optional[datetime]
     email_verified: bool
     last_login: Optional[datetime]
+```
+
+### Circle Contact Room Assignment (v1.1.2)
+
+Each circle contact is assigned a dedicated room (3-10) for video/voice calls:
+
+```python
+class CircleContact(Base):
+    # ... other fields
+    room_number: Optional[int]  # Assigned room (3-10)
+```
+
+**Room Allocation:**
+- Rooms 1-2: Reserved for parents
+- Rooms 3-10: Available for circle contacts
+- Auto-assigned on invite creation via `create-and-invite` endpoint
+
+**Login Flow:**
+```
+1. Parent invites contact via My Circle
+2. System auto-assigns available room (3-10)
+3. Email sent with login link: /my-circle/contact?email={email}
+4. Contact visits login page (email pre-filled from URL)
+5. After login, contact accesses their dedicated room
+```
+
+**Frontend Integration:**
+```typescript
+// Login URL with email pre-fill
+const loginUrl = `/my-circle/contact?email=${encodeURIComponent(contact.contact_email)}`;
+
+// Room lookup via room_number
+const contactRoom = contact.room_number
+  ? rooms.find((room) => room.room_number === contact.room_number)
+  : undefined;
 ```
 
 ---
