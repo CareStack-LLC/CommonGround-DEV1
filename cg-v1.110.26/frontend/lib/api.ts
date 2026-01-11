@@ -6167,6 +6167,15 @@ export const walletAPI = {
   },
 
   /**
+   * Sync wallet with Stripe account status
+   */
+  async syncWallet(walletId: string): Promise<WalletWithBalance> {
+    return fetchAPI<WalletWithBalance>(`/wallets/${walletId}/sync`, {
+      method: 'POST',
+    });
+  },
+
+  /**
    * Get wallet balance
    */
   async getBalance(walletId: string): Promise<WalletBalance> {
