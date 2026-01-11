@@ -8,7 +8,6 @@ import {
   MessageSquare,
   Calendar,
   Wallet,
-  Video,
   Menu,
   X,
   Settings,
@@ -16,7 +15,6 @@ import {
   LogOut,
   ChevronDown,
   Bell,
-  User,
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -38,7 +36,7 @@ const navItems: NavItem[] = [
   { name: 'Chat', path: '/messages', icon: MessageSquare },
   { name: 'Calendar', path: '/schedule', icon: Calendar },
   { name: 'Clearfund', path: '/payments', icon: Wallet },
-  { name: 'KidComs', path: '/kidcoms', icon: Video },
+  { name: 'Files', path: '/family-files', icon: FolderHeart },
 ];
 
 // Logo component
@@ -144,19 +142,6 @@ export function Navigation() {
                   </button>
                 );
               })}
-
-              {/* Family Files - Desktop only */}
-              <button
-                onClick={() => handleNavigation('/family-files')}
-                className={`nav-item ${
-                  pathname === '/family-files' || pathname?.startsWith('/family-files/')
-                    ? 'active'
-                    : ''
-                }`}
-              >
-                <FolderHeart className="h-4 w-4" />
-                Family Files
-              </button>
             </nav>
 
             {/* Right Side Actions */}
