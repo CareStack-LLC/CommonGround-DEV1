@@ -4982,6 +4982,16 @@ export interface PendingAgreement {
   submitted_by_name?: string;
 }
 
+export interface ActiveQuickAccord {
+  id: string;
+  title: string;
+  purpose_category: string;
+  event_date?: string;
+  start_date?: string;
+  end_date?: string;
+  activated_at?: string;
+}
+
 export interface CourtNotification {
   id: string;
   message_type: string;  // "notice", "reminder", "order", "general"
@@ -5036,6 +5046,9 @@ export interface DashboardSummary {
   sender_name?: string;
   pending_agreements_count: number;
   pending_agreements: PendingAgreement[];
+  // Active QuickAccords awaiting completion tracking
+  active_quick_accords_count: number;
+  active_quick_accords: ActiveQuickAccord[];
   unread_court_count: number;
   court_notifications: CourtNotification[];
   upcoming_events: UpcomingEvent[];

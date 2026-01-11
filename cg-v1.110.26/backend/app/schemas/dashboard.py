@@ -37,6 +37,17 @@ class PendingAgreement(BaseModel):
     submitted_by_name: Optional[str] = None
 
 
+class ActiveQuickAccord(BaseModel):
+    """Active QuickAccord awaiting completion tracking."""
+    id: str
+    title: str
+    purpose_category: str
+    event_date: Optional[datetime] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    activated_at: Optional[datetime] = None
+
+
 class CourtNotification(BaseModel):
     """Unread court message/notification."""
     id: str
@@ -91,6 +102,10 @@ class DashboardSummary(BaseModel):
     # Agreement approvals
     pending_agreements_count: int = 0
     pending_agreements: List[PendingAgreement] = []
+
+    # Active QuickAccords (awaiting completion tracking)
+    active_quick_accords_count: int = 0
+    active_quick_accords: List[ActiveQuickAccord] = []
 
     # Court notifications
     unread_court_count: int = 0

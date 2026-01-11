@@ -1064,6 +1064,28 @@ function DashboardContent() {
                   );
                 })()}
 
+                {/* Active QuickAccords - Awaiting Completion */}
+                {(() => {
+                  const activeAccords = dashboardSummary?.active_quick_accords || [];
+                  if (activeAccords.length === 0) return null;
+                  const familyFileId = activeFileIdsRef.current[0];
+                  const count = activeAccords.length;
+                  return (
+                    <ActionStreamItem
+                      icon={CheckCircle}
+                      iconBg="bg-cg-sage-subtle"
+                      iconColor="text-cg-sage"
+                      title="QuickAccord Active"
+                      subtitle={
+                        count === 1
+                          ? `"${activeAccords[0].title}" - mark as completed when done`
+                          : `${count} QuickAccords ready for completion tracking`
+                      }
+                      onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${activeAccords[0].id}`)}
+                    />
+                  );
+                })()}
+
                 {/* Court Notifications */}
                 {(dashboardSummary?.unread_court_count ?? 0) > 0 && (
                   <ActionStreamItem

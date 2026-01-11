@@ -23,6 +23,7 @@ from app.schemas.dashboard import (
     PendingExpense,
     UnreadMessage,
     PendingAgreement,
+    ActiveQuickAccord,
     CourtNotification,
     UpcomingEvent,
     RecentActivity,
@@ -65,6 +66,9 @@ class DashboardService:
         agreements_count, agreements = await DashboardService._get_pending_agreements(
             db, family_file_id, user, is_parent_a
         )
+        active_qa_count, active_quick_accords = await DashboardService._get_active_quick_accords(
+            db, family_file_id
+        )
         court_count, court_notifications = await DashboardService._get_court_notifications(
             db, family_file, user, is_parent_a
         )
@@ -102,6 +106,8 @@ class DashboardService:
             sender_name=sender_name,
             pending_agreements_count=agreements_count,
             pending_agreements=agreements,
+            active_quick_accords_count=active_qa_count,
+            active_quick_accords=active_quick_accords,
             unread_court_count=court_count,
             court_notifications=court_notifications,
             upcoming_events=events,
@@ -336,6 +342,36 @@ class DashboardService:
                 status=qa.status,
                 submitted_at=qa.updated_at,
                 submitted_by_name=initiator_name,
+            ))
+
+        return len(items), items
+
+    @staticmethod
+    async def _get_active_quick_accords(
+        db: AsyncSession,
+        family_file_id: str
+    ) -> Tuple[int, List[ActiveQuickAccord]]:
+        """Get active QuickAccords awaiting completion tracking."""
+        result = await db.execute(
+            select(QuickAccord).where(
+                and_(
+                    QuickAccord.family_file_id == family_file_id,
+                    QuickAccord.status == "active"
+                )
+            ).order_by(desc(QuickAccord.updated_at)).limit(5)
+        )
+        quick_accords = result.scalars().all()
+
+        items = []
+        for qa in quick_accords:
+            items.append(ActiveQuickAccord(
+                id=str(qa.id),
+                title=qa.title,
+                purpose_category=qa.purpose_category,
+                event_date=qa.event_date,
+                start_date=qa.start_date,
+                end_date=qa.end_date,
+                activated_at=qa.updated_at,
             ))
 
         return len(items), items
