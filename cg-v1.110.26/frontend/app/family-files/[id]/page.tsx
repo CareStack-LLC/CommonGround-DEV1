@@ -331,36 +331,6 @@ function FamilyFileDetailContent() {
                   </div>
                 </button>
 
-                <button
-                  onClick={() => router.push(`/family-files/${id}/my-circle`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-border transition-all text-left group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                    <Heart className="h-5 w-5 text-teal-600" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-foreground">My Circle</div>
-                    <div className="text-sm text-muted-foreground">
-                      Manage trusted contacts
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => router.push(`/wallet?familyFileId=${id}`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-border transition-all text-left group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                    <Wallet className="h-5 w-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-foreground">Wallet</div>
-                    <div className="text-sm text-muted-foreground">
-                      Manage payments & child savings
-                    </div>
-                  </div>
-                </button>
-
                 {!familyFile.parent_b_id && (
                   <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
                     <DialogTrigger asChild>

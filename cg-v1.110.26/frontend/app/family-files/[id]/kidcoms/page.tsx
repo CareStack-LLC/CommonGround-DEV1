@@ -300,7 +300,7 @@ export default function KidComsPage() {
                 <CGCardTitle className="text-base">Quick Actions</CGCardTitle>
               </CGCardHeader>
               <CGCardContent>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => startVideoCall()}
                     disabled={!selectedChild || isStartingSession}
@@ -332,6 +332,16 @@ export default function KidComsPage() {
                       <Phone className="h-8 w-8 text-cg-sage" />
                     )}
                     <span className="mt-2 text-sm font-medium text-cg-sage">Voice</span>
+                  </button>
+                  <button
+                    onClick={() => router.push(`/family-files/${familyFileId}/kidcoms/circle`)}
+                    className={cn(
+                      'flex flex-col items-center p-4 rounded-xl transition-all',
+                      'bg-teal-50 hover:bg-teal-100 active:scale-95'
+                    )}
+                  >
+                    <Heart className="h-8 w-8 text-teal-600" />
+                    <span className="mt-2 text-sm font-medium text-teal-700">My Circle</span>
                   </button>
                   <button
                     disabled
