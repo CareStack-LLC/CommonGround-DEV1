@@ -70,22 +70,33 @@ function WalletContent() {
 
   // Handle return from Stripe onboarding
   useEffect(() => {
-    if (onboardingComplete && walletIdFromUrl) {
-      // Sync wallet status with Stripe
-      const syncWallet = async () => {
+    if (onboardingComplete) {
+      // Sync wallet status with Stripe after returning from onboarding
+      const handleOnboardingComplete = async () => {
         try {
-          await walletAPI.syncWallet(walletIdFromUrl);
+          // First try to sync using the wallet ID from URL
+          if (walletIdFromUrl) {
+            try {
+              await walletAPI.syncWallet(walletIdFromUrl);
+            } catch (err) {
+              console.log('Sync with URL wallet ID failed, trying getMyWallet');
+            }
+          }
+          // Load fresh wallet data
           await loadWalletData();
           setShowOnboardingSuccess(true);
           // Clear URL params after handling
           router.replace('/wallet');
         } catch (err) {
-          console.error('Failed to sync wallet:', err);
+          console.error('Failed to complete onboarding:', err);
+          // Still clear URL and try to load data
+          router.replace('/wallet');
+          await loadWalletData();
         }
       };
-      syncWallet();
+      handleOnboardingComplete();
     }
-  }, [onboardingComplete, walletIdFromUrl]);
+  }, [onboardingComplete]);
 
   const loadWalletData = async () => {
     try {

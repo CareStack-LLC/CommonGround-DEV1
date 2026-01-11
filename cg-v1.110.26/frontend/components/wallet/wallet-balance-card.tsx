@@ -119,9 +119,9 @@ export default function WalletBalanceCard({
     );
   }
 
-  const balance = wallet.balance;
-  const availableBalance = parseFloat(balance.available);
-  const pendingBalance = parseFloat(balance.pending);
+  const balance = wallet.balance || { available: '0.00', pending: '0.00', total: '0.00', currency: 'usd' };
+  const availableBalance = parseFloat(balance.available || '0');
+  const pendingBalance = parseFloat(balance.pending || '0');
 
   return (
     <div className="cg-card-elevated overflow-hidden">
