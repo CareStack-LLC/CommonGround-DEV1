@@ -932,6 +932,8 @@ async def create_circle_contact_session(
     - Creates Daily.co room and session
     - Returns room URL and token to join
     """
+    logger.info(f"Circle contact session create: circle_user_id={current_circle_user.id}, circle_contact_id={current_circle_user.circle_contact_id}, child_id={session_data.child_id}")
+
     # Get the circle contact associated with this user
     contact_result = await db.execute(
         select(CircleContact).where(
@@ -1077,14 +1079,14 @@ async def create_circle_contact_session(
 
     # Create session with WAITING status (like child-initiated calls)
     session = KidComsSession(
-        family_file_id=family_file_id,
-        child_id=session_data.child_id,
-        circle_contact_id=contact.id,  # Track which circle contact is in the call
+        family_file_id=str(family_file_id),
+        child_id=str(session_data.child_id),
+        circle_contact_id=str(contact.id),  # Track which circle contact is in the call
         session_type=session_data.session_type,
         title=f"Call from {contact.contact_name}",
         daily_room_name=room_name,
         daily_room_url=room_url,
-        initiated_by_id=current_circle_user.id,
+        initiated_by_id=str(current_circle_user.id),
         initiated_by_type=ParticipantType.CIRCLE_CONTACT.value,
         status=SessionStatus.WAITING.value,
         ringing_started_at=datetime.utcnow(),  # Track when the call started ringing
@@ -1092,7 +1094,7 @@ async def create_circle_contact_session(
 
     # Add circle contact as first participant
     session.add_participant(
-        participant_id=contact.id,
+        participant_id=str(contact.id),
         participant_type=ParticipantType.CIRCLE_CONTACT.value,
         name=contact.contact_name
     )
