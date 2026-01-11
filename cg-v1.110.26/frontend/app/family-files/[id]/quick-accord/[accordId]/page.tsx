@@ -27,7 +27,8 @@ import {
   Send,
   ThumbsUp,
   ThumbsDown,
-  RotateCcw,
+  CheckCircle2,
+  XOctagon,
 } from 'lucide-react';
 
 function QuickAccordDetailContent() {
@@ -112,7 +113,7 @@ function QuickAccordDetailContent() {
       setIsActioning(true);
       const result = await quickAccordsAPI.complete(accordId);
       setQuickAccord(result);
-      setActionMessage(result.message);
+      setActionMessage(result.message || 'QuickAccord marked as completed as agreed');
     } catch (err: any) {
       if (!handleAuthError(err)) {
         setError(err.message || 'Failed to complete');
@@ -127,10 +128,10 @@ function QuickAccordDetailContent() {
       setIsActioning(true);
       const result = await quickAccordsAPI.revoke(accordId);
       setQuickAccord(result);
-      setActionMessage(result.message);
+      setActionMessage(result.message || 'QuickAccord marked as not completed as agreed');
     } catch (err: any) {
       if (!handleAuthError(err)) {
-        setError(err.message || 'Failed to revoke');
+        setError(err.message || 'Failed to mark as not completed');
       }
     } finally {
       setIsActioning(false);
@@ -141,37 +142,37 @@ function QuickAccordDetailContent() {
     switch (status) {
       case 'active':
         return (
-          <Badge className="bg-green-100 text-green-700">
+          <Badge className="bg-cg-sage-subtle text-cg-sage border-0">
             <CheckCircle className="h-3 w-3 mr-1" />
             Active
           </Badge>
         );
       case 'pending_approval':
         return (
-          <Badge className="bg-yellow-100 text-yellow-700">
+          <Badge className="bg-cg-amber-subtle text-cg-amber border-0">
             <Clock className="h-3 w-3 mr-1" />
-            Pending Approval
+            Pending
           </Badge>
         );
       case 'completed':
         return (
-          <Badge className="bg-blue-100 text-blue-700">
-            <CheckCircle className="h-3 w-3 mr-1" />
+          <Badge className="bg-cg-sage-subtle text-cg-sage border-0">
+            <CheckCircle2 className="h-3 w-3 mr-1" />
             Completed
           </Badge>
         );
       case 'draft':
         return (
-          <Badge className="bg-gray-100 text-gray-700">
+          <Badge className="bg-cg-slate-subtle text-cg-slate border-0">
             <FileText className="h-3 w-3 mr-1" />
             Draft
           </Badge>
         );
       case 'revoked':
         return (
-          <Badge className="bg-red-100 text-red-700">
+          <Badge className="bg-cg-error-subtle text-cg-error border-0">
             <XCircle className="h-3 w-3 mr-1" />
-            Revoked
+            Not Completed
           </Badge>
         );
       default:
@@ -205,7 +206,7 @@ function QuickAccordDetailContent() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage"></div>
       </div>
     );
   }
@@ -230,46 +231,61 @@ function QuickAccordDetailContent() {
   const hasApproved = isParentA ? quickAccord.parent_a_approved : quickAccord.parent_b_approved;
   const awaitingMyApproval = quickAccord.status === 'pending_approval' && !hasApproved;
 
+  // Get parent labels
+  const getParentALabel = () => {
+    if (familyFile.parent_a_role === 'mother') return 'Mother';
+    if (familyFile.parent_a_role === 'father') return 'Father';
+    return 'Parent A';
+  };
+
+  const getParentBLabel = () => {
+    if (familyFile.parent_b_role === 'mother') return 'Mother';
+    if (familyFile.parent_b_role === 'father') return 'Father';
+    return 'Parent B';
+  };
+
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push(`/family-files/${familyFileId}`)}>
+    <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
+      {/* Header - Mobile optimized */}
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <Button variant="ghost" size="icon" className="flex-shrink-0 -ml-2" onClick={() => router.push(`/family-files/${familyFileId}`)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div>
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{getCategoryIcon(quickAccord.purpose_category)}</span>
-              <h1 className="text-2xl font-bold text-foreground">{quickAccord.title}</h1>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xl sm:text-2xl">{getCategoryIcon(quickAccord.purpose_category)}</span>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">{quickAccord.title}</h1>
             </div>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {quickAccord.accord_number} - {getCategoryLabel(quickAccord.purpose_category)}
             </p>
           </div>
         </div>
-        {getStatusBadge(quickAccord.status)}
+        <div className="flex-shrink-0 ml-10 sm:ml-0">
+          {getStatusBadge(quickAccord.status)}
+        </div>
       </div>
 
       {actionMessage && (
-        <Alert>
-          <CheckCircle className="h-4 w-4" />
-          <AlertDescription>{actionMessage}</AlertDescription>
+        <Alert className="bg-cg-sage-subtle border-cg-sage/20">
+          <CheckCircle className="h-4 w-4 text-cg-sage" />
+          <AlertDescription className="text-cg-sage">{actionMessage}</AlertDescription>
         </Alert>
       )}
 
-      {/* Action Buttons */}
+      {/* Action Cards */}
       {quickAccord.status === 'draft' && isInitiator && (
-        <Card className="border-primary/20 bg-primary/5">
+        <Card className="border-cg-sage/20 bg-cg-sage-subtle/30">
           <CardContent className="py-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <p className="font-medium">Ready to submit?</p>
+                <p className="font-medium text-foreground">Ready to submit?</p>
                 <p className="text-sm text-muted-foreground">
                   Send this QuickAccord to your co-parent for approval
                 </p>
               </div>
-              <Button onClick={handleSubmit} disabled={isActioning}>
+              <Button onClick={handleSubmit} disabled={isActioning} className="bg-cg-sage hover:bg-cg-sage/90 w-full sm:w-auto">
                 <Send className="h-4 w-4 mr-2" />
                 Submit for Approval
               </Button>
@@ -279,20 +295,21 @@ function QuickAccordDetailContent() {
       )}
 
       {awaitingMyApproval && (
-        <Card className="border-yellow-200 bg-yellow-50">
+        <Card className="border-cg-amber/20 bg-cg-amber-subtle/30">
           <CardContent className="py-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col gap-3">
               <div>
-                <p className="font-medium text-yellow-800">Your approval is needed</p>
-                <p className="text-sm text-yellow-700">
+                <p className="font-medium text-foreground">Your approval is needed</p>
+                <p className="text-sm text-muted-foreground">
                   Review this QuickAccord and approve or request changes
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button
                   variant="outline"
                   onClick={() => handleApprove(false)}
                   disabled={isActioning}
+                  className="flex-1 sm:flex-none"
                 >
                   <ThumbsDown className="h-4 w-4 mr-2" />
                   Request Changes
@@ -300,7 +317,7 @@ function QuickAccordDetailContent() {
                 <Button
                   onClick={() => handleApprove(true)}
                   disabled={isActioning}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="flex-1 sm:flex-none bg-cg-sage hover:bg-cg-sage/90"
                 >
                   <ThumbsUp className="h-4 w-4 mr-2" />
                   Approve
@@ -312,32 +329,32 @@ function QuickAccordDetailContent() {
       )}
 
       {quickAccord.status === 'active' && (
-        <Card className="border-green-200 bg-green-50">
+        <Card className="border-cg-sage/20 bg-cg-sage-subtle/30">
           <CardContent className="py-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3">
               <div>
-                <p className="font-medium text-green-800">This QuickAccord is active</p>
-                <p className="text-sm text-green-700">
-                  Both parents have approved this agreement
+                <p className="font-medium text-foreground">QuickAccord is Active</p>
+                <p className="text-sm text-muted-foreground">
+                  After the agreed event/date, mark if this was completed as agreed
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button
-                  variant="outline"
                   onClick={handleComplete}
                   disabled={isActioning}
+                  className="flex-1 sm:flex-none bg-cg-sage hover:bg-cg-sage/90"
                 >
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  Mark Complete
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                  Completed as Agreed
                 </Button>
                 <Button
                   variant="outline"
                   onClick={handleRevoke}
                   disabled={isActioning}
-                  className="text-red-600 hover:bg-red-50"
+                  className="flex-1 sm:flex-none border-cg-error/30 text-cg-error hover:bg-cg-error-subtle"
                 >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Revoke
+                  <XOctagon className="h-4 w-4 mr-2" />
+                  Not Completed as Agreed
                 </Button>
               </div>
             </div>
@@ -345,37 +362,74 @@ function QuickAccordDetailContent() {
         </Card>
       )}
 
+      {/* Completed/Revoked Status Display */}
+      {quickAccord.status === 'completed' && (
+        <Card className="border-cg-sage/20 bg-cg-sage-subtle/30">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-cg-sage-subtle flex items-center justify-center flex-shrink-0">
+                <CheckCircle2 className="h-5 w-5 text-cg-sage" />
+              </div>
+              <div>
+                <p className="font-medium text-foreground">Completed as Agreed</p>
+                <p className="text-sm text-muted-foreground">
+                  This QuickAccord was successfully completed
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {quickAccord.status === 'revoked' && (
+        <Card className="border-cg-error/20 bg-cg-error-subtle/30">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-cg-error-subtle flex items-center justify-center flex-shrink-0">
+                <XOctagon className="h-5 w-5 text-cg-error" />
+              </div>
+              <div>
+                <p className="font-medium text-foreground">Not Completed as Agreed</p>
+                <p className="text-sm text-muted-foreground">
+                  This QuickAccord was not fulfilled as agreed
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Main Content */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
         {/* Details */}
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="text-lg">Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {quickAccord.purpose_description && (
               <div>
                 <div className="text-sm text-muted-foreground mb-1">Description</div>
-                <p>{quickAccord.purpose_description}</p>
+                <p className="text-sm">{quickAccord.purpose_description}</p>
               </div>
             )}
 
             {quickAccord.event_date && (
               <div className="flex items-center gap-3">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <div>
+                <Calendar className="h-4 w-4 text-cg-sage flex-shrink-0" />
+                <div className="min-w-0">
                   <div className="text-sm text-muted-foreground">Date</div>
-                  <div>{new Date(quickAccord.event_date).toLocaleDateString()}</div>
+                  <div className="text-sm">{new Date(quickAccord.event_date).toLocaleDateString()}</div>
                 </div>
               </div>
             )}
 
             {(quickAccord.start_date || quickAccord.end_date) && (
               <div className="flex items-center gap-3">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <div>
+                <Calendar className="h-4 w-4 text-cg-sage flex-shrink-0" />
+                <div className="min-w-0">
                   <div className="text-sm text-muted-foreground">Date Range</div>
-                  <div>
+                  <div className="text-sm">
                     {quickAccord.start_date && new Date(quickAccord.start_date).toLocaleDateString()}
                     {' - '}
                     {quickAccord.end_date && new Date(quickAccord.end_date).toLocaleDateString()}
@@ -386,20 +440,20 @@ function QuickAccordDetailContent() {
 
             {quickAccord.location && (
               <div className="flex items-center gap-3">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <div>
+                <MapPin className="h-4 w-4 text-cg-sage flex-shrink-0" />
+                <div className="min-w-0">
                   <div className="text-sm text-muted-foreground">Location</div>
-                  <div>{quickAccord.location}</div>
+                  <div className="text-sm">{quickAccord.location}</div>
                 </div>
               </div>
             )}
 
             {quickAccord.child_ids.length > 0 && familyFile.children.length > 0 && (
               <div className="flex items-center gap-3">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <div>
+                <Users className="h-4 w-4 text-cg-sage flex-shrink-0" />
+                <div className="min-w-0">
                   <div className="text-sm text-muted-foreground">Children</div>
-                  <div>
+                  <div className="text-sm">
                     {familyFile.children
                       .filter((c) => quickAccord.child_ids.includes(c.id))
                       .map((c) => c.first_name)
@@ -413,26 +467,26 @@ function QuickAccordDetailContent() {
 
         {/* Logistics */}
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="text-lg">Logistics</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {quickAccord.pickup_responsibility && (
               <div className="flex items-center gap-3">
-                <Car className="h-4 w-4 text-muted-foreground" />
-                <div>
+                <Car className="h-4 w-4 text-cg-sage flex-shrink-0" />
+                <div className="min-w-0">
                   <div className="text-sm text-muted-foreground">Pickup</div>
-                  <div className="capitalize">{quickAccord.pickup_responsibility}</div>
+                  <div className="text-sm capitalize">{quickAccord.pickup_responsibility}</div>
                 </div>
               </div>
             )}
 
             {quickAccord.dropoff_responsibility && (
               <div className="flex items-center gap-3">
-                <Car className="h-4 w-4 text-muted-foreground rotate-180" />
-                <div>
+                <Car className="h-4 w-4 text-cg-sage flex-shrink-0 rotate-180" />
+                <div className="min-w-0">
                   <div className="text-sm text-muted-foreground">Drop-off</div>
-                  <div className="capitalize">{quickAccord.dropoff_responsibility}</div>
+                  <div className="text-sm capitalize">{quickAccord.dropoff_responsibility}</div>
                 </div>
               </div>
             )}
@@ -446,70 +500,77 @@ function QuickAccordDetailContent() {
 
             {quickAccord.has_shared_expense && (
               <div className="flex items-center gap-3">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <div>
+                <DollarSign className="h-4 w-4 text-cg-sage flex-shrink-0" />
+                <div className="min-w-0">
                   <div className="text-sm text-muted-foreground">Shared Expense</div>
-                  <div>
+                  <div className="text-sm">
                     ${quickAccord.estimated_amount || 'TBD'}
                     {quickAccord.expense_category && ` (${quickAccord.expense_category})`}
                   </div>
                 </div>
               </div>
             )}
+
+            {!quickAccord.pickup_responsibility && !quickAccord.dropoff_responsibility &&
+             !quickAccord.transportation_notes && !quickAccord.has_shared_expense && (
+              <p className="text-sm text-muted-foreground">No logistics specified</p>
+            )}
           </CardContent>
         </Card>
 
         {/* Approval Status */}
         <Card className="md:col-span-2">
-          <CardHeader>
+          <CardHeader className="pb-3">
             <CardTitle className="text-lg">Approval Status</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                  quickAccord.parent_a_approved ? 'bg-green-100' : 'bg-gray-100'
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className={`flex items-center gap-3 p-3 rounded-xl ${
+                quickAccord.parent_a_approved ? 'bg-cg-sage-subtle' : 'bg-muted'
+              }`}>
+                <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  quickAccord.parent_a_approved ? 'bg-cg-sage/20' : 'bg-background'
                 }`}>
                   {quickAccord.parent_a_approved ? (
-                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <CheckCircle className="h-5 w-5 text-cg-sage" />
                   ) : (
-                    <Clock className="h-4 w-4 text-gray-400" />
+                    <Clock className="h-5 w-5 text-muted-foreground" />
                   )}
                 </div>
-                <div>
-                  <div className="font-medium">
-                    {familyFile.parent_a_role === 'mother' ? 'Mother' :
-                     familyFile.parent_a_role === 'father' ? 'Father' : 'Parent A'}
-                    {isParentA && ' (You)'}
+                <div className="min-w-0">
+                  <div className="font-medium text-foreground">
+                    {getParentALabel()}
+                    {isParentA && <span className="text-muted-foreground font-normal"> (You)</span>}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {quickAccord.parent_a_approved
                       ? `Approved ${quickAccord.parent_a_approved_at ? new Date(quickAccord.parent_a_approved_at).toLocaleDateString() : ''}`
-                      : 'Pending'}
+                      : 'Pending approval'}
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                  quickAccord.parent_b_approved ? 'bg-green-100' : 'bg-gray-100'
+              <div className={`flex items-center gap-3 p-3 rounded-xl ${
+                quickAccord.parent_b_approved ? 'bg-cg-sage-subtle' : 'bg-muted'
+              }`}>
+                <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  quickAccord.parent_b_approved ? 'bg-cg-sage/20' : 'bg-background'
                 }`}>
                   {quickAccord.parent_b_approved ? (
-                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <CheckCircle className="h-5 w-5 text-cg-sage" />
                   ) : (
-                    <Clock className="h-4 w-4 text-gray-400" />
+                    <Clock className="h-5 w-5 text-muted-foreground" />
                   )}
                 </div>
-                <div>
-                  <div className="font-medium">
-                    {familyFile.parent_b_role === 'mother' ? 'Mother' :
-                     familyFile.parent_b_role === 'father' ? 'Father' : 'Parent B'}
-                    {!isParentA && ' (You)'}
+                <div className="min-w-0">
+                  <div className="font-medium text-foreground">
+                    {getParentBLabel()}
+                    {!isParentA && <span className="text-muted-foreground font-normal"> (You)</span>}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {quickAccord.parent_b_approved
                       ? `Approved ${quickAccord.parent_b_approved_at ? new Date(quickAccord.parent_b_approved_at).toLocaleDateString() : ''}`
-                      : 'Pending'}
+                      : 'Pending approval'}
                   </div>
                 </div>
               </div>
@@ -520,14 +581,14 @@ function QuickAccordDetailContent() {
         {/* AI Summary */}
         {quickAccord.ai_summary && (
           <Card className="md:col-span-2">
-            <CardHeader>
+            <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
-                <Zap className="h-5 w-5 text-yellow-500" />
+                <Zap className="h-5 w-5 text-cg-amber" />
                 ARIA Summary
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="whitespace-pre-wrap">{quickAccord.ai_summary}</p>
+              <p className="text-sm whitespace-pre-wrap">{quickAccord.ai_summary}</p>
             </CardContent>
           </Card>
         )}
