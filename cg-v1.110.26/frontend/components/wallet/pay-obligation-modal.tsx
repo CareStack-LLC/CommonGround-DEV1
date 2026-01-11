@@ -1,6 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js';
 import { walletAPI, Obligation, WalletWithBalance } from '@/lib/api';
 import {
   Wallet,
@@ -11,8 +18,15 @@ import {
   CheckCircle,
   X,
   ArrowRight,
-  Receipt
+  Receipt,
+  Lock,
+  Info
 } from 'lucide-react';
+
+// Load Stripe
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ''
+);
 
 interface PayObligationModalProps {
   obligation: Obligation;
@@ -31,13 +45,35 @@ function formatCurrency(amount: string | number): string {
   }).format(num);
 }
 
-export default function PayObligationModal({
+// Card element styling
+const cardElementOptions = {
+  style: {
+    base: {
+      fontSize: '16px',
+      color: '#1f2937',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      '::placeholder': {
+        color: '#9ca3af',
+      },
+    },
+    invalid: {
+      color: '#dc2626',
+      iconColor: '#dc2626',
+    },
+  },
+  hidePostalCode: false,
+};
+
+function PayObligationModalInner({
   obligation,
   wallet,
   userShare,
   onSuccess,
   onClose
 }: PayObligationModalProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+
   const [paymentSource, setPaymentSource] = useState<'wallet' | 'card'>(
     wallet?.onboarding_completed ? 'wallet' : 'card'
   );
@@ -45,10 +81,14 @@ export default function PayObligationModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [cardComplete, setCardComplete] = useState(false);
 
   const walletBalance = wallet ? parseFloat(wallet.available_balance || wallet.balance?.available || '0') : 0;
   const paymentAmount = parseFloat(amount) || 0;
   const canPayFromWallet = wallet?.onboarding_completed && walletBalance >= paymentAmount;
+
+  // Calculate card fee
+  const cardFee = paymentAmount > 0 ? paymentAmount * 0.029 + 0.30 : 0;
 
   const handleAmountChange = (value: string) => {
     const cleaned = value.replace(/[^0-9.]/g, '');
@@ -57,6 +97,15 @@ export default function PayObligationModal({
     if (parts[1] && parts[1].length > 2) return;
     setAmount(cleaned);
     setError(null);
+  };
+
+  const handleCardChange = (event: any) => {
+    setCardComplete(event.complete);
+    if (event.error) {
+      setError(event.error.message);
+    } else {
+      setError(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,16 +126,72 @@ export default function PayObligationModal({
       return;
     }
 
+    if (paymentSource === 'card') {
+      if (!stripe || !elements) {
+        setError('Payment system not ready. Please try again.');
+        return;
+      }
+
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) {
+        setError('Card input not found');
+        return;
+      }
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      await walletAPI.payObligation({
+      let paymentMethodId: string | undefined;
+
+      // For card payments, create PaymentMethod first
+      if (paymentSource === 'card' && stripe && elements) {
+        const cardElement = elements.getElement(CardElement);
+        if (!cardElement) {
+          throw new Error('Card input not found');
+        }
+
+        const { error: stripeError, paymentMethod: pm } = await stripe.createPaymentMethod({
+          type: 'card',
+          card: cardElement,
+        });
+
+        if (stripeError) {
+          setError(stripeError.message || 'Card verification failed');
+          setIsLoading(false);
+          return;
+        }
+
+        if (!pm) {
+          setError('Could not process card');
+          setIsLoading(false);
+          return;
+        }
+
+        paymentMethodId = pm.id;
+      }
+
+      // Call backend to process payment
+      const result = await walletAPI.payObligation({
         obligation_id: obligation.id,
         amount: paymentAmount,
         payment_source: paymentSource,
-        // payment_method_id would come from Stripe Elements for card payments
+        payment_method_id: paymentMethodId,
       });
+
+      // Handle 3D Secure if required
+      if (result.requires_action && result.client_secret && stripe) {
+        const { error: confirmError } = await stripe.confirmCardPayment(
+          result.client_secret
+        );
+
+        if (confirmError) {
+          setError(confirmError.message || 'Payment confirmation failed');
+          setIsLoading(false);
+          return;
+        }
+      }
 
       setSuccess(true);
       if (onSuccess) {
@@ -98,6 +203,11 @@ export default function PayObligationModal({
       setIsLoading(false);
     }
   };
+
+  // Determine if submit should be disabled
+  const isSubmitDisabled = isLoading ||
+    paymentAmount <= 0 ||
+    (paymentSource === 'card' && (!stripe || !cardComplete));
 
   if (success) {
     return (
@@ -206,7 +316,7 @@ export default function PayObligationModal({
                   <p className="font-medium text-foreground">Wallet Balance</p>
                   <p className="text-sm text-muted-foreground">
                     {wallet?.onboarding_completed
-                      ? `Available: ${formatCurrency(walletBalance)}`
+                      ? `Available: ${formatCurrency(walletBalance)} - No fees`
                       : 'Set up wallet to use'
                     }
                   </p>
@@ -229,11 +339,54 @@ export default function PayObligationModal({
                 <CreditCard className={`h-5 w-5 ${paymentSource === 'card' ? 'text-cg-sage' : 'text-muted-foreground'}`} />
                 <div className="text-left flex-1">
                   <p className="font-medium text-foreground">Credit/Debit Card</p>
-                  <p className="text-sm text-muted-foreground">2.9% + $0.30 fee</p>
+                  <p className="text-sm text-muted-foreground">2.9% + $0.30 processing fee</p>
                 </div>
               </button>
             </div>
           </div>
+
+          {/* Card Input - Only show when card is selected */}
+          {paymentSource === 'card' && (
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Card Details
+              </label>
+              <div className="p-4 bg-card border border-border rounded-xl">
+                <CardElement
+                  options={cardElementOptions}
+                  onChange={handleCardChange}
+                />
+              </div>
+              <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                <Lock className="h-3 w-3" />
+                <span>Secured by Stripe</span>
+              </div>
+            </div>
+          )}
+
+          {/* Fee Info - Only show for card payments with amount */}
+          {paymentSource === 'card' && paymentAmount > 0 && (
+            <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-xl">
+              <Info className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-muted-foreground">
+                <p>Card payments incur a processing fee.</p>
+                <p className="mt-1 text-foreground font-medium">
+                  Fee: {formatCurrency(cardFee)} | Total: {formatCurrency(paymentAmount + cardFee)}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* No fee info for wallet */}
+          {paymentSource === 'wallet' && paymentAmount > 0 && (
+            <div className="flex items-start gap-3 p-4 bg-cg-sage-subtle rounded-xl">
+              <CheckCircle className="h-5 w-5 text-cg-sage flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-cg-sage">
+                <p className="font-medium">No processing fees</p>
+                <p className="text-cg-sage/80">Pay directly from your wallet balance.</p>
+              </div>
+            </div>
+          )}
 
           {/* Error */}
           {error && (
@@ -256,7 +409,7 @@ export default function PayObligationModal({
             <button
               type="submit"
               className="cg-btn-primary flex-1 inline-flex items-center justify-center gap-2"
-              disabled={isLoading || paymentAmount <= 0}
+              disabled={isSubmitDisabled}
             >
               {isLoading ? (
                 <>
@@ -274,5 +427,33 @@ export default function PayObligationModal({
         </form>
       </div>
     </div>
+  );
+}
+
+// Wrapper with Stripe Elements
+export default function PayObligationModal(props: PayObligationModalProps) {
+  if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div className="bg-card rounded-2xl shadow-xl max-w-md w-full p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-cg-warning-subtle flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="h-8 w-8 text-cg-warning" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">Payment Not Configured</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Stripe is not configured. Please contact support.
+          </p>
+          <button onClick={props.onClose} className="cg-btn-secondary">
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Elements stripe={stripePromise}>
+      <PayObligationModalInner {...props} />
+    </Elements>
   );
 }

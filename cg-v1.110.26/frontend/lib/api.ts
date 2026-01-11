@@ -2479,13 +2479,24 @@ export interface ObligationPaymentRequest {
 }
 
 export interface ObligationPaymentResponse {
-  funding_id: string;
+  id: string;
+  obligation_id: string;
+  payer_id: string;
   amount: string;
+  payment_source: string;
   status: string;
-  obligation_status: string;
-  is_fully_funded: boolean;
-  payout_initiated: boolean;
-  message: string;
+  wallet_transaction_id?: string | null;
+  stripe_payment_intent_id?: string | null;
+  client_secret?: string | null;
+  requires_action: boolean;
+  created_at: string;
+  completed_at?: string | null;
+  // Legacy fields for backwards compatibility
+  funding_id?: string;
+  obligation_status?: string;
+  is_fully_funded?: boolean;
+  payout_initiated?: boolean;
+  message?: string;
 }
 
 export interface ChildContributionRequest {
