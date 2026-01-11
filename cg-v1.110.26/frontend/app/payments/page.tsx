@@ -621,7 +621,7 @@ function PaymentsContent() {
               <div>
                 <p className="text-sm text-muted-foreground">Wallet Balance</p>
                 <p className="font-mono text-lg font-semibold text-foreground">
-                  ${parseFloat(wallet.balance.available).toFixed(2)}
+                  ${parseFloat(wallet.available_balance || wallet.balance?.available || '0').toFixed(2)}
                 </p>
               </div>
             </div>

@@ -168,8 +168,11 @@ function WalletContent() {
         // Add default balance to convert Wallet to WalletWithBalance
         currentWallet = {
           ...createdWallet,
-          balance: { available: '0.00', pending: '0.00', total: '0.00', currency: 'usd' }
-        };
+          current_balance: '0.00',
+          available_balance: '0.00',
+          is_ready_for_payments: false,
+          is_ready_for_payouts: false,
+        } as WalletWithBalance;
         setWallet(currentWallet);
       }
 

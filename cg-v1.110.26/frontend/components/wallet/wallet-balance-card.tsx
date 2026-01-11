@@ -119,9 +119,10 @@ export default function WalletBalanceCard({
     );
   }
 
-  const balance = wallet.balance || { available: '0.00', pending: '0.00', total: '0.00', currency: 'usd' };
-  const availableBalance = parseFloat(balance.available || '0');
-  const pendingBalance = parseFloat(balance.pending || '0');
+  // Backend returns current_balance and available_balance directly on wallet
+  const availableBalance = parseFloat(wallet.available_balance || wallet.balance?.available || '0');
+  const currentBalance = parseFloat(wallet.current_balance || wallet.balance?.total || '0');
+  const pendingBalance = currentBalance - availableBalance;
 
   return (
     <div className="cg-card-elevated overflow-hidden">
@@ -135,7 +136,7 @@ export default function WalletBalanceCard({
             <div>
               <p className="text-sm text-muted-foreground">Available Balance</p>
               <p className="text-3xl font-bold text-foreground font-mono tabular-nums">
-                {formatCurrency(balance.available)}
+                {formatCurrency(availableBalance)}
               </p>
             </div>
           </div>
@@ -177,7 +178,7 @@ export default function WalletBalanceCard({
           <div>
             <p className="text-xs text-muted-foreground mb-1">Pending</p>
             <p className="font-mono text-sm tabular-nums">
-              {formatCurrency(balance.pending)}
+              {formatCurrency(pendingBalance)}
             </p>
           </div>
           <div>

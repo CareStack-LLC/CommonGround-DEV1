@@ -46,7 +46,7 @@ export default function PayObligationModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const walletBalance = wallet ? parseFloat(wallet.balance.available) : 0;
+  const walletBalance = wallet ? parseFloat(wallet.available_balance || wallet.balance?.available || '0') : 0;
   const paymentAmount = parseFloat(amount) || 0;
   const canPayFromWallet = wallet?.onboarding_completed && walletBalance >= paymentAmount;
 

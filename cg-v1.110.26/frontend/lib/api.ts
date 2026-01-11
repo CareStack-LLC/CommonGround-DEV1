@@ -2410,8 +2410,14 @@ export interface WalletBalance {
   currency: string;
 }
 
+// Backend response includes balance fields directly on wallet object
 export interface WalletWithBalance extends Wallet {
-  balance: WalletBalance;
+  current_balance: string;
+  available_balance: string;
+  is_ready_for_payments: boolean;
+  is_ready_for_payouts: boolean;
+  // Legacy nested balance for backwards compatibility
+  balance?: WalletBalance;
 }
 
 export interface WalletTransaction {
