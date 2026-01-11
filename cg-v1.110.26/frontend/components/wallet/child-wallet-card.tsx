@@ -23,8 +23,8 @@ export default function ChildWalletCard({
   onContribute,
   onViewDetails
 }: ChildWalletCardProps) {
-  const balance = parseFloat(childWallet.balance.available);
-  const totalContributions = parseFloat(childWallet.total_contributions);
+  const balance = parseFloat(childWallet.balance);
+  const totalReceived = parseFloat(childWallet.total_received);
 
   return (
     <div className="cg-card overflow-hidden hover:shadow-md transition-shadow">
@@ -56,7 +56,7 @@ export default function ChildWalletCard({
               <TrendingUp className="h-4 w-4" />
               <span className="text-xs">Total Received</span>
             </div>
-            <p className="font-mono text-sm font-medium">{formatCurrency(totalContributions)}</p>
+            <p className="font-mono text-sm font-medium">{formatCurrency(totalReceived)}</p>
           </div>
           <div className="p-3 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-2 text-muted-foreground mb-1">

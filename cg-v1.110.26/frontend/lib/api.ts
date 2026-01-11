@@ -2550,12 +2550,23 @@ export interface PayoutListResponse {
 }
 
 export interface ChildWallet {
-  wallet: Wallet;
+  wallet_id: string;
   child_id: string;
   child_name: string;
-  balance: WalletBalance;
-  total_contributions: string;
+  balance: string;  // Decimal as string
+  total_received: string;  // Decimal as string
   contribution_count: number;
+  recent_contributions?: ChildContribution[];
+}
+
+export interface ChildContribution {
+  id: string;
+  amount: string;
+  contributor_name: string;
+  purpose: string | null;
+  message: string | null;
+  status: string;
+  created_at: string;
 }
 
 export const clearfundAPI = {
@@ -6240,10 +6251,27 @@ export const walletAPI = {
   // Child Wallet Operations
 
   /**
-   * Get child wallets for family
+   * Get child wallets for a family file
+   * Fetches children from family file, then gets each child's wallet
    */
   async getChildWallets(familyFileId: string): Promise<ChildWallet[]> {
-    return fetchAPI<ChildWallet[]>(`/wallets/children?family_file_id=${familyFileId}`);
+    // Get children in this family file
+    const childrenResponse = await fetchAPI<{ items: { id: string }[]; total: number }>(
+      `/family-files/${familyFileId}/children`
+    );
+
+    // Get wallet for each child
+    const childWallets: ChildWallet[] = [];
+    for (const child of childrenResponse.items) {
+      try {
+        const wallet = await fetchAPI<ChildWallet>(`/wallets/child/${child.id}`);
+        childWallets.push(wallet);
+      } catch (err) {
+        // Child may not have a wallet yet - skip
+        console.debug(`No wallet for child ${child.id}`);
+      }
+    }
+    return childWallets;
   },
 
   /**

@@ -132,7 +132,7 @@ function ChildWalletContent() {
     );
   }
 
-  const balance = parseFloat(childWallet.balance.available);
+  const balance = parseFloat(childWallet.balance);
 
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-8">
@@ -185,7 +185,7 @@ function ChildWalletContent() {
                 <span className="text-sm">Total Received</span>
               </div>
               <p className="font-mono text-lg font-medium text-foreground">
-                {formatCurrency(childWallet.total_contributions)}
+                {formatCurrency(childWallet.total_received)}
               </p>
             </div>
             <div className="p-4 bg-white/60 rounded-xl">

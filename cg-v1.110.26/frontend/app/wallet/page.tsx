@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import {
   walletAPI,
@@ -39,6 +39,8 @@ type TabType = 'overview' | 'transactions' | 'children' | 'payouts';
 
 function WalletContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const familyFileId = searchParams.get('familyFileId');
   const { user } = useAuth();
   const [wallet, setWallet] = useState<WalletWithBalance | null>(null);
   const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
@@ -58,7 +60,7 @@ function WalletContent() {
     if (user) {
       loadWalletData();
     }
-  }, [user]);
+  }, [user, familyFileId]);
 
   const loadWalletData = async () => {
     try {
@@ -95,9 +97,13 @@ function WalletContent() {
         const ffData = await familyFilesAPI.list();
         setFamilyFiles(ffData.items || []);
 
-        // Load child wallets for each family file
+        // Load child wallets - if familyFileId provided, only load for that family
         const allChildWallets: ChildWallet[] = [];
-        for (const ff of ffData.items || []) {
+        const filesToLoad = familyFileId
+          ? (ffData.items || []).filter(ff => ff.id === familyFileId)
+          : (ffData.items || []);
+
+        for (const ff of filesToLoad) {
           try {
             const children = await walletAPI.getChildWallets(ff.id);
             allChildWallets.push(...children);
