@@ -37,6 +37,7 @@ import {
   MapPin,
   Gavel,
   CheckCircle,
+  Zap,
 } from 'lucide-react';
 
 /**
@@ -1014,22 +1015,54 @@ function DashboardContent() {
                   />
                 )}
 
-                {/* Pending Agreements */}
-                {(dashboardSummary?.pending_agreements_count ?? 0) > 0 && (
-                  <ActionStreamItem
-                    icon={FileText}
-                    iconBg="bg-cg-sage-subtle"
-                    iconColor="text-cg-sage"
-                    title="Agreement Approval"
-                    subtitle={
-                      dashboardSummary!.pending_agreements.length > 0
-                        ? `"${dashboardSummary!.pending_agreements[0].title}" needs approval`
-                        : `${dashboardSummary!.pending_agreements_count} agreement${dashboardSummary!.pending_agreements_count > 1 ? 's' : ''} need approval`
-                    }
-                    hasNotification
-                    onClick={() => router.push('/agreements')}
-                  />
-                )}
+                {/* Pending SharedCare Agreements */}
+                {(() => {
+                  const sharedCareAgreements = dashboardSummary?.pending_agreements.filter(
+                    a => a.agreement_type === 'shared_care'
+                  ) || [];
+                  if (sharedCareAgreements.length === 0) return null;
+                  const count = sharedCareAgreements.length;
+                  return (
+                    <ActionStreamItem
+                      icon={FileText}
+                      iconBg="bg-cg-sage-subtle"
+                      iconColor="text-cg-sage"
+                      title="Agreement Approval"
+                      subtitle={
+                        count === 1
+                          ? `"${sharedCareAgreements[0].title}" needs approval`
+                          : `${count} agreements need approval`
+                      }
+                      hasNotification
+                      onClick={() => router.push('/agreements')}
+                    />
+                  );
+                })()}
+
+                {/* Pending QuickAccords */}
+                {(() => {
+                  const quickAccords = dashboardSummary?.pending_agreements.filter(
+                    a => a.agreement_type === 'quick_accord'
+                  ) || [];
+                  if (quickAccords.length === 0) return null;
+                  const familyFileId = activeFileIdsRef.current[0];
+                  const count = quickAccords.length;
+                  return (
+                    <ActionStreamItem
+                      icon={Zap}
+                      iconBg="bg-cg-amber-subtle"
+                      iconColor="text-cg-amber"
+                      title="QuickAccord Approval"
+                      subtitle={
+                        count === 1
+                          ? `"${quickAccords[0].title}" needs your approval`
+                          : `${count} QuickAccords need your approval`
+                      }
+                      hasNotification
+                      onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${quickAccords[0].id}`)}
+                    />
+                  );
+                })()}
 
                 {/* Court Notifications */}
                 {(dashboardSummary?.unread_court_count ?? 0) > 0 && (

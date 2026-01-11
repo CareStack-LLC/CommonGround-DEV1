@@ -61,16 +61,16 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium rounded-xl transition-smooth ${
+      className={`relative flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-xl transition-smooth flex-shrink-0 ${
         active
           ? 'bg-cg-sage text-white'
           : 'text-muted-foreground hover:bg-muted hover:text-foreground'
       }`}
     >
-      <Icon className="h-4 w-4" />
-      <span className="hidden sm:inline">{label}</span>
+      <Icon className="h-4 w-4 flex-shrink-0" />
+      <span className="hidden sm:inline whitespace-nowrap">{label}</span>
       {badge && (
-        <span className={`text-xs px-1.5 py-0.5 rounded-md ${
+        <span className={`hidden sm:inline text-xs px-1.5 py-0.5 rounded-md ${
           active ? 'bg-white/20' : 'bg-muted'
         }`}>
           {badge}
@@ -123,18 +123,18 @@ function QuickActionCard({
 // Custody Legend
 function CustodyLegend() {
   return (
-    <div className="flex items-center gap-4 text-xs">
-      <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-2 sm:gap-4 text-xs overflow-x-auto">
+      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
         <div className="w-3 h-3 rounded-sm bg-cg-sage" />
-        <span className="text-muted-foreground">Mom's Time</span>
+        <span className="text-muted-foreground whitespace-nowrap">Mom's Time</span>
       </div>
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
         <div className="w-3 h-3 rounded-sm bg-cg-slate" />
-        <span className="text-muted-foreground">Dad's Time</span>
+        <span className="text-muted-foreground whitespace-nowrap">Dad's Time</span>
       </div>
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
         <div className="w-3 h-3 rounded-sm bg-purple-500" />
-        <span className="text-muted-foreground">Exchange</span>
+        <span className="text-muted-foreground whitespace-nowrap">Exchange</span>
       </div>
     </div>
   );
@@ -374,7 +374,7 @@ function ScheduleContent() {
   const currentFamilyFileData = familyFilesWithAgreements.find(f => f.familyFile.id === selectedFamilyFile.id);
 
   return (
-    <div className="min-h-screen bg-background pb-24 lg:pb-8">
+    <div className="min-h-screen bg-background pb-24 lg:pb-8 overflow-x-hidden">
       <Navigation />
 
       {/* Page Header */}
@@ -456,7 +456,7 @@ function ScheduleContent() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 overflow-x-hidden">
         {error && (
           <div className="mb-6 flex items-center gap-3 p-4 bg-cg-error-subtle border border-cg-error/20 rounded-xl">
             <AlertCircle className="h-5 w-5 text-cg-error flex-shrink-0" />
@@ -465,8 +465,8 @@ function ScheduleContent() {
         )}
 
         {/* Tabs */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-2 p-1 bg-muted rounded-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <div className="flex items-center gap-2 p-1 bg-muted rounded-xl overflow-x-auto">
             <TabButton
               active={activeTab === 'calendar'}
               icon={Calendar}
