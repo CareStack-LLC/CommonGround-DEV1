@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, use } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
   Users,
   Plus,
@@ -10,23 +10,20 @@ import {
   Check,
   X,
   Loader2,
-  ChevronRight,
-  Video,
   Phone,
+  Video,
   MessageCircle,
   Film,
   Clock,
   Calendar,
   Edit2,
-  Trash2,
   UserPlus,
   QrCode,
   Copy,
-  ExternalLink,
+  Link2,
   ArrowLeft,
   Sparkles,
-  LayoutGrid,
-  List,
+  Home as HomeIcon,
 } from 'lucide-react';
 import { myCircleAPI, familyFilesAPI, circleAPI, KidComsRoom, CirclePermission, FamilyFileChild, CircleContact } from '@/lib/api';
 import { Navigation } from '@/components/navigation';
@@ -69,10 +66,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
   const resolvedParams = use(params);
   const familyFileId = resolvedParams.id;
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialTab = searchParams.get('tab') || 'rooms';
 
-  const [activeTab, setActiveTab] = useState<'rooms' | 'contacts'>(initialTab as 'rooms' | 'contacts');
   const [isLoading, setIsLoading] = useState(true);
   const [rooms, setRooms] = useState<KidComsRoom[]>([]);
   const [contacts, setContacts] = useState<CircleContact[]>([]);
@@ -114,13 +108,6 @@ export default function MyCircleManagementPage({ params }: PageParams) {
   useEffect(() => {
     loadData();
   }, [familyFileId]);
-
-  useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab === 'contacts' || tab === 'rooms') {
-      setActiveTab(tab);
-    }
-  }, [searchParams]);
 
   async function loadData() {
     try {
@@ -343,7 +330,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                 </div>
                 <div>
                   <h1 className="text-2xl font-semibold text-foreground">My Circle</h1>
-                  <p className="text-muted-foreground text-sm">Manage communication rooms and contacts</p>
+                  <p className="text-muted-foreground text-sm">Manage trusted contacts who can communicate with your children</p>
                 </div>
               </div>
             </div>
@@ -360,38 +347,6 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                 </button>
               </div>
             )}
-
-            {/* Tab Switcher */}
-            <div className="flex gap-2 p-1 bg-muted/50 rounded-xl w-fit">
-              <button
-                onClick={() => {
-                  setActiveTab('rooms');
-                  router.replace(`/family-files/${familyFileId}/my-circle?tab=rooms`);
-                }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                  activeTab === 'rooms'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <LayoutGrid className="h-4 w-4" />
-                Rooms
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab('contacts');
-                  router.replace(`/family-files/${familyFileId}/my-circle?tab=contacts`);
-                }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-                  activeTab === 'contacts'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <List className="h-4 w-4" />
-                Contacts
-              </button>
-            </div>
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -438,221 +393,198 @@ export default function MyCircleManagementPage({ params }: PageParams) {
               </button>
             </div>
 
-            {/* Tab Content */}
-            {activeTab === 'rooms' ? (
-              <>
-                {/* Rooms Grid */}
-                <div>
-                  <h2 className="text-lg font-semibold text-foreground mb-4">Communication Rooms</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    {rooms.map((room) => (
+            {/* Circle Contacts */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-foreground">Circle Contacts</h2>
+                <span className="text-sm text-muted-foreground">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</span>
+              </div>
+
+              {contacts.length === 0 ? (
+                <div className="cg-card p-8 text-center">
+                  <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">No contacts yet</h3>
+                  <p className="text-muted-foreground text-sm mb-4">Invite trusted people to your circle</p>
+                  <button
+                    onClick={() => setShowInviteModal(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/90 transition-colors"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Invite Contact
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {contacts.map((contact) => {
+                    const relationshipEmoji: Record<string, string> = {
+                      grandparent: '👴',
+                      aunt: '👩',
+                      uncle: '👨',
+                      cousin: '🧒',
+                      family_friend: '🤗',
+                      godparent: '💝',
+                      step_parent: '💕',
+                      sibling: '👦',
+                      therapist: '🧠',
+                      tutor: '📚',
+                      coach: '⚽',
+                    };
+
+                    // Find the room assigned to this contact (match by name)
+                    const contactRoom = rooms.find(
+                      (room) => room.is_assigned && room.assigned_contact_name === contact.contact_name
+                    );
+
+                    return (
                       <div
-                        key={room.id}
-                        className={`relative rounded-xl border-2 p-4 transition-all ${
-                          room.is_assigned
-                            ? ROOM_COLORS[(room.room_number - 1) % ROOM_COLORS.length]
-                            : 'bg-muted/30 border-border text-muted-foreground'
-                        }`}
+                        key={contact.id}
+                        className="cg-card p-4 hover:shadow-md transition-all"
                       >
-                        {/* Room Number */}
-                        <div className="absolute top-2 right-2 w-6 h-6 bg-white/50 rounded-full flex items-center justify-center text-xs font-bold">
-                          {room.room_number}
-                        </div>
-
-                        {room.is_assigned ? (
-                          <>
-                            <div className="text-3xl mb-2">
-                              {room.room_type === 'parent_a' ? '👩' :
-                               room.room_type === 'parent_b' ? '👨' :
-                               room.assigned_contact_relationship ? (
-                                 { grandparent: '👴', aunt: '👩', uncle: '👨', cousin: '🧒', family_friend: '🤗', godparent: '💝', step_parent: '💕', sibling: '👦', therapist: '🧠', tutor: '📚', coach: '⚽' }[room.assigned_contact_relationship] || '💜'
-                               ) : '💜'}
-                            </div>
-                            <h3 className="font-semibold truncate">{room.room_name || room.assigned_contact_name}</h3>
-                            <p className="text-xs opacity-75 capitalize">
-                              {room.room_type?.replace('_', ' ') || room.assigned_contact_relationship?.replace('_', ' ')}
-                            </p>
-
-                            {/* Room type indicator */}
-                            {room.room_type === 'circle' && (
-                              <div className="flex gap-1 mt-2">
-                                <Settings className="h-3 w-3 opacity-50" />
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div className="text-center py-2">
-                            <div className="text-2xl mb-2">🏠</div>
-                            <p className="text-sm">Empty Room</p>
-                            <button
-                              onClick={() => {
-                                setInviteRoomNumber(room.room_number);
-                                setShowInviteModal(true);
-                              }}
-                              className="mt-2 text-xs text-cg-sage hover:text-cg-sage/80 flex items-center gap-1 mx-auto"
-                            >
-                              <Plus className="h-3 w-3" />
-                              Assign
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Legend */}
-                <div className="cg-card p-6">
-                  <h3 className="font-semibold text-foreground mb-3">How Rooms Work</h3>
-                  <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
-                    <div>
-                      <p className="mb-2"><strong className="text-foreground">Rooms 1-2:</strong> Reserved for parents (auto-assigned)</p>
-                      <p><strong className="text-foreground">Rooms 3-10:</strong> Available for grandparents, aunts, uncles, friends, etc.</p>
-                    </div>
-                    <div>
-                      <p className="mb-2">Each contact can have customized permissions for:</p>
-                      <div className="flex gap-4">
-                        <span className="flex items-center gap-1"><Video className="h-4 w-4" /> Video</span>
-                        <span className="flex items-center gap-1"><Phone className="h-4 w-4" /> Voice</span>
-                        <span className="flex items-center gap-1"><MessageCircle className="h-4 w-4" /> Chat</span>
-                        <span className="flex items-center gap-1"><Film className="h-4 w-4" /> Theater</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              /* Contacts List View */
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-foreground">Circle Contacts</h2>
-                  <span className="text-sm text-muted-foreground">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</span>
-                </div>
-
-                {contacts.length === 0 ? (
-                  <div className="cg-card p-8 text-center">
-                    <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-                      <Users className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                    <h3 className="font-semibold text-foreground mb-2">No contacts yet</h3>
-                    <p className="text-muted-foreground text-sm mb-4">Invite trusted people to your circle</p>
-                    <button
-                      onClick={() => setShowInviteModal(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/90 transition-colors"
-                    >
-                      <UserPlus className="h-4 w-4" />
-                      Invite Contact
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {contacts.map((contact) => {
-                      const relationshipEmoji: Record<string, string> = {
-                        grandparent: '👴',
-                        aunt: '👩',
-                        uncle: '👨',
-                        cousin: '🧒',
-                        family_friend: '🤗',
-                        godparent: '💝',
-                        step_parent: '💕',
-                        sibling: '👦',
-                        therapist: '🧠',
-                        tutor: '📚',
-                        coach: '⚽',
-                      };
-
-                      return (
-                        <div
-                          key={contact.id}
-                          className="cg-card p-4 hover:shadow-md transition-all"
-                        >
-                          <div className="flex items-center gap-4">
-                            {/* Avatar */}
+                        <div className="flex items-center gap-4">
+                          {/* Avatar with Room Badge */}
+                          <div className="relative">
                             <div className="w-12 h-12 rounded-xl bg-cg-sage-subtle flex items-center justify-center text-2xl">
                               {relationshipEmoji[contact.relationship_type] || '💜'}
                             </div>
+                            {contactRoom && (
+                              <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                                ROOM_COLORS[(contactRoom.room_number - 1) % ROOM_COLORS.length]
+                              }`}>
+                                {contactRoom.room_number}
+                              </div>
+                            )}
+                          </div>
 
-                            {/* Info */}
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-foreground truncate">{contact.contact_name}</h3>
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-foreground truncate">{contact.contact_name}</h3>
+                            <div className="flex items-center gap-2">
                               <p className="text-sm text-muted-foreground capitalize">
                                 {contact.relationship_type.replace('_', ' ')}
                               </p>
-                            </div>
-
-                            {/* Status & Permissions */}
-                            <div className="flex items-center gap-3">
-                              {/* Approval Status */}
-                              <div className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                                contact.can_communicate
-                                  ? 'bg-cg-success-subtle text-cg-success'
-                                  : contact.is_partially_approved
-                                    ? 'bg-amber-100 text-amber-700'
-                                    : 'bg-muted text-muted-foreground'
-                              }`}>
-                                {contact.can_communicate
-                                  ? 'Approved'
-                                  : contact.is_partially_approved
-                                    ? 'Pending'
-                                    : 'Not Approved'}
-                              </div>
-
-                              {/* Permission Icons */}
-                              <div className="flex items-center gap-1">
-                                <div className={`p-1.5 rounded-lg ${contact.can_communicate ? 'bg-green-100 text-green-600' : 'bg-muted text-muted-foreground'}`}>
-                                  <Video className="h-4 w-4" />
-                                </div>
-                                <div className={`p-1.5 rounded-lg ${contact.can_communicate ? 'bg-blue-100 text-blue-600' : 'bg-muted text-muted-foreground'}`}>
-                                  <Phone className="h-4 w-4" />
-                                </div>
-                              </div>
-
-                              {/* Edit Button */}
-                              <button
-                                onClick={() => {
-                                  // For now, redirect to a future detail page or show edit modal
-                                  // This could be expanded to show a permission editing modal
-                                  alert('Permission editing coming soon!');
-                                }}
-                                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                              >
-                                <Edit2 className="h-4 w-4" />
-                              </button>
+                              {contactRoom && (
+                                <span className={`text-xs px-1.5 py-0.5 rounded ${
+                                  ROOM_COLORS[(contactRoom.room_number - 1) % ROOM_COLORS.length]
+                                }`}>
+                                  Room {contactRoom.room_number}
+                                </span>
+                              )}
                             </div>
                           </div>
 
-                          {/* Parent Approval Details */}
-                          <div className="mt-3 pt-3 border-t border-border flex items-center gap-4 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              {contact.approved_by_parent_a_at ? (
-                                <Check className="h-3 w-3 text-cg-success" />
-                              ) : (
-                                <X className="h-3 w-3 text-muted-foreground" />
-                              )}
-                              Parent A
-                            </span>
-                            <span className="flex items-center gap-1">
-                              {contact.approved_by_parent_b_at ? (
-                                <Check className="h-3 w-3 text-cg-success" />
-                              ) : (
-                                <X className="h-3 w-3 text-muted-foreground" />
-                              )}
-                              Parent B
-                            </span>
-                            {contact.contact_email && (
-                              <span className="flex items-center gap-1 ml-auto">
-                                <Mail className="h-3 w-3" />
-                                {contact.contact_email}
-                              </span>
-                            )}
+                          {/* Status & Actions */}
+                          <div className="flex items-center gap-2">
+                            {/* Approval Status */}
+                            <div className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                              contact.can_communicate
+                                ? 'bg-cg-success-subtle text-cg-success'
+                                : contact.is_partially_approved
+                                  ? 'bg-amber-100 text-amber-700'
+                                  : 'bg-muted text-muted-foreground'
+                            }`}>
+                              {contact.can_communicate
+                                ? 'Approved'
+                                : contact.is_partially_approved
+                                  ? 'Pending'
+                                  : 'Not Approved'}
+                            </div>
+
+                            {/* Voice Call Button */}
+                            <button
+                              onClick={() => {
+                                // Navigate to KidComs to initiate a call
+                                router.push(`/family-files/${familyFileId}/kidcoms`);
+                              }}
+                              disabled={!contact.can_communicate}
+                              className={`p-2 rounded-lg transition-colors ${
+                                contact.can_communicate
+                                  ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                                  : 'bg-muted text-muted-foreground cursor-not-allowed'
+                              }`}
+                              title="Voice Call"
+                            >
+                              <Phone className="h-4 w-4" />
+                            </button>
+
+                            {/* Copy Invite Link Button */}
+                            <button
+                              onClick={() => {
+                                const inviteLink = `${window.location.origin}/my-circle/login?contact=${contact.id}`;
+                                navigator.clipboard.writeText(inviteLink);
+                                alert('Login link copied to clipboard!');
+                              }}
+                              className="p-2 text-purple-600 bg-purple-100 hover:bg-purple-200 rounded-lg transition-colors"
+                              title="Copy login link"
+                            >
+                              <Link2 className="h-4 w-4" />
+                            </button>
+
+                            {/* Edit Button */}
+                            <button
+                              onClick={() => {
+                                // Find permission for this contact and open modal
+                                // For now, create a mock permission object
+                                const mockPermission: CirclePermission = {
+                                  id: contact.id,
+                                  circle_contact_id: contact.id,
+                                  child_id: '',
+                                  family_file_id: familyFileId,
+                                  can_video_call: true,
+                                  can_voice_call: true,
+                                  can_chat: false,
+                                  can_theater: true,
+                                  allowed_start_time: undefined,
+                                  allowed_end_time: undefined,
+                                  allowed_days: undefined,
+                                  is_within_allowed_time: true,
+                                  max_call_duration_minutes: 60,
+                                  require_parent_present: false,
+                                  created_at: '',
+                                  updated_at: '',
+                                };
+                                openPermissionModal(mockPermission);
+                              }}
+                              className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                              title="Edit permissions"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
+
+                        {/* Parent Approval Details */}
+                        <div className="mt-3 pt-3 border-t border-border flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            {contact.approved_by_parent_a_at ? (
+                              <Check className="h-3 w-3 text-cg-success" />
+                            ) : (
+                              <X className="h-3 w-3 text-muted-foreground" />
+                            )}
+                            Parent A
+                          </span>
+                          <span className="flex items-center gap-1">
+                            {contact.approved_by_parent_b_at ? (
+                              <Check className="h-3 w-3 text-cg-success" />
+                            ) : (
+                              <X className="h-3 w-3 text-muted-foreground" />
+                            )}
+                            Parent B
+                          </span>
+                          {contact.contact_email && (
+                            <span className="flex items-center gap-1 ml-auto">
+                              <Mail className="h-3 w-3" />
+                              {contact.contact_email}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </PageContainer>
 
