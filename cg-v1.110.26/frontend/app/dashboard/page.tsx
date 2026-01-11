@@ -591,27 +591,38 @@ function DashboardContent() {
   const { user } = useAuth();
   const router = useRouter();
   const [familyFilesWithData, setFamilyFilesWithData] = useState<FamilyFileWithData[]>([]);
-  const [custodyStatus, setCustodyStatus] = useState<CustodyStatusResponse | null>(null);
+  const [allCustodyStatuses, setAllCustodyStatuses] = useState<CustodyStatusResponse[]>([]);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const activeFileIdRef = useRef<string | null>(null);
+  const activeFileIdsRef = useRef<string[]>([]);
 
   // Lightweight refresh - only updates summary data (for auto-refresh)
   const refreshSummary = useCallback(async () => {
-    if (!activeFileIdRef.current) return;
+    if (activeFileIdsRef.current.length === 0) return;
 
     try {
-      const [custodyResult, summaryResult] = await Promise.allSettled([
-        familyFilesAPI.getCustodyStatus(activeFileIdRef.current),
-        dashboardAPI.getSummary(activeFileIdRef.current),
+      // Fetch custody status for all active family files
+      const custodyPromises = activeFileIdsRef.current.map(id =>
+        familyFilesAPI.getCustodyStatus(id)
+      );
+
+      // Also fetch dashboard summary for the first file
+      const summaryPromise = dashboardAPI.getSummary(activeFileIdsRef.current[0]);
+
+      const [custodyResults, summaryResult] = await Promise.all([
+        Promise.allSettled(custodyPromises),
+        summaryPromise.catch(() => null),
       ]);
 
-      if (custodyResult.status === 'fulfilled') {
-        setCustodyStatus(custodyResult.value);
-      }
+      // Collect successful custody statuses
+      const successfulStatuses = custodyResults
+        .filter((r): r is PromiseFulfilledResult<CustodyStatusResponse> => r.status === 'fulfilled')
+        .map(r => r.value);
 
-      if (summaryResult.status === 'fulfilled') {
-        setDashboardSummary(summaryResult.value);
+      setAllCustodyStatuses(successfulStatuses);
+
+      if (summaryResult) {
+        setDashboardSummary(summaryResult);
       }
     } catch (error) {
       console.error('Failed to refresh dashboard:', error);
@@ -656,28 +667,37 @@ function DashboardContent() {
 
       setFamilyFilesWithData(filesWithData);
 
-      // Fetch custody status and dashboard summary for the first active family file
-      const activeFile = familyFiles.find(ff => ff.status === 'active');
-      if (activeFile) {
-        // Store active file ID for auto-refresh
-        activeFileIdRef.current = activeFile.id;
+      // Fetch custody status for ALL active family files
+      const activeFiles = familyFiles.filter(ff => ff.status === 'active');
+      if (activeFiles.length > 0) {
+        // Store active file IDs for auto-refresh
+        activeFileIdsRef.current = activeFiles.map(f => f.id);
 
-        // Fetch both in parallel
-        const [custodyResult, summaryResult] = await Promise.allSettled([
-          familyFilesAPI.getCustodyStatus(activeFile.id),
-          dashboardAPI.getSummary(activeFile.id),
+        // Fetch custody status for all active family files in parallel
+        const custodyPromises = activeFiles.map(file =>
+          familyFilesAPI.getCustodyStatus(file.id)
+        );
+
+        // Fetch dashboard summary for the first file
+        const summaryPromise = dashboardAPI.getSummary(activeFiles[0].id);
+
+        const [custodyResults, summaryResult] = await Promise.all([
+          Promise.allSettled(custodyPromises),
+          summaryPromise.catch((err) => {
+            console.error('Failed to load dashboard summary:', err);
+            return null;
+          }),
         ]);
 
-        if (custodyResult.status === 'fulfilled') {
-          setCustodyStatus(custodyResult.value);
-        } else {
-          console.error('Failed to load custody status:', custodyResult.reason);
-        }
+        // Collect successful custody statuses
+        const successfulStatuses = custodyResults
+          .filter((r): r is PromiseFulfilledResult<CustodyStatusResponse> => r.status === 'fulfilled')
+          .map(r => r.value);
 
-        if (summaryResult.status === 'fulfilled') {
-          setDashboardSummary(summaryResult.value);
-        } else {
-          console.error('Failed to load dashboard summary:', summaryResult.reason);
+        setAllCustodyStatuses(successfulStatuses);
+
+        if (summaryResult) {
+          setDashboardSummary(summaryResult);
         }
       }
     } catch (error) {
@@ -720,12 +740,12 @@ function DashboardContent() {
   // Auto-mark activities as read when dashboard loads with unread activities
   useEffect(() => {
     const markActivitiesAsRead = async () => {
-      if (!activeFileIdRef.current) return;
+      if (activeFileIdsRef.current.length === 0) return;
       if (!dashboardSummary) return;
       if (dashboardSummary.unread_activity_count === 0) return;
 
       try {
-        await activitiesAPI.markAllAsRead(activeFileIdRef.current);
+        await activitiesAPI.markAllAsRead(activeFileIdsRef.current[0]);
         // Update local state to reflect that activities are now read
         setDashboardSummary(prev => prev ? {
           ...prev,
@@ -744,8 +764,8 @@ function DashboardContent() {
 
   // Handle manual "With Me" check-in
   const handleWithMe = async (childId: string) => {
-    const activeFile = familyFilesWithData.find(f => f.familyFile.status === 'active');
-    if (!activeFile) return;
+    const activeFiles = familyFilesWithData.filter(f => f.familyFile.status === 'active');
+    if (activeFiles.length === 0) return;
 
     const child = allChildren.find(c => c.id === childId);
     const childName = child?.first_name || 'Child';
@@ -758,10 +778,15 @@ function DashboardContent() {
 
     if (confirmed) {
       try {
-        // Refresh custody status to show the change
-        // Note: Full implementation requires backend endpoint
-        const updatedStatus = await familyFilesAPI.getCustodyStatus(activeFile.familyFile.id);
-        setCustodyStatus(updatedStatus);
+        // Refresh custody status for all active family files
+        const custodyPromises = activeFiles.map(f =>
+          familyFilesAPI.getCustodyStatus(f.familyFile.id)
+        );
+        const results = await Promise.allSettled(custodyPromises);
+        const successfulStatuses = results
+          .filter((r): r is PromiseFulfilledResult<CustodyStatusResponse> => r.status === 'fulfilled')
+          .map(r => r.value);
+        setAllCustodyStatuses(successfulStatuses);
 
         // Show success feedback
         alert(`${childName} is now marked as "With Me".\n\nNote: Manual check-in feature is being finalized.`);
@@ -893,14 +918,35 @@ function DashboardContent() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Custody Status Card */}
-            {allChildren.length > 0 && (
-              <CustodyStatusCard
-                custodyStatus={custodyStatus}
-                children={allChildren}
-                coparentName={custodyStatus?.coparent_name}
-                onWithMe={handleWithMe}
-              />
+            {/* Custody Status Cards - One per child across all family files */}
+            {allChildren.length > 0 && allCustodyStatuses.length > 0 && (
+              <div className="space-y-3">
+                {allCustodyStatuses.flatMap((custodyStatus) =>
+                  (custodyStatus.children || []).map((childStatus) => {
+                    const childData = allChildren.find(c => c.id === childStatus.child_id);
+                    return (
+                      <ChildCustodyCard
+                        key={childStatus.child_id}
+                        childStatus={childStatus}
+                        childData={childData}
+                        coparentName={custodyStatus.coparent_name}
+                        onWithMe={handleWithMe}
+                      />
+                    );
+                  })
+                )}
+              </div>
+            )}
+            {/* Fallback if no custody data but children exist */}
+            {allChildren.length > 0 && allCustodyStatuses.length === 0 && (
+              <div className="cg-card overflow-hidden">
+                <div className="h-2 bg-cg-sage" />
+                <div className="p-5">
+                  <p className="text-sm text-muted-foreground">
+                    Set up custody exchanges to see status
+                  </p>
+                </div>
+              </div>
             )}
 
             {/* Action Stream */}
