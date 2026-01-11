@@ -432,10 +432,10 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                       coach: '⚽',
                     };
 
-                    // Find the room assigned to this contact (match by name)
-                    const contactRoom = rooms.find(
-                      (room) => room.is_assigned && room.assigned_contact_name === contact.contact_name
-                    );
+                    // Get room info directly from contact's room_number
+                    const contactRoom = contact.room_number
+                      ? rooms.find((room) => room.room_number === contact.room_number)
+                      : undefined;
 
                     return (
                       <div
@@ -511,8 +511,11 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                             {/* Copy Invite Link Button */}
                             <button
                               onClick={() => {
-                                const inviteLink = `${window.location.origin}/my-circle/login?contact=${contact.id}`;
-                                navigator.clipboard.writeText(inviteLink);
+                                // Link to circle contact login page, pre-fill email if available
+                                const loginUrl = contact.contact_email
+                                  ? `${window.location.origin}/my-circle/contact?email=${encodeURIComponent(contact.contact_email)}`
+                                  : `${window.location.origin}/my-circle/contact`;
+                                navigator.clipboard.writeText(loginUrl);
                                 alert('Login link copied to clipboard!');
                               }}
                               className="p-2 text-purple-600 bg-purple-100 hover:bg-purple-200 rounded-lg transition-colors"

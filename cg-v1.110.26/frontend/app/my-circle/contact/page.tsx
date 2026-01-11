@@ -1,17 +1,26 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, Users, Eye, EyeOff, Shield } from 'lucide-react';
 import { myCircleAPI } from '@/lib/api';
 
-export default function CircleContactLoginPage() {
+function CircleContactLoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Pre-fill email from URL parameter if provided
+  useEffect(() => {
+    const emailParam = searchParams.get('email');
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -132,7 +141,7 @@ export default function CircleContactLoginPage() {
         {/* Help Text */}
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>
-            Don't have an account? You need an invitation from a parent.
+            Don&apos;t have an account? You need an invitation from a parent.
           </p>
           <p className="mt-2">
             <button
@@ -145,5 +154,17 @@ export default function CircleContactLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CircleContactLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-teal-50 to-cyan-50 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+      </div>
+    }>
+      <CircleContactLoginContent />
+    </Suspense>
   );
 }

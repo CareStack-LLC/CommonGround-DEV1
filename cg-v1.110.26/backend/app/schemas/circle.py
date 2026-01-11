@@ -77,6 +77,9 @@ class CircleContactResponse(BaseModel):
     photo_url: Optional[str] = None
     notes: Optional[str] = None
 
+    # Room assignment
+    room_number: Optional[int] = None
+
     # Approval tracking
     added_by: str
     approved_by_parent_a_at: Optional[datetime] = None

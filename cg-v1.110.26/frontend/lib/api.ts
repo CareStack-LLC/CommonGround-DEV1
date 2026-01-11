@@ -5175,6 +5175,7 @@ export interface CircleContact {
   relationship_type: string;
   photo_url?: string;
   notes?: string;
+  room_number?: number;
   added_by: string;
   approved_by_parent_a_at?: string;
   approved_by_parent_b_at?: string;
