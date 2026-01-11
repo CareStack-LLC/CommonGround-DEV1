@@ -45,6 +45,7 @@ function CircleManagementContent() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingContact, setEditingContact] = useState<CircleContact | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [approvingContactId, setApprovingContactId] = useState<string | null>(null);
 
   // Form state
   const [formData, setFormData] = useState<CircleContactCreate>({
@@ -123,12 +124,17 @@ function CircleManagementContent() {
 
   async function handleApprove(contactId: string, approved: boolean) {
     try {
+      setApprovingContactId(contactId);
+      setError(null);
       const updated = await circleAPI.approve(contactId, approved);
       setContacts((prev) =>
         prev.map((c) => (c.id === updated.id ? updated : c))
       );
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating approval:', err);
+      setError(err.message || 'Failed to update approval. Please try again.');
+    } finally {
+      setApprovingContactId(null);
     }
   }
 
@@ -426,10 +432,15 @@ function CircleManagementContent() {
                       {!contact.is_fully_approved && (
                         <button
                           onClick={() => handleApprove(contact.id, true)}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                          disabled={approvingContactId === contact.id}
+                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Approve"
                         >
-                          <Check className="h-5 w-5" />
+                          {approvingContactId === contact.id ? (
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                          ) : (
+                            <Check className="h-5 w-5" />
+                          )}
                         </button>
                       )}
 

@@ -104,6 +104,7 @@ export default function CircleManagementPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedContactId, setExpandedContactId] = useState<string | null>(null);
   const [savingPermission, setSavingPermission] = useState<string | null>(null);
+  const [approvingContactId, setApprovingContactId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<CircleContactCreate>({
     family_file_id: familyFileId,
@@ -239,12 +240,17 @@ export default function CircleManagementPage() {
 
   async function handleApprove(contactId: string, approved: boolean) {
     try {
+      setApprovingContactId(contactId);
+      setError(null);
       const updated = await circleAPI.approve(contactId, approved);
       setContacts((prev) =>
         prev.map((c) => (c.id === updated.id ? updated : c))
       );
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating approval:', err);
+      setError(err.message || 'Failed to update approval. Please try again.');
+    } finally {
+      setApprovingContactId(null);
     }
   }
 
@@ -547,10 +553,15 @@ export default function CircleManagementPage() {
                           {!contact.is_fully_approved && (
                             <button
                               onClick={() => handleApprove(contact.id, true)}
-                              className="p-2 text-cg-success hover:bg-cg-success-subtle rounded-lg transition-colors"
+                              disabled={approvingContactId === contact.id}
+                              className="p-2 text-cg-success hover:bg-cg-success-subtle rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Approve"
                             >
-                              <Check className="h-5 w-5" />
+                              {approvingContactId === contact.id ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                              ) : (
+                                <Check className="h-5 w-5" />
+                              )}
                             </button>
                           )}
 
