@@ -22,6 +22,7 @@ import { useAuth } from '@/lib/auth-context';
 import {
   clearfundAPI,
   walletAPI,
+  getImageUrl,
   Obligation,
   FundingStatus,
   Attestation,
@@ -533,7 +534,7 @@ function ObligationDetailContent() {
                   </div>
                   {artifact.receipt_url && (
                     <a
-                      href={artifact.receipt_url}
+                      href={getImageUrl(artifact.receipt_url) || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="cg-btn-secondary text-sm py-1.5 px-3"
