@@ -326,6 +326,75 @@ async def upload_receipt(
     return VerificationArtifactResponse.model_validate(artifact)
 
 
+@router.post("/obligations/{obligation_id}/receipt/upload")
+async def upload_receipt_file(
+    obligation_id: str,
+    file: UploadFile = File(...),
+    amount: float = Query(..., gt=0, description="Receipt amount"),
+    vendor_name: Optional[str] = Query(None, description="Vendor name"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> VerificationArtifactResponse:
+    """
+    Upload a receipt file for verification.
+
+    Accepts an image file, saves it to storage, and creates a verification artifact.
+    """
+    import os
+    import uuid
+    from pathlib import Path
+    from decimal import Decimal
+
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"]
+    if file.content_type not in allowed_types:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File type {file.content_type} not allowed. Use JPEG, PNG, GIF, WebP, or PDF."
+        )
+
+    # Validate file size (max 10MB)
+    content = await file.read()
+    if len(content) > 10 * 1024 * 1024:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File too large. Maximum size is 10MB."
+        )
+
+    # Create uploads directory if it doesn't exist
+    upload_dir = Path("uploads/receipts")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+
+    # Generate unique filename
+    file_ext = Path(file.filename or "receipt.jpg").suffix.lower()
+    if not file_ext:
+        file_ext = ".jpg" if file.content_type.startswith("image/") else ".pdf"
+    unique_filename = f"{obligation_id}_{uuid.uuid4().hex[:8]}{file_ext}"
+    file_path = upload_dir / unique_filename
+
+    # Save file
+    with open(file_path, "wb") as f:
+        f.write(content)
+
+    # Generate URL (relative to API)
+    receipt_url = f"/uploads/receipts/{unique_filename}"
+
+    # Create verification artifact
+    service = ClearFundService(db)
+    artifact = await service.upload_receipt(
+        obligation_id,
+        receipt_url,
+        file.filename or unique_filename,
+        file.content_type or "image/jpeg",
+        Decimal(str(amount)),
+        vendor_name,
+        current_user
+    )
+    return VerificationArtifactResponse.model_validate(artifact)
+
+
 @router.get("/obligations/{obligation_id}/artifacts")
 async def list_artifacts(
     obligation_id: str,

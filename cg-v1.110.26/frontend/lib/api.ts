@@ -2737,6 +2737,44 @@ export const clearfundAPI = {
   },
 
   /**
+   * Upload receipt file for verification
+   */
+  async uploadReceiptFile(
+    obligationId: string,
+    file: File,
+    amount: number,
+    vendorName?: string
+  ): Promise<VerificationArtifact> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const params = new URLSearchParams({
+      amount: String(amount),
+    });
+    if (vendorName) params.append('vendor_name', vendorName);
+
+    const token = localStorage.getItem('access_token');
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+    const response = await fetch(
+      `${apiUrl}/clearfund/obligations/${obligationId}/receipt/upload?${params.toString()}`,
+      {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(error.detail || 'Failed to upload receipt');
+    }
+
+    return response.json();
+  },
+
+  /**
    * List verification artifacts for an obligation
    */
   async listArtifacts(obligationId: string): Promise<VerificationArtifact[]> {
