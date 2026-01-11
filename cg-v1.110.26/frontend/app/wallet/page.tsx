@@ -32,7 +32,8 @@ import {
   ExternalLink,
   AlertCircle,
   X,
-  ChevronRight
+  ChevronRight,
+  CheckCircle
 } from 'lucide-react';
 
 type TabType = 'overview' | 'transactions' | 'children' | 'payouts';
@@ -56,11 +57,35 @@ function WalletContent() {
   const [showContributeModal, setShowContributeModal] = useState(false);
   const [selectedChildWallet, setSelectedChildWallet] = useState<ChildWallet | null>(null);
 
+  // Check for onboarding completion
+  const onboardingComplete = searchParams.get('onboarding') === 'complete';
+  const walletIdFromUrl = searchParams.get('wallet_id');
+  const [showOnboardingSuccess, setShowOnboardingSuccess] = useState(false);
+
   useEffect(() => {
     if (user) {
       loadWalletData();
     }
   }, [user, familyFileId]);
+
+  // Handle return from Stripe onboarding
+  useEffect(() => {
+    if (onboardingComplete && walletIdFromUrl) {
+      // Sync wallet status with Stripe
+      const syncWallet = async () => {
+        try {
+          await walletAPI.syncWallet(walletIdFromUrl);
+          await loadWalletData();
+          setShowOnboardingSuccess(true);
+          // Clear URL params after handling
+          router.replace('/wallet');
+        } catch (err) {
+          console.error('Failed to sync wallet:', err);
+        }
+      };
+      syncWallet();
+    }
+  }, [onboardingComplete, walletIdFromUrl]);
 
   const loadWalletData = async () => {
     try {
@@ -169,6 +194,28 @@ function WalletContent() {
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-8">
       <Navigation />
+
+      {/* Onboarding Success Banner */}
+      {showOnboardingSuccess && (
+        <div className="bg-cg-success-subtle border-b border-cg-success/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-cg-success" />
+                <p className="text-sm font-medium text-cg-success">
+                  Wallet setup complete! You can now receive payments and manage funds.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowOnboardingSuccess(false)}
+                className="text-cg-success hover:text-cg-success/80"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <header className="border-b border-border bg-card">
