@@ -361,6 +361,90 @@ async def deposit_funds(
         )
 
 
+@router.post("/{wallet_id}/deposit/{transaction_id}/confirm")
+async def confirm_deposit(
+    wallet_id: str,
+    transaction_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> DepositResponse:
+    """
+    Confirm a deposit after 3D Secure authentication.
+
+    Call this after stripe.confirmCardPayment() succeeds on the frontend.
+    This checks the payment status with Stripe and updates the transaction.
+    """
+    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
+
+    if not wallet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
+
+    if wallet.owner_id != str(current_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    try:
+        # Get the transaction
+        from sqlalchemy import select
+        from app.models.wallet import WalletTransaction
+
+        result = await db.execute(
+            select(WalletTransaction).where(WalletTransaction.id == transaction_id)
+        )
+        transaction = result.scalar_one_or_none()
+
+        if not transaction:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+
+        if transaction.wallet_id != wallet_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Transaction does not belong to this wallet")
+
+        # If already completed, just return current state
+        if transaction.status == "completed":
+            return DepositResponse(
+                transaction_id=transaction.id,
+                wallet_id=wallet_id,
+                amount=transaction.amount,
+                fee_amount=transaction.fee_amount,
+                net_amount=transaction.net_amount,
+                payment_method="card",
+                status=transaction.status,
+                stripe_payment_intent_id=transaction.stripe_payment_intent_id,
+                client_secret=None,
+                requires_action=False,
+                created_at=transaction.created_at,
+            )
+
+        # Check with Stripe and complete if successful
+        if transaction.stripe_payment_intent_id:
+            transaction = await wallet_service.complete_deposit(
+                db, transaction_id, transaction.stripe_payment_intent_id
+            )
+            await db.commit()
+
+        return DepositResponse(
+            transaction_id=transaction.id,
+            wallet_id=wallet_id,
+            amount=transaction.amount,
+            fee_amount=transaction.fee_amount,
+            net_amount=transaction.net_amount,
+            payment_method="card",
+            status=transaction.status,
+            stripe_payment_intent_id=transaction.stripe_payment_intent_id,
+            client_secret=None,
+            requires_action=False,
+            created_at=transaction.created_at,
+        )
+    except ValueError as e:
+        await db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Confirmation failed: {str(e)}"
+        )
+
+
 # ============================================================================
 # Obligation Payments
 # ============================================================================

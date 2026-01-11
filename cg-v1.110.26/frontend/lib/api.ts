@@ -6193,6 +6193,15 @@ export const walletAPI = {
   },
 
   /**
+   * Confirm deposit after 3D Secure authentication
+   */
+  async confirmDeposit(walletId: string, transactionId: string): Promise<DepositResponse> {
+    return fetchAPI<DepositResponse>(`/wallets/${walletId}/deposit/${transactionId}/confirm`, {
+      method: 'POST',
+    });
+  },
+
+  /**
    * Get wallet transactions
    */
   async getTransactions(

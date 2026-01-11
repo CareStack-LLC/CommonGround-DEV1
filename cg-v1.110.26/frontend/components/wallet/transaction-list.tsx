@@ -45,16 +45,18 @@ function formatTime(dateString: string): string {
 }
 
 function getTransactionIcon(type: string) {
+  // Handle backend transaction types (deposit_card, deposit_ach, payout_received, etc.)
+  if (type.startsWith('deposit')) {
+    return ArrowDownLeft;
+  }
   switch (type) {
-    case 'deposit':
-      return ArrowDownLeft;
-    case 'withdrawal':
+    case 'transfer_out':
       return ArrowUpRight;
-    case 'payment':
+    case 'payment_to_obligation':
       return Receipt;
-    case 'payout':
+    case 'payout_received':
       return Building2;
-    case 'contribution':
+    case 'gift_received':
       return Gift;
     case 'refund':
       return RefreshCw;
@@ -78,14 +80,16 @@ function getStatusIcon(status: string) {
 }
 
 function getTransactionColor(type: string): { bg: string; text: string } {
+  // Handle backend transaction types (deposit_card, deposit_ach, payout_received, etc.)
+  if (type.startsWith('deposit') || type === 'payout_received') {
+    return { bg: 'bg-cg-success-subtle', text: 'text-cg-success' };
+  }
   switch (type) {
-    case 'deposit':
-    case 'payout':
-      return { bg: 'bg-cg-success-subtle', text: 'text-cg-success' };
-    case 'payment':
-    case 'withdrawal':
+    case 'payment_to_obligation':
+    case 'transfer_out':
+    case 'fee':
       return { bg: 'bg-cg-error-subtle', text: 'text-cg-error' };
-    case 'contribution':
+    case 'gift_received':
       return { bg: 'bg-purple-100', text: 'text-purple-600' };
     case 'refund':
       return { bg: 'bg-blue-100', text: 'text-blue-600' };
@@ -95,7 +99,10 @@ function getTransactionColor(type: string): { bg: string; text: string } {
 }
 
 function isCredit(type: string): boolean {
-  return ['deposit', 'payout', 'contribution', 'refund'].includes(type);
+  // Credit types: deposits, payouts received, gifts, refunds
+  // Backend sends: deposit_card, deposit_ach, payout_received, gift_received, refund
+  const creditTypes = ['payout_received', 'gift_received', 'refund'];
+  return type.startsWith('deposit') || creditTypes.includes(type);
 }
 
 export default function TransactionList({

@@ -160,6 +160,14 @@ function DepositFormInner({
           setIsLoading(false);
           return;
         }
+
+        // After 3D Secure, confirm the deposit with backend
+        await walletAPI.confirmDeposit(walletId, result.transaction_id);
+      }
+
+      // If status is not completed, confirm with backend (handles immediate success too)
+      if (result.status !== 'completed') {
+        await walletAPI.confirmDeposit(walletId, result.transaction_id);
       }
 
       setSuccess(true);
