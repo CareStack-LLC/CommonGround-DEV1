@@ -513,10 +513,10 @@ export default function CircleManagementPage() {
                   >
                     {/* Contact Header */}
                     <CGCardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-4 min-w-0 flex-1">
                           <CGAvatar name={contact.contact_name} size="lg" color="sage" />
-                          <div>
+                          <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <h3 className="font-semibold text-foreground">
                                 {contact.contact_name}
@@ -529,17 +529,17 @@ export default function CircleManagementPage() {
                             <p className="text-sm text-muted-foreground capitalize">
                               {contact.relationship_type.replace('_', ' ')}
                             </p>
-                            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-sm text-muted-foreground">
                               {contact.contact_email && (
-                                <span className="flex items-center gap-1">
-                                  <Mail className="h-4 w-4" />
-                                  <span>{contact.contact_email}</span>
+                                <span className="flex items-center gap-1 min-w-0">
+                                  <Mail className="h-4 w-4 flex-shrink-0" />
+                                  <span className="truncate">{contact.contact_email}</span>
                                 </span>
                               )}
                               {contact.contact_phone && (
-                                <span className="flex items-center gap-1">
-                                  <Phone className="h-4 w-4" />
-                                  <span>{contact.contact_phone}</span>
+                                <span className="flex items-center gap-1 min-w-0">
+                                  <Phone className="h-4 w-4 flex-shrink-0" />
+                                  <span className="truncate">{contact.contact_phone}</span>
                                 </span>
                               )}
                             </div>
@@ -549,7 +549,7 @@ export default function CircleManagementPage() {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                           {!contact.is_fully_approved && (
                             <button
                               onClick={() => handleApprove(contact.id, true)}

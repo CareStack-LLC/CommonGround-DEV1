@@ -389,12 +389,12 @@ function CircleManagementContent() {
                     !contact.is_active ? 'opacity-50' : ''
                   }`}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-semibold text-lg">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start space-x-4 min-w-0 flex-1">
+                      <div className="w-12 h-12 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-semibold text-lg flex-shrink-0">
                         {contact.contact_name[0]}
                       </div>
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center space-x-2">
                           <h3 className="font-semibold text-gray-900">
                             {contact.contact_name}
@@ -407,17 +407,17 @@ function CircleManagementContent() {
                         <p className="text-sm text-gray-500 capitalize">
                           {contact.relationship_type.replace('_', ' ')}
                         </p>
-                        <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-sm text-gray-500">
                           {contact.contact_email && (
-                            <span className="flex items-center space-x-1">
-                              <Mail className="h-4 w-4" />
-                              <span>{contact.contact_email}</span>
+                            <span className="flex items-center space-x-1 min-w-0">
+                              <Mail className="h-4 w-4 flex-shrink-0" />
+                              <span className="truncate">{contact.contact_email}</span>
                             </span>
                           )}
                           {contact.contact_phone && (
-                            <span className="flex items-center space-x-1">
-                              <Phone className="h-4 w-4" />
-                              <span>{contact.contact_phone}</span>
+                            <span className="flex items-center space-x-1 min-w-0">
+                              <Phone className="h-4 w-4 flex-shrink-0" />
+                              <span className="truncate">{contact.contact_phone}</span>
                             </span>
                           )}
                         </div>
@@ -427,7 +427,7 @@ function CircleManagementContent() {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                       {/* Approval Buttons */}
                       {!contact.is_fully_approved && (
                         <button
