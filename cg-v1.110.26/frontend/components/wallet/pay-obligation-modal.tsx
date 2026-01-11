@@ -195,7 +195,8 @@ function PayObligationModalInner({
 
       setSuccess(true);
       if (onSuccess) {
-        setTimeout(onSuccess, 1500);
+        // Wait for database to propagate, then trigger success callback
+        setTimeout(onSuccess, 2000);
       }
     } catch (err: any) {
       setError(err.message || 'Payment failed');

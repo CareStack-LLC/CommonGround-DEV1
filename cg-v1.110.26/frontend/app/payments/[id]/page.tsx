@@ -129,9 +129,11 @@ function ObligationDetailContent() {
     }
   };
 
-  const handlePaymentSuccess = () => {
+  const handlePaymentSuccess = async () => {
     setShowPaymentModal(false);
-    loadObligationData();
+    // Add small delay to account for database replication lag
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    await loadObligationData();
   };
 
   const handleComplete = async () => {
