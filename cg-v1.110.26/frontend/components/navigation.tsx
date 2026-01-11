@@ -37,7 +37,7 @@ const navItems: NavItem[] = [
   { name: 'Home', path: '/dashboard', icon: Home },
   { name: 'Chat', path: '/messages', icon: MessageSquare },
   { name: 'Calendar', path: '/schedule', icon: Calendar },
-  { name: 'Wallet', path: '/wallet', icon: Wallet },
+  { name: 'Clearfund', path: '/payments', icon: Wallet },
   { name: 'KidComs', path: '/kidcoms', icon: Video },
 ];
 
@@ -126,11 +126,11 @@ export function Navigation() {
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => {
-                // Special handling for Wallet to also highlight on /payments (ClearFund)
+                // Special handling for Clearfund to also highlight on /wallet
                 const isActive =
                   pathname === item.path ||
                   pathname?.startsWith(`${item.path}/`) ||
-                  (item.path === '/wallet' && (pathname === '/payments' || pathname?.startsWith('/payments/')));
+                  (item.path === '/payments' && (pathname === '/wallet' || pathname?.startsWith('/wallet/')));
                 const Icon = item.icon;
 
                 return (
@@ -309,11 +309,11 @@ export function Navigation() {
       {/* Mobile Bottom Navigation */}
       <nav className="bottom-nav lg:hidden">
         {navItems.map((item) => {
-          // Special handling for Wallet to also highlight on /payments (ClearFund)
+          // Special handling for Clearfund to also highlight on /wallet
           const isActive =
             pathname === item.path ||
             pathname?.startsWith(`${item.path}/`) ||
-            (item.path === '/wallet' && (pathname === '/payments' || pathname?.startsWith('/payments/')));
+            (item.path === '/payments' && (pathname === '/wallet' || pathname?.startsWith('/wallet/')));
           const Icon = item.icon;
 
           return (
