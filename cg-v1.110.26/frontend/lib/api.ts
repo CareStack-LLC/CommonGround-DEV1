@@ -2754,9 +2754,8 @@ export const clearfundAPI = {
     if (vendorName) params.append('vendor_name', vendorName);
 
     const token = localStorage.getItem('access_token');
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
     const response = await fetch(
-      `${apiUrl}/clearfund/obligations/${obligationId}/receipt/upload?${params.toString()}`,
+      `${API_URL}/clearfund/obligations/${obligationId}/receipt/upload?${params.toString()}`,
       {
         method: 'POST',
         headers: {
