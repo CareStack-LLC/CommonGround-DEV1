@@ -53,6 +53,20 @@ from app.models.clearfund import (
     ARTIFACT_TYPES,
     CREDIT_SOURCES,
 )
+from app.models.wallet import (
+    Wallet,
+    WalletTransaction,
+    WalletFunding,
+    ChildWalletContribution,
+    Payout,
+    WALLET_TYPES,
+    OWNER_TYPES,
+    CONNECT_ACCOUNT_STATUSES,
+    TRANSACTION_TYPES,
+    TRANSACTION_STATUSES,
+    PAYMENT_SOURCES,
+    PAYOUT_STATUSES,
+)
 from app.models.legal import LegalAccess, CourtExport
 from app.models.audit import AuditLog, EventLog
 from app.models.activity import (
@@ -217,6 +231,19 @@ __all__ = [
     "CARD_STATUSES",
     "ARTIFACT_TYPES",
     "CREDIT_SOURCES",
+    # Wallet System (ClearFund v2)
+    "Wallet",
+    "WalletTransaction",
+    "WalletFunding",
+    "ChildWalletContribution",
+    "Payout",
+    "WALLET_TYPES",
+    "OWNER_TYPES",
+    "CONNECT_ACCOUNT_STATUSES",
+    "TRANSACTION_TYPES",
+    "TRANSACTION_STATUSES",
+    "PAYMENT_SOURCES",
+    "PAYOUT_STATUSES",
     # Court Access Mode
     "CourtProfessional",
     "CourtAccessGrant",

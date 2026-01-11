@@ -24,6 +24,8 @@ from app.api.v1.endpoints import (
     cubbie,
     children,
     clearfund,
+    wallet,
+    webhook,
     exports,
     intake,
     dashboard,
@@ -67,6 +69,12 @@ api_router.include_router(children.router, prefix="/children", tags=["Child Prof
 
 # ClearFund - Purpose-Locked Financial Obligations
 api_router.include_router(clearfund.router, prefix="/clearfund", tags=["ClearFund"])
+
+# Wallet System - Parent/Child Wallets with Stripe Connect
+api_router.include_router(wallet.router, prefix="/wallets", tags=["Wallets"])
+
+# Stripe Webhooks
+api_router.include_router(webhook.router, prefix="/webhooks", tags=["Webhooks"])
 
 # CaseExport - Court-ready documentation packages
 api_router.include_router(exports.router, prefix="/exports", tags=["Case Exports"])
