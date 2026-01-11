@@ -176,26 +176,26 @@ function ChatHeader({
   onBack?: () => void;
 }) {
   return (
-    <div className="cg-glass border-b border-border sticky top-0 z-10">
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-3">
+    <div className="bg-card border-b border-border flex-shrink-0">
+      <div className="flex items-center justify-between p-4 gap-2">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
           {onBack && (
             <button
               onClick={onBack}
-              className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-cg-sage-subtle transition-smooth"
+              className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-cg-sage-subtle transition-smooth flex-shrink-0"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
           )}
-          <div className="w-10 h-10 rounded-full bg-cg-sage-subtle flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-cg-sage-subtle flex items-center justify-center flex-shrink-0">
             <Users className="h-5 w-5 text-cg-sage" />
           </div>
-          <div>
-            <h2 className="font-semibold text-foreground">{familyFileName}</h2>
-            <p className="text-xs text-muted-foreground">{agreementTitle}</p>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-semibold text-foreground truncate">{familyFileName}</h2>
+            <p className="text-xs text-muted-foreground truncate">{agreementTitle}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <ARIAGuardianBadge />
         </div>
       </div>
@@ -484,11 +484,12 @@ function MessagesContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navigation />
 
-      <div className="max-w-7xl mx-auto">
-        <div className="flex h-[calc(100vh-4rem)] lg:h-[calc(100vh-5rem)]">
+      <div className="flex-1 max-w-7xl mx-auto w-full">
+        {/* Height: viewport - top nav (4rem) - bottom nav (~5rem on mobile, 0 on desktop) */}
+        <div className="flex h-[calc(100dvh-4rem-5rem)] lg:h-[calc(100dvh-4rem)]">
           {/* Sidebar - Conversations */}
           <aside className={`
             ${showSidebar ? 'flex' : 'hidden lg:flex'}
@@ -520,7 +521,7 @@ function MessagesContent() {
           {/* Main Chat Area */}
           <main className={`
             ${!showSidebar || selectedAgreement ? 'flex' : 'hidden lg:flex'}
-            flex-1 flex flex-col bg-background pb-20 lg:pb-0
+            flex-1 flex flex-col bg-background overflow-hidden
           `}>
             {!selectedAgreement ? (
               /* No Agreement Selected */
@@ -599,7 +600,7 @@ function MessagesContent() {
 
                 {/* Compose Area */}
                 {showCompose ? (
-                  <div className="border-t border-border p-4 bg-card">
+                  <div className="border-t border-border p-4 bg-card flex-shrink-0">
                     {getOtherParentId() ? (
                       <MessageCompose
                         caseId={selectedAgreement.case_id || undefined}
@@ -629,7 +630,7 @@ function MessagesContent() {
                   </div>
                 ) : (
                   /* Quick Compose Button */
-                  <div className="border-t border-border p-4 bg-card">
+                  <div className="border-t border-border p-4 bg-card flex-shrink-0">
                     <button
                       onClick={() => setShowCompose(true)}
                       disabled={!getOtherParentId()}
