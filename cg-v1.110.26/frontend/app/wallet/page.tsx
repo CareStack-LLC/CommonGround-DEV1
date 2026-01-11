@@ -128,8 +128,13 @@ function WalletContent() {
       // Create wallet if doesn't exist
       let currentWallet = wallet;
       if (!currentWallet) {
-        currentWallet = await walletAPI.createWallet();
-        setWallet(currentWallet as WalletWithBalance);
+        const createdWallet = await walletAPI.createWallet();
+        // Add default balance to convert Wallet to WalletWithBalance
+        currentWallet = {
+          ...createdWallet,
+          balance: { available: '0.00', pending: '0.00', total: '0.00', currency: 'usd' }
+        };
+        setWallet(currentWallet);
       }
 
       // Start onboarding
