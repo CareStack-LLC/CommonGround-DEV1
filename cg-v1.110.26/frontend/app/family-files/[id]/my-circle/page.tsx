@@ -586,13 +586,13 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                               <div className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                                 contact.can_communicate
                                   ? 'bg-cg-success-subtle text-cg-success'
-                                  : contact.parent_a_approved || contact.parent_b_approved
+                                  : contact.is_partially_approved
                                     ? 'bg-amber-100 text-amber-700'
                                     : 'bg-muted text-muted-foreground'
                               }`}>
                                 {contact.can_communicate
                                   ? 'Approved'
-                                  : contact.parent_a_approved || contact.parent_b_approved
+                                  : contact.is_partially_approved
                                     ? 'Pending'
                                     : 'Not Approved'}
                               </div>
@@ -624,7 +624,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                           {/* Parent Approval Details */}
                           <div className="mt-3 pt-3 border-t border-border flex items-center gap-4 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
-                              {contact.parent_a_approved ? (
+                              {contact.approved_by_parent_a_at ? (
                                 <Check className="h-3 w-3 text-cg-success" />
                               ) : (
                                 <X className="h-3 w-3 text-muted-foreground" />
@@ -632,17 +632,17 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                               Parent A
                             </span>
                             <span className="flex items-center gap-1">
-                              {contact.parent_b_approved ? (
+                              {contact.approved_by_parent_b_at ? (
                                 <Check className="h-3 w-3 text-cg-success" />
                               ) : (
                                 <X className="h-3 w-3 text-muted-foreground" />
                               )}
                               Parent B
                             </span>
-                            {contact.email && (
+                            {contact.contact_email && (
                               <span className="flex items-center gap-1 ml-auto">
                                 <Mail className="h-3 w-3" />
-                                {contact.email}
+                                {contact.contact_email}
                               </span>
                             )}
                           </div>
