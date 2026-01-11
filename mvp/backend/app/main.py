@@ -3,6 +3,7 @@ FastAPI application entry point.
 """
 
 import os
+import subprocess
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -20,6 +21,33 @@ UPLOADS_DIR = Path(__file__).parent.parent / "uploads"
 UPLOADS_DIR.mkdir(exist_ok=True)
 
 
+def run_migrations():
+    """Run alembic migrations on startup."""
+    try:
+        # Get the directory containing alembic.ini
+        backend_dir = Path(__file__).parent.parent
+        print(f"📦 Running database migrations from {backend_dir}...")
+
+        result = subprocess.run(
+            ["alembic", "upgrade", "head"],
+            cwd=str(backend_dir),
+            capture_output=True,
+            text=True,
+            timeout=120  # 2 minute timeout
+        )
+
+        if result.returncode == 0:
+            print("✅ Database migrations completed successfully")
+            if result.stdout:
+                print(result.stdout)
+        else:
+            print(f"⚠️ Migration warning (may already be up to date): {result.stderr}")
+    except subprocess.TimeoutExpired:
+        print("⚠️ Migration timeout - continuing startup")
+    except Exception as e:
+        print(f"⚠️ Migration error (continuing startup): {e}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
@@ -27,6 +55,10 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     print(f"🚀 Starting {settings.APP_NAME} ({settings.ENVIRONMENT})")
+
+    # Always run migrations on startup (safe - alembic tracks applied migrations)
+    run_migrations()
+
     if settings.is_development:
         await init_db()  # Auto-create tables in dev
         print("✅ Database tables created")
