@@ -17,6 +17,10 @@ import {
   X,
   Heart,
   Sparkles,
+  Star,
+  Lock,
+  Eye,
+  HandHeart,
 } from 'lucide-react';
 import { myCircleAPI, kidcomsAPI, CirclePermission, IncomingCall } from '@/lib/api';
 import IncomingCallAlert from '@/components/my-circle/incoming-call-alert';
@@ -24,8 +28,8 @@ import { CGCard, CGBadge, CGButton, CGEmptyState } from '@/components/cg';
 import { cn } from '@/lib/utils';
 
 /* =============================================================================
-   Circle Contact Dashboard - "The Sanctuary of Truth"
-   Clean, professional interface for trusted contacts (grandparents, etc.)
+   Circle Contact Dashboard - "The Village That Raises A Child"
+   Warm, inviting interface celebrating the importance of extended family
    ============================================================================= */
 
 interface CircleUserData {
@@ -58,6 +62,15 @@ const CHILD_AVATARS: Record<string, string> = {
   dragon: '🐉',
 };
 
+// Encouraging messages that rotate
+const ENCOURAGING_MESSAGES = [
+  "Your voice brings comfort and joy",
+  "Every call creates lasting memories",
+  "You're helping them feel loved and grounded",
+  "Your connection matters more than you know",
+  "Being present is the greatest gift",
+];
+
 export default function CircleContactDashboardPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -67,6 +80,9 @@ export default function CircleContactDashboardPage() {
   const [isStartingCall, setIsStartingCall] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
+  const [encouragingMessage] = useState(() =>
+    ENCOURAGING_MESSAGES[Math.floor(Math.random() * ENCOURAGING_MESSAGES.length)]
+  );
 
   // Poll for incoming calls
   const checkIncomingCalls = useCallback(async () => {
@@ -242,21 +258,21 @@ export default function CircleContactDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-cg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-teal-50/50 to-cg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-              <Sparkles className="h-8 w-8 text-cg-sage animate-pulse" />
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-100 to-cg-sage-subtle flex items-center justify-center">
+              <Heart className="h-10 w-10 text-teal-600 animate-pulse" />
             </div>
           </div>
-          <p className="text-cg-text-secondary font-medium">Loading your circle...</p>
+          <p className="text-cg-text-secondary font-medium">Connecting to your circle...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-cg-background">
+    <div className="min-h-screen bg-gradient-to-b from-teal-50/30 to-cg-background">
       {/* Incoming Call Alert */}
       {incomingCall && (
         <IncomingCallAlert
@@ -269,13 +285,13 @@ export default function CircleContactDashboardPage() {
       )}
 
       {/* Header */}
-      <header className="bg-card border-b border-border/50 sticky top-0 z-40">
+      <header className="bg-white/80 backdrop-blur-sm border-b border-teal-100/50 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo & User Info */}
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
-                <Heart className="h-6 w-6 text-cg-sage" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-100 to-teal-50 flex items-center justify-center shadow-sm">
+                <Heart className="h-6 w-6 text-teal-600" />
               </div>
               <div>
                 <h1 className="text-xl font-semibold text-foreground">My Circle</h1>
@@ -299,6 +315,25 @@ export default function CircleContactDashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
+        {/* Hero Welcome Section */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-teal-100/50 rounded-full mb-4">
+            <Star className="h-4 w-4 text-teal-600" />
+            <span className="text-sm font-medium text-teal-700">You&apos;re Part of Something Special</span>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+            Thank You for Being Here
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto mb-2">
+            You&apos;re part of a trusted circle helping to keep a child grounded in love and connection.
+            In times of change, <span className="text-teal-600 font-medium">you are their constant</span>.
+          </p>
+          <p className="text-sm text-teal-600 italic flex items-center justify-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            {encouragingMessage}
+          </p>
+        </div>
+
         {/* Error Message */}
         {error && (
           <CGCard variant="default" className="mb-6 border-cg-error/30 bg-cg-error-subtle">
@@ -311,23 +346,31 @@ export default function CircleContactDashboardPage() {
           </CGCard>
         )}
 
-        {/* Section Header */}
+        {/* Connection Section */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-foreground mb-1">Your Connections</h2>
+          <div className="flex items-center gap-2 mb-2">
+            <HandHeart className="h-5 w-5 text-teal-600" />
+            <h3 className="text-lg font-semibold text-foreground">Your Connections</h3>
+          </div>
           <p className="text-sm text-muted-foreground">
-            Children you're approved to connect with
+            The children you&apos;re approved to connect with &mdash; they&apos;re excited to hear from you!
           </p>
         </div>
 
         {/* Empty State */}
         {children.length === 0 ? (
-          <CGCard variant="elevated" className="p-0">
-            <CGEmptyState
-              icon={<Users className="h-8 w-8" />}
-              title="No Connections Yet"
-              description="You'll see children you can connect with here once a parent adds you to their circle."
-              size="lg"
-            />
+          <CGCard variant="elevated" className="p-8 text-center border-teal-100">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-100 to-teal-50 flex items-center justify-center mx-auto mb-4">
+              <Users className="h-10 w-10 text-teal-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">Awaiting Connections</h3>
+            <p className="text-muted-foreground max-w-sm mx-auto">
+              Once a parent adds you to their circle and approves your access,
+              you&apos;ll see the children you can connect with here.
+            </p>
+            <p className="text-sm text-teal-600 mt-4">
+              Your patience and presence mean everything.
+            </p>
           </CGCard>
         ) : (
           /* Children Grid */
@@ -340,7 +383,7 @@ export default function CircleContactDashboardPage() {
                   key={child.child_id}
                   variant="interactive"
                   className={cn(
-                    'cursor-pointer transition-all duration-200',
+                    'cursor-pointer transition-all duration-200 border-teal-100/50 hover:border-teal-200 hover:shadow-md',
                     !status.allowed && 'opacity-60 cursor-not-allowed'
                   )}
                   onClick={() => status.allowed && setSelectedChild(child)}
@@ -348,8 +391,15 @@ export default function CircleContactDashboardPage() {
                   <div className="p-5">
                     <div className="flex items-start gap-4">
                       {/* Avatar */}
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle flex items-center justify-center text-4xl flex-shrink-0">
-                        {getChildAvatar(child.avatar_id)}
+                      <div className="relative">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-100 to-amber-50 flex items-center justify-center text-4xl flex-shrink-0 shadow-sm">
+                          {getChildAvatar(child.avatar_id)}
+                        </div>
+                        {status.allowed && (
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-cg-success rounded-full border-2 border-white flex items-center justify-center">
+                            <div className="w-2 h-2 bg-white rounded-full" />
+                          </div>
+                        )}
                       </div>
 
                       {/* Info */}
@@ -366,8 +416,8 @@ export default function CircleContactDashboardPage() {
                         {/* Permission Icons */}
                         <div className="flex gap-2 mb-3">
                           {child.permissions.can_video_call && (
-                            <div className="p-2 bg-cg-sage-subtle rounded-lg" title="Video Calls">
-                              <Video className="h-4 w-4 text-cg-sage" />
+                            <div className="p-2 bg-teal-50 rounded-lg" title="Video Calls">
+                              <Video className="h-4 w-4 text-teal-600" />
                             </div>
                           )}
                           {child.permissions.can_voice_call && (
@@ -376,13 +426,13 @@ export default function CircleContactDashboardPage() {
                             </div>
                           )}
                           {child.permissions.can_chat && (
-                            <div className="p-2 bg-purple-100 rounded-lg" title="Chat">
-                              <MessageCircle className="h-4 w-4 text-purple-600" />
+                            <div className="p-2 bg-purple-50 rounded-lg" title="Chat">
+                              <MessageCircle className="h-4 w-4 text-purple-500" />
                             </div>
                           )}
                           {child.permissions.can_theater && (
-                            <div className="p-2 bg-cg-amber-subtle rounded-lg" title="Watch Together">
-                              <Film className="h-4 w-4 text-cg-amber" />
+                            <div className="p-2 bg-amber-50 rounded-lg" title="Watch Together">
+                              <Film className="h-4 w-4 text-amber-600" />
                             </div>
                           )}
                         </div>
@@ -409,13 +459,13 @@ export default function CircleContactDashboardPage() {
 
                         {/* Unavailable Reason */}
                         {!status.allowed && status.reason && (
-                          <p className="mt-2 text-xs text-cg-amber font-medium">{status.reason}</p>
+                          <p className="mt-2 text-xs text-amber-600 font-medium">{status.reason}</p>
                         )}
                       </div>
 
                       {/* Arrow */}
                       {status.allowed && (
-                        <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                        <ChevronRight className="h-5 w-5 text-teal-400 flex-shrink-0" />
                       )}
                     </div>
                   </div>
@@ -425,10 +475,64 @@ export default function CircleContactDashboardPage() {
           </div>
         )}
 
-        {/* Safety Notice */}
-        <div className="mt-10 flex items-center justify-center gap-2 text-muted-foreground text-sm">
-          <Shield className="h-4 w-4" />
-          <span>All communications are monitored for child safety</span>
+        {/* Trust & Safety Section - Warm, Non-Aggressive */}
+        <div className="mt-12 mb-8">
+          <div className="bg-gradient-to-r from-teal-50/80 to-slate-50/80 rounded-2xl p-6 border border-teal-100/50">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm flex-shrink-0">
+                <Shield className="h-6 w-6 text-teal-600" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-foreground mb-2">
+                  A Safe Space for Connection
+                </h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  CommonGround creates a protected environment where children can stay connected
+                  with the people who matter most. Here&apos;s how we keep everyone safe:
+                </p>
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
+                      <Eye className="h-4 w-4 text-teal-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Monitored Calls</p>
+                      <p className="text-xs text-muted-foreground">Parents are notified of all communications</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
+                      <Lock className="h-4 w-4 text-teal-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Parent Approved</p>
+                      <p className="text-xs text-muted-foreground">Access controlled by parents</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
+                      <Heart className="h-4 w-4 text-teal-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Child-Centered</p>
+                      <p className="text-xs text-muted-foreground">Everything revolves around their wellbeing</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Encouragement Footer */}
+        <div className="text-center py-6">
+          <p className="text-sm text-muted-foreground mb-2">
+            <span className="text-teal-600 font-medium">&quot;It takes a village to raise a child&quot;</span>
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Thank you for being part of this child&apos;s village.
+            Your love and consistency help them find their <span className="font-medium">common ground</span>.
+          </p>
         </div>
       </main>
 
@@ -440,17 +544,17 @@ export default function CircleContactDashboardPage() {
         >
           <CGCard
             variant="elevated"
-            className="max-w-sm w-full animate-in zoom-in-95 duration-200"
+            className="max-w-sm w-full animate-in zoom-in-95 duration-200 border-teal-100"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-8 text-center">
               {/* Avatar */}
               <div className="relative inline-block mb-6">
-                <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle flex items-center justify-center text-6xl mx-auto shadow-lg">
+                <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-teal-100 to-amber-50 flex items-center justify-center text-7xl mx-auto shadow-lg">
                   {getChildAvatar(selectedChild.avatar_id)}
                 </div>
                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
-                  <CGBadge variant="sage" className="shadow-sm">Online</CGBadge>
+                  <CGBadge variant="sage" className="shadow-sm">Ready to Connect</CGBadge>
                 </div>
               </div>
 
@@ -458,7 +562,8 @@ export default function CircleContactDashboardPage() {
               <h2 className="text-2xl font-semibold text-foreground mb-1">
                 {selectedChild.child_name}
               </h2>
-              <p className="text-muted-foreground mb-8">Choose how to connect</p>
+              <p className="text-muted-foreground mb-2">is excited to hear from you!</p>
+              <p className="text-sm text-teal-600 mb-6">Choose how to connect</p>
 
               {/* Call Options */}
               <div className="grid grid-cols-2 gap-4 mb-6">
@@ -468,16 +573,17 @@ export default function CircleContactDashboardPage() {
                     disabled={isStartingCall}
                     className={cn(
                       'flex flex-col items-center gap-3 p-5 rounded-2xl transition-all',
-                      'bg-cg-sage-subtle hover:bg-cg-sage/20 active:scale-95',
-                      'disabled:opacity-50 disabled:hover:bg-cg-sage-subtle disabled:active:scale-100'
+                      'bg-gradient-to-br from-teal-50 to-teal-100/50 hover:from-teal-100 hover:to-teal-100 active:scale-95',
+                      'border border-teal-200/50',
+                      'disabled:opacity-50 disabled:hover:from-teal-50 disabled:active:scale-100'
                     )}
                   >
                     {isStartingCall ? (
-                      <Loader2 className="h-10 w-10 text-cg-sage animate-spin" />
+                      <Loader2 className="h-10 w-10 text-teal-600 animate-spin" />
                     ) : (
-                      <Video className="h-10 w-10 text-cg-sage" />
+                      <Video className="h-10 w-10 text-teal-600" />
                     )}
-                    <span className="font-semibold text-cg-sage">Video Call</span>
+                    <span className="font-semibold text-teal-700">Video Call</span>
                   </button>
                 )}
                 {selectedChild.permissions.can_voice_call && (
@@ -486,8 +592,9 @@ export default function CircleContactDashboardPage() {
                     disabled={isStartingCall}
                     className={cn(
                       'flex flex-col items-center gap-3 p-5 rounded-2xl transition-all',
-                      'bg-cg-slate-subtle hover:bg-cg-slate/20 active:scale-95',
-                      'disabled:opacity-50 disabled:hover:bg-cg-slate-subtle disabled:active:scale-100'
+                      'bg-gradient-to-br from-slate-50 to-slate-100/50 hover:from-slate-100 hover:to-slate-100 active:scale-95',
+                      'border border-slate-200/50',
+                      'disabled:opacity-50 disabled:hover:from-slate-50 disabled:active:scale-100'
                     )}
                   >
                     {isStartingCall ? (
@@ -501,27 +608,31 @@ export default function CircleContactDashboardPage() {
               </div>
 
               {/* Other Options (Coming Soon) */}
-              <div className="flex justify-center gap-3 mb-2">
-                {selectedChild.permissions.can_chat && (
-                  <button
-                    disabled
-                    className="p-4 bg-purple-50 rounded-xl opacity-50"
-                    title="Coming soon!"
-                  >
-                    <MessageCircle className="h-6 w-6 text-purple-500" />
-                  </button>
-                )}
-                {selectedChild.permissions.can_theater && (
-                  <button
-                    disabled
-                    className="p-4 bg-cg-amber-subtle rounded-xl opacity-50"
-                    title="Coming soon!"
-                  >
-                    <Film className="h-6 w-6 text-cg-amber" />
-                  </button>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground mb-6">Chat & Watch Together coming soon!</p>
+              {(selectedChild.permissions.can_chat || selectedChild.permissions.can_theater) && (
+                <>
+                  <div className="flex justify-center gap-3 mb-2">
+                    {selectedChild.permissions.can_chat && (
+                      <button
+                        disabled
+                        className="p-4 bg-purple-50 rounded-xl opacity-50 border border-purple-100"
+                        title="Coming soon!"
+                      >
+                        <MessageCircle className="h-6 w-6 text-purple-400" />
+                      </button>
+                    )}
+                    {selectedChild.permissions.can_theater && (
+                      <button
+                        disabled
+                        className="p-4 bg-amber-50 rounded-xl opacity-50 border border-amber-100"
+                        title="Coming soon!"
+                      >
+                        <Film className="h-6 w-6 text-amber-400" />
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-6">Chat & Watch Together coming soon!</p>
+                </>
+              )}
 
               {/* Cancel */}
               <CGButton
@@ -529,7 +640,7 @@ export default function CircleContactDashboardPage() {
                 className="w-full"
                 onClick={() => setSelectedChild(null)}
               >
-                Cancel
+                Maybe Later
               </CGButton>
             </div>
           </CGCard>
