@@ -113,9 +113,9 @@ class StripeService:
         base_url = settings.FRONTEND_URL
 
         if not refresh_url:
-            refresh_url = f"{base_url}/clearfund/wallet/onboarding?wallet_id={wallet_id}"
+            refresh_url = f"{base_url}/wallet/onboarding?wallet_id={wallet_id}"
         if not return_url:
-            return_url = f"{base_url}/clearfund/wallet?wallet_id={wallet_id}&onboarding=complete"
+            return_url = f"{base_url}/wallet?wallet_id={wallet_id}&onboarding=complete"
 
         account_link = stripe.AccountLink.create(
             account=account_id,
@@ -221,7 +221,7 @@ class StripeService:
 
         if confirm and payment_method_id:
             params["confirm"] = True
-            params["return_url"] = f"{settings.FRONTEND_URL}/clearfund/payment/complete"
+            params["return_url"] = f"{settings.FRONTEND_URL}/payments?payment=complete"
 
         # Add idempotency key to prevent duplicate charges
         stripe_params = {}
