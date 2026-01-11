@@ -4507,6 +4507,25 @@ export const familyFilesAPI = {
   async getCustodyStatus(familyFileId: string): Promise<CustodyStatusResponse> {
     return fetchAPI<CustodyStatusResponse>(`/exchanges/family-file/${familyFileId}/custody-status`);
   },
+
+  /**
+   * Override custody status - "With Me" button
+   * Immediately sets custody status for the specified children
+   */
+  async overrideCustody(
+    familyFileId: string,
+    childIds: string[],
+    notes?: string
+  ): Promise<{ success: boolean; message: string }> {
+    return fetchAPI<{ success: boolean; message: string }>('/exchanges/override-custody', {
+      method: 'POST',
+      body: JSON.stringify({
+        family_file_id: familyFileId,
+        child_ids: childIds,
+        notes,
+      }),
+    });
+  },
 };
 
 // ============================================================================

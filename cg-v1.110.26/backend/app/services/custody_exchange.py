@@ -1163,17 +1163,82 @@ class CustodyExchangeService:
         for child in children:
             child_id_str = str(child.id)
 
+            # ============================================================
+            # PRIORITY 1: Check for manual custody override
+            # ============================================================
+            if child.current_custody_parent_id:
+                # Manual override is set - use it directly
+                override_parent_id = str(child.current_custody_parent_id)
+                with_current_user = override_parent_id == str(user_id)
+                current_parent_id = override_parent_id
+                if with_current_user:
+                    current_parent_name = "You"
+                    next_action = "dropoff"  # Next action would be to drop off
+                else:
+                    current_parent_name = coparent_name
+                    next_action = "pickup"  # Next action would be to pick up
+
+                # Still find next exchange for time calculations
+                next_exchange_instance = None
+                for inst in all_upcoming_instances:
+                    exchange = inst.exchange
+                    exchange_child_ids = exchange.child_ids or []
+                    pickup_ids = exchange.pickup_child_ids or []
+                    dropoff_ids = exchange.dropoff_child_ids or []
+                    if (child_id_str in exchange_child_ids or
+                        child_id_str in pickup_ids or
+                        child_id_str in dropoff_ids):
+                        next_exchange_instance = inst
+                        break
+                if not next_exchange_instance and all_upcoming_instances:
+                    next_exchange_instance = all_upcoming_instances[0]
+
+                # Calculate time remaining
+                hours_remaining = None
+                time_with_current_hours = None
+                progress_percentage = 0.0
+                default_custody_period = 168.0  # 7 days in hours
+
+                if next_exchange_instance:
+                    hours_remaining = (next_exchange_instance.scheduled_time - now).total_seconds() / 3600
+                    if hours_remaining < default_custody_period:
+                        time_with_current_hours = default_custody_period - hours_remaining
+                        progress_percentage = min(100.0, (time_with_current_hours / default_custody_period) * 100)
+
+                child_statuses.append({
+                    "child_id": child.id,
+                    "child_first_name": child.first_name,
+                    "child_last_name": child.last_name,
+                    "with_current_user": with_current_user,
+                    "current_parent_id": current_parent_id,
+                    "current_parent_name": current_parent_name,
+                    "next_action": next_action,
+                    "next_exchange_id": next_exchange_instance.id if next_exchange_instance else None,
+                    "next_exchange_time": next_exchange_instance.scheduled_time if next_exchange_instance else None,
+                    "next_exchange_location": (
+                        next_exchange_instance.exchange.location
+                        if next_exchange_instance else None
+                    ),
+                    "hours_remaining": round(hours_remaining, 1) if hours_remaining else None,
+                    "time_with_current_parent_hours": round(time_with_current_hours, 1) if time_with_current_hours else None,
+                    "progress_percentage": round(progress_percentage, 1)
+                })
+                continue  # Skip to next child - override handled
+
+            # ============================================================
+            # PRIORITY 2: Determine custody from upcoming exchanges
+            # ============================================================
             # Find the next exchange that includes this child (filter in Python)
             next_exchange_instance = None
             child_explicitly_assigned = False
             for inst in all_upcoming_instances:
                 exchange = inst.exchange
-                child_ids = exchange.child_ids or []
+                exchange_child_ids = exchange.child_ids or []
                 pickup_ids = exchange.pickup_child_ids or []
                 dropoff_ids = exchange.dropoff_child_ids or []
 
                 # Check if child is in any of the ID lists
-                if (child_id_str in child_ids or
+                if (child_id_str in exchange_child_ids or
                     child_id_str in pickup_ids or
                     child_id_str in dropoff_ids):
                     next_exchange_instance = inst
@@ -1419,3 +1484,73 @@ class CustodyExchangeService:
             "manual_override_by": None,
             "pending_override_request": False
         }
+
+    @staticmethod
+    async def override_custody(
+        db: AsyncSession,
+        family_file_id: str,
+        user_id: str,
+        child_ids: list[str],
+        notes: Optional[str] = None
+    ) -> bool:
+        """
+        Manually override custody status for children.
+
+        When a parent clicks "With Me", this immediately sets the custody
+        status to show the children are with them.
+
+        Args:
+            db: Database session
+            family_file_id: The family file containing the children
+            user_id: The user claiming custody
+            child_ids: List of child IDs being claimed
+            notes: Optional notes about the override
+
+        Returns:
+            True if successful
+
+        Raises:
+            ValueError: If children not found or invalid
+            PermissionError: If user doesn't have access
+        """
+        from app.models.child import Child
+        from app.models.family_file import FamilyFile
+
+        # Verify family file access
+        family_file_result = await db.execute(
+            select(FamilyFile).where(FamilyFile.id == family_file_id)
+        )
+        family_file = family_file_result.scalar_one_or_none()
+
+        if not family_file:
+            raise ValueError("Family file not found")
+
+        if user_id not in [family_file.parent_a_id, family_file.parent_b_id]:
+            raise PermissionError("You don't have access to this family file")
+
+        # Get and update children
+        now = datetime.utcnow()
+        updated_count = 0
+
+        for child_id in child_ids:
+            child_result = await db.execute(
+                select(Child).where(
+                    and_(
+                        Child.id == child_id,
+                        Child.family_file_id == family_file_id
+                    )
+                )
+            )
+            child = child_result.scalar_one_or_none()
+
+            if not child:
+                raise ValueError(f"Child {child_id} not found in this family file")
+
+            # Update custody override fields
+            child.current_custody_parent_id = user_id
+            child.custody_override_at = now
+            child.custody_override_by = user_id
+            updated_count += 1
+
+        await db.commit()
+        return True

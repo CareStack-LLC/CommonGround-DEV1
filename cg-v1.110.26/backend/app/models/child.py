@@ -155,6 +155,16 @@ class Child(Base, UUIDMixin, TimestampMixin):
     # Status
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # === CUSTODY OVERRIDE ===
+    # Manual custody override - when a parent clicks "With Me"
+    current_custody_parent_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("users.id"), nullable=True
+    )
+    custody_override_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    custody_override_by: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("users.id"), nullable=True
+    )
+
     # === RELATIONSHIPS ===
     case: Mapped[Optional["Case"]] = relationship("Case", back_populates="children")
     family_file: Mapped[Optional["FamilyFile"]] = relationship(

@@ -25,6 +25,8 @@ from app.schemas.custody_exchange import (
     GeocodeAddressResponse,
     WindowStatusResponse,
     QRTokenResponse,
+    ManualCustodyOverrideRequest,
+    ManualCustodyOverrideResponse,
 )
 from app.services.custody_exchange import CustodyExchangeService
 from app.services.geolocation import GeolocationService
@@ -839,3 +841,65 @@ async def get_custody_status(
     custody_status["children"] = children_models
 
     return CustodyStatusResponse(**custody_status)
+
+
+@router.post(
+    "/override-custody",
+    response_model=ManualCustodyOverrideResponse,
+    summary="Claim children are with me",
+    description="Manually override custody status when parent confirms children are with them."
+)
+async def override_custody(
+    override_data: ManualCustodyOverrideRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Manually set custody status - used when parent clicks "With Me" button.
+
+    This immediately transfers custody status to the requesting parent
+    for the specified children. No confirmation from the other parent required.
+
+    - **family_file_id**: The family file containing the children
+    - **child_ids**: List of child IDs to claim custody of
+    - **notes**: Optional notes about the override
+    """
+    try:
+        result = await CustodyExchangeService.override_custody(
+            db=db,
+            family_file_id=override_data.family_file_id,
+            user_id=current_user.id,
+            child_ids=override_data.child_ids,
+            notes=override_data.notes
+        )
+
+        # Log activity
+        try:
+            actor_name = f"{current_user.first_name} {current_user.last_name or ''}".strip()
+            await log_exchange_activity(
+                db=db,
+                family_file_id=override_data.family_file_id,
+                actor_id=str(current_user.id),
+                actor_name=actor_name or "Co-parent",
+                exchange_id=None,
+                action="custody_claimed",
+                extra_data={"child_ids": override_data.child_ids}
+            )
+        except Exception as e:
+            print(f"Activity logging failed: {e}")
+
+        return ManualCustodyOverrideResponse(
+            success=True,
+            message=f"Custody status updated for {len(override_data.child_ids)} child(ren)"
+        )
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except PermissionError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(e)
+        )

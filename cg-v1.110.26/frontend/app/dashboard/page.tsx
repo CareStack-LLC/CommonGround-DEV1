@@ -770,14 +770,28 @@ function DashboardContent() {
     const child = allChildren.find(c => c.id === childId);
     const childName = child?.first_name || 'Child';
 
-    // For now, show confirmation and refresh status
-    // TODO: Implement backend endpoint for manual custody override
+    // Find the family file for this child
+    const familyFileWithChild = activeFiles.find(f =>
+      f.familyFile.children?.some(c => c.id === childId)
+    );
+
+    if (!familyFileWithChild) {
+      alert('Unable to find family file for this child.');
+      return;
+    }
+
     const confirmed = window.confirm(
       `Mark ${childName} as "With Me"?\n\nThis will update the custody status to reflect that ${childName} is currently with you.`
     );
 
     if (confirmed) {
       try {
+        // Call the custody override API
+        await familyFilesAPI.overrideCustody(
+          familyFileWithChild.familyFile.id,
+          [childId]
+        );
+
         // Refresh custody status for all active family files
         const custodyPromises = activeFiles.map(f =>
           familyFilesAPI.getCustodyStatus(f.familyFile.id)
@@ -787,9 +801,6 @@ function DashboardContent() {
           .filter((r): r is PromiseFulfilledResult<CustodyStatusResponse> => r.status === 'fulfilled')
           .map(r => r.value);
         setAllCustodyStatuses(successfulStatuses);
-
-        // Show success feedback
-        alert(`${childName} is now marked as "With Me".\n\nNote: Manual check-in feature is being finalized.`);
       } catch (error) {
         console.error('Failed to update custody status:', error);
         alert('Unable to update custody status. Please try again.');
