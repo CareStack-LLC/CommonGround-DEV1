@@ -12,6 +12,7 @@ import {
   agreementsAPI,
   dashboardAPI,
   activitiesAPI,
+  getImageUrl,
   FamilyFileDetail,
   FamilyFileChild,
   Agreement,
@@ -174,7 +175,7 @@ function ChildCustodyCard({
           <div className="w-10 h-10 rounded-full bg-cg-amber-subtle flex items-center justify-center flex-shrink-0 overflow-hidden">
             {childData?.photo_url && !imageError ? (
               <img
-                src={childData.photo_url}
+                src={getImageUrl(childData.photo_url) || ''}
                 alt={childStatus.child_first_name}
                 className="w-full h-full object-cover"
                 onError={() => setImageError(true)}
