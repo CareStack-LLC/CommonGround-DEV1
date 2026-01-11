@@ -21,15 +21,18 @@ import {
 import { useAuth } from '@/lib/auth-context';
 import {
   clearfundAPI,
+  walletAPI,
   Obligation,
   FundingStatus,
   Attestation,
   VerificationArtifact,
-  LedgerEntry
+  LedgerEntry,
+  WalletWithBalance
 } from '@/lib/api';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import FundingProgress from '@/components/clearfund/funding-progress';
+import PayObligationModal from '@/components/wallet/pay-obligation-modal';
 
 function formatCurrency(amount: string | number): string {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -72,11 +75,10 @@ function ObligationDetailContent() {
   const [attestation, setAttestation] = useState<Attestation | null>(null);
   const [artifacts, setArtifacts] = useState<VerificationArtifact[]>([]);
   const [ledgerEntries, setLedgerEntries] = useState<LedgerEntry[]>([]);
+  const [wallet, setWallet] = useState<WalletWithBalance | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showFundingModal, setShowFundingModal] = useState(false);
-  const [fundingAmount, setFundingAmount] = useState('');
-  const [isFunding, setIsFunding] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const obligationId = params.id as string;
 
@@ -91,17 +93,19 @@ function ObligationDetailContent() {
       setIsLoading(true);
       setError(null);
 
-      const [obligationRes, fundingRes, attestationRes, artifactsRes] = await Promise.all([
+      const [obligationRes, fundingRes, attestationRes, artifactsRes, walletRes] = await Promise.all([
         clearfundAPI.getObligation(obligationId),
         clearfundAPI.getFundingStatus(obligationId),
         clearfundAPI.getAttestation(obligationId).catch(() => null),
         clearfundAPI.listArtifacts(obligationId),
+        walletAPI.getMyWallet().catch(() => null),
       ]);
 
       setObligation(obligationRes);
       setFundingStatus(fundingRes);
       setAttestation(attestationRes);
       setArtifacts(artifactsRes);
+      setWallet(walletRes);
 
       // Fetch ledger entries for this obligation
       if (obligationRes.case_id) {
@@ -125,22 +129,9 @@ function ObligationDetailContent() {
     }
   };
 
-  const handleFund = async () => {
-    if (!fundingAmount || parseFloat(fundingAmount) <= 0) return;
-
-    try {
-      setIsFunding(true);
-      await clearfundAPI.recordFunding(obligationId, {
-        amount: parseFloat(fundingAmount)
-      });
-      setShowFundingModal(false);
-      setFundingAmount('');
-      await loadObligationData();
-    } catch (err: any) {
-      setError(err.message || 'Failed to record funding');
-    } finally {
-      setIsFunding(false);
-    }
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    loadObligationData();
   };
 
   const handleComplete = async () => {
@@ -209,6 +200,28 @@ function ObligationDetailContent() {
   const needsVerification = ['funded', 'pending_verification'].includes(obligation.status) && obligation.verification_required;
   const canComplete = obligation.status === 'verified' || (obligation.status === 'funded' && !obligation.verification_required);
   const canCancel = ['open', 'partially_funded'].includes(obligation.status);
+
+  // Determine user's share based on their funding record
+  const getUserShare = (): number => {
+    if (!fundingStatus || !user) return 0;
+
+    // Check if user is petitioner or respondent based on funding records
+    if (fundingStatus.petitioner_funding?.parent_id === user.id) {
+      const required = parseFloat(fundingStatus.petitioner_funding.amount_required || obligation.petitioner_share);
+      const funded = parseFloat(fundingStatus.petitioner_funding.amount_funded || '0');
+      return Math.max(0, required - funded);
+    }
+    if (fundingStatus.respondent_funding?.parent_id === user.id) {
+      const required = parseFloat(fundingStatus.respondent_funding.amount_required || obligation.respondent_share);
+      const funded = parseFloat(fundingStatus.respondent_funding.amount_funded || '0');
+      return Math.max(0, required - funded);
+    }
+
+    // Fallback: use petitioner share (most likely requestor)
+    return parseFloat(obligation.petitioner_share);
+  };
+
+  const userShare = getUserShare();
 
   return (
     <div className="min-h-screen bg-background pb-24 lg:pb-8">
@@ -306,30 +319,10 @@ function ObligationDetailContent() {
 
           {needsFunding && (
             <div className="mt-4">
-              {showFundingModal ? (
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={fundingAmount}
-                    onChange={(e) => setFundingAmount(e.target.value)}
-                    placeholder="Amount to fund"
-                    className="flex-1 px-3 py-2.5 border border-input rounded-xl bg-background text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-cg-sage/20 focus:border-cg-sage transition-smooth"
-                  />
-                  <button onClick={handleFund} disabled={isFunding} className="cg-btn-primary">
-                    {isFunding ? 'Processing...' : 'Confirm'}
-                  </button>
-                  <button onClick={() => setShowFundingModal(false)} className="cg-btn-secondary">
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <button onClick={() => setShowFundingModal(true)} className="cg-btn-primary flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
-                  Fund My Share
-                </button>
-              )}
+              <button onClick={() => setShowPaymentModal(true)} className="cg-btn-primary flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                Fund My Share
+              </button>
             </div>
           )}
         </div>
@@ -573,6 +566,17 @@ function ObligationDetailContent() {
           )}
         </div>
       </main>
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <PayObligationModal
+          obligation={obligation}
+          wallet={wallet}
+          userShare={userShare}
+          onSuccess={handlePaymentSuccess}
+          onClose={() => setShowPaymentModal(false)}
+        />
+      )}
     </div>
   );
 }
