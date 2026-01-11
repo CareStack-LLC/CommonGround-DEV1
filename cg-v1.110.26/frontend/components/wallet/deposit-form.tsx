@@ -146,7 +146,7 @@ function DepositFormInner({
       const result = await walletAPI.deposit(walletId, {
         amount: numAmount,
         payment_method_id: pm.id,
-        payment_method_type: 'card'
+        payment_method: 'card'
       });
 
       // Check if additional action required (3D Secure)

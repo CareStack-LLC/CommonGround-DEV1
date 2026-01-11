@@ -2452,7 +2452,7 @@ export interface WalletTransactionListResponse {
 export interface DepositRequest {
   amount: number;
   payment_method_id: string;
-  payment_method_type?: 'card' | 'us_bank_account';
+  payment_method: 'card' | 'ach';
 }
 
 export interface DepositResponse {
