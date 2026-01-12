@@ -6,11 +6,14 @@ from pydantic import BaseModel
 
 
 class AgreementSectionUpdate(BaseModel):
-    """Update data for a specific agreement section."""
+    """Update data for a specific agreement section.
 
-    section_number: str
-    section_title: str
-    content: str
+    All fields are optional to support partial updates.
+    """
+
+    section_number: Optional[str] = None
+    section_title: Optional[str] = None
+    content: Optional[str] = None
     structured_data: Optional[Dict[str, Any]] = None
 
 

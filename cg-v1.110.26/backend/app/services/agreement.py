@@ -313,9 +313,14 @@ class AgreementService:
             )
 
         try:
-            # Update section
-            section.content = update_data.content
-            if update_data.structured_data:
+            # Update section - only update fields that are provided
+            if update_data.section_number is not None:
+                section.section_number = update_data.section_number
+            if update_data.section_title is not None:
+                section.section_title = update_data.section_title
+            if update_data.content is not None:
+                section.content = update_data.content
+            if update_data.structured_data is not None:
                 section.structured_data = update_data.structured_data
             section.is_completed = True
 

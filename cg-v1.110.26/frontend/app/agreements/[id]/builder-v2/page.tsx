@@ -142,7 +142,8 @@ function BuilderV2Content() {
       // Load existing data if any, mapping backend types to v2 keys
       const dataMap: Record<string, any> = {};
       const completed = new Set<string>();
-      data.sections.forEach((section: AgreementSection) => {
+      const sectionsArray = data.sections || [];
+      sectionsArray.forEach((section: AgreementSection) => {
         if (section.structured_data) {
           const v2Key = BACKEND_TO_V2_MAP[section.section_type] || section.section_type;
           dataMap[v2Key] = section.structured_data;
