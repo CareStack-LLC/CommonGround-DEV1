@@ -452,19 +452,19 @@ export default function FeaturesPage() {
       {/* Hero Section */}
       <section className="relative py-20 lg:py-28 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-[10%] w-96 h-96 rounded-full bg-gradient-to-br from-emerald-500/10 to-teal-500/5 blur-3xl" />
-          <div className="absolute bottom-20 left-[5%] w-72 h-72 rounded-full bg-gradient-to-br from-amber-500/10 to-orange-500/5 blur-3xl" />
+          <div className="absolute top-20 right-[10%] w-96 h-96 rounded-full bg-gradient-to-br from-cg-sage/10 to-cg-sage-light/5 blur-3xl" />
+          <div className="absolute bottom-20 left-[5%] w-72 h-72 rounded-full bg-gradient-to-br from-cg-amber/10 to-cg-amber/5 blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full mb-6">
-              <Sparkles className="w-4 h-4 text-emerald-600" />
-              <span className="text-sm font-medium text-emerald-700">The only AI-powered co-parenting platform</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage-subtle rounded-full mb-6">
+              <Sparkles className="w-4 h-4 text-cg-sage" />
+              <span className="text-sm font-medium text-cg-sage">The only AI-powered co-parenting platform</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6 leading-tight">
               Co-parenting tools that actually{' '}
-              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">reduce conflict</span>
+              <span className="text-cg-sage">reduce conflict</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
               CommonGround combines AI-powered communication, GPS-verified exchanges,
@@ -473,14 +473,14 @@ export default function FeaturesPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/25 hover:-translate-y-1"
+                className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
               >
                 Start Free Trial
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 href="#comparison"
-                className="inline-flex items-center justify-center gap-2 border-2 border-slate-300 text-slate-700 font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300 hover:border-emerald-500 hover:text-emerald-600"
+                className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage hover:text-white"
               >
                 Compare to Competitors
               </Link>
@@ -490,7 +490,7 @@ export default function FeaturesPage() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-3xl mx-auto">
               {heroStats.map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  <div className="text-3xl lg:text-4xl font-semibold text-cg-sage">
                     {stat.value}
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
@@ -502,27 +502,27 @@ export default function FeaturesPage() {
       </section>
 
       {/* What's New Section */}
-      <section className="py-16 bg-gradient-to-b from-emerald-50/50 to-background">
+      <section className="py-16 bg-gradient-to-b from-cg-sage-subtle/50 to-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-8">
-            <div className="p-2 bg-emerald-100 rounded-lg">
-              <Zap className="w-5 h-5 text-emerald-600" />
+            <div className="p-2 bg-cg-sage-subtle rounded-lg">
+              <Zap className="w-5 h-5 text-cg-sage" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground">What&apos;s New</h2>
+            <h2 className="text-2xl font-semibold text-foreground">What&apos;s New</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {whatsNew.map((item) => (
               <div
                 key={item.title}
-                className="bg-white rounded-xl p-5 border border-slate-200 hover:border-emerald-300 hover:shadow-lg transition-all duration-300"
+                className="bg-card rounded-xl p-5 border border-border/50 hover:border-cg-sage/50 hover:shadow-lg transition-all duration-300"
               >
                 <div className="flex items-center gap-2 mb-3">
                   <span className={`text-xs font-medium px-2 py-1 rounded-full ${
                     item.tag === 'Major Update'
-                      ? 'bg-emerald-100 text-emerald-700'
+                      ? 'bg-cg-sage-subtle text-cg-sage'
                       : item.tag === 'New Feature'
-                      ? 'bg-amber-100 text-amber-700'
-                      : 'bg-slate-100 text-slate-700'
+                      ? 'bg-cg-amber-subtle text-cg-amber'
+                      : 'bg-muted text-muted-foreground'
                   }`}>
                     {item.tag}
                   </span>
@@ -540,7 +540,7 @@ export default function FeaturesPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
               Every tool you need for successful co-parenting
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -555,28 +555,28 @@ export default function FeaturesPage() {
 
               const colorClasses = {
                 amber: {
-                  badge: 'bg-amber-100 text-amber-700',
-                  icon: 'text-amber-500',
-                  iconBg: 'bg-amber-50',
-                  check: 'bg-amber-100 text-amber-600',
-                  gradient: 'from-amber-50 to-orange-50',
-                  border: 'border-amber-200',
+                  badge: 'bg-cg-amber-subtle text-cg-amber',
+                  icon: 'text-cg-amber',
+                  iconBg: 'bg-cg-amber-subtle',
+                  check: 'bg-cg-amber-subtle text-cg-amber',
+                  gradient: 'from-cg-amber-subtle to-cg-sand',
+                  border: 'border-cg-amber/20',
                 },
                 sage: {
-                  badge: 'bg-emerald-100 text-emerald-700',
-                  icon: 'text-emerald-500',
-                  iconBg: 'bg-emerald-50',
-                  check: 'bg-emerald-100 text-emerald-600',
-                  gradient: 'from-emerald-50 to-teal-50',
-                  border: 'border-emerald-200',
+                  badge: 'bg-cg-sage-subtle text-cg-sage',
+                  icon: 'text-cg-sage',
+                  iconBg: 'bg-cg-sage-subtle',
+                  check: 'bg-cg-sage-subtle text-cg-sage',
+                  gradient: 'from-cg-sage-subtle to-cg-sand',
+                  border: 'border-cg-sage/20',
                 },
                 slate: {
-                  badge: 'bg-slate-100 text-slate-700',
-                  icon: 'text-slate-500',
-                  iconBg: 'bg-slate-50',
-                  check: 'bg-slate-100 text-slate-600',
-                  gradient: 'from-slate-50 to-gray-50',
-                  border: 'border-slate-200',
+                  badge: 'bg-cg-slate-subtle text-cg-slate',
+                  icon: 'text-cg-slate',
+                  iconBg: 'bg-cg-slate-subtle',
+                  check: 'bg-cg-slate-subtle text-cg-slate',
+                  gradient: 'from-cg-slate-subtle to-cg-sand',
+                  border: 'border-cg-slate/20',
                 },
               };
 
@@ -595,7 +595,7 @@ export default function FeaturesPage() {
                         </span>
                       )}
                       {feature.isNew && (
-                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
+                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-cg-sage text-white">
                           NEW
                         </span>
                       )}
@@ -608,7 +608,7 @@ export default function FeaturesPage() {
                         {feature.tagline}
                       </span>
                     </div>
-                    <h3 className="text-3xl font-bold text-foreground mb-4">
+                    <h3 className="text-3xl font-semibold text-foreground mb-4">
                       {feature.name}
                     </h3>
                     <p className="text-lg text-muted-foreground mb-6">
@@ -641,14 +641,14 @@ export default function FeaturesPage() {
       </section>
 
       {/* Competitor Comparison */}
-      <section id="comparison" className="py-20 bg-slate-50">
+      <section id="comparison" className="py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 rounded-full mb-6">
-              <Award className="w-4 h-4 text-amber-600" />
-              <span className="text-sm font-medium text-amber-700">Honest Comparison</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-amber-subtle rounded-full mb-6">
+              <Award className="w-4 h-4 text-cg-amber" />
+              <span className="text-sm font-medium text-cg-amber">Honest Comparison</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
               How CommonGround compares
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -665,10 +665,10 @@ export default function FeaturesPage() {
                     <th className="text-left py-5 px-6 font-semibold text-foreground min-w-[200px]">Feature</th>
                     <th className="text-center py-5 px-4 min-w-[140px]">
                       <div className="flex flex-col items-center">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mb-2">
+                        <div className="w-10 h-10 rounded-xl bg-cg-sage flex items-center justify-center mb-2">
                           <span className="text-white font-bold text-sm">CG</span>
                         </div>
-                        <span className="font-bold text-emerald-600">CommonGround</span>
+                        <span className="font-semibold text-cg-sage">CommonGround</span>
                       </div>
                     </th>
                     <th className="text-center py-5 px-4 min-w-[140px]">
@@ -706,7 +706,7 @@ export default function FeaturesPage() {
                             <div className="flex items-center gap-2">
                               {feature.name}
                               {feature.tooltip && (
-                                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 text-xs cursor-help" title={feature.tooltip}>
+                                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-cg-sage-subtle text-cg-sage text-xs cursor-help" title={feature.tooltip}>
                                   ?
                                 </span>
                               )}
@@ -714,7 +714,7 @@ export default function FeaturesPage() {
                           </td>
                           <td className="text-center py-4 px-4">
                             {feature.commonground ? (
-                              <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto" />
+                              <CheckCircle2 className="w-6 h-6 text-cg-sage mx-auto" />
                             ) : (
                               <X className="w-5 h-5 text-slate-300 mx-auto" />
                             )}
@@ -742,17 +742,17 @@ export default function FeaturesPage() {
             </div>
 
             {/* Comparison Footer */}
-            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-6 border-t border-emerald-100">
+            <div className="bg-cg-sage-subtle p-6 border-t border-cg-sage/10">
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+                  <CheckCircle2 className="w-6 h-6 text-cg-sage" />
                   <span className="font-medium text-foreground">
-                    CommonGround has <span className="text-emerald-600 font-bold">12+ exclusive features</span> not available anywhere else
+                    CommonGround has <span className="text-cg-sage font-semibold">12+ exclusive features</span> not available anywhere else
                   </span>
                 </div>
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/25"
+                  className="inline-flex items-center gap-2 bg-cg-sage text-white font-semibold px-6 py-3 rounded-full transition-all duration-300 hover:bg-cg-sage-light hover:shadow-lg"
                 >
                   Try CommonGround Free
                   <ArrowRight className="w-4 h-4" />
@@ -763,29 +763,29 @@ export default function FeaturesPage() {
 
           {/* Why We're Different */}
           <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-4">
-                <Brain className="w-6 h-6 text-amber-600" />
+            <div className="bg-card rounded-xl p-6 border border-border">
+              <div className="w-12 h-12 rounded-xl bg-cg-amber-subtle flex items-center justify-center mb-4">
+                <Brain className="w-6 h-6 text-cg-amber" />
               </div>
-              <h3 className="font-bold text-foreground mb-2">AI That Prevents Conflict</h3>
+              <h3 className="font-semibold text-foreground mb-2">AI That Prevents Conflict</h3>
               <p className="text-muted-foreground text-sm">
                 Other apps just record your messages. ARIA helps you communicate better <em>before</em> you hit send, preventing conflicts before they start.
               </p>
             </div>
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4">
-                <MapPin className="w-6 h-6 text-emerald-600" />
+            <div className="bg-card rounded-xl p-6 border border-border">
+              <div className="w-12 h-12 rounded-xl bg-cg-sage-subtle flex items-center justify-center mb-4">
+                <MapPin className="w-6 h-6 text-cg-sage" />
               </div>
-              <h3 className="font-bold text-foreground mb-2">GPS Exchange Proof</h3>
+              <h3 className="font-semibold text-foreground mb-2">GPS Exchange Proof</h3>
               <p className="text-muted-foreground text-sm">
                 Silent Handoff™ creates undeniable proof of when you arrived. No more &quot;they were late&quot; accusations—the GPS doesn&apos;t lie.
               </p>
             </div>
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-4">
-                <CircleDollarSign className="w-6 h-6 text-slate-600" />
+            <div className="bg-card rounded-xl p-6 border border-border">
+              <div className="w-12 h-12 rounded-xl bg-cg-slate-subtle flex items-center justify-center mb-4">
+                <CircleDollarSign className="w-6 h-6 text-cg-slate" />
               </div>
-              <h3 className="font-bold text-foreground mb-2">Purpose-Locked Expenses</h3>
+              <h3 className="font-semibold text-foreground mb-2">Purpose-Locked Expenses</h3>
               <p className="text-muted-foreground text-sm">
                 Our expense system ties payments to specific obligations—medical, tuition, activities—so every dollar is accounted for with receipts.
               </p>
@@ -798,7 +798,7 @@ export default function FeaturesPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
               Trusted by thousands of families
             </h2>
             <p className="text-lg text-muted-foreground">
@@ -810,7 +810,7 @@ export default function FeaturesPage() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl p-8 border border-slate-200 hover:shadow-xl transition-shadow duration-300"
+                className="bg-card rounded-2xl p-8 border border-border hover:shadow-xl transition-shadow duration-300"
               >
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -833,10 +833,10 @@ export default function FeaturesPage() {
       </section>
 
       {/* Additional Features Grid */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-muted/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
               Plus everything else you need
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -850,10 +850,10 @@ export default function FeaturesPage() {
               return (
                 <div
                   key={feature.name}
-                  className="bg-white rounded-xl p-6 border border-slate-200 hover:border-emerald-300 hover:shadow-lg transition-all duration-300 group"
+                  className="bg-card rounded-xl p-6 border border-border hover:border-cg-sage/50 hover:shadow-lg transition-all duration-300 group"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center mb-4 transition-colors">
-                    <Icon className="w-6 h-6 text-emerald-600" />
+                  <div className="w-12 h-12 rounded-xl bg-cg-sage-subtle group-hover:bg-cg-sage/20 flex items-center justify-center mb-4 transition-colors">
+                    <Icon className="w-6 h-6 text-cg-sage" />
                   </div>
                   <h3 className="font-semibold text-foreground mb-2">{feature.name}</h3>
                   <p className="text-sm text-muted-foreground">{feature.description}</p>
@@ -865,23 +865,23 @@ export default function FeaturesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-emerald-600 to-teal-600 relative overflow-hidden">
+      <section className="py-20 bg-cg-sage relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl font-semibold text-white mb-6">
             Ready to transform your co-parenting experience?
           </h2>
-          <p className="text-lg text-emerald-100 mb-10 max-w-xl mx-auto">
+          <p className="text-lg text-white/80 mb-10 max-w-xl mx-auto">
             Join thousands of families who&apos;ve found common ground. Start your free 14-day trial today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/register"
-              className="inline-flex items-center justify-center gap-2 bg-white text-emerald-600 font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+              className="inline-flex items-center justify-center gap-2 bg-white text-cg-sage font-semibold px-8 py-4 rounded-full text-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
             >
               Start Free Trial
               <ArrowRight className="w-5 h-5" />
@@ -893,7 +893,7 @@ export default function FeaturesPage() {
               View Pricing
             </Link>
           </div>
-          <p className="text-emerald-200 text-sm mt-6">
+          <p className="text-white/60 text-sm mt-6">
             No credit card required. Cancel anytime.
           </p>
         </div>
