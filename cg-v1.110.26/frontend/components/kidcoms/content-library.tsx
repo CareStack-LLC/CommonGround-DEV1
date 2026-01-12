@@ -8,6 +8,7 @@ import {
   Youtube,
   Play,
   Search,
+  Sparkles,
 } from 'lucide-react';
 import {
   theaterContent,
@@ -82,74 +83,82 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-md"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative bg-gray-900 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl">
+      <div className="relative bg-slate-900 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-2xl border border-slate-700/50">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-xl font-semibold text-white">Choose Content</h2>
+        <div className="flex items-center justify-between p-5 border-b border-slate-700/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+              <Sparkles className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white">Choose Content</h2>
+              <p className="text-sm text-slate-400">Watch together in real-time</p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-700">
+        <div className="flex border-b border-slate-700/50">
           <button
             onClick={() => setActiveTab('videos')}
-            className={`flex-1 flex items-center justify-center space-x-2 py-3 transition-colors ${
+            className={`flex-1 flex items-center justify-center space-x-2 py-3.5 transition-all duration-200 ${
               activeTab === 'videos'
-                ? 'text-purple-400 border-b-2 border-purple-400 bg-purple-500/10'
-                : 'text-gray-400 hover:text-white'
+                ? 'text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
             <Film className="h-5 w-5" />
-            <span>Videos</span>
+            <span className="font-medium">Videos</span>
           </button>
           <button
             onClick={() => setActiveTab('storybooks')}
-            className={`flex-1 flex items-center justify-center space-x-2 py-3 transition-colors ${
+            className={`flex-1 flex items-center justify-center space-x-2 py-3.5 transition-all duration-200 ${
               activeTab === 'storybooks'
-                ? 'text-purple-400 border-b-2 border-purple-400 bg-purple-500/10'
-                : 'text-gray-400 hover:text-white'
+                ? 'text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
             <BookOpen className="h-5 w-5" />
-            <span>Storybooks</span>
+            <span className="font-medium">Storybooks</span>
           </button>
           <button
             onClick={() => setActiveTab('youtube')}
-            className={`flex-1 flex items-center justify-center space-x-2 py-3 transition-colors ${
+            className={`flex-1 flex items-center justify-center space-x-2 py-3.5 transition-all duration-200 ${
               activeTab === 'youtube'
-                ? 'text-purple-400 border-b-2 border-purple-400 bg-purple-500/10'
-                : 'text-gray-400 hover:text-white'
+                ? 'text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
             }`}
           >
             <Youtube className="h-5 w-5" />
-            <span>YouTube</span>
+            <span className="font-medium">YouTube</span>
           </button>
         </div>
 
         {/* Search (for videos and storybooks) */}
         {activeTab !== 'youtube' && (
-          <div className="p-4 border-b border-gray-700">
+          <div className="p-4 border-b border-slate-700/50">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search..."
-                className="w-full bg-gray-800 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full bg-slate-800/50 text-white rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 border border-slate-700/50 placeholder:text-slate-500 transition-all"
               />
             </div>
           </div>
@@ -161,7 +170,7 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
           {activeTab === 'videos' && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {filteredVideos.length === 0 ? (
-                <p className="col-span-full text-center text-gray-400 py-8">
+                <p className="col-span-full text-center text-slate-400 py-8">
                   No videos found
                 </p>
               ) : (
@@ -169,27 +178,27 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
                   <button
                     key={video.id}
                     onClick={() => handleVideoSelect(video)}
-                    className="group relative aspect-video bg-gray-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-purple-500 transition-all"
+                    className="group relative aspect-video bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-emerald-500 transition-all duration-200 hover:scale-[1.02]"
                   >
                     {/* Placeholder thumbnail */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-900/50 to-gray-900 flex items-center justify-center">
-                      <Film className="h-10 w-10 text-gray-600" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
+                      <Film className="h-10 w-10 text-slate-600" />
                     </div>
 
                     {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="p-3 bg-purple-600 rounded-full">
+                    <div className="absolute inset-0 bg-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="p-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full shadow-lg shadow-emerald-500/30 transform scale-90 group-hover:scale-100 transition-transform">
                         <Play className="h-6 w-6 text-white" />
                       </div>
                     </div>
 
                     {/* Title */}
-                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
                       <p className="text-white text-sm font-medium truncate">
                         {video.title}
                       </p>
                       {video.duration && (
-                        <p className="text-gray-400 text-xs">{video.duration}</p>
+                        <p className="text-slate-400 text-xs">{video.duration}</p>
                       )}
                     </div>
                   </button>
@@ -202,7 +211,7 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
           {activeTab === 'storybooks' && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {filteredStorybooks.length === 0 ? (
-                <p className="col-span-full text-center text-gray-400 py-8">
+                <p className="col-span-full text-center text-slate-400 py-8">
                   No storybooks found
                 </p>
               ) : (
@@ -210,27 +219,27 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
                   <button
                     key={book.id}
                     onClick={() => handleStorybookSelect(book)}
-                    className="group relative aspect-[3/4] bg-gray-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-purple-500 transition-all"
+                    className="group relative aspect-[3/4] bg-slate-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-emerald-500 transition-all duration-200 hover:scale-[1.02]"
                   >
                     {/* Placeholder cover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-amber-900/50 to-gray-900 flex items-center justify-center">
-                      <BookOpen className="h-10 w-10 text-gray-600" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-900/30 via-slate-800 to-slate-900 flex items-center justify-center">
+                      <BookOpen className="h-10 w-10 text-slate-600" />
                     </div>
 
                     {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="p-3 bg-purple-600 rounded-full">
+                    <div className="absolute inset-0 bg-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="p-3 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full shadow-lg shadow-emerald-500/30 transform scale-90 group-hover:scale-100 transition-transform">
                         <BookOpen className="h-6 w-6 text-white" />
                       </div>
                     </div>
 
                     {/* Title */}
-                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent">
                       <p className="text-white text-sm font-medium truncate">
                         {book.title}
                       </p>
                       {book.author && (
-                        <p className="text-gray-400 text-xs">{book.author}</p>
+                        <p className="text-slate-400 text-xs">{book.author}</p>
                       )}
                     </div>
                   </button>
@@ -242,7 +251,7 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
           {/* YouTube Tab */}
           {activeTab === 'youtube' && (
             <div className="space-y-4">
-              <p className="text-gray-300">
+              <p className="text-slate-300">
                 Paste a YouTube video URL to watch together
               </p>
 
@@ -255,11 +264,11 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
                     setYoutubeError('');
                   }}
                   placeholder="https://www.youtube.com/watch?v=..."
-                  className="flex-1 bg-gray-800 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="flex-1 bg-slate-800/50 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 border border-slate-700/50 placeholder:text-slate-500 transition-all"
                 />
                 <button
                   onClick={handleYoutubeSubmit}
-                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors"
+                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30"
                 >
                   Watch
                 </button>
@@ -269,14 +278,23 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
                 <p className="text-red-400 text-sm">{youtubeError}</p>
               )}
 
-              <div className="pt-4 border-t border-gray-700">
-                <p className="text-gray-400 text-sm">
+              <div className="pt-4 border-t border-slate-700/50">
+                <p className="text-slate-400 text-sm">
                   Supported formats:
                 </p>
-                <ul className="text-gray-500 text-sm mt-2 space-y-1">
-                  <li>youtube.com/watch?v=VIDEO_ID</li>
-                  <li>youtu.be/VIDEO_ID</li>
-                  <li>youtube.com/embed/VIDEO_ID</li>
+                <ul className="text-slate-500 text-sm mt-2 space-y-1">
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    youtube.com/watch?v=VIDEO_ID
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    youtu.be/VIDEO_ID
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                    youtube.com/embed/VIDEO_ID
+                  </li>
                 </ul>
               </div>
             </div>

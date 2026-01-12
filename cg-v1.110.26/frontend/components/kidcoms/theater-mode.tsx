@@ -371,11 +371,11 @@ export function TheaterMode({
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="fixed inset-0 z-40 bg-gray-900 flex flex-col">
+    <div className="fixed inset-0 z-40 bg-slate-900 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-800/50">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50">
         <div className="flex items-center space-x-3">
-          <span className="text-purple-400 text-sm font-medium px-2 py-1 bg-purple-500/20 rounded">
+          <span className="text-emerald-400 text-sm font-medium px-3 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
             Theater Mode
           </span>
           {content && (
@@ -385,14 +385,14 @@ export function TheaterMode({
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowLibrary(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+            className="flex items-center space-x-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
           >
             <Library className="h-4 w-4" />
             <span className="text-sm hidden sm:inline">Library</span>
           </button>
           <button
             onClick={handleExit}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+            className="flex items-center space-x-2 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
           >
             <X className="h-4 w-4" />
             <span className="text-sm hidden sm:inline">Exit</span>
@@ -407,7 +407,7 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-purple-500/50 bg-gray-800"
+              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-emerald-500/40 bg-slate-800"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -420,7 +420,7 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-purple-500/50 bg-gray-800"
+              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-emerald-500/40 bg-slate-800"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -428,7 +428,7 @@ export function TheaterMode({
 
           {/* Local participant PiP */}
           {localParticipant && (
-            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-gray-700 bg-gray-800">
+            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-slate-600/50 bg-slate-800">
               <PiPVideoTile participant={localParticipant} />
             </div>
           )}
@@ -440,16 +440,19 @@ export function TheaterMode({
             // No content selected - show prompt
             <div className="flex-1 flex flex-col items-center justify-center">
               <div className="text-center px-4">
-                <Library className="h-16 w-16 md:h-20 md:w-20 text-gray-600 mx-auto mb-4" />
-                <h2 className="text-lg md:text-xl text-white mb-2">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full blur-2xl opacity-20" />
+                  <Library className="relative h-16 w-16 md:h-20 md:w-20 text-slate-500 mx-auto" />
+                </div>
+                <h2 className="text-lg md:text-xl text-white mb-2 font-semibold">
                   Choose something to watch together
                 </h2>
-                <p className="text-gray-400 mb-6 text-sm md:text-base">
+                <p className="text-slate-400 mb-6 text-sm md:text-base">
                   Select a video or storybook from the library
                 </p>
                 <button
                   onClick={() => setShowLibrary(true)}
-                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors"
+                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30"
                 >
                   Open Library
                 </button>
@@ -499,24 +502,24 @@ export function TheaterMode({
       </div>
 
       {/* Bottom Controls */}
-      <div className="px-4 py-3 bg-gray-800/90 safe-area-bottom">
-        <div className="flex items-center justify-center space-x-4">
+      <div className="px-4 py-3 bg-slate-800/90 backdrop-blur-sm safe-area-bottom border-t border-slate-700/50">
+        <div className="flex items-center justify-center space-x-3">
           <button
             onClick={onToggleAudio}
-            className={`p-3 rounded-full transition-colors ${
+            className={`p-3 rounded-full transition-all duration-200 ${
               isAudioOn
-                ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                : 'bg-red-600 hover:bg-red-700 text-white'
+                ? 'bg-slate-700 hover:bg-slate-600 text-white hover:scale-105'
+                : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
             {isAudioOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
           </button>
           <button
             onClick={onToggleVideo}
-            className={`p-3 rounded-full transition-colors ${
+            className={`p-3 rounded-full transition-all duration-200 ${
               isVideoOn
-                ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                : 'bg-red-600 hover:bg-red-700 text-white'
+                ? 'bg-slate-700 hover:bg-slate-600 text-white hover:scale-105'
+                : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
             {isVideoOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
@@ -580,8 +583,8 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gray-700">
-          <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white text-lg font-semibold">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-800">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-lg font-semibold shadow-lg shadow-emerald-500/20">
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
         </div>
@@ -591,16 +594,16 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
       {!participant.isLocal && <audio ref={audioRef} />}
 
       {/* Name label */}
-      <div className="absolute bottom-0 left-0 right-0 bg-black/50 px-2 py-0.5">
-        <span className="text-white text-xs truncate block">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1">
+        <span className="text-white text-xs truncate block drop-shadow-lg">
           {participant.odName}
-          {participant.isLocal && ' (You)'}
+          {participant.isLocal && <span className="text-emerald-400"> (You)</span>}
         </span>
       </div>
 
       {/* Mute indicator */}
       {!participant.audioOn && (
-        <div className="absolute top-1 right-1 p-1 bg-red-500 rounded-full">
+        <div className="absolute top-1 right-1 p-1 bg-red-500/90 rounded-full">
           <MicOff className="h-2.5 w-2.5 text-white" />
         </div>
       )}

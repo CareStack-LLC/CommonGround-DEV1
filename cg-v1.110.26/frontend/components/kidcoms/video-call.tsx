@@ -178,15 +178,16 @@ export default function VideoCall({
 
   if (error) {
     return (
-      <div className="h-full flex items-center justify-center bg-gray-900 rounded-xl">
+      <div className="h-full flex items-center justify-center bg-slate-900 rounded-2xl border border-slate-800">
         <div className="text-center p-8">
-          <div className="text-red-500 mb-4">
-            <VideoOff className="h-16 w-16 mx-auto" />
+          <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+            <VideoOff className="h-10 w-10 text-red-400" />
           </div>
-          <p className="text-white mb-4">{error}</p>
+          <p className="text-slate-200 font-medium mb-2">Connection Error</p>
+          <p className="text-slate-400 mb-6 text-sm">{error}</p>
           <button
             onClick={onLeave}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg"
+            className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-medium transition-colors border border-slate-700"
           >
             Go Back
           </button>
@@ -197,10 +198,14 @@ export default function VideoCall({
 
   if (isJoining) {
     return (
-      <div className="h-full flex items-center justify-center bg-gray-900 rounded-xl">
+      <div className="h-full flex items-center justify-center bg-slate-900 rounded-2xl border border-slate-800">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-purple-500 mx-auto mb-4" />
-          <p className="text-white">Connecting to call...</p>
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full blur-xl opacity-30 animate-pulse" />
+            <Loader2 className="relative h-12 w-12 animate-spin text-emerald-500 mx-auto mb-4" />
+          </div>
+          <p className="text-slate-200 font-medium">Connecting to call...</p>
+          <p className="text-slate-500 text-sm mt-1">Setting up secure connection</p>
         </div>
       </div>
     );
@@ -211,12 +216,17 @@ export default function VideoCall({
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="h-full flex flex-col bg-gray-900 rounded-xl overflow-hidden">
+    <div className="h-full flex flex-col bg-slate-900 rounded-2xl overflow-hidden border border-slate-800">
       {/* Video Grid */}
       <div className="flex-1 p-4">
         {participantList.length === 0 ? (
           <div className="h-full flex items-center justify-center">
-            <p className="text-gray-400">Waiting for others to join...</p>
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+                <Video className="h-8 w-8 text-emerald-500" />
+              </div>
+              <p className="text-slate-400">Waiting for others to join...</p>
+            </div>
           </div>
         ) : (
           <div
@@ -242,13 +252,13 @@ export default function VideoCall({
       </div>
 
       {/* Controls */}
-      <div className="bg-gray-800 px-6 py-4 flex items-center justify-center space-x-4">
+      <div className="bg-slate-800/80 backdrop-blur-sm px-6 py-4 flex items-center justify-center space-x-3 border-t border-slate-700/50">
         <button
           onClick={toggleAudio}
-          className={`p-4 rounded-full transition-colors ${
+          className={`p-4 rounded-full transition-all duration-200 ${
             isAudioOn
-              ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-red-600 hover:bg-red-700 text-white'
+              ? 'bg-slate-700 hover:bg-slate-600 text-white hover:scale-105'
+              : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
           }`}
           title={isAudioOn ? 'Mute microphone' : 'Unmute microphone'}
         >
@@ -257,10 +267,10 @@ export default function VideoCall({
 
         <button
           onClick={toggleVideo}
-          className={`p-4 rounded-full transition-colors ${
+          className={`p-4 rounded-full transition-all duration-200 ${
             isVideoOn
-              ? 'bg-gray-700 hover:bg-gray-600 text-white'
-              : 'bg-red-600 hover:bg-red-700 text-white'
+              ? 'bg-slate-700 hover:bg-slate-600 text-white hover:scale-105'
+              : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
           }`}
           title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
         >
@@ -269,7 +279,7 @@ export default function VideoCall({
 
         <button
           onClick={leaveCall}
-          className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white"
+          className="p-4 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all duration-200 hover:scale-105 shadow-lg shadow-red-500/25"
           title="Leave call"
         >
           <PhoneOff className="h-6 w-6" />
@@ -299,7 +309,7 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
 
   return (
     <div
-      className={`relative bg-gray-800 rounded-lg overflow-hidden ${
+      className={`relative bg-slate-800 rounded-xl overflow-hidden ring-1 ring-slate-700/50 ${
         isLarge ? 'aspect-video' : ''
       }`}
     >
@@ -312,26 +322,32 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gray-700">
-          <div className="w-20 h-20 rounded-full bg-purple-600 flex items-center justify-center text-white text-2xl font-semibold">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl font-semibold shadow-lg shadow-emerald-500/20">
             {participant.userName[0]?.toUpperCase() || '?'}
           </div>
         </div>
       )}
 
       {/* Participant Name */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3">
         <div className="flex items-center justify-between">
-          <span className="text-white text-sm font-medium">
+          <span className="text-white text-sm font-medium drop-shadow-lg">
             {participant.userName}
-            {participant.isLocal && ' (You)'}
+            {participant.isLocal && (
+              <span className="text-emerald-400 ml-1">(You)</span>
+            )}
           </span>
           <div className="flex items-center space-x-2">
             {!participant.audioOn && (
-              <MicOff className="h-4 w-4 text-red-400" />
+              <div className="p-1 bg-red-500/20 rounded-full">
+                <MicOff className="h-3.5 w-3.5 text-red-400" />
+              </div>
             )}
             {!participant.videoOn && (
-              <VideoOff className="h-4 w-4 text-red-400" />
+              <div className="p-1 bg-red-500/20 rounded-full">
+                <VideoOff className="h-3.5 w-3.5 text-red-400" />
+              </div>
             )}
           </div>
         </div>
