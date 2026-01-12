@@ -233,12 +233,16 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                       <div key={sectionName} className="border-l-4 border-green-500 pl-4">
                         <h4 className="font-semibold text-gray-900 mb-2">{sectionName}</h4>
                         <div className="space-y-1">
-                          {fields.map((item: any, idx: number) => (
+                          {Array.isArray(fields) ? fields.map((item: any, idx: number) => (
                             <div key={idx} className="text-sm">
                               <span className="text-gray-600">{item.field}:</span>{' '}
                               <span className="font-medium text-gray-900">{item.value}</span>
                             </div>
-                          ))}
+                          )) : (
+                            <div className="text-sm text-gray-600">
+                              {typeof fields === 'object' ? JSON.stringify(fields) : String(fields)}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
