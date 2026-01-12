@@ -757,7 +757,7 @@ function AgreementDetailsContent() {
                       Submit for Approval
                     </ActionButton>
                     <ActionButton
-                      onClick={() => router.push(`/agreements/${agreementId}/builder`)}
+                      onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
                       variant="secondary"
                       icon={<Edit3 className="h-4 w-4" />}
                     >
@@ -877,7 +877,7 @@ function AgreementDetailsContent() {
                   </div>
                   {agreement.status === 'draft' && (
                     <button
-                      onClick={() => router.push(`/agreements/${agreementId}/builder`)}
+                      onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
                       className="cg-btn-secondary text-sm py-2 px-4"
                     >
                       <Edit3 className="h-4 w-4 mr-2" />
@@ -892,7 +892,7 @@ function AgreementDetailsContent() {
                   <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground mb-4">No sections completed yet</p>
                   <button
-                    onClick={() => router.push(`/agreements/${agreementId}/builder`)}
+                    onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
                     className="cg-btn-primary"
                   >
                     Start Building
@@ -910,7 +910,7 @@ function AgreementDetailsContent() {
                         section={section}
                         sectionIndex={index + 1}
                         canEdit={canEdit}
-                        onEdit={() => router.push(`/agreements/${agreementId}/builder?section=${editIndex}`)}
+                        onEdit={() => router.push(`/agreements/${agreementId}/builder-v2`)}
                       />
                     );
                   })}

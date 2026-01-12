@@ -22,7 +22,7 @@ export function ReviewSection({ onPrevious }: ReviewSectionProps) {
     try {
       setIsSubmitting(true);
       // Navigate back to agreement details
-      router.push(window.location.pathname.replace('/builder', ''));
+      router.push(window.location.pathname.replace('/builder-v2', '').replace('/builder', ''));
     } catch (err) {
       console.error('Failed to finish:', err);
     } finally {

@@ -143,7 +143,7 @@ I'll ask questions to make sure we cover everything important, and at the end, I
       await agreementsAPI.finalizeAriaAgreement(agreementId);
 
       // Redirect to agreement builder to review
-      router.push(`/agreements/${agreementId}/builder`);
+      router.push(`/agreements/${agreementId}/builder-v2`);
     } catch (error: any) {
       console.error('Error finalizing:', error);
       alert(`Error finalizing agreement: ${error.message}`);
@@ -185,7 +185,7 @@ I'll ask questions to make sure we cover everything important, and at the end, I
               )}
               <Button
                 variant="outline"
-                onClick={() => router.push(`/agreements/${agreementId}/builder`)}
+                onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
               >
                 Switch to Wizard
               </Button>
