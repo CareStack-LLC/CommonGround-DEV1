@@ -164,6 +164,8 @@ class FamilyFileService:
                 selectinload(FamilyFile.court_custody_case),
                 selectinload(FamilyFile.cases).selectinload(Case.agreements),  # Load linked cases with their agreements
                 selectinload(FamilyFile.cases).selectinload(Case.children),  # Load linked cases with their children
+                selectinload(FamilyFile.parent_a),  # Load parent A user info
+                selectinload(FamilyFile.parent_b),  # Load parent B user info (if joined)
             )
             .where(FamilyFile.id == family_file_id)
         )

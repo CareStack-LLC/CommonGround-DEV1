@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { agreementsAPI, Agreement, AgreementSection } from '@/lib/api';
+import { agreementsAPI, familyFilesAPI, Agreement, AgreementSection, FamilyFileDetail, FamilyFileChild, ParentInfo } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -106,6 +106,7 @@ function BuilderV2Content() {
   const agreementId = params.id as string;
 
   const [agreement, setAgreement] = useState<Agreement | null>(null);
+  const [familyFile, setFamilyFile] = useState<FamilyFileDetail | null>(null);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [sectionData, setSectionData] = useState<Record<string, any>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -138,6 +139,16 @@ function BuilderV2Content() {
       const data = await agreementsAPI.get(agreementId);
       setAgreement(data.agreement);
       setExistingSections(data.sections || []);
+
+      // Load family file data if this is a family file-based agreement
+      if (data.agreement.family_file_id) {
+        try {
+          const familyFileData = await familyFilesAPI.get(data.agreement.family_file_id);
+          setFamilyFile(familyFileData);
+        } catch (err) {
+          console.error('Failed to load family file:', err);
+        }
+      }
 
       // Load existing data if any, mapping backend types to v2 keys
       const dataMap: Record<string, any> = {};
@@ -422,6 +433,7 @@ function BuilderV2Content() {
                 data={currentData}
                 onSave={(data) => handleSaveSection(currentSection.key, data)}
                 isSaving={isSaving}
+                familyFile={familyFile}
               />
             </CardContent>
           </Card>
@@ -469,11 +481,13 @@ function SectionForm({
   data,
   onSave,
   isSaving,
+  familyFile,
 }: {
   sectionKey: SectionKeyV2;
   data: any;
   onSave: (data: any) => void;
   isSaving: boolean;
+  familyFile: FamilyFileDetail | null;
 }) {
   const [formData, setFormData] = useState(data);
 
@@ -489,7 +503,7 @@ function SectionForm({
 
   switch (sectionKey) {
     case 'parties_children':
-      return <PartiesChildrenForm data={formData} onChange={handleChange} />;
+      return <PartiesChildrenForm data={formData} onChange={handleChange} familyFile={familyFile} />;
     case 'scope_duration':
       return <ScopeDurationForm data={formData} onChange={handleChange} />;
     case 'parenting_time':
@@ -507,16 +521,142 @@ function SectionForm({
   }
 }
 
+// Helper function to format parent name
+function formatParentName(info: ParentInfo | null | undefined): string {
+  if (!info) return 'Not yet joined';
+  const first = info.first_name || '';
+  const last = info.last_name || '';
+  if (first || last) {
+    return `${first} ${last}`.trim();
+  }
+  return info.email;
+}
+
+// Helper function to format role display
+function formatRole(role: string | null | undefined): string {
+  if (!role) return '';
+  const roleMap: Record<string, string> = {
+    mother: 'Mother',
+    father: 'Father',
+    parent_a: 'Parent A',
+    parent_b: 'Parent B',
+  };
+  return roleMap[role] || role;
+}
+
+// Helper function to calculate age from date of birth
+function calculateAge(dateOfBirth: string): number {
+  const today = new Date();
+  const birthDate = new Date(dateOfBirth);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
+
 // Individual Section Forms
-function PartiesChildrenForm({ data, onChange }: { data: any; onChange: (field: string, value: any) => void }) {
+function PartiesChildrenForm({
+  data,
+  onChange,
+  familyFile,
+}: {
+  data: any;
+  onChange: (field: string, value: any) => void;
+  familyFile: FamilyFileDetail | null;
+}) {
   return (
     <div className="space-y-6">
-      <div className="p-4 rounded-lg bg-muted/50 border">
-        <p className="text-sm text-muted-foreground flex items-center gap-2">
-          <Info className="h-4 w-4" />
-          Basic parent and child information is pulled from your Family File. You can add any notes about current arrangements below.
-        </p>
-      </div>
+      {/* Parent Information */}
+      {familyFile ? (
+        <div className="space-y-4">
+          <div className="p-4 rounded-lg bg-cg-primary/5 border border-cg-primary/20">
+            <h3 className="font-medium text-foreground mb-3 flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-cg-success" />
+              Parent Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Parent A */}
+              <div className="p-3 rounded-lg bg-card border">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                  {formatRole(familyFile.parent_a_role) || 'Parent A'}
+                </div>
+                <div className="font-medium text-foreground">
+                  {formatParentName(familyFile.parent_a_info)}
+                </div>
+                {familyFile.parent_a_info?.email && (
+                  <div className="text-sm text-muted-foreground mt-0.5">
+                    {familyFile.parent_a_info.email}
+                  </div>
+                )}
+              </div>
+              {/* Parent B */}
+              <div className="p-3 rounded-lg bg-card border">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                  {formatRole(familyFile.parent_b_role) || 'Parent B'}
+                </div>
+                <div className="font-medium text-foreground">
+                  {familyFile.parent_b_info
+                    ? formatParentName(familyFile.parent_b_info)
+                    : familyFile.parent_b_email
+                      ? `Invited: ${familyFile.parent_b_email}`
+                      : 'Not yet invited'}
+                </div>
+                {familyFile.parent_b_info?.email && (
+                  <div className="text-sm text-muted-foreground mt-0.5">
+                    {familyFile.parent_b_info.email}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Children Information */}
+          {familyFile.children && familyFile.children.length > 0 && (
+            <div className="p-4 rounded-lg bg-cg-primary/5 border border-cg-primary/20">
+              <h3 className="font-medium text-foreground mb-3 flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-cg-success" />
+                Children ({familyFile.children.length})
+              </h3>
+              <div className="space-y-2">
+                {familyFile.children.map((child) => (
+                  <div key={child.id} className="p-3 rounded-lg bg-card border flex items-center justify-between">
+                    <div>
+                      <div className="font-medium text-foreground">
+                        {child.first_name} {child.last_name}
+                        {child.preferred_name && (
+                          <span className="text-muted-foreground ml-1">
+                            ("{child.preferred_name}")
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {calculateAge(child.date_of_birth)} years old
+                        {child.gender && ` • ${child.gender}`}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="p-4 rounded-lg bg-muted/50 border">
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              <Info className="h-4 w-4" />
+              This information is pulled from your Family File. To update parent or child details, visit your Family File settings.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="p-4 rounded-lg bg-muted/50 border">
+          <p className="text-sm text-muted-foreground flex items-center gap-2">
+            <Info className="h-4 w-4" />
+            Loading family information...
+          </p>
+        </div>
+      )}
 
       <div className="space-y-4">
         <div>

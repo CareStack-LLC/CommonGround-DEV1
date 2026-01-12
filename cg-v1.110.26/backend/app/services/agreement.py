@@ -648,23 +648,43 @@ class AgreementService:
                 detail="Agreement must be submitted for approval first"
             )
 
-        # Determine user's role in the case
-        result = await self.db.execute(
-            select(CaseParticipant)
-            .where(CaseParticipant.case_id == agreement.case_id)
-            .where(CaseParticipant.user_id == user.id)
-        )
-        participant = result.scalar_one_or_none()
+        # Determine user's role - check Family File first, then Case
+        user_role = None
 
-        if not participant:
+        if agreement.family_file_id:
+            # Family File-based agreement (SharedCare v2)
+            from app.models.family_file import FamilyFile
+            result = await self.db.execute(
+                select(FamilyFile).where(FamilyFile.id == agreement.family_file_id)
+            )
+            family_file = result.scalar_one_or_none()
+
+            if family_file:
+                if str(family_file.parent_a_id) == str(user.id):
+                    user_role = "petitioner"  # parent_a maps to petitioner
+                elif str(family_file.parent_b_id) == str(user.id):
+                    user_role = "respondent"  # parent_b maps to respondent
+
+        if not user_role and agreement.case_id:
+            # Case-based agreement (legacy)
+            result = await self.db.execute(
+                select(CaseParticipant)
+                .where(CaseParticipant.case_id == agreement.case_id)
+                .where(CaseParticipant.user_id == user.id)
+            )
+            participant = result.scalar_one_or_none()
+            if participant:
+                user_role = participant.role
+
+        if not user_role:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You are not a participant in this case"
+                detail="You are not a participant in this agreement"
             )
 
         try:
             # Mark approval based on role
-            if participant.role == "petitioner":
+            if user_role == "petitioner":
                 if agreement.petitioner_approved:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,
@@ -673,7 +693,7 @@ class AgreementService:
                 agreement.petitioner_approved = True
                 agreement.petitioner_approved_at = datetime.utcnow()
 
-            elif participant.role == "respondent":
+            elif user_role == "respondent":
                 if agreement.respondent_approved:
                     raise HTTPException(
                         status_code=status.HTTP_400_BAD_REQUEST,

@@ -84,6 +84,19 @@ def _build_child_response(child) -> dict:
     }
 
 
+def _build_parent_info(user, role: str) -> dict:
+    """Build a ParentInfo dict from a User model."""
+    if not user:
+        return None
+    return {
+        "id": str(user.id),
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "role": role,
+    }
+
+
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_family_file(
     data: FamilyFileCreate,
@@ -209,6 +222,10 @@ async def get_family_file(
                 seen_child_ids.add(child.id)
 
     response["children"] = [_build_child_response(c) for c in all_children]
+
+    # Add parent info with names
+    response["parent_a_info"] = _build_parent_info(family_file.parent_a, family_file.parent_a_role)
+    response["parent_b_info"] = _build_parent_info(family_file.parent_b, family_file.parent_b_role) if family_file.parent_b else None
 
     # Count agreements from both family file and linked cases
     all_agreements = list(family_file.agreements)

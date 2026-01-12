@@ -4370,10 +4370,20 @@ export interface FamilyFile {
   can_create_shared_care_agreement: boolean;
 }
 
+export interface ParentInfo {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  role: string;
+}
+
 export interface FamilyFileDetail extends FamilyFile {
   children: FamilyFileChild[];
   active_agreement_count: number;
   quick_accord_count: number;
+  parent_a_info?: ParentInfo | null;
+  parent_b_info?: ParentInfo | null;
 }
 
 export interface FamilyFileCreate {
