@@ -1,7 +1,7 @@
 # CommonGround V1 - Complete Feature Analysis
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
+**Last Updated:** January 12, 2026
+**Version:** 1.1.0
 **Status:** Production MVP
 
 ---
@@ -420,10 +420,24 @@ CREATE TABLE case_status_history (
 | File | Purpose | Key Functions |
 |------|---------|---------------|
 | `app/services/aria.py` | Main ARIA service | `analyze_message()`, `suggest_rewrite()` |
-| `app/services/aria_agreement_builder.py` | Agreement assistance | `build_agreement_section()` |
+| `app/services/aria_agreement.py` | Agreement builder | `send_message()`, `generate_summary()`, `generate_summary_v2()` |
 | `app/services/aria_paralegal.py` | Court form help | `intake_form_assistance()` |
 | `app/services/aria_quick_accord.py` | Quick agreement | `generate_quick_accord()` |
 | `app/services/aria_extraction_schema.py` | Data extraction | `extract_structured_data()` |
+| `app/services/agreement_v2.py` | V2 templates | `SECTION_TEMPLATES_V2`, section mappings |
+
+#### V2 Agreement Support (v1.3.0)
+
+ARIA now supports both v1 (18-section) and v2 (7-section) agreement formats:
+
+| Method | Agreement Version | Purpose |
+|--------|-------------------|---------|
+| `generate_summary()` | v1 | Full 18-section summary |
+| `generate_summary_v2()` | v2_standard, v2_lite | 7-section summary |
+| `extract_structured_data()` | v1 | Extract to 18 sections |
+| `generate_extraction_preview_v2()` | v2_standard, v2_lite | Extract to 7 sections |
+
+API endpoints automatically detect agreement version and call appropriate methods.
 
 #### API Endpoints
 
@@ -592,7 +606,17 @@ class ARIASettings:
 
 ### 4. Agreement Builder
 
-**Purpose:** Structured custody agreement creation with 18-section wizard
+**Purpose:** Structured custody agreement creation with v1 (18-section) and v2 (7-section) wizard formats
+
+#### Agreement Versions
+
+| Version | Sections | Use Case |
+|---------|----------|----------|
+| `v1` | 18 sections | Comprehensive agreements (legacy) |
+| `v2_standard` | 7 sections | Standard agreements (default for new) |
+| `v2_lite` | 5 sections | Low-conflict cooperative parents |
+
+The `agreement_version` field on the Agreement model tracks which format is used.
 
 #### Backend Components
 
@@ -647,6 +671,20 @@ class ARIASettings:
 | 17 | Dispute Resolution | Yes | Conflict resolution process |
 | 18 | Other Provisions | No | Custom terms |
 | 19 | Review & Finalize | No | Summary and completion |
+
+#### V2 Agreement Sections (7 Sections)
+
+| # | Section | Description |
+|---|---------|-------------|
+| 1 | Parties & Children | Parent info and children covered |
+| 2 | Scope & Duration | When agreement is effective |
+| 3 | Parenting Time Structure | Baseline schedule pattern |
+| 4 | Logistics & Transitions | Exchange details |
+| 5 | Decision-Making & Communication | Authority and methods |
+| 6 | Expenses & Financial Cooperation | Shared costs (optional) |
+| 7 | Modification, Disputes & Acknowledgment | Close the loop |
+
+The V2 Builder is available at `/agreements/[id]/builder-v2`.
 
 #### Database Tables
 
@@ -1087,7 +1125,24 @@ CREATE TABLE time_blocks (
 
 ### 7. KidComs Video Communication
 
-**Purpose:** Monitored video calls between children and parents/approved contacts
+**Purpose:** Monitored video calls, Theater Mode watch-together, and chat between children and parents/approved contacts
+
+#### Session Types
+
+| Type | Status | Description |
+|------|--------|-------------|
+| `video_call` | Production | Standard video call |
+| `theater` | Production | Watch together (videos, storybooks, YouTube) |
+| `arcade` | Planned | Play games together |
+| `whiteboard` | Planned | Collaborative drawing |
+
+#### Theater Mode (v1.3.0)
+
+Watch content together with synchronized playback:
+- **Content Library**: Curated videos and PDF storybooks
+- **YouTube Integration**: Paste any YouTube URL
+- **PiP Video Tiles**: Picture-in-picture participant videos
+- **Emerald/Teal Branding**: Matches CommonGround theme
 
 #### Backend Components
 
@@ -1237,6 +1292,20 @@ class DailyVideoService:
 | Video Call | `/kidcoms/call/[id]/page.tsx` | Active call interface |
 | Daily Embed | `components/kidcoms/daily-embed.tsx` | Daily.co video component |
 | Call Controls | `components/kidcoms/call-controls.tsx` | Mute, end, etc. |
+| Theater Mode | `components/kidcoms/theater-mode.tsx` | Watch-together experience |
+| Content Library | `components/kidcoms/content-library.tsx` | Content selection modal |
+| Video Call UI | `components/kidcoms/video-call.tsx` | Video tile rendering |
+
+#### Brand Theming (v1.3.0)
+
+KidComs uses the CommonGround brand colors:
+
+| Element | Tailwind Classes |
+|---------|------------------|
+| Primary Gradient | `from-emerald-500 to-teal-600` |
+| Active Tab | `text-emerald-400 border-emerald-400` |
+| Accent Shadow | `shadow-emerald-500/20` |
+| Background | `bg-slate-800`, `bg-slate-900` |
 
 #### Known Limitations
 

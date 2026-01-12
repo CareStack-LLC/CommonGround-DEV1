@@ -1,7 +1,7 @@
 # ARIA - AI Relationship Intelligence Assistant
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
+**Last Updated:** January 12, 2026
+**Version:** 1.1.0
 **Status:** Production Ready
 
 ---
@@ -138,7 +138,7 @@ Conducts conversational legal intake interviews for California family court form
 
 ### 3. AriaAgreementService (aria_agreement.py)
 
-Guides parents through conversational custody agreement creation.
+Guides parents through conversational custody agreement creation. Supports both v1 (18-section) and v2 (7-section) agreement formats.
 
 **Location:** `mvp/backend/app/services/aria_agreement.py`
 
@@ -147,9 +147,16 @@ Guides parents through conversational custody agreement creation.
 | Method | Purpose |
 |--------|---------|
 | `send_message()` | Process conversation message |
-| `generate_summary()` | Create agreement summary |
-| `extract_structured_data()` | Convert to structured sections |
+| `generate_summary()` | Create v1 agreement summary (18 sections) |
+| `generate_summary_v2()` | Create v2 agreement summary (7 sections) |
+| `extract_structured_data()` | Convert to v1 structured sections |
+| `generate_extraction_preview_v2()` | Convert to v2 structured sections |
 | `finalize_agreement()` | Write data to agreement sections |
+
+**Version Detection:**
+API endpoints automatically detect the agreement version and call the appropriate method:
+- `v1` agreements → `generate_summary()`, `extract_structured_data()`
+- `v2_standard`/`v2_lite` agreements → `generate_summary_v2()`, `generate_extraction_preview_v2()`
 
 ### 4. AriaQuickAccordService (aria_quick_accord.py)
 
@@ -338,7 +345,10 @@ SUGGESTIONS = {
 
 ### Conversational Agreement System
 
-The ARIA Agreement Builder uses natural conversation to create custody agreements:
+The ARIA Agreement Builder uses natural conversation to create custody agreements. ARIA supports two agreement formats:
+
+- **V1 (Legacy)**: 18 detailed sections for comprehensive agreements
+- **V2 (Current)**: 7 streamlined sections for faster completion
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -350,11 +360,13 @@ The ARIA Agreement Builder uses natural conversation to create custody agreement
 │  │  (Natural)  │    │ (Readable)  │    │  (Structured JSON)  │  │
 │  └─────────────┘    └─────────────┘    └──────────┬──────────┘  │
 │                                                    │             │
-│                                                    ▼             │
-│                                        ┌─────────────────────┐   │
-│                                        │  Agreement Sections │   │
-│                                        │    (18 Sections)    │   │
-│                                        └─────────────────────┘   │
+│                          ┌─────────────────────────┼─────────────┤
+│                          │                         │             │
+│                          ▼                         ▼             │
+│              ┌─────────────────────┐   ┌─────────────────────┐   │
+│              │  V1 Agreement       │   │  V2 Agreement       │   │
+│              │  (18 Sections)      │   │  (7 Sections)       │   │
+│              └─────────────────────┘   └─────────────────────┘   │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -390,9 +402,27 @@ their custody arrangement preferences.
 """
 ```
 
-### Extraction Schema
+### Extraction Schemas
 
-The extraction schema maps 18 agreement sections:
+ARIA supports two extraction schemas based on agreement version.
+
+#### V2 Extraction Schema (7 Sections - Current)
+
+The V2 format consolidates information into 7 focused sections:
+
+| Section | Key Fields |
+|---------|------------|
+| 1. Parties & Children | parent_a (name, role), parent_b (name, role), children[], state |
+| 2. Scope & Duration | effective_date, duration, renewal_terms |
+| 3. Parenting Time Structure | base_pattern, mother_days, father_days, rotation_frequency |
+| 4. Logistics & Transitions | exchange_location, exchange_day, exchange_time, transportation |
+| 5. Decision-Making & Communication | legal_custody_type, major_decisions, communication_method, response_time |
+| 6. Expenses & Financial Cooperation | expense_split_percentage, shared_expense_categories, child_support |
+| 7. Modification & Disputes | modification_process, dispute_resolution, acknowledgment |
+
+#### V1 Extraction Schema (18 Sections - Legacy)
+
+The original comprehensive 18-section format:
 
 | Section | Key Fields |
 |---------|------------|
@@ -807,5 +837,5 @@ interface ARIAIntervention {
 
 ---
 
-*Last Updated: January 10, 2026*
-*Document Version: 1.0.0*
+*Last Updated: January 12, 2026*
+*Document Version: 1.1.0*

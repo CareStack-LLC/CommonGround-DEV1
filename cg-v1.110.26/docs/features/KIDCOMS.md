@@ -1,7 +1,7 @@
 # KidComs - Child Communication System
 
-**Last Updated:** January 11, 2026
-**Version:** 1.1.0
+**Last Updated:** January 12, 2026
+**Version:** 1.2.0
 **Status:** Production Ready
 
 ---
@@ -19,6 +19,8 @@
 9. [ARIA Chat Monitoring](#aria-chat-monitoring)
 10. [API Reference](#api-reference)
 11. [Frontend Integration](#frontend-integration)
+12. [Theater Mode](#theater-mode)
+13. [Brand Theming](#brand-theming-v130)
 
 ---
 
@@ -30,7 +32,8 @@ KidComs is CommonGround's child communication platform that enables children to 
 
 - **Video/Voice Calls**: Real-time video and audio communication
 - **Chat Messaging**: Text-based communication with ARIA monitoring
-- **Theater Mode**: Watch movies together (planned)
+- **Theater Mode**: Watch videos, storybooks, and YouTube together in real-time
+- **Content Library**: Curated videos and PDF storybooks for children
 - **Arcade Mode**: Play games together (planned)
 - **Whiteboard**: Collaborative drawing (planned)
 - **Circle Management**: Parents control approved contacts
@@ -232,9 +235,9 @@ if not self.api_key:
 ```python
 class SessionType(str, Enum):
     VIDEO_CALL = "video_call"   # Standard video call
-    THEATER = "theater"         # Watch together (future)
-    ARCADE = "arcade"           # Play games (future)
-    WHITEBOARD = "whiteboard"   # Collaborative drawing (future)
+    THEATER = "theater"         # Watch together (production)
+    ARCADE = "arcade"           # Play games (planned)
+    WHITEBOARD = "whiteboard"   # Collaborative drawing (planned)
     MIXED = "mixed"             # Multiple features
 ```
 
@@ -880,6 +883,148 @@ for session in sessions:
 
 ---
 
+## Theater Mode
+
+### Overview
+
+Theater Mode enables children and their circle to watch content together in real-time while maintaining video/voice communication. The experience includes synchronized playback and picture-in-picture video tiles.
+
+### Content Types
+
+| Type | Description | Source |
+|------|-------------|--------|
+| `video` | Local video files | Content Library |
+| `pdf` | PDF storybooks | Content Library |
+| `youtube` | YouTube videos | User-provided URL |
+
+### Content Library
+
+The Content Library modal provides curated, child-appropriate content:
+
+```typescript
+interface ContentLibrary {
+  videos: VideoContent[];     // Curated animated videos
+  storybooks: StorybookContent[]; // PDF picture books
+}
+
+interface VideoContent {
+  id: string;
+  title: string;
+  url: string;
+  duration?: string;
+}
+
+interface StorybookContent {
+  id: string;
+  title: string;
+  url: string;
+  author?: string;
+}
+```
+
+### YouTube Integration
+
+Theater Mode supports YouTube video playback with URL validation:
+
+```typescript
+// Supported YouTube URL formats
+const isValidYouTubeUrl = (url: string) => {
+  return (
+    url.includes('youtube.com/watch') ||
+    url.includes('youtu.be/') ||
+    url.includes('youtube.com/embed/')
+  );
+};
+```
+
+### Picture-in-Picture (PiP) Video
+
+During Theater Mode, participants' video feeds appear as PiP tiles:
+
+- Small overlays in corner of content area
+- Draggable positioning
+- Show participant name and mute status
+- Emerald border for active speaker
+
+### Theater Mode UI Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `theater-mode.tsx` | `components/kidcoms/` | Main theater experience |
+| `content-library.tsx` | `components/kidcoms/` | Content selection modal |
+| `video-call.tsx` | `components/kidcoms/` | Video tile rendering |
+
+---
+
+## Brand Theming (v1.3.0)
+
+### Color Palette
+
+KidComs uses the CommonGround brand colors throughout the interface:
+
+| Element | Color | Tailwind Class |
+|---------|-------|----------------|
+| Primary Gradient | Emerald to Teal | `from-emerald-500 to-teal-600` |
+| Hover Gradient | Darker | `from-emerald-600 to-teal-700` |
+| Background Dark | Slate | `bg-slate-800`, `bg-slate-900` |
+| Accent Shadow | Emerald glow | `shadow-emerald-500/20` |
+| Tab Active | Emerald | `text-emerald-400`, `border-emerald-400` |
+| Loading Spinner | Emerald | `text-emerald-500` |
+
+### UI Component Styling
+
+**Video Call Controls:**
+```typescript
+// Mute/unmute button (active state)
+className="bg-slate-700 hover:bg-slate-600 text-white"
+
+// Mute/unmute button (muted state)
+className="bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25"
+
+// End call button
+className="bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25"
+```
+
+**Content Library:**
+```typescript
+// Header icon
+className="bg-gradient-to-br from-emerald-500 to-teal-600"
+
+// Tab (active)
+className="text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5"
+
+// Content card hover
+className="hover:ring-2 hover:ring-emerald-500"
+
+// Submit button
+className="bg-gradient-to-r from-emerald-500 to-teal-600"
+```
+
+**Theater Mode:**
+```typescript
+// Mode badge
+className="bg-gradient-to-r from-emerald-500 to-teal-600"
+
+// PiP video border
+className="ring-emerald-500/50"
+
+// Empty state icon background
+className="bg-emerald-500/10"
+```
+
+### Avatar Styling
+
+```typescript
+// Avatar with initials
+<div className="bg-gradient-to-br from-emerald-500 to-teal-600
+               flex items-center justify-center text-white
+               shadow-lg shadow-emerald-500/20">
+  {userName[0]?.toUpperCase()}
+</div>
+```
+
+---
+
 ## Document Index
 
 | Document | Location | Purpose |
@@ -888,8 +1033,12 @@ for session in sessions:
 | kidcoms.py (endpoints) | `app/api/v1/endpoints/` | API routes |
 | kidcoms.py (models) | `app/models/` | Database models |
 | daily_video.py | `app/services/` | Daily.co integration |
+| theater-mode.tsx | `components/kidcoms/` | Theater Mode component |
+| content-library.tsx | `components/kidcoms/` | Content Library modal |
+| video-call.tsx | `components/kidcoms/` | Video call component |
+| theater-content.ts | `lib/` | Content catalog |
 
 ---
 
-*Last Updated: January 10, 2026*
-*Document Version: 1.0.0*
+*Last Updated: January 12, 2026*
+*Document Version: 1.2.0*

@@ -5,6 +5,44 @@ All notable changes to CommonGround will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-01-12
+
+### Added
+
+#### ARIA v2 Agreement Support
+- **V2 Summary Generation** - `generate_summary_v2` method for 7-section agreements
+- **V2 Extraction Preview** - `generate_extraction_preview_v2` for structured data extraction
+- **Version-Aware API** - Endpoints automatically detect agreement version and call appropriate methods
+- **Section Mapping** - Proper mapping from v2 sections to summary format
+
+#### Features Page Redesign
+- **Competitor Comparison** - Side-by-side comparison with TalkingParents and OurFamily Wizard
+- **Feature Cards** - Visual cards highlighting ARIA, SharedCare, ClearFund, KidComs
+- **Trust Indicators** - Court-ready compliance and security badges
+- **Responsive Layout** - Mobile-optimized design with proper spacing
+
+#### KidComs Theater Mode
+- **Synchronized Viewing** - Watch videos and read storybooks together in real-time
+- **Content Library Modal** - Tabbed interface for Videos, Storybooks, and YouTube
+- **PiP Video Tiles** - Picture-in-picture video overlays during content viewing
+- **YouTube Integration** - Paste any YouTube URL to watch together
+
+### Changed
+
+#### KidComs Brand Theming
+- **Emerald/Teal Color Scheme** - Replaced purple/magenta with CommonGround brand colors
+- **Video Call UI** - Loading spinner, avatar backgrounds, control bar styling updated
+- **Content Library** - Header icons, tabs, content cards use emerald gradients
+- **Theater Mode** - Badge styling, PiP borders, empty states match brand
+- **Shadow Effects** - Added emerald glow effects (shadow-emerald-500/20)
+- **Gradient Buttons** - Consistent from-emerald-500 to-teal-600 gradients
+
+### Fixed
+- ARIA summary generation now correctly handles v2 7-section agreements
+- PDF generation uses version-appropriate summary method
+
+---
+
 ## [1.2.0] - 2025-01-11
 
 ### Added
@@ -399,6 +437,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.3.0 | 2026-01-12 | ARIA v2 support, Features page redesign, KidComs brand theming |
+| 1.2.0 | 2025-01-11 | SharedCare Agreement v2, 7-section format, Quick Accords |
 | 1.1.2 | 2025-01-11 | Stripe obligation payments, My Circle refactor, room tracking |
 | 1.1.1 | 2025-01-10 | My Circle email invitations, KidComs notification fix |
 | 1.1.0 | 2025-01-10 | KidComs video calling, My Circle, Activity Feed |
