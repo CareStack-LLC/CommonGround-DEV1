@@ -225,6 +225,13 @@ export default function KidComsPage() {
           {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => router.push(`/family-files/${familyFileId}`)}
+                className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
+                aria-label="Go back"
+              >
+                <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+              </button>
               <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
                 <Video className="h-5 w-5 text-cg-sage" />
               </div>

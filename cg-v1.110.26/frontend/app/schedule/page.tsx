@@ -24,6 +24,7 @@ import {
   FileText,
   Plus,
   ChevronDown,
+  ChevronLeft,
   ArrowLeftRight,
   MapPin,
   CheckCircle2,
@@ -384,6 +385,13 @@ function ScheduleContent() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
+                  aria-label="Go back"
+                >
+                  <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+                </button>
                 <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
                   <Calendar className="h-5 w-5 text-cg-sage" />
                 </div>

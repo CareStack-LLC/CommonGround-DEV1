@@ -18,6 +18,7 @@ import {
   Video,
   Info,
   ChevronLeft,
+  ArrowLeft,
   Clock,
   CheckCheck,
   AlertTriangle,
@@ -498,11 +499,20 @@ function MessagesContent() {
           `}>
             {/* Sidebar Header */}
             <div className="p-4 border-b border-border">
-              <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-cg-sage" />
-                Comms
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">The Neutral Zone</p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
+                  aria-label="Go back"
+                >
+                  <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+                </button>
+                <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-cg-sage" />
+                  Comms
+                </h1>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1 ml-9">The Neutral Zone</p>
             </div>
 
             {/* Conversations List */}
