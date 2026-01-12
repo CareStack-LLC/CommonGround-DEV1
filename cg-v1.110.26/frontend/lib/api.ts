@@ -605,6 +605,7 @@ export interface ARIAAnalysisResponse {
   explanation: string;
   suggestion: string | null;
   is_flagged: boolean;
+  block_send?: boolean; // New field for blocking severe threats
 }
 
 export const messagesAPI = {

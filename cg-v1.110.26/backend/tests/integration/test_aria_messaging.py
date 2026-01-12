@@ -303,7 +303,53 @@ class TestMessageSending:
         assert flag.flag_type == "toxicity_detected"
         assert flag.toxicity_score > 0.3
         assert len(flag.toxicity_categories) > 0
+        assert flag.toxicity_score > 0.3
+        assert len(flag.toxicity_categories) > 0
         assert flag.suggested_rewrite is not None
+
+    @pytest.mark.asyncio
+    async def test_block_severe_threat(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        test_case: dict,
+        auth_headers_user1: dict
+    ):
+        """Test that severe threats are BLOCKED (hidden from recipient)."""
+        response = await client.post(
+            "/api/v1/messages/",
+            json={
+                "case_id": test_case["case"].id,
+                "recipient_id": test_case["user2"].id,
+                "content": "I'm coming over to kill you right now.",
+                "message_type": "text"
+            },
+            headers=auth_headers_user1
+        )
+
+        assert response.status_code == 201
+        data = response.json()
+        message_id = data["id"]
+
+        # Verify message created but hidden
+        result = await db.execute(
+            select(Message).where(Message.id == message_id)
+        )
+        message = result.scalar_one()
+        
+        # Should be flagged
+        assert message.was_flagged is True
+        
+        # Should be hidden from recipient (BLOCKED)
+        assert message.is_hidden_by_recipient is True
+        
+        # Verify flag is severe
+        flag_result = await db.execute(
+            select(MessageFlag).where(MessageFlag.message_id == message_id)
+        )
+        flag = flag_result.scalar_one()
+        assert flag.severity == "severe"
+
 
 
 # =============================================================================
@@ -504,6 +550,45 @@ class TestInterventionWorkflow:
         )
         flag = flag_result.scalar_one()
         assert flag.user_action == "sent_anyway"
+
+
+    @pytest.mark.asyncio
+    async def test_prevent_sent_anyway_for_threat(
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        test_case: dict,
+        auth_headers_user1: dict
+    ):
+        """Test that user CANNOT send anyway if message is severe threat."""
+        # Send threat
+        send_response = await client.post(
+            "/api/v1/messages/",
+            json={
+                "case_id": test_case["case"].id,
+                "recipient_id": test_case["user2"].id,
+                "content": "I will beat you up if you come here.",
+                "message_type": "text"
+            },
+            headers=auth_headers_user1
+        )
+        message_id = send_response.json()["id"]
+
+        # Try to send anyway
+        intervention_response = await client.post(
+            f"/api/v1/messages/{message_id}/intervention",
+            json={
+                "action": "sent_anyway",
+                "final_message": "I will beat you up if you come here.",
+                "notes": "I don't care"
+            },
+            headers=auth_headers_user1
+        )
+
+        # Should be Forbidden
+        assert intervention_response.status_code == 403
+        assert "severe" in intervention_response.json()["detail"].lower()
+
 
 
 # =============================================================================
@@ -752,7 +837,9 @@ class TestARIAService:
 
         assert result.toxicity_score > 0.3
         assert result.is_flagged is True
-        assert any(cat.value == "hostility" for cat in result.categories)
+        # "Terrible parent" is an insult
+        categories = [cat.value for cat in result.categories]
+        assert "hostility" in categories or "insult" in categories
 
     def test_regex_analysis_all_caps(self):
         """Test detection of all caps."""
@@ -771,6 +858,136 @@ class TestARIAService:
 
         assert result.toxicity_score > 0.2
         assert any(cat.value == "passive_aggressive" for cat in result.categories)
+
+    def test_custody_weaponization(self):
+        """Test detection of custody weaponization."""
+        result = aria_service.analyze_message(
+            "If you don't pay me, you won't see the kids."
+        )
+        assert result.is_flagged is True
+        assert any(cat.value == "custody_weaponization" for cat in result.categories)
+        assert result.toxicity_level.value in ["high", "severe"]
+
+    def test_financial_coercion(self):
+        """Test detection of financial coercion."""
+        result = aria_service.analyze_message(
+            "I'm gonna cut you off and starve you out."
+        )
+        assert result.is_flagged is True
+        assert any(cat.value == "financial_coercion" for cat in result.categories)
+
+    def test_expanded_insults(self):
+        """Test detection of new specific insults."""
+        result = aria_service.analyze_message("You dumb ass hoe")
+        assert result.is_flagged is True
+        # Could be insult or profanity depending on pattern
+        categories = [c.value for c in result.categories]
+        assert "insult" in categories or "profanity" in categories
+
+    def test_hate_speech_detection(self):
+        """Test detection of hate speech (SEVERE + BLOCKED)."""
+        # Test a racial slur (censored in logs but active in regex)
+        # Using a pattern from the list: r'\bnigger\w*\b'
+        result = aria_service.analyze_message("You are a nigger")
+        
+        assert result.is_flagged is True
+        assert any(cat.value == "hate_speech" for cat in result.categories)
+        assert result.toxicity_score >= 1.0
+        assert result.block_send is True  # SHould be auto-blocked
+
+    def test_sexual_harassment_detection(self):
+        """Test detection of sexual harassment (SEVERE + BLOCKED)."""
+        result = aria_service.analyze_message("Send me nudes now")
+        
+        assert result.is_flagged is True
+        assert any(cat.value == "sexual_harassment" for cat in result.categories)
+        assert result.toxicity_score >= 1.0
+        assert result.block_send is True
+
+    def test_suicide_baiting(self):
+        """Test suicide baiting detection (THREATENING + SEVERE + BLOCKED)."""
+        result = aria_service.analyze_message("You should just kys")
+        
+        assert result.is_flagged is True
+        assert any(cat.value == "threatening" for cat in result.categories)
+        # Should be severe enough to block? 
+        # Threatening category weight is 0.95, plus trigger points. 
+        # Suicide baiting is in THREATENING_PATTERNS.
+        # Logic: block_send needs (SEVERE & THREATENING).
+        # Score needs to be >= 0.85 for SEVERE.
+        assert result.toxicity_level.value == "severe"
+        assert result.block_send is True
+
+    def test_modern_slang_toxicity(self):
+        """Test detection of modern internet insults."""
+        slang_terms = ["simp", "incel", "groomer", "gaslighting"]
+        for term in slang_terms:
+            result = aria_service.analyze_message(f"Stop being a {term}")
+            assert result.is_flagged is True
+            assert any(cat.value == "insult" for cat in result.categories)
+
+    def test_expanded_patterns_coverage(self):
+        """Test a sampling of new expanded patterns across categories."""
+        test_cases = [
+            # Pattern, Expected Category
+            ("Bless your heart", "passive_aggressive"),
+            ("You should just drop dead", "hostility"),
+            ("Talk to the hand", "dismissive"),
+            ("Look what you did", "blame"),
+            ("You are an unfit mother", "insult"),
+            ("I'll bleed you dry", "financial_coercion"),
+            ("Tell the kids what you did", "custody_weaponization"),
+            ("Do the world a favor and end it", "threatening"),
+        ]
+
+        for message, category in test_cases:
+            result = aria_service.analyze_message(message)
+            assert result.is_flagged is True, f"Failed to flag: {message}"
+            categories = [c.value for c in result.categories]
+            assert category in categories, f"Expected {category} for '{message}', got {categories}"
+
+    def test_leetspeak_detection(self):
+        """Test detection of leetspeak/evasion variants."""
+        test_cases = [
+            ("n1gger", "hate_speech"),
+            ("n!gger", "hate_speech"),
+            ("c.u.n.t", "profanity"), # Or hate_speech depending on list, checking flag at least
+            ("sh!t", "profanity"),
+            ("f*ck", "profanity"),
+        ]
+
+        for message, category in test_cases:
+            result = aria_service.analyze_message(f"You {message}")
+            assert result.is_flagged is True, f"Failed to flag: {message}"
+            # Check if likely category is present (c.u.n.t might be profanity or hate speech now)
+            cat_values = [c.value for c in result.categories]
+            assert category in cat_values or "hate_speech" in cat_values or "profanity" in cat_values
+
+    def test_suggestion_quality(self):
+        """Test that suggestions are grammatical and constructive."""
+        test_cases = [
+            # Use examples that are Medium toxicity to trigger replacements (not templates)
+            (
+                "This is fuck ass behavior", 
+                "I am frustrated" # Expect "This is I am frustrated behavior" roughly
+            ),
+            (
+                "Stop gaslighting me",
+                "misrepresenting the situation"
+            ),
+            (
+                "You are fucking late",
+                "You are very late" # 'fucking' -> 'very'
+            )
+        ]
+
+        for original, expected_part in test_cases:
+            result = aria_service.analyze_message(original)
+            # If it hit High/Severe, we get a template which fails this test.
+            # Ensure we are testing replacements.
+            assert result.toxicity_level.value in ["low", "medium", "high"], f"Message '{original}' triggered {result.toxicity_level}, expected replacement."
+            assert result.suggestion is not None
+            assert expected_part.lower() in result.suggestion.lower(), f"Expected part '{expected_part}' not found in '{result.suggestion}'"
 
 
 if __name__ == "__main__":

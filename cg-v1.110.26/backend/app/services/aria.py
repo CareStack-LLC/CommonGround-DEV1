@@ -43,6 +43,10 @@ class ToxicityCategory(Enum):
     MANIPULATION = "manipulation"
     PASSIVE_AGGRESSIVE = "passive_aggressive"
     ALL_CAPS = "all_caps"
+    CUSTODY_WEAPONIZATION = "custody_weaponization"
+    FINANCIAL_COERCION = "financial_coercion"
+    HATE_SPEECH = "hate_speech"
+    SEXUAL_HARASSMENT = "sexual_harassment"
 
 
 @dataclass
@@ -71,6 +75,17 @@ class ARIAService:
         r'\bfuck\w*\b', r'\bshit\w*\b', r'\bass\b', r'\basshole\b',
         r'\bbitch\w*\b', r'\bdamn\w*\b', r'\bhell\b', r'\bcrap\b',
         r'\bpiss\w*\b', r'\bbastard\b', r'\bwtf\b', r'\bstfu\b',
+        r'\bhoe\b', r'\bwhore\b', r'\bslut\b',
+        r'\bsuck\s+(my\s+)?dick\b', r'\bdick\b', r'\bcock\b', r'\bcunt\b',
+        r'\bpussy\b', r'\btwat\b', r'\bprick\b', r'\bbollocks\b', r'\bwanker\b',
+        r'\bmotherfucker\b', r'\btits\b', r'\bboobs\b',
+        r'\bdouche\b', r'\bdipshit\b', r'\bjackass\b', r'\bscumbag\b',
+        r'\bshithead\b', r'\bfuckface\b', r'\bmeathead\b', r'\bnumbskull\b',
+        r'\bscrew\s+you\b', r'\beff\s+you\b', r'\bf\s+u\b',
+        # Leetspeak / Variants
+        r'\bc\.?u\.?n\.?t\b', r'\bc\*nt\b', r'\bc\@nt\b',
+        r'\bf\.?u\.?c\.?k\b', r'\bf\*ck\b', r'\bf\@ck\b', r'\bfvck\b',
+        r'\bs\.?h\.?i\.?t\b', r'\bsh\*t\b', r'\bsh!t\b',
     ]
 
     INSULT_PATTERNS = [
@@ -78,6 +93,23 @@ class ARIAService:
         r'\bpathetic\b', r'\bloser\b', r'\bworthless\b', r'\buseless\b',
         r'\bincompetent\b', r'\bcrazy\b', r'\binsane\b', r'\bpsycho\b',
         r'\bterrible\s+(mother|father|parent)\b', r'\bbad\s+(mother|father|parent)\b',
+        r'\bdummy\b', r'\bdumb\s*(ass|as|azz)?\s*(hoe|ho)\b', r'\bstupid\s+ass\b',
+        r'\bretard\w*\b', r'\bimbeccile\b', r'\bclown\b', r'\bjerk\b', 
+        r'\bscum\b', r'\btrash\b', r'\bgarbage\b', r'\bfilth\b',
+        # Modern Slang / Internet Toxicity
+        r'\bsimp\b', r'\bincel\b', r'\bcuck\b', r'\bsoyboy\b',
+        r'\bgroomer\b', r'\bpedophile\b', r'\bpedo\b', r'\bnonc(e|ing)\b',
+        r'\bthot\b', r'\bskank\b', r'\brachet\b', r'\bghetto\b',
+        r'\bkaren\b', r'\bboomer\b',
+        r'\bgaslight(ing|er)?\b', r'\bnarcissist\b', r'\bnarc\b',
+        r'\btoxic\b', r'\bdelusional\b',
+        # Parenting/Character Attacks
+        r'\bunfit\b', r'\bnegligent\b', r'\bdeadbeat\b', r'\blazy\b',
+        r'\bchildish\b', r'\bimmature\b', r'\bdisgrace\b', r'\beinstein\b', # Sarcastic
+        r'\bgenius\b', # Sarcastic
+        r'\bmanic\b', r'\bbipolar\b', r'\bschizo\b', # Weaponized mental health
+        r'\bdisgusting\b', r'\brepulsive\b', r'\bslob\b', r'\bpig\b',
+        r'\bhypocrite\b', r'\bliar\b', r'\bcheat\b', r'\bfake\b',
     ]
 
     HOSTILITY_PATTERNS = [
@@ -89,6 +121,10 @@ class ARIAService:
         r'\bgo\s+to\s+hell\b', r'\bfuck\s+off\b', r'\bget\s+lost\b',
         r'\bstop\s+bothering\s+me\b', r'\bwaste\s+of\s+time\b',
         r'\byou\'?re\s+(the\s+)?worst\b', r'\bcan\'?t\s+believe\s+you\b',
+        r'\bregret\s+meeting\s+you\b', r'\bbiggest\s+mistake\b',
+        r'\bwish\s+you\s+were\s+dead\b', # Borderline threat
+        r'\bdrop\s+dead\b', r'\beat\s+shit\b', r'\brot\s+in\s+hell\b',
+        r'\byou\s+make\s+me\s+sick\b', r'\bcan\'?t\s+look\s+at\s+you\b',
     ]
 
     DISMISSIVE_PATTERNS = [
@@ -96,18 +132,31 @@ class ARIAService:
         r"\bthat'?s\s+your\s+(problem|issue)\b", r'\bgo\s+look\b',
         r'\bi\s+told\s+you\b', r'\bi\s+already\s+said\b',
         r'\bhow\s+many\s+times\b', r'\bfor\s+the\s+last\s+time\b',
+        r'\btalk\s+to\s+the\s+hand\b', r'\bblah\s+blah\b',
+        r'\bdon\'?t\s+start\b', r'\bhere\s+we\s+go\s+again\b',
+        r'\bwhatever\b', r'\banyway\b', r'\bboring\b',
+        r'\bnot\s+listening\b', r'\bwho\s+cares\b', r'\bso\s+what\b',
     ]
 
     PASSIVE_AGGRESSIVE_PATTERNS = [
         r'\bfine\.?\s*$', r'\bwhatever\s+you\s+say\b', r'\bif\s+you\s+say\s+so\b',
         r'\bsure\.?\s*$', r'\bok\s+then\.?\s*$', r'\bnice\s+try\b',
         r'\bgood\s+(luck|job)\s+with\s+that\b', r'\bthanks\s+for\s+nothing\b',
+        r'\bif\s+you\s+(actually\s+)?cared\b',
+        r'\bfunny\s+how\b', r'\binteresting\s+that\b',
+        r'\bbless\s+your\s+heart\b', r'\bwow\b', r'\bjust\s+saying\b',
+        r'\bi\s+guess\b', r'\bwhatever\s+makes\s+you\s+happy\b',
+        r'\bper\s+my\s+last\s+email\b', r'\bas\s+previously\s+stated\b',
+        r'\byou\s+do\s+you\b', r'\bact\s+like\s+an\s+adult\b',
     ]
 
     BLAME_PATTERNS = [
         r'\byou\s+made\s+me\b', r'\byou\s+caused\b', r'\bbecause\s+of\s+you\b',
         r'\bif\s+you\s+had\s+(just\s+)?(\w+)\b', r'\byou\s+should\s+have\b',
         r'\bthis\s+is\s+(all\s+)?your\s+fault\b', r'\byou\s+ruined\b',
+        r'\blook\s+what\s+you\s+did\b', r'\ball\s+your\s+doing\b',
+        r'\bthanks\s+to\s+you\b', r'\byou\s+always\s+ruin\b',
+        r'\bnever\s+take\s+responsibility\b',
     ]
 
     THREATENING_PATTERNS = [
@@ -130,6 +179,71 @@ class ARIAService:
         # Custody threats
         r'\byou\'?ll?\s+never\s+see\s+(the\s+)?kids?\b',
         r'\btake\s+(away\s+)?the\s+kids?\b', r'\bi\'?ll?\s+get\s+full\s+custody\b',
+        r'\bfile\s+for\s+emergency\s+custody\b', r'\bcall\s+(cps|dcfs)\b',
+        r'\bdeclare\s+you\s+unfit\b', r'\blose\s+your\s+rights\b',
+        # Suicide Baiting (SEVERE - Treated as threat/violence)
+        r'\bkys\b', r'\bkill\s+yoursel(f|ves)\b', r'\bunalive\s+yoursel(f|ves)\b',
+        r'\bgo\s+die\b', r'\bbetter\s+off\s+dead\b', r'\bdrink\s+bleach\b',
+        r'\bhang\s+yoursel(f|ves)\b', r'\bjump\s+off\b', r'\bhope\s+you\s+die\b',
+        r'\bdo\s+the\s+world\s+a\s+favor\b', r'\bend\s+it\b',
+    ]
+
+    CUSTODY_WEAPONIZATION_PATTERNS = [
+        r'\b(if|since|because)\s+you\s+(don\'?t|won\'?t|not\s+gonna)\s+pay.*see\s+(the\s+)?kids?\b',
+        r'\bno\s+(money|payment|pay).*no\s+kids?\b',
+        r'\bpay\s+(up|me).*or\s+(you\s+)?(won\'?t|can\'?t)\s+see\b',
+        r'\byou\'?ll?\s+never\s+see\s+(the\s+)?kids?\s+again\b',
+        r'\bkids?\s+(are|will\s+be|belong)\s+(all\s+)?mine\b',
+        r'\btaking\s+(the\s+)?kids?\s+(away|from\s+you)\b',
+        r'\bwon\'?t\s+see\s+(your\s+)?kids?\b',
+        r'\bforget\s+about\s+the\s+kids?\b', r'\bnot\s+your\s+kids?\s+anymore\b',
+        r'\bthey\s+hate\s+you\b', r'\bthey\s+don\'?t\s+want\s+to\s+see\s+you\b', # Weaponizing feelings
+        r'\btell\s+the\s+kids?\s+what\s+you\s+did\b',
+    ]
+
+    FINANCIAL_COERCION_PATTERNS = [
+        r'\bnot\s+gonna\s+pay\b', r'\bai\'?nt\s+paying\b',
+        r'\bcut\s+you\s+off\b', r'\bstarve\s+you\s+out\b',
+        r'\bi\s+buy\s+everything\b', r'\byou\s+pay\s+for\s+nothing\b',
+        r'\bcontrol\s+the\s+money\b', r'\bmy\s+money\s+not\s+yours\b',
+        r'\bbroke\s+ass\b', r'\bcan\'?t\s+afford\b', # Shaming
+        r'\bchild\s+support\s+is\s+(for\s+)?me\b',
+        r'\bsue\s+you\s+for\s+every\s+penny\b', r'\bbleed\s+you\s+dry\b',
+    ]
+
+    HATE_SPEECH_PATTERNS = [
+        # Racial/Ethnic/Religious (CENSORED IN LOGS BUT ACTIVE IN REGEX)
+        r'\btrailer\s+trash\b', r'\bwhite\s+trash\b',
+        r'\bnigger\w*\b', r'\bnigga\w*\b', r'\bspic\b', r'\bwetback\b',
+        r'\bchink\b', r'\bgook\b', r'\bkike\b', r'\bjewboy\b', r'\bhitler\b',
+        r'\bnazi\b', r'\bterrorist\b', r'\braghead\b', r'\bsand\s+nigger\b',
+        r'\bcoon\b', r'\bab(o|bo)\b', r'\bgypsy\b',
+        r'\bbeaner\b', r'\bjungle\s+bunny\b', r'\bporch\s+monkey\b', r'\btowel\s+head\b',
+        r'\bgoyim\b', r'\bshylock\b', r'\bheeb\b',
+        r'\bmulatto\b', r'\bhalf\s+breed\b', r'\bsquaw\b', r'\bredskin\b',
+        # Leetspeak / Evasion variants for N-word
+        r'\bn\.?i\.?g\.?g\.?e\.?r\b', r'\bn1gger\b', r'\bn!gger\b', r'\bnigg3r\b',
+        r'\bn\.?i\.?g\.?g\.?a\b', r'\bn1gga\b', r'\bn!gga\b', r'\bnigg4\b',
+        r'\bn\s*i\s*g\s*g\s*e\s*r\b',
+        # LGTBQ+
+        r'\bfaggot\b', r'\bfag\b', r'\bdyke\b', r'\blezzie\b',
+        r'\btranny\b', r'\bshe.?male\b', r'\bhe.?she\b', r'\bit\b',
+        r'\bgay\s*lord\b', r'\bhomo\b',
+        r'\bf\.?a\.?g\.?g\.?o\.?t\b', r'\bf4ggot\b',
+        # Sexist/Gender Violence
+        r'\bcum\s*dumpster\b', r'\broast\s*beef\b', r'\bdishwasher\b',
+        r'\bkitchen\b', r'\bmake\s+me\s+a\s+sandwich\b', 
+        r'\brape\b', r'\brapist\b', r'\bgrope\b', r'\bmolest\b',
+        r'\bcunt\b', # Often considered severe misogynistic insult
+    ]
+
+    SEXUAL_HARASSMENT_PATTERNS = [
+        r'\bsend\s+(me\s+)?nudes?\b', r'\bshow\s+(me\s+)?(your\s+)?(tits|boobs|pussy|dick|cock)\b',
+        r'\bwanna\s+fuck\b', r'\blet\'?s\s+fuck\b', r'\bsit\s+on\s+my\s+face\b',
+        r'\bsuck\s+me\b', r'\beat\s+me\b', r'\bhorny\b',
+        r'\bjerking\s+off\b', r'\brubbing\s+one\s+out\b',
+        r'\bthick\b', r'\bsexy\b', r'\bhot\b', # Context dependent, but flagged in co-parenting apps usually
+        r'\bonlyfans\b',
     ]
 
     # Mediator Templates (BIFF Method: Brief, Informative, Friendly, Firm)
@@ -158,6 +272,14 @@ class ARIAService:
             "I understand you might be busy, but I need a clear answer on this for the children's planning.",
             "Please let me know if you are available to discuss this, as I need to finalize the plan.",
         ],
+        ToxicityCategory.CUSTODY_WEAPONIZATION: [
+            "I understand you're frustrated about finances. However, parenting time and financial matters are legally separate. Let's discuss each issue on its own merits.",
+            "Money and parenting time need to be discussed separately. What specific schedule concern do you have?",
+        ],
+        ToxicityCategory.FINANCIAL_COERCION: [
+            "Let's stick to the financial agreement we have or discuss this through proper legal channels.",
+            "I would like to keep our financial discussions professional and documented.",
+        ],
     }
 
     # Context-Aware Phrase Replacements (Gentler, Mediator-style)
@@ -171,6 +293,14 @@ class ARIAService:
         r'\bfuck\s+you\b': "I am angry",
         r'\byou\s+are\s+a\s+bitch\b': "I am finding your behavior difficult",
         r'\bstop\s+being\s+a\s+bitch\b': "Please stop communicating this way",
+        r'\bsuck\s+(my\s+)?dick\b': "I am very frustrated",
+
+        # Custody/Financial -> Separation of issues
+        r'\bno\s+(money|pay).*no\s+kids?\b': "let's discuss finances and scheduling separately",
+        r'\bwon\'?t\s+see\s+(the\s+)?kids?\b': "we need to discuss the parenting schedule",
+        r'\bdumb\s*(ass|as)?\s*hoe\b': "difficult to understand",
+        r'\bdummy\b': "mistaken",
+        r'\bstupid\s+ass\b': "unreasonable",
 
         # Hate and contempt -> I-statements
         r'\bi\s+hate\s+you\b': "I am feeling very hostile towards you right now",
@@ -200,6 +330,40 @@ class ARIAService:
         r'\bdumb\b': "ill-advised",
         r'\bcrazy\b': "unreasonable",
         r'\binsane\b': "difficult to understand",
+        
+        # Compound Profanity/Insults -> Constructive Expression
+        r'\bfuck\s+ass\b': "I am frustrated",
+        r'\bpiece\s+of\s+shit\b': "I am very upset with your behavior",
+        r'\bwaste\s+of\s+space\b': "I am disappointed",
+        r'\bson\s+of\s+a\s+bitch\b': "I am angry",
+        r'\bdumb\s*ass\b': "unreasonable",
+        r'\bstupid\s*ass\b': "difficult",
+        r'\bjack\s*ass\b': "difficult",
+        
+        # Hostile Opener Replacements
+        r'\bwhy\s+are\s+you\s+so\s+stupid\b': "I don't understand your decision",
+        r'\bwhat\s+is\s+wrong\s+with\s+you\b': "I am confused by your actions",
+        r'\bstop\s+being\s+a\s+dick\b': "please treat me with respect",
+        r'\bstop\s+being\s+an\s+asshole\b': "please be respectful",
+        r'\byou\s+are\s+impossible\b': "I am finding this difficult to resolve",
+        
+        # New Categories - Slang & Weaponized Language
+        r'\bgaslighting\b': "misrepresenting the situation",
+        r'\bnarcissist\b': "unwilling to compromise",
+        r'\bincel\b': "hostile",
+        r'\bsimp\b': "person",
+        r'\bgroomer\b': "harmful",
+        
+        # Coercion/Custody Specifics
+        r'\bnot\s+gonna\s+pay\b': "I cannot pay right now (let's discuss a plan)",
+        r'\bmy\s+money\b': "the finances",
+        r'\bkeep\s+the\s+kids\b': "change the schedule",
+        r'\bnever\s+see\s+them\b': "we need to resolve the schedule",
+        
+        # General Filler/Intensifiers (to avoid broken sentences)
+        r'\bfucking\b': "very", # "You are fucking late" -> "You are very late"
+        r'\bdamn\b': "very",
+        r'\bloody\b': "very",
     }
 
     def __init__(self):
@@ -229,6 +393,18 @@ class ARIAService:
             ],
             ToxicityCategory.THREATENING: [
                 re.compile(p, re.IGNORECASE) for p in self.THREATENING_PATTERNS
+            ],
+            ToxicityCategory.CUSTODY_WEAPONIZATION: [
+                re.compile(p, re.IGNORECASE) for p in self.CUSTODY_WEAPONIZATION_PATTERNS
+            ],
+            ToxicityCategory.FINANCIAL_COERCION: [
+                re.compile(p, re.IGNORECASE) for p in self.FINANCIAL_COERCION_PATTERNS
+            ],
+            ToxicityCategory.HATE_SPEECH: [
+                re.compile(p, re.IGNORECASE) for p in self.HATE_SPEECH_PATTERNS
+            ],
+            ToxicityCategory.SEXUAL_HARASSMENT: [
+                re.compile(p, re.IGNORECASE) for p in self.SEXUAL_HARASSMENT_PATTERNS
             ],
         }
 
@@ -272,9 +448,11 @@ class ARIAService:
         toxicity_level = self._get_level(toxicity_score)
 
         # Blocking Logic: Block if SEVERE and THREATENING (physical harm)
+        # Also block HATE SPEECH and SEXUAL HARASSMENT automatically
         block_send = (
-            toxicity_level == ToxicityLevel.SEVERE and
-            ToxicityCategory.THREATENING in categories
+            (toxicity_level == ToxicityLevel.SEVERE and ToxicityCategory.THREATENING in categories) or
+            ToxicityCategory.HATE_SPEECH in categories or
+            ToxicityCategory.SEXUAL_HARASSMENT in categories
         )
 
         # Generate explanation
@@ -324,6 +502,10 @@ class ARIAService:
             ToxicityCategory.SARCASM: 0.3,          # Sarcasm = unprofessional
             ToxicityCategory.ALL_CAPS: 0.2,         # Shouting = aggressive
             ToxicityCategory.MANIPULATION: 0.5,     # Manipulation = bad faith
+            ToxicityCategory.CUSTODY_WEAPONIZATION: 0.8,  # Very high - courts hate this
+            ToxicityCategory.FINANCIAL_COERCION: 0.6,
+            ToxicityCategory.HATE_SPEECH: 1.0,      # ZERO TOLERANCE
+            ToxicityCategory.SEXUAL_HARASSMENT: 1.0, # ZERO TOLERANCE
         }
 
         score = sum(weights.get(cat, 0.2) for cat in set(categories))
@@ -366,6 +548,10 @@ class ARIAService:
             ToxicityCategory.SARCASM: "uses sarcasm (inappropriate for legal documentation)",
             ToxicityCategory.ALL_CAPS: "uses all caps (interpreted as shouting in court records)",
             ToxicityCategory.MANIPULATION: "appears manipulative (bad faith behavior)",
+            ToxicityCategory.CUSTODY_WEAPONIZATION: "uses children as leverage (courts view this extremely negatively)",
+            ToxicityCategory.FINANCIAL_COERCION: "links financial matters to parenting time (legally inappropriate)",
+            ToxicityCategory.HATE_SPEECH: "contains hate speech or slurs (ZERO TOLERANCE - will be blocked)",
+            ToxicityCategory.SEXUAL_HARASSMENT: "contains sexual harassment or inappropriate content (ZERO TOLERANCE - will be blocked)",
         }
 
         issues = [explanations.get(cat, str(cat)) for cat in set(categories)]
@@ -390,11 +576,12 @@ class ARIAService:
         """
         import random
 
-        # STRATEGY 1: TEMPLATE RESPONSE (For High/Severe Toxicity)
-        # If the message is highly toxic, attempting to salvage it word-by-word usually fails 
-        # (e.g. "Fuck you stupid bitch" -> "you confusing").
-        # Instead, we suggest a complete replacement based on the category.
-        if toxicity_level in [ToxicityLevel.HIGH, ToxicityLevel.SEVERE]:
+        # STRATEGY 1: TEMPLATE RESPONSE (For Severe Toxicity Only)
+        # If the message is severely toxic/threatening, we suggest a complete reset.
+        # For High toxicity (0.6-0.85), we now try to replacement phrases first to salvage the intent.
+        if toxicity_level == ToxicityLevel.SEVERE:
+            # For severe messages, suggest a complete rewrite using BIFF method
+            # on the category.
             # Prioritize categories for template selection
             priority_order = [
                 ToxicityCategory.THREATENING,

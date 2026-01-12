@@ -79,8 +79,8 @@ export function ARIAIntervention({
           bg: 'bg-cg-error-subtle',
           border: 'border-cg-error/30',
           icon: <XCircle className="h-6 w-6 text-cg-error" />,
-          title: 'Please revise your message',
-          subtitle: 'This message has high conflict potential.',
+          title: 'Message Blocked',
+          subtitle: 'This message violates safety policies and cannot be sent.',
           color: 'text-cg-error',
         };
       default:
@@ -95,8 +95,9 @@ export function ARIAIntervention({
     }
   };
 
-  const config = getLevelConfig(analysis.toxicity_level);
-  const canSendAnyway = analysis.toxicity_level !== 'red';
+  const config = getLevelConfig(analysis.block_send ? 'red' : analysis.toxicity_level);
+  // Strictly prevent sending if block_send is true
+  const canSendAnyway = !analysis.block_send && analysis.toxicity_level !== 'red'; // Double safety check
 
   return (
     <div className={`aria-guardian ${config.bg} ${config.border} overflow-hidden`}>
@@ -146,15 +147,14 @@ export function ARIAIntervention({
           </div>
           <div className="h-2 bg-white/50 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                analysis.toxicity_level === 'green'
+              className={`h-full rounded-full transition-all duration-500 ${analysis.toxicity_level === 'green'
                   ? 'bg-cg-success'
                   : analysis.toxicity_level === 'yellow'
-                  ? 'bg-cg-amber'
-                  : analysis.toxicity_level === 'orange'
-                  ? 'bg-cg-warning'
-                  : 'bg-cg-error'
-              }`}
+                    ? 'bg-cg-amber'
+                    : analysis.toxicity_level === 'orange'
+                      ? 'bg-cg-warning'
+                      : 'bg-cg-error'
+                }`}
               style={{ width: `${analysis.toxicity_score * 100}%` }}
             />
           </div>
@@ -181,9 +181,9 @@ export function ARIAIntervention({
                       {analysis.categories.map((category, index) => (
                         <span
                           key={index}
-                          className="px-2 py-1 bg-white/50 rounded-lg text-xs font-medium text-foreground/80"
+                          className="px-2 py-1 bg-white/50 rounded-lg text-xs font-medium text-foreground/80 capitalize"
                         >
-                          {category.replace(/_/g, ' ')}
+                          {category.replace(/_/g, ' ').toLowerCase()}
                         </span>
                       ))}
                     </div>
@@ -313,8 +313,10 @@ export function ARIAIntervention({
             </div>
 
             {!canSendAnyway && (
-              <p className="text-xs text-cg-error text-center pt-2">
-                This message requires revision before sending.
+              <p className="text-xs text-cg-error text-center pt-2 font-medium">
+                {analysis.block_send
+                  ? "This message contains content that violates our safety guidelines."
+                  : "This message requires revision before sending."}
               </p>
             )}
           </div>
