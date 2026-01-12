@@ -606,11 +606,8 @@ function AgreementDetailsContent() {
 
       await agreementsAPI.delete(agreementId);
 
-      if (agreement?.case_id) {
-        router.push(`/cases/${agreement.case_id}`);
-      } else {
-        router.push('/dashboard');
-      }
+      // Return to agreements list so user can manage other agreements
+      router.push('/agreements');
     } catch (err: any) {
       console.error('Failed to delete agreement:', err);
       setError(err.message || 'Failed to delete agreement');
