@@ -382,6 +382,100 @@ class AgreementService:
 
         return rules
 
+    def _format_structured_data_for_pdf(self, data: Dict[str, Any]) -> str:
+        """
+        Format structured data from v2 agreements into readable PDF content.
+
+        Args:
+            data: Structured data dictionary from section
+
+        Returns:
+            Formatted string for PDF paragraph
+        """
+        if not data:
+            return "<i>No content provided</i>"
+
+        # Human-readable labels for common fields
+        field_labels = {
+            'current_arrangements': 'Current Living Arrangements',
+            'effective_date': 'Effective Date',
+            'duration_type': 'Agreement Duration',
+            'review_schedule': 'Review Schedule',
+            'primary_residence': 'Primary Residence',
+            'schedule_pattern': 'Schedule Pattern',
+            'transition_day': 'Transition Day',
+            'transition_time': 'Transition Time',
+            'exchange_location': 'Exchange Location',
+            'exchange_location_address': 'Exchange Address',
+            'transportation_responsibility': 'Transportation',
+            'transition_communication': 'Communication Method',
+            'major_decision_authority': 'Decision-Making Authority',
+            'response_timeframe': 'Response Timeframe',
+            'split_ratio': 'Expense Split Ratio',
+            'reimbursement_window': 'Reimbursement Window',
+            'escalation_timeframe': 'Escalation Timeframe',
+            'parent_a_acknowledgment': 'Parent A Acknowledged',
+            'parent_b_acknowledgment': 'Parent B Acknowledged',
+        }
+
+        # Human-readable values for common options
+        value_labels = {
+            'indefinite': 'Until modified by both parents',
+            'until_child_18': 'Until child(ren) turn 18',
+            'fixed_term': 'Fixed term',
+            'annual': 'Annually',
+            'every_6_months': 'Every 6 months',
+            'as_needed': 'As needed',
+            'equal': 'Equal time with both parents (50/50)',
+            'parent_a': 'Primarily with Parent A',
+            'parent_b': 'Primarily with Parent B',
+            'week_on_week_off': 'Week-on, week-off',
+            '2-2-3': '2-2-3 rotation',
+            'every_other_weekend': 'Every other weekend + one weeknight',
+            'custom': 'Custom arrangement',
+            'school': 'At school (pickup/dropoff)',
+            'parent_a_home': 'At Parent A\'s home',
+            'parent_b_home': 'At Parent B\'s home',
+            'neutral_location': 'Neutral location',
+            'picking_up_parent': 'Parent picking up handles transportation',
+            'dropping_off_parent': 'Parent dropping off handles transportation',
+            'shared': 'Meet in the middle',
+            'commonground': 'CommonGround app',
+            'text': 'Text messages',
+            'email': 'Email',
+            'joint': 'Together (both parents must agree)',
+            'divided': 'Divided by category',
+            'same_day_urgent': 'Same day for urgent, 24 hours for routine',
+            '24_hours': 'Within 24 hours',
+            '48_hours': 'Within 48 hours',
+            '50/50': '50/50 split',
+            '60/40': '60/40 split',
+            'income_based': 'Based on income proportions',
+            '14_days': '14 days',
+            '30_days': '30 days',
+            '7_days': '7 days',
+        }
+
+        lines = []
+        for key, value in data.items():
+            if value is None or value == '':
+                continue
+
+            # Get human-readable label
+            label = field_labels.get(key, key.replace('_', ' ').title())
+
+            # Get human-readable value
+            if isinstance(value, bool):
+                display_value = 'Yes' if value else 'No'
+            elif isinstance(value, str):
+                display_value = value_labels.get(value, value)
+            else:
+                display_value = str(value)
+
+            lines.append(f"<b>{label}:</b> {display_value}")
+
+        return '<br/>'.join(lines) if lines else "<i>No content provided</i>"
+
     async def generate_pdf(self, agreement: Agreement) -> bytes:
         """
         Generate PDF document from agreement.
@@ -466,8 +560,16 @@ class AgreementService:
                     section_style
                 ))
 
-                # Section content
-                story.append(Paragraph(section.content, content_style))
+                # Section content - handle both v1 (content) and v2 (structured_data)
+                content = section.content
+                if not content or content.strip() == '':
+                    # For v2 agreements, format structured_data
+                    if section.structured_data:
+                        content = self._format_structured_data_for_pdf(section.structured_data)
+                    else:
+                        content = "<i>No content provided</i>"
+
+                story.append(Paragraph(content, content_style))
                 story.append(Spacer(1, 0.2*inch))
 
             # Add signature block
