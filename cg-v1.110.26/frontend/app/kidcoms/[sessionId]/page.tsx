@@ -297,7 +297,7 @@ function SessionContent() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-purple-500 mx-auto mb-4" />
+          <Loader2 className="h-12 w-12 animate-spin text-cg-sage mx-auto mb-4" />
           <p className="text-white">Connecting to call...</p>
         </div>
       </div>
@@ -312,7 +312,7 @@ function SessionContent() {
           <p className="text-white mb-4">{error || 'Session not found'}</p>
           <button
             onClick={() => router.push(familyFileId ? `/family-files/${familyFileId}/kidcoms` : '/kidcoms')}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage-light"
           >
             Back to KidComs
           </button>
@@ -357,7 +357,7 @@ function SessionContent() {
           {!isCallJoined ? (
             <div className="h-full bg-gray-800 flex items-center justify-center">
               <div className="text-center">
-                <Loader2 className="h-12 w-12 animate-spin text-purple-500 mx-auto mb-4" />
+                <Loader2 className="h-12 w-12 animate-spin text-cg-sage mx-auto mb-4" />
                 <p className="text-gray-400">{isJoiningCall ? 'Joining call...' : 'Connecting...'}</p>
               </div>
             </div>
@@ -455,7 +455,7 @@ function SessionContent() {
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
               className={`hidden md:flex p-3 rounded-full transition-colors ${
                 activePanel === 'chat'
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-cg-sage text-white'
                   : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
               }`}
             >
@@ -467,7 +467,7 @@ function SessionContent() {
               onClick={() => setActivePanel(activePanel === 'participants' ? null : 'participants')}
               className={`hidden md:flex p-3 rounded-full transition-colors ${
                 activePanel === 'participants'
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-cg-sage text-white'
                   : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
               }`}
             >
@@ -481,7 +481,7 @@ function SessionContent() {
               className={`p-4 md:p-3 rounded-full transition-colors ${
                 !isCallJoined
                   ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
-                  : 'bg-gray-700 hover:bg-purple-600 text-gray-300 hover:text-white'
+                  : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
               }`}
               title="Theater Mode"
             >
@@ -520,7 +520,7 @@ function SessionContent() {
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-medium text-purple-400">{msg.sender_name}</span>
+                          <span className="text-sm font-medium text-cg-sage">{msg.sender_name}</span>
                           <span className="text-xs text-gray-500">
                             {new Date(msg.sent_at).toLocaleTimeString()}
                           </span>
@@ -539,12 +539,12 @@ function SessionContent() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
-                      className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage"
                     />
                     <button
                       onClick={handleSendMessage}
                       disabled={isSendingMessage || !newMessage.trim()}
-                      className="p-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg disabled:opacity-50"
+                      className="p-2 bg-cg-sage hover:bg-cg-sage-light text-white rounded-lg disabled:opacity-50"
                     >
                       <Send className="h-5 w-5" />
                     </button>
@@ -560,7 +560,7 @@ function SessionContent() {
                     key={participant.id || index}
                     className="flex items-center space-x-3 p-3 bg-gray-700 rounded-lg"
                   >
-                    <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold">
+                    <div className="w-10 h-10 rounded-full bg-cg-sage flex items-center justify-center text-white font-semibold">
                       {participant.name[0]}
                     </div>
                     <div className="flex-1">
@@ -651,7 +651,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-700">
-            <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-white text-lg font-semibold">
+            <div className="w-12 h-12 rounded-full bg-cg-sage flex items-center justify-center text-white text-lg font-semibold">
               {participant.odName[0]?.toUpperCase() || '?'}
             </div>
           </div>
@@ -679,7 +679,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-800">
-            <div className="w-32 h-32 rounded-full bg-purple-600 flex items-center justify-center text-white text-5xl font-semibold">
+            <div className="w-32 h-32 rounded-full bg-cg-sage flex items-center justify-center text-white text-5xl font-semibold">
               {participant.odName[0]?.toUpperCase() || '?'}
             </div>
           </div>
@@ -720,7 +720,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gray-700">
-          <div className="w-24 h-24 rounded-full bg-purple-600 flex items-center justify-center text-white text-3xl font-semibold">
+          <div className="w-24 h-24 rounded-full bg-cg-sage flex items-center justify-center text-white text-3xl font-semibold">
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
         </div>
@@ -747,7 +747,7 @@ export default function SessionPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
-        <Loader2 className="h-12 w-12 animate-spin text-purple-500" />
+        <Loader2 className="h-12 w-12 animate-spin text-cg-sage" />
       </div>
     }>
       <SessionContent />

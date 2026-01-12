@@ -375,7 +375,7 @@ export function TheaterMode({
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50">
         <div className="flex items-center space-x-3">
-          <span className="text-emerald-400 text-sm font-medium px-3 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+          <span className="text-cg-sage text-sm font-medium px-3 py-1 bg-cg-sage/10 rounded-lg border border-cg-sage/20">
             Theater Mode
           </span>
           {content && (
@@ -407,7 +407,7 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-emerald-500/40 bg-slate-800"
+              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-cg-sage/40 bg-slate-800"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -420,7 +420,7 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-emerald-500/40 bg-slate-800"
+              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-cg-sage/40 bg-slate-800"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -441,7 +441,7 @@ export function TheaterMode({
             <div className="flex-1 flex flex-col items-center justify-center">
               <div className="text-center px-4">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full blur-2xl opacity-20" />
+                  <div className="absolute inset-0 bg-cg-sage rounded-full blur-2xl opacity-20" />
                   <Library className="relative h-16 w-16 md:h-20 md:w-20 text-slate-500 mx-auto" />
                 </div>
                 <h2 className="text-lg md:text-xl text-white mb-2 font-semibold">
@@ -452,7 +452,7 @@ export function TheaterMode({
                 </p>
                 <button
                   onClick={() => setShowLibrary(true)}
-                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30"
+                  className="px-6 py-3 bg-cg-sage hover:bg-cg-sage-light text-white rounded-xl font-medium transition-all shadow-lg shadow-cg-sage/20 hover:shadow-cg-sage/30"
                 >
                   Open Library
                 </button>
@@ -584,7 +584,7 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-800">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-lg font-semibold shadow-lg shadow-emerald-500/20">
+          <div className="w-10 h-10 rounded-full bg-cg-sage flex items-center justify-center text-white text-lg font-semibold shadow-lg shadow-cg-sage/20">
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
         </div>
@@ -597,7 +597,7 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1">
         <span className="text-white text-xs truncate block drop-shadow-lg">
           {participant.odName}
-          {participant.isLocal && <span className="text-emerald-400"> (You)</span>}
+          {participant.isLocal && <span className="text-cg-sage"> (You)</span>}
         </span>
       </div>
 

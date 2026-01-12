@@ -201,8 +201,8 @@ export default function VideoCall({
       <div className="h-full flex items-center justify-center bg-slate-900 rounded-2xl border border-slate-800">
         <div className="text-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full blur-xl opacity-30 animate-pulse" />
-            <Loader2 className="relative h-12 w-12 animate-spin text-emerald-500 mx-auto mb-4" />
+            <div className="absolute inset-0 bg-cg-sage rounded-full blur-xl opacity-30 animate-pulse" />
+            <Loader2 className="relative h-12 w-12 animate-spin text-cg-sage mx-auto mb-4" />
           </div>
           <p className="text-slate-200 font-medium">Connecting to call...</p>
           <p className="text-slate-500 text-sm mt-1">Setting up secure connection</p>
@@ -222,8 +222,8 @@ export default function VideoCall({
         {participantList.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-                <Video className="h-8 w-8 text-emerald-500" />
+              <div className="w-16 h-16 rounded-full bg-cg-sage/10 flex items-center justify-center mx-auto mb-4">
+                <Video className="h-8 w-8 text-cg-sage" />
               </div>
               <p className="text-slate-400">Waiting for others to join...</p>
             </div>
@@ -323,7 +323,7 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl font-semibold shadow-lg shadow-emerald-500/20">
+          <div className="w-20 h-20 rounded-full bg-cg-sage flex items-center justify-center text-white text-2xl font-semibold shadow-lg shadow-cg-sage/20">
             {participant.userName[0]?.toUpperCase() || '?'}
           </div>
         </div>
@@ -335,7 +335,7 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
           <span className="text-white text-sm font-medium drop-shadow-lg">
             {participant.userName}
             {participant.isLocal && (
-              <span className="text-emerald-400 ml-1">(You)</span>
+              <span className="text-cg-sage ml-1">(You)</span>
             )}
           </span>
           <div className="flex items-center space-x-2">
