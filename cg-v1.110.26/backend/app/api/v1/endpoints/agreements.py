@@ -436,13 +436,24 @@ async def generate_aria_summary(
     Generate a parent-readable summary of the conversation.
 
     ARIA will create a comprehensive summary of all discussed topics
-    in clear, accessible language.
+    in clear, accessible language. Uses v2 format (7 sections) for
+    v2 agreements, v1 format (18 sections) for v1 agreements.
 
     Returns:
         Generated summary
     """
+    # Get agreement to check version
+    agreement_service = AgreementService(db)
+    agreement = await agreement_service.get_agreement(agreement_id, current_user)
+
     aria_service = AriaAgreementService(db)
-    return await aria_service.generate_summary(agreement_id, current_user)
+
+    # Use v2 method for v2 agreements
+    version = getattr(agreement, 'agreement_version', 'v1')
+    if version in ('v2_standard', 'v2_lite'):
+        return await aria_service.generate_summary_v2(agreement_id, current_user)
+    else:
+        return await aria_service.generate_summary(agreement_id, current_user)
 
 
 @router.post("/{agreement_id}/aria/extract")
@@ -455,15 +466,27 @@ async def extract_aria_data(
     Extract structured data from the conversation.
 
     Converts natural language discussion into database-ready structured data.
+    Uses v2 format (7 sections) for v2 agreements, v1 format (18 sections) for v1.
 
     Returns:
         Extracted structured data mapped to agreement sections with human-readable preview
     """
-    aria_service = AriaAgreementService(db)
-    result = await aria_service.extract_structured_data(agreement_id, current_user)
+    # Get agreement to check version
+    agreement_service = AgreementService(db)
+    agreement = await agreement_service.get_agreement(agreement_id, current_user)
 
-    # Add human-readable preview
-    result['preview'] = aria_service.generate_extraction_preview(result['extracted_data'])
+    aria_service = AriaAgreementService(db)
+
+    # Use v2 method for v2 agreements
+    version = getattr(agreement, 'agreement_version', 'v1')
+    if version in ('v2_standard', 'v2_lite'):
+        result = await aria_service.extract_structured_data_v2(agreement_id, current_user)
+        # Add human-readable preview using v2 method
+        result['preview'] = aria_service.generate_extraction_preview_v2(result['extracted_data'], version)
+    else:
+        result = await aria_service.extract_structured_data(agreement_id, current_user)
+        # Add human-readable preview using v1 method
+        result['preview'] = aria_service.generate_extraction_preview(result['extracted_data'])
 
     return result
 
@@ -479,15 +502,25 @@ async def finalize_aria_agreement(
 
     This takes the extracted structured data and creates/updates all
     agreement sections with the information from the conversation.
+    Uses v2 format (7 sections) for v2 agreements, v1 format (18 sections) for v1.
 
     Returns:
         Updated agreement with all sections populated
     """
+    # Get agreement to check version
+    agreement_service = AgreementService(db)
+    agreement = await agreement_service.get_agreement(agreement_id, current_user)
+
     aria_service = AriaAgreementService(db)
-    agreement = await aria_service.finalize_agreement(agreement_id, current_user)
+
+    # Use v2 method for v2 agreements
+    version = getattr(agreement, 'agreement_version', 'v1')
+    if version in ('v2_standard', 'v2_lite'):
+        await aria_service.finalize_agreement_v2(agreement_id, current_user)
+    else:
+        await aria_service.finalize_agreement(agreement_id, current_user)
 
     # Return updated agreement with sections
-    agreement_service = AgreementService(db)
     return await agreement_service.get_agreement(agreement_id, current_user)
 
 

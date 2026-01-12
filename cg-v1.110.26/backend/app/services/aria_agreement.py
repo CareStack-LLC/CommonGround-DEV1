@@ -313,6 +313,107 @@ Use simple, clear language that both parents can understand."""
                 detail=f"Error generating summary: {str(e)}"
             )
 
+    async def generate_summary_v2(
+        self, agreement_id: str, user: User
+    ) -> Dict[str, Any]:
+        """
+        Generate a summary for v2 agreements (7 or 5 sections).
+
+        Returns parent-readable summary with v2 section structure.
+        """
+        conversation = await self.get_or_create_conversation(agreement_id, user)
+
+        if len(conversation.messages) < 2:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Not enough conversation to generate summary"
+            )
+
+        # Get agreement to check version
+        agreement_result = await self.db.execute(
+            select(Agreement).where(Agreement.id == agreement_id)
+        )
+        agreement = agreement_result.scalar_one_or_none()
+        version = getattr(agreement, 'agreement_version', 'v2_standard')
+
+        # V2 summary prompt - 7 sections for standard, 5 for lite
+        if version == 'v2_lite':
+            summary_prompt = """Based on our conversation, please create a clear summary of the custody arrangement.
+
+Format it with these 5 sections:
+1. **Parties & Children** - Who is covered by this agreement
+2. **Scope & Duration** - When the agreement starts and how long it lasts
+3. **Parenting Time** - The regular schedule pattern
+4. **Logistics & Expenses** - Exchange locations, transportation, and expense sharing
+5. **Acknowledgment** - Confirmation both parents agree
+
+For each section, summarize what was discussed. Note any items not yet covered.
+Use simple, clear language. Keep it brief and practical."""
+        else:
+            summary_prompt = """Based on our conversation, please create a clear summary of the custody arrangement.
+
+Format it with these 7 sections:
+1. **Parties & Children** - Who is covered by this agreement
+2. **Scope & Duration** - When the agreement starts, how long it lasts, and review schedule
+3. **Parenting Time** - The regular schedule pattern (focus on baseline, not holidays)
+4. **Logistics & Transitions** - Exchange locations, transportation, and communication
+5. **Decision-Making & Communication** - Who makes decisions and how you communicate
+6. **Expenses** - How shared expenses are split (not child support)
+7. **Modification & Disputes** - How to handle changes and disagreements
+
+For each section, summarize what was discussed. Note any items not yet covered.
+Use simple, clear language. Keep it practical - holiday details and travel plans can be added later as Quick Accords."""
+
+        # Add summary request to messages
+        messages = conversation.messages + [{
+            "role": "user",
+            "content": summary_prompt
+        }]
+
+        # Get case/family file info for context
+        case_name = "your family"
+        if agreement.case_id:
+            case_result = await self.db.execute(
+                select(Case).where(Case.id == agreement.case_id)
+            )
+            case = case_result.scalar_one_or_none()
+            if case:
+                case_name = case.case_name
+
+        system_prompt = self._get_system_prompt_v2(case_name, [], version)
+
+        try:
+            openai_messages = [
+                {"role": "system", "content": system_prompt}
+            ] + [
+                {"role": msg["role"], "content": msg["content"]}
+                for msg in messages
+            ]
+
+            response = self.client.chat.completions.create(
+                model="gpt-4-turbo",
+                max_tokens=2000,
+                messages=openai_messages
+            )
+
+            summary = response.choices[0].message.content
+
+            # Save summary
+            conversation.summary = summary
+            await self.db.commit()
+
+            return {
+                "summary": summary,
+                "conversation_id": conversation.id,
+                "agreement_version": version
+            }
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error generating summary: {str(e)}"
+            )
+
     async def extract_structured_data(
         self, agreement_id: str, user: User
     ) -> Dict[str, Any]:
@@ -912,6 +1013,213 @@ Start warmly and explain you'll help them build a simple, clear agreement."""
         await self.db.refresh(agreement)
 
         return agreement
+
+    def generate_extraction_preview_v2(
+        self, extracted_data: Dict[str, Any], version: str = "v2_standard"
+    ) -> Dict[str, List[Dict[str, str]]]:
+        """
+        Generate a human-readable preview of v2 extracted data.
+
+        Returns a dict with section names as keys and list of field mappings as values.
+        """
+        preview = {}
+
+        # V2 Standard section info (7 sections)
+        section_info_standard = {
+            "parties_children": ("Parties & Children", {
+                "parent_a": "Parent A",
+                "parent_b": "Parent B",
+                "children": "Children",
+                "current_arrangements": "Current Arrangements"
+            }),
+            "scope_duration": ("Scope & Duration", {
+                "effective_date": "Effective Date",
+                "duration_type": "Duration",
+                "end_date": "End Date",
+                "review_schedule": "Review Schedule",
+                "amendment_process": "Amendment Process"
+            }),
+            "parenting_time": ("Parenting Time", {
+                "primary_residence": "Primary Residence",
+                "schedule_pattern": "Schedule Pattern",
+                "custom_pattern_description": "Custom Pattern",
+                "transition_day": "Transition Day",
+                "transition_time": "Transition Time",
+                "schedule_notes": "Schedule Notes"
+            }),
+            "logistics_transitions": ("Logistics & Transitions", {
+                "exchange_location": "Exchange Location",
+                "exchange_location_address": "Exchange Address",
+                "transportation_responsibility": "Transportation",
+                "transition_communication": "Communication Method",
+                "backup_plan": "Backup Plan"
+            }),
+            "decision_communication": ("Decision-Making & Communication", {
+                "major_decision_authority": "Major Decisions",
+                "decision_categories": "Decision Categories",
+                "communication_platform": "Communication Platform",
+                "response_timeframe": "Response Timeframe",
+                "emergency_contact_order": "Emergency Contact Order"
+            }),
+            "expenses_financial": ("Expenses & Financial", {
+                "expense_categories": "Expense Categories",
+                "split_ratio": "Split Ratio",
+                "custom_split_details": "Custom Split Details",
+                "reimbursement_window": "Reimbursement Window",
+                "documentation_required": "Documentation Required",
+                "payment_method": "Payment Method"
+            }),
+            "modification_disputes": ("Modification & Disputes", {
+                "modification_triggers": "Modification Triggers",
+                "dispute_resolution_steps": "Dispute Resolution Steps",
+                "escalation_timeframe": "Escalation Timeframe",
+                "parent_a_acknowledgment": "Parent A Acknowledged",
+                "parent_b_acknowledgment": "Parent B Acknowledged",
+                "acknowledgment_date": "Acknowledgment Date"
+            })
+        }
+
+        # V2 Lite section info (5 sections)
+        section_info_lite = {
+            "parties_children": ("Parties & Children", {
+                "parent_a_name": "Parent A Name",
+                "parent_b_name": "Parent B Name",
+                "children": "Children"
+            }),
+            "scope_duration": ("Scope & Duration", {
+                "effective_date": "Effective Date",
+                "review_schedule": "Review Schedule"
+            }),
+            "parenting_time": ("Parenting Time", {
+                "primary_residence": "Primary Residence",
+                "schedule_pattern": "Schedule Pattern",
+                "transition_day": "Transition Day",
+                "transition_time": "Transition Time"
+            }),
+            "logistics_expenses": ("Logistics & Expenses", {
+                "exchange_location": "Exchange Location",
+                "transportation_responsibility": "Transportation",
+                "expense_split": "Expense Split",
+                "communication_method": "Communication Method"
+            }),
+            "acknowledgment": ("Acknowledgment", {
+                "parent_a_acknowledgment": "Parent A Acknowledged",
+                "parent_b_acknowledgment": "Parent B Acknowledged",
+                "acknowledgment_date": "Acknowledgment Date"
+            })
+        }
+
+        # Human-readable value labels
+        value_labels = {
+            "week_on_week_off": "Week-on, week-off",
+            "2-2-3": "2-2-3 rotation",
+            "every_other_weekend": "Every other weekend",
+            "parent_a": "Parent A",
+            "parent_b": "Parent B",
+            "equal": "Equal/Shared",
+            "joint": "Joint decision",
+            "indefinite": "Until modified",
+            "fixed_term": "Fixed term",
+            "until_child_18": "Until child turns 18",
+            "annual": "Annually",
+            "every_6_months": "Every 6 months",
+            "as_needed": "As needed",
+            "mutual_written": "Mutual written agreement",
+            "30_day_notice": "30 days notice",
+            "mediation_required": "Mediation required",
+            "school": "School",
+            "parent_a_home": "Parent A's home",
+            "parent_b_home": "Parent B's home",
+            "neutral_location": "Neutral location",
+            "picking_up_parent": "Parent picking up",
+            "dropping_off_parent": "Parent dropping off",
+            "shared": "Shared responsibility",
+            "alternate": "Alternating",
+            "commonground": "CommonGround app",
+            "text": "Text message",
+            "email": "Email",
+            "phone": "Phone call",
+            "talking_parents": "TalkingParents",
+            "24_hours": "24 hours",
+            "48_hours": "48 hours",
+            "72_hours": "72 hours",
+            "same_day_urgent": "Same day for urgent",
+            "50/50": "50/50 split",
+            "60/40": "60/40 split",
+            "70/30": "70/30 split",
+            "income_based": "Based on income",
+            "14_days": "14 days",
+            "30_days": "30 days",
+            "60_days": "60 days",
+            "commonground_clearfund": "CommonGround ClearFund",
+            "venmo": "Venmo",
+            "zelle": "Zelle",
+            "check": "Check",
+            "cash": "Cash"
+        }
+
+        # Select appropriate section info based on version
+        section_info = section_info_lite if version == "v2_lite" else section_info_standard
+
+        for section_key, (section_name, field_map) in section_info.items():
+            section_data = extracted_data.get(section_key)
+            if section_data and isinstance(section_data, dict):
+                fields = []
+                for field_key, field_label in field_map.items():
+                    field_value = section_data.get(field_key)
+                    if field_value is not None and field_value != "" and field_value != []:
+                        # Handle nested objects (like parent_a, parent_b, decision_categories)
+                        if isinstance(field_value, dict):
+                            nested_parts = []
+                            for k, v in field_value.items():
+                                if v:
+                                    readable_key = k.replace('_', ' ').title()
+                                    readable_val = value_labels.get(v, v) if isinstance(v, str) else str(v)
+                                    nested_parts.append(f"{readable_key}: {readable_val}")
+                            if nested_parts:
+                                fields.append({
+                                    "field": field_label,
+                                    "value": "; ".join(nested_parts)
+                                })
+                        # Handle lists (like children, expense_categories)
+                        elif isinstance(field_value, list):
+                            if field_value:
+                                if isinstance(field_value[0], dict):
+                                    # List of objects (children)
+                                    items = []
+                                    for item in field_value:
+                                        if isinstance(item, dict):
+                                            name = item.get('name', 'Unknown')
+                                            dob = item.get('date_of_birth', '')
+                                            items.append(f"{name}" + (f" (DOB: {dob})" if dob else ""))
+                                    fields.append({
+                                        "field": field_label,
+                                        "value": ", ".join(items)
+                                    })
+                                else:
+                                    # List of strings
+                                    fields.append({
+                                        "field": field_label,
+                                        "value": ", ".join(str(v) for v in field_value)
+                                    })
+                        # Handle booleans
+                        elif isinstance(field_value, bool):
+                            fields.append({
+                                "field": field_label,
+                                "value": "Yes" if field_value else "No"
+                            })
+                        # Handle strings
+                        else:
+                            readable_value = value_labels.get(field_value, field_value)
+                            fields.append({
+                                "field": field_label,
+                                "value": str(readable_value)
+                            })
+
+                if fields:
+                    preview[section_name] = fields
+
+        return preview
 
     def get_quick_accord_suggestions(
         self, completed_sections: List[str]
