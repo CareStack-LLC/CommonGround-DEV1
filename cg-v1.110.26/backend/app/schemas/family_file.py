@@ -243,6 +243,10 @@ class QuickAccordCreate(BaseModel):
     estimated_amount: Optional[float] = None
     expense_category: Optional[str] = Field(None, max_length=50)
     receipt_required: bool = False
+    expense_type: Optional[str] = Field(
+        "shared",
+        description="shared, reimbursement, or request_payment"
+    )
 
     @field_validator('title')
     @classmethod
@@ -272,6 +276,10 @@ class QuickAccordUpdate(BaseModel):
     estimated_amount: Optional[float] = None
     expense_category: Optional[str] = Field(None, max_length=50)
     receipt_required: Optional[bool] = None
+    expense_type: Optional[str] = Field(
+        None,
+        description="shared, reimbursement, or request_payment"
+    )
 
 
 class QuickAccordResponse(BaseModel):
@@ -304,6 +312,7 @@ class QuickAccordResponse(BaseModel):
     estimated_amount: Optional[float] = None
     expense_category: Optional[str] = None
     receipt_required: bool = False
+    expense_type: Optional[str] = "shared"
 
     # Approval
     parent_a_approved: bool = False

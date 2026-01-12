@@ -10,8 +10,9 @@ QuickAccords are used for impromptu situations like:
 They can be created conversationally via ARIA chat.
 """
 
-from datetime import datetime
-from typing import List, Optional
+from datetime import datetime, timedelta
+from decimal import Decimal
+from typing import List, Optional, Dict, Any
 import uuid
 
 from fastapi import HTTPException, status
@@ -24,6 +25,8 @@ from app.models.family_file import (
     QuickAccord,
     generate_quick_accord_number,
 )
+from app.models.schedule import ScheduleEvent
+from app.models.clearfund import Obligation, ObligationFunding
 from app.models.user import User
 from app.schemas.family_file import (
     QuickAccordCreate,
@@ -31,6 +34,9 @@ from app.schemas.family_file import (
     QuickAccordApproval,
 )
 from app.services.family_file import FamilyFileService
+
+# Purpose categories that create schedule events
+SCHEDULE_EVENT_CATEGORIES = ["travel", "schedule_swap", "special_event", "overnight"]
 
 
 class QuickAccordService:
@@ -342,6 +348,14 @@ class QuickAccordService:
         # Check if both parents have approved
         if quick_accord.parent_a_approved and quick_accord.parent_b_approved:
             quick_accord.status = "active"
+            quick_accord.updated_at = datetime.utcnow()
+
+            await self.db.commit()
+            await self.db.refresh(quick_accord)
+
+            # Handle approval side effects (create events/expenses)
+            await self._handle_approval_side_effects(quick_accord, family_file)
+
         elif not data.approved:
             # If rejected, revert to draft for revision
             quick_accord.status = "draft"
@@ -351,10 +365,13 @@ class QuickAccordService:
             quick_accord.parent_b_approved = False
             quick_accord.parent_b_approved_at = None
 
-        quick_accord.updated_at = datetime.utcnow()
-
-        await self.db.commit()
-        await self.db.refresh(quick_accord)
+            quick_accord.updated_at = datetime.utcnow()
+            await self.db.commit()
+            await self.db.refresh(quick_accord)
+        else:
+            quick_accord.updated_at = datetime.utcnow()
+            await self.db.commit()
+            await self.db.refresh(quick_accord)
 
         return quick_accord
 
@@ -459,3 +476,226 @@ class QuickAccordService:
             family_file.parent_a_id == user.id or
             family_file.parent_b_id == user.id
         )
+
+    async def _handle_approval_side_effects(
+        self,
+        quick_accord: QuickAccord,
+        family_file: FamilyFile
+    ) -> Dict[str, Any]:
+        """
+        Handle side effects when a QuickAccord is approved by both parents.
+
+        Creates:
+        1. ScheduleEvent for schedule-related accords (travel, schedule_swap, special_event, overnight)
+        2. ClearFund Obligation for expense-related accords (has_shared_expense = True)
+
+        Args:
+            quick_accord: The approved QuickAccord
+            family_file: The associated FamilyFile
+
+        Returns:
+            Dict with created resources (schedule_event_id, obligation_id)
+        """
+        result: Dict[str, Any] = {
+            "schedule_event_created": False,
+            "schedule_event_id": None,
+            "obligation_created": False,
+            "obligation_id": None,
+        }
+
+        try:
+            # 1. Create ScheduleEvent for schedule-related categories
+            if quick_accord.purpose_category in SCHEDULE_EVENT_CATEGORIES:
+                schedule_event = await self._create_schedule_event_from_accord(
+                    quick_accord, family_file
+                )
+                if schedule_event:
+                    result["schedule_event_created"] = True
+                    result["schedule_event_id"] = schedule_event.id
+
+            # 2. Create ClearFund Obligation if has_shared_expense
+            if quick_accord.has_shared_expense and quick_accord.estimated_amount:
+                obligation = await self._create_obligation_from_accord(
+                    quick_accord, family_file
+                )
+                if obligation:
+                    result["obligation_created"] = True
+                    result["obligation_id"] = obligation.id
+
+            await self.db.commit()
+
+        except Exception as e:
+            # Log but don't fail - side effects are non-critical
+            import logging
+            logging.error(f"Error creating QuickAccord side effects: {str(e)}")
+            await self.db.rollback()
+
+        return result
+
+    async def _create_schedule_event_from_accord(
+        self,
+        quick_accord: QuickAccord,
+        family_file: FamilyFile
+    ) -> Optional[ScheduleEvent]:
+        """
+        Create a ScheduleEvent from an approved QuickAccord.
+
+        Args:
+            quick_accord: The approved QuickAccord
+            family_file: The associated FamilyFile
+
+        Returns:
+            Created ScheduleEvent or None
+        """
+        # Determine event timing
+        if quick_accord.is_single_event and quick_accord.event_date:
+            start_time = quick_accord.event_date
+            end_time = quick_accord.event_date + timedelta(hours=4)  # Default 4 hour event
+        elif quick_accord.start_date and quick_accord.end_date:
+            start_time = quick_accord.start_date
+            end_time = quick_accord.end_date
+        else:
+            # Can't create event without dates
+            return None
+
+        # Map purpose category to event type
+        event_type_mapping = {
+            "travel": "vacation",
+            "schedule_swap": "regular",
+            "special_event": "special",
+            "overnight": "regular",
+        }
+        event_type = event_type_mapping.get(quick_accord.purpose_category, "special")
+
+        # Create the schedule event
+        schedule_event = ScheduleEvent(
+            id=str(uuid.uuid4()),
+            family_file_id=family_file.id,
+            quick_accord_id=quick_accord.id,
+            created_by=quick_accord.initiated_by,
+            event_type=event_type,
+            event_category="general",
+            start_time=start_time,
+            end_time=end_time,
+            all_day=not quick_accord.is_single_event,  # Multi-day = all day
+            custodial_parent_id=quick_accord.initiated_by,
+            child_ids=quick_accord.child_ids or [],
+            title=quick_accord.title,
+            description=quick_accord.purpose_description,
+            location=quick_accord.location,
+            visibility="co_parent",
+            location_shared=True,
+        )
+
+        self.db.add(schedule_event)
+        await self.db.flush()
+
+        return schedule_event
+
+    async def _create_obligation_from_accord(
+        self,
+        quick_accord: QuickAccord,
+        family_file: FamilyFile
+    ) -> Optional[Obligation]:
+        """
+        Create a ClearFund Obligation from an approved QuickAccord.
+
+        Uses agreement-locked split ratio if available.
+
+        Args:
+            quick_accord: The approved QuickAccord with expense
+            family_file: The associated FamilyFile
+
+        Returns:
+            Created Obligation or None
+        """
+        if not quick_accord.estimated_amount:
+            return None
+
+        # Determine expense type (default to shared for backwards compatibility)
+        expense_type = quick_accord.expense_type or "shared"
+
+        # Determine split ratio based on expense type
+        petitioner_percentage = 50  # Default 50/50
+        split_from_agreement = False
+
+        if expense_type in ("reimbursement", "request_payment"):
+            # Full amount from other parent
+            # If initiator is parent_a, parent_b pays 100% (petitioner_percentage = 0)
+            # If initiator is parent_b, parent_a pays 100% (petitioner_percentage = 100)
+            if quick_accord.initiated_by == family_file.parent_a_id:
+                petitioner_percentage = 0  # Parent B pays 100%
+            else:
+                petitioner_percentage = 100  # Parent A pays 100%
+        else:
+            # "shared" - use agreement-locked split or default 50/50
+            if family_file.agreement_split_locked and family_file.agreement_split_parent_a_percentage is not None:
+                petitioner_percentage = family_file.agreement_split_parent_a_percentage
+                split_from_agreement = True
+
+        # Calculate shares
+        total_amount = Decimal(str(quick_accord.estimated_amount))
+        petitioner_share = total_amount * Decimal(petitioner_percentage) / 100
+        respondent_share = total_amount - petitioner_share
+
+        # Map purpose to expense category
+        category_mapping = {
+            "travel": "transportation",
+            "schedule_swap": "other",
+            "special_event": "extracurricular",
+            "overnight": "childcare",
+            "expense": "other",
+        }
+        expense_category = quick_accord.expense_category or category_mapping.get(
+            quick_accord.purpose_category, "other"
+        )
+
+        # Create the obligation
+        obligation = Obligation(
+            id=str(uuid.uuid4()),
+            family_file_id=family_file.id,
+            quick_accord_id=quick_accord.id,
+            source_type="agreement",  # From QuickAccord agreement
+            source_id=quick_accord.id,
+            purpose_category=expense_category,
+            title=f"Expense: {quick_accord.title}",
+            description=quick_accord.purpose_description,
+            child_ids=quick_accord.child_ids or [],
+            total_amount=total_amount,
+            petitioner_share=petitioner_share,
+            respondent_share=respondent_share,
+            petitioner_percentage=petitioner_percentage,
+            split_from_agreement=split_from_agreement,
+            status="open",
+            verification_required=True,
+            receipt_required=quick_accord.receipt_required or False,
+            created_by=quick_accord.initiated_by,
+        )
+
+        self.db.add(obligation)
+        await self.db.flush()
+
+        # Create funding records for each parent
+        if family_file.parent_a_id:
+            parent_a_funding = ObligationFunding(
+                id=str(uuid.uuid4()),
+                obligation_id=obligation.id,
+                parent_id=family_file.parent_a_id,
+                amount_required=petitioner_share,
+                amount_funded=Decimal("0"),
+            )
+            self.db.add(parent_a_funding)
+
+        if family_file.parent_b_id:
+            parent_b_funding = ObligationFunding(
+                id=str(uuid.uuid4()),
+                obligation_id=obligation.id,
+                parent_id=family_file.parent_b_id,
+                amount_required=respondent_share,
+                amount_funded=Decimal("0"),
+            )
+            self.db.add(parent_b_funding)
+
+        await self.db.flush()
+
+        return obligation

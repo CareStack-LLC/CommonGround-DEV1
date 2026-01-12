@@ -2,10 +2,15 @@
 Agreement models - custody and co-parenting agreements (SharedCare Agreements).
 
 Agreement Types:
-- shared_care: Formal 18-section comprehensive agreement (SharedCare Agreement)
+- shared_care: Formal SharedCare Agreement
 - parenting: Legacy type for backwards compatibility (treated as shared_care)
 - custody: Legacy type (treated as shared_care)
 - visitation: Legacy type (treated as shared_care)
+
+Agreement Versions (agreement_version field):
+- v1: Original 18-section comprehensive format (ARIA Professional)
+- v2_standard: Simplified 7-section format (default)
+- v2_lite: Minimal 5-section format (for low-conflict situations)
 
 Note: QuickAccords are separate lightweight agreements in family_file.py
 """
@@ -71,6 +76,11 @@ class Agreement(Base, UUIDMixin, TimestampMixin):
     agreement_type: Mapped[str] = mapped_column(
         String(50), default=AgreementType.SHARED_CARE.value
     )  # shared_care, parenting (legacy), custody (legacy), visitation (legacy)
+
+    # Agreement version format: v1 (18-section), v2_standard (7-section), v2_lite (5-section)
+    agreement_version: Mapped[str] = mapped_column(
+        String(20), default="v2_standard"
+    )
 
     # Version tracking
     version: Mapped[int] = mapped_column(Integer, default=1)

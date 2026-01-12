@@ -115,6 +115,11 @@ class ScheduleEvent(Base, UUIDMixin, TimestampMixin):
         Boolean, default=False
     )  # Auto-generated from agreement
 
+    # QuickAccord link (for events created from approved QuickAccords)
+    quick_accord_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("quick_accords.id"), nullable=True, index=True
+    )
+
     # Modifications
     is_modification: Mapped[bool] = mapped_column(Boolean, default=False)
     modification_approved: Mapped[bool] = mapped_column(Boolean, default=False)
