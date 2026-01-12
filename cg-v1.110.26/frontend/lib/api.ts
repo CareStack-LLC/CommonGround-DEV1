@@ -684,6 +684,7 @@ export interface Agreement {
   family_file_id: string | null;  // Primary container for SharedCare Agreements
   title: string;
   version: number;
+  agreement_version: 'v1' | 'v2_standard' | 'v2_lite';  // v1 = 18 sections, v2_standard = 7 sections
   status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'expired' | 'active';
   petitioner_approved: boolean;
   respondent_approved: boolean;

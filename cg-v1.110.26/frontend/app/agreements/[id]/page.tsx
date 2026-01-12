@@ -627,8 +627,11 @@ function AgreementDetailsContent() {
     return !hasUserApproved();
   };
 
+  // Determine total sections based on agreement version
+  const isV2Agreement = agreement?.agreement_version?.startsWith('v2') ?? true; // Default to v2
+  const totalSections = isV2Agreement ? 7 : 18;
   const completedSections = sections.filter((s) => s.is_completed).length;
-  const completionPercent = sections.length > 0 ? Math.round((completedSections / sections.length) * 100) : 0;
+  const completionPercent = Math.round((completedSections / totalSections) * 100);
 
   return (
     <div className="min-h-screen bg-cg-sand">
@@ -691,6 +694,11 @@ function AgreementDetailsContent() {
                       <span className="text-sm text-muted-foreground font-mono">
                         Version {agreement.version}
                       </span>
+                      {isV2Agreement && (
+                        <span className="text-xs bg-cg-sage/10 text-cg-sage px-2 py-0.5 rounded-full">
+                          Simplified 7-Section
+                        </span>
+                      )}
                     </div>
                     <h1 className="font-serif text-3xl font-bold text-foreground">
                       {agreement.title}
@@ -737,22 +745,20 @@ function AgreementDetailsContent() {
                 )}
 
                 {/* Completion Progress */}
-                {sections.length > 0 && (
-                  <div className="mt-6 pt-6 border-t border-border">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">
-                        {completedSections} of {sections.length} sections complete
-                      </span>
-                      <span className="font-semibold text-foreground">{completionPercent}%</span>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-cg-sage rounded-full transition-all duration-500"
-                        style={{ width: `${completionPercent}%` }}
-                      />
-                    </div>
+                <div className="mt-6 pt-6 border-t border-border">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">
+                      {completedSections} of {totalSections} sections complete
+                    </span>
+                    <span className="font-semibold text-foreground">{completionPercent}%</span>
                   </div>
-                )}
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-cg-sage rounded-full transition-all duration-500"
+                      style={{ width: `${completionPercent}%` }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
