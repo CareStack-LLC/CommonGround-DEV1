@@ -457,7 +457,7 @@ function AgreementsListContent() {
       if (useAria) {
         router.push(`/agreements/${newAgreement.id}/aria`);
       } else {
-        router.push(`/agreements/${newAgreement.id}/builder`);
+        router.push(`/agreements/${newAgreement.id}/builder-v2`);
       }
     } catch (err: any) {
       console.error('Failed to create agreement:', err);
