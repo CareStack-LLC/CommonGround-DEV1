@@ -9,14 +9,17 @@ Key Invariants:
 5. All state transitions logged
 """
 
+import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, and_, or_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from dateutil.rrule import rrule, WEEKLY, MONTHLY
+from dateutil.relativedelta import relativedelta
 
 from app.models.clearfund import (
     Obligation,
@@ -143,8 +146,25 @@ class ClearFundService:
         access = await self._verify_case_access(data.case_id, user)
 
         try:
+            # Determine split percentage - check for agreement-locked split
+            petitioner_percentage = data.petitioner_percentage
+            split_from_agreement = False
+
+            # Check if family file has locked agreement split
+            if access.is_family_file and not data.override_agreement_split:
+                result = await self.db.execute(
+                    select(FamilyFile).where(FamilyFile.id == data.case_id)
+                )
+                family_file = result.scalar_one_or_none()
+
+                if family_file and family_file.agreement_split_locked:
+                    # Use agreement-locked split ratio
+                    if family_file.agreement_split_parent_a_percentage is not None:
+                        petitioner_percentage = family_file.agreement_split_parent_a_percentage
+                        split_from_agreement = True
+
             # Calculate shares from percentage
-            petitioner_share = data.total_amount * Decimal(data.petitioner_percentage) / 100
+            petitioner_share = data.total_amount * Decimal(petitioner_percentage) / 100
             respondent_share = data.total_amount - petitioner_share
 
             # Create the obligation - set case_id or family_file_id based on access type
@@ -160,7 +180,8 @@ class ClearFundService:
                 total_amount=data.total_amount,
                 petitioner_share=petitioner_share,
                 respondent_share=respondent_share,
-                petitioner_percentage=data.petitioner_percentage,
+                petitioner_percentage=petitioner_percentage,
+                split_from_agreement=split_from_agreement,
                 due_date=data.due_date,
                 status="open",
                 verification_required=data.verification_required,
@@ -1013,6 +1034,234 @@ class ClearFundService:
             total_this_month=total_this_month,
             total_overdue=total_overdue,
         )
+
+    # =========================================================================
+    # Recurring Obligation Methods
+    # =========================================================================
+
+    async def regenerate_recurring_instances(
+        self,
+        template_obligation_id: str,
+        current_user: User,
+        months_ahead: int = 3
+    ) -> int:
+        """
+        Generate additional instances for a recurring obligation template.
+
+        Skips dates that already have instances to prevent duplicates.
+
+        Args:
+            template_obligation_id: Template obligation ID
+            current_user: Current user for access check
+            months_ahead: Number of months to generate (1-12)
+
+        Returns:
+            Number of new instances created
+
+        Raises:
+            HTTPException: If not a valid template or no access
+        """
+        # Get template
+        template = await self._get_obligation(template_obligation_id)
+        if not template:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Obligation not found"
+            )
+
+        # Verify it's a recurring template
+        if not template.is_recurring or template.status != "template":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Not a recurring obligation template"
+            )
+
+        # Check access
+        access = await check_case_or_family_file_access(
+            self.db,
+            case_id=template.case_id,
+            family_file_id=template.family_file_id,
+            user=current_user
+        )
+        if not access.has_access:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied"
+            )
+
+        # Get family file for parent IDs
+        family_file = None
+        if template.family_file_id:
+            result = await self.db.execute(
+                select(FamilyFile).where(FamilyFile.id == template.family_file_id)
+            )
+            family_file = result.scalar_one_or_none()
+
+        if not family_file:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No family file associated with obligation"
+            )
+
+        # Determine payer from template
+        if template.petitioner_percentage == 100:
+            payer_id = family_file.parent_a_id
+        elif template.petitioner_percentage == 0:
+            payer_id = family_file.parent_b_id
+        else:
+            # Split obligation - both parents pay
+            payer_id = None
+
+        # Get existing instance due dates to avoid duplicates
+        existing_dates_result = await self.db.execute(
+            select(Obligation.due_date).where(
+                Obligation.parent_obligation_id == template.id,
+                Obligation.due_date.isnot(None)
+            )
+        )
+        existing_dates = {row[0].date() for row in existing_dates_result.fetchall()}
+
+        # Generate new dates
+        now = datetime.utcnow()
+        end_date = now + relativedelta(months=months_ahead)
+        dates = self._get_recurrence_dates(
+            recurrence_rule=template.recurrence_rule,
+            start_date=now,
+            end_date=end_date
+        )
+
+        # Create instances for new dates only
+        count = 0
+        for due_date in dates:
+            if due_date.date() in existing_dates:
+                continue  # Skip existing
+
+            instance = Obligation(
+                id=str(uuid.uuid4()),
+                case_id=template.case_id,
+                family_file_id=template.family_file_id,
+                agreement_id=template.agreement_id,
+                parent_obligation_id=template.id,
+                source_type="agreement",
+                source_id=template.source_id,
+                purpose_category=template.purpose_category,
+                title=f"Child Support - {due_date.strftime('%B %Y')}",
+                description=template.description,
+                child_ids=template.child_ids,
+                total_amount=template.total_amount,
+                petitioner_share=template.petitioner_share,
+                respondent_share=template.respondent_share,
+                petitioner_percentage=template.petitioner_percentage,
+                split_from_agreement=True,
+                due_date=due_date,
+                status="open",
+                is_recurring=False,
+                verification_required=False,
+                receipt_required=False,
+                created_by=str(current_user.id),
+            )
+            self.db.add(instance)
+            await self.db.flush()
+
+            # Create funding record(s)
+            if payer_id:
+                # Single payer
+                funding = ObligationFunding(
+                    id=str(uuid.uuid4()),
+                    obligation_id=instance.id,
+                    parent_id=payer_id,
+                    amount_required=template.total_amount,
+                    amount_funded=Decimal("0"),
+                )
+                self.db.add(funding)
+            else:
+                # Split funding
+                if template.petitioner_share > 0 and family_file.parent_a_id:
+                    self.db.add(ObligationFunding(
+                        id=str(uuid.uuid4()),
+                        obligation_id=instance.id,
+                        parent_id=family_file.parent_a_id,
+                        amount_required=template.petitioner_share,
+                        amount_funded=Decimal("0"),
+                    ))
+                if template.respondent_share > 0 and family_file.parent_b_id:
+                    self.db.add(ObligationFunding(
+                        id=str(uuid.uuid4()),
+                        obligation_id=instance.id,
+                        parent_id=family_file.parent_b_id,
+                        amount_required=template.respondent_share,
+                        amount_funded=Decimal("0"),
+                    ))
+
+            count += 1
+
+        await self.db.commit()
+        return count
+
+    def _get_recurrence_dates(
+        self,
+        recurrence_rule: str,
+        start_date: datetime,
+        end_date: datetime
+    ) -> List[datetime]:
+        """
+        Parse RRULE and generate dates between start and end.
+
+        Args:
+            recurrence_rule: iCal RRULE string (e.g., "FREQ=MONTHLY;BYMONTHDAY=1")
+            start_date: Start date for generation
+            end_date: End date for generation
+
+        Returns:
+            List of datetime objects for each occurrence
+        """
+        dates = []
+
+        if not recurrence_rule:
+            return dates
+
+        # Parse the rule
+        parts = {}
+        for part in recurrence_rule.split(";"):
+            if "=" in part:
+                key, value = part.split("=", 1)
+                parts[key] = value
+
+        freq = parts.get("FREQ", "MONTHLY")
+        interval = int(parts.get("INTERVAL", 1))
+        by_monthday = parts.get("BYMONTHDAY")
+
+        # Build rrule
+        if freq == "WEEKLY":
+            rule = rrule(
+                WEEKLY,
+                interval=interval,
+                dtstart=start_date,
+                until=end_date
+            )
+        else:  # MONTHLY
+            if by_monthday:
+                days = [int(d) for d in by_monthday.split(",")]
+                rule = rrule(
+                    MONTHLY,
+                    interval=interval,
+                    bymonthday=days,
+                    dtstart=start_date,
+                    until=end_date
+                )
+            else:
+                rule = rrule(
+                    MONTHLY,
+                    interval=interval,
+                    dtstart=start_date,
+                    until=end_date
+                )
+
+        for dt in rule:
+            if start_date <= dt <= end_date:
+                dates.append(dt)
+
+        return dates
 
 
 class LedgerService:

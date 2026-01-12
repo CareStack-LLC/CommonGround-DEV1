@@ -59,6 +59,10 @@ class ObligationCreate(ObligationBase):
     agreement_id: Optional[str] = Field(None, description="SharedCare Agreement ID")
     source_type: str = Field("request", description="Source: court_order, agreement, request")
     source_id: Optional[str] = Field(None, description="Reference to source document")
+    override_agreement_split: bool = Field(
+        False,
+        description="Set True to ignore agreement-locked split ratio and use custom percentage"
+    )
 
     @field_validator('source_type')
     @classmethod
@@ -98,6 +102,7 @@ class ObligationResponse(BaseModel):
     case_id: Optional[str] = None  # Court case context (legacy)
     family_file_id: Optional[str] = None  # Family file context
     agreement_id: Optional[str] = None  # SharedCare Agreement context
+    quick_accord_id: Optional[str] = None  # QuickAccord that created this
     source_type: str
     source_id: Optional[str]
     purpose_category: str
@@ -108,6 +113,7 @@ class ObligationResponse(BaseModel):
     petitioner_share: Decimal
     respondent_share: Decimal
     petitioner_percentage: int
+    split_from_agreement: bool = False  # True if split came from active agreement
     due_date: Optional[datetime]
     status: str
     amount_funded: Decimal

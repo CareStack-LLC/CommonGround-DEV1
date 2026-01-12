@@ -21,6 +21,7 @@ from app.schemas.agreement import (
 )
 from app.services.agreement import AgreementService
 from app.services.aria_agreement import AriaAgreementService
+from app.services.agreement_activation import AgreementActivationService
 
 router = APIRouter()
 
@@ -224,6 +225,34 @@ async def approve_agreement(
     }
 
 
+@router.get("/{agreement_id}/activation-preview")
+async def preview_activation(
+    agreement_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Preview what will be created when agreement is activated.
+
+    Returns a preview of:
+    - Custody exchanges that will be created
+    - Expense split ratio that will be locked
+    - Default exchange location
+
+    Args:
+        agreement_id: ID of the agreement to preview
+
+    Returns:
+        Preview of activation effects
+    """
+    agreement_service = AgreementService(db)
+    activation_service = AgreementActivationService(db)
+
+    agreement = await agreement_service.get_agreement(agreement_id, current_user)
+
+    return await activation_service.preview_activation(agreement)
+
+
 @router.post("/{agreement_id}/activate")
 async def activate_agreement(
     agreement_id: str,
@@ -233,22 +262,41 @@ async def activate_agreement(
     """
     Activate an approved agreement.
 
-    Deactivates any currently active agreements for the same case.
+    This will:
+    1. Change status to 'active' and deactivate other active agreements
+    2. Create recurring custody exchanges from parenting schedule
+    3. Lock expense split ratio on family file (for ClearFund)
+    4. Set default exchange location
 
     Args:
         agreement_id: ID of the agreement to activate
 
     Returns:
-        Updated agreement status
+        Updated agreement status and activation results
     """
     agreement_service = AgreementService(db)
+    activation_service = AgreementActivationService(db)
+
+    # First, activate the agreement (status change)
     agreement = await agreement_service.activate_agreement(agreement_id, current_user)
+
+    # Then, process activation side effects (create exchanges, set split ratio, etc.)
+    activation_result = await activation_service.activate_agreement(
+        agreement=agreement,
+        activated_by=str(current_user.id)
+    )
 
     return {
         "id": agreement.id,
         "status": agreement.status,
         "effective_date": agreement.effective_date,
-        "message": "Agreement activated successfully!"
+        "message": "Agreement activated successfully!",
+        "activation_details": {
+            "exchanges_created": activation_result.exchanges_created,
+            "split_ratio_set": activation_result.split_ratio_set,
+            "exchange_location_set": activation_result.exchange_location_set,
+            "errors": activation_result.errors if activation_result.errors else None
+        }
     }
 
 

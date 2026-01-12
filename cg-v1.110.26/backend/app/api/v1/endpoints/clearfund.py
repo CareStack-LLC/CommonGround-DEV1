@@ -554,3 +554,40 @@ async def get_metrics(
     """Get obligation metrics for dashboard cards."""
     service = ClearFundService(db)
     return await service.get_obligation_metrics(case_id, current_user)
+
+
+# ============================================================================
+# Recurring Obligation Endpoints
+# ============================================================================
+
+@router.post("/obligations/{obligation_id}/regenerate-instances")
+async def regenerate_instances(
+    obligation_id: str,
+    months_ahead: int = Query(3, ge=1, le=12, description="Months of instances to generate"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Generate additional instances for a recurring obligation template.
+
+    Only works on template obligations (is_recurring=True, status='template').
+    Skips dates that already have instances to prevent duplicates.
+
+    Args:
+        obligation_id: Template obligation ID
+        months_ahead: Number of months to generate (1-12)
+
+    Returns:
+        Number of new instances created
+    """
+    service = ClearFundService(db)
+    count = await service.regenerate_recurring_instances(
+        template_obligation_id=obligation_id,
+        current_user=current_user,
+        months_ahead=months_ahead
+    )
+    return {
+        "template_id": obligation_id,
+        "instances_created": count,
+        "months_generated": months_ahead
+    }

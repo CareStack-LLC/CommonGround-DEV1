@@ -133,6 +133,33 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
         String(36), nullable=True, index=True
     )
 
+    # =========================================================================
+    # Agreement-Derived Defaults (set when SharedCare Agreement is activated)
+    # =========================================================================
+
+    # Expense split ratio from active agreement
+    agreement_expense_split_ratio: Mapped[Optional[str]] = mapped_column(
+        String(20), nullable=True
+    )  # "50/50", "60/40", "70/30", "income_based", "custom"
+    agreement_split_parent_a_percentage: Mapped[Optional[int]] = mapped_column(
+        nullable=True
+    )  # 0-100, parent_a's percentage
+    agreement_split_locked: Mapped[bool] = mapped_column(Boolean, default=False)
+    agreement_split_source_id: Mapped[Optional[str]] = mapped_column(
+        String(36), nullable=True
+    )  # Link to the Agreement that set this
+    agreement_split_set_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True
+    )
+
+    # Default exchange location from active agreement
+    default_exchange_location: Mapped[Optional[str]] = mapped_column(
+        String(500), nullable=True
+    )  # From logistics section
+    default_exchange_location_type: Mapped[Optional[str]] = mapped_column(
+        String(50), nullable=True
+    )  # "school", "parent_a_home", "parent_b_home", "neutral_location"
+
     # Relationships
     creator: Mapped["User"] = relationship(
         "User", foreign_keys=[created_by], backref="created_family_files"
@@ -389,6 +416,9 @@ class QuickAccord(Base, UUIDMixin, TimestampMixin):
     estimated_amount: Mapped[Optional[float]] = mapped_column(nullable=True)
     expense_category: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     receipt_required: Mapped[bool] = mapped_column(Boolean, default=False)
+    expense_type: Mapped[Optional[str]] = mapped_column(
+        String(20), nullable=True, default="shared"
+    )  # "shared", "reimbursement", "request_payment"
 
     # Initiated by
     initiated_by: Mapped[str] = mapped_column(

@@ -128,6 +128,14 @@ class Obligation(Base, UUIDMixin, TimestampMixin):
     # Split percentage (for display/reference)
     petitioner_percentage: Mapped[int] = mapped_column(default=50)  # 0-100
 
+    # Whether split came from active agreement (vs manual entry)
+    split_from_agreement: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # QuickAccord link (for expenses created from approved QuickAccords)
+    quick_accord_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("quick_accords.id"), nullable=True, index=True
+    )
+
     # Due date
     due_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 

@@ -5,6 +5,48 @@ All notable changes to CommonGround will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-01-11
+
+### Added
+
+#### SharedCare Agreement v2 - Simplified Structure
+- **7-Section Standard Agreement** - Reduced from 18 sections for easier completion
+- **5-Section Lite Agreement** - For low-conflict cooperative parents
+- **ARIA Conflict Detection** - Automatically assesses conflict level from conversation
+- **Dynamic Version Selection** - ARIA recommends lite/standard/professional based on signals
+- **Quick Accord Suggestions** - Post-section suggestions for holidays, travel, etc.
+- **New Builder V2 UI** - Simplified 7-step wizard at `/agreements/[id]/builder-v2`
+
+#### V2 Section Structure
+1. Parties & Children - Who is covered
+2. Scope & Duration - When agreement is effective
+3. Parenting Time Structure - Baseline schedule pattern
+4. Logistics & Transitions - Exchange details
+5. Decision-Making & Communication - Authority and methods
+6. Expenses & Financial Cooperation - Shared costs (optional)
+7. Modification, Disputes & Acknowledgment - Close the loop
+
+#### Backend V2 Support
+- **agreement_version field** - Track v1/v2_standard/v2_lite per agreement
+- **SECTION_TEMPLATES_V2** - New section templates in agreement_v2.py
+- **Extraction Schema V2** - Simplified extraction for 7 sections
+- **Conflict Signal Detection** - High/moderate/low conflict assessment
+- **V2 ARIA Methods** - `send_message_v2`, `extract_structured_data_v2`, `finalize_agreement_v2`
+
+#### Quick Accords Integration
+- Holiday Schedule Quick Accord suggestion
+- Summer Vacation Quick Accord suggestion
+- Travel Consent Quick Accord suggestion
+- School Breaks Quick Accord suggestion
+- Extracurricular Activities Quick Accord suggestion
+
+### Changed
+- Default new agreements to v2_standard (7 sections)
+- Existing agreements remain as v1 (18 sections)
+- ARIA prompts updated for focused, section-specific guidance
+
+---
+
 ## [1.1.2] - 2025-01-11
 
 ### Added
