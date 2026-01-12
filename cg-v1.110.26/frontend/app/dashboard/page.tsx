@@ -29,7 +29,6 @@ import {
   Plus,
   FolderOpen,
   Wallet,
-  Bell,
   Users,
   Clock,
   ArrowRight,
@@ -853,36 +852,21 @@ function DashboardContent() {
             </h2>
           </div>
 
-          {/* Children Avatars & Notification */}
-          <div className="flex items-center gap-3">
-            {allChildren.length > 0 && (
-              <div className="flex -space-x-2">
-                {allChildren.slice(0, 3).map((child) => (
-                  <ChildAvatar key={child.id} child={child} size="md" />
-                ))}
-                {allChildren.length > 3 && (
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center ring-2 ring-card">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      +{allChildren.length - 3}
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
-            <button
-              onClick={() => router.push('/activities')}
-              className="relative p-2 rounded-xl hover:bg-cg-sage-subtle transition-smooth"
-            >
-              <Bell className="w-6 h-6 text-muted-foreground" />
-              {(dashboardSummary?.unread_activity_count ?? 0) > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-cg-error rounded-full flex items-center justify-center px-1">
-                  <span className="text-[10px] font-bold text-white">
-                    {(dashboardSummary?.unread_activity_count ?? 0) > 9 ? '9+' : dashboardSummary?.unread_activity_count}
+          {/* Children Avatars */}
+          {allChildren.length > 0 && (
+            <div className="flex -space-x-2">
+              {allChildren.slice(0, 3).map((child) => (
+                <ChildAvatar key={child.id} child={child} size="md" />
+              ))}
+              {allChildren.length > 3 && (
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center ring-2 ring-card">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    +{allChildren.length - 3}
                   </span>
-                </span>
+                </div>
               )}
-            </button>
-          </div>
+            </div>
+          )}
         </div>
 
         {needsSetup ? (

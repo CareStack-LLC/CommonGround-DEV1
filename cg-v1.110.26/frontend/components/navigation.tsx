@@ -38,7 +38,7 @@ interface NavItem {
 
 // App navigation items (bottom nav for mobile)
 const appNavItems: NavItem[] = [
-  { name: 'Home', path: '/dashboard', icon: Home },
+  { name: 'Dashboard', path: '/dashboard', icon: Home },
   { name: 'Chat', path: '/messages', icon: MessageSquare },
   { name: 'Calendar', path: '/schedule', icon: Calendar },
   { name: 'Clearfund', path: '/payments', icon: Wallet },
@@ -164,7 +164,10 @@ export function Navigation() {
               {user ? (
                 <>
                   {/* Notifications - Only for signed in users */}
-                  <button className="relative p-2 rounded-xl hover:bg-cg-sage-subtle transition-smooth">
+                  <button
+                    onClick={() => router.push('/activities')}
+                    className="relative p-2 rounded-xl hover:bg-cg-sage-subtle transition-smooth"
+                  >
                     <Bell className="h-5 w-5 text-muted-foreground" />
                     {/* Notification badge */}
                     <span className="absolute top-1 right-1 w-2 h-2 bg-cg-amber rounded-full" />
