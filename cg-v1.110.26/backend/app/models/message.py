@@ -3,12 +3,15 @@ Message models - communication between parents with ARIA integration.
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
+
+if TYPE_CHECKING:
+    from app.models.agreement import Agreement
 
 
 class MessageThread(Base, UUIDMixin, TimestampMixin):
@@ -47,6 +50,7 @@ class MessageThread(Base, UUIDMixin, TimestampMixin):
     messages: Mapped[list["Message"]] = relationship(
         "Message", back_populates="thread", cascade="all, delete-orphan"
     )
+    agreement: Mapped[Optional["Agreement"]] = relationship("Agreement", back_populates="message_threads")
 
     def __repr__(self) -> str:
         return f"<MessageThread {self.subject}>"
@@ -114,6 +118,7 @@ class Message(Base, UUIDMixin, TimestampMixin):
     case: Mapped[Optional["Case"]] = relationship("Case", back_populates="messages")
     family_file: Mapped[Optional["FamilyFile"]] = relationship("FamilyFile", back_populates="messages")
     thread: Mapped[Optional["MessageThread"]] = relationship("MessageThread", back_populates="messages")
+    agreement: Mapped[Optional["Agreement"]] = relationship("Agreement", back_populates="messages")
     flags: Mapped[list["MessageFlag"]] = relationship(
         "MessageFlag", back_populates="message", cascade="all, delete-orphan"
     )

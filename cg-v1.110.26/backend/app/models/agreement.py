@@ -29,6 +29,7 @@ from app.models.base import Base, TimestampMixin, UUIDMixin
 if TYPE_CHECKING:
     from app.models.case import Case
     from app.models.family_file import FamilyFile
+    from app.models.message import Message, MessageThread
 
 
 class AgreementType(str, Enum):
@@ -128,6 +129,12 @@ class Agreement(Base, UUIDMixin, TimestampMixin):
     )
     conversations: Mapped[list["AgreementConversation"]] = relationship(
         "AgreementConversation", back_populates="agreement", cascade="all, delete-orphan"
+    )
+    messages: Mapped[list["Message"]] = relationship(
+        "Message", back_populates="agreement", cascade="all, delete-orphan"
+    )
+    message_threads: Mapped[list["MessageThread"]] = relationship(
+        "MessageThread", back_populates="agreement", cascade="all, delete-orphan"
     )
 
     def __repr__(self) -> str:
