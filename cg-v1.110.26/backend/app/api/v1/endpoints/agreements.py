@@ -68,6 +68,7 @@ async def get_agreement(
             family_file_id=agreement.family_file_id,
             title=agreement.title,
             version=agreement.version,
+            agreement_version=agreement.agreement_version or "v2_standard",
             status=agreement.status,
             petitioner_approved=agreement.petitioner_approved,
             respondent_approved=agreement.respondent_approved,

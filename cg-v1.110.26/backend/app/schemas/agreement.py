@@ -38,6 +38,7 @@ class AgreementCreateForFamilyFile(BaseModel):
 
     title: str = "SharedCare Agreement"
     agreement_type: str = "shared_care"
+    agreement_version: str = "v2_standard"  # v2_standard (7 sections), v2_lite (5), or v1 (18)
 
 
 class AgreementResponse(BaseModel):

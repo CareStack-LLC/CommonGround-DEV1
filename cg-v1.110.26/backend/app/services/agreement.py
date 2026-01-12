@@ -26,6 +26,7 @@ from app.models.case import Case, CaseParticipant
 from app.models.family_file import FamilyFile
 from app.models.user import User
 from app.schemas.agreement import SECTION_TEMPLATES, AgreementSectionUpdate
+from app.schemas.agreement_v2 import SECTION_TEMPLATES_V2, get_section_templates
 from app.services.case import CaseService
 from app.services.family_file import FamilyFileService
 from app.services.email import EmailService
@@ -1019,18 +1020,23 @@ KEY_POINTS:
         family_file_id: str,
         title: str,
         agreement_type: str,
-        user: User
+        user: User,
+        agreement_version: str = "v2_standard"
     ) -> Agreement:
         """
         Create a new SharedCare Agreement for a Family File.
 
-        Initializes agreement with 18 section templates.
+        Initializes agreement with appropriate section templates based on version:
+        - v2_standard: 7 sections (default)
+        - v2_lite: 5 sections
+        - v1: 18 sections (legacy ARIA Professional)
 
         Args:
             family_file_id: ID of the Family File
             title: Agreement title
             agreement_type: Type of agreement (shared_care)
             user: User creating the agreement
+            agreement_version: Version format (v2_standard, v2_lite, or v1)
 
         Returns:
             Created agreement
@@ -1048,22 +1054,26 @@ KEY_POINTS:
                 agreement_number=generate_shared_care_number(),
                 title=title,
                 agreement_type=agreement_type,
+                agreement_version=agreement_version,
                 version=1,
                 status="draft",
             )
             self.db.add(agreement)
             await self.db.flush()
 
+            # Get templates based on agreement version
+            templates = get_section_templates(agreement_version)
+
             # Create sections from templates
-            for template in SECTION_TEMPLATES:
+            for template in templates:
                 section = AgreementSection(
                     agreement_id=agreement.id,
                     section_number=template["section_number"],
                     section_title=template["section_title"],
                     section_type=template["section_type"],
                     display_order=template["display_order"],
-                    is_required=template["is_required"],
-                    content=template["template"],
+                    is_required=template.get("is_required", False),
+                    content=template.get("template", ""),
                     is_completed=False,
                 )
                 self.db.add(section)

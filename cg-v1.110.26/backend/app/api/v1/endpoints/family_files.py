@@ -579,7 +579,8 @@ async def create_agreement_for_family_file(
         family_file_id=family_file_id,
         title=data.title,
         agreement_type=data.agreement_type,
-        user=current_user
+        user=current_user,
+        agreement_version=data.agreement_version
     )
 
     return {
@@ -588,10 +589,11 @@ async def create_agreement_for_family_file(
         "agreement_number": agreement.agreement_number,
         "title": agreement.title,
         "agreement_type": agreement.agreement_type,
+        "agreement_version": agreement.agreement_version,
         "version": agreement.version,
         "status": agreement.status,
         "created_at": agreement.created_at,
-        "message": "SharedCare Agreement created. Add sections to complete the agreement."
+        "message": "SharedCare Agreement created. Use the builder to complete the agreement."
     }
 
 
