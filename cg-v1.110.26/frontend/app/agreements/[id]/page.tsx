@@ -35,7 +35,19 @@ import {
 
 // Map backend section types to wizard section indexes for editing
 function getSectionEditIndex(sectionType: string, sectionNumber: string): number {
-  const mappings: Record<string, number> = {
+  // V2 section mappings (new simplified builder)
+  const v2Mappings: Record<string, number> = {
+    'parties_1': 0,
+    'scope_2': 1,
+    'schedule_3': 2,
+    'logistics_4': 3,
+    'decision_making_5': 4,
+    'financial_6': 5,
+    'legal_7': 6,
+  };
+
+  // V1 section mappings (legacy builder)
+  const v1Mappings: Record<string, number> = {
     'basic_info_1': 1,
     'custody_2': 4,
     'custody_3': 5,
@@ -54,7 +66,7 @@ function getSectionEditIndex(sectionType: string, sectionNumber: string): number
   };
 
   const key = `${sectionType}_${sectionNumber}`;
-  return mappings[key] ?? -1;
+  return v2Mappings[key] ?? v1Mappings[key] ?? 0; // Default to 0 for v2 builder
 }
 
 // Helper to format structured data into human-readable summary
@@ -70,6 +82,44 @@ function formatSectionSummary(section: AgreementSection): string | null {
     const sectionData = typeof data === 'string' ? JSON.parse(data) : data;
 
     switch (section.section_type) {
+      // V2 Section Types
+      case 'parties': {
+        const parts = [];
+        if (sectionData.parent1_name) parts.push(sectionData.parent1_name);
+        if (sectionData.parent2_name) parts.push(sectionData.parent2_name);
+        if (sectionData.children_count) parts.push(`${sectionData.children_count} child(ren)`);
+        if (sectionData.children && Array.isArray(sectionData.children)) {
+          parts.push(`${sectionData.children.length} child(ren)`);
+        }
+        return parts.length > 0 ? parts.join(' • ') : 'Parties identified';
+      }
+
+      case 'scope': {
+        const parts = [];
+        if (sectionData.effective_date) parts.push(`Effective: ${sectionData.effective_date}`);
+        if (sectionData.duration) parts.push(sectionData.duration);
+        if (sectionData.review_frequency) parts.push(`Review: ${sectionData.review_frequency}`);
+        return parts.length > 0 ? parts.join(' • ') : 'Scope defined';
+      }
+
+      case 'logistics': {
+        const parts = [];
+        if (sectionData.exchange_location) parts.push(`Exchange at: ${sectionData.exchange_location}`);
+        if (sectionData.transportation_responsibility) parts.push(`Transport: ${sectionData.transportation_responsibility}`);
+        if (sectionData.pickup_time) parts.push(`Pickup: ${sectionData.pickup_time}`);
+        if (sectionData.dropoff_time) parts.push(`Dropoff: ${sectionData.dropoff_time}`);
+        return parts.length > 0 ? parts.join(' • ') : 'Logistics configured';
+      }
+
+      case 'legal': {
+        const parts = [];
+        if (sectionData.modification_process) parts.push(sectionData.modification_process);
+        if (sectionData.dispute_resolution) parts.push(sectionData.dispute_resolution);
+        if (sectionData.acknowledged === true || sectionData.acknowledged === 'yes') parts.push('Acknowledged');
+        return parts.length > 0 ? parts.join(' • ') : 'Terms acknowledged';
+      }
+
+      // V1 Section Types (legacy)
       case 'physical_custody':
       case 'custody': {
         const pc = sectionData.physical_custody || sectionData;
