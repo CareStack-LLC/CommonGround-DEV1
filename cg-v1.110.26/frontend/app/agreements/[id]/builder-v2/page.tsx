@@ -113,6 +113,7 @@ function BuilderV2Content() {
   const [error, setError] = useState<string | null>(null);
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
   const [showQuickAccordSuggestions, setShowQuickAccordSuggestions] = useState(false);
+  const [existingSections, setExistingSections] = useState<AgreementSection[]>([]);
 
   const sections = SECTIONS_V2_STANDARD;
 
@@ -120,25 +121,52 @@ function BuilderV2Content() {
     loadAgreement();
   }, [agreementId]);
 
+  // Reverse map backend types to v2 section keys
+  const BACKEND_TO_V2_MAP: Record<string, string> = {
+    parties: 'parties_children',
+    scope: 'scope_duration',
+    schedule: 'parenting_time',
+    logistics: 'logistics_transitions',
+    decision_making: 'decision_communication',
+    financial: 'expenses_financial',
+    legal: 'modification_disputes',
+  };
+
   const loadAgreement = async () => {
     try {
       setIsLoading(true);
       const data = await agreementsAPI.get(agreementId);
       setAgreement(data.agreement);
+      setExistingSections(data.sections || []);
 
-      // Load existing data if any
+      // Load existing data if any, mapping backend types to v2 keys
       const dataMap: Record<string, any> = {};
+      const completed = new Set<string>();
       data.sections.forEach((section: AgreementSection) => {
         if (section.structured_data) {
-          dataMap[section.section_type] = section.structured_data;
+          const v2Key = BACKEND_TO_V2_MAP[section.section_type] || section.section_type;
+          dataMap[v2Key] = section.structured_data;
+          completed.add(v2Key);
         }
       });
       setSectionData(dataMap);
+      setCompletedSections(completed);
     } catch (err: any) {
       setError(err.message || 'Failed to load agreement');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Map v2 section keys to backend section types
+  const SECTION_TYPE_MAP: Record<string, { type: string; number: string; title: string }> = {
+    parties_children: { type: 'parties', number: '1', title: 'Parties & Children' },
+    scope_duration: { type: 'scope', number: '2', title: 'Scope & Duration' },
+    parenting_time: { type: 'schedule', number: '3', title: 'Parenting Time' },
+    logistics_transitions: { type: 'logistics', number: '4', title: 'Logistics & Transitions' },
+    decision_communication: { type: 'decision_making', number: '5', title: 'Decision-Making' },
+    expenses_financial: { type: 'financial', number: '6', title: 'Expenses' },
+    modification_disputes: { type: 'legal', number: '7', title: 'Review & Sign' },
   };
 
   const handleSaveSection = async (key: string, data: any) => {
@@ -150,8 +178,34 @@ function BuilderV2Content() {
       setSectionData(prev => ({ ...prev, [key]: data }));
       setCompletedSections(prev => new Set([...prev, key]));
 
-      // TODO: Save to backend via API
-      // await agreementsAPI.updateSectionV2(agreementId, key, data);
+      // Save to backend via API
+      const sectionInfo = SECTION_TYPE_MAP[key];
+      if (sectionInfo && agreementId) {
+        // Check if section already exists
+        const existingSection = existingSections.find(s =>
+          s.section_type === sectionInfo.type || s.section_number === sectionInfo.number
+        );
+
+        if (existingSection) {
+          // Update existing section
+          await agreementsAPI.updateSection(agreementId, existingSection.id, {
+            content: JSON.stringify(data),
+            structured_data: data,
+          });
+        } else {
+          // Create new section
+          const newSection = await agreementsAPI.createSection(
+            agreementId,
+            sectionInfo.type,
+            {
+              section_number: sectionInfo.number,
+              section_title: sectionInfo.title,
+              structured_data: data,
+            }
+          );
+          setExistingSections(prev => [...prev, newSection]);
+        }
+      }
 
     } catch (err: any) {
       setError(err.message || 'Failed to save section');
