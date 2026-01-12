@@ -23,10 +23,11 @@ EXPOSE 8000
 RUN echo '#!/bin/bash\n\
 set -e\n\
 echo "Starting CommonGround API..."\n\
+echo "PORT=$PORT"\n\
 echo "Running database migrations..."\n\
 alembic upgrade head || echo "Migration failed or no changes needed"\n\
-echo "Starting uvicorn..."\n\
-exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}\n\
+echo "Starting uvicorn on port ${PORT:-8000}..."\n\
+exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --log-level info --access-log\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
 # Run application
