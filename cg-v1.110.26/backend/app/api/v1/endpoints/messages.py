@@ -481,7 +481,6 @@ async def send_message(
         content_hash=content_hash,
         message_type=message_data.message_type,
         sent_at=datetime.utcnow(),
-        sent_at=datetime.utcnow(),
         was_flagged=aria_analysis.is_flagged
     )
 
