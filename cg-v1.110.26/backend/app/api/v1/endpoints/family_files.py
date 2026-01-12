@@ -280,6 +280,56 @@ async def update_family_file(
     return _build_family_file_response(family_file)
 
 
+@router.delete("/{family_file_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_family_file(
+    family_file_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Delete a Family File.
+
+    Only the creator (Parent A) can delete a Family File.
+    Cannot delete if a Court Case is linked.
+
+    Args:
+        family_file_id: ID of the Family File
+
+    Returns:
+        204 No Content on success
+    """
+    service = FamilyFileService(db)
+    await service.delete_family_file(family_file_id, current_user)
+    return None
+
+
+@router.post("/{family_file_id}/remove-parent-b")
+async def remove_parent_b(
+    family_file_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Remove Parent B from a Family File.
+
+    Only the creator (Parent A) can remove the co-parent.
+    Cannot remove if a Court Case is linked.
+
+    Args:
+        family_file_id: ID of the Family File
+
+    Returns:
+        Updated Family File
+    """
+    service = FamilyFileService(db)
+    family_file = await service.remove_parent_b(family_file_id, current_user)
+
+    response = _build_family_file_response(family_file)
+    response["message"] = "Co-parent has been removed from this Family File"
+
+    return response
+
+
 @router.post("/{family_file_id}/invite")
 async def invite_parent_b(
     family_file_id: str,

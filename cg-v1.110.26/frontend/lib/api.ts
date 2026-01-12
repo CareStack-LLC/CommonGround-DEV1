@@ -4579,6 +4579,26 @@ export const familyFilesAPI = {
       }),
     });
   },
+
+  /**
+   * Delete a Family File
+   * Only the creator (Parent A) can delete
+   */
+  async delete(id: string): Promise<void> {
+    await fetchAPI<void>(`/family-files/${id}`, {
+      method: 'DELETE',
+    });
+  },
+
+  /**
+   * Remove Parent B from a Family File
+   * Only the creator (Parent A) can remove co-parent
+   */
+  async removeParentB(id: string): Promise<FamilyFile & { message: string }> {
+    return fetchAPI<FamilyFile & { message: string }>(`/family-files/${id}/remove-parent-b`, {
+      method: 'POST',
+    });
+  },
 };
 
 // ============================================================================

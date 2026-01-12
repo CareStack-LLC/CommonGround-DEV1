@@ -54,10 +54,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { IncomingCallBanner } from "@/components/kidcoms/incoming-call-banner";
 import { cn } from '@/lib/utils';
+import { Trash2, UserMinus, Pencil, Gavel } from 'lucide-react';
 
 /* =============================================================================
    Family File Detail Page - "The Sanctuary of Truth"
@@ -82,6 +92,17 @@ function FamilyFileDetailContent() {
   const [isInviting, setIsInviting] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviteSuccess, setInviteSuccess] = useState<string | null>(null);
+
+  // Settings State
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [isSavingTitle, setIsSavingTitle] = useState(false);
+  const [isRemovingParent, setIsRemovingParent] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -135,6 +156,60 @@ function FamilyFileDetailContent() {
     } finally {
       setIsInviting(false);
     }
+  };
+
+  const handleSaveTitle = async () => {
+    if (!newTitle.trim()) return;
+
+    try {
+      setIsSavingTitle(true);
+      setSettingsError(null);
+      await familyFilesAPI.update(id, { title: newTitle.trim() });
+      await loadData();
+      setIsEditingTitle(false);
+    } catch (err: any) {
+      console.error('Failed to update title:', err);
+      setSettingsError(err.message || 'Failed to update title');
+    } finally {
+      setIsSavingTitle(false);
+    }
+  };
+
+  const handleRemoveParentB = async () => {
+    try {
+      setIsRemovingParent(true);
+      setSettingsError(null);
+      await familyFilesAPI.removeParentB(id);
+      await loadData();
+      setShowRemoveConfirm(false);
+    } catch (err: any) {
+      console.error('Failed to remove co-parent:', err);
+      setSettingsError(err.message || 'Failed to remove co-parent');
+    } finally {
+      setIsRemovingParent(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      setSettingsError(null);
+      await familyFilesAPI.delete(id);
+      router.push('/family-files');
+    } catch (err: any) {
+      console.error('Failed to delete family file:', err);
+      setSettingsError(err.message || 'Failed to delete family file');
+      setIsDeleting(false);
+    }
+  };
+
+  const handleOpenSettings = () => {
+    setNewTitle(familyFile?.title || '');
+    setSettingsError(null);
+    setShowDeleteConfirm(false);
+    setShowRemoveConfirm(false);
+    setIsEditingTitle(false);
+    setIsSettingsOpen(true);
   };
 
   const getRoleName = (role: string | null) => {
@@ -237,10 +312,220 @@ function FamilyFileDetailContent() {
             <p className="text-muted-foreground mt-1 ml-14">{familyFile.family_file_number}</p>
           </div>
         </div>
-        <CGButton variant="ghost" size="sm">
-          <Settings className="h-4 w-4 mr-2" />
-          Settings
-        </CGButton>
+        <Sheet open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+          <SheetTrigger asChild>
+            <CGButton variant="ghost" size="sm" onClick={handleOpenSettings}>
+              <Settings className="h-4 w-4 mr-2" />
+              Settings
+            </CGButton>
+          </SheetTrigger>
+          <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5 text-cg-sage" />
+                Family File Settings
+              </SheetTitle>
+              <SheetDescription>
+                Manage your family file settings and preferences
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="py-6 space-y-6">
+              {/* Error Display */}
+              {settingsError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{settingsError}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Edit Title Section */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-foreground">Family File Name</Label>
+                {isEditingTitle ? (
+                  <div className="space-y-3">
+                    <Input
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                      placeholder="Enter family file name"
+                      className="focus-visible:ring-cg-sage"
+                    />
+                    <div className="flex gap-2">
+                      <CGButton
+                        variant="primary"
+                        size="sm"
+                        onClick={handleSaveTitle}
+                        disabled={isSavingTitle || !newTitle.trim()}
+                      >
+                        {isSavingTitle ? 'Saving...' : 'Save'}
+                      </CGButton>
+                      <CGButton
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setIsEditingTitle(false);
+                          setNewTitle(familyFile?.title || '');
+                        }}
+                      >
+                        Cancel
+                      </CGButton>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50 border border-border/50">
+                    <span className="text-foreground font-medium">{familyFile?.title}</span>
+                    <CGButton
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsEditingTitle(true)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </CGButton>
+                  </div>
+                )}
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-border" />
+
+              {/* Send to Court Section */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-foreground">Court Filing</Label>
+                <p className="text-sm text-muted-foreground">
+                  Start the FL-300/FL-311 process to submit your family file to the court.
+                </p>
+                <CGButton
+                  variant="secondary"
+                  className="w-full justify-start"
+                  onClick={() => router.push(`/family-files/${id}/court-filing`)}
+                >
+                  <Gavel className="h-4 w-4 mr-3" />
+                  Send Family File to Court
+                </CGButton>
+              </div>
+
+              {/* Danger Zone - Only for Parent A */}
+              {isParentA && (
+                <>
+                  <div className="border-t border-border" />
+
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-sm font-medium text-cg-error">Danger Zone</Label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        These actions cannot be undone.
+                      </p>
+                    </div>
+
+                    {/* Remove Parent B */}
+                    {(familyFile?.parent_b_id || familyFile?.parent_b_email) && !familyFile?.has_court_case && (
+                      <div className="space-y-2">
+                        {!showRemoveConfirm ? (
+                          <button
+                            onClick={() => setShowRemoveConfirm(true)}
+                            className="w-full flex items-center gap-3 p-3 rounded-xl border border-cg-amber/30 bg-cg-amber-subtle/30 hover:bg-cg-amber-subtle/50 hover:border-cg-amber/50 transition-all text-left"
+                          >
+                            <UserMinus className="h-5 w-5 text-cg-amber" />
+                            <div>
+                              <div className="font-medium text-foreground">Remove Co-Parent</div>
+                              <div className="text-sm text-muted-foreground">
+                                Revoke their access to this family file
+                              </div>
+                            </div>
+                          </button>
+                        ) : (
+                          <div className="p-4 rounded-xl border border-cg-amber/50 bg-cg-amber-subtle/30 space-y-3">
+                            <p className="text-sm text-foreground font-medium">
+                              Are you sure you want to remove the co-parent?
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              They will lose access to this family file and all shared data.
+                            </p>
+                            <div className="flex gap-2">
+                              <CGButton
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleRemoveParentB}
+                                disabled={isRemovingParent}
+                                className="bg-cg-amber text-white hover:bg-cg-amber/90"
+                              >
+                                {isRemovingParent ? 'Removing...' : 'Yes, Remove'}
+                              </CGButton>
+                              <CGButton
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowRemoveConfirm(false)}
+                              >
+                                Cancel
+                              </CGButton>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Delete Family File */}
+                    {!familyFile?.has_court_case && (
+                      <div className="space-y-2">
+                        {!showDeleteConfirm ? (
+                          <button
+                            onClick={() => setShowDeleteConfirm(true)}
+                            className="w-full flex items-center gap-3 p-3 rounded-xl border border-cg-error/30 bg-cg-error-subtle/30 hover:bg-cg-error-subtle/50 hover:border-cg-error/50 transition-all text-left"
+                          >
+                            <Trash2 className="h-5 w-5 text-cg-error" />
+                            <div>
+                              <div className="font-medium text-cg-error">Delete Family File</div>
+                              <div className="text-sm text-muted-foreground">
+                                Permanently delete this family file and all data
+                              </div>
+                            </div>
+                          </button>
+                        ) : (
+                          <div className="p-4 rounded-xl border border-cg-error/50 bg-cg-error-subtle/30 space-y-3">
+                            <p className="text-sm text-foreground font-medium">
+                              Are you absolutely sure?
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              This will permanently delete the family file, all agreements, messages, and related data. This action cannot be undone.
+                            </p>
+                            <div className="flex gap-2">
+                              <CGButton
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleDelete}
+                                disabled={isDeleting}
+                                className="bg-cg-error text-white hover:bg-cg-error/90"
+                              >
+                                {isDeleting ? 'Deleting...' : 'Yes, Delete Everything'}
+                              </CGButton>
+                              <CGButton
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowDeleteConfirm(false)}
+                              >
+                                Cancel
+                              </CGButton>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Court Case Warning */}
+                    {familyFile?.has_court_case && (
+                      <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
+                        <p className="text-sm text-muted-foreground">
+                          <Scale className="h-4 w-4 inline mr-2" />
+                          Removal and deletion are disabled because this family file is linked to a court case.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       {/* Status Alert */}

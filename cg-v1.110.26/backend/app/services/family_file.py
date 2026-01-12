@@ -467,6 +467,108 @@ class FamilyFileService:
             (family_file.parent_b_email and family_file.parent_b_email.lower() == user.email.lower())
         )
 
+    async def delete_family_file(
+        self,
+        family_file_id: str,
+        user: User
+    ) -> None:
+        """
+        Delete a Family File.
+
+        Only the creator (Parent A) can delete a Family File.
+        The Family File must not have active court cases.
+
+        Args:
+            family_file_id: ID of the Family File
+            user: User requesting deletion
+
+        Raises:
+            HTTPException: If deletion not allowed or fails
+        """
+        family_file = await self.get_family_file(family_file_id, user)
+
+        # Only Parent A (creator) can delete
+        if family_file.parent_a_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only the creator of this Family File can delete it"
+            )
+
+        # Don't allow deletion if court case is linked
+        if family_file.status == FamilyFileStatus.COURT_LINKED.value:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot delete a Family File with an active Court Case"
+            )
+
+        try:
+            # Delete associated records (cascading should handle most)
+            await self.db.delete(family_file)
+            await self.db.commit()
+        except Exception as e:
+            await self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to delete Family File: {str(e)}"
+            )
+
+    async def remove_parent_b(
+        self,
+        family_file_id: str,
+        user: User
+    ) -> FamilyFile:
+        """
+        Remove Parent B from a Family File.
+
+        Only the creator (Parent A) can remove Parent B.
+        This revokes Parent B's access and clears their invitation.
+
+        Args:
+            family_file_id: ID of the Family File
+            user: User requesting removal
+
+        Returns:
+            Updated FamilyFile
+
+        Raises:
+            HTTPException: If removal not allowed
+        """
+        family_file = await self.get_family_file(family_file_id, user)
+
+        # Only Parent A can remove Parent B
+        if family_file.parent_a_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only the creator of this Family File can remove the co-parent"
+            )
+
+        # Check if there's a Parent B to remove
+        if not family_file.parent_b_id and not family_file.parent_b_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No co-parent to remove from this Family File"
+            )
+
+        # Don't allow removal if court case is linked
+        if family_file.status == FamilyFileStatus.COURT_LINKED.value:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot remove co-parent when a Court Case is active"
+            )
+
+        # Clear Parent B fields
+        family_file.parent_b_id = None
+        family_file.parent_b_email = None
+        family_file.parent_b_role = None
+        family_file.parent_b_invited_at = None
+        family_file.parent_b_joined_at = None
+        family_file.updated_at = datetime.utcnow()
+
+        await self.db.commit()
+        await self.db.refresh(family_file)
+
+        return family_file
+
     async def _send_parent_b_invitation(
         self,
         family_file: FamilyFile,
