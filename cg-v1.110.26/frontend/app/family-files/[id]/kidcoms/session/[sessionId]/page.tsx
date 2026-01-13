@@ -437,8 +437,8 @@ export default function SessionPage() {
               onClick={toggleAudio}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${isAudioOn
-                  ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                  : 'bg-red-600 hover:bg-red-700 text-white'
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                : 'bg-red-600 hover:bg-red-700 text-white'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
             >
@@ -450,8 +450,8 @@ export default function SessionPage() {
               onClick={toggleVideo}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${isVideoOn
-                  ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                  : 'bg-red-600 hover:bg-red-700 text-white'
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                : 'bg-red-600 hover:bg-red-700 text-white'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
             >
@@ -474,8 +474,8 @@ export default function SessionPage() {
             <button
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
               className={`hidden md:flex p-3 rounded-full transition-colors ${activePanel === 'chat'
-                  ? 'bg-cg-sage text-white'
-                  : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                ? 'bg-cg-sage text-white'
+                : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                 }`}
               title="Chat"
             >
@@ -486,8 +486,8 @@ export default function SessionPage() {
             <button
               onClick={() => setActivePanel(activePanel === 'participants' ? null : 'participants')}
               className={`hidden md:flex p-3 rounded-full transition-colors ${activePanel === 'participants'
-                  ? 'bg-cg-sage text-white'
-                  : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                ? 'bg-cg-sage text-white'
+                : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                 }`}
               title="Participants"
             >
@@ -499,8 +499,8 @@ export default function SessionPage() {
               onClick={() => setIsTheaterMode(true)}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${!isCallJoined
-                  ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
-                  : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
+                ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
+                : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
                 }`}
               title="Theater Mode"
             >
@@ -510,9 +510,9 @@ export default function SessionPage() {
             <button
               onClick={() => setIsArcadeMode(true)}
               disabled={!isCallJoined}
-              className={`hidden md:flex p-3 rounded-full transition-colors ${!isCallJoined
-                  ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
-                  : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
+              className={`p-4 md:p-3 rounded-full transition-colors ${!isCallJoined
+                ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
+                : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
                 }`}
               title="Arcade (Mini & Mega)"
             >

@@ -13,6 +13,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Supabase createClient might throw if URL is empty, so let's safeguard.
 
 export const supabase = createClient(
-    supabaseUrl || 'https://placeholder.supabase.co',
-    supabaseAnonKey || 'placeholder'
+    supabaseUrl || 'https://qqttugwxmkbnrgzgqbkz.supabase.co',
+    supabaseAnonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxdHR1Z3d4bWtibnJnemdxYmt6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwNzY1NDEsImV4cCI6MjA4MjY1MjU0MX0.JfzKDV-8yhW3ThFz1wHIXL2uJmjCl7yhS_R_yBt5pNE'
 );
