@@ -109,21 +109,21 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
             }
 
             preload() {
-                this.load.image('bg_v2', '/assets/minimega/bg_v2.png');
-                this.load.image('tiles', '/assets/minimega/tileset.png');
+                // Load 'Nano Banana Pro' generated assets
+                this.load.image('bg_v3', '/assets/minimega/bg_v3.png');
+                this.load.image('tiles', '/assets/minimega/bg_v3.png'); // Use same sheet for now, user to crop
 
-                // Load Sprite Sheets with estimated frame sizes from the pixel art provided
-                // Assuming typical 32x32 or similar. The user provided images look like sheets.
-                // We'll guess decent dimensions. If they are rows, we'll slice them.
-                this.load.spritesheet('mini', '/assets/minimega/mini_spritesheet_v2.png', { frameWidth: 64, frameHeight: 64 });
-                this.load.spritesheet('mega', '/assets/minimega/mega_spritesheet_v2.png', { frameWidth: 80, frameHeight: 80 });
+                // Load Sprite Sheet (Mini & Mega on one sheet in v3)
+                // Note: These assets are raw AI generations and may need external cropping for perfect alignment.
+                // We estimate a larger frame size for the V3 high-res assets.
+                this.load.spritesheet('chars', '/assets/minimega/chars_v3.png', { frameWidth: 256, frameHeight: 256 });
             }
 
             create() {
                 // Background
-                const bg = this.add.image(0, 0, 'bg_v2').setOrigin(0, 0);
-                bg.displayWidth = 1600; // Double width for scrolling level
-                bg.displayHeight = 600;
+                const bg = this.add.image(0, 0, 'bg_v3').setOrigin(0, 0);
+                bg.displayWidth = 1600;
+                bg.displayHeight = 800; // Taller background
                 this.physics.world.setBounds(0, 0, 1600, 600);
 
                 // Platforms (Level Design)
@@ -136,44 +136,69 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
                 // High platform for Mini
                 this.createPlatform(300, 400, 200, 20);
 
-                // Gap that Mega needs to carry Mini over? Or High wall?
-                // Big Wall that blocks Mega
-                this.createPlatform(600, 450, 40, 300); // Tall wall at x=600
-
-                // Bridge Ramp (Initially Up/Blocking or invisible)
-                // Let's make a drawbridge at x=600 that Mega uses to cross `gap` or climb wall?
-                // Let's say there's a gap at x=800
-                // this.createPlatform(800, 580, 0, 0); // Gap
+                // Wall
+                this.createPlatform(600, 450, 40, 300);
 
                 // Ramp/Bridge Object
-                this.bridge = this.physics.add.sprite(660, 400, 'tiles'); // Placeholder
-                this.bridge.setTint(0x8B4513); // Wood color
+                this.bridge = this.physics.add.sprite(660, 400, 'tiles');
+                this.bridge.setTint(0x8B4513);
                 this.bridge.setDisplaySize(150, 20);
-                this.bridge.setAngle(-45); // Ramp up
+                this.bridge.setAngle(-45);
                 (this.bridge.body as Phaser.Physics.Arcade.Body).allowGravity = false;
                 this.bridge.setImmovable(true);
-                this.physics.add.collider(this.bridge, [this.player, this.partner]); // Will add colliders later
+                this.physics.add.collider(this.bridge, [this.player, this.partner]);
 
-                // Interactive Button (Only Mini can reach)
+                // Interactive Button
                 const button = this.interactables = this.physics.add.staticGroup();
                 const btn = button.create(300, 370, 'tiles');
-                btn.setTint(0xff0000); // Red button
+                btn.setTint(0xff0000);
                 btn.setDisplaySize(30, 30);
                 btn.refreshBody();
 
-                // Players
-                this.createAnims(isParent ? 'mini' : 'mega'); // Create local anims
-                this.createAnims(isParent ? 'mega' : 'mini'); // Create partner anims
+                // Players - V3 Shared Sheet
+                // Create specific animations from the shared 'chars' sheet
+                // 'Mini' is top row (frames 0-3 approx), 'Mega' is bottom row (frames 4-7 approx)
+                this.anims.create({
+                    key: 'mini-idle',
+                    frames: this.anims.generateFrameNumbers('chars', { start: 0, end: 0 }),
+                    frameRate: 4,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'mini-walk',
+                    frames: this.anims.generateFrameNumbers('chars', { start: 1, end: 2 }),
+                    frameRate: 8,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'mini-jump',
+                    frames: [{ key: 'chars', frame: 3 }],
+                    frameRate: 1,
+                });
+
+                this.anims.create({
+                    key: 'mega-idle',
+                    frames: this.anims.generateFrameNumbers('chars', { start: 4, end: 4 }), // Next row
+                    frameRate: 4,
+                    repeat: -1
+                });
+                this.anims.create({
+                    key: 'mega-walk',
+                    frames: this.anims.generateFrameNumbers('chars', { start: 5, end: 6 }),
+                    frameRate: 8,
+                    repeat: -1
+                });
 
                 const myRole = isParent ? 'mini' : 'mega';
                 const partnerRole = isParent ? 'mega' : 'mini';
 
-                this.player = this.physics.add.sprite(100, 500, myRole);
-                this.player.setCollideWorldBounds(true);
+                // Use 'chars' texture for both
+                this.player = this.physics.add.sprite(100, 500, 'chars');
+                this.partner = this.physics.add.sprite(150, 500, 'chars');
 
-                this.partner = this.physics.add.sprite(150, 500, partnerRole);
+                this.player.setCollideWorldBounds(true);
                 this.partner.setCollideWorldBounds(true);
-                this.partner.setTint(0xdddddd); // Slight dim for partner
+                this.partner.setTint(0xdddddd);
 
                 // Physics Properties
                 if (myRole === 'mini') {
