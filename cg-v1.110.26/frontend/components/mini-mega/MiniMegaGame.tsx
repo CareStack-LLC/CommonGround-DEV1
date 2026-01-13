@@ -150,7 +150,7 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
                 this.bridge.setTint(0x8B4513); // Wood color
                 this.bridge.setDisplaySize(150, 20);
                 this.bridge.setAngle(-45); // Ramp up
-                this.bridge.body!.allowGravity = false;
+                (this.bridge.body as Phaser.Physics.Arcade.Body).allowGravity = false;
                 this.bridge.setImmovable(true);
                 this.physics.add.collider(this.bridge, [this.player, this.partner]); // Will add colliders later
 
@@ -188,7 +188,7 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
                 }
 
                 // Partner physics (kinematic-ish via lerp, but we give it a body for collision)
-                this.partner.body!.allowGravity = false; // We sync pos directly
+                (this.partner.body as Phaser.Physics.Arcade.Body).allowGravity = false; // We sync pos directly
 
                 // Collision
                 this.physics.add.collider(this.player, this.platforms);
@@ -309,7 +309,7 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
                     const dy = this.player.y - this.partner.y;
 
                     // Specific hitbox: Mini is within 30px X and ~50-80px above Mega
-                    if (dx < 40 && dy > -100 && dy < -40 && this.player.body!.velocity.y > 0) {
+                    if (dx < 40 && dy > -100 && dy < -40 && (this.player.body as Phaser.Physics.Arcade.Body).velocity.y > 0) {
                         this.isBeingCarried = true;
                     }
                 }
