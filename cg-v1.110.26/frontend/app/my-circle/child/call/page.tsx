@@ -407,7 +407,7 @@ function ChildCallContent() {
         </header>
 
         {/* Video Area */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative overflow-hidden">
           {!isCallJoined ? (
             <div className="h-full bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center">
               <div className="text-center">
