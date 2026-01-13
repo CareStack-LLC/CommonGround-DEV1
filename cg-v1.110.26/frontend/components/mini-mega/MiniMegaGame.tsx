@@ -86,6 +86,8 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
             player!: Phaser.Physics.Arcade.Sprite;
             partner!: Phaser.Physics.Arcade.Sprite;
             cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+
+            mobileInput: 'up' | 'down' | 'left' | 'right' | 'stop' = 'stop';
             partnerPos = { x: 400, y: 300, vx: 0, vy: 0, anim: 'idle' };
 
             constructor() {
@@ -183,20 +185,20 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
                 this.player.setVelocity(0);
                 let anim = 'idle';
 
-                if (this.cursors.left.isDown) {
+                if (this.cursors.left.isDown || this.mobileInput === 'left') {
                     this.player.setVelocityX(-speed);
                     this.player.setFlipX(true);
                     anim = 'walk';
-                } else if (this.cursors.right.isDown) {
+                } else if (this.cursors.right.isDown || this.mobileInput === 'right') {
                     this.player.setVelocityX(speed);
                     this.player.setFlipX(false);
                     anim = 'walk';
                 }
 
-                if (this.cursors.up.isDown) {
+                if (this.cursors.up.isDown || this.mobileInput === 'up') {
                     this.player.setVelocityY(-speed);
                     anim = 'jump';
-                } else if (this.cursors.down.isDown) {
+                } else if (this.cursors.down.isDown || this.mobileInput === 'down') {
                     this.player.setVelocityY(speed);
                     anim = 'walk';
                 }
@@ -238,11 +240,16 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
             }
         }
 
+        // ... (inside initGame)
         const config: Phaser.Types.Core.GameConfig = {
             type: Phaser.AUTO,
             parent: gameContainerRef.current!,
-            width: 800,
-            height: 600,
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                width: 800,
+                height: 600,
+            },
             physics: {
                 default: 'arcade',
                 arcade: {
@@ -258,29 +265,41 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
         gameRef.current = new Phaser.Game(config);
     }
 
+    // Virtual D-pad handlers
+    const handleMove = (direction: 'up' | 'down' | 'left' | 'right' | 'stop') => {
+        if (!gameRef.current) return;
+        const scene = gameRef.current.scene.getScene('MainScene') as any;
+        if (!scene || !scene.player) return;
+
+        // Simulate key presses for the scene update loop
+        // Alternatively, expose a `mobileInput` state in the scene
+        // For simplicity, let's just communicate direction to scene
+        scene.mobileInput = direction;
+    };
+
     return (
         <div className="fixed inset-0 z-50 bg-slate-900/95 flex flex-col items-center justify-center p-4 backdrop-blur-sm">
             <div className="absolute top-4 right-4 z-50">
                 <button onClick={onClose} className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold shadow-lg transition-transform hover:scale-105">
-                    Exit Game
+                    Exit
                 </button>
             </div>
 
-            <div className="mb-6 text-center">
-                <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-2 drop-shadow-md">
+            <div className="mb-2 text-center shrink-0">
+                <h1 className="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-2 drop-shadow-md">
                     Mini & Mega
                 </h1>
-                <div className="flex items-center justify-center gap-2 text-slate-300">
+                <div className="flex items-center justify-center gap-2 text-slate-300 text-sm">
                     {status === 'connecting' && <><Loader2 className="w-4 h-4 animate-spin" /> Connecting...</>}
                     {status === 'waiting' && <><Loader2 className="w-4 h-4 animate-spin" /> Waiting for Player 2...</>}
                     {status === 'playing' && <span className="text-emerald-400 font-bold">● Game Active</span>}
                 </div>
             </div>
 
+            {/* Responsive Game Container */}
             <div
                 ref={gameContainerRef}
-                className="rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-700 bg-slate-800 relative ring-4 ring-slate-900/50"
-                style={{ width: 800, height: 600 }}
+                className="rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-700 bg-slate-800 relative ring-4 ring-slate-900/50 w-full max-w-[800px] aspect-[4/3]"
             >
                 {status !== 'playing' && (
                     <div className="absolute inset-0 flex items-center justify-center bg-slate-800/90 z-10 backdrop-blur-sm">
@@ -294,7 +313,31 @@ export default function MiniMegaGame({ sessionId, userId, isParent, onClose }: M
                 )}
             </div>
 
-            <div className="mt-6 flex gap-8 text-slate-400 font-medium bg-slate-800/50 px-6 py-3 rounded-full border border-slate-700/50">
+            {/* Mobile Controls Overlay - Visible only on small screens or touch */}
+            <div className="mt-4 md:hidden flex gap-4">
+                <div className="flex flex-col items-center gap-2">
+                    <button
+                        className="w-12 h-12 bg-slate-700/80 rounded-full text-white active:bg-cyan-500"
+                        onTouchStart={() => handleMove('up')} onTouchEnd={() => handleMove('stop')}
+                    >▲</button>
+                    <div className="flex gap-2">
+                        <button
+                            className="w-12 h-12 bg-slate-700/80 rounded-full text-white active:bg-cyan-500"
+                            onTouchStart={() => handleMove('left')} onTouchEnd={() => handleMove('stop')}
+                        >◀</button>
+                        <button
+                            className="w-12 h-12 bg-slate-700/80 rounded-full text-white active:bg-cyan-500"
+                            onTouchStart={() => handleMove('down')} onTouchEnd={() => handleMove('stop')}
+                        >▼</button>
+                        <button
+                            className="w-12 h-12 bg-slate-700/80 rounded-full text-white active:bg-cyan-500"
+                            onTouchStart={() => handleMove('right')} onTouchEnd={() => handleMove('stop')}
+                        >▶</button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="hidden md:flex mt-4 gap-8 text-slate-400 font-medium bg-slate-800/50 px-6 py-3 rounded-full border border-slate-700/50">
                 <span className="flex items-center gap-2">🕹️ Arrown Keys to Move</span>
                 <span className="flex items-center gap-2">You are: <span className={isParent ? "text-orange-400" : "text-cyan-400"}>{isParent ? 'Mini (Parent)' : 'Mega (Child)'}</span></span>
             </div>
