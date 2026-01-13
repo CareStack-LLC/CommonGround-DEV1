@@ -20,8 +20,11 @@ import {
   Send,
 } from 'lucide-react';
 // Dynamically import TheaterMode to avoid SSR issues with Daily.co
-const TheaterMode = dynamic(
-  () => import('@/components/kidcoms/theater-mode').then((mod) => mod.TheaterMode),
+{ ssr: false }
+);
+// Dynamically import ArcadeMode
+const ArcadeMode = dynamic(
+  () => import('@/components/kidcoms/arcade-mode').then((mod) => mod.ArcadeMode),
   { ssr: false }
 );
 
@@ -72,6 +75,8 @@ function ChildCallContent() {
 
   // Theater mode
   const [isTheaterMode, setIsTheaterMode] = useState(false);
+  // Arcade mode
+  const [isArcadeMode, setIsArcadeMode] = useState(false);
 
   // Child user data
   const [childUserId, setChildUserId] = useState<string>('');
@@ -393,9 +398,8 @@ function ChildCallContent() {
               </p>
             </div>
           </div>
-          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-            isCallJoined ? 'bg-green-500/30 text-green-300' : 'bg-yellow-500/30 text-yellow-300'
-          }`}>
+          <span className={`px-3 py-1 rounded-full text-xs font-bold ${isCallJoined ? 'bg-green-500/30 text-green-300' : 'bg-yellow-500/30 text-yellow-300'
+            }`}>
             {participantList.length} {participantList.length === 1 ? 'person' : 'people'} 👥
           </span>
         </header>
@@ -451,8 +455,8 @@ function ChildCallContent() {
                     participantList.length === 1
                       ? '1fr'
                       : participantList.length === 2
-                      ? '1fr 1fr'
-                      : '1fr 1fr',
+                        ? '1fr 1fr'
+                        : '1fr 1fr',
                   gridTemplateRows:
                     participantList.length <= 2 ? '1fr' : participantList.length <= 4 ? '1fr 1fr' : '1fr 1fr',
                 }}
@@ -472,11 +476,10 @@ function ChildCallContent() {
             <button
               onClick={toggleAudio}
               disabled={!isCallJoined}
-              className={`p-4 rounded-full transition-all transform hover:scale-105 ${
-                isAudioOn
-                  ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                  : 'bg-red-500 hover:bg-red-600 text-white'
-              } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`p-4 rounded-full transition-all transform hover:scale-105 ${isAudioOn
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                : 'bg-red-500 hover:bg-red-600 text-white'
+                } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
             >
               {isAudioOn ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
@@ -486,11 +489,10 @@ function ChildCallContent() {
             <button
               onClick={toggleVideo}
               disabled={!isCallJoined}
-              className={`p-4 rounded-full transition-all transform hover:scale-105 ${
-                isVideoOn
-                  ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                  : 'bg-red-500 hover:bg-red-600 text-white'
-              } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`p-4 rounded-full transition-all transform hover:scale-105 ${isVideoOn
+                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                : 'bg-red-500 hover:bg-red-600 text-white'
+                } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
             >
               {isVideoOn ? <Video className="h-6 w-6" /> : <VideoOff className="h-6 w-6" />}
@@ -511,11 +513,10 @@ function ChildCallContent() {
             {/* Chat Toggle - Desktop only */}
             <button
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
-              className={`hidden md:flex p-3 rounded-full transition-all ${
-                activePanel === 'chat'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-              }`}
+              className={`hidden md:flex p-3 rounded-full transition-all ${activePanel === 'chat'
+                ? 'bg-purple-600 text-white'
+                : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                }`}
               title="Chat"
             >
               <MessageCircle className="h-5 w-5" />
@@ -524,11 +525,10 @@ function ChildCallContent() {
             {/* Participants Toggle - Desktop only */}
             <button
               onClick={() => setActivePanel(activePanel === 'participants' ? null : 'participants')}
-              className={`hidden md:flex p-3 rounded-full transition-all ${
-                activePanel === 'participants'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-              }`}
+              className={`hidden md:flex p-3 rounded-full transition-all ${activePanel === 'participants'
+                ? 'bg-purple-600 text-white'
+                : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                }`}
               title="Participants"
             >
               <Users className="h-5 w-5" />
@@ -538,21 +538,24 @@ function ChildCallContent() {
             <button
               onClick={() => setIsTheaterMode(true)}
               disabled={!isCallJoined}
-              className={`p-4 md:p-3 rounded-full transition-all transform hover:scale-105 ${
-                !isCallJoined
-                  ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white'
-              }`}
+              className={`p-4 md:p-3 rounded-full transition-all transform hover:scale-105 ${!isCallJoined
+                ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
+                : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white'
+                }`}
               title="Watch Together! 🎬"
             >
               <Film className="h-6 w-6 md:h-5 md:w-5" />
             </button>
 
-            {/* Games - Coming Soon */}
+            {/* Games - Mini & Mega */}
             <button
-              disabled
-              className="hidden md:flex p-3 rounded-full bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed"
-              title="Games (Coming Soon!)"
+              onClick={() => setIsArcadeMode(true)}
+              disabled={!isCallJoined}
+              className={`p-4 md:p-3 flex rounded-full transition-all ${!isCallJoined
+                ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
+                : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
+                }`}
+              title="Arcade (Mini & Mega)"
             >
               <Gamepad2 className="h-5 w-5" />
             </button>
@@ -671,6 +674,13 @@ function ChildCallContent() {
         onToggleVideo={toggleVideo}
         onToggleAudio={toggleAudio}
         onExit={() => setIsTheaterMode(false)}
+      />
+
+      {/* Arcade Mode Overlay */}
+      <ArcadeMode
+        isActive={isArcadeMode}
+        userId={childUserId}
+        onExit={() => setIsArcadeMode(false)}
       />
     </div>
   );
