@@ -360,7 +360,7 @@ export default function SessionPage() {
         </header>
 
         {/* Video Area - Full screen on mobile, grid on desktop */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative overflow-hidden">
           {!isCallJoined ? (
             <div className="h-full bg-gray-800 flex items-center justify-center">
               <div className="text-center">
