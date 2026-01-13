@@ -22,6 +22,7 @@ import {
 import { kidcomsAPI, KidComsSession, KidComsMessage } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { TheaterMode } from '@/components/kidcoms/theater-mode';
+import { ArcadeMode } from '@/components/kidcoms/arcade-mode';
 
 interface VideoParticipant {
   odId: string;
@@ -64,6 +65,8 @@ export default function SessionPage() {
 
   // Theater mode
   const [isTheaterMode, setIsTheaterMode] = useState(false);
+  // Arcade mode
+  const [isArcadeMode, setIsArcadeMode] = useState(false);
 
   // Load session data
   useEffect(() => {
@@ -350,9 +353,8 @@ export default function SessionPage() {
               </p>
             </div>
           </div>
-          <span className={`px-2 py-1 rounded text-xs ${
-            isCallJoined ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
-          }`}>
+          <span className={`px-2 py-1 rounded text-xs ${isCallJoined ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
+            }`}>
             {participantList.length} in call
           </span>
         </header>
@@ -410,11 +412,11 @@ export default function SessionPage() {
               <div className="hidden md:grid h-full gap-2 p-2" style={{
                 gridTemplateColumns: participantList.length === 1 ? '1fr' :
                   participantList.length === 2 ? '1fr 1fr' :
-                  participantList.length <= 4 ? '1fr 1fr' :
-                  '1fr 1fr 1fr',
+                    participantList.length <= 4 ? '1fr 1fr' :
+                      '1fr 1fr 1fr',
                 gridTemplateRows: participantList.length <= 2 ? '1fr' :
                   participantList.length <= 4 ? '1fr 1fr' :
-                  '1fr 1fr'
+                    '1fr 1fr'
               }}>
                 {participantList.map((participant) => (
                   <VideoTile
@@ -434,11 +436,10 @@ export default function SessionPage() {
             <button
               onClick={toggleAudio}
               disabled={!isCallJoined}
-              className={`p-4 md:p-3 rounded-full transition-colors ${
-                isAudioOn
+              className={`p-4 md:p-3 rounded-full transition-colors ${isAudioOn
                   ? 'bg-gray-700 hover:bg-gray-600 text-white'
                   : 'bg-red-600 hover:bg-red-700 text-white'
-              } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
+                } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
             >
               {isAudioOn ? <Mic className="h-6 w-6 md:h-5 md:w-5" /> : <MicOff className="h-6 w-6 md:h-5 md:w-5" />}
@@ -448,11 +449,10 @@ export default function SessionPage() {
             <button
               onClick={toggleVideo}
               disabled={!isCallJoined}
-              className={`p-4 md:p-3 rounded-full transition-colors ${
-                isVideoOn
+              className={`p-4 md:p-3 rounded-full transition-colors ${isVideoOn
                   ? 'bg-gray-700 hover:bg-gray-600 text-white'
                   : 'bg-red-600 hover:bg-red-700 text-white'
-              } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
+                } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
             >
               {isVideoOn ? <Video className="h-6 w-6 md:h-5 md:w-5" /> : <VideoOff className="h-6 w-6 md:h-5 md:w-5" />}
@@ -473,11 +473,10 @@ export default function SessionPage() {
             {/* Chat Toggle - hidden on mobile */}
             <button
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
-              className={`hidden md:flex p-3 rounded-full transition-colors ${
-                activePanel === 'chat'
+              className={`hidden md:flex p-3 rounded-full transition-colors ${activePanel === 'chat'
                   ? 'bg-cg-sage text-white'
                   : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-              }`}
+                }`}
               title="Chat"
             >
               <MessageCircle className="h-5 w-5" />
@@ -486,11 +485,10 @@ export default function SessionPage() {
             {/* Participants Toggle - hidden on mobile */}
             <button
               onClick={() => setActivePanel(activePanel === 'participants' ? null : 'participants')}
-              className={`hidden md:flex p-3 rounded-full transition-colors ${
-                activePanel === 'participants'
+              className={`hidden md:flex p-3 rounded-full transition-colors ${activePanel === 'participants'
                   ? 'bg-cg-sage text-white'
                   : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-              }`}
+                }`}
               title="Participants"
             >
               <Users className="h-5 w-5" />
@@ -500,16 +498,24 @@ export default function SessionPage() {
             <button
               onClick={() => setIsTheaterMode(true)}
               disabled={!isCallJoined}
-              className={`p-4 md:p-3 rounded-full transition-colors ${
-                !isCallJoined
+              className={`p-4 md:p-3 rounded-full transition-colors ${!isCallJoined
                   ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
                   : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
-              }`}
+                }`}
               title="Theater Mode"
             >
               <Film className="h-6 w-6 md:h-5 md:w-5" />
             </button>
-            <button disabled className="hidden md:flex p-3 rounded-full bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed" title="Arcade (Coming Soon)">
+
+            <button
+              onClick={() => setIsArcadeMode(true)}
+              disabled={!isCallJoined}
+              className={`hidden md:flex p-3 rounded-full transition-colors ${!isCallJoined
+                  ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
+                  : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
+                }`}
+              title="Arcade (Mini & Mega)"
+            >
               <Gamepad2 className="h-5 w-5" />
             </button>
             <button disabled className="hidden md:flex p-3 rounded-full bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed" title="Whiteboard (Coming Soon)">
@@ -536,9 +542,8 @@ export default function SessionPage() {
                     messages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`p-3 rounded-lg ${
-                          msg.aria_flagged ? 'bg-yellow-900/30 border border-yellow-700' : 'bg-gray-700'
-                        }`}
+                        className={`p-3 rounded-lg ${msg.aria_flagged ? 'bg-yellow-900/30 border border-yellow-700' : 'bg-gray-700'
+                          }`}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-medium text-cg-sage">{msg.sender_name}</span>
@@ -613,6 +618,12 @@ export default function SessionPage() {
         onToggleVideo={toggleVideo}
         onToggleAudio={toggleAudio}
         onExit={() => setIsTheaterMode(false)}
+      />
+
+      <ArcadeMode
+        isActive={isArcadeMode}
+        userId={user?.id || ''}
+        onExit={() => setIsArcadeMode(false)}
       />
     </div>
   );
