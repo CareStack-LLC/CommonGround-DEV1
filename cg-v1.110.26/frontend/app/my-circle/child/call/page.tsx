@@ -20,7 +20,9 @@ import {
   Send,
 } from 'lucide-react';
 // Dynamically import TheaterMode to avoid SSR issues with Daily.co
-{ ssr: false }
+const TheaterMode = dynamic(
+  () => import('@/components/kidcoms/theater-mode').then((mod) => mod.TheaterMode),
+  { ssr: false }
 );
 // Dynamically import ArcadeMode
 const ArcadeMode = dynamic(
