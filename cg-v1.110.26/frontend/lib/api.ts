@@ -6535,15 +6535,27 @@ export interface SubscriptionPlan {
 }
 
 export interface SubscriptionStatus {
-  user_id: string;
-  subscription_tier: string;
-  subscription_status: string;
+  // Current plan
+  tier: string;  // "starter", "plus", "family_plus"
+  tier_display_name: string;  // "Starter", "Plus", "Family+"
+  status: string;  // "trial", "active", "past_due", "cancelled", "grant"
+
+  // Stripe subscription info
   stripe_subscription_id: string | null;
-  subscription_period_start: string | null;
-  subscription_period_end: string | null;
+  period_start: string | null;
+  period_end: string | null;
+
+  // Grant info
   has_active_grant: boolean;
+  grant_nonprofit_name: string | null;
   grant_expires_at: string | null;
-  features: Record<string, boolean | number | string>;
+
+  // Features
+  features: Record<string, { has_access: boolean; limit: number | null }>;
+
+  // Trial info
+  is_trial: boolean;
+  trial_ends_at: string | null;
 }
 
 export interface CheckoutSessionResponse {

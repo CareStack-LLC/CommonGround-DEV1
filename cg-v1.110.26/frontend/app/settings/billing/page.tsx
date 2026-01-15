@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { subscriptionAPI, grantsAPI, SubscriptionStatus, GrantStatusResponse } from '@/lib/api';
 import { Button } from '@/components/ui/button';
@@ -82,10 +83,12 @@ const PLAN_DETAILS: Record<string, {
 
 export default function BillingSettingsPage() {
   const { profile } = useAuth();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null);
   const [grantStatus, setGrantStatus] = useState<GrantStatusResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Grant code redemption
   const [grantCode, setGrantCode] = useState('');
@@ -103,6 +106,15 @@ export default function BillingSettingsPage() {
 
   // API availability state
   const [apiAvailable, setApiAvailable] = useState(true);
+
+  // Handle checkout success/cancelled URL params
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      setSuccessMessage('Your subscription has been activated! Welcome to your new plan.');
+    } else if (searchParams.get('cancelled') === 'true') {
+      setError('Checkout was cancelled. No changes were made to your subscription.');
+    }
+  }, [searchParams]);
 
   // Load subscription status
   useEffect(() => {
@@ -224,10 +236,10 @@ export default function BillingSettingsPage() {
     }
   };
 
-  const currentTier = subscription?.subscription_tier || profile?.subscription_tier || 'starter';
+  const currentTier = subscription?.tier || profile?.subscription_tier || 'starter';
   const currentPlan = PLAN_DETAILS[currentTier] || PLAN_DETAILS.starter;
   const isGrantUser = subscription?.has_active_grant || grantStatus?.has_active_grant;
-  const isPaidUser = subscription?.stripe_subscription_id !== null && subscription?.stripe_subscription_id !== undefined;
+  const isPaidUser = !!subscription?.stripe_subscription_id;
 
   if (isLoading) {
     return (
@@ -311,6 +323,13 @@ export default function BillingSettingsPage() {
       </div>
 
       {/* Success/Error Alerts */}
+      {successMessage && (
+        <Alert className="bg-cg-success-subtle border-cg-success/20">
+          <CheckCircle className="h-4 w-4 text-cg-success" />
+          <AlertDescription className="text-cg-success">{successMessage}</AlertDescription>
+        </Alert>
+      )}
+
       {redeemSuccess && (
         <Alert className="bg-cg-success-subtle border-cg-success/20">
           <CheckCircle className="h-4 w-4 text-cg-success" />
@@ -355,23 +374,23 @@ export default function BillingSettingsPage() {
                 <span className="text-lg font-semibold text-foreground">{currentPlan.price}</span>
                 <span>{currentPlan.period}</span>
               </div>
-              {isGrantUser && grantStatus?.nonprofit_name && (
+              {isGrantUser && (subscription?.grant_nonprofit_name || grantStatus?.nonprofit_name) && (
                 <p className="text-sm text-cg-sage mt-1">
-                  Provided by {grantStatus.nonprofit_name}
-                  {grantStatus.expires_at && (
+                  Provided by {subscription?.grant_nonprofit_name || grantStatus?.nonprofit_name}
+                  {(subscription?.grant_expires_at || grantStatus?.expires_at) && (
                     <span className="text-muted-foreground">
                       {' '}
-                      (expires {new Date(grantStatus.expires_at).toLocaleDateString()})
+                      (expires {new Date(subscription?.grant_expires_at || grantStatus?.expires_at || '').toLocaleDateString()})
                     </span>
                   )}
                 </p>
               )}
-              {isPaidUser && subscription?.subscription_period_end && (
+              {isPaidUser && subscription?.period_end && (
                 <p className="text-sm text-muted-foreground mt-1">
-                  {subscription.subscription_status === 'canceling'
+                  {subscription.status === 'canceling' || subscription.status === 'cancelled'
                     ? 'Access until '
                     : 'Renews '}
-                  {new Date(subscription.subscription_period_end).toLocaleDateString()}
+                  {new Date(subscription.period_end).toLocaleDateString()}
                 </p>
               )}
             </div>
