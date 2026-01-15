@@ -6579,8 +6579,11 @@ export interface SubscriptionStatus {
 }
 
 export interface CheckoutSessionResponse {
-  checkout_url: string;
-  session_id: string;
+  action: 'checkout' | 'upgraded';
+  checkout_url?: string;
+  session_id?: string;
+  new_tier?: string;
+  message?: string;
 }
 
 export interface PortalSessionResponse {

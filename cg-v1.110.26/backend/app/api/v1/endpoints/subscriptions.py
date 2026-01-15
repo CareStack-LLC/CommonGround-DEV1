@@ -10,7 +10,7 @@ Handles:
 """
 
 import logging
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -208,17 +208,29 @@ async def get_current_subscription(
 # =============================================================================
 
 
-@router.post("/checkout", response_model=CheckoutSessionResponse)
+class SubscribeResponse(BaseModel):
+    """Response for subscribe/checkout endpoint."""
+    action: str  # "checkout" or "upgraded"
+    checkout_url: Optional[str] = None
+    session_id: Optional[str] = None
+    new_tier: Optional[str] = None
+    message: Optional[str] = None
+
+
+@router.post("/checkout")
 async def create_checkout_session(
     request: CheckoutRequest,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
-):
+) -> SubscribeResponse:
     """
-    Create a Stripe Checkout session for subscription.
+    Subscribe to a plan or upgrade existing subscription.
 
-    Redirects user to Stripe-hosted checkout page.
+    - If user has NO subscription: Creates Stripe Checkout session
+    - If user HAS subscription: Updates it directly (no checkout needed)
     """
+    from datetime import datetime
+
     profile = current_user.profile
     if not profile:
         raise HTTPException(
@@ -231,51 +243,6 @@ async def create_checkout_session(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid plan code. Must be 'plus' or 'family_plus'"
-        )
-
-    # Check if user already has an active Stripe subscription
-    if profile.stripe_subscription_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You already have an active subscription. Use 'Manage Subscription' to change your plan."
-        )
-
-    # Also check Stripe directly in case our DB is out of sync
-    if profile.stripe_customer_id:
-        try:
-            existing_subs = await stripe_service.get_customer_subscriptions(
-                profile.stripe_customer_id
-            )
-            active_subs = [s for s in existing_subs if s["status"] in ("active", "trialing")]
-            if active_subs:
-                # Sync the subscription to our DB
-                sub = active_subs[0]
-                profile.stripe_subscription_id = sub["id"]
-                profile.subscription_status = sub["status"]
-                await db.commit()
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="You already have an active subscription. Use 'Manage Subscription' to change your plan."
-                )
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.warning(f"Failed to check existing subscriptions: {e}")
-
-    # Check if user is already on this plan
-    current_tier = feature_gate.get_effective_tier(current_user)
-    if current_tier == request.plan_code:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"You are already subscribed to the {request.plan_code} plan"
-        )
-
-    # Prevent downgrade via checkout (use portal for downgrades)
-    tier_order = {"starter": 0, "plus": 1, "family_plus": 2}
-    if tier_order.get(request.plan_code, 0) < tier_order.get(current_tier, 0):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="To downgrade your plan, please use the Manage Subscription button"
         )
 
     # Get plan for price ID
@@ -303,7 +270,7 @@ async def create_checkout_session(
             detail="Stripe price not configured for this plan"
         )
 
-    # Ensure customer exists
+    # Ensure customer exists in Stripe
     if not profile.stripe_customer_id:
         customer = await stripe_service.create_customer(
             email=current_user.email,
@@ -313,11 +280,95 @@ async def create_checkout_session(
         profile.stripe_customer_id = customer["id"]
         await db.commit()
 
-    # Create checkout session
+    # =========================================================================
+    # CRITICAL: Check Stripe directly for existing subscriptions
+    # =========================================================================
+    existing_subscription_id = None
+
+    try:
+        existing_subs = await stripe_service.get_customer_subscriptions(
+            profile.stripe_customer_id
+        )
+        active_subs = [s for s in existing_subs if s["status"] in ("active", "trialing")]
+
+        if active_subs:
+            existing_subscription_id = active_subs[0]["id"]
+            current_price_id = active_subs[0].get("price_id")
+
+            # Sync to our DB if needed
+            if not profile.stripe_subscription_id:
+                profile.stripe_subscription_id = existing_subscription_id
+                profile.subscription_status = active_subs[0]["status"]
+
+            # Check if already on this plan
+            if current_price_id == price_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"You are already subscribed to the {request.plan_code} plan"
+                )
+
+            logger.info(
+                f"Found existing subscription {existing_subscription_id} for customer "
+                f"{profile.stripe_customer_id}, will upgrade instead of creating new"
+            )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.warning(f"Failed to check existing subscriptions: {e}")
+
+    # =========================================================================
+    # If user has existing subscription: UPDATE IT (don't create new)
+    # =========================================================================
+    if existing_subscription_id:
+        try:
+            updated_sub = await stripe_service.update_subscription_price(
+                subscription_id=existing_subscription_id,
+                new_price_id=price_id,
+                proration_behavior="create_prorations",
+            )
+
+            # Update our database
+            profile.subscription_tier = request.plan_code
+            profile.subscription_status = updated_sub["status"]
+            profile.stripe_subscription_id = existing_subscription_id
+
+            if updated_sub.get("current_period_start"):
+                profile.subscription_period_start = datetime.fromtimestamp(
+                    updated_sub["current_period_start"]
+                )
+            if updated_sub.get("current_period_end"):
+                profile.subscription_period_end = datetime.fromtimestamp(
+                    updated_sub["current_period_end"]
+                )
+
+            await db.commit()
+
+            logger.info(
+                f"UPGRADED subscription {existing_subscription_id} to {request.plan_code} "
+                f"for user {current_user.id}"
+            )
+
+            return SubscribeResponse(
+                action="upgraded",
+                new_tier=request.plan_code,
+                message=f"Successfully upgraded to {plan.display_name}!"
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to upgrade subscription: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to upgrade subscription: {str(e)}"
+            )
+
+    # =========================================================================
+    # No existing subscription: Create Stripe Checkout session
+    # =========================================================================
     trial_days = plan.trial_days if profile.subscription_status == "trial" else 0
 
     logger.info(
-        f"Creating checkout session: customer={profile.stripe_customer_id}, "
+        f"Creating NEW checkout session: customer={profile.stripe_customer_id}, "
         f"price={price_id}, plan={request.plan_code}"
     )
 
@@ -336,7 +387,8 @@ async def create_checkout_session(
             f"url={checkout_data['url'][:50]}..."
         )
 
-        return CheckoutSessionResponse(
+        return SubscribeResponse(
+            action="checkout",
             checkout_url=checkout_data["url"],
             session_id=checkout_data["id"]
         )

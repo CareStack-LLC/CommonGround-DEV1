@@ -247,30 +247,25 @@ export default function BillingSettingsPage() {
       setIsProcessing(planCode);
       setError(null);
 
-      // Check if user already has a subscription
-      const hasExistingSubscription = subscription?.stripe_subscription_id ||
-        (currentTier !== 'starter' && subscription?.status && subscription.status !== 'trial');
+      // Call checkout endpoint - it handles both new subscriptions AND upgrades
+      const result = await subscriptionAPI.createCheckout(
+        planCode,
+        `${window.location.origin}/settings/billing?success=true`,
+        `${window.location.origin}/settings/billing?cancelled=true`
+      );
 
-      if (hasExistingSubscription) {
-        // Use upgrade endpoint to modify existing subscription
-        const result = await subscriptionAPI.upgradeSubscription(planCode, 'monthly');
-        if (result.success) {
-          // Refresh subscription data
-          const updatedSubscription = await subscriptionAPI.getCurrentSubscription();
-          setSubscription(updatedSubscription);
-          setError(null);
-          // Show success message briefly
-          alert(result.message);
-        }
+      // Check response action type
+      if (result.action === 'upgraded') {
+        // Subscription was upgraded directly - refresh and show success
+        const updatedSubscription = await subscriptionAPI.getCurrentSubscription();
+        setSubscription(updatedSubscription);
         setIsProcessing(null);
-      } else {
-        // No existing subscription - go to checkout
-        const result = await subscriptionAPI.createCheckout(
-          planCode,
-          `${window.location.origin}/settings/billing?success=true`,
-          `${window.location.origin}/settings/billing?cancelled=true`
-        );
+        alert(result.message || 'Successfully upgraded your plan!');
+      } else if (result.action === 'checkout' && result.checkout_url) {
+        // New subscription - redirect to Stripe Checkout
         window.location.href = result.checkout_url;
+      } else {
+        throw new Error('Unexpected response from server');
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process upgrade';
