@@ -505,37 +505,51 @@ export default function BillingSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Sparkles className="h-5 w-5 text-cg-amber" />
-              {currentTier === 'starter' ? 'Upgrade Your Plan' : 'Change Your Plan'}
+              Choose Your Plan
             </CardTitle>
             <CardDescription>
-              {currentTier === 'starter'
-                ? 'Get more features by upgrading to a higher tier'
-                : 'Upgrade for more features or downgrade to save'}
+              Select the plan that best fits your co-parenting needs
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-3">
-              {/* Starter Plan - show for paid users to downgrade */}
-              {currentTier !== 'starter' && (
-                <div className="rounded-lg border border-border p-4">
-                  <h3 className="font-semibold text-foreground">Starter</h3>
-                  <p className="text-2xl font-bold text-foreground">
-                    Free
-                  </p>
-                  <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-cg-sage" />
-                      Basic messaging
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-cg-sage" />
-                      Schedule tracking
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-cg-sage" />
-                      Silent handoff GPS
-                    </li>
-                  </ul>
+              {/* Starter Plan */}
+              <div className={`rounded-lg border p-4 relative ${currentTier === 'starter' ? 'border-cg-sage ring-2 ring-cg-sage/20' : 'border-border'}`}>
+                {currentTier === 'starter' && (
+                  <div className="absolute -top-3 left-4">
+                    <span className="bg-cg-sage text-white text-xs px-2 py-1 rounded-full">
+                      Current Plan
+                    </span>
+                  </div>
+                )}
+                <h3 className="font-semibold text-foreground mt-2">Starter</h3>
+                <p className="text-2xl font-bold text-foreground">
+                  Free
+                </p>
+                <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-cg-sage" />
+                    Basic messaging
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-cg-sage" />
+                    Schedule tracking
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-cg-sage" />
+                    Silent handoff GPS
+                  </li>
+                </ul>
+                {currentTier === 'starter' ? (
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                    disabled
+                  >
+                    <Check className="mr-2 h-4 w-4" />
+                    Current Plan
+                  </Button>
+                ) : (
                   <Button
                     variant="outline"
                     className="w-full mt-4"
@@ -547,37 +561,52 @@ export default function BillingSettingsPage() {
                     ) : null}
                     Downgrade to Starter
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Plus Plan */}
-              {currentTier !== 'plus' && (
-                <div className={`rounded-lg border p-4 relative ${currentTier === 'starter' ? 'border-cg-sage' : 'border-border'}`}>
-                  {currentTier === 'starter' && (
-                    <div className="absolute -top-3 left-4">
-                      <span className="bg-cg-sage text-white text-xs px-2 py-1 rounded-full">
-                        Most Popular
-                      </span>
-                    </div>
-                  )}
-                  <h3 className="font-semibold text-foreground mt-2">Plus</h3>
-                  <p className="text-2xl font-bold text-foreground">
-                    $12<span className="text-sm font-normal text-muted-foreground">/mo</span>
-                  </p>
-                  <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-cg-sage" />
-                      QuickAccords auto-scheduling
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-cg-sage" />
-                      Custody dashboard
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-cg-sage" />
-                      No ClearFund fees
-                    </li>
-                  </ul>
+              <div className={`rounded-lg border p-4 relative ${currentTier === 'plus' ? 'border-cg-sage ring-2 ring-cg-sage/20' : 'border-border'}`}>
+                {currentTier === 'plus' ? (
+                  <div className="absolute -top-3 left-4">
+                    <span className="bg-cg-sage text-white text-xs px-2 py-1 rounded-full">
+                      Current Plan
+                    </span>
+                  </div>
+                ) : (
+                  <div className="absolute -top-3 left-4">
+                    <span className="bg-cg-amber text-white text-xs px-2 py-1 rounded-full">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
+                <h3 className="font-semibold text-foreground mt-2">Plus</h3>
+                <p className="text-2xl font-bold text-foreground">
+                  $12<span className="text-sm font-normal text-muted-foreground">/mo</span>
+                </p>
+                <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-cg-sage" />
+                    QuickAccords auto-scheduling
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-cg-sage" />
+                    Custody dashboard
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-cg-sage" />
+                    No ClearFund fees
+                  </li>
+                </ul>
+                {currentTier === 'plus' ? (
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                    disabled
+                  >
+                    <Check className="mr-2 h-4 w-4" />
+                    Current Plan
+                  </Button>
+                ) : (
                   <Button
                     variant={currentTier === 'family_plus' ? 'outline' : 'default'}
                     className="w-full mt-4"
@@ -589,32 +618,48 @@ export default function BillingSettingsPage() {
                     ) : null}
                     {currentTier === 'family_plus' ? 'Downgrade to Plus' : 'Upgrade to Plus'}
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Family+ Plan */}
-              {currentTier !== 'family_plus' && (
-                <div className="rounded-lg border border-border p-4">
-                  <h3 className="font-semibold text-foreground">Family+</h3>
-                  <p className="text-2xl font-bold text-foreground">
-                    $25<span className="text-sm font-normal text-muted-foreground">/mo</span>
-                  </p>
-                  <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-cg-sage" />
-                      KidsCom child portal
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-cg-sage" />
-                      Watch Together theater
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="h-3 w-3 text-cg-sage" />
-                      Court-ready reports
-                    </li>
-                  </ul>
+              <div className={`rounded-lg border p-4 relative ${currentTier === 'family_plus' ? 'border-cg-sage ring-2 ring-cg-sage/20' : 'border-border'}`}>
+                {currentTier === 'family_plus' && (
+                  <div className="absolute -top-3 left-4">
+                    <span className="bg-cg-sage text-white text-xs px-2 py-1 rounded-full">
+                      Current Plan
+                    </span>
+                  </div>
+                )}
+                <h3 className={`font-semibold text-foreground ${currentTier === 'family_plus' ? 'mt-2' : ''}`}>Family+</h3>
+                <p className="text-2xl font-bold text-foreground">
+                  $25<span className="text-sm font-normal text-muted-foreground">/mo</span>
+                </p>
+                <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-cg-sage" />
+                    KidsCom child portal
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-cg-sage" />
+                    Watch Together theater
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-cg-sage" />
+                    Court-ready reports
+                  </li>
+                </ul>
+                {currentTier === 'family_plus' ? (
                   <Button
-                    variant={currentTier === 'starter' ? 'outline' : 'default'}
+                    variant="outline"
+                    className="w-full mt-4"
+                    disabled
+                  >
+                    <Check className="mr-2 h-4 w-4" />
+                    Current Plan
+                  </Button>
+                ) : (
+                  <Button
+                    variant="default"
                     className="w-full mt-4"
                     onClick={() => handleUpgrade('family_plus')}
                     disabled={isProcessing === 'family_plus'}
@@ -622,10 +667,10 @@ export default function BillingSettingsPage() {
                     {isProcessing === 'family_plus' ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : null}
-                    {currentTier === 'plus' ? 'Upgrade to Family+' : 'Choose Family+'}
+                    {currentTier === 'plus' ? 'Upgrade to Family+' : 'Upgrade to Family+'}
                   </Button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
