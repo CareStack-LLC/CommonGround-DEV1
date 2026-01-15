@@ -232,6 +232,22 @@ async def create_checkout_session(
             detail="Invalid plan code. Must be 'plus' or 'family_plus'"
         )
 
+    # Check if user is already on this plan
+    current_tier = feature_gate.get_effective_tier(current_user)
+    if current_tier == request.plan_code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"You are already subscribed to the {request.plan_code} plan"
+        )
+
+    # Prevent downgrade via checkout (use portal for downgrades)
+    tier_order = {"starter": 0, "plus": 1, "family_plus": 2}
+    if tier_order.get(request.plan_code, 0) < tier_order.get(current_tier, 0):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="To downgrade your plan, please use the Manage Subscription button"
+        )
+
     # Get plan for price ID
     result = await db.execute(
         select(SubscriptionPlan)

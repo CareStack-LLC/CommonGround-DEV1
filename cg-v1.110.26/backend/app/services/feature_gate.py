@@ -124,7 +124,8 @@ class FeatureGate:
             return "plus"
 
         # Check subscription status
-        if profile.subscription_status in ("active", "trial"):
+        # Note: Stripe returns "trialing" not "trial", and we set "cancelling" for cancel_at_period_end
+        if profile.subscription_status in ("active", "trial", "trialing", "cancelling"):
             return profile.subscription_tier
 
         # Past due or cancelled - revert to starter

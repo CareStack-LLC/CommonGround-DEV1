@@ -111,22 +111,32 @@ export default function BillingSettingsPage() {
   useEffect(() => {
     if (searchParams.get('success') === 'true') {
       setSuccessMessage('Your subscription has been activated! Welcome to your new plan.');
-      // Refetch subscription data after a delay to allow webhook processing
-      const refetchWithDelay = async () => {
-        // Wait for webhook to process
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        try {
-          const [subData, grantData] = await Promise.all([
-            subscriptionAPI.getCurrentSubscription(),
-            grantsAPI.getStatus(),
-          ]);
-          setSubscription(subData);
-          setGrantStatus(grantData);
-        } catch (err) {
-          console.error('Failed to refresh subscription:', err);
+      // Poll for subscription update (webhook may take a moment to process)
+      const pollForUpdate = async () => {
+        const maxAttempts = 5;
+        const delayMs = 2000;
+
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          try {
+            const [subData, grantData] = await Promise.all([
+              subscriptionAPI.getCurrentSubscription(),
+              grantsAPI.getStatus(),
+            ]);
+            setSubscription(subData);
+            setGrantStatus(grantData);
+
+            // If we got a paid tier, we're done
+            if (subData.tier && subData.tier !== 'starter') {
+              console.log(`Subscription updated to ${subData.tier} after ${attempt + 1} attempts`);
+              break;
+            }
+          } catch (err) {
+            console.error('Failed to refresh subscription:', err);
+          }
         }
       };
-      refetchWithDelay();
+      pollForUpdate();
     } else if (searchParams.get('cancelled') === 'true') {
       setError('Checkout was cancelled. No changes were made to your subscription.');
     }
@@ -223,8 +233,15 @@ export default function BillingSettingsPage() {
   };
 
   const handleUpgrade = async (planCode: string) => {
+    // Prevent upgrading to current plan
+    if (planCode === currentTier) {
+      setError(`You are already on the ${PLAN_DETAILS[planCode]?.name || planCode} plan`);
+      return;
+    }
+
     try {
       setIsProcessing(planCode);
+      setError(null);
       const result = await subscriptionAPI.createCheckout(
         planCode,
         `${window.location.origin}/settings/billing?success=true`,
@@ -485,7 +502,7 @@ export default function BillingSettingsPage() {
                   <Button
                     className="w-full mt-4"
                     onClick={() => handleUpgrade('plus')}
-                    disabled={isProcessing === 'plus'}
+                    disabled={isProcessing === 'plus' || currentTier === 'plus'}
                   >
                     {isProcessing === 'plus' ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -496,37 +513,39 @@ export default function BillingSettingsPage() {
               )}
 
               {/* Family+ Plan - show if user can upgrade to Family+ */}
-              <div className="rounded-lg border border-border p-4">
-                <h3 className="font-semibold text-foreground">Family+</h3>
-                <p className="text-2xl font-bold text-foreground">
-                  $25<span className="text-sm font-normal text-muted-foreground">/mo</span>
-                </p>
-                <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-3 w-3 text-cg-sage" />
-                    KidsCom child portal
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-3 w-3 text-cg-sage" />
-                    Watch Together theater
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-3 w-3 text-cg-sage" />
-                    Court-ready reports
-                  </li>
-                </ul>
-                <Button
-                  variant={currentTier !== 'plus' && currentTier !== 'family_plus' ? 'outline' : 'default'}
-                  className="w-full mt-4"
-                  onClick={() => handleUpgrade('family_plus')}
-                  disabled={isProcessing === 'family_plus'}
-                >
-                  {isProcessing === 'family_plus' ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : null}
-                  {currentTier === 'plus' ? 'Upgrade to Family+' : 'Choose Family+'}
-                </Button>
-              </div>
+              {currentTier !== 'family_plus' && (
+                <div className="rounded-lg border border-border p-4">
+                  <h3 className="font-semibold text-foreground">Family+</h3>
+                  <p className="text-2xl font-bold text-foreground">
+                    $25<span className="text-sm font-normal text-muted-foreground">/mo</span>
+                  </p>
+                  <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-cg-sage" />
+                      KidsCom child portal
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-cg-sage" />
+                      Watch Together theater
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-cg-sage" />
+                      Court-ready reports
+                    </li>
+                  </ul>
+                  <Button
+                    variant={currentTier === 'starter' ? 'outline' : 'default'}
+                    className="w-full mt-4"
+                    onClick={() => handleUpgrade('family_plus')}
+                    disabled={isProcessing === 'family_plus' || currentTier === 'family_plus'}
+                  >
+                    {isProcessing === 'family_plus' ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}
+                    {currentTier === 'plus' ? 'Upgrade to Family+' : 'Choose Family+'}
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
