@@ -461,6 +461,26 @@ export const authAPI = {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   },
+
+  /**
+   * Request a password reset email
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    await fetchAPI('/auth/password-reset/request', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  /**
+   * Reset password with token
+   */
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    await fetchAPI('/auth/password-reset/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ token, new_password: newPassword }),
+    });
+  },
 };
 
 // ============================================================================

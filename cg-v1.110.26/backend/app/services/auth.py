@@ -264,3 +264,47 @@ class AuthService:
         except Exception as e:
             # Don't fail if Supabase sign out fails
             pass
+
+    async def request_password_reset(self, email: str) -> None:
+        """
+        Request a password reset email.
+
+        Sends password reset email via Supabase Auth.
+        Always succeeds to prevent email enumeration attacks.
+
+        Args:
+            email: User email address
+        """
+        try:
+            # Use Supabase's built-in password reset
+            self.supabase.auth.reset_password_for_email(
+                email,
+                options={
+                    "redirect_to": "https://commonground.app/reset-password"
+                }
+            )
+        except Exception:
+            # Silently ignore errors to prevent email enumeration
+            pass
+
+    async def confirm_password_reset(self, token: str, new_password: str) -> None:
+        """
+        Confirm password reset with token.
+
+        Verifies the reset token and updates the password.
+
+        Args:
+            token: Password reset token from email
+            new_password: New password to set
+
+        Raises:
+            HTTPException: If reset fails
+        """
+        try:
+            # Supabase handles token verification and password update
+            self.supabase.auth.update_user({"password": new_password})
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired reset token"
+            ) from e

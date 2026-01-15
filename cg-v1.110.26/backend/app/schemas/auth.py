@@ -86,3 +86,35 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class PasswordResetRequest(BaseModel):
+    """Request to initiate password reset."""
+
+    email: EmailStr
+
+
+class PasswordResetConfirm(BaseModel):
+    """Confirm password reset with token."""
+
+    token: str = Field(..., min_length=1)
+    new_password: str = Field(..., min_length=8, max_length=128)
+
+    @field_validator('new_password')
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        """Validate password meets security requirements."""
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if len(v) > 128:
+            raise ValueError('Password must be less than 128 characters')
+
+        has_letter = any(c.isalpha() for c in v)
+        has_number = any(c.isdigit() for c in v)
+
+        if not has_letter:
+            raise ValueError('Password must contain at least one letter')
+        if not has_number:
+            raise ValueError('Password must contain at least one number')
+
+        return v

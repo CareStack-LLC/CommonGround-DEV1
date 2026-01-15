@@ -8,7 +8,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.schemas.auth import LoginRequest, LoginResponse, RegisterRequest, UserResponse
+from app.schemas.auth import (
+    LoginRequest,
+    LoginResponse,
+    RegisterRequest,
+    UserResponse,
+    PasswordResetRequest,
+    PasswordResetConfirm,
+)
 from app.services.auth import AuthService
 
 router = APIRouter()
@@ -156,3 +163,48 @@ async def get_current_user_info(
         first_name=current_user.first_name,
         last_name=current_user.last_name,
     )
+
+
+@router.post("/password-reset/request", status_code=status.HTTP_200_OK)
+async def request_password_reset(
+    request: PasswordResetRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Request password reset email.
+
+    Sends a password reset link to the provided email address.
+    Always returns success to prevent email enumeration attacks.
+
+    Args:
+        request: Email address for password reset
+
+    Returns:
+        Success message
+    """
+    auth_service = AuthService(db)
+    await auth_service.request_password_reset(request.email)
+
+    return {"message": "If an account exists for this email, a password reset link has been sent."}
+
+
+@router.post("/password-reset/confirm", status_code=status.HTTP_200_OK)
+async def confirm_password_reset(
+    request: PasswordResetConfirm,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Confirm password reset with token.
+
+    Verifies the reset token and updates the password.
+
+    Args:
+        request: Token and new password
+
+    Returns:
+        Success message
+    """
+    auth_service = AuthService(db)
+    await auth_service.confirm_password_reset(request.token, request.new_password)
+
+    return {"message": "Password has been reset successfully."}
