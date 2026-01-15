@@ -483,6 +483,9 @@ class Payout(Base, UUIDMixin, TimestampMixin):
 
     # Relationships
     recipient_wallet: Mapped["Wallet"] = relationship("Wallet", back_populates="payouts_received")
+    fee: Mapped[Optional["ClearFundFee"]] = relationship(
+        "ClearFundFee", back_populates="payout", uselist=False
+    )
 
     # Indexes
     __table_args__ = (

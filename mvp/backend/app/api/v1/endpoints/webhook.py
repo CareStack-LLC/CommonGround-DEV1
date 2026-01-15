@@ -336,15 +336,227 @@ async def handle_payout_failed(db: AsyncSession, event_data: dict) -> None:
 
 
 # ============================================================================
+# Subscription Event Handlers
+# ============================================================================
+
+
+async def handle_subscription_created(db: AsyncSession, event_data: dict) -> None:
+    """Handle new subscription creation."""
+    from app.models.user import UserProfile
+    from app.models.subscription import SubscriptionPlan
+
+    subscription = event_data.get("subscription", {})
+    customer_id = subscription.get("customer")
+    subscription_id = subscription.get("id")
+    status = subscription.get("status")
+
+    # Find user by Stripe customer ID
+    result = await db.execute(
+        select(UserProfile).where(UserProfile.stripe_customer_id == customer_id)
+    )
+    profile = result.scalar_one_or_none()
+
+    if not profile:
+        logger.warning(f"No profile found for Stripe customer {customer_id}")
+        return
+
+    # Get the plan from price ID
+    items = subscription.get("items", {}).get("data", [])
+    if items:
+        price_id = items[0].get("price", {}).get("id")
+
+        # Find plan by price ID
+        plan_result = await db.execute(
+            select(SubscriptionPlan).where(
+                (SubscriptionPlan.stripe_price_id_monthly == price_id) |
+                (SubscriptionPlan.stripe_price_id_annual == price_id)
+            )
+        )
+        plan = plan_result.scalar_one_or_none()
+
+        if plan:
+            profile.subscription_tier = plan.plan_code
+
+    # Update profile
+    profile.stripe_subscription_id = subscription_id
+    profile.subscription_status = "trial" if status == "trialing" else "active"
+    profile.subscription_period_start = datetime.fromtimestamp(
+        subscription.get("current_period_start", 0)
+    )
+    profile.subscription_period_end = datetime.fromtimestamp(
+        subscription.get("current_period_end", 0)
+    )
+
+    logger.info(f"Subscription created for user profile {profile.id}: {subscription_id}")
+
+
+async def handle_subscription_updated(db: AsyncSession, event_data: dict) -> None:
+    """Handle subscription updates (renewals, plan changes, cancellations)."""
+    from app.models.user import UserProfile
+    from app.models.subscription import SubscriptionPlan
+
+    subscription = event_data.get("subscription", {})
+    customer_id = subscription.get("customer")
+    subscription_id = subscription.get("id")
+    status = subscription.get("status")
+
+    # Find user by Stripe customer ID
+    result = await db.execute(
+        select(UserProfile).where(UserProfile.stripe_customer_id == customer_id)
+    )
+    profile = result.scalar_one_or_none()
+
+    if not profile:
+        logger.warning(f"No profile found for Stripe customer {customer_id}")
+        return
+
+    # Map Stripe status to our status
+    status_map = {
+        "active": "active",
+        "trialing": "trial",
+        "past_due": "past_due",
+        "canceled": "cancelled",
+        "unpaid": "past_due",
+        "incomplete": "trial",
+        "incomplete_expired": "cancelled",
+        "paused": "cancelled",
+    }
+
+    profile.subscription_status = status_map.get(status, "active")
+
+    # Update period dates
+    profile.subscription_period_start = datetime.fromtimestamp(
+        subscription.get("current_period_start", 0)
+    )
+    profile.subscription_period_end = datetime.fromtimestamp(
+        subscription.get("current_period_end", 0)
+    )
+
+    # Check if plan changed
+    items = subscription.get("items", {}).get("data", [])
+    if items:
+        price_id = items[0].get("price", {}).get("id")
+
+        plan_result = await db.execute(
+            select(SubscriptionPlan).where(
+                (SubscriptionPlan.stripe_price_id_monthly == price_id) |
+                (SubscriptionPlan.stripe_price_id_annual == price_id)
+            )
+        )
+        plan = plan_result.scalar_one_or_none()
+
+        if plan and plan.plan_code != profile.subscription_tier:
+            logger.info(
+                f"Plan changed for {profile.id}: {profile.subscription_tier} -> {plan.plan_code}"
+            )
+            profile.subscription_tier = plan.plan_code
+
+    logger.info(f"Subscription updated for user profile {profile.id}: status={status}")
+
+
+async def handle_subscription_deleted(db: AsyncSession, event_data: dict) -> None:
+    """Handle subscription cancellation/deletion."""
+    from app.models.user import UserProfile
+
+    subscription = event_data.get("subscription", {})
+    customer_id = subscription.get("customer")
+
+    # Find user by Stripe customer ID
+    result = await db.execute(
+        select(UserProfile).where(UserProfile.stripe_customer_id == customer_id)
+    )
+    profile = result.scalar_one_or_none()
+
+    if not profile:
+        logger.warning(f"No profile found for Stripe customer {customer_id}")
+        return
+
+    # Downgrade to starter tier
+    profile.subscription_tier = "starter"
+    profile.subscription_status = "cancelled"
+    profile.stripe_subscription_id = None
+    profile.subscription_period_start = None
+    profile.subscription_period_end = None
+
+    logger.info(f"Subscription deleted for user profile {profile.id}, downgraded to starter")
+
+
+async def handle_invoice_paid(db: AsyncSession, event_data: dict) -> None:
+    """Handle successful invoice payment (subscription renewal)."""
+    invoice = event_data.get("invoice", {})
+    customer_id = invoice.get("customer")
+    subscription_id = invoice.get("subscription")
+
+    logger.info(
+        f"Invoice paid for customer {customer_id}, subscription {subscription_id}"
+    )
+    # Subscription updated event will handle the actual status update
+
+
+async def handle_invoice_payment_failed(db: AsyncSession, event_data: dict) -> None:
+    """Handle failed invoice payment."""
+    from app.models.user import UserProfile
+
+    invoice = event_data.get("invoice", {})
+    customer_id = invoice.get("customer")
+
+    # Find user by Stripe customer ID
+    result = await db.execute(
+        select(UserProfile).where(UserProfile.stripe_customer_id == customer_id)
+    )
+    profile = result.scalar_one_or_none()
+
+    if not profile:
+        logger.warning(f"No profile found for Stripe customer {customer_id}")
+        return
+
+    # Mark as past due
+    profile.subscription_status = "past_due"
+
+    logger.warning(
+        f"Invoice payment failed for user profile {profile.id}, marked as past_due"
+    )
+    # Could trigger notification here
+
+
+async def handle_checkout_session_completed(db: AsyncSession, event_data: dict) -> None:
+    """Handle completed Stripe Checkout session."""
+    session = event_data.get("session", {})
+    customer_id = session.get("customer")
+    subscription_id = session.get("subscription")
+    mode = session.get("mode")
+
+    if mode != "subscription":
+        return
+
+    logger.info(
+        f"Checkout completed for customer {customer_id}, subscription {subscription_id}"
+    )
+    # The subscription.created webhook will handle the actual subscription setup
+
+
+# ============================================================================
 # Handler Mapping
 # ============================================================================
 
 WEBHOOK_HANDLERS = {
+    # Payment events
     "payment_intent.succeeded": handle_payment_intent_succeeded,
     "payment_intent.payment_failed": handle_payment_intent_failed,
+    # Connect account events
     "account.updated": handle_account_updated,
+    # Transfer/payout events
     "transfer.created": handle_transfer_created,
     "transfer.paid": handle_transfer_paid,
     "payout.paid": handle_payout_paid,
     "payout.failed": handle_payout_failed,
+    # Subscription events
+    "customer.subscription.created": handle_subscription_created,
+    "customer.subscription.updated": handle_subscription_updated,
+    "customer.subscription.deleted": handle_subscription_deleted,
+    # Invoice events
+    "invoice.paid": handle_invoice_paid,
+    "invoice.payment_failed": handle_invoice_payment_failed,
+    # Checkout events
+    "checkout.session.completed": handle_checkout_session_completed,
 }

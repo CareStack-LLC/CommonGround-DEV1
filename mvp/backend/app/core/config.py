@@ -73,6 +73,8 @@ class Settings(BaseSettings):
     STRIPE_SECRET_KEY: str
     STRIPE_PUBLISHABLE_KEY: str
     STRIPE_WEBHOOK_SECRET: str
+    STRIPE_PLUS_PRICE_ID: str = ""
+    STRIPE_FAMILY_PLUS_PRICE_ID: str = ""
 
     # Mapbox (for geocoding in Silent Handoff)
     MAPBOX_API_KEY: str = "pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA"

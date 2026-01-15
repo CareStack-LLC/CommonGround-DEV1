@@ -52,6 +52,12 @@ class User(Base, UUIDMixin, TimestampMixin):
     cases_as_participant: Mapped[list["CaseParticipant"]] = relationship(
         "CaseParticipant", back_populates="user", cascade="all, delete-orphan"
     )
+    grant_redemptions: Mapped[list["GrantRedemption"]] = relationship(
+        "GrantRedemption", back_populates="user", cascade="all, delete-orphan"
+    )
+    clearfund_fees: Mapped[list["ClearFundFee"]] = relationship(
+        "ClearFundFee", back_populates="user", cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<User {self.email}>"
@@ -92,13 +98,23 @@ class UserProfile(Base, UUIDMixin, TimestampMixin):
 
     # Subscription
     subscription_tier: Mapped[str] = mapped_column(
-        String(20), default="essential"
-    )  # essential, complete, premium
+        String(20), default="starter"
+    )  # starter, plus, family_plus
     subscription_status: Mapped[str] = mapped_column(
         String(20), default="trial"
-    )  # trial, active, past_due, cancelled
+    )  # trial, active, past_due, cancelled, grant
     subscription_ends_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Stripe integration
     stripe_customer_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    subscription_period_start: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    subscription_period_end: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Grant code (if using nonprofit grant instead of paid subscription)
+    active_grant_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("grant_redemptions.id"), nullable=True
+    )
 
     # Preferences
     notification_email: Mapped[bool] = mapped_column(Boolean, default=True)

@@ -5,7 +5,7 @@ import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
 import { cn } from '@/lib/utils';
-import { User, Bell, Shield, ChevronLeft } from 'lucide-react';
+import { User, Bell, Shield, CreditCard, ChevronLeft } from 'lucide-react';
 
 /**
  * CommonGround Settings Layout
@@ -27,6 +27,12 @@ const settingsNavItems: SettingsNavItem[] = [
     path: '/settings/account',
     icon: User,
     description: 'Profile and personal info',
+  },
+  {
+    name: 'Billing',
+    path: '/settings/billing',
+    icon: CreditCard,
+    description: 'Subscription and payments',
   },
   {
     name: 'Notifications',
