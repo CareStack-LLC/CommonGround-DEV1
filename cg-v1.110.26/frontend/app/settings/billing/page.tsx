@@ -101,6 +101,9 @@ export default function BillingSettingsPage() {
   // Checkout state
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
+  // API availability state
+  const [apiAvailable, setApiAvailable] = useState(true);
+
   // Load subscription status
   useEffect(() => {
     const loadData = async () => {
@@ -112,9 +115,21 @@ export default function BillingSettingsPage() {
         ]);
         setSubscription(subData);
         setGrantStatus(grantData);
-      } catch (err) {
+        setApiAvailable(true);
+      } catch (err: unknown) {
         console.error('Failed to load subscription data:', err);
-        setError('Failed to load subscription information. Please try again.');
+        // Check if it's a 404 (API not deployed yet) vs other error
+        const is404 = err instanceof Error && (
+          err.message.includes('404') ||
+          err.message.includes('Not Found') ||
+          err.message.includes('Failed to fetch')
+        );
+        if (is404) {
+          // API not available yet - show fallback UI
+          setApiAvailable(false);
+        } else {
+          setError('Failed to load subscription information. Please try again.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -212,12 +227,75 @@ export default function BillingSettingsPage() {
   const currentTier = subscription?.subscription_tier || profile?.subscription_tier || 'starter';
   const currentPlan = PLAN_DETAILS[currentTier] || PLAN_DETAILS.starter;
   const isGrantUser = subscription?.has_active_grant || grantStatus?.has_active_grant;
-  const isPaidUser = subscription?.stripe_subscription_id !== null;
+  const isPaidUser = subscription?.stripe_subscription_id !== null && subscription?.stripe_subscription_id !== undefined;
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // Fallback UI when subscription API is not yet deployed
+  if (!apiAvailable) {
+    const fallbackTier = profile?.subscription_tier || 'starter';
+    const fallbackPlan = PLAN_DETAILS[fallbackTier] || PLAN_DETAILS.starter;
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-xl font-semibold text-foreground">Billing & Subscription</h2>
+          <p className="text-muted-foreground">
+            Manage your subscription and payment information
+          </p>
+        </div>
+
+        {/* Current Plan */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Crown className="h-5 w-5 text-cg-amber" />
+              Current Plan
+            </CardTitle>
+            <CardDescription>Your current subscription tier</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl font-bold text-foreground">{fallbackPlan.name}</span>
+              {fallbackPlan.badge && (
+                <span className="bg-cg-sage text-white text-xs px-2 py-0.5 rounded-full">
+                  {fallbackPlan.badge}
+                </span>
+              )}
+            </div>
+            <div className="text-muted-foreground mb-4">
+              <span className="text-lg font-semibold text-foreground">{fallbackPlan.price}</span>
+              <span>{fallbackPlan.period}</span>
+            </div>
+            <div className="pt-4 border-t border-border">
+              <p className="text-sm font-medium text-foreground mb-2">Included in your plan:</p>
+              <ul className="grid gap-1 text-sm text-muted-foreground">
+                {fallbackPlan.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-cg-sage flex-shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Coming Soon Notice */}
+        <Alert className="bg-cg-sage-subtle border-cg-sage/20">
+          <Sparkles className="h-4 w-4 text-cg-sage" />
+          <AlertDescription className="text-cg-sage">
+            <strong>Subscription management coming soon!</strong>
+            <br />
+            Upgrade options and billing management will be available shortly. For now, enjoy your current plan features.
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
