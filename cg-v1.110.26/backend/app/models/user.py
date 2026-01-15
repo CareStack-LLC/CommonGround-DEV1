@@ -3,7 +3,7 @@ User and UserProfile models for authentication and user data.
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -51,6 +51,14 @@ class User(Base, UUIDMixin, TimestampMixin):
     )
     cases_as_participant: Mapped[list["CaseParticipant"]] = relationship(
         "CaseParticipant", back_populates="user", cascade="all, delete-orphan"
+    )
+
+    # Subscription relationships
+    grant_redemptions: Mapped[List["GrantRedemption"]] = relationship(
+        "GrantRedemption", back_populates="user"
+    )
+    clearfund_fees: Mapped[List["ClearFundFee"]] = relationship(
+        "ClearFundFee", back_populates="user"
     )
 
     def __repr__(self) -> str:
