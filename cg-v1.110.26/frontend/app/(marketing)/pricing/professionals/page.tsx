@@ -40,7 +40,7 @@ const professionalPlans = [
       'Client invitation system',
     ],
     cta: 'Start Free Trial',
-    ctaLink: '/register?plan=pro-starter',
+    ctaLink: '/court-portal/register?plan=pro-starter',
   },
   {
     name: 'Practice',
@@ -60,7 +60,7 @@ const professionalPlans = [
       'Team member access (up to 3)',
     ],
     cta: 'Start Free Trial',
-    ctaLink: '/register?plan=pro-practice',
+    ctaLink: '/court-portal/register?plan=pro-practice',
   },
   {
     name: 'Enterprise',
@@ -418,7 +418,7 @@ export default function ProfessionalPricingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/register?plan=pro-practice"
+              href="/court-portal/register?plan=pro-practice"
               className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
             >
               Start Free Trial
