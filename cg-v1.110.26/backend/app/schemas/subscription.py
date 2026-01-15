@@ -12,7 +12,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 # =============================================================================
@@ -110,10 +110,21 @@ class CheckoutRequest(BaseModel):
     plan_code: str = Field(..., description="Plan to subscribe to: 'plus' or 'family_plus'")
     period: str = Field(
         default="monthly",
-        description="Billing period: 'monthly' or 'annual'"
+        description="Billing period: 'monthly' or 'annual'",
+        alias="billing_cycle"
     )
     success_url: str = Field(..., description="URL to redirect after successful payment")
     cancel_url: str = Field(..., description="URL to redirect if user cancels")
+
+    model_config = {"populate_by_name": True}
+
+    @field_validator("period", mode="before")
+    @classmethod
+    def normalize_period(cls, v: str) -> str:
+        """Normalize 'annually' to 'annual' for consistency."""
+        if v == "annually":
+            return "annual"
+        return v
 
 
 class CheckoutSessionResponse(BaseModel):

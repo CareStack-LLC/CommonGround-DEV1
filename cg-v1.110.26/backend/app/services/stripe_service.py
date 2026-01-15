@@ -733,6 +733,61 @@ class StripeService:
                 "failure_code": data.failure_code,
             })
 
+        # Subscription Events
+        elif event_type in ("customer.subscription.created", "customer.subscription.updated"):
+            result.update({
+                "subscription_id": data.id,
+                "customer_id": data.customer,
+                "status": data.status,
+                "current_period_start": data.current_period_start,
+                "current_period_end": data.current_period_end,
+                "cancel_at_period_end": data.cancel_at_period_end,
+                "cancel_at": data.cancel_at,
+                "canceled_at": data.canceled_at,
+                "price_id": data.items.data[0].price.id if data.items and data.items.data else None,
+                "product_id": data.items.data[0].price.product if data.items and data.items.data else None,
+                "metadata": dict(data.metadata) if data.metadata else {},
+            })
+
+        elif event_type == "customer.subscription.deleted":
+            result.update({
+                "subscription_id": data.id,
+                "customer_id": data.customer,
+                "status": data.status,
+                "canceled_at": data.canceled_at,
+                "metadata": dict(data.metadata) if data.metadata else {},
+            })
+
+        elif event_type == "invoice.paid":
+            result.update({
+                "invoice_id": data.id,
+                "customer_id": data.customer,
+                "subscription_id": data.subscription,
+                "amount_paid": Decimal(data.amount_paid) / 100 if data.amount_paid else Decimal(0),
+                "status": data.status,
+                "billing_reason": data.billing_reason,
+            })
+
+        elif event_type == "invoice.payment_failed":
+            result.update({
+                "invoice_id": data.id,
+                "customer_id": data.customer,
+                "subscription_id": data.subscription,
+                "amount_due": Decimal(data.amount_due) / 100 if data.amount_due else Decimal(0),
+                "attempt_count": data.attempt_count,
+                "next_payment_attempt": data.next_payment_attempt,
+            })
+
+        elif event_type == "checkout.session.completed":
+            result.update({
+                "session_id": data.id,
+                "customer_id": data.customer,
+                "subscription_id": data.subscription,
+                "mode": data.mode,
+                "payment_status": data.payment_status,
+                "metadata": dict(data.metadata) if data.metadata else {},
+            })
+
         return result
 
     # =========================================================================
