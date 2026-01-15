@@ -111,13 +111,23 @@ export default function BillingSettingsPage() {
   useEffect(() => {
     if (searchParams.get('success') === 'true') {
       setSuccessMessage('Your subscription has been activated! Welcome to your new plan.');
-      // Poll for subscription update (webhook may take a moment to process)
-      const pollForUpdate = async () => {
-        const maxAttempts = 5;
-        const delayMs = 2000;
+      // Sync subscription from Stripe directly (don't wait for webhook)
+      const syncFromStripe = async () => {
+        try {
+          // First sync from Stripe to update the profile
+          const syncedData = await subscriptionAPI.syncSubscription();
+          setSubscription(syncedData);
 
-        for (let attempt = 0; attempt < maxAttempts; attempt++) {
-          await new Promise(resolve => setTimeout(resolve, delayMs));
+          // Also refresh grant status
+          const grantData = await grantsAPI.getStatus();
+          setGrantStatus(grantData);
+
+          if (syncedData.tier && syncedData.tier !== 'starter') {
+            console.log(`Subscription synced to ${syncedData.tier}`);
+          }
+        } catch (err) {
+          console.error('Failed to sync subscription:', err);
+          // Fallback to regular fetch
           try {
             const [subData, grantData] = await Promise.all([
               subscriptionAPI.getCurrentSubscription(),
@@ -125,18 +135,12 @@ export default function BillingSettingsPage() {
             ]);
             setSubscription(subData);
             setGrantStatus(grantData);
-
-            // If we got a paid tier, we're done
-            if (subData.tier && subData.tier !== 'starter') {
-              console.log(`Subscription updated to ${subData.tier} after ${attempt + 1} attempts`);
-              break;
-            }
-          } catch (err) {
-            console.error('Failed to refresh subscription:', err);
+          } catch (fallbackErr) {
+            console.error('Fallback fetch also failed:', fallbackErr);
           }
         }
       };
-      pollForUpdate();
+      syncFromStripe();
     } else if (searchParams.get('cancelled') === 'true') {
       setError('Checkout was cancelled. No changes were made to your subscription.');
     }

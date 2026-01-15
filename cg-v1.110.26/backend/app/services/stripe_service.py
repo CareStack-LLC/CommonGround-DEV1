@@ -631,6 +631,33 @@ class StripeService:
             ],
         }
 
+    async def get_customer_subscriptions(
+        self,
+        customer_id: str,
+    ) -> list[Dict[str, Any]]:
+        """
+        Get all subscriptions for a customer.
+
+        Args:
+            customer_id: Stripe Customer ID
+
+        Returns:
+            List of subscription details
+        """
+        subscriptions = stripe.Subscription.list(customer=customer_id, limit=10)
+
+        return [
+            {
+                "id": sub.id,
+                "status": sub.status,
+                "current_period_start": sub.current_period_start,
+                "current_period_end": sub.current_period_end,
+                "cancel_at_period_end": sub.cancel_at_period_end,
+                "price_id": sub.items.data[0].price.id if sub.items.data else None,
+            }
+            for sub in subscriptions.data
+        ]
+
     # =========================================================================
     # Webhook Operations
     # =========================================================================

@@ -6628,6 +6628,16 @@ export const subscriptionAPI = {
   },
 
   /**
+   * Sync subscription status from Stripe
+   * Call this after checkout success to ensure profile is updated
+   */
+  async syncSubscription(): Promise<SubscriptionStatus> {
+    return fetchAPI<SubscriptionStatus>('/subscriptions/sync', {
+      method: 'POST',
+    });
+  },
+
+  /**
    * Create a Stripe Checkout session for subscription
    */
   async createCheckout(

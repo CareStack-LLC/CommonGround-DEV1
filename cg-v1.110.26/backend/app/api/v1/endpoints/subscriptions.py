@@ -480,3 +480,111 @@ async def list_features(
         tier=tier,
         features=features
     )
+
+
+# =============================================================================
+# Sync from Stripe
+# =============================================================================
+
+
+@router.post("/sync", response_model=SubscriptionStatusResponse)
+async def sync_subscription_from_stripe(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Sync subscription status from Stripe.
+
+    This is a fallback endpoint to pull subscription status directly from Stripe
+    when webhooks are delayed or not working. Call this after checkout success.
+    """
+    from datetime import datetime
+
+    profile = current_user.profile
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User profile not found"
+        )
+
+    if not profile.stripe_customer_id:
+        # No Stripe customer - return current status
+        return await get_current_subscription(current_user, db)
+
+    try:
+        # Get subscriptions from Stripe
+        subscriptions = await stripe_service.get_customer_subscriptions(
+            profile.stripe_customer_id
+        )
+
+        if not subscriptions:
+            # No subscriptions found - return current status
+            return await get_current_subscription(current_user, db)
+
+        # Find the most recent active/trialing subscription
+        active_sub = None
+        for sub in subscriptions:
+            if sub["status"] in ("active", "trialing"):
+                active_sub = sub
+                break
+
+        if not active_sub:
+            # No active subscription - might be cancelled
+            for sub in subscriptions:
+                if sub["status"] in ("canceled", "cancelled"):
+                    # Subscription was cancelled
+                    profile.subscription_tier = "starter"
+                    profile.subscription_status = "cancelled"
+                    profile.stripe_subscription_id = None
+                    await db.commit()
+                    break
+            return await get_current_subscription(current_user, db)
+
+        # Map price ID to tier
+        price_id = active_sub.get("price_id")
+        if price_id:
+            result = await db.execute(
+                select(SubscriptionPlan).where(
+                    (SubscriptionPlan.stripe_price_id_monthly == price_id) |
+                    (SubscriptionPlan.stripe_price_id_annual == price_id)
+                )
+            )
+            plan = result.scalar_one_or_none()
+            tier = plan.plan_code if plan else "starter"
+        else:
+            tier = "starter"
+
+        # Update profile
+        profile.subscription_tier = tier
+        profile.subscription_status = active_sub["status"]
+        profile.stripe_subscription_id = active_sub["id"]
+
+        if active_sub.get("current_period_start"):
+            profile.subscription_period_start = datetime.fromtimestamp(
+                active_sub["current_period_start"]
+            )
+        if active_sub.get("current_period_end"):
+            profile.subscription_period_end = datetime.fromtimestamp(
+                active_sub["current_period_end"]
+            )
+            profile.subscription_ends_at = datetime.fromtimestamp(
+                active_sub["current_period_end"]
+            )
+
+        # Handle cancel_at_period_end
+        if active_sub.get("cancel_at_period_end") and active_sub["status"] == "active":
+            profile.subscription_status = "cancelling"
+
+        await db.commit()
+        await db.refresh(profile)
+
+        logger.info(
+            f"Synced subscription for user {current_user.id}: "
+            f"tier={tier}, status={profile.subscription_status}"
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to sync subscription from Stripe: {e}")
+        # Don't raise - return current status
+
+    return await get_current_subscription(current_user, db)
