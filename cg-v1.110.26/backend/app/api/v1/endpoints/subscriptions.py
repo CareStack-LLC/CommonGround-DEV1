@@ -262,7 +262,7 @@ async def create_checkout_session(
         customer = await stripe_service.create_customer(
             email=current_user.email,
             name=profile.full_name,
-            metadata={"user_id": current_user.id}
+            user_id=str(current_user.id),
         )
         profile.stripe_customer_id = customer["id"]
         await db.commit()
@@ -276,6 +276,7 @@ async def create_checkout_session(
         success_url=request.success_url,
         cancel_url=request.cancel_url,
         trial_days=trial_days,
+        metadata={"user_id": str(current_user.id), "plan_code": request.plan_code},
     )
 
     return CheckoutSessionResponse(
