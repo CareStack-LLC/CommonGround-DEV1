@@ -21,7 +21,7 @@ from decimal import Decimal
 
 # revision identifiers, used by Alembic.
 revision = "s1u2b3s4c5r6"
-down_revision = "a7b8c9d0e1f2"
+down_revision = "f937603dd5bc"
 branch_labels = None
 depends_on = None
 
