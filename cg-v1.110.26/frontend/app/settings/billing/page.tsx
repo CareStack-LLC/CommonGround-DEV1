@@ -343,8 +343,8 @@ export default function BillingSettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2">
-              {/* Plus Plan */}
-              {currentTier === 'starter' && (
+              {/* Plus Plan - show if user can upgrade to Plus */}
+              {currentTier !== 'plus' && currentTier !== 'family_plus' && (
                 <div className="rounded-lg border border-cg-sage p-4 relative">
                   <div className="absolute -top-3 left-4">
                     <span className="bg-cg-sage text-white text-xs px-2 py-1 rounded-full">
@@ -382,7 +382,7 @@ export default function BillingSettingsPage() {
                 </div>
               )}
 
-              {/* Family+ Plan */}
+              {/* Family+ Plan - show if user can upgrade to Family+ */}
               <div className="rounded-lg border border-border p-4">
                 <h3 className="font-semibold text-foreground">Family+</h3>
                 <p className="text-2xl font-bold text-foreground">
@@ -403,7 +403,7 @@ export default function BillingSettingsPage() {
                   </li>
                 </ul>
                 <Button
-                  variant={currentTier === 'starter' ? 'outline' : 'default'}
+                  variant={currentTier !== 'plus' && currentTier !== 'family_plus' ? 'outline' : 'default'}
                   className="w-full mt-4"
                   onClick={() => handleUpgrade('family_plus')}
                   disabled={isProcessing === 'family_plus'}
