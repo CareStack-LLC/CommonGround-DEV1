@@ -100,6 +100,14 @@ class UserProfile(Base, UUIDMixin, TimestampMixin):
     subscription_ends_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     stripe_customer_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
+    # GTM Subscription fields
+    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    subscription_period_start: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    subscription_period_end: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    active_grant_id: Mapped[Optional[str]] = mapped_column(
+        String(36), nullable=True
+    )  # FK to grant_redemptions - not enforced for flexibility
+
     # Preferences
     notification_email: Mapped[bool] = mapped_column(Boolean, default=True)
     notification_sms: Mapped[bool] = mapped_column(Boolean, default=False)
