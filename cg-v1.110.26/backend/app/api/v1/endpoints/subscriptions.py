@@ -286,19 +286,36 @@ async def create_checkout_session(
     # Create checkout session
     trial_days = plan.trial_days if profile.subscription_status == "trial" else 0
 
-    checkout_data = await stripe_service.create_subscription_checkout(
-        customer_id=profile.stripe_customer_id,
-        price_id=price_id,
-        success_url=request.success_url,
-        cancel_url=request.cancel_url,
-        trial_days=trial_days,
-        metadata={"user_id": str(current_user.id), "plan_code": request.plan_code},
+    logger.info(
+        f"Creating checkout session: customer={profile.stripe_customer_id}, "
+        f"price={price_id}, plan={request.plan_code}"
     )
 
-    return CheckoutSessionResponse(
-        checkout_url=checkout_data["url"],
-        session_id=checkout_data["id"]
-    )
+    try:
+        checkout_data = await stripe_service.create_subscription_checkout(
+            customer_id=profile.stripe_customer_id,
+            price_id=price_id,
+            success_url=request.success_url,
+            cancel_url=request.cancel_url,
+            trial_days=trial_days,
+            metadata={"user_id": str(current_user.id), "plan_code": request.plan_code},
+        )
+
+        logger.info(
+            f"Checkout session created: id={checkout_data['id']}, "
+            f"url={checkout_data['url'][:50]}..."
+        )
+
+        return CheckoutSessionResponse(
+            checkout_url=checkout_data["url"],
+            session_id=checkout_data["id"]
+        )
+    except Exception as e:
+        logger.error(f"Failed to create checkout session: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create checkout session: {str(e)}"
+        )
 
 
 # =============================================================================
@@ -480,6 +497,102 @@ async def list_features(
         tier=tier,
         features=features
     )
+
+
+# =============================================================================
+# Debug / Verify Stripe Setup
+# =============================================================================
+
+
+@router.get("/debug/stripe-status")
+async def debug_stripe_status(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Debug endpoint to verify Stripe configuration.
+
+    Returns information about prices, customer, and subscriptions.
+    """
+    import stripe
+    from app.core.config import settings
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    profile = current_user.profile
+    result = {
+        "stripe_configured": bool(settings.STRIPE_SECRET_KEY),
+        "customer_id": profile.stripe_customer_id if profile else None,
+        "prices": {},
+        "customer_subscriptions": [],
+        "checkout_sessions": [],
+    }
+
+    # Check prices in database
+    plans_result = await db.execute(
+        select(SubscriptionPlan).where(SubscriptionPlan.is_active == True)
+    )
+    plans = plans_result.scalars().all()
+
+    for plan in plans:
+        price_id = plan.stripe_price_id_monthly
+        result["prices"][plan.plan_code] = {
+            "price_id": price_id,
+            "exists_in_stripe": False,
+            "is_recurring": False,
+            "error": None,
+        }
+
+        if price_id:
+            try:
+                price = stripe.Price.retrieve(price_id)
+                result["prices"][plan.plan_code]["exists_in_stripe"] = True
+                result["prices"][plan.plan_code]["is_recurring"] = price.type == "recurring"
+                result["prices"][plan.plan_code]["unit_amount"] = price.unit_amount
+                result["prices"][plan.plan_code]["currency"] = price.currency
+            except stripe.error.InvalidRequestError as e:
+                result["prices"][plan.plan_code]["error"] = str(e)
+            except Exception as e:
+                result["prices"][plan.plan_code]["error"] = str(e)
+
+    # Check customer subscriptions
+    if profile and profile.stripe_customer_id:
+        try:
+            subscriptions = stripe.Subscription.list(
+                customer=profile.stripe_customer_id,
+                limit=5
+            )
+            result["customer_subscriptions"] = [
+                {
+                    "id": sub.id,
+                    "status": sub.status,
+                    "price_id": sub.items.data[0].price.id if sub.items.data else None,
+                }
+                for sub in subscriptions.data
+            ]
+        except Exception as e:
+            result["customer_subscriptions_error"] = str(e)
+
+        # Check recent checkout sessions
+        try:
+            sessions = stripe.checkout.Session.list(
+                customer=profile.stripe_customer_id,
+                limit=5
+            )
+            result["checkout_sessions"] = [
+                {
+                    "id": sess.id,
+                    "status": sess.status,
+                    "mode": sess.mode,
+                    "payment_status": sess.payment_status,
+                    "subscription": sess.subscription,
+                }
+                for sess in sessions.data
+            ]
+        except Exception as e:
+            result["checkout_sessions_error"] = str(e)
+
+    return result
 
 
 # =============================================================================
