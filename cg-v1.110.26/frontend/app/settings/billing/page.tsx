@@ -111,6 +111,22 @@ export default function BillingSettingsPage() {
   useEffect(() => {
     if (searchParams.get('success') === 'true') {
       setSuccessMessage('Your subscription has been activated! Welcome to your new plan.');
+      // Refetch subscription data after a delay to allow webhook processing
+      const refetchWithDelay = async () => {
+        // Wait for webhook to process
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        try {
+          const [subData, grantData] = await Promise.all([
+            subscriptionAPI.getCurrentSubscription(),
+            grantsAPI.getStatus(),
+          ]);
+          setSubscription(subData);
+          setGrantStatus(grantData);
+        } catch (err) {
+          console.error('Failed to refresh subscription:', err);
+        }
+      };
+      refetchWithDelay();
     } else if (searchParams.get('cancelled') === 'true') {
       setError('Checkout was cancelled. No changes were made to your subscription.');
     }
