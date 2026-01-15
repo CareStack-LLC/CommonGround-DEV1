@@ -55,17 +55,83 @@ async def list_subscription_plans(
     List all available subscription plans.
 
     Returns plans ordered by display_order for consistent presentation.
+    Falls back to hardcoded plans if database query fails.
     """
-    result = await db.execute(
-        select(SubscriptionPlan)
-        .where(SubscriptionPlan.is_active == True)
-        .order_by(SubscriptionPlan.display_order)
-    )
-    plans = result.scalars().all()
+    try:
+        result = await db.execute(
+            select(SubscriptionPlan)
+            .where(SubscriptionPlan.is_active == True)
+            .order_by(SubscriptionPlan.display_order)
+        )
+        plans = result.scalars().all()
 
-    return PlansListResponse(
-        plans=[PlanResponse.model_validate(plan) for plan in plans]
-    )
+        if plans:
+            return PlansListResponse(
+                plans=[PlanResponse.model_validate(plan) for plan in plans]
+            )
+    except Exception as e:
+        logger.warning(f"Failed to fetch plans from database: {e}")
+
+    # Fallback to hardcoded plans if database unavailable or empty
+    hardcoded_plans = [
+        PlanResponse(
+            id="plan_starter_001",
+            plan_code="starter",
+            display_name="Starter",
+            description="Everything you need to get started with better co-parenting.",
+            badge=None,
+            price_monthly=0.00,
+            price_annual=0.00,
+            features={
+                "aria_manual_sentiment": True,
+                "clearfund_fee_exempt": False,
+                "quick_accords": False,
+                "circle_contacts_limit": 0,
+                "kidcoms_access": False,
+            },
+            trial_days=14,
+            display_order=0,
+        ),
+        PlanResponse(
+            id="plan_plus_001",
+            plan_code="plus",
+            display_name="Plus",
+            description="Better scheduling, no fees, and a trusted contact.",
+            badge="Most Popular",
+            price_monthly=12.00,
+            price_annual=120.00,
+            features={
+                "aria_manual_sentiment": True,
+                "clearfund_fee_exempt": True,
+                "quick_accords": True,
+                "circle_contacts_limit": 1,
+                "kidcoms_access": False,
+            },
+            trial_days=14,
+            display_order=1,
+        ),
+        PlanResponse(
+            id="plan_family_plus_001",
+            plan_code="family_plus",
+            display_name="Family+",
+            description="Full access including KidComs video calls and theater mode.",
+            badge=None,
+            price_monthly=25.00,
+            price_annual=250.00,
+            features={
+                "aria_manual_sentiment": True,
+                "aria_advanced": True,
+                "clearfund_fee_exempt": True,
+                "quick_accords": True,
+                "circle_contacts_limit": 5,
+                "kidcoms_access": True,
+                "theater_mode": True,
+            },
+            trial_days=14,
+            display_order=2,
+        ),
+    ]
+    return PlansListResponse(plans=hardcoded_plans)
 
 
 # =============================================================================
