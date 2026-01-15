@@ -288,6 +288,27 @@ export default function BillingSettingsPage() {
     }
   };
 
+  const handleDowngradeToStarter = async () => {
+    if (!confirm('Are you sure you want to downgrade to the Starter plan? Your current subscription will be cancelled at the end of the billing period.')) {
+      return;
+    }
+
+    try {
+      setIsProcessing('starter');
+      setError(null);
+      await subscriptionAPI.cancelSubscription();
+      // Refresh subscription data
+      const updatedSubscription = await subscriptionAPI.getCurrentSubscription();
+      setSubscription(updatedSubscription);
+      setIsProcessing(null);
+      alert('Your subscription will be cancelled at the end of the billing period. You will be downgraded to the Starter plan.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to downgrade';
+      setError(errorMessage);
+      setIsProcessing(null);
+    }
+  };
+
   const currentTier = subscription?.tier || profile?.subscription_tier || 'starter';
   const currentPlan = PLAN_DETAILS[currentTier] || PLAN_DETAILS.starter;
   const isGrantUser = subscription?.has_active_grant || grantStatus?.has_active_grant;
@@ -478,28 +499,67 @@ export default function BillingSettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Upgrade Options */}
-      {currentTier !== 'family_plus' && !isGrantUser && (
+      {/* Plan Options */}
+      {!isGrantUser && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <Sparkles className="h-5 w-5 text-cg-amber" />
-              Upgrade Your Plan
+              {currentTier === 'starter' ? 'Upgrade Your Plan' : 'Change Your Plan'}
             </CardTitle>
             <CardDescription>
-              Get more features by upgrading to a higher tier
+              {currentTier === 'starter'
+                ? 'Get more features by upgrading to a higher tier'
+                : 'Upgrade for more features or downgrade to save'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {/* Plus Plan - show if user can upgrade to Plus */}
-              {currentTier !== 'plus' && currentTier !== 'family_plus' && (
-                <div className="rounded-lg border border-cg-sage p-4 relative">
-                  <div className="absolute -top-3 left-4">
-                    <span className="bg-cg-sage text-white text-xs px-2 py-1 rounded-full">
-                      Most Popular
-                    </span>
-                  </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {/* Starter Plan - show for paid users to downgrade */}
+              {currentTier !== 'starter' && (
+                <div className="rounded-lg border border-border p-4">
+                  <h3 className="font-semibold text-foreground">Starter</h3>
+                  <p className="text-2xl font-bold text-foreground">
+                    Free
+                  </p>
+                  <ul className="mt-3 space-y-1 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-cg-sage" />
+                      Basic messaging
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-cg-sage" />
+                      Schedule tracking
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-3 w-3 text-cg-sage" />
+                      Silent handoff GPS
+                    </li>
+                  </ul>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                    onClick={handleDowngradeToStarter}
+                    disabled={isProcessing === 'starter'}
+                  >
+                    {isProcessing === 'starter' ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : null}
+                    Downgrade to Starter
+                  </Button>
+                </div>
+              )}
+
+              {/* Plus Plan */}
+              {currentTier !== 'plus' && (
+                <div className={`rounded-lg border p-4 relative ${currentTier === 'starter' ? 'border-cg-sage' : 'border-border'}`}>
+                  {currentTier === 'starter' && (
+                    <div className="absolute -top-3 left-4">
+                      <span className="bg-cg-sage text-white text-xs px-2 py-1 rounded-full">
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
                   <h3 className="font-semibold text-foreground mt-2">Plus</h3>
                   <p className="text-2xl font-bold text-foreground">
                     $12<span className="text-sm font-normal text-muted-foreground">/mo</span>
@@ -519,19 +579,20 @@ export default function BillingSettingsPage() {
                     </li>
                   </ul>
                   <Button
+                    variant={currentTier === 'family_plus' ? 'outline' : 'default'}
                     className="w-full mt-4"
                     onClick={() => handleUpgrade('plus')}
-                    disabled={isProcessing === 'plus' || currentTier === 'plus'}
+                    disabled={isProcessing === 'plus'}
                   >
                     {isProcessing === 'plus' ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : null}
-                    Upgrade to Plus
+                    {currentTier === 'family_plus' ? 'Downgrade to Plus' : 'Upgrade to Plus'}
                   </Button>
                 </div>
               )}
 
-              {/* Family+ Plan - show if user can upgrade to Family+ */}
+              {/* Family+ Plan */}
               {currentTier !== 'family_plus' && (
                 <div className="rounded-lg border border-border p-4">
                   <h3 className="font-semibold text-foreground">Family+</h3>
@@ -556,7 +617,7 @@ export default function BillingSettingsPage() {
                     variant={currentTier === 'starter' ? 'outline' : 'default'}
                     className="w-full mt-4"
                     onClick={() => handleUpgrade('family_plus')}
-                    disabled={isProcessing === 'family_plus' || currentTier === 'family_plus'}
+                    disabled={isProcessing === 'family_plus'}
                   >
                     {isProcessing === 'family_plus' ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
