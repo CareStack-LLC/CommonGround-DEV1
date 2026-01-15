@@ -19,17 +19,17 @@ depends_on = None
 
 def upgrade() -> None:
     """Add Stripe price IDs to subscription plans."""
-    # Plus plan - monthly price
+    # Plus plan - monthly price (test mode)
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_price_id_monthly = 'price_1SpdKEBQiJH5qPMuS1mg72AV'
+        SET stripe_price_id_monthly = 'price_1SpxbVBQiJH5qPMuvFiaAc0m'
         WHERE plan_code = 'plus'
     """)
 
-    # Family+ plan - monthly price
+    # Family+ plan - monthly price (test mode)
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_price_id_monthly = 'price_1SpdMfBQiJH5qPMu5d4niIbm'
+        SET stripe_price_id_monthly = 'price_1SpxbpBQiJH5qPMu2hVbTv2F'
         WHERE plan_code = 'family_plus'
     """)
 
