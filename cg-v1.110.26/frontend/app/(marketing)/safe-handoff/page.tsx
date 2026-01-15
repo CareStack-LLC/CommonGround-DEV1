@@ -133,22 +133,22 @@ export default function SafeHandoffPage() {
       {/* Hero Section */}
       <section className="relative py-20 lg:py-28 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-purple-500/5 blur-3xl" />
-          <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-sage/5 blur-3xl" />
+          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-cg-sage/5 blur-3xl" />
+          <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-amber/5 blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-6">
-                <Shield className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage-subtle rounded-full mb-6">
+                <Shield className="w-4 h-4 text-cg-sage" />
+                <span className="text-sm font-medium text-cg-sage">
                   Safety-First Design
                 </span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6">
                 Safe custody exchanges.{' '}
-                <span className="text-purple-600 dark:text-purple-400">Zero contact.</span>
+                <span className="text-cg-sage">Zero contact.</span>
               </h1>
               <p className="text-xl text-muted-foreground mb-6">
                 You shouldn't have to see, speak to, or interact with your co-parent to
@@ -162,14 +162,14 @@ export default function SafeHandoffPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-purple-600 text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-purple-700 hover:shadow-xl hover:-translate-y-1"
+                  className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
                 >
                   Get Started Free
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
                   href="#grant-code"
-                  className="inline-flex items-center justify-center gap-2 border-2 border-purple-600 text-purple-600 dark:text-purple-400 font-medium px-8 py-4 rounded-full text-lg transition-all hover:bg-purple-600 hover:text-white"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all hover:bg-cg-sage hover:text-white"
                 >
                   Have a Grant Code?
                 </Link>
@@ -179,8 +179,8 @@ export default function SafeHandoffPage() {
             {/* Crisis Resources Sidebar */}
             <div className="bg-card rounded-2xl border border-border p-6 lg:p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
-                  <Phone className="w-5 h-5 text-red-600 dark:text-red-400" />
+                <div className="w-10 h-10 bg-cg-sage-subtle rounded-lg flex items-center justify-center">
+                  <Phone className="w-5 h-5 text-cg-sage" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Need Help Now?</h3>
@@ -191,7 +191,7 @@ export default function SafeHandoffPage() {
                 {crisisResources.map((resource) => (
                   <div key={resource.name} className="p-4 bg-background rounded-lg border border-border/50">
                     <div className="font-medium text-foreground">{resource.name}</div>
-                    <div className="text-lg font-semibold text-purple-600 dark:text-purple-400">
+                    <div className="text-lg font-semibold text-cg-sage">
                       {resource.number}
                     </div>
                     <div className="text-sm text-muted-foreground">{resource.description}</div>
@@ -225,10 +225,10 @@ export default function SafeHandoffPage() {
               return (
                 <div
                   key={feature.title}
-                  className="bg-background rounded-xl p-6 border border-border/50 hover:border-purple-500/30 transition-colors"
+                  className="bg-background rounded-xl p-6 border border-border/50 hover:border-cg-sage/30 transition-colors"
                 >
-                  <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                  <div className="w-12 h-12 bg-cg-sage-subtle rounded-xl flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-cg-sage" />
                   </div>
                   <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground">{feature.description}</p>
@@ -255,7 +255,7 @@ export default function SafeHandoffPage() {
             <div className="grid gap-8">
               {howItWorks.map((step) => (
                 <div key={step.step} className="flex gap-6 items-start">
-                  <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                  <div className="w-12 h-12 bg-cg-sage rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                     {step.step}
                   </div>
                   <div>
@@ -287,7 +287,7 @@ export default function SafeHandoffPage() {
                 key={index}
                 className="bg-background rounded-xl p-6 border border-border/50"
               >
-                <div className="text-purple-600 dark:text-purple-400 text-4xl font-serif mb-4">"</div>
+                <div className="text-cg-sage text-4xl font-serif mb-4">"</div>
                 <p className="text-foreground mb-6">{testimonial.quote}</p>
                 <div className="text-sm text-muted-foreground">{testimonial.context}</div>
               </div>
@@ -297,13 +297,13 @@ export default function SafeHandoffPage() {
       </section>
 
       {/* Grant Code Section */}
-      <section id="grant-code" className="py-20 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20">
+      <section id="grant-code" className="py-20 bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-200 dark:bg-purple-800/50 rounded-full mb-6">
-                <Heart className="w-4 h-4 text-purple-700 dark:text-purple-300" />
-                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage/20 rounded-full mb-6">
+                <Heart className="w-4 h-4 text-cg-sage" />
+                <span className="text-sm font-medium text-cg-sage">
                   Nonprofit Partner Program
                 </span>
               </div>
@@ -322,19 +322,19 @@ export default function SafeHandoffPage() {
                 <h4 className="font-semibold text-foreground mb-4">How to Redeem Your Code</h4>
                 <ol className="space-y-3 text-muted-foreground">
                   <li className="flex items-center gap-3">
-                    <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center text-sm text-purple-600 dark:text-purple-400 font-medium">1</span>
+                    <span className="w-6 h-6 bg-cg-sage-subtle rounded-full flex items-center justify-center text-sm text-cg-sage font-medium">1</span>
                     Create a free CommonGround account
                   </li>
                   <li className="flex items-center gap-3">
-                    <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center text-sm text-purple-600 dark:text-purple-400 font-medium">2</span>
+                    <span className="w-6 h-6 bg-cg-sage-subtle rounded-full flex items-center justify-center text-sm text-cg-sage font-medium">2</span>
                     Go to Settings &gt; Billing
                   </li>
                   <li className="flex items-center gap-3">
-                    <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center text-sm text-purple-600 dark:text-purple-400 font-medium">3</span>
+                    <span className="w-6 h-6 bg-cg-sage-subtle rounded-full flex items-center justify-center text-sm text-cg-sage font-medium">3</span>
                     Enter your grant code in the redemption form
                   </li>
                   <li className="flex items-center gap-3">
-                    <span className="w-6 h-6 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center text-sm text-purple-600 dark:text-purple-400 font-medium">4</span>
+                    <span className="w-6 h-6 bg-cg-sage-subtle rounded-full flex items-center justify-center text-sm text-cg-sage font-medium">4</span>
                     Instant access to Plus features
                   </li>
                 </ol>
@@ -342,7 +342,7 @@ export default function SafeHandoffPage() {
             </div>
             <div className="bg-card rounded-2xl p-8 border border-border">
               <h3 className="text-xl font-semibold text-foreground mb-6 flex items-center gap-3">
-                <Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                <Users className="w-6 h-6 text-cg-sage" />
                 For Nonprofit Organizations
               </h3>
               <p className="text-muted-foreground mb-6">
@@ -352,14 +352,14 @@ export default function SafeHandoffPage() {
               <ul className="space-y-3 mb-8">
                 {partnerBenefits.map((benefit) => (
                   <li key={benefit} className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                    <Check className="w-5 h-5 text-cg-sage flex-shrink-0" />
                     <span className="text-foreground">{benefit}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 href="mailto:partnerships@commonground.co?subject=Safe Handoff Grant Partnership"
-                className="inline-flex items-center justify-center gap-2 w-full bg-purple-600 text-white font-medium px-6 py-3 rounded-lg transition-all hover:bg-purple-700"
+                className="inline-flex items-center justify-center gap-2 w-full bg-cg-sage text-white font-medium px-6 py-3 rounded-lg transition-all hover:bg-cg-sage-light"
               >
                 Become a Partner Organization
                 <ArrowRight className="w-4 h-4" />
@@ -393,7 +393,7 @@ export default function SafeHandoffPage() {
       {/* CTA */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Shield className="w-12 h-12 text-purple-600 dark:text-purple-400 mx-auto mb-6" />
+          <Shield className="w-12 h-12 text-cg-sage mx-auto mb-6" />
           <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
             You deserve to feel safe
           </h2>
@@ -404,7 +404,7 @@ export default function SafeHandoffPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/register"
-              className="inline-flex items-center justify-center gap-2 bg-purple-600 text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-purple-700 hover:shadow-xl hover:-translate-y-1"
+              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
             >
               Create Free Account
               <ArrowRight className="w-5 h-5" />
