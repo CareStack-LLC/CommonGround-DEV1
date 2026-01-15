@@ -224,7 +224,7 @@ export default function BillingSettingsPage() {
     }
   };
 
-  const currentTier = subscription?.tier || profile?.subscription_tier || 'starter';
+  const currentTier = subscription?.subscription_tier || profile?.subscription_tier || 'starter';
   const currentPlan = PLAN_DETAILS[currentTier] || PLAN_DETAILS.starter;
   const isGrantUser = subscription?.has_active_grant || grantStatus?.has_active_grant;
   const isPaidUser = subscription?.stripe_subscription_id !== null && subscription?.stripe_subscription_id !== undefined;
