@@ -153,18 +153,18 @@ export default function ARIAPage() {
       {/* Hero Section */}
       <section className="relative py-20 lg:py-28 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-cg-amber/10 blur-3xl" />
-          <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-sage/10 blur-3xl" />
+          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-cg-sage/10 blur-3xl" />
+          <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-sage/5 blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-amber-subtle rounded-full mb-6">
-              <Sparkles className="w-4 h-4 text-cg-amber" />
-              <span className="text-sm font-medium text-cg-amber">AI-Powered Communication</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage-subtle rounded-full mb-6">
+              <Sparkles className="w-4 h-4 text-cg-sage" />
+              <span className="text-sm font-medium text-cg-sage">AI-Powered Communication</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6">
-              Meet <span className="text-cg-amber">ARIA</span>
+              Meet <span className="text-cg-sage">ARIA</span>
             </h1>
             <p className="text-2xl text-muted-foreground mb-4">
               AI-Powered Relationship Intelligence Assistant
@@ -175,7 +175,7 @@ export default function ARIAPage() {
             </p>
             <Link
               href="/register"
-              className="inline-flex items-center justify-center gap-2 bg-cg-amber text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-amber/90 hover:shadow-xl hover:-translate-y-1"
+              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
             >
               Try ARIA Free
               <ArrowRight className="w-5 h-5" />
@@ -203,10 +203,10 @@ export default function ARIAPage() {
               return (
                 <div
                   key={feature.title}
-                  className="bg-card rounded-xl p-6 border border-border/50 hover:border-cg-amber/30 transition-colors"
+                  className="bg-card rounded-xl p-6 border border-border/50 hover:border-cg-sage/30 transition-colors"
                 >
-                  <div className="w-12 h-12 bg-cg-amber-subtle rounded-xl flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-cg-amber" />
+                  <div className="w-12 h-12 bg-cg-sage-subtle rounded-xl flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-cg-sage" />
                   </div>
                   <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground">{feature.description}</p>
@@ -234,7 +234,7 @@ export default function ARIAPage() {
               <div key={step.step} className="grid md:grid-cols-2 gap-8 items-center">
                 <div className={index % 2 === 1 ? 'md:order-2' : ''}>
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-10 h-10 bg-cg-amber rounded-full flex items-center justify-center text-white font-semibold">
+                    <div className="w-10 h-10 bg-cg-sage rounded-full flex items-center justify-center text-white font-semibold">
                       {step.step}
                     </div>
                     <h3 className="text-xl font-semibold text-foreground">{step.title}</h3>
@@ -348,7 +348,7 @@ export default function ARIAPage() {
               </ul>
             </div>
             <div className="relative">
-              <div className="bg-gradient-to-br from-cg-sage-subtle to-cg-amber-subtle rounded-3xl p-8">
+              <div className="bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle rounded-3xl p-8">
                 <div className="bg-card rounded-2xl p-6 border border-border/50">
                   <div className="flex items-center justify-between mb-6">
                     <span className="font-semibold text-foreground">Good Faith Score</span>
@@ -405,7 +405,7 @@ export default function ARIAPage() {
                 key={index}
                 className="bg-card rounded-xl p-6 border border-border/50"
               >
-                <div className="text-cg-amber text-4xl font-serif mb-4">"</div>
+                <div className="text-cg-sage text-4xl font-serif mb-4">"</div>
                 <p className="text-foreground mb-6">{testimonial.quote}</p>
                 <div>
                   <div className="font-semibold text-foreground">{testimonial.author}</div>
@@ -448,9 +448,9 @@ export default function ARIAPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-gradient-to-br from-cg-amber-subtle to-cg-sage-subtle">
+      <section className="py-20 bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Heart className="w-12 h-12 text-cg-amber mx-auto mb-6" />
+          <Heart className="w-12 h-12 text-cg-sage mx-auto mb-6" />
           <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
             Ready to communicate better?
           </h2>
@@ -460,7 +460,7 @@ export default function ARIAPage() {
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center justify-center gap-2 bg-cg-amber text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-amber/90 hover:shadow-xl hover:-translate-y-1"
+            className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
           >
             Get Started Free
             <ArrowRight className="w-5 h-5" />
