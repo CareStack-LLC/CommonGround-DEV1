@@ -27,67 +27,67 @@ export const metadata: Metadata = {
 
 const plans = [
   {
-    name: 'Free',
+    name: 'Starter',
     price: '$0',
     period: 'forever',
-    description: 'Everything you need to get started with better co-parenting.',
+    description: 'Everything you need to get started with safe, documented co-parenting.',
     cta: 'Get Started Free',
     ctaLink: '/register',
     highlighted: false,
     features: [
-      { name: 'ARIA-powered messaging', included: true, tooltip: 'AI helps prevent conflict' },
-      { name: 'Basic agreement builder', included: true },
-      { name: 'Shared calendar', included: true },
-      { name: 'Up to 2 children', included: true },
-      { name: '1 active case', included: true },
+      { name: 'Basic ARIA messaging', included: true, tooltip: 'Manual sentiment checks' },
+      { name: 'ClearFund expense tracking', included: true, tooltip: '$1.50 per payout' },
+      { name: 'TimeBridge calendar view', included: true },
+      { name: 'Silent Handoff GPS logging', included: true },
+      { name: 'Unlimited children', included: true },
       { name: 'Email support', included: true },
-      { name: 'Expense tracking', included: false },
-      { name: 'Court export packages', included: false },
-      { name: 'Legal access portal', included: false },
-      { name: 'Priority support', included: false },
+      { name: 'QuickAccords', included: false },
+      { name: 'Custody tracking dashboard', included: false },
+      { name: 'KidsCom video calls', included: false },
+      { name: 'My Circle contacts', included: false },
     ],
   },
   {
-    name: 'Basic',
-    price: '$9.99',
+    name: 'Plus',
+    price: '$12',
     period: '/month',
-    description: 'Full expense tracking and documentation for organized co-parenting.',
+    description: 'Smart automation and tracking for organized co-parenting. No more manual work.',
     cta: 'Start 14-Day Free Trial',
-    ctaLink: '/register?plan=basic',
+    ctaLink: '/register?plan=plus',
     highlighted: true,
     badge: 'Most Popular',
     features: [
-      { name: 'Everything in Free', included: true },
-      { name: 'ClearFund expense tracking', included: true, tooltip: 'Track and split all expenses' },
-      { name: 'Receipt uploads', included: true },
-      { name: 'Payment history & ledger', included: true },
-      { name: 'Unlimited children', included: true },
-      { name: 'Multiple cases', included: true },
-      { name: 'Basic court exports', included: true },
+      { name: 'Everything in Starter', included: true },
+      { name: 'QuickAccords with auto-scheduling', included: true, tooltip: 'AI-assisted agreement creation' },
+      { name: 'Auto-generated events from agreements', included: true },
+      { name: 'Custody tracking dashboard', included: true, tooltip: 'Who has the kids?' },
+      { name: 'Monthly PDF summaries', included: true },
+      { name: 'My Circle: +1 trusted contact', included: true },
+      { name: 'No ClearFund payout fees', included: true },
       { name: 'Priority email support', included: true },
-      { name: 'Legal access portal', included: false },
-      { name: 'Advanced analytics', included: false },
+      { name: 'KidsCom video calls', included: false },
+      { name: 'Court-ready reporting', included: false },
     ],
   },
   {
-    name: 'Premium',
-    price: '$19.99',
+    name: 'Family+',
+    price: '$25',
     period: '/month',
-    description: 'Complete platform access with legal portal and advanced features.',
+    description: 'Complete platform access with KidsCom for safe child communication.',
     cta: 'Start 14-Day Free Trial',
-    ctaLink: '/register?plan=premium',
+    ctaLink: '/register?plan=family_plus',
     highlighted: false,
     features: [
-      { name: 'Everything in Basic', included: true },
-      { name: 'Legal access portal', included: true, tooltip: 'Grant access to attorneys & GALs' },
-      { name: 'Advanced court exports', included: true },
+      { name: 'Everything in Plus', included: true },
+      { name: 'KidsCom access', included: true, tooltip: 'Child login, video calls' },
+      { name: 'Watch Together theater mode', included: true },
+      { name: 'My Circle: +3-5 contacts', included: true },
+      { name: 'Advanced ARIA features', included: true },
+      { name: 'Court-ready reporting bundles', included: true },
       { name: 'Compliance analytics', included: true },
+      { name: 'Priority phone support', included: true },
       { name: 'Calendar sync (Google/Outlook)', included: true },
       { name: 'SMS notifications', included: true },
-      { name: 'API access', included: true },
-      { name: 'Phone support', included: true },
-      { name: 'Custom branding', included: true },
-      { name: 'Dedicated success manager', included: true },
     ],
   },
 ];
@@ -123,41 +123,43 @@ const comparisonFeatures = [
   {
     category: 'Communication',
     features: [
-      { name: 'ARIA messaging', free: true, basic: true, premium: true },
-      { name: 'Message history', free: '90 days', basic: 'Unlimited', premium: 'Unlimited' },
-      { name: 'SMS notifications', free: false, basic: false, premium: true },
-    ]
-  },
-  {
-    category: 'Agreements',
-    features: [
-      { name: 'Agreement builder', free: 'Basic', basic: 'Full', premium: 'Full' },
-      { name: 'Section templates', free: '5', basic: '18', premium: '18' },
-      { name: 'PDF export', free: false, basic: true, premium: true },
+      { name: 'ARIA messaging', starter: 'Manual checks', plus: 'Auto-analysis', familyPlus: 'Advanced AI' },
+      { name: 'Message history', starter: '90 days', plus: 'Unlimited', familyPlus: 'Unlimited' },
+      { name: 'SMS notifications', starter: false, plus: false, familyPlus: true },
     ]
   },
   {
     category: 'Scheduling',
     features: [
-      { name: 'Shared calendar', free: true, basic: true, premium: true },
-      { name: 'Exchange check-ins', free: true, basic: true, premium: true },
-      { name: 'Calendar sync', free: false, basic: false, premium: true },
+      { name: 'TimeBridge calendar', starter: true, plus: true, familyPlus: true },
+      { name: 'Silent Handoff GPS', starter: true, plus: true, familyPlus: true },
+      { name: 'QuickAccords auto-scheduling', starter: false, plus: true, familyPlus: true },
+      { name: 'Calendar sync (Google/Outlook)', starter: false, plus: false, familyPlus: true },
     ]
   },
   {
-    category: 'Finances',
+    category: 'Finances (ClearFund)',
     features: [
-      { name: 'Expense tracking', free: false, basic: true, premium: true },
-      { name: 'Receipt uploads', free: false, basic: true, premium: true },
-      { name: 'Payment ledger', free: false, basic: true, premium: true },
+      { name: 'Expense tracking', starter: true, plus: true, familyPlus: true },
+      { name: 'Payout requests', starter: '$1.50/payout', plus: 'No fees', familyPlus: 'No fees' },
+      { name: 'Receipt uploads', starter: true, plus: true, familyPlus: true },
+    ]
+  },
+  {
+    category: 'Family Features',
+    features: [
+      { name: 'Custody dashboard', starter: false, plus: true, familyPlus: true },
+      { name: 'My Circle contacts', starter: '0', plus: '1', familyPlus: '3-5' },
+      { name: 'KidsCom (child portal)', starter: false, plus: false, familyPlus: true },
+      { name: 'Watch Together theater', starter: false, plus: false, familyPlus: true },
     ]
   },
   {
     category: 'Legal & Court',
     features: [
-      { name: 'Court exports', free: false, basic: 'Basic', premium: 'Advanced' },
-      { name: 'Legal portal', free: false, basic: false, premium: true },
-      { name: 'Audit logging', free: 'Basic', basic: 'Full', premium: 'Full' },
+      { name: 'PDF summaries', starter: false, plus: 'Monthly', familyPlus: 'On-demand' },
+      { name: 'Court-ready exports', starter: false, plus: false, familyPlus: true },
+      { name: 'Compliance analytics', starter: false, plus: false, familyPlus: true },
     ]
   },
 ];
@@ -279,9 +281,9 @@ export default function PricingPage() {
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left py-4 px-4 font-semibold text-foreground">Feature</th>
-                  <th className="text-center py-4 px-4 font-semibold text-foreground">Free</th>
-                  <th className="text-center py-4 px-4 font-semibold text-cg-sage">Basic</th>
-                  <th className="text-center py-4 px-4 font-semibold text-foreground">Premium</th>
+                  <th className="text-center py-4 px-4 font-semibold text-foreground">Starter</th>
+                  <th className="text-center py-4 px-4 font-semibold text-cg-sage">Plus</th>
+                  <th className="text-center py-4 px-4 font-semibold text-foreground">Family+</th>
                 </tr>
               </thead>
               <tbody>
@@ -296,36 +298,36 @@ export default function PricingPage() {
                       <tr key={feature.name} className="border-b border-border/50">
                         <td className="py-3 px-4 text-foreground">{feature.name}</td>
                         <td className="text-center py-3 px-4">
-                          {typeof feature.free === 'boolean' ? (
-                            feature.free ? (
+                          {typeof feature.starter === 'boolean' ? (
+                            feature.starter ? (
                               <Check className="w-5 h-5 text-cg-sage mx-auto" />
                             ) : (
                               <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
                             )
                           ) : (
-                            <span className="text-muted-foreground">{feature.free}</span>
+                            <span className="text-muted-foreground">{feature.starter}</span>
                           )}
                         </td>
                         <td className="text-center py-3 px-4">
-                          {typeof feature.basic === 'boolean' ? (
-                            feature.basic ? (
+                          {typeof feature.plus === 'boolean' ? (
+                            feature.plus ? (
                               <Check className="w-5 h-5 text-cg-sage mx-auto" />
                             ) : (
                               <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
                             )
                           ) : (
-                            <span className="text-cg-sage font-medium">{feature.basic}</span>
+                            <span className="text-cg-sage font-medium">{feature.plus}</span>
                           )}
                         </td>
                         <td className="text-center py-3 px-4">
-                          {typeof feature.premium === 'boolean' ? (
-                            feature.premium ? (
+                          {typeof feature.familyPlus === 'boolean' ? (
+                            feature.familyPlus ? (
                               <Check className="w-5 h-5 text-cg-sage mx-auto" />
                             ) : (
                               <X className="w-5 h-5 text-muted-foreground/30 mx-auto" />
                             )
                           ) : (
-                            <span className="text-foreground font-medium">{feature.premium}</span>
+                            <span className="text-foreground font-medium">{feature.familyPlus}</span>
                           )}
                         </td>
                       </tr>

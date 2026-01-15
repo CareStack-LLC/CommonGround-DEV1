@@ -394,11 +394,11 @@ class StripeService:
         name: Optional[str] = None,
         user_id: Optional[str] = None,
         metadata: Optional[Dict[str, Any]] = None,
-    ) -> str:
+    ) -> Dict[str, Any]:
         """
         Create a Stripe Customer.
 
-        Returns customer ID.
+        Returns dict with customer details.
         """
         customer = stripe.Customer.create(
             email=email,
@@ -410,7 +410,11 @@ class StripeService:
             },
         )
 
-        return customer.id
+        return {
+            "id": customer.id,
+            "email": customer.email,
+            "name": customer.name,
+        }
 
     async def attach_payment_method(
         self,
@@ -457,6 +461,175 @@ class StripeService:
             }
             for pm in methods.data
         ]
+
+    # =========================================================================
+    # Subscription Operations
+    # =========================================================================
+
+    async def create_subscription_checkout(
+        self,
+        customer_id: str,
+        price_id: str,
+        success_url: str,
+        cancel_url: str,
+        trial_days: int = 0,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Create a Stripe Checkout session for subscription.
+
+        Args:
+            customer_id: Stripe Customer ID
+            price_id: Stripe Price ID for the subscription
+            success_url: Redirect URL after successful payment
+            cancel_url: Redirect URL if user cancels
+            trial_days: Number of trial days (0 for no trial)
+            metadata: Additional metadata
+
+        Returns:
+            Dict with checkout session ID and URL
+        """
+        params = {
+            "customer": customer_id,
+            "mode": "subscription",
+            "line_items": [{"price": price_id, "quantity": 1}],
+            "success_url": success_url,
+            "cancel_url": cancel_url,
+            "metadata": {
+                "platform": "commonground",
+                **(metadata or {}),
+            },
+            "subscription_data": {
+                "metadata": {
+                    "platform": "commonground",
+                    **(metadata or {}),
+                },
+            },
+        }
+
+        if trial_days > 0:
+            params["subscription_data"]["trial_period_days"] = trial_days
+
+        session = stripe.checkout.Session.create(**params)
+
+        return {
+            "id": session.id,
+            "url": session.url,
+            "customer": customer_id,
+        }
+
+    async def create_customer_portal_session(
+        self,
+        customer_id: str,
+        return_url: str,
+    ) -> str:
+        """
+        Create a Stripe Customer Portal session.
+
+        Allows users to manage their subscription, update payment methods, etc.
+
+        Args:
+            customer_id: Stripe Customer ID
+            return_url: URL to return to after portal session
+
+        Returns:
+            Portal session URL
+        """
+        session = stripe.billing_portal.Session.create(
+            customer=customer_id,
+            return_url=return_url,
+        )
+
+        return session.url
+
+    async def cancel_subscription(
+        self,
+        subscription_id: str,
+        at_period_end: bool = True,
+    ) -> Dict[str, Any]:
+        """
+        Cancel a subscription.
+
+        Args:
+            subscription_id: Stripe Subscription ID
+            at_period_end: If True, cancel at end of period. If False, cancel immediately.
+
+        Returns:
+            Dict with subscription status and cancel_at date
+        """
+        if at_period_end:
+            subscription = stripe.Subscription.modify(
+                subscription_id,
+                cancel_at_period_end=True,
+            )
+        else:
+            subscription = stripe.Subscription.cancel(subscription_id)
+
+        return {
+            "id": subscription.id,
+            "status": subscription.status,
+            "cancel_at_period_end": subscription.cancel_at_period_end,
+            "cancel_at": datetime.fromtimestamp(subscription.cancel_at) if subscription.cancel_at else None,
+            "canceled_at": datetime.fromtimestamp(subscription.canceled_at) if subscription.canceled_at else None,
+        }
+
+    async def reactivate_subscription(
+        self,
+        subscription_id: str,
+    ) -> Dict[str, Any]:
+        """
+        Reactivate a subscription that was cancelled but hasn't ended yet.
+
+        Args:
+            subscription_id: Stripe Subscription ID
+
+        Returns:
+            Dict with subscription status
+        """
+        subscription = stripe.Subscription.modify(
+            subscription_id,
+            cancel_at_period_end=False,
+        )
+
+        return {
+            "id": subscription.id,
+            "status": subscription.status,
+            "cancel_at_period_end": subscription.cancel_at_period_end,
+        }
+
+    async def get_subscription(
+        self,
+        subscription_id: str,
+    ) -> Dict[str, Any]:
+        """
+        Get subscription details.
+
+        Args:
+            subscription_id: Stripe Subscription ID
+
+        Returns:
+            Dict with subscription details
+        """
+        subscription = stripe.Subscription.retrieve(subscription_id)
+
+        return {
+            "id": subscription.id,
+            "status": subscription.status,
+            "current_period_start": datetime.fromtimestamp(subscription.current_period_start),
+            "current_period_end": datetime.fromtimestamp(subscription.current_period_end),
+            "cancel_at_period_end": subscription.cancel_at_period_end,
+            "cancel_at": datetime.fromtimestamp(subscription.cancel_at) if subscription.cancel_at else None,
+            "canceled_at": datetime.fromtimestamp(subscription.canceled_at) if subscription.canceled_at else None,
+            "trial_start": datetime.fromtimestamp(subscription.trial_start) if subscription.trial_start else None,
+            "trial_end": datetime.fromtimestamp(subscription.trial_end) if subscription.trial_end else None,
+            "items": [
+                {
+                    "price_id": item.price.id,
+                    "product_id": item.price.product,
+                }
+                for item in subscription.items.data
+            ],
+        }
 
     # =========================================================================
     # Webhook Operations

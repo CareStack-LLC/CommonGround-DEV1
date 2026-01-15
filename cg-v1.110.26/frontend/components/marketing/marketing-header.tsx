@@ -20,7 +20,16 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Features', href: '/features' },
+  {
+    label: 'Solutions',
+    href: '/features',
+    children: [
+      { label: 'All Features', href: '/features', description: 'Complete platform overview' },
+      { label: 'Safe Handoff', href: '/safe-handoff', description: 'For DV survivors - zero contact custody' },
+      { label: 'High-Conflict', href: '/high-conflict', description: 'Documentation & court evidence' },
+      { label: 'ARIA Messaging', href: '/aria', description: 'AI-powered communication' },
+    ]
+  },
   {
     label: 'Pricing',
     href: '/pricing',

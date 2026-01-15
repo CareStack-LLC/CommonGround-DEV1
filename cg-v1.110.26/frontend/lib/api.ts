@@ -6516,5 +6516,173 @@ export const walletAPI = {
   },
 };
 
+// ============================================================================
+// SUBSCRIPTION API
+// ============================================================================
+
+export interface SubscriptionPlan {
+  id: string;
+  plan_code: string;
+  display_name: string;
+  description: string | null;
+  price_monthly: string;
+  price_annually: string | null;
+  features: Record<string, boolean | number | string>;
+  is_active: boolean;
+  stripe_product_id: string | null;
+  stripe_price_id_monthly: string | null;
+  stripe_price_id_annually: string | null;
+}
+
+export interface SubscriptionStatus {
+  user_id: string;
+  subscription_tier: string;
+  subscription_status: string;
+  stripe_subscription_id: string | null;
+  subscription_period_start: string | null;
+  subscription_period_end: string | null;
+  has_active_grant: boolean;
+  grant_expires_at: string | null;
+  features: Record<string, boolean | number | string>;
+}
+
+export interface CheckoutSessionResponse {
+  checkout_url: string;
+  session_id: string;
+}
+
+export interface PortalSessionResponse {
+  portal_url: string;
+}
+
+export interface GrantCodeInfo {
+  code: string;
+  nonprofit_name: string;
+  granted_tier: string;
+  is_valid: boolean;
+  reason?: string;
+}
+
+export interface GrantRedemptionResponse {
+  success: boolean;
+  message: string;
+  nonprofit_name: string;
+  granted_tier: string;
+  expires_at: string | null;
+}
+
+export interface GrantStatusResponse {
+  has_active_grant: boolean;
+  grant_code?: string;
+  nonprofit_name?: string;
+  granted_tier?: string;
+  granted_at?: string;
+  expires_at?: string;
+}
+
+export const subscriptionAPI = {
+  /**
+   * Get all available subscription plans
+   */
+  async getPlans(): Promise<SubscriptionPlan[]> {
+    return fetchAPI<SubscriptionPlan[]>('/subscriptions/plans');
+  },
+
+  /**
+   * Get current user's subscription status
+   */
+  async getCurrentSubscription(): Promise<SubscriptionStatus> {
+    return fetchAPI<SubscriptionStatus>('/subscriptions/current');
+  },
+
+  /**
+   * Create a Stripe Checkout session for subscription
+   */
+  async createCheckout(
+    planCode: string,
+    successUrl: string,
+    cancelUrl: string,
+    billingCycle: 'monthly' | 'annually' = 'monthly'
+  ): Promise<CheckoutSessionResponse> {
+    return fetchAPI<CheckoutSessionResponse>('/subscriptions/checkout', {
+      method: 'POST',
+      body: JSON.stringify({
+        plan_code: planCode,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        billing_cycle: billingCycle,
+      }),
+    });
+  },
+
+  /**
+   * Create a Stripe Customer Portal session
+   */
+  async createPortalSession(returnUrl: string): Promise<PortalSessionResponse> {
+    return fetchAPI<PortalSessionResponse>('/subscriptions/portal', {
+      method: 'POST',
+      body: JSON.stringify({ return_url: returnUrl }),
+    });
+  },
+
+  /**
+   * Cancel subscription (at end of billing period)
+   */
+  async cancelSubscription(): Promise<{ success: boolean; message: string; ends_at: string }> {
+    return fetchAPI('/subscriptions/cancel', {
+      method: 'POST',
+    });
+  },
+
+  /**
+   * Reactivate a cancelled subscription
+   */
+  async reactivateSubscription(): Promise<{ success: boolean; message: string }> {
+    return fetchAPI('/subscriptions/reactivate', {
+      method: 'POST',
+    });
+  },
+
+  /**
+   * Check if user has access to a specific feature
+   */
+  async hasFeature(feature: string): Promise<{ has_access: boolean; limit?: number }> {
+    return fetchAPI(`/subscriptions/features/${feature}`);
+  },
+
+  /**
+   * Get all feature access for current user
+   */
+  async getFeatures(): Promise<Record<string, boolean | number | string>> {
+    return fetchAPI('/subscriptions/features');
+  },
+};
+
+export const grantsAPI = {
+  /**
+   * Validate a grant code without redeeming
+   */
+  async validateCode(code: string): Promise<GrantCodeInfo> {
+    return fetchAPI<GrantCodeInfo>(`/grants/validate/${encodeURIComponent(code)}`);
+  },
+
+  /**
+   * Redeem a grant code
+   */
+  async redeemCode(code: string): Promise<GrantRedemptionResponse> {
+    return fetchAPI<GrantRedemptionResponse>('/grants/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    });
+  },
+
+  /**
+   * Get current user's grant status
+   */
+  async getStatus(): Promise<GrantStatusResponse> {
+    return fetchAPI<GrantStatusResponse>('/grants/status');
+  },
+};
+
 // Export commonly used functions
 export { getAuthToken, clearAuthTokens };
