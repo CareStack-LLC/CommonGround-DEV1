@@ -232,6 +232,35 @@ async def create_checkout_session(
             detail="Invalid plan code. Must be 'plus' or 'family_plus'"
         )
 
+    # Check if user already has an active Stripe subscription
+    if profile.stripe_subscription_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You already have an active subscription. Use 'Manage Subscription' to change your plan."
+        )
+
+    # Also check Stripe directly in case our DB is out of sync
+    if profile.stripe_customer_id:
+        try:
+            existing_subs = await stripe_service.get_customer_subscriptions(
+                profile.stripe_customer_id
+            )
+            active_subs = [s for s in existing_subs if s["status"] in ("active", "trialing")]
+            if active_subs:
+                # Sync the subscription to our DB
+                sub = active_subs[0]
+                profile.stripe_subscription_id = sub["id"]
+                profile.subscription_status = sub["status"]
+                await db.commit()
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="You already have an active subscription. Use 'Manage Subscription' to change your plan."
+                )
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.warning(f"Failed to check existing subscriptions: {e}")
+
     # Check if user is already on this plan
     current_tier = feature_gate.get_effective_tier(current_user)
     if current_tier == request.plan_code:
