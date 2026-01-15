@@ -162,6 +162,16 @@ from app.models.kidcoms import (
     ParticipantType,
     RoomType,
 )
+from app.models.subscription import (
+    SubscriptionPlan,
+    GrantCode,
+    GrantRedemption,
+    ClearFundFee,
+    SUBSCRIPTION_TIERS,
+    SUBSCRIPTION_STATUSES,
+    GRANT_STATUSES,
+    FEE_STATUSES,
+)
 
 __all__ = [
     "Base",
@@ -321,4 +331,13 @@ __all__ = [
     "SessionStatus",
     "ParticipantType",
     "RoomType",
+    # Subscription System (GTM)
+    "SubscriptionPlan",
+    "GrantCode",
+    "GrantRedemption",
+    "ClearFundFee",
+    "SUBSCRIPTION_TIERS",
+    "SUBSCRIPTION_STATUSES",
+    "GRANT_STATUSES",
+    "FEE_STATUSES",
 ]
