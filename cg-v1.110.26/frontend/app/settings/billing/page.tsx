@@ -246,14 +246,34 @@ export default function BillingSettingsPage() {
     try {
       setIsProcessing(planCode);
       setError(null);
-      const result = await subscriptionAPI.createCheckout(
-        planCode,
-        `${window.location.origin}/settings/billing?success=true`,
-        `${window.location.origin}/settings/billing?cancelled=true`
-      );
-      window.location.href = result.checkout_url;
+
+      // Check if user already has a subscription
+      const hasExistingSubscription = subscription?.stripe_subscription_id ||
+        (currentTier !== 'starter' && subscription?.status && subscription.status !== 'trial');
+
+      if (hasExistingSubscription) {
+        // Use upgrade endpoint to modify existing subscription
+        const result = await subscriptionAPI.upgradeSubscription(planCode, 'monthly');
+        if (result.success) {
+          // Refresh subscription data
+          const updatedSubscription = await subscriptionAPI.getCurrentSubscription();
+          setSubscription(updatedSubscription);
+          setError(null);
+          // Show success message briefly
+          alert(result.message);
+        }
+        setIsProcessing(null);
+      } else {
+        // No existing subscription - go to checkout
+        const result = await subscriptionAPI.createCheckout(
+          planCode,
+          `${window.location.origin}/settings/billing?success=true`,
+          `${window.location.origin}/settings/billing?cancelled=true`
+        );
+        window.location.href = result.checkout_url;
+      }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to start checkout';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to process upgrade';
       setError(errorMessage);
       setIsProcessing(null);
     }

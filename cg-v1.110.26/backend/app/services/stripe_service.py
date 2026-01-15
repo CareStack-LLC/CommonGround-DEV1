@@ -658,6 +658,56 @@ class StripeService:
             for sub in subscriptions.data
         ]
 
+    async def update_subscription_price(
+        self,
+        subscription_id: str,
+        new_price_id: str,
+        proration_behavior: str = "create_prorations",
+    ) -> Dict[str, Any]:
+        """
+        Update a subscription to a new price (plan change).
+
+        This is used for upgrades/downgrades where the user already has
+        an active subscription and payment method on file.
+
+        Args:
+            subscription_id: Stripe Subscription ID
+            new_price_id: New Stripe Price ID to switch to
+            proration_behavior: How to handle prorations
+                - "create_prorations" (default): Charge/credit the difference
+                - "none": No proration, new price starts next billing cycle
+                - "always_invoice": Invoice immediately
+
+        Returns:
+            Dict with updated subscription details
+        """
+        # Get current subscription to find the item ID
+        subscription = stripe.Subscription.retrieve(subscription_id)
+
+        if not subscription.items.data:
+            raise ValueError("Subscription has no items")
+
+        # Get the subscription item ID (there's typically one item per subscription)
+        item_id = subscription.items.data[0].id
+
+        # Update the subscription with the new price
+        updated_subscription = stripe.Subscription.modify(
+            subscription_id,
+            items=[{
+                "id": item_id,
+                "price": new_price_id,
+            }],
+            proration_behavior=proration_behavior,
+        )
+
+        return {
+            "id": updated_subscription.id,
+            "status": updated_subscription.status,
+            "current_period_start": updated_subscription.current_period_start,
+            "current_period_end": updated_subscription.current_period_end,
+            "price_id": updated_subscription.items.data[0].price.id if updated_subscription.items.data else None,
+        }
+
     # =========================================================================
     # Webhook Operations
     # =========================================================================

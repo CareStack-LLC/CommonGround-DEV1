@@ -6658,6 +6658,23 @@ export const subscriptionAPI = {
   },
 
   /**
+   * Upgrade an existing subscription to a new plan
+   * Use this when user already has a subscription and wants to change plans
+   */
+  async upgradeSubscription(
+    planCode: string,
+    period: 'monthly' | 'annual' = 'monthly'
+  ): Promise<{ success: boolean; new_tier: string; message: string }> {
+    return fetchAPI('/subscriptions/upgrade', {
+      method: 'POST',
+      body: JSON.stringify({
+        plan_code: planCode,
+        period: period,
+      }),
+    });
+  },
+
+  /**
    * Create a Stripe Customer Portal session
    */
   async createPortalSession(returnUrl: string): Promise<PortalSessionResponse> {

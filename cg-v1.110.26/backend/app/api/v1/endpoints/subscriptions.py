@@ -13,6 +13,7 @@ import logging
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -344,6 +345,140 @@ async def create_checkout_session(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create checkout session: {str(e)}"
+        )
+
+
+# =============================================================================
+# Upgrade/Change Plan
+# =============================================================================
+
+
+class UpgradeRequest(BaseModel):
+    """Request to upgrade/change subscription plan."""
+    plan_code: str = Field(..., description="Plan to switch to: 'plus' or 'family_plus'")
+    period: str = Field(default="monthly", description="Billing period: 'monthly' or 'annual'")
+
+
+class UpgradeResponse(BaseModel):
+    """Response after plan upgrade."""
+    success: bool
+    new_tier: str
+    message: str
+
+
+@router.post("/upgrade", response_model=UpgradeResponse)
+async def upgrade_subscription(
+    request: UpgradeRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Upgrade or change an existing subscription's plan.
+
+    This updates the existing subscription to a new price instead of
+    creating a new subscription. Prorations are applied automatically.
+    """
+    from datetime import datetime
+
+    profile = current_user.profile
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User profile not found"
+        )
+
+    # Validate plan code
+    if request.plan_code not in ("plus", "family_plus"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid plan code. Must be 'plus' or 'family_plus'"
+        )
+
+    # Must have an existing subscription to upgrade
+    subscription_id = profile.stripe_subscription_id
+
+    # If no subscription in DB, check Stripe directly
+    if not subscription_id and profile.stripe_customer_id:
+        try:
+            existing_subs = await stripe_service.get_customer_subscriptions(
+                profile.stripe_customer_id
+            )
+            active_subs = [s for s in existing_subs if s["status"] in ("active", "trialing")]
+            if active_subs:
+                subscription_id = active_subs[0]["id"]
+                profile.stripe_subscription_id = subscription_id
+        except Exception as e:
+            logger.warning(f"Failed to check existing subscriptions: {e}")
+
+    if not subscription_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No active subscription found. Use checkout to subscribe first."
+        )
+
+    # Get the new plan's price ID
+    result = await db.execute(
+        select(SubscriptionPlan)
+        .where(SubscriptionPlan.plan_code == request.plan_code)
+    )
+    plan = result.scalar_one_or_none()
+
+    if not plan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Plan '{request.plan_code}' not found"
+        )
+
+    price_id = (
+        plan.stripe_price_id_annual if request.period == "annual"
+        else plan.stripe_price_id_monthly
+    )
+
+    if not price_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Stripe price not configured for this plan"
+        )
+
+    # Update the subscription in Stripe
+    try:
+        updated_sub = await stripe_service.update_subscription_price(
+            subscription_id=subscription_id,
+            new_price_id=price_id,
+            proration_behavior="create_prorations",  # Charge/credit difference
+        )
+
+        # Update our database
+        profile.subscription_tier = request.plan_code
+        profile.subscription_status = updated_sub["status"]
+
+        if updated_sub.get("current_period_start"):
+            profile.subscription_period_start = datetime.fromtimestamp(
+                updated_sub["current_period_start"]
+            )
+        if updated_sub.get("current_period_end"):
+            profile.subscription_period_end = datetime.fromtimestamp(
+                updated_sub["current_period_end"]
+            )
+
+        await db.commit()
+
+        logger.info(
+            f"Upgraded subscription {subscription_id} to {request.plan_code} "
+            f"for user {current_user.id}"
+        )
+
+        return UpgradeResponse(
+            success=True,
+            new_tier=request.plan_code,
+            message=f"Successfully upgraded to {plan.display_name}!"
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to upgrade subscription: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upgrade subscription: {str(e)}"
         )
 
 
