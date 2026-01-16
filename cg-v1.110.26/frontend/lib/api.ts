@@ -6690,9 +6690,10 @@ export const subscriptionAPI = {
   /**
    * Cancel subscription (at end of billing period)
    */
-  async cancelSubscription(): Promise<{ success: boolean; message: string; ends_at: string }> {
+  async cancelSubscription(immediate: boolean = false): Promise<{ success: boolean; message: string; ends_at: string }> {
     return fetchAPI('/subscriptions/cancel', {
       method: 'POST',
+      body: JSON.stringify({ immediate }),
     });
   },
 
