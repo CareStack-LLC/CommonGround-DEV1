@@ -155,6 +155,8 @@ export default function BillingSettingsPage() {
           subscriptionAPI.getCurrentSubscription(),
           grantsAPI.getStatus(),
         ]);
+        console.log('Subscription data from API:', subData);
+        console.log('Current tier:', subData?.tier);
         setSubscription(subData);
         setGrantStatus(grantData);
         setApiAvailable(true);
