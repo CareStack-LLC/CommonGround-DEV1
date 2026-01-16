@@ -13,11 +13,14 @@ from app.models.base import Base
 
 
 # Create async engine
+# Note: statement_cache_size=0 is required for Supabase connection pooler (Supavisor/PgBouncer)
+# which doesn't support prepared statements in transaction mode
 engine = create_async_engine(
     settings.async_database_url,
     echo=settings.DATABASE_ECHO,
     future=True,
     poolclass=NullPool if settings.is_development else None,
+    connect_args={"statement_cache_size": 0},
 )
 
 # Create async session factory
