@@ -285,15 +285,29 @@ async def create_checkout_session(
     # =========================================================================
     existing_subscription_id = None
 
+    logger.info(
+        f"Checking subscriptions for customer {profile.stripe_customer_id} "
+        f"(user {current_user.id}, email {current_user.email})"
+    )
+
     try:
         existing_subs = await stripe_service.get_customer_subscriptions(
             profile.stripe_customer_id
         )
-        active_subs = [s for s in existing_subs if s["status"] in ("active", "trialing")]
+        logger.info(f"Found {len(existing_subs)} subscriptions for customer: {existing_subs}")
+
+        # Include past_due since that's still an active subscription
+        active_subs = [s for s in existing_subs if s["status"] in ("active", "trialing", "past_due")]
+        logger.info(f"Active subscriptions (active/trialing/past_due): {len(active_subs)}")
 
         if active_subs:
             existing_subscription_id = active_subs[0]["id"]
             current_price_id = active_subs[0].get("price_id")
+
+            logger.info(
+                f"User has active subscription {existing_subscription_id} "
+                f"with price_id {current_price_id}, requested price_id {price_id}"
+            )
 
             # Sync to our DB if needed
             if not profile.stripe_subscription_id:
@@ -308,14 +322,20 @@ async def create_checkout_session(
                 )
 
             logger.info(
-                f"Found existing subscription {existing_subscription_id} for customer "
-                f"{profile.stripe_customer_id}, will upgrade instead of creating new"
+                f"Will UPGRADE subscription {existing_subscription_id} from "
+                f"{current_price_id} to {price_id}"
             )
+        else:
+            logger.info(f"No active subscriptions found, will create new checkout session")
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.warning(f"Failed to check existing subscriptions: {e}")
+        logger.error(f"CRITICAL: Failed to check existing subscriptions: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to check subscription status: {str(e)}"
+        )
 
     # =========================================================================
     # If user has existing subscription: UPDATE IT (don't create new)
