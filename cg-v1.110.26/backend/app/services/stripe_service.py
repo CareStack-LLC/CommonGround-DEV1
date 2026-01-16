@@ -565,12 +565,13 @@ class StripeService:
         else:
             subscription = stripe.Subscription.cancel(subscription_id)
 
+        # Use dict-style access for all Stripe object fields
         return {
-            "id": subscription.id,
-            "status": subscription.status,
-            "cancel_at_period_end": subscription.cancel_at_period_end,
-            "cancel_at": datetime.fromtimestamp(subscription.cancel_at) if subscription.cancel_at else None,
-            "canceled_at": datetime.fromtimestamp(subscription.canceled_at) if subscription.canceled_at else None,
+            "id": subscription.get("id"),
+            "status": subscription.get("status"),
+            "cancel_at_period_end": subscription.get("cancel_at_period_end"),
+            "cancel_at": datetime.fromtimestamp(subscription.get("cancel_at")) if subscription.get("cancel_at") else None,
+            "canceled_at": datetime.fromtimestamp(subscription.get("canceled_at")) if subscription.get("canceled_at") else None,
         }
 
     async def reactivate_subscription(
@@ -591,10 +592,11 @@ class StripeService:
             cancel_at_period_end=False,
         )
 
+        # Use dict-style access for all Stripe object fields
         return {
-            "id": subscription.id,
-            "status": subscription.status,
-            "cancel_at_period_end": subscription.cancel_at_period_end,
+            "id": subscription.get("id"),
+            "status": subscription.get("status"),
+            "cancel_at_period_end": subscription.get("cancel_at_period_end"),
         }
 
     async def get_subscription(
@@ -612,19 +614,19 @@ class StripeService:
         """
         subscription = stripe.Subscription.retrieve(subscription_id)
 
-        # Access items via dict-style (sub["items"]) not attribute (sub.items)
+        # Use dict-style access for ALL Stripe object fields
         items_data = subscription.get("items", {}).get("data", [])
 
         return {
-            "id": subscription.id,
-            "status": subscription.status,
-            "current_period_start": datetime.fromtimestamp(subscription.current_period_start),
-            "current_period_end": datetime.fromtimestamp(subscription.current_period_end),
-            "cancel_at_period_end": subscription.cancel_at_period_end,
-            "cancel_at": datetime.fromtimestamp(subscription.cancel_at) if subscription.cancel_at else None,
-            "canceled_at": datetime.fromtimestamp(subscription.canceled_at) if subscription.canceled_at else None,
-            "trial_start": datetime.fromtimestamp(subscription.trial_start) if subscription.trial_start else None,
-            "trial_end": datetime.fromtimestamp(subscription.trial_end) if subscription.trial_end else None,
+            "id": subscription.get("id"),
+            "status": subscription.get("status"),
+            "current_period_start": datetime.fromtimestamp(subscription.get("current_period_start")) if subscription.get("current_period_start") else None,
+            "current_period_end": datetime.fromtimestamp(subscription.get("current_period_end")) if subscription.get("current_period_end") else None,
+            "cancel_at_period_end": subscription.get("cancel_at_period_end"),
+            "cancel_at": datetime.fromtimestamp(subscription.get("cancel_at")) if subscription.get("cancel_at") else None,
+            "canceled_at": datetime.fromtimestamp(subscription.get("canceled_at")) if subscription.get("canceled_at") else None,
+            "trial_start": datetime.fromtimestamp(subscription.get("trial_start")) if subscription.get("trial_start") else None,
+            "trial_end": datetime.fromtimestamp(subscription.get("trial_end")) if subscription.get("trial_end") else None,
             "items": [
                 {
                     "price_id": item["price"]["id"],
@@ -656,17 +658,18 @@ class StripeService:
 
         result = []
         for sub in subscriptions.data:
-            # Access items via dict-style access (sub["items"]) not attribute (sub.items)
+            # Access ALL fields via dict-style access, not attribute access
+            # The Stripe library returns objects where .attribute returns dict methods
             items_data = sub.get("items", {}).get("data", [])
             price_id = items_data[0]["price"]["id"] if items_data else None
-            logger.info(f"Subscription {sub.id}: status={sub.status}, price_id={price_id}")
+            logger.info(f"Subscription {sub.get('id')}: status={sub.get('status')}, price_id={price_id}")
 
             result.append({
-                "id": sub.id,
-                "status": sub.status,
-                "current_period_start": sub.current_period_start,
-                "current_period_end": sub.current_period_end,
-                "cancel_at_period_end": sub.cancel_at_period_end,
+                "id": sub.get("id"),
+                "status": sub.get("status"),
+                "current_period_start": sub.get("current_period_start"),
+                "current_period_end": sub.get("current_period_end"),
+                "cancel_at_period_end": sub.get("cancel_at_period_end"),
                 "price_id": price_id,
             })
 
@@ -717,15 +720,15 @@ class StripeService:
             proration_behavior=proration_behavior,
         )
 
-        # Get updated items
+        # Get updated items - use dict-style access for all Stripe object fields
         updated_items = updated_subscription.get("items", {}).get("data", [])
         updated_price_id = updated_items[0]["price"]["id"] if updated_items else None
 
         return {
-            "id": updated_subscription.id,
-            "status": updated_subscription.status,
-            "current_period_start": updated_subscription.current_period_start,
-            "current_period_end": updated_subscription.current_period_end,
+            "id": updated_subscription.get("id"),
+            "status": updated_subscription.get("status"),
+            "current_period_start": updated_subscription.get("current_period_start"),
+            "current_period_end": updated_subscription.get("current_period_end"),
             "price_id": updated_price_id,
         }
 
