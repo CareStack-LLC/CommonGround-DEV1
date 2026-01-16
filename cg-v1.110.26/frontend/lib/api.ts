@@ -481,6 +481,30 @@ export const authAPI = {
       body: JSON.stringify({ token, new_password: newPassword }),
     });
   },
+
+  /**
+   * Sync OAuth user with backend
+   * Called after successful OAuth authentication to create/update user in our database
+   */
+  async oauthSync(data: {
+    supabase_id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    avatar_url?: string;
+  }): Promise<AuthResponse> {
+    const response = await fetchAPI<AuthResponse>('/auth/oauth/sync', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+
+    setAuthTokens(response.access_token, response.refresh_token);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user', JSON.stringify(response.user));
+    }
+
+    return response;
+  },
 };
 
 // ============================================================================

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import create_access_token, create_refresh_token, decode_token
 from app.core.supabase import get_supabase_client
 from app.models.user import User, UserProfile
-from app.schemas.auth import RegisterRequest, LoginRequest
+from app.schemas.auth import RegisterRequest, LoginRequest, OAuthSyncRequest
 
 
 class AuthService:
@@ -308,3 +308,67 @@ class AuthService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid or expired reset token"
             ) from e
+
+    async def oauth_sync(self, request: OAuthSyncRequest) -> Tuple[User, str, str]:
+        """
+        Sync OAuth user with backend database.
+
+        Creates or updates user in local database after OAuth authentication.
+        OAuth users don't have passwords - they authenticate via Supabase OAuth.
+
+        Args:
+            request: OAuth sync request with user data from Supabase
+
+        Returns:
+            Tuple of (User, access_token, refresh_token)
+        """
+        # Check if user already exists by Supabase ID or email
+        result = await self.db.execute(
+            select(User).where(
+                (User.supabase_id == request.supabase_id) |
+                (User.email == request.email)
+            )
+        )
+        existing_user = result.scalar_one_or_none()
+
+        if existing_user:
+            # Update existing user with OAuth data
+            existing_user.supabase_id = request.supabase_id
+            existing_user.email_verified = True  # OAuth emails are verified
+            if request.first_name and not existing_user.first_name:
+                existing_user.first_name = request.first_name
+            if request.last_name and not existing_user.last_name:
+                existing_user.last_name = request.last_name
+            existing_user.last_login = datetime.utcnow()
+
+            await self.db.commit()
+            await self.db.refresh(existing_user)
+            user = existing_user
+        else:
+            # Create new user from OAuth data
+            user = User(
+                email=request.email,
+                supabase_id=request.supabase_id,
+                first_name=request.first_name,
+                last_name=request.last_name or "",
+                email_verified=True,  # OAuth emails are verified
+                is_active=True,
+                last_login=datetime.utcnow(),
+            )
+            self.db.add(user)
+            await self.db.commit()
+            await self.db.refresh(user)
+
+            # Create default profile for new OAuth users
+            profile = UserProfile(
+                user_id=user.id,
+                avatar_url=request.avatar_url,
+            )
+            self.db.add(profile)
+            await self.db.commit()
+
+        # Generate our JWT tokens
+        access_token = create_access_token(user.id)
+        refresh_token = create_refresh_token(user.id)
+
+        return user, access_token, refresh_token

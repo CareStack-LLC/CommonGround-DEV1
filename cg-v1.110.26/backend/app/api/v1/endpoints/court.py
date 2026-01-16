@@ -2861,8 +2861,14 @@ async def get_report_type(report_type_id: str):
 # Custody Agreement Upload & Extraction Endpoints
 # =============================================================================
 
+import uuid
 from fastapi import UploadFile, File, BackgroundTasks
 from app.services.custody_extraction import CustodyExtractionService, compute_file_hash
+from app.services.storage import (
+    storage_service,
+    StorageBucket,
+    build_document_path,
+)
 from app.schemas.custody_order import (
     AgreementUploadResponse,
     ExtractionStatusResponse,
@@ -2905,7 +2911,7 @@ async def upload_custody_agreement(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Upload a custody agreement PDF for AI extraction.
+    Upload a custody agreement PDF to Supabase Storage for AI extraction.
 
     The extraction will run in the background. Use the extraction status
     endpoint to check progress and retrieve results.
@@ -2925,10 +2931,23 @@ async def upload_custody_agreement(
     file_hash = compute_file_hash(content)
     file_size = len(content)
 
-    # For now, store in a temporary location (in production, use Supabase Storage)
-    # We'll store the base64 content in the database for simplicity
-    import base64
-    file_url = f"data:application/pdf;base64,{base64.b64encode(content).decode()}"
+    # Generate unique filename and upload to Supabase Storage
+    original_filename = file.filename or "custody_agreement.pdf"
+    unique_filename = f"{uuid.uuid4().hex[:8]}_{original_filename}"
+    storage_path = build_document_path(case_id, "custody_orders", unique_filename)
+
+    try:
+        file_url = await storage_service.upload_file(
+            bucket=StorageBucket.DOCUMENTS,
+            path=storage_path,
+            file_content=content,
+            content_type="application/pdf"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload file: {str(e)}"
+        )
 
     # Create upload record
     service = CustodyExtractionService(db)
@@ -2936,7 +2955,7 @@ async def upload_custody_agreement(
         case_id=case_id,
         uploaded_by=professional_id,
         uploaded_by_type="court_professional",
-        filename=file.filename or "custody_agreement.pdf",
+        filename=original_filename,
         file_url=file_url,
         file_size=file_size,
         file_hash=file_hash,
@@ -2952,9 +2971,10 @@ async def upload_custody_agreement(
         resource_type="agreement_upload",
         resource_id=upload.id,
         details={
-            "filename": file.filename,
+            "filename": original_filename,
             "file_size": file_size,
             "document_type": document_type,
+            "storage_path": storage_path,
         },
     )
 
@@ -2974,10 +2994,10 @@ async def upload_custody_agreement(
     return AgreementUploadResponse(
         id=upload.id,
         case_id=case_id,
-        filename=file.filename or "custody_agreement.pdf",
-        file_url=upload.file_url,
+        filename=original_filename,
+        file_url=file_url,
         extraction_status="processing",
-        message="File uploaded. Extraction started in background.",
+        message="File uploaded to cloud storage. Extraction started in background.",
     )
 
 

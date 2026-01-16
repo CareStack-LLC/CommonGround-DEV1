@@ -5,12 +5,20 @@ Endpoints for managing obligations, funding, verification, and ledger entries.
 """
 
 from typing import Optional
-from fastapi import APIRouter, Depends, Query, Request, UploadFile, File, status
+import uuid
+from decimal import Decimal
+
+from fastapi import APIRouter, Depends, Query, Request, UploadFile, File, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
+from app.services.storage import (
+    storage_service,
+    StorageBucket,
+    build_receipt_path,
+)
 from app.schemas.clearfund import (
     ObligationCreate,
     ObligationCreateFromRequest,
@@ -336,53 +344,62 @@ async def upload_receipt_file(
     db: AsyncSession = Depends(get_db)
 ) -> VerificationArtifactResponse:
     """
-    Upload a receipt file for verification.
+    Upload a receipt file for verification to Supabase Storage.
 
-    Accepts an image file, saves it to storage, and creates a verification artifact.
+    Accepts an image or PDF file, saves it to cloud storage, and creates a verification artifact.
     """
-    import os
-    import uuid
     from pathlib import Path
-    from decimal import Decimal
 
     # Validate file type
     allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"]
     if file.content_type not in allowed_types:
-        from fastapi import HTTPException
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"File type {file.content_type} not allowed. Use JPEG, PNG, GIF, WebP, or PDF."
         )
 
-    # Validate file size (max 10MB)
+    # Read and validate file size (max 10MB)
     content = await file.read()
     if len(content) > 10 * 1024 * 1024:
-        from fastapi import HTTPException
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="File too large. Maximum size is 10MB."
         )
 
-    # Create uploads directory if it doesn't exist
-    upload_dir = Path("uploads/receipts")
-    upload_dir.mkdir(parents=True, exist_ok=True)
+    # Get the obligation to verify access and get family context
+    service = ClearFundService(db)
+    obligation = await service.get_obligation(obligation_id, current_user)
+
+    # Determine the family context (family_file_id or case_id)
+    family_context_id = obligation.family_file_id or obligation.case_id
+    if not family_context_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Obligation must be associated with a family file or case"
+        )
 
     # Generate unique filename
     file_ext = Path(file.filename or "receipt.jpg").suffix.lower()
     if not file_ext:
         file_ext = ".jpg" if file.content_type.startswith("image/") else ".pdf"
-    unique_filename = f"{obligation_id}_{uuid.uuid4().hex[:8]}{file_ext}"
-    file_path = upload_dir / unique_filename
+    unique_filename = f"{uuid.uuid4().hex[:8]}{file_ext}"
+    storage_path = build_receipt_path(family_context_id, obligation_id, unique_filename)
 
-    # Save file
-    with open(file_path, "wb") as f:
-        f.write(content)
-
-    # Generate URL (relative to API)
-    receipt_url = f"/uploads/receipts/{unique_filename}"
+    # Upload to Supabase Storage
+    try:
+        receipt_url = await storage_service.upload_file(
+            bucket=StorageBucket.RECEIPTS,
+            path=storage_path,
+            file_content=content,
+            content_type=file.content_type or "image/jpeg"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload file: {str(e)}"
+        )
 
     # Create verification artifact
-    service = ClearFundService(db)
     artifact = await service.upload_receipt(
         obligation_id,
         receipt_url,

@@ -7,6 +7,7 @@ Profiles start as pending_approval and become active when both parents approve.
 
 from typing import List, Optional
 import json
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +16,11 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
 from app.services.child import ChildService
+from app.services.storage import (
+    storage_service,
+    StorageBucket,
+    build_child_photo_path,
+)
 from app.services.activity import log_child_activity
 from app.schemas.child import (
     ChildCreateBasic,
@@ -448,11 +454,7 @@ async def upload_photo(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Upload and save a child's profile photo file."""
-    import os
-    import uuid
-    from pathlib import Path
-
+    """Upload and save a child's profile photo to Supabase Storage."""
     # Validate file type
     allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp"]
     if file.content_type not in allowed_types:
@@ -461,29 +463,47 @@ async def upload_photo(
             detail=f"File type {file.content_type} not allowed. Use JPEG, PNG, GIF, or WebP."
         )
 
-    # Create uploads directory if needed
-    uploads_dir = Path(__file__).parent.parent.parent.parent.parent / "uploads" / "children"
-    uploads_dir.mkdir(parents=True, exist_ok=True)
+    # Get the child to verify access and get family_file_id
+    service = ChildService(db)
+    child = await service.get_child(child_id, current_user)
+
+    # Determine the family context (family_file_id or case_id)
+    family_context_id = child.family_file_id or child.case_id
+    if not family_context_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Child must be associated with a family file or case"
+        )
 
     # Generate unique filename
     ext = file.filename.split(".")[-1] if file.filename and "." in file.filename else "jpg"
-    filename = f"{child_id}_{uuid.uuid4().hex[:8]}.{ext}"
-    filepath = uploads_dir / filename
+    filename = f"{uuid.uuid4().hex[:8]}.{ext}"
+    storage_path = build_child_photo_path(family_context_id, child_id, filename)
 
-    # Save file
+    # Read file content
     try:
         content = await file.read()
-        with open(filepath, "wb") as f:
-            f.write(content)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to save file: {str(e)}"
+            detail=f"Failed to read file: {str(e)}"
+        )
+
+    # Upload to Supabase Storage
+    try:
+        photo_url = await storage_service.upload_file(
+            bucket=StorageBucket.CHILDREN,
+            path=storage_path,
+            file_content=content,
+            content_type=file.content_type or "image/jpeg"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload file: {str(e)}"
         )
 
     # Update child with photo URL
-    photo_url = f"/uploads/children/{filename}"
-    service = ChildService(db)
     child = await service.update_photo(child_id, photo_url, current_user)
     return _child_to_full_response(child)
 
