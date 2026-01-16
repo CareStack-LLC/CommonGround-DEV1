@@ -366,8 +366,8 @@ export default function PricingPage() {
                     isCurrentPlan(plan.planCode)
                       ? 'bg-muted text-muted-foreground cursor-default'
                       : plan.highlighted
-                      ? 'bg-cg-sage text-white hover:bg-cg-sage-light hover:shadow-lg disabled:opacity-50'
-                      : 'border-2 border-cg-sage text-cg-sage hover:bg-cg-sage hover:text-white disabled:opacity-50'
+                      ? 'bg-cg-sage text-white hover:opacity-90 hover:shadow-lg disabled:opacity-50'
+                      : 'border-2 border-cg-sage text-cg-sage hover:bg-cg-sage-subtle hover:border-cg-sage-light disabled:opacity-50'
                   }`}
                 >
                   {getButtonText(plan)}
@@ -542,7 +542,7 @@ export default function PricingPage() {
           {isLoggedIn ? (
             <Link
               href="/dashboard"
-              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
+              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:opacity-90 hover:shadow-xl hover:-translate-y-1"
             >
               Go to Dashboard
               <ArrowRight className="w-5 h-5" />
@@ -550,7 +550,7 @@ export default function PricingPage() {
           ) : (
             <Link
               href="/register"
-              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
+              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:opacity-90 hover:shadow-xl hover:-translate-y-1"
             >
               Get Started Free
               <ArrowRight className="w-5 h-5" />
