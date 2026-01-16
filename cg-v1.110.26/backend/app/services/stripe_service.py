@@ -647,13 +647,19 @@ class StripeService:
         Returns:
             List of subscription details
         """
+        import logging
+        logger = logging.getLogger(__name__)
+
+        logger.info(f"get_customer_subscriptions called for customer {customer_id}")
         subscriptions = stripe.Subscription.list(customer=customer_id, limit=10)
+        logger.info(f"Found {len(subscriptions.data)} subscriptions")
 
         result = []
         for sub in subscriptions.data:
             # Access items via dict-style access (sub["items"]) not attribute (sub.items)
             items_data = sub.get("items", {}).get("data", [])
             price_id = items_data[0]["price"]["id"] if items_data else None
+            logger.info(f"Subscription {sub.id}: status={sub.status}, price_id={price_id}")
 
             result.append({
                 "id": sub.id,
@@ -664,6 +670,7 @@ class StripeService:
                 "price_id": price_id,
             })
 
+        logger.info(f"Returning {len(result)} subscriptions: {result}")
         return result
 
     async def update_subscription_price(

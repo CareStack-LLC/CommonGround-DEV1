@@ -964,7 +964,120 @@ async def sync_subscription_from_stripe(
         )
 
     except Exception as e:
-        logger.error(f"Failed to sync subscription from Stripe: {e}")
+        logger.error(f"Failed to sync subscription from Stripe: {e}", exc_info=True)
         # Don't raise - return current status
 
     return await get_current_subscription(current_user, db)
+
+
+@router.post("/debug/sync")
+async def debug_sync_subscription(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Debug version of sync that returns detailed error info instead of swallowing errors.
+    """
+    from datetime import datetime
+
+    profile = current_user.profile
+    if not profile:
+        return {"error": "User profile not found"}
+
+    if not profile.stripe_customer_id:
+        return {"error": "No Stripe customer ID", "profile_tier": profile.subscription_tier}
+
+    result = {
+        "customer_id": profile.stripe_customer_id,
+        "before_sync": {
+            "tier": profile.subscription_tier,
+            "status": profile.subscription_status,
+            "subscription_id": profile.stripe_subscription_id,
+        },
+        "steps": [],
+    }
+
+    try:
+        # Step 1: Get subscriptions
+        result["steps"].append("1. Getting subscriptions from Stripe...")
+        subscriptions = await stripe_service.get_customer_subscriptions(
+            profile.stripe_customer_id
+        )
+        result["subscriptions_found"] = len(subscriptions)
+        result["subscriptions"] = subscriptions
+
+        if not subscriptions:
+            result["steps"].append("2. No subscriptions found")
+            return result
+
+        # Step 2: Find active subscription
+        result["steps"].append("2. Looking for active subscription...")
+        active_sub = None
+        for sub in subscriptions:
+            if sub["status"] in ("active", "trialing"):
+                active_sub = sub
+                break
+
+        if not active_sub:
+            result["steps"].append("3. No active subscription found")
+            return result
+
+        result["active_subscription"] = active_sub
+        result["steps"].append(f"3. Found active subscription: {active_sub['id']}")
+
+        # Step 3: Map price to tier
+        price_id = active_sub.get("price_id")
+        result["price_id"] = price_id
+        result["steps"].append(f"4. Mapping price_id {price_id} to tier...")
+
+        if price_id:
+            plan_result = await db.execute(
+                select(SubscriptionPlan).where(
+                    (SubscriptionPlan.stripe_price_id_monthly == price_id) |
+                    (SubscriptionPlan.stripe_price_id_annual == price_id)
+                )
+            )
+            plan = plan_result.scalar_one_or_none()
+            tier = plan.plan_code if plan else "starter"
+            result["plan_found"] = plan is not None
+            result["tier"] = tier
+            result["steps"].append(f"5. Mapped to tier: {tier}")
+        else:
+            tier = "starter"
+            result["tier"] = tier
+            result["steps"].append("5. No price_id, defaulting to starter")
+
+        # Step 4: Update profile
+        result["steps"].append("6. Updating profile...")
+        profile.subscription_tier = tier
+        profile.subscription_status = active_sub["status"]
+        profile.stripe_subscription_id = active_sub["id"]
+
+        if active_sub.get("current_period_start"):
+            profile.subscription_period_start = datetime.fromtimestamp(
+                active_sub["current_period_start"]
+            )
+        if active_sub.get("current_period_end"):
+            profile.subscription_period_end = datetime.fromtimestamp(
+                active_sub["current_period_end"]
+            )
+
+        result["steps"].append("7. Committing to database...")
+        await db.commit()
+        await db.refresh(profile)
+
+        result["after_sync"] = {
+            "tier": profile.subscription_tier,
+            "status": profile.subscription_status,
+            "subscription_id": profile.stripe_subscription_id,
+        }
+        result["steps"].append("8. Sync complete!")
+        result["success"] = True
+
+    except Exception as e:
+        import traceback
+        result["error"] = str(e)
+        result["traceback"] = traceback.format_exc()
+        result["success"] = False
+
+    return result
