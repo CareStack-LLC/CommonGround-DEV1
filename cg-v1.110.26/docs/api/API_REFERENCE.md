@@ -1,7 +1,7 @@
 # CommonGround V1 - Complete API Reference
 
-**Last Updated:** January 11, 2026
-**API Version:** 1.1.2
+**Last Updated:** January 15, 2026
+**API Version:** 1.4.0
 **Base URL:** `https://api.commonground.app/api/v1`
 **Local Development:** `http://localhost:8000/api/v1`
 
@@ -23,6 +23,8 @@
    - [Agreements](#agreements-endpoints)
    - [ClearFund](#clearfund-endpoints)
    - [Wallet](#wallet-endpoints-v112)
+   - [Subscriptions](#subscriptions-endpoints)
+   - [Grants](#grants-endpoints)
    - [Schedule](#schedule-endpoints)
    - [Exchanges](#exchanges-endpoints)
    - [KidComs](#kidcoms-endpoints)
@@ -414,8 +416,12 @@ Verify email with token from email.
 
 ---
 
-#### POST /auth/forgot-password
+#### POST /auth/password-reset/request
 Request password reset email.
+
+> **v1.4.0:** Updated endpoint path from `/auth/forgot-password`
+
+**Authentication:** Not required
 
 **Request:**
 ```json
@@ -427,21 +433,25 @@ Request password reset email.
 **Response (200):**
 ```json
 {
-  "data": {
-    "message": "Password reset email sent"
-  }
+  "message": "If an account exists with this email, a password reset link has been sent."
 }
 ```
 
+> **Security Note:** Always returns success to prevent email enumeration attacks.
+
 ---
 
-#### POST /auth/reset-password
-Reset password with token.
+#### POST /auth/password-reset/confirm
+Reset password with token from email.
+
+> **v1.4.0:** Updated endpoint path from `/auth/reset-password`
+
+**Authentication:** Not required
 
 **Request:**
 ```json
 {
-  "token": "reset_token_xxx",
+  "token": "reset_token_from_email",
   "new_password": "NewSecurePass123!"
 }
 ```
@@ -449,11 +459,18 @@ Reset password with token.
 **Response (200):**
 ```json
 {
-  "data": {
-    "message": "Password reset successfully"
-  }
+  "message": "Password reset successfully"
 }
 ```
+
+**Errors:**
+- `400 BAD_REQUEST`: Token expired or invalid
+- `422 VALIDATION_ERROR`: Password does not meet requirements
+
+> **Token Details:**
+> - Single-use: Token is invalidated after successful reset
+> - Expires after 1 hour
+> - Delivered via Supabase email integration
 
 ---
 
@@ -1649,6 +1666,392 @@ When 3D Secure authentication is required:
 
 ---
 
+### Subscriptions Endpoints
+
+Manage subscription plans, checkout, billing, and feature access.
+
+> **v1.4.0:** Added subscription management system with Stripe integration
+
+#### GET /subscriptions/plans
+List all available subscription plans.
+
+**Authentication:** Not required
+
+**Response (200):**
+```json
+{
+  "plans": [
+    {
+      "id": "plan_starter_001",
+      "plan_code": "starter",
+      "display_name": "Starter",
+      "description": "Everything you need to get started with better co-parenting.",
+      "badge": null,
+      "price_monthly": 0.00,
+      "price_annual": 0.00,
+      "features": {
+        "aria_manual_sentiment": true,
+        "clearfund_fee_exempt": false,
+        "quick_accords": false,
+        "circle_contacts_limit": 0,
+        "kidcoms_access": false
+      },
+      "trial_days": 14,
+      "display_order": 0
+    },
+    {
+      "id": "plan_plus_001",
+      "plan_code": "plus",
+      "display_name": "Plus",
+      "description": "Better scheduling, no fees, and a trusted contact.",
+      "badge": "Most Popular",
+      "price_monthly": 12.00,
+      "price_annual": 120.00,
+      "features": {
+        "aria_manual_sentiment": true,
+        "clearfund_fee_exempt": true,
+        "quick_accords": true,
+        "circle_contacts_limit": 1,
+        "kidcoms_access": false
+      },
+      "trial_days": 14,
+      "display_order": 1
+    },
+    {
+      "id": "plan_family_plus_001",
+      "plan_code": "family_plus",
+      "display_name": "Family+",
+      "description": "Full access including KidComs video calls and theater mode.",
+      "badge": null,
+      "price_monthly": 25.00,
+      "price_annual": 250.00,
+      "features": {
+        "aria_manual_sentiment": true,
+        "aria_advanced": true,
+        "clearfund_fee_exempt": true,
+        "quick_accords": true,
+        "circle_contacts_limit": 5,
+        "kidcoms_access": true,
+        "theater_mode": true
+      },
+      "trial_days": 14,
+      "display_order": 2
+    }
+  ]
+}
+```
+
+---
+
+#### GET /subscriptions/current
+Get the current user's subscription status.
+
+**Authentication:** Required
+
+**Response (200):**
+```json
+{
+  "tier": "plus",
+  "tier_display_name": "Plus",
+  "status": "active",
+  "stripe_subscription_id": "sub_xxx",
+  "period_start": "2026-01-15T00:00:00Z",
+  "period_end": "2026-02-15T00:00:00Z",
+  "has_active_grant": false,
+  "grant_nonprofit_name": null,
+  "grant_expires_at": null,
+  "is_trial": false,
+  "trial_ends_at": null,
+  "features": {
+    "aria_manual_sentiment": { "has_access": true, "limit": null },
+    "clearfund_fee_exempt": { "has_access": true, "limit": null },
+    "quick_accords": { "has_access": true, "limit": null },
+    "circle_contacts_limit": { "has_access": true, "limit": 1 },
+    "kidcoms_access": { "has_access": false, "limit": null }
+  }
+}
+```
+
+---
+
+#### POST /subscriptions/checkout
+Subscribe to a plan or upgrade existing subscription.
+
+**Authentication:** Required
+
+**Request:**
+```json
+{
+  "plan_code": "plus",
+  "period": "monthly",
+  "success_url": "https://app.commonground.app/billing?success=true",
+  "cancel_url": "https://app.commonground.app/billing"
+}
+```
+
+**Response (200) - New subscription (checkout required):**
+```json
+{
+  "action": "checkout",
+  "checkout_url": "https://checkout.stripe.com/c/pay/cs_xxx",
+  "session_id": "cs_xxx"
+}
+```
+
+**Response (200) - Existing subscription upgraded:**
+```json
+{
+  "action": "upgraded",
+  "new_tier": "family_plus",
+  "message": "Successfully upgraded to Family+!"
+}
+```
+
+**Errors:**
+- `400 BAD_REQUEST`: Invalid plan code or already on this plan
+- `404 NOT_FOUND`: Plan not found
+
+---
+
+#### POST /subscriptions/upgrade
+Upgrade or change an existing subscription's plan.
+
+**Authentication:** Required
+
+**Request:**
+```json
+{
+  "plan_code": "family_plus",
+  "period": "monthly"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "new_tier": "family_plus",
+  "message": "Successfully upgraded to Family+!"
+}
+```
+
+**Errors:**
+- `400 BAD_REQUEST`: No active subscription to upgrade
+
+---
+
+#### POST /subscriptions/portal
+Create a Stripe Customer Portal session for billing management.
+
+**Authentication:** Required
+
+**Request:**
+```json
+{
+  "return_url": "https://app.commonground.app/settings/billing"
+}
+```
+
+**Response (200):**
+```json
+{
+  "portal_url": "https://billing.stripe.com/session/xxx"
+}
+```
+
+---
+
+#### POST /subscriptions/cancel
+Cancel the current subscription.
+
+**Authentication:** Required
+
+**Request:**
+```json
+{
+  "immediate": false
+}
+```
+
+**Response (200):**
+```json
+{
+  "cancelled": true,
+  "cancel_at": "2026-02-15T00:00:00Z",
+  "message": "Subscription will be cancelled at the end of the billing period."
+}
+```
+
+> When `immediate: false` (default), subscription remains active until period end. When `immediate: true`, cancellation is immediate and user is downgraded to Starter.
+
+---
+
+#### POST /subscriptions/reactivate
+Reactivate a cancelled subscription before it ends.
+
+**Authentication:** Required
+
+**Response (200):**
+```json
+{
+  "reactivated": true,
+  "message": "Subscription reactivated successfully."
+}
+```
+
+**Errors:**
+- `400 BAD_REQUEST`: No subscription to reactivate
+
+---
+
+#### GET /subscriptions/features
+List all features and the current user's access level.
+
+**Authentication:** Required
+
+**Response (200):**
+```json
+{
+  "tier": "plus",
+  "features": {
+    "aria_manual_sentiment": {
+      "has_access": true,
+      "limit": null,
+      "required_tier": "starter"
+    },
+    "clearfund_fee_exempt": {
+      "has_access": true,
+      "limit": null,
+      "required_tier": "plus"
+    },
+    "kidcoms_access": {
+      "has_access": false,
+      "limit": null,
+      "required_tier": "family_plus"
+    }
+  }
+}
+```
+
+---
+
+#### GET /subscriptions/features/{feature}
+Check if the current user has access to a specific feature.
+
+**Authentication:** Required
+
+**Response (200):**
+```json
+{
+  "feature": "kidcoms_access",
+  "has_access": false,
+  "current_tier": "plus",
+  "required_tier": "family_plus",
+  "limit": null,
+  "upgrade_message": "Upgrade to Family+ to access KidComs video calling."
+}
+```
+
+---
+
+#### POST /subscriptions/sync
+Sync subscription status from Stripe (fallback when webhooks are delayed).
+
+**Authentication:** Required
+
+**Response (200):** Returns `SubscriptionStatusResponse` (same as GET /subscriptions/current)
+
+---
+
+### Grants Endpoints
+
+Manage nonprofit grant code redemption for DV survivors.
+
+> **v1.4.0:** Added grant code system for nonprofit partnerships
+
+#### POST /grants/redeem
+Redeem a nonprofit grant code.
+
+**Authentication:** Required
+
+**Request:**
+```json
+{
+  "code": "SAFEHAVEN-ABC123"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Grant code redeemed successfully! You now have Plus access.",
+  "nonprofit_name": "Safe Haven",
+  "granted_tier": "plus",
+  "expires_at": "2026-07-15T00:00:00Z"
+}
+```
+
+**Errors:**
+- `400 BAD_REQUEST`: User already has active grant or paid subscription
+- `404 NOT_FOUND`: Invalid grant code
+
+---
+
+#### GET /grants/status
+Check if the current user has an active grant.
+
+**Authentication:** Required
+
+**Response (200) - With active grant:**
+```json
+{
+  "has_active_grant": true,
+  "grant_code": "SAFEHAVEN-ABC123",
+  "nonprofit_name": "Safe Haven",
+  "granted_tier": "plus",
+  "granted_at": "2026-01-15T12:00:00Z",
+  "expires_at": "2026-07-15T00:00:00Z"
+}
+```
+
+**Response (200) - No active grant:**
+```json
+{
+  "has_active_grant": false
+}
+```
+
+---
+
+#### GET /grants/validate/{code}
+Validate a grant code without redeeming it.
+
+**Authentication:** Not required (public endpoint)
+
+**Response (200) - Valid code:**
+```json
+{
+  "code": "SAFEHAVEN-ABC123",
+  "nonprofit_name": "Safe Haven",
+  "granted_tier": "plus",
+  "is_valid": true
+}
+```
+
+**Response (200) - Invalid code:**
+```json
+{
+  "code": "INVALID-CODE",
+  "nonprofit_name": "",
+  "granted_tier": "",
+  "is_valid": false,
+  "reason": "Invalid grant code"
+}
+```
+
+---
+
 ### Schedule Endpoints
 
 #### POST /schedule/events
@@ -2415,7 +2818,7 @@ Get notification preferences.
 
 CommonGround can send webhooks for real-time event notifications.
 
-### Webhook Events
+### Application Webhook Events
 
 | Event | Trigger |
 |-------|---------|
@@ -2428,6 +2831,26 @@ CommonGround can send webhooks for real-time event notifications.
 | `expense.approved` | Expense approved |
 | `exchange.checkin` | Parent checked in |
 | `export.completed` | Export ready |
+
+### Stripe Webhook Events (v1.4.0)
+
+The backend processes the following Stripe webhooks at `POST /api/v1/webhooks/stripe`:
+
+| Event | Trigger | Action |
+|-------|---------|--------|
+| `checkout.session.completed` | User completes Stripe checkout | Create subscription, update user tier |
+| `customer.subscription.created` | New subscription created | Sync subscription to user profile |
+| `customer.subscription.updated` | Subscription plan or status changed | Update tier, status, period dates |
+| `customer.subscription.deleted` | Subscription cancelled | Downgrade user to Starter tier |
+| `invoice.paid` | Successful payment/renewal | Extend subscription period |
+| `invoice.payment_failed` | Payment failed | Mark subscription as `past_due` |
+| `payment_intent.succeeded` | Wallet deposit successful | Credit user wallet balance |
+| `transfer.created` | Payout initiated | Log payout to wallet |
+
+**Stripe Webhook Configuration:**
+- Endpoint URL: `https://api.commonground.app/api/v1/webhooks/stripe`
+- Events: Select the events listed above
+- Signing secret: Set in `STRIPE_WEBHOOK_SECRET` environment variable
 
 ### Webhook Payload
 

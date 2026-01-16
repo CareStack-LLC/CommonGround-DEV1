@@ -5,6 +5,58 @@ All notable changes to CommonGround will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-01-15
+
+### Added
+
+#### GTM Subscription System
+- **3-Tier Subscription Plans** - Starter (free), Plus ($12/mo), Family+ ($25/mo)
+- **Stripe Checkout Integration** - Create checkout sessions for new subscribers
+- **Subscription Upgrade Flow** - In-app upgrades with automatic proration
+- **Stripe Customer Portal** - Self-service billing management via `/subscriptions/portal`
+- **Feature Gating Service** - Control feature access by subscription tier
+
+#### Subscription Management Endpoints
+- `GET /subscriptions/plans` - List available plans with pricing and features
+- `GET /subscriptions/current` - Get current user's subscription status
+- `POST /subscriptions/checkout` - Create Stripe checkout session or upgrade existing subscription
+- `POST /subscriptions/portal` - Generate Stripe Customer Portal session
+- `POST /subscriptions/cancel` - Cancel subscription (end of period or immediate)
+- `POST /subscriptions/reactivate` - Reactivate a cancelled subscription
+- `GET /subscriptions/features` - List features available for current tier
+- `POST /subscriptions/sync` - Sync subscription status from Stripe
+
+#### DV Nonprofit Grant System
+- **Grant Code Redemption** - Partners provide free subscription access to DV survivors
+- **Grant Validation** - Public endpoint to check code validity before redemption
+- **Grant Status Tracking** - Monitor active grants with expiration dates
+- `POST /grants/redeem` - Redeem a nonprofit grant code
+- `GET /grants/status` - Get active grant information
+- `GET /grants/validate/{code}` - Validate grant code (public)
+
+#### Password Reset Flow
+- **Email-Based Reset** - Request password reset via email link
+- **Secure Token Workflow** - Single-use tokens with 1-hour expiration
+- `POST /auth/password-reset/request` - Request password reset email
+- `POST /auth/password-reset/confirm` - Complete reset with token
+
+#### Pricing Page Enhancements
+- **Direct Checkout** - Logged-in users go straight to Stripe from pricing page
+- **Plan Comparison** - Feature matrix comparing all subscription tiers
+- **Current Plan Indicator** - Visual indicator of active subscription
+
+#### Mini & Mega Multiplayer v3
+- **Updated Visual Assets** - New character sprites from Nano Banana Pro
+- **Carry Mechanic** - Mini can be carried by Mega character
+- **Bridge Puzzle** - Collaborative puzzle element requiring both characters
+
+### Fixed
+- **Stripe API Access Pattern** - Fixed dict-style access for Stripe objects (`sub.get("field")` instead of `sub.field`)
+- **Cancel Subscription 422 Error** - Fixed by sending JSON body with `{ immediate: false }`
+- **Pricing Page Hover Colors** - Changed to subtle opacity-based hover states
+
+---
+
 ## [1.3.0] - 2026-01-12
 
 ### Added
@@ -437,6 +489,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.0 | 2026-01-15 | GTM Subscription System, Grant Codes, Password Reset, Mini & Mega v3 |
 | 1.3.0 | 2026-01-12 | ARIA v2 support, Features page redesign, KidComs brand theming |
 | 1.2.0 | 2025-01-11 | SharedCare Agreement v2, 7-section format, Quick Accords |
 | 1.1.2 | 2025-01-11 | Stripe obligation payments, My Circle refactor, room tracking |

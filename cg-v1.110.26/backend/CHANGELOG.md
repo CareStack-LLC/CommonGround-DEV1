@@ -5,7 +5,61 @@ All notable changes to the CommonGround Backend API will be documented in this f
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.2] - 2025-01-11
+## [1.2.0] - 2026-01-15
+
+### Added
+
+#### Subscription Management System
+- **SubscriptionPlan Model** - Store plans with Stripe price IDs in database
+- **Feature Gate Service** - `feature_gate.has_feature()` for subscription tier checks
+- **Stripe Customer Creation** - Auto-create Stripe customers on first checkout
+- **Subscription Sync** - Pull subscription status directly from Stripe API
+
+#### Subscription Endpoints
+- `GET /api/v1/subscriptions/plans` - List available plans with pricing
+- `GET /api/v1/subscriptions/current` - Get current user's subscription status
+- `POST /api/v1/subscriptions/checkout` - Create Stripe checkout session or upgrade
+- `POST /api/v1/subscriptions/upgrade` - Upgrade existing subscription
+- `POST /api/v1/subscriptions/portal` - Generate Stripe Customer Portal session
+- `POST /api/v1/subscriptions/cancel` - Cancel subscription (immediate or end-of-period)
+- `POST /api/v1/subscriptions/reactivate` - Reactivate cancelled subscription
+- `GET /api/v1/subscriptions/features` - List features for current tier
+- `GET /api/v1/subscriptions/features/{feature}` - Check specific feature access
+- `POST /api/v1/subscriptions/sync` - Sync status from Stripe
+
+#### Grant Code System
+- **GrantCode Model** - Nonprofit partnership codes for DV survivors
+- **GrantRedemption Model** - Track user redemptions with expiration
+- `POST /api/v1/grants/redeem` - Redeem grant code
+- `GET /api/v1/grants/status` - Get active grant information
+- `GET /api/v1/grants/validate/{code}` - Validate grant code (public)
+
+#### Password Reset Flow
+- `POST /api/v1/auth/password-reset/request` - Request password reset email
+- `POST /api/v1/auth/password-reset/confirm` - Complete reset with token
+- Supabase integration for email delivery
+- Single-use tokens with 1-hour expiration
+
+#### Subscription Webhook Handlers
+- `checkout.session.completed` - Process successful checkouts
+- `customer.subscription.updated` - Sync plan/status changes
+- `customer.subscription.deleted` - Downgrade to starter
+- `invoice.paid` - Extend subscription period
+- `invoice.payment_failed` - Mark as past_due
+
+### Fixed
+- **Stripe Service Dict Access** - Changed from `sub.field` to `sub.get("field")` for all Stripe object access
+- **User Model Relationships** - Added missing `grant_redemptions` and `clearfund_fees` relationships
+- **Payout Model** - Added `fee` relationship for fee tracking
+
+### Database Migrations
+- `012_subscriptions` - Subscription plans table with Stripe price IDs
+- `013_grants` - Grant codes and redemptions tables
+- User profile fields: `subscription_tier`, `subscription_status`, `stripe_subscription_id`, etc.
+
+---
+
+## [1.1.2] - 2026-01-11
 
 ### Added
 
@@ -473,6 +527,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Endpoints | Models | Key Features |
 |---------|-----------|--------|--------------|
+| 1.2.0 | 137+ | 38+ | Subscriptions, Grants, Password Reset, Stripe Webhooks |
 | 1.1.2 | 122+ | 35+ | Room tracking, Stripe obligation payments |
 | 1.1.1 | 121+ | 35+ | Circle email invites, KidComs fix |
 | 1.1.0 | 120+ | 35+ | KidComs, My Circle, Activities |

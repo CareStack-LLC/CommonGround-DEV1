@@ -1,7 +1,7 @@
 # CommonGround V1 - Authentication & Authorization Guide
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
+**Last Updated:** January 15, 2026
+**Version:** 1.1.0
 **Security Level:** Production
 
 ---
@@ -12,15 +12,16 @@
 2. [Authentication Architecture](#authentication-architecture)
 3. [User Registration](#user-registration)
 4. [Login & Token Management](#login--token-management)
-5. [JWT Token Structure](#jwt-token-structure)
-6. [Token Refresh Flow](#token-refresh-flow)
-7. [Authorization & Permissions](#authorization--permissions)
-8. [Role-Based Access Control](#role-based-access-control)
-9. [Case-Level Permissions](#case-level-permissions)
-10. [Professional Access (Court Portal)](#professional-access-court-portal)
-11. [Security Best Practices](#security-best-practices)
-12. [Implementation Details](#implementation-details)
-13. [Troubleshooting](#troubleshooting)
+5. [Password Reset Flow](#password-reset-flow)
+6. [JWT Token Structure](#jwt-token-structure)
+7. [Token Refresh Flow](#token-refresh-flow)
+8. [Authorization & Permissions](#authorization--permissions)
+9. [Role-Based Access Control](#role-based-access-control)
+10. [Case-Level Permissions](#case-level-permissions)
+11. [Professional Access (Court Portal)](#professional-access-court-portal)
+12. [Security Best Practices](#security-best-practices)
+13. [Implementation Details](#implementation-details)
+14. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -283,6 +284,189 @@ const storeTokensLocalStorage = (accessToken: string, refreshToken: string) => {
   localStorage.setItem('access_token', accessToken);
   localStorage.setItem('refresh_token', refreshToken);
 };
+```
+
+---
+
+## Password Reset Flow
+
+*(Added in v1.1.0)*
+
+### Overview
+
+Users can reset their password via a secure email-based flow. The system uses Supabase Auth for token generation and email delivery.
+
+### Flow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                      PASSWORD RESET FLOW                              │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│  1. User requests password reset                                    │
+│     │                                                               │
+│     ▼                                                               │
+│  POST /api/v1/auth/password-reset/request                           │
+│  { "email": "user@example.com" }                                    │
+│     │                                                               │
+│     ▼                                                               │
+│  ┌─────────────────────────────────────────┐                        │
+│  │ Backend processing:                     │                        │
+│  │ a. Validate email format                │                        │
+│  │ b. Call Supabase resetPasswordForEmail  │                        │
+│  │ c. ALWAYS return success (security)     │                        │
+│  └────────────────┬────────────────────────┘                        │
+│                   │                                                 │
+│  2. Response (always 200 OK)                                        │
+│     │                                                               │
+│     ▼                                                               │
+│  { "message": "If this email exists, a reset link was sent" }      │
+│                                                                     │
+│  3. If email exists in system:                                      │
+│     │                                                               │
+│     ▼                                                               │
+│  ┌─────────────────────────────────────────┐                        │
+│  │ Supabase sends email with reset link:   │                        │
+│  │ https://app.commonground.co/reset?      │                        │
+│  │   token=eyJ...&type=recovery            │                        │
+│  └────────────────┬────────────────────────┘                        │
+│                   │                                                 │
+│  4. User clicks link and enters new password                        │
+│     │                                                               │
+│     ▼                                                               │
+│  POST /api/v1/auth/password-reset/confirm                           │
+│  {                                                                  │
+│    "token": "eyJ...",                                               │
+│    "new_password": "NewSecurePass123!"                              │
+│  }                                                                  │
+│     │                                                               │
+│     ▼                                                               │
+│  ┌─────────────────────────────────────────┐                        │
+│  │ Backend processing:                     │                        │
+│  │ a. Verify token with Supabase           │                        │
+│  │ b. Validate password strength           │                        │
+│  │ c. Update password                      │                        │
+│  │ d. Invalidate all existing sessions     │                        │
+│  └────────────────┬────────────────────────┘                        │
+│                   │                                                 │
+│  5. Success response                                                │
+│     │                                                               │
+│     ▼                                                               │
+│  { "message": "Password reset successfully" }                       │
+│                                                                     │
+│  6. User redirected to login                                        │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### API Endpoints
+
+#### Request Password Reset
+
+```http
+POST /api/v1/auth/password-reset/request
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
+```
+
+**Response (always 200):**
+```json
+{
+  "message": "If this email exists in our system, a password reset link has been sent"
+}
+```
+
+#### Confirm Password Reset
+
+```http
+POST /api/v1/auth/password-reset/confirm
+Content-Type: application/json
+
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "new_password": "NewSecurePass123!"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "message": "Password has been reset successfully"
+}
+```
+
+**Error Responses:**
+```json
+// 400 - Invalid or expired token
+{
+  "detail": "Invalid or expired reset token"
+}
+
+// 400 - Password doesn't meet requirements
+{
+  "detail": "Password must be at least 12 characters and contain uppercase, lowercase, number, and special character"
+}
+```
+
+### Security Considerations
+
+1. **Anti-Enumeration:**
+   - The request endpoint always returns success, even for non-existent emails
+   - This prevents attackers from discovering valid email addresses
+
+2. **Token Expiration:**
+   - Reset tokens expire after 1 hour
+   - Tokens are single-use (invalidated after successful reset)
+
+3. **Session Invalidation:**
+   - All existing sessions are invalidated after password reset
+   - User must log in again with new password
+
+4. **Rate Limiting:**
+   - Password reset requests are rate-limited to 3 per hour per email
+   - Prevents abuse and spam
+
+5. **Password Validation:**
+   - New password must meet all security requirements
+   - Cannot reuse the current password
+
+### Frontend Implementation
+
+```typescript
+// lib/auth.ts
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  const response = await fetch('/api/v1/auth/password-reset/request', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to request password reset');
+  }
+
+  // Always show success message (anti-enumeration)
+}
+
+export async function confirmPasswordReset(
+  token: string,
+  newPassword: string
+): Promise<void> {
+  const response = await fetch('/api/v1/auth/password-reset/confirm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, new_password: newPassword })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Failed to reset password');
+  }
+}
 ```
 
 ---
@@ -1206,5 +1390,5 @@ logger.error(f"Token verification failed: {error}")
 
 ---
 
-*Last Updated: January 10, 2026*
-*Document Version: 1.0.0*
+*Last Updated: January 15, 2026*
+*Document Version: 1.1.0*
