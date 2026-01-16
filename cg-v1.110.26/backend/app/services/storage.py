@@ -103,12 +103,17 @@ class SupabaseStorageService:
         )
 
         # Return the public URL for public buckets (avatars)
-        # or the path for private buckets (use get_signed_url for access)
+        # For private buckets, return a signed URL that lasts 1 year
         if bucket == StorageBucket.AVATARS:
             return self._get_storage_url(bucket, path)
         else:
-            # For private buckets, return the path that can be used with get_signed_url
-            return f"{bucket}/{path}"
+            # For private buckets, return a long-lived signed URL (1 year)
+            # This is stored in the database and used directly in the frontend
+            signed = self.client.storage.from_(bucket).create_signed_url(
+                path=path,
+                expires_in=31536000  # 1 year in seconds
+            )
+            return signed.get("signedURL", f"{bucket}/{path}")
 
     async def upload_file_with_hash(
         self,
