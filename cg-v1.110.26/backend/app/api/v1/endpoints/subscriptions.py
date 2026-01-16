@@ -863,22 +863,28 @@ async def sync_subscription_from_stripe(
 
     try:
         # Get subscriptions from Stripe
+        logger.info(f"Sync: Getting subscriptions for customer {profile.stripe_customer_id}")
         subscriptions = await stripe_service.get_customer_subscriptions(
             profile.stripe_customer_id
         )
+        logger.info(f"Sync: Found {len(subscriptions)} subscriptions: {subscriptions}")
 
         if not subscriptions:
             # No subscriptions found - return current status
+            logger.info("Sync: No subscriptions found, returning current status")
             return await get_current_subscription(current_user, db)
 
         # Find the most recent active/trialing subscription
         active_sub = None
         for sub in subscriptions:
+            logger.info(f"Sync: Checking subscription {sub['id']} with status {sub['status']}")
             if sub["status"] in ("active", "trialing"):
                 active_sub = sub
+                logger.info(f"Sync: Found active subscription: {active_sub}")
                 break
 
         if not active_sub:
+            logger.info("Sync: No active subscription found")
             # No active subscription - might be cancelled
             for sub in subscriptions:
                 if sub["status"] in ("canceled", "cancelled"):
@@ -892,6 +898,7 @@ async def sync_subscription_from_stripe(
 
         # Map price ID to tier
         price_id = active_sub.get("price_id")
+        logger.info(f"Sync: Mapping price_id {price_id} to tier")
         if price_id:
             result = await db.execute(
                 select(SubscriptionPlan).where(
@@ -901,10 +908,13 @@ async def sync_subscription_from_stripe(
             )
             plan = result.scalar_one_or_none()
             tier = plan.plan_code if plan else "starter"
+            logger.info(f"Sync: Found plan {plan.plan_code if plan else 'None'}, tier={tier}")
         else:
             tier = "starter"
+            logger.info("Sync: No price_id, defaulting to starter")
 
         # Update profile
+        logger.info(f"Sync: Updating profile to tier={tier}, subscription_id={active_sub['id']}")
         profile.subscription_tier = tier
         profile.subscription_status = active_sub["status"]
         profile.stripe_subscription_id = active_sub["id"]
