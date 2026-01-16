@@ -1,38 +1,37 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
+import { subscriptionAPI } from '@/lib/api';
 import {
   Check,
   X,
   ArrowRight,
-  MessageSquare,
-  FileText,
-  Calendar,
-  Wallet,
   Shield,
   Users,
-  Sparkles,
   HelpCircle,
+  Loader2,
 } from 'lucide-react';
-
-export const metadata: Metadata = {
-  title: 'Pricing | CommonGround',
-  description: 'Simple, transparent pricing for co-parents. Start free and upgrade when you need more features.',
-};
 
 /**
  * Pricing Page
  *
  * Main pricing page for parents with three tiers.
+ * - If user is logged in: Subscribe directly via Stripe Checkout
+ * - If user is not logged in: Redirect to registration with plan param
  */
 
 const plans = [
   {
     name: 'Starter',
+    planCode: 'starter',
     price: '$0',
     period: 'forever',
     description: 'Everything you need to get started with safe, documented co-parenting.',
     cta: 'Get Started Free',
-    ctaLink: '/register',
+    ctaLoggedIn: 'Current Plan',
     highlighted: false,
     features: [
       { name: 'Basic ARIA messaging', included: true, tooltip: 'Manual sentiment checks' },
@@ -49,11 +48,12 @@ const plans = [
   },
   {
     name: 'Plus',
+    planCode: 'plus',
     price: '$12',
     period: '/month',
     description: 'Smart automation and tracking for organized co-parenting. No more manual work.',
     cta: 'Start 14-Day Free Trial',
-    ctaLink: '/register?plan=plus',
+    ctaLoggedIn: 'Subscribe to Plus',
     highlighted: true,
     badge: 'Most Popular',
     features: [
@@ -71,11 +71,12 @@ const plans = [
   },
   {
     name: 'Family+',
+    planCode: 'family_plus',
     price: '$25',
     period: '/month',
     description: 'Complete platform access with KidsCom for safe child communication.',
     cta: 'Start 14-Day Free Trial',
-    ctaLink: '/register?plan=family_plus',
+    ctaLoggedIn: 'Subscribe to Family+',
     highlighted: false,
     features: [
       { name: 'Everything in Plus', included: true },
@@ -165,6 +166,97 @@ const comparisonFeatures = [
 ];
 
 export default function PricingPage() {
+  const { user, profile, isLoading: authLoading } = useAuth();
+  const router = useRouter();
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const isLoggedIn = !!user;
+  const currentTier = profile?.subscription_tier || 'starter';
+
+  const handlePlanAction = async (planCode: string) => {
+    // If not logged in, redirect to register with plan param
+    if (!isLoggedIn) {
+      if (planCode === 'starter') {
+        router.push('/register');
+      } else {
+        router.push(`/register?plan=${planCode}`);
+      }
+      return;
+    }
+
+    // If logged in and clicking starter, go to billing settings
+    if (planCode === 'starter') {
+      router.push('/settings/billing');
+      return;
+    }
+
+    // If logged in and clicking current plan, go to billing settings
+    if (planCode === currentTier) {
+      router.push('/settings/billing');
+      return;
+    }
+
+    // If logged in, start checkout for paid plans
+    try {
+      setProcessingPlan(planCode);
+      setError(null);
+
+      const result = await subscriptionAPI.createCheckout(
+        planCode,
+        `${window.location.origin}/settings/billing?success=true`,
+        `${window.location.origin}/pricing?cancelled=true`
+      );
+
+      if (result.action === 'upgraded') {
+        // Already upgraded - redirect to billing
+        router.push('/settings/billing?success=true');
+      } else if (result.action === 'checkout' && result.checkout_url) {
+        // Redirect to Stripe Checkout
+        window.location.href = result.checkout_url;
+      } else {
+        throw new Error('Unexpected response from server');
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to start checkout';
+      setError(errorMessage);
+      setProcessingPlan(null);
+    }
+  };
+
+  const getButtonText = (plan: typeof plans[0]) => {
+    if (processingPlan === plan.planCode) {
+      return (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+          Processing...
+        </>
+      );
+    }
+
+    if (!isLoggedIn) {
+      return plan.cta;
+    }
+
+    // Logged in user
+    if (plan.planCode === currentTier) {
+      return (
+        <>
+          <Check className="w-4 h-4 mr-2" />
+          Current Plan
+        </>
+      );
+    }
+
+    if (plan.planCode === 'starter') {
+      return 'View Billing';
+    }
+
+    return plan.ctaLoggedIn;
+  };
+
+  const isCurrentPlan = (planCode: string) => isLoggedIn && planCode === currentTier;
+
   return (
     <div className="bg-background">
       {/* Hero Section */}
@@ -182,7 +274,12 @@ export default function PricingPage() {
             <p className="text-xl text-muted-foreground mb-4">
               Start free and upgrade when you need more. No hidden fees, no surprises.
             </p>
-            <p className="text-sm text-muted-foreground">
+            {isLoggedIn && (
+              <p className="text-sm text-cg-sage">
+                You&apos;re currently on the <strong>{currentTier === 'family_plus' ? 'Family+' : currentTier.charAt(0).toUpperCase() + currentTier.slice(1)}</strong> plan
+              </p>
+            )}
+            <p className="text-sm text-muted-foreground mt-2">
               Looking for professional or court pricing?{' '}
               <Link href="/pricing/professionals" className="text-cg-sage hover:underline">
                 See professional plans
@@ -191,6 +288,15 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
+
+      {/* Error Alert */}
+      {error && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 mb-4">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-center">
+            {error}
+          </div>
+        </div>
+      )}
 
       {/* Pricing Cards */}
       <section className="py-12 -mt-8">
@@ -202,13 +308,22 @@ export default function PricingPage() {
                 className={`relative bg-card rounded-2xl border ${
                   plan.highlighted
                     ? 'border-cg-sage shadow-xl scale-105'
+                    : isCurrentPlan(plan.planCode)
+                    ? 'border-cg-sage/50 ring-2 ring-cg-sage/20'
                     : 'border-border/50'
                 } p-8 flex flex-col`}
               >
-                {plan.badge && (
+                {plan.badge && !isCurrentPlan(plan.planCode) && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <span className="bg-cg-sage text-white text-sm font-medium px-4 py-1 rounded-full">
                       {plan.badge}
+                    </span>
+                  </div>
+                )}
+                {isCurrentPlan(plan.planCode) && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="bg-cg-amber text-white text-sm font-medium px-4 py-1 rounded-full">
+                      Your Plan
                     </span>
                   </div>
                 )}
@@ -244,16 +359,19 @@ export default function PricingPage() {
                   ))}
                 </ul>
 
-                <Link
-                  href={plan.ctaLink}
-                  className={`w-full py-3 px-6 rounded-full font-medium text-center transition-all duration-200 ${
-                    plan.highlighted
-                      ? 'bg-cg-sage text-white hover:bg-cg-sage-light hover:shadow-lg'
-                      : 'border-2 border-cg-sage text-cg-sage hover:bg-cg-sage hover:text-white'
+                <button
+                  onClick={() => handlePlanAction(plan.planCode)}
+                  disabled={processingPlan === plan.planCode || (isCurrentPlan(plan.planCode) && plan.planCode !== 'starter')}
+                  className={`w-full py-3 px-6 rounded-full font-medium text-center transition-all duration-200 flex items-center justify-center ${
+                    isCurrentPlan(plan.planCode)
+                      ? 'bg-muted text-muted-foreground cursor-default'
+                      : plan.highlighted
+                      ? 'bg-cg-sage text-white hover:bg-cg-sage-light hover:shadow-lg disabled:opacity-50'
+                      : 'border-2 border-cg-sage text-cg-sage hover:bg-cg-sage hover:text-white disabled:opacity-50'
                   }`}
                 >
-                  {plan.cta}
-                </Link>
+                  {getButtonText(plan)}
+                </button>
               </div>
             ))}
           </div>
@@ -272,7 +390,7 @@ export default function PricingPage() {
               Compare Plans
             </h2>
             <p className="text-muted-foreground">
-              A detailed breakdown of what's included in each plan.
+              A detailed breakdown of what&apos;s included in each plan.
             </p>
           </div>
 
@@ -418,16 +536,26 @@ export default function PricingPage() {
             Start your journey today
           </h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            Join thousands of families who've found a better way to co-parent.
-            Start free, upgrade when you're ready.
+            Join thousands of families who&apos;ve found a better way to co-parent.
+            Start free, upgrade when you&apos;re ready.
           </p>
-          <Link
-            href="/register"
-            className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
-          >
-            Get Started Free
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
+            >
+              Go to Dashboard
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          ) : (
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
+            >
+              Get Started Free
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          )}
         </div>
       </section>
     </div>
