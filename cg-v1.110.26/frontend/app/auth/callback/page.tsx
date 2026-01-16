@@ -1,20 +1,41 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { authAPI } from '@/lib/api';
 
 /**
- * OAuth Callback Page
- *
- * Handles the callback from OAuth providers (Google, Apple, etc.)
- * After successful OAuth authentication:
- * 1. Exchanges the code for a Supabase session
- * 2. Syncs the OAuth user with the backend
- * 3. Redirects to the dashboard
+ * Loading component for the callback page
  */
-export default function AuthCallbackPage() {
+function CallbackLoading() {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-lg">
+                <div className="text-center">
+                    <div className="mx-auto h-12 w-12 animate-spin text-blue-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    <h2 className="mt-4 text-xl font-semibold text-gray-900">
+                        Processing sign in...
+                    </h2>
+                    <p className="mt-2 text-gray-600">
+                        Please wait while we complete your sign in.
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/**
+ * OAuth Callback Handler Component
+ * Uses useSearchParams which requires Suspense boundary
+ */
+function AuthCallbackHandler() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [error, setError] = useState<string | null>(null);
@@ -180,5 +201,22 @@ export default function AuthCallbackPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+/**
+ * OAuth Callback Page
+ *
+ * Handles the callback from OAuth providers (Google, Apple, etc.)
+ * After successful OAuth authentication:
+ * 1. Exchanges the code for a Supabase session
+ * 2. Syncs the OAuth user with the backend
+ * 3. Redirects to the dashboard
+ */
+export default function AuthCallbackPage() {
+    return (
+        <Suspense fallback={<CallbackLoading />}>
+            <AuthCallbackHandler />
+        </Suspense>
     );
 }
