@@ -612,6 +612,9 @@ class StripeService:
         """
         subscription = stripe.Subscription.retrieve(subscription_id)
 
+        # Access items via dict-style (sub["items"]) not attribute (sub.items)
+        items_data = subscription.get("items", {}).get("data", [])
+
         return {
             "id": subscription.id,
             "status": subscription.status,
@@ -624,10 +627,10 @@ class StripeService:
             "trial_end": datetime.fromtimestamp(subscription.trial_end) if subscription.trial_end else None,
             "items": [
                 {
-                    "price_id": item.price.id,
-                    "product_id": item.price.product,
+                    "price_id": item["price"]["id"],
+                    "product_id": item["price"]["product"],
                 }
-                for item in subscription.items.data
+                for item in items_data
             ],
         }
 
@@ -646,17 +649,22 @@ class StripeService:
         """
         subscriptions = stripe.Subscription.list(customer=customer_id, limit=10)
 
-        return [
-            {
+        result = []
+        for sub in subscriptions.data:
+            # Access items via dict-style access (sub["items"]) not attribute (sub.items)
+            items_data = sub.get("items", {}).get("data", [])
+            price_id = items_data[0]["price"]["id"] if items_data else None
+
+            result.append({
                 "id": sub.id,
                 "status": sub.status,
                 "current_period_start": sub.current_period_start,
                 "current_period_end": sub.current_period_end,
                 "cancel_at_period_end": sub.cancel_at_period_end,
-                "price_id": sub.items.data[0].price.id if sub.items.data else None,
-            }
-            for sub in subscriptions.data
-        ]
+                "price_id": price_id,
+            })
+
+        return result
 
     async def update_subscription_price(
         self,
@@ -684,11 +692,13 @@ class StripeService:
         # Get current subscription to find the item ID
         subscription = stripe.Subscription.retrieve(subscription_id)
 
-        if not subscription.items.data:
+        # Access items via dict-style (sub["items"]) not attribute (sub.items)
+        items_data = subscription.get("items", {}).get("data", [])
+        if not items_data:
             raise ValueError("Subscription has no items")
 
         # Get the subscription item ID (there's typically one item per subscription)
-        item_id = subscription.items.data[0].id
+        item_id = items_data[0]["id"]
 
         # Update the subscription with the new price
         updated_subscription = stripe.Subscription.modify(
@@ -700,12 +710,16 @@ class StripeService:
             proration_behavior=proration_behavior,
         )
 
+        # Get updated items
+        updated_items = updated_subscription.get("items", {}).get("data", [])
+        updated_price_id = updated_items[0]["price"]["id"] if updated_items else None
+
         return {
             "id": updated_subscription.id,
             "status": updated_subscription.status,
             "current_period_start": updated_subscription.current_period_start,
             "current_period_end": updated_subscription.current_period_end,
-            "price_id": updated_subscription.items.data[0].price.id if updated_subscription.items.data else None,
+            "price_id": updated_price_id,
         }
 
     # =========================================================================
@@ -812,6 +826,11 @@ class StripeService:
 
         # Subscription Events
         elif event_type in ("customer.subscription.created", "customer.subscription.updated"):
+            # Access items via dict-style (data["items"]) not attribute (data.items)
+            items_data = data.get("items", {}).get("data", [])
+            price_id = items_data[0]["price"]["id"] if items_data else None
+            product_id = items_data[0]["price"]["product"] if items_data else None
+
             result.update({
                 "subscription_id": data.id,
                 "customer_id": data.customer,
@@ -821,8 +840,8 @@ class StripeService:
                 "cancel_at_period_end": data.cancel_at_period_end,
                 "cancel_at": data.cancel_at,
                 "canceled_at": data.canceled_at,
-                "price_id": data.items.data[0].price.id if data.items and data.items.data else None,
-                "product_id": data.items.data[0].price.product if data.items and data.items.data else None,
+                "price_id": price_id,
+                "product_id": product_id,
                 "metadata": dict(data.metadata) if data.metadata else {},
             })
 

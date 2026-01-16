@@ -798,14 +798,15 @@ async def debug_stripe_status(
                 customer=profile.stripe_customer_id,
                 limit=5
             )
-            result["customer_subscriptions"] = [
-                {
+            for sub in subscriptions.data:
+                # Access items via dict-style (sub["items"]) not attribute (sub.items)
+                items_data = sub.get("items", {}).get("data", [])
+                price_id = items_data[0]["price"]["id"] if items_data else None
+                result["customer_subscriptions"].append({
                     "id": sub.id,
                     "status": sub.status,
-                    "price_id": sub.items.data[0].price.id if sub.items.data else None,
-                }
-                for sub in subscriptions.data
-            ]
+                    "price_id": price_id,
+                })
         except Exception as e:
             result["customer_subscriptions_error"] = str(e)
 
