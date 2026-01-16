@@ -829,6 +829,26 @@ async def debug_stripe_status(
         except Exception as e:
             result["checkout_sessions_error"] = str(e)
 
+        # Test price mapping for first subscription
+        if result["customer_subscriptions"]:
+            test_price_id = result["customer_subscriptions"][0].get("price_id")
+            if test_price_id:
+                try:
+                    plan_result = await db.execute(
+                        select(SubscriptionPlan).where(
+                            (SubscriptionPlan.stripe_price_id_monthly == test_price_id) |
+                            (SubscriptionPlan.stripe_price_id_annual == test_price_id)
+                        )
+                    )
+                    plan = plan_result.scalar_one_or_none()
+                    result["price_mapping_test"] = {
+                        "price_id": test_price_id,
+                        "mapped_plan_code": plan.plan_code if plan else None,
+                        "plan_found": plan is not None,
+                    }
+                except Exception as e:
+                    result["price_mapping_error"] = str(e)
+
     return result
 
 
