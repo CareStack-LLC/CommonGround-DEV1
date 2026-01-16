@@ -152,10 +152,40 @@ class AuthService:
             user = result.scalar_one_or_none()
 
             if not user:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="User not found in local database"
+                # Auto-create user if they exist in Supabase Auth but not locally
+                # This handles users created directly in Supabase or migrated databases
+                user_metadata = supabase_user.user_metadata or {}
+                first_name = (
+                    user_metadata.get("first_name") or
+                    user_metadata.get("full_name", "").split()[0] if user_metadata.get("full_name") else
+                    supabase_user.email.split("@")[0] if supabase_user.email else "User"
                 )
+                last_name = (
+                    user_metadata.get("last_name") or
+                    " ".join(user_metadata.get("full_name", "").split()[1:]) if user_metadata.get("full_name") else ""
+                )
+
+                user = User(
+                    id=supabase_user.id,
+                    supabase_id=supabase_user.id,
+                    email=supabase_user.email,
+                    email_verified=supabase_user.email_confirmed_at is not None,
+                    first_name=first_name,
+                    last_name=last_name,
+                    is_active=True,
+                )
+                self.db.add(user)
+
+                # Create user profile
+                profile = UserProfile(
+                    user_id=user.id,
+                    first_name=first_name,
+                    last_name=last_name,
+                )
+                self.db.add(profile)
+
+                await self.db.commit()
+                await self.db.refresh(user)
 
             if not user.is_active:
                 raise HTTPException(
