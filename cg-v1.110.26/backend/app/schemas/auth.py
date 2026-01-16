@@ -118,3 +118,28 @@ class PasswordResetConfirm(BaseModel):
             raise ValueError('Password must contain at least one number')
 
         return v
+
+
+class OAuthSyncRequest(BaseModel):
+    """
+    Request to sync OAuth user with backend.
+
+    Called after successful OAuth authentication (Google, Apple, etc.)
+    to create or update the user in our database.
+    """
+
+    supabase_id: str = Field(..., min_length=1, description="Supabase user ID")
+    email: EmailStr = Field(..., description="User's email from OAuth provider")
+    first_name: str = Field(..., min_length=1, max_length=100)
+    last_name: str = Field(default="", max_length=100)
+    avatar_url: str | None = Field(None, max_length=500)
+
+    @field_validator('first_name', 'last_name')
+    @classmethod
+    def sanitize_names(cls, v: str) -> str:
+        """Sanitize name fields for XSS protection."""
+        if v is None:
+            return ""
+        if not v.strip():
+            return v
+        return sanitize_text(v, max_length=100) or v

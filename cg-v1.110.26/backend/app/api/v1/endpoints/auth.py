@@ -15,6 +15,7 @@ from app.schemas.auth import (
     UserResponse,
     PasswordResetRequest,
     PasswordResetConfirm,
+    OAuthSyncRequest,
 )
 from app.services.auth import AuthService
 
@@ -208,3 +209,37 @@ async def confirm_password_reset(
     await auth_service.confirm_password_reset(request.token, request.new_password)
 
     return {"message": "Password has been reset successfully."}
+
+
+@router.post("/oauth/sync", response_model=LoginResponse)
+async def oauth_sync(
+    request: OAuthSyncRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Sync OAuth user with backend database.
+
+    Called after successful OAuth authentication (Google, Apple, etc.)
+    to create or update the user in our database and return JWT tokens.
+
+    Args:
+        request: OAuth user data from Supabase
+
+    Returns:
+        LoginResponse with user data and JWT tokens
+    """
+    auth_service = AuthService(db)
+    user, access_token, refresh_token = await auth_service.oauth_sync(request)
+
+    return LoginResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        user=UserResponse(
+            id=user.id,
+            email=user.email,
+            email_verified=user.email_verified,
+            first_name=user.first_name,
+            last_name=user.last_name,
+        )
+    )

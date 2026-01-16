@@ -15,6 +15,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 from app.core.config import settings
+from sqlalchemy import create_engine
 
 # Get database URL and convert to sync driver for alembic
 db_url = settings.DATABASE_URL
@@ -23,7 +24,14 @@ if "+asyncpg" in db_url:
     db_url = db_url.replace("postgresql+asyncpg://", "postgresql://")
 elif "postgres://" in db_url:
     db_url = db_url.replace("postgres://", "postgresql://", 1)
-config.set_main_option("sqlalchemy.url", db_url)
+
+# Add SSL mode for Supabase connections
+if "supabase.co" in db_url and "sslmode=" not in db_url:
+    separator = "&" if "?" in db_url else "?"
+    db_url = f"{db_url}{separator}sslmode=require"
+
+# Store the URL for later use (don't use config.set_main_option to avoid % interpolation issues)
+_database_url = db_url
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -56,9 +64,8 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
     context.configure(
-        url=url,
+        url=_database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -75,11 +82,8 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    # Create engine directly to avoid configparser % interpolation issues
+    connectable = create_engine(_database_url, poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
         context.configure(
