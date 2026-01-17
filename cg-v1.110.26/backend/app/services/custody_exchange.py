@@ -16,6 +16,7 @@ from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
 from app.models.case import Case, CaseParticipant
 from app.models.family_file import FamilyFile
 from app.services.geolocation import GeolocationService
+from app.services.custody_time import CustodyTimeService
 from app.utils.timezone import strip_tz
 
 
@@ -1558,11 +1559,22 @@ class CustodyExchangeService:
             if not child:
                 raise ValueError(f"Child {child_id} not found in this family file")
 
-            # Update custody override fields
+            # Update custody override fields on Child model
             child.current_custody_parent_id = user_id
             child.custody_override_at = now
             child.custody_override_by = user_id
             updated_count += 1
+
+            # Also create a CustodyDayRecord for tracking stats
+            await CustodyTimeService.set_manual_override(
+                db=db,
+                family_file_id=family_file_id,
+                child_id=child_id,
+                parent_id=user_id,
+                override_by=user_id,
+                record_date=now.date(),
+                reason=notes
+            )
 
         await db.commit()
         return True
