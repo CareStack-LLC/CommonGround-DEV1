@@ -80,6 +80,53 @@ async def health_check():
     return {"status": "healthy"}
 
 
+@app.get("/debug/email-config")
+async def debug_email_config():
+    """Debug endpoint to check email configuration."""
+    return {
+        "email_enabled": settings.EMAIL_ENABLED,
+        "from_email": settings.FROM_EMAIL,
+        "from_name": settings.FROM_NAME,
+        "sendgrid_key_set": bool(settings.SENDGRID_API_KEY),
+        "sendgrid_key_prefix": settings.SENDGRID_API_KEY[:10] + "..." if settings.SENDGRID_API_KEY else None,
+    }
+
+
+@app.post("/debug/test-email")
+async def test_email(to_email: str):
+    """Send a test email to verify SendGrid configuration."""
+    from app.services.email import email_service
+
+    # Check config
+    if not email_service.enabled:
+        return {
+            "success": False,
+            "error": "Email is disabled",
+            "config": {
+                "email_enabled": settings.EMAIL_ENABLED,
+                "api_key_set": bool(settings.SENDGRID_API_KEY),
+            }
+        }
+
+    try:
+        result = await email_service._send_email(
+            to_email=to_email,
+            subject="CommonGround Test Email",
+            html_body="""
+            <html>
+            <body style="font-family: Arial, sans-serif; padding: 20px;">
+                <h1 style="color: #6B8E6B;">Test Email from CommonGround</h1>
+                <p>If you're seeing this, SendGrid is configured correctly!</p>
+                <p style="color: #666;">Sent via CommonGround email service.</p>
+            </body>
+            </html>
+            """
+        )
+        return {"success": result, "message": "Email sent successfully" if result else "Email send failed"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 if __name__ == "__main__":
     import uvicorn
 
