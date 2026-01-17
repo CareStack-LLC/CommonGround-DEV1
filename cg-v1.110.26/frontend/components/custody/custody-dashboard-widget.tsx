@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { CGAvatar } from '@/components/cg';
-import { Clock, Calendar, ChevronRight, FileText, Users, ArrowRight, MapPin } from 'lucide-react';
-import { exchangesAPI, CustodyExchangeInstance } from '@/lib/api';
-import { formatInUserTimezone, isToday as isTodayTz } from '@/lib/timezone';
+import { Clock, Calendar, ChevronRight, FileText, Users } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
 interface ParentStats {
@@ -135,51 +133,6 @@ function ChildCustodyRow({
   );
 }
 
-// Upcoming exchange row
-function ExchangeRow({
-  exchange,
-  timezone,
-  onClick,
-}: {
-  exchange: CustodyExchangeInstance;
-  timezone: string;
-  onClick?: () => void;
-}) {
-  const scheduledTime = exchange.override_time || exchange.scheduled_time;
-
-  // Format the date
-  const isToday = isTodayTz(scheduledTime, timezone);
-  const now = new Date();
-  const tomorrow = new Date(now.getTime() + 86400000).toISOString();
-  const isTomorrow = formatInUserTimezone(scheduledTime, timezone, 'yyyy-MM-dd') ===
-    formatInUserTimezone(tomorrow, timezone, 'yyyy-MM-dd');
-
-  const timeStr = formatInUserTimezone(scheduledTime, timezone, 'h:mm a');
-  const dayStr = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : formatInUserTimezone(scheduledTime, timezone, 'EEE, MMM d');
-
-  return (
-    <div
-      className="flex items-center gap-3 p-3 rounded-lg bg-cg-slate-subtle/50 cursor-pointer hover:bg-cg-slate-subtle transition-colors"
-      onClick={onClick}
-    >
-      <div className="w-8 h-8 rounded-lg bg-cg-slate/10 flex items-center justify-center flex-shrink-0">
-        <ArrowRight className="h-4 w-4 text-cg-slate" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground">Exchange</p>
-        <p className="text-xs text-muted-foreground">
-          {dayStr} at {timeStr}
-        </p>
-      </div>
-      {exchange.override_location && (
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <MapPin className="h-3 w-3" />
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function CustodyDashboardWidget({
   familyFileId,
   familyStats,
@@ -191,34 +144,12 @@ export default function CustodyDashboardWidget({
   onViewReport,
 }: CustodyDashboardWidgetProps) {
   const router = useRouter();
-  const { user, timezone } = useAuth();
-  const [upcomingExchanges, setUpcomingExchanges] = useState<CustodyExchangeInstance[]>([]);
-  const [exchangesLoading, setExchangesLoading] = useState(true);
+  const { user } = useAuth();
 
   // Determine if current user is parent A
   const isParentA = currentUserId
     ? familyStats?.parent_a_id === currentUserId
     : user?.id === familyStats?.parent_a_id;
-
-  // Fetch upcoming exchanges
-  useEffect(() => {
-    async function loadExchanges() {
-      if (!familyFileId) return;
-
-      try {
-        setExchangesLoading(true);
-        const exchanges = await exchangesAPI.getUpcoming(familyFileId, undefined, undefined, 3);
-        setUpcomingExchanges(exchanges);
-      } catch (err) {
-        console.error('Failed to load upcoming exchanges:', err);
-        setUpcomingExchanges([]);
-      } finally {
-        setExchangesLoading(false);
-      }
-    }
-
-    loadExchanges();
-  }, [familyFileId]);
 
   // Loading state
   if (isLoading) {
@@ -246,11 +177,10 @@ export default function CustodyDashboardWidget({
 
   const totalDays = totalMyDays + totalTheirDays;
 
-  // No data state - but still show upcoming exchanges if any
+  // No data state
   const hasNoStats = !familyStats || familyStats.children.length === 0;
-  const hasNoExchanges = upcomingExchanges.length === 0;
 
-  if (hasNoStats && hasNoExchanges && !exchangesLoading) {
+  if (hasNoStats) {
     return (
       <Card className={`p-5 ${className}`}>
         <div className="flex items-center gap-2 mb-4">
@@ -327,25 +257,6 @@ export default function CustodyDashboardWidget({
               onClick={() => router.push(`/family-files/${familyFileId}/children/${child.child_id}`)}
             />
           ))}
-        </div>
-      )}
-
-      {/* Upcoming Exchanges */}
-      {!exchangesLoading && upcomingExchanges.length > 0 && (
-        <div className="pt-3 border-t border-border">
-          <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-            Upcoming Exchanges
-          </h4>
-          <div className="space-y-2">
-            {upcomingExchanges.slice(0, 2).map((exchange) => (
-              <ExchangeRow
-                key={exchange.id}
-                exchange={exchange}
-                timezone={timezone}
-                onClick={() => router.push(`/schedule`)}
-              />
-            ))}
-          </div>
         </div>
       )}
 
