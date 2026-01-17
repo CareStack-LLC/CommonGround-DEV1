@@ -100,7 +100,7 @@ export function ARIAIntervention({
   const canSendAnyway = !analysis.block_send && analysis.toxicity_level !== 'red'; // Double safety check
 
   return (
-    <div className={`aria-guardian ${config.bg} ${config.border} overflow-hidden max-h-[80vh] sm:max-h-[85vh] flex flex-col`}>
+    <div className={`aria-guardian ${config.bg} ${config.border} overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col`}>
       {/* Header - Compact on mobile */}
       <div className="p-3 sm:p-5 flex-shrink-0">
         <div className="flex items-start gap-2 sm:gap-4">
