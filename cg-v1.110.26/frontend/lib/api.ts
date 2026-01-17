@@ -357,9 +357,11 @@ export interface UserProfile {
 }
 
 export interface UserProfileUpdate {
-  timezone?: string;
+  first_name?: string;
+  last_name?: string;
   preferred_name?: string;
   phone?: string;
+  timezone?: string;
   address_line1?: string;
   address_line2?: string;
   city?: string;

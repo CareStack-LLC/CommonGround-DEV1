@@ -112,9 +112,11 @@ export default function AccountSettingsPage() {
     try {
       // Call the profile update API
       await usersAPI.updateProfile({
-        timezone: formData.timezone,
+        first_name: formData.first_name || undefined,
+        last_name: formData.last_name || undefined,
         preferred_name: formData.preferred_name || undefined,
         phone: formData.phone || undefined,
+        timezone: formData.timezone,
         address_line1: formData.address_line1 || undefined,
         address_line2: formData.address_line2 || undefined,
         city: formData.city || undefined,
