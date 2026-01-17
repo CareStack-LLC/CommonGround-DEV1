@@ -567,6 +567,19 @@ export const usersAPI = {
       body: JSON.stringify(data),
     });
   },
+
+  /**
+   * Change current user's password
+   */
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string; success: boolean }> {
+    return fetchAPI<{ message: string; success: boolean }>('/users/me/password', {
+      method: 'PUT',
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
+    });
+  },
 };
 
 // ============================================================================

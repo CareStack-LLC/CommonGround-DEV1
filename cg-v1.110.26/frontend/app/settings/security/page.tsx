@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { usersAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +25,7 @@ import {
   AlertTriangle,
   Eye,
   EyeOff,
+  Loader2,
 } from 'lucide-react';
 
 /**
@@ -88,6 +90,11 @@ export default function SecuritySettingsPage() {
     setError(null);
 
     // Validation
+    if (!passwordForm.currentPassword) {
+      setError('Please enter your current password');
+      return;
+    }
+
     if (passwordForm.newPassword.length < 8) {
       setError('New password must be at least 8 characters long');
       return;
@@ -101,11 +108,10 @@ export default function SecuritySettingsPage() {
     setIsSaving(true);
 
     try {
-      // In production, this would call the password change API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // TODO: Implement actual API call
-      // await usersAPI.changePassword(passwordForm.currentPassword, passwordForm.newPassword);
+      await usersAPI.changePassword(
+        passwordForm.currentPassword,
+        passwordForm.newPassword
+      );
 
       setShowSuccess(true);
       setPasswordForm({
@@ -114,8 +120,9 @@ export default function SecuritySettingsPage() {
         confirmPassword: '',
       });
       setTimeout(() => setShowSuccess(false), 3000);
-    } catch (err) {
-      setError('Failed to change password. Please check your current password.');
+    } catch (err: any) {
+      const message = err?.data?.detail || err?.message || 'Failed to change password';
+      setError(message);
     } finally {
       setIsSaving(false);
     }
@@ -262,7 +269,14 @@ export default function SecuritySettingsPage() {
             </div>
 
             <Button type="submit" disabled={isSaving}>
-              {isSaving ? 'Changing Password...' : 'Change Password'}
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Changing Password...
+                </>
+              ) : (
+                'Change Password'
+              )}
             </Button>
           </form>
         </CardContent>
@@ -293,7 +307,7 @@ export default function SecuritySettingsPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant={twoFactorEnabled ? 'success' : 'secondary'}>
+              <Badge variant={twoFactorEnabled ? 'success' : 'outline'}>
                 {twoFactorEnabled ? 'Enabled' : 'Disabled'}
               </Badge>
               <Button
