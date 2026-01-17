@@ -983,6 +983,7 @@ function DashboardContent() {
                 isLoading={custodyStatsLoading}
                 parentAName={user?.first_name || 'You'}
                 parentBName={dashboardSummary?.sender_name || 'Co-parent'}
+                currentUserId={user?.id}
                 onViewReport={() => router.push(`/family-files/${activeFileIdsRef.current[0]}/parenting-report`)}
               />
             )}
