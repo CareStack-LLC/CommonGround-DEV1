@@ -332,6 +332,7 @@ function ChildProfileContent() {
   const [editMode, setEditMode] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [checkingIn, setCheckingIn] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Custody stats state
@@ -579,6 +580,32 @@ function ChildProfileContent() {
     }
   };
 
+  // Handle "With Me" check-in
+  const handleWithMeCheckIn = async () => {
+    if (!child) return;
+
+    const confirmed = window.confirm(
+      `Mark ${child.first_name} as "With Me"?\n\nThis will update the custody status to reflect that ${child.first_name} is currently with you.`
+    );
+
+    if (confirmed) {
+      try {
+        setCheckingIn(true);
+        setError(null);
+        await familyFilesAPI.overrideCustody(familyFileId, [childId]);
+        setSuccess(`${child.first_name} is now checked in with you!`);
+        // Refresh custody stats
+        const stats = await custodyTimeAPI.getChildStats(childId, custodyPeriod);
+        setCustodyStats(stats);
+        setTimeout(() => setSuccess(null), 3000);
+      } catch (err: any) {
+        setError(err.message || 'Failed to check in child');
+      } finally {
+        setCheckingIn(false);
+      }
+    }
+  };
+
   const addEmergencyContact = () => {
     setEmergencyForm({
       emergency_contacts: [...emergencyForm.emergency_contacts, { name: '', relationship: '', phone: '' }],
@@ -797,9 +824,26 @@ function ChildProfileContent() {
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-6 pt-4 border-t border-border">
+          <div className="mt-6 pt-4 border-t border-border flex flex-wrap gap-3">
+            <button
+              onClick={handleWithMeCheckIn}
+              disabled={checkingIn}
+              className="px-4 py-2.5 bg-cg-sage text-white rounded-xl hover:bg-cg-sage/90 transition-all shadow-sm hover:shadow-md inline-flex items-center gap-2 disabled:opacity-50"
+            >
+              {checkingIn ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Checking in...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4" />
+                  {child.first_name} is With Me
+                </>
+              )}
+            </button>
             <Link href={`/family-files/${familyFileId}/children/${childId}/cubbie`}>
-              <button className="px-4 py-2.5 bg-cg-sage text-white rounded-xl hover:bg-cg-sage/90 transition-all shadow-sm hover:shadow-md inline-flex items-center gap-2">
+              <button className="px-4 py-2.5 bg-card border border-border text-foreground rounded-xl hover:bg-muted transition-all shadow-sm hover:shadow-md inline-flex items-center gap-2">
                 <Package className="h-4 w-4" />
                 {child.first_name}'s Cubbie
               </button>

@@ -909,31 +909,13 @@ function DashboardContent() {
 
       <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
         {/* Header with Greeting */}
-        <div className="flex items-start justify-between mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
-              {greeting},
-            </h1>
-            <h2 className="text-2xl sm:text-3xl font-semibold text-cg-sage">
-              {user?.first_name}
-            </h2>
-          </div>
-
-          {/* Children Avatars */}
-          {allChildren.length > 0 && (
-            <div className="flex -space-x-2">
-              {allChildren.slice(0, 3).map((child) => (
-                <ChildAvatar key={child.id} child={child} size="md" />
-              ))}
-              {allChildren.length > 3 && (
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center ring-2 ring-card">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    +{allChildren.length - 3}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
+            {greeting},
+          </h1>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-cg-sage">
+            {user?.first_name}
+          </h2>
         </div>
 
         {needsSetup ? (
@@ -1032,6 +1014,7 @@ function DashboardContent() {
               <CustodyDashboardWidget
                 familyFileId={familyCustodyStats?.family_file_id || activeFileIdsRef.current[0]}
                 familyStats={familyCustodyStats}
+                childrenData={allChildren}
                 isLoading={custodyStatsLoading}
                 parentAName={user?.first_name || 'You'}
                 parentBName={dashboardSummary?.sender_name || 'Co-parent'}
