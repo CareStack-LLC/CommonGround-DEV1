@@ -30,15 +30,17 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
         className={cn(
           // Base styles - larger touch target
           "relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full",
-          "border-2 border-transparent",
+          "border-2",
           // Smooth transitions
           "transition-smooth",
           // Focus states
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cg-primary/50 focus-visible:ring-offset-2",
           // Disabled state
           "disabled:cursor-not-allowed disabled:opacity-50",
-          // Color states - primary teal when checked
-          checked ? "bg-primary" : "bg-border",
+          // Color states - visible gray when off, primary teal when checked
+          checked
+            ? "bg-cg-primary border-cg-primary"
+            : "bg-gray-300 border-gray-300",
           className
         )}
       >

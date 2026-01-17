@@ -92,8 +92,8 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
                     className={cn(
                       'w-full flex items-start gap-3 px-3 py-3 rounded-lg text-left transition-smooth',
                       isActive
-                        ? 'bg-accent text-accent-foreground'
-                        : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
+                        ? 'bg-cg-primary/10 text-cg-primary border border-cg-primary/20'
+                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                     )}
                   >
                     <Icon className="h-5 w-5 flex-shrink-0 mt-0.5" />

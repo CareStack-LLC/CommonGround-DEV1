@@ -109,15 +109,18 @@ function Toggle({
       onClick={() => onChange(!checked)}
       className={`
         relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full
-        border-2 border-transparent transition-colors duration-200 ease-in-out
-        focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
-        ${checked ? 'bg-cg-primary' : 'bg-muted'}
+        border-2 transition-colors duration-200 ease-in-out
+        focus:outline-none focus:ring-2 focus:ring-cg-primary/50 focus:ring-offset-2
+        ${checked
+          ? 'bg-cg-primary border-cg-primary'
+          : 'bg-gray-300 border-gray-300'
+        }
       `}
     >
       <span
         className={`
           pointer-events-none inline-block h-5 w-5 transform rounded-full
-          bg-white shadow ring-0 transition duration-200 ease-in-out
+          bg-white shadow-md ring-0 transition duration-200 ease-in-out
           ${checked ? 'translate-x-5' : 'translate-x-0'}
         `}
       />
@@ -255,8 +258,8 @@ export default function NotificationSettingsPage() {
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-secondary rounded-lg">
-                          <Icon className="h-4 w-4 text-muted-foreground" />
+                        <div className="p-2 bg-cg-primary/10 rounded-lg">
+                          <Icon className="h-4 w-4 text-cg-primary" />
                         </div>
                         <div>
                           <Label className="font-medium">
