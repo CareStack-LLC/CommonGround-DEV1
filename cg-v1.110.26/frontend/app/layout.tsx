@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { NotificationProvider } from "@/contexts/notification-context";
+import { WebSocketProvider } from "@/contexts/websocket-context";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 
 export const metadata: Metadata = {
   title: "CommonGround - Co-parenting without the conflict",
@@ -30,8 +33,13 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <ServiceWorkerRegister />
         <AuthProvider>
-          {children}
+          <NotificationProvider>
+            <WebSocketProvider>
+              {children}
+            </WebSocketProvider>
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

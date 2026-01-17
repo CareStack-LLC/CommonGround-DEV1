@@ -28,6 +28,7 @@ from app.schemas.message import (
 )
 from app.services.aria import aria_service
 from app.services.activity import log_message_activity
+from app.services.push import push_service
 from app.core.websocket import manager
 from datetime import datetime
 import uuid
@@ -543,19 +544,39 @@ async def send_message(
     # Broadcast via WebSocket to recipient
     if context_id:
         try:
-            await manager.send_message(
-                case_id=context_id,
+            await manager.broadcast_to_case(
                 message={
                     "type": "new_message",
-                    "message_id": new_message.id,
-                    "sender_id": current_user.id,
+                    "message_id": str(new_message.id),
+                    "sender_id": str(current_user.id),
+                    "sender_name": f"{current_user.first_name} {current_user.last_name or ''}".strip(),
                     "content": new_message.content,
                     "sent_at": new_message.sent_at.isoformat(),
                     "was_flagged": new_message.was_flagged
-                }
+                },
+                case_id=context_id,
+                exclude_user=None  # Send to all including sender so all tabs update
             )
         except Exception as e:
             print(f"WebSocket broadcast failed: {e}")
+
+    # Send push notification to recipient if they have subscriptions
+    if new_message.recipient_id and new_message.recipient_id != current_user.id:
+        try:
+            sender_name = f"{current_user.first_name} {current_user.last_name or ''}".strip()
+            # Truncate content for push notification
+            body_preview = new_message.content[:100] + "..." if len(new_message.content) > 100 else new_message.content
+            await push_service.send_notification(
+                db=db,
+                user_id=new_message.recipient_id,
+                title=f"New message from {sender_name}",
+                body=body_preview,
+                url=f"/messages?family_file_id={new_message.family_file_id}" if new_message.family_file_id else "/messages",
+                tag=f"message-{context_id}" if context_id else "message",
+                data={"message_id": str(new_message.id), "sender_id": str(current_user.id)}
+            )
+        except Exception as e:
+            print(f"Push notification failed: {e}")
 
     return MessageResponse(
         id=new_message.id,

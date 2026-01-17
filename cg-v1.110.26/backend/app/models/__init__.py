@@ -172,6 +172,7 @@ from app.models.subscription import (
     GRANT_STATUSES,
     FEE_STATUSES,
 )
+from app.models.push_subscription import PushSubscription
 
 __all__ = [
     "Base",
@@ -340,4 +341,6 @@ __all__ = [
     "SUBSCRIPTION_STATUSES",
     "GRANT_STATUSES",
     "FEE_STATUSES",
+    # Push Notifications
+    "PushSubscription",
 ]

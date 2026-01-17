@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import { useNotification } from '@/contexts/notification-context';
 import {
   Home,
   FolderHeart,
@@ -102,6 +103,7 @@ export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotification();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -167,10 +169,15 @@ export function Navigation() {
                   <button
                     onClick={() => router.push('/activities')}
                     className="relative p-2 rounded-xl hover:bg-cg-sage-subtle transition-smooth"
+                    aria-label={unreadCount > 0 ? `${unreadCount} unread notifications` : 'Notifications'}
                   >
                     <Bell className="h-5 w-5 text-muted-foreground" />
-                    {/* Notification badge */}
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-cg-amber rounded-full" />
+                    {/* Notification badge - only show when there are unread */}
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-cg-error text-white text-xs font-medium rounded-full flex items-center justify-center px-1">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
                   </button>
 
                   {/* User Menu - Only for signed in users */}

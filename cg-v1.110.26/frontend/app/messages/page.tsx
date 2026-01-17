@@ -4,7 +4,9 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import { useWebSocket } from '@/contexts/websocket-context';
 import { familyFilesAPI, agreementsAPI, messagesAPI, FamilyFile, FamilyFileDetail, Agreement, Message } from '@/lib/api';
+import { NewMessageEvent, TypingEvent } from '@/lib/websocket';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
@@ -322,6 +324,7 @@ function MessagesContent() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { subscribe, unsubscribe, onNewMessage, onTyping, isConnected } = useWebSocket();
   const agreementIdParam = searchParams.get('agreement');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -334,6 +337,8 @@ function MessagesContent() {
   const [error, setError] = useState<string | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -341,6 +346,77 @@ function MessagesContent() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
+
+  // Subscribe to case for real-time updates
+  useEffect(() => {
+    const caseId = selectedAgreement?.case_id;
+    if (!caseId || !isConnected) return;
+
+    subscribe(caseId);
+
+    return () => {
+      unsubscribe(caseId);
+    };
+  }, [selectedAgreement?.case_id, isConnected, subscribe, unsubscribe]);
+
+  // Handle incoming new messages via WebSocket
+  useEffect(() => {
+    if (!selectedAgreement) return;
+
+    const unsubscribeMessage = onNewMessage((data: NewMessageEvent) => {
+      // Only add if it's for the current agreement (via case_id match)
+      // and not already in messages
+      if (data.sender_id !== user?.id) {
+        const newMessage: Message = {
+          id: data.message_id,
+          sender_id: data.sender_id,
+          content: data.content,
+          sent_at: data.sent_at,
+          was_flagged: data.was_flagged,
+          message_type: 'text',
+        } as Message;
+
+        setMessages((prev) => {
+          // Check if message already exists
+          if (prev.some((m) => m.id === data.message_id)) {
+            return prev;
+          }
+          return [...prev, newMessage];
+        });
+      }
+    });
+
+    return unsubscribeMessage;
+  }, [selectedAgreement, user?.id, onNewMessage]);
+
+  // Handle typing indicator
+  useEffect(() => {
+    if (!selectedAgreement) return;
+
+    const unsubscribeTyping = onTyping((data: TypingEvent) => {
+      // Only show typing for other users
+      if (data.user_id !== user?.id) {
+        setIsOtherTyping(data.is_typing);
+
+        // Auto-clear typing after 3 seconds of inactivity
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
+        if (data.is_typing) {
+          typingTimeoutRef.current = setTimeout(() => {
+            setIsOtherTyping(false);
+          }, 3000);
+        }
+      }
+    });
+
+    return () => {
+      unsubscribeTyping();
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [selectedAgreement, user?.id, onTyping]);
 
   useEffect(() => {
     loadFamilyFilesAndAgreements();
@@ -603,6 +679,23 @@ function MessagesContent() {
                           />
                         );
                       })}
+
+                      {/* Typing Indicator */}
+                      {isOtherTyping && (
+                        <div className="flex gap-3">
+                          <div className="w-8 h-8 rounded-full bg-cg-slate flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs font-medium text-white">P</span>
+                          </div>
+                          <div className="chat-bubble-other">
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       <div ref={messagesEndRef} />
                     </>
                   )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
@@ -21,7 +21,13 @@ import {
   Gavel,
   Sparkles,
   CheckCircle,
+  Bell,
+  BellOff,
+  AlertCircle,
+  Loader2,
 } from 'lucide-react';
+import { usersAPI, NotificationPreferences } from '@/lib/api';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 /**
  * Notification Settings Page
@@ -35,70 +41,87 @@ interface NotificationCategory {
   name: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  email: boolean;
-  push: boolean;
+  emailKey: keyof NotificationPreferences;
+  pushKey: keyof NotificationPreferences;
 }
 
-const defaultNotifications: NotificationCategory[] = [
+const notificationCategories: NotificationCategory[] = [
   {
     id: 'messages',
     name: 'Messages',
     description: 'When your co-parent sends you a message',
     icon: MessageSquare,
-    email: true,
-    push: true,
+    emailKey: 'email_messages',
+    pushKey: 'push_messages',
   },
   {
     id: 'schedule',
     name: 'Schedule Changes',
     description: 'When events are added, modified, or canceled',
     icon: Calendar,
-    email: true,
-    push: true,
+    emailKey: 'email_schedule',
+    pushKey: 'push_schedule',
   },
   {
     id: 'agreements',
     name: 'Agreement Updates',
     description: 'When agreements need your review or are signed',
     icon: FileText,
-    email: true,
-    push: false,
+    emailKey: 'email_agreements',
+    pushKey: 'push_agreements',
   },
   {
     id: 'payments',
     name: 'Payment Reminders',
     description: 'When payments are due or expenses need approval',
     icon: Wallet,
-    email: true,
-    push: false,
+    emailKey: 'email_payments',
+    pushKey: 'push_payments',
   },
   {
     id: 'court',
     name: 'Court Events',
     description: 'Reminders for upcoming court dates and deadlines',
     icon: Gavel,
-    email: true,
-    push: true,
+    emailKey: 'email_court',
+    pushKey: 'push_court',
   },
   {
     id: 'aria',
     name: 'ARIA Suggestions',
     description: 'Tips for improving communication',
     icon: Sparkles,
-    email: false,
-    push: false,
+    emailKey: 'email_aria',
+    pushKey: 'push_aria',
   },
 ];
+
+const defaultPreferences: NotificationPreferences = {
+  email_messages: true,
+  email_schedule: true,
+  email_agreements: true,
+  email_payments: true,
+  email_court: true,
+  email_aria: true,
+  push_messages: true,
+  push_schedule: true,
+  push_agreements: true,
+  push_payments: true,
+  push_court: true,
+  push_aria: true,
+};
 
 // Toggle Switch Component
 function Toggle({
   checked,
   onChange,
   label,
+  disabled = false,
 }: {
   checked: boolean;
   onChange: (checked: boolean) => void;
   label: string;
+  disabled?: boolean;
 }) {
   return (
     <button
@@ -106,11 +129,13 @@ function Toggle({
       role="switch"
       aria-checked={checked}
       aria-label={label}
-      onClick={() => onChange(!checked)}
+      disabled={disabled}
+      onClick={() => !disabled && onChange(!checked)}
       className={`
         relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full
         border-2 transition-colors duration-200 ease-in-out
         focus:outline-none focus:ring-2 focus:ring-cg-primary/50 focus:ring-offset-2
+        ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         ${checked
           ? 'bg-cg-primary border-cg-primary'
           : 'bg-gray-300 border-gray-300'
@@ -129,39 +154,60 @@ function Toggle({
 }
 
 export default function NotificationSettingsPage() {
+  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [notifications, setNotifications] =
-    useState<NotificationCategory[]>(defaultNotifications);
+  const [error, setError] = useState<string | null>(null);
+  const [preferences, setPreferences] = useState<NotificationPreferences>(defaultPreferences);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  const handleToggle = (
-    categoryId: string,
-    type: 'email' | 'push',
-    value: boolean
-  ) => {
-    setNotifications((prev) =>
-      prev.map((cat) =>
-        cat.id === categoryId ? { ...cat, [type]: value } : cat
-      )
-    );
+  // Push notifications hook
+  const {
+    isSupported: pushSupported,
+    isSubscribed: pushSubscribed,
+    permission: pushPermission,
+    isLoading: pushLoading,
+    subscribe: subscribePush,
+    unsubscribe: unsubscribePush,
+  } = usePushNotifications();
+
+  // Fetch current preferences on mount
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const data = await usersAPI.getNotificationPreferences();
+        setPreferences(data);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch notification preferences:', err);
+        setError('Failed to load notification preferences');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPreferences();
+  }, []);
+
+  const handleToggle = (key: keyof NotificationPreferences, value: boolean) => {
+    setPreferences((prev) => ({ ...prev, [key]: value }));
     setShowSuccess(false);
+    setHasChanges(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
+    setError(null);
 
     try {
-      // In production, this would call the notification preferences API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // TODO: Implement actual API call
-      // await usersAPI.updateNotificationPreferences(notifications);
-
+      await usersAPI.updateNotificationPreferences(preferences);
       setShowSuccess(true);
+      setHasChanges(false);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (err) {
       console.error('Failed to save notification preferences:', err);
+      setError('Failed to save notification preferences');
     } finally {
       setIsSaving(false);
     }
@@ -169,18 +215,41 @@ export default function NotificationSettingsPage() {
 
   // Quick actions
   const enableAll = () => {
-    setNotifications((prev) =>
-      prev.map((cat) => ({ ...cat, email: true, push: true }))
-    );
+    const allEnabled = Object.keys(preferences).reduce((acc, key) => ({
+      ...acc,
+      [key]: true,
+    }), {} as NotificationPreferences);
+    setPreferences(allEnabled);
     setShowSuccess(false);
+    setHasChanges(true);
   };
 
   const disableAll = () => {
-    setNotifications((prev) =>
-      prev.map((cat) => ({ ...cat, email: false, push: false }))
-    );
+    const allDisabled = Object.keys(preferences).reduce((acc, key) => ({
+      ...acc,
+      [key]: false,
+    }), {} as NotificationPreferences);
+    setPreferences(allDisabled);
     setShowSuccess(false);
+    setHasChanges(true);
   };
+
+  // Handle push notification toggle
+  const handlePushToggle = async () => {
+    if (pushSubscribed) {
+      await unsubscribePush();
+    } else {
+      await subscribePush();
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-cg-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -194,6 +263,16 @@ export default function NotificationSettingsPage() {
         </p>
       </div>
 
+      {/* Error Alert */}
+      {error && (
+        <Alert className="bg-red-50 border-red-200">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-600">
+            {error}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Success Alert */}
       {showSuccess && (
         <Alert className="bg-cg-success-subtle border-cg-success/20">
@@ -202,6 +281,53 @@ export default function NotificationSettingsPage() {
             Your notification preferences have been saved.
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* Push Notifications Status */}
+      {pushSupported && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              {pushSubscribed ? (
+                <Bell className="h-5 w-5 text-cg-primary" />
+              ) : (
+                <BellOff className="h-5 w-5 text-muted-foreground" />
+              )}
+              Browser Push Notifications
+            </CardTitle>
+            <CardDescription>
+              {pushSubscribed
+                ? 'Push notifications are enabled for this browser'
+                : pushPermission === 'denied'
+                ? 'Push notifications are blocked. Please enable them in your browser settings.'
+                : 'Enable push notifications to receive instant alerts'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              type="button"
+              variant={pushSubscribed ? 'outline' : 'default'}
+              onClick={handlePushToggle}
+              disabled={pushLoading || pushPermission === 'denied'}
+            >
+              {pushLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : pushSubscribed ? (
+                'Disable Push Notifications'
+              ) : (
+                'Enable Push Notifications'
+              )}
+            </Button>
+            {pushPermission === 'denied' && (
+              <p className="text-sm text-muted-foreground mt-2">
+                To enable notifications, click the lock icon in your browser's address bar and allow notifications.
+              </p>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -249,7 +375,7 @@ export default function NotificationSettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="divide-y divide-border">
-              {notifications.map((category) => {
+              {notificationCategories.map((category) => {
                 const Icon = category.icon;
                 return (
                   <div
@@ -277,9 +403,9 @@ export default function NotificationSettingsPage() {
                             Email
                           </span>
                           <Toggle
-                            checked={category.email}
+                            checked={preferences[category.emailKey] as boolean}
                             onChange={(value) =>
-                              handleToggle(category.id, 'email', value)
+                              handleToggle(category.emailKey, value)
                             }
                             label={`Email notifications for ${category.name}`}
                           />
@@ -290,11 +416,12 @@ export default function NotificationSettingsPage() {
                             Push
                           </span>
                           <Toggle
-                            checked={category.push}
+                            checked={preferences[category.pushKey] as boolean}
                             onChange={(value) =>
-                              handleToggle(category.id, 'push', value)
+                              handleToggle(category.pushKey, value)
                             }
                             label={`Push notifications for ${category.name}`}
+                            disabled={!pushSubscribed}
                           />
                         </div>
                       </div>
@@ -322,12 +449,22 @@ export default function NotificationSettingsPage() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => setNotifications(defaultNotifications)}
+            onClick={() => {
+              setPreferences(defaultPreferences);
+              setHasChanges(true);
+            }}
           >
             Reset to Defaults
           </Button>
-          <Button type="submit" disabled={isSaving}>
-            {isSaving ? 'Saving...' : 'Save Preferences'}
+          <Button type="submit" disabled={isSaving || !hasChanges}>
+            {isSaving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              'Save Preferences'
+            )}
           </Button>
         </div>
       </form>

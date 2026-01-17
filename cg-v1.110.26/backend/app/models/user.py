@@ -61,6 +61,11 @@ class User(Base, UUIDMixin, TimestampMixin):
         "ClearFundFee", back_populates="user"
     )
 
+    # Push notification subscriptions
+    push_subscriptions: Mapped[List["PushSubscription"]] = relationship(
+        "PushSubscription", back_populates="user", cascade="all, delete-orphan"
+    )
+
     def __repr__(self) -> str:
         return f"<User {self.email}>"
 

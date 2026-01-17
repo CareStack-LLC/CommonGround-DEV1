@@ -35,6 +35,7 @@ from app.api.v1.endpoints import (
     my_circle,
     subscriptions,
     grants,
+    push,
 )
 
 api_router = APIRouter()
@@ -102,3 +103,6 @@ api_router.include_router(subscriptions.router, prefix="/subscriptions", tags=["
 
 # Grants - Nonprofit grant codes
 api_router.include_router(grants.router, prefix="/grants", tags=["Grant Codes"])
+
+# Push Notifications - Web Push API
+api_router.include_router(push.router, prefix="/push", tags=["Push Notifications"])

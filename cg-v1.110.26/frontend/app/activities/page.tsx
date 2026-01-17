@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { useNotification } from '@/contexts/notification-context';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { formatDistanceToNow, isToday, isYesterday, format } from 'date-fns';
@@ -156,6 +157,7 @@ function ActivitySection({
 function ActivitiesContent() {
   const router = useRouter();
   const { user } = useAuth();
+  const { refreshUnreadCount, markAllRead: markAllReadInContext, decrementUnread } = useNotification();
   const [activities, setActivities] = useState<RecentActivity[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -209,6 +211,9 @@ function ActivitiesContent() {
         prev.map((a) => ({ ...a, is_read: true }))
       );
       setUnreadCount(0);
+
+      // Update the global notification context (updates the bell badge)
+      await markAllReadInContext();
     } catch (error) {
       console.error('Failed to mark all as read:', error);
     } finally {
@@ -227,6 +232,9 @@ function ActivitiesContent() {
           )
         );
         setUnreadCount((prev) => Math.max(0, prev - 1));
+
+        // Update the global notification context (updates the bell badge)
+        decrementUnread();
       } catch (error) {
         console.error('Failed to mark activity as read:', error);
       }

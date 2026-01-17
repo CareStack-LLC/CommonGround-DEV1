@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 from app.core.database import get_db
 from app.core.security import get_current_user, get_current_child_user, get_current_circle_user
 from app.services.daily_video import daily_service
+from app.services.push import push_service
 from app.models.user import User
 from app.models.family_file import FamilyFile
 from app.models.child import Child
@@ -317,6 +318,36 @@ async def create_session(
             db.add(invite)
 
     await db.commit()
+
+    # Send push notification for incoming call
+    if is_immediate_call:
+        try:
+            caller_name = f"{current_user.first_name} {current_user.last_name or ''}".strip()
+            child_name = child.display_name
+
+            # Notify the other parent about the call
+            other_parent_id = None
+            if str(current_user.id) == str(family_file.parent_a_id):
+                other_parent_id = family_file.parent_b_id
+            else:
+                other_parent_id = family_file.parent_a_id
+
+            if other_parent_id:
+                await push_service.send_notification(
+                    db=db,
+                    user_id=str(other_parent_id),
+                    title=f"Incoming KidComs Call",
+                    body=f"{caller_name} is calling {child_name}",
+                    url=f"/kidcoms?session={session.id}",
+                    tag="kidcoms-call",
+                    data={
+                        "session_id": str(session.id),
+                        "child_id": str(child.id),
+                        "caller_name": caller_name
+                    }
+                )
+        except Exception as e:
+            logger.warning(f"Failed to send push notification for KidComs call: {e}")
 
     return _session_to_response(session)
 

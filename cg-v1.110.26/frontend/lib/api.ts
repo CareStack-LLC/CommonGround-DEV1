@@ -454,6 +454,13 @@ export const authAPI = {
   },
 
   /**
+   * Get the current access token
+   */
+  getToken(): string | null {
+    return getAuthToken();
+  },
+
+  /**
    * Get current user from localStorage
    */
   getCurrentUser(): User | null {
@@ -511,6 +518,21 @@ export const authAPI = {
 // Users API (Profile Management)
 // ============================================================================
 
+export interface NotificationPreferences {
+  email_messages: boolean;
+  email_schedule: boolean;
+  email_agreements: boolean;
+  email_payments: boolean;
+  email_court: boolean;
+  email_aria: boolean;
+  push_messages: boolean;
+  push_schedule: boolean;
+  push_agreements: boolean;
+  push_payments: boolean;
+  push_court: boolean;
+  push_aria: boolean;
+}
+
 export const usersAPI = {
   /**
    * Get current user's profile
@@ -524,6 +546,23 @@ export const usersAPI = {
    */
   async updateProfile(data: UserProfileUpdate): Promise<UserProfile> {
     return fetchAPI<UserProfile>('/users/me/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Get current user's notification preferences
+   */
+  async getNotificationPreferences(): Promise<NotificationPreferences> {
+    return fetchAPI<NotificationPreferences>('/users/me/notifications');
+  },
+
+  /**
+   * Update current user's notification preferences
+   */
+  async updateNotificationPreferences(data: NotificationPreferences): Promise<NotificationPreferences> {
+    return fetchAPI<NotificationPreferences>('/users/me/notifications', {
       method: 'PUT',
       body: JSON.stringify(data),
     });
