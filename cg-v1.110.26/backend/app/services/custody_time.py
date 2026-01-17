@@ -126,9 +126,9 @@ class CustodyTimeService:
         if exchange.child_ids:
             child_ids = exchange.child_ids if isinstance(exchange.child_ids, list) else [exchange.child_ids]
 
-        record_date = exchange_instance.scheduled_date.date() if isinstance(
-            exchange_instance.scheduled_date, datetime
-        ) else exchange_instance.scheduled_date
+        record_date = exchange_instance.scheduled_time.date() if isinstance(
+            exchange_instance.scheduled_time, datetime
+        ) else exchange_instance.scheduled_time
 
         records = []
         for child_id in child_ids:
@@ -521,8 +521,8 @@ class CustodyTimeService:
                         CustodyExchange.case_id == family_file_id,
                         CustodyExchange.family_file_id == family_file_id
                     ),
-                    CustodyExchangeInstance.scheduled_date >= start_date,
-                    CustodyExchangeInstance.scheduled_date <= end_date
+                    CustodyExchangeInstance.scheduled_time >= datetime.combine(start_date, datetime.min.time()),
+                    CustodyExchangeInstance.scheduled_time <= datetime.combine(end_date, datetime.max.time())
                 )
             )
         )
@@ -537,8 +537,8 @@ class CustodyTimeService:
             select(ScheduleEvent).where(
                 and_(
                     ScheduleEvent.case_id == family_file_id,
-                    ScheduleEvent.event_date >= start_date,
-                    ScheduleEvent.event_date <= end_date
+                    ScheduleEvent.start_time >= datetime.combine(start_date, datetime.min.time()),
+                    ScheduleEvent.start_time <= datetime.combine(end_date, datetime.max.time())
                 )
             )
         )
@@ -546,7 +546,7 @@ class CustodyTimeService:
 
         events_by_category: Dict[str, int] = {}
         for event in events:
-            category = event.category or "other"
+            category = event.event_category or "other"
             events_by_category[category] = events_by_category.get(category, 0) + 1
 
         # Get expense statistics (ClearFund)
@@ -562,7 +562,7 @@ class CustodyTimeService:
         expenses = expense_result.scalars().all()
 
         total_expenses = len(expenses)
-        total_amount = sum(float(e.amount or 0) for e in expenses)
+        total_amount = sum(float(e.total_amount or 0) for e in expenses)
         approved_count = sum(1 for e in expenses if e.status == "approved")
 
         return {
@@ -734,7 +734,7 @@ class CustodyTimeService:
                     CustodyExchangeInstance.status == "completed"
                 )
             )
-            .order_by(CustodyExchangeInstance.scheduled_date)
+            .order_by(CustodyExchangeInstance.scheduled_time)
         )
         instances = result.scalars().all()
 
