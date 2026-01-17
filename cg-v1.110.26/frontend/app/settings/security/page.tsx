@@ -1,8 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { usersAPI } from '@/lib/api';
+import {
+  listMFAFactors,
+  enrollMFA,
+  verifyMFA,
+  unenrollMFA,
+} from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +32,7 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  X,
 } from 'lucide-react';
 
 /**
@@ -61,6 +68,20 @@ const mockSessions: ActiveSession[] = [
   },
 ];
 
+// MFA enrollment state
+interface MFAEnrollment {
+  factorId: string;
+  qrCode: string;
+  secret: string;
+}
+
+interface MFAFactor {
+  id: string;
+  friendly_name?: string;
+  factor_type: string;
+  status: string;
+}
+
 export default function SecuritySettingsPage() {
   const { user, logout } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
@@ -68,7 +89,14 @@ export default function SecuritySettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+
+  // MFA state
+  const [mfaFactors, setMfaFactors] = useState<MFAFactor[]>([]);
+  const [mfaLoading, setMfaLoading] = useState(true);
+  const [mfaEnrollment, setMfaEnrollment] = useState<MFAEnrollment | null>(null);
+  const [mfaCode, setMfaCode] = useState('');
+  const [mfaError, setMfaError] = useState<string | null>(null);
+  const [mfaProcessing, setMfaProcessing] = useState(false);
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -77,6 +105,27 @@ export default function SecuritySettingsPage() {
   });
 
   const [sessions] = useState<ActiveSession[]>(mockSessions);
+
+  // Check if MFA is enabled (has verified TOTP factor)
+  const twoFactorEnabled = mfaFactors.some(
+    (f) => f.factor_type === 'totp' && f.status === 'verified'
+  );
+
+  // Load MFA factors on mount
+  useEffect(() => {
+    const loadMFAFactors = async () => {
+      try {
+        const { totp } = await listMFAFactors();
+        setMfaFactors(totp || []);
+      } catch (err) {
+        console.error('Failed to load MFA factors:', err);
+      } finally {
+        setMfaLoading(false);
+      }
+    };
+
+    loadMFAFactors();
+  }, []);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -157,6 +206,83 @@ export default function SecuritySettingsPage() {
       // Refresh sessions list
     } catch (err) {
       setError('Failed to revoke session');
+    }
+  };
+
+  // Start MFA enrollment
+  const handleEnableMFA = async () => {
+    setMfaError(null);
+    setMfaProcessing(true);
+
+    try {
+      const enrollment = await enrollMFA('Authenticator App');
+      setMfaEnrollment({
+        factorId: enrollment.id,
+        qrCode: enrollment.totp.qr_code,
+        secret: enrollment.totp.secret,
+      });
+    } catch (err: any) {
+      setMfaError(err?.message || 'Failed to start MFA enrollment');
+    } finally {
+      setMfaProcessing(false);
+    }
+  };
+
+  // Verify MFA code and complete enrollment
+  const handleVerifyMFA = async () => {
+    if (!mfaEnrollment || !mfaCode) return;
+
+    setMfaError(null);
+    setMfaProcessing(true);
+
+    try {
+      await verifyMFA(mfaEnrollment.factorId, mfaCode);
+
+      // Refresh factors list
+      const { totp } = await listMFAFactors();
+      setMfaFactors(totp || []);
+
+      // Clear enrollment state
+      setMfaEnrollment(null);
+      setMfaCode('');
+    } catch (err: any) {
+      setMfaError(err?.message || 'Invalid code. Please try again.');
+    } finally {
+      setMfaProcessing(false);
+    }
+  };
+
+  // Cancel MFA enrollment
+  const handleCancelMFA = () => {
+    setMfaEnrollment(null);
+    setMfaCode('');
+    setMfaError(null);
+  };
+
+  // Disable MFA
+  const handleDisableMFA = async () => {
+    const verifiedFactor = mfaFactors.find(
+      (f) => f.factor_type === 'totp' && f.status === 'verified'
+    );
+    if (!verifiedFactor) return;
+
+    if (!confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.')) {
+      return;
+    }
+
+    setMfaError(null);
+    setMfaProcessing(true);
+
+    try {
+      await unenrollMFA(verifiedFactor.id);
+
+      // Refresh factors list
+      const { totp } = await listMFAFactors();
+      setMfaFactors(totp || []);
+    } catch (err: any) {
+      setMfaError(err?.message || 'Failed to disable MFA');
+    } finally {
+      setMfaProcessing(false);
     }
   };
 
@@ -293,34 +419,120 @@ export default function SecuritySettingsPage() {
             Add an extra layer of security to your account
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-secondary rounded-lg">
-                <Smartphone className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="font-medium">Authenticator App</p>
-                <p className="text-sm text-muted-foreground">
-                  Use an app like Google Authenticator or Authy
+        <CardContent className="space-y-4">
+          {/* MFA Error */}
+          {mfaError && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>{mfaError}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Loading state */}
+          {mfaLoading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : mfaEnrollment ? (
+            /* Enrollment flow - show QR code */
+            <div className="space-y-4">
+              <div className="text-center">
+                <p className="font-medium mb-2">
+                  Scan this QR code with your authenticator app
                 </p>
+                <div className="flex justify-center mb-4">
+                  <img
+                    src={mfaEnrollment.qrCode}
+                    alt="QR Code for authenticator app"
+                    className="w-48 h-48 border rounded-lg"
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Or enter this code manually:
+                </p>
+                <code className="bg-muted px-3 py-1 rounded text-sm font-mono">
+                  {mfaEnrollment.secret}
+                </code>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="mfaCode">Enter verification code</Label>
+                <Input
+                  id="mfaCode"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  value={mfaCode}
+                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="000000"
+                  className="text-center text-lg tracking-widest"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={handleCancelMFA}
+                  disabled={mfaProcessing}
+                  className="flex-1"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleVerifyMFA}
+                  disabled={mfaProcessing || mfaCode.length !== 6}
+                  className="flex-1"
+                >
+                  {mfaProcessing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Verifying...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Verify & Enable
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Badge variant={twoFactorEnabled ? 'success' : 'outline'}>
-                {twoFactorEnabled ? 'Enabled' : 'Disabled'}
-              </Badge>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  // In production, this would open 2FA setup flow
-                  setTwoFactorEnabled(!twoFactorEnabled);
-                }}
-              >
-                {twoFactorEnabled ? 'Disable' : 'Enable'}
-              </Button>
+          ) : (
+            /* Normal state - show enable/disable */
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-secondary rounded-lg">
+                  <Smartphone className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-medium">Authenticator App</p>
+                  <p className="text-sm text-muted-foreground">
+                    Use an app like Google Authenticator or Authy
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant={twoFactorEnabled ? 'success' : 'outline'}>
+                  {twoFactorEnabled ? 'Enabled' : 'Disabled'}
+                </Badge>
+                <Button
+                  variant="outline"
+                  onClick={twoFactorEnabled ? handleDisableMFA : handleEnableMFA}
+                  disabled={mfaProcessing}
+                >
+                  {mfaProcessing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : twoFactorEnabled ? (
+                    'Disable'
+                  ) : (
+                    'Enable'
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
