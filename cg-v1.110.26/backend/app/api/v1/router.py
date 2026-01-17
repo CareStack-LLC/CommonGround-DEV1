@@ -36,6 +36,7 @@ from app.api.v1.endpoints import (
     subscriptions,
     grants,
     push,
+    custody_time,
 )
 
 api_router = APIRouter()
@@ -106,3 +107,6 @@ api_router.include_router(grants.router, prefix="/grants", tags=["Grant Codes"])
 
 # Push Notifications - Web Push API
 api_router.include_router(push.router, prefix="/push", tags=["Push Notifications"])
+
+# Custody Time - Parenting time tracking and reports
+api_router.include_router(custody_time.router, prefix="/custody-time", tags=["Custody Time"])

@@ -6825,5 +6825,190 @@ export const grantsAPI = {
   },
 };
 
+// =============================================================================
+// Custody Time API - Parenting time tracking and reports
+// =============================================================================
+
+export interface ParentStats {
+  user_id: string;
+  days: number;
+  percentage: number;
+}
+
+export interface AgreedSchedule {
+  pattern: string | null;
+  parent_a_percentage: number;
+  parent_b_percentage: number;
+}
+
+export interface CustodyVariance {
+  parent_a: number;
+  parent_b: number;
+}
+
+export interface PeriodInfo {
+  start_date: string;
+  end_date: string;
+  total_days?: number;
+}
+
+export interface ChildCustodyStats {
+  child_id: string;
+  child_name: string;
+  total_days: number;
+  recorded_days: number;
+  unknown_days: number;
+  parent_a: ParentStats;
+  parent_b: ParentStats;
+  agreed_schedule: AgreedSchedule;
+  variance: CustodyVariance;
+  comparison_summary: string;
+  period: PeriodInfo;
+}
+
+export interface FamilyCustodyStats {
+  family_file_id: string;
+  period: PeriodInfo;
+  parent_a_id: string;
+  parent_b_id: string;
+  children: ChildCustodyStats[];
+  summary: string;
+}
+
+export interface ExchangeStats {
+  total_scheduled: number;
+  completed: number;
+  missed: number;
+  completion_rate: number;
+}
+
+export interface EventStats {
+  total_events: number;
+  by_category: Record<string, number>;
+}
+
+export interface ExpenseStats {
+  total_expenses: number;
+  total_amount: number;
+  approved_count: number;
+}
+
+export interface ParentingReport {
+  family_file_id: string;
+  generated_at: string;
+  generated_by: string;
+  report_period: PeriodInfo;
+  custody_time: FamilyCustodyStats;
+  exchanges: ExchangeStats;
+  events: EventStats;
+  expenses: ExpenseStats;
+}
+
+export interface CustodyOverrideRequest {
+  child_id: string;
+  parent_id: string;
+  record_date?: string;
+  reason?: string;
+}
+
+export interface BackfillRequest {
+  start_date: string;
+  end_date: string;
+  child_ids?: string[];
+}
+
+export interface BackfillResponse {
+  family_file_id: string;
+  records_created: number;
+  start_date: string;
+  end_date: string;
+}
+
+export type TimePeriod = '30_days' | '90_days' | 'ytd' | 'all_time';
+
+export const custodyTimeAPI = {
+  /**
+   * Get custody statistics for a specific child
+   */
+  async getChildStats(
+    childId: string,
+    period: TimePeriod = '30_days',
+    startDate?: string,
+    endDate?: string
+  ): Promise<ChildCustodyStats> {
+    const params = new URLSearchParams({ period });
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    return fetchAPI<ChildCustodyStats>(`/custody-time/child/${childId}/stats?${params.toString()}`);
+  },
+
+  /**
+   * Get custody statistics for all children in a family
+   */
+  async getFamilyStats(
+    familyFileId: string,
+    period: TimePeriod = '30_days',
+    startDate?: string,
+    endDate?: string
+  ): Promise<FamilyCustodyStats> {
+    const params = new URLSearchParams({ period });
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    return fetchAPI<FamilyCustodyStats>(`/custody-time/family/${familyFileId}/stats?${params.toString()}`);
+  },
+
+  /**
+   * Generate comprehensive parenting report
+   */
+  async getParentingReport(
+    familyFileId: string,
+    period: TimePeriod = '30_days',
+    startDate?: string,
+    endDate?: string
+  ): Promise<ParentingReport> {
+    const params = new URLSearchParams({ period });
+    if (startDate) params.append('start_date', startDate);
+    if (endDate) params.append('end_date', endDate);
+    return fetchAPI<ParentingReport>(`/custody-time/family/${familyFileId}/report?${params.toString()}`);
+  },
+
+  /**
+   * Manually override custody for a day ("With Me" button)
+   */
+  async overrideCustody(
+    familyFileId: string,
+    data: CustodyOverrideRequest
+  ): Promise<{ success: boolean; record_id: string; record_date: string; custodial_parent_id: string }> {
+    return fetchAPI(`/custody-time/family/${familyFileId}/override`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Backfill custody records from agreed schedule
+   */
+  async backfillRecords(
+    familyFileId: string,
+    data: BackfillRequest
+  ): Promise<BackfillResponse> {
+    return fetchAPI<BackfillResponse>(`/custody-time/family/${familyFileId}/backfill`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Backfill custody records from completed exchanges
+   */
+  async backfillFromExchanges(
+    familyFileId: string
+  ): Promise<{ success: boolean; family_file_id: string; records_updated: number }> {
+    return fetchAPI(`/custody-time/family/${familyFileId}/backfill-from-exchanges`, {
+      method: 'POST',
+    });
+  },
+};
+
 // Export commonly used functions
 export { getAuthToken, clearAuthTokens };

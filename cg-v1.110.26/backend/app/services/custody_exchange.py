@@ -502,6 +502,10 @@ class CustodyExchangeService:
             instance.status = "completed"
             instance.completed_at = datetime.utcnow()
 
+            # Update custody day record when exchange completes
+            from app.services.custody_time import CustodyTimeService
+            await CustodyTimeService.update_custody_from_exchange(db, instance)
+
         instance.updated_at = datetime.utcnow()
         await db.commit()
         await db.refresh(instance)
@@ -933,6 +937,10 @@ class CustodyExchangeService:
             instance.status = "completed"
             instance.completed_at = now
 
+            # Update custody day record when exchange completes
+            from app.services.custody_time import CustodyTimeService
+            await CustodyTimeService.update_custody_from_exchange(db, instance)
+
         instance.updated_at = now
         await db.commit()
         await db.refresh(instance)
@@ -1003,6 +1011,10 @@ class CustodyExchangeService:
         instance.completed_at = now
         instance.handoff_outcome = "completed"
         instance.updated_at = now
+
+        # Update custody day record when exchange completes via QR
+        from app.services.custody_time import CustodyTimeService
+        await CustodyTimeService.update_custody_from_exchange(db, instance)
 
         await db.commit()
         await db.refresh(instance)

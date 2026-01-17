@@ -899,7 +899,7 @@ function FamilyFileDetailContent() {
                     >
                       <CGAvatar
                         name={child.preferred_name || child.first_name}
-                        src={child.photo_url ? getImageUrl(child.photo_url) || undefined : undefined}
+                        src={child.photo_url ? getImageUrl(child.photo_url) ?? undefined : undefined}
                         size="sm"
                         color="sage"
                       />

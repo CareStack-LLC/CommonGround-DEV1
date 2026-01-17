@@ -173,6 +173,7 @@ from app.models.subscription import (
     FEE_STATUSES,
 )
 from app.models.push_subscription import PushSubscription
+from app.models.custody_day_record import CustodyDayRecord, DeterminationMethod
 
 __all__ = [
     "Base",
@@ -343,4 +344,7 @@ __all__ = [
     "FEE_STATUSES",
     # Push Notifications
     "PushSubscription",
+    # Custody Time Tracking
+    "CustodyDayRecord",
+    "DeterminationMethod",
 ]

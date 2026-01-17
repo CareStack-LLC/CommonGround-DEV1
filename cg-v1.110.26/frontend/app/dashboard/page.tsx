@@ -12,6 +12,7 @@ import {
   agreementsAPI,
   dashboardAPI,
   activitiesAPI,
+  custodyTimeAPI,
   getImageUrl,
   FamilyFileDetail,
   FamilyFileChild,
@@ -20,7 +21,9 @@ import {
   ChildCustodyStatus,
   DashboardSummary,
   UpcomingEvent,
+  FamilyCustodyStats,
 } from '@/lib/api';
+import { CustodyDashboardWidget } from '@/components/custody';
 import {
   Calendar,
   MessageSquare,
@@ -606,6 +609,8 @@ function DashboardContent() {
   const [familyFilesWithData, setFamilyFilesWithData] = useState<FamilyFileWithData[]>([]);
   const [allCustodyStatuses, setAllCustodyStatuses] = useState<CustodyStatusResponse[]>([]);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
+  const [familyCustodyStats, setFamilyCustodyStats] = useState<FamilyCustodyStats | null>(null);
+  const [custodyStatsLoading, setCustodyStatsLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const activeFileIdsRef = useRef<string[]>([]);
 
@@ -711,6 +716,18 @@ function DashboardContent() {
 
         if (summaryResult) {
           setDashboardSummary(summaryResult);
+        }
+
+        // Fetch parenting time stats for the first family file
+        try {
+          setCustodyStatsLoading(true);
+          const stats = await custodyTimeAPI.getFamilyStats(activeFiles[0].id, '30_days');
+          setFamilyCustodyStats(stats);
+        } catch (err) {
+          console.error('Failed to load custody time stats:', err);
+          setFamilyCustodyStats(null);
+        } finally {
+          setCustodyStatsLoading(false);
         }
       }
     } catch (error) {
@@ -956,6 +973,18 @@ function DashboardContent() {
                   </p>
                 </div>
               </div>
+            )}
+
+            {/* Parenting Time Stats Widget */}
+            {allChildren.length > 0 && activeFileIdsRef.current.length > 0 && (
+              <CustodyDashboardWidget
+                familyFileId={activeFileIdsRef.current[0]}
+                familyStats={familyCustodyStats}
+                isLoading={custodyStatsLoading}
+                parentAName={user?.first_name || 'You'}
+                parentBName={dashboardSummary?.sender_name || 'Co-parent'}
+                onViewReport={() => router.push(`/family-files/${activeFileIdsRef.current[0]}/parenting-report`)}
+              />
             )}
 
             {/* Action Stream */}

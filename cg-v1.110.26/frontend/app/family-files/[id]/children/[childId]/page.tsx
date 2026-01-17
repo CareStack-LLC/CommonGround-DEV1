@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { childrenAPI, ChildProfile, getImageUrl } from '@/lib/api';
+import { childrenAPI, ChildProfile, getImageUrl, custodyTimeAPI, ChildCustodyStats, TimePeriod } from '@/lib/api';
+import { ParentingTimeCard } from '@/components/custody';
 import { useAuth } from '@/lib/auth-context';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
@@ -333,6 +334,11 @@ function ChildProfileContent() {
   const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Custody stats state
+  const [custodyStats, setCustodyStats] = useState<ChildCustodyStats | null>(null);
+  const [custodyStatsLoading, setCustodyStatsLoading] = useState(true);
+  const [custodyPeriod, setCustodyPeriod] = useState<TimePeriod>('30_days');
+
   // Form states
   const [basicForm, setBasicForm] = useState({
     first_name: '',
@@ -391,6 +397,25 @@ function ChildProfileContent() {
   useEffect(() => {
     loadChild();
   }, [childId]);
+
+  // Load custody stats
+  useEffect(() => {
+    const loadCustodyStats = async () => {
+      try {
+        setCustodyStatsLoading(true);
+        const stats = await custodyTimeAPI.getChildStats(childId, custodyPeriod);
+        setCustodyStats(stats);
+      } catch (err) {
+        // Silently fail - custody stats are not critical
+        console.error('Failed to load custody stats:', err);
+        setCustodyStats(null);
+      } finally {
+        setCustodyStatsLoading(false);
+      }
+    };
+
+    loadCustodyStats();
+  }, [childId, custodyPeriod]);
 
   const loadChild = async () => {
     try {
@@ -766,6 +791,28 @@ function ChildProfileContent() {
           </div>
         </div>
       </div>
+
+      {/* Parenting Time Card */}
+      {(custodyStats || custodyStatsLoading) && (
+        <ParentingTimeCard
+          stats={custodyStats || {
+            child_id: childId,
+            child_name: `${child.first_name} ${child.last_name}`,
+            total_days: 30,
+            recorded_days: 0,
+            unknown_days: 30,
+            parent_a: { user_id: '', days: 0, percentage: 50 },
+            parent_b: { user_id: '', days: 0, percentage: 50 },
+            agreed_schedule: { pattern: null, parent_a_percentage: 50, parent_b_percentage: 50 },
+            variance: { parent_a: 0, parent_b: 0 },
+            comparison_summary: 'Loading custody data...',
+          }}
+          parentAName="Parent A"
+          parentBName="Parent B"
+          currentPeriod={custodyPeriod}
+          onPeriodChange={(period) => setCustodyPeriod(period as TimePeriod)}
+        />
+      )}
 
       {/* Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2">
