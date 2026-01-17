@@ -30,6 +30,7 @@ class StorageBucket:
     CUBBIE = "cubbie"
     RECEIPTS = "receipts"
     DOCUMENTS = "documents"
+    KIDCOMS = "kidcoms"  # Public bucket for Watch Together videos and books
 
 
 class SupabaseStorageService:
@@ -102,9 +103,9 @@ class SupabaseStorageService:
             }
         )
 
-        # Return the public URL for public buckets (avatars)
+        # Return the public URL for public buckets (avatars, kidcoms)
         # For private buckets, return a signed URL that lasts 1 year
-        if bucket == StorageBucket.AVATARS:
+        if bucket in (StorageBucket.AVATARS, StorageBucket.KIDCOMS):
             return self._get_storage_url(bucket, path)
         else:
             # For private buckets, return a long-lived signed URL (1 year)
