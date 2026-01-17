@@ -100,9 +100,9 @@ export function ARIAIntervention({
   const canSendAnyway = !analysis.block_send && analysis.toxicity_level !== 'red'; // Double safety check
 
   return (
-    <div className={`aria-guardian ${config.bg} ${config.border} overflow-hidden`}>
+    <div className={`aria-guardian ${config.bg} ${config.border} overflow-hidden max-h-[85vh] flex flex-col`}>
       {/* Header */}
-      <div className="p-4 sm:p-5">
+      <div className="p-4 sm:p-5 flex-shrink-0">
         <div className="flex items-start gap-3 sm:gap-4">
           {/* Animated Icon */}
           <div className="flex-shrink-0">
@@ -210,8 +210,8 @@ export function ARIAIntervention({
         )}
       </div>
 
-      {/* Messages Comparison */}
-      <div className="border-t border-black/5">
+      {/* Messages Comparison - Scrollable area */}
+      <div className="border-t border-black/5 overflow-y-auto flex-1 min-h-0">
         <div className="p-4 sm:p-5 space-y-4">
           {/* Original Message */}
           <div>
@@ -253,8 +253,8 @@ export function ARIAIntervention({
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="border-t border-black/5 p-4 sm:p-5 bg-white/30">
+      {/* Actions - Fixed at bottom */}
+      <div className="border-t border-black/5 p-4 sm:p-5 bg-white/30 flex-shrink-0">
         {action === 'none' ? (
           <div className="space-y-2">
             {/* Primary Action - Accept Suggestion */}
