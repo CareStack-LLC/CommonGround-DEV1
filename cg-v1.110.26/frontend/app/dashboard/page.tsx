@@ -99,6 +99,7 @@ function formatHoursRemaining(hours: number | undefined): string {
 
 // Child Avatar Component
 function ChildAvatar({ child, size = 'md' }: { child: FamilyFileChild; size?: 'sm' | 'md' | 'lg' }) {
+  const [imageError, setImageError] = useState(false);
   const initials = getInitials(child.first_name, child.last_name);
   const sizeClasses = {
     sm: 'w-8 h-8 text-xs',
@@ -106,12 +107,23 @@ function ChildAvatar({ child, size = 'md' }: { child: FamilyFileChild; size?: 's
     lg: 'w-16 h-16 text-base',
   };
 
+  const imageUrl = child.photo_url ? getImageUrl(child.photo_url) : null;
+
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full bg-cg-amber-subtle flex items-center justify-center ring-2 ring-card`}
+      className={`${sizeClasses[size]} rounded-full bg-cg-amber-subtle flex items-center justify-center ring-2 ring-card overflow-hidden`}
       title={`${child.first_name} ${child.last_name}`}
     >
-      <span className="font-semibold text-cg-amber">{initials}</span>
+      {imageUrl && !imageError ? (
+        <img
+          src={imageUrl}
+          alt={`${child.first_name} ${child.last_name}`}
+          className="w-full h-full object-cover"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <span className="font-semibold text-cg-amber">{initials}</span>
+      )}
     </div>
   );
 }
