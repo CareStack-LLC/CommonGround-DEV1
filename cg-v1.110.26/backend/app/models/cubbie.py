@@ -76,7 +76,7 @@ class CubbieItem(Base, UUIDMixin, TimestampMixin):
     )
     purchase_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     serial_number: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
-    photo_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    photo_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)  # Supabase signed URLs are ~600+ chars
 
     # Tracking
     added_by: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"))
@@ -179,9 +179,9 @@ class ChildPhoto(Base, UUIDMixin, TimestampMixin):
     )
     uploaded_by: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"))
 
-    # Photo details
-    photo_url: Mapped[str] = mapped_column(String(500))
-    thumbnail_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    # Photo details - Supabase signed URLs are ~600+ chars
+    photo_url: Mapped[str] = mapped_column(String(2048))
+    thumbnail_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
     caption: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
 
     # Metadata

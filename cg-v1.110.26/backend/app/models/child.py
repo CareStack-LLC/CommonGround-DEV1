@@ -88,7 +88,7 @@ class Child(Base, UUIDMixin, TimestampMixin):
     pronouns: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
 
     # Photo
-    photo_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    photo_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)  # Supabase signed URLs are ~600+ chars
 
     # === SPECIAL NEEDS ===
     has_special_needs: Mapped[bool] = mapped_column(Boolean, default=False)

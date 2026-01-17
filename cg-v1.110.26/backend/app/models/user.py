@@ -81,7 +81,7 @@ class UserProfile(Base, UUIDMixin, TimestampMixin):
     preferred_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
     # Profile
-    avatar_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    avatar_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)  # Supabase signed URLs are ~600+ chars
     bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     timezone: Mapped[str] = mapped_column(String(50), default="America/Los_Angeles")
     locale: Mapped[str] = mapped_column(String(10), default="en-US")

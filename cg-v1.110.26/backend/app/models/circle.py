@@ -61,7 +61,7 @@ class CircleContact(Base, UUIDMixin, TimestampMixin):
     contact_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     contact_phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     relationship_type: Mapped[str] = mapped_column(String(50), default=RelationshipType.OTHER.value)
-    photo_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    photo_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)  # Supabase signed URLs are ~600+ chars
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Approval tracking
