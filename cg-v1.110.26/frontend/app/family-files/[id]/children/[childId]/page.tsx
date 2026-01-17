@@ -823,8 +823,16 @@ function ChildProfileContent() {
             variance: { parent_a: 0, parent_b: 0 },
             comparison_summary: 'Loading custody data...',
           }}
-          parentAName={familyFile?.parent_a_info?.first_name || 'Parent A'}
-          parentBName={familyFile?.parent_b_info?.first_name || 'Parent B'}
+          parentAName={
+            familyFile?.parent_a_info?.first_name ||
+            familyFile?.parent_a_info?.email?.split('@')[0] ||
+            'Parent A'
+          }
+          parentBName={
+            familyFile?.parent_b_info?.first_name ||
+            familyFile?.parent_b_info?.email?.split('@')[0] ||
+            'Parent B'
+          }
           currentPeriod={custodyPeriod}
           onPeriodChange={(period) => setCustodyPeriod(period as TimePeriod)}
         />

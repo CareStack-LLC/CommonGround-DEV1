@@ -122,26 +122,28 @@ export default function ParentingTimeCard({
     ? Math.floor((Date.now() - new Date(agreementStartDate).getTime()) / (1000 * 60 * 60 * 24))
     : stats.total_days;
 
-  // Individual bar component with access to stats
+  // Total days in the period (e.g., 30 days)
+  const periodTotalDays = stats.total_days || 30;
+
+  // Individual bar component - bar width based on days out of period total
   const ParentBarSection = ({
     name,
     days,
-    percentage,
     color,
     variance,
     agreedPercentage,
   }: {
     name: string;
     days: number;
-    percentage: number;
     color: 'sage' | 'slate';
     variance: number;
     agreedPercentage: number;
   }) => {
-    const barWidth = totalTrackedDays > 0 ? Math.max((days / totalTrackedDays) * 100, 2) : 2;
+    // Bar width = days / period total (e.g., 1 day out of 30 = 3.3%)
+    // Minimum width of 1% so it's visible even with 0 days
+    const barWidth = periodTotalDays > 0 ? Math.max((days / periodTotalDays) * 100, days > 0 ? 3 : 0) : 0;
     const colorClasses = color === 'sage' ? 'bg-cg-sage' : 'bg-cg-slate';
     const bgClasses = color === 'sage' ? 'bg-cg-sage-subtle' : 'bg-cg-slate-subtle';
-    const textColorClasses = color === 'sage' ? 'text-cg-sage' : 'text-cg-slate';
 
     return (
       <div className="space-y-2">
@@ -154,23 +156,12 @@ export default function ParentingTimeCard({
           </div>
         </div>
 
-        {/* Bar graph */}
+        {/* Bar graph - width based on days out of period total */}
         <div className={`h-7 ${bgClasses} rounded-lg overflow-hidden relative`}>
           <div
-            className={`h-full ${colorClasses} rounded-lg transition-all duration-700 ease-out flex items-center justify-end px-2.5`}
+            className={`h-full ${colorClasses} rounded-lg transition-all duration-700 ease-out`}
             style={{ width: `${barWidth}%` }}
-          >
-            {barWidth > 20 && (
-              <span className="text-xs font-semibold text-white">
-                {percentage.toFixed(0)}%
-              </span>
-            )}
-          </div>
-          {barWidth <= 20 && (
-            <span className={`absolute top-1/2 -translate-y-1/2 left-2.5 text-xs font-semibold ${textColorClasses}`}>
-              {percentage.toFixed(0)}%
-            </span>
-          )}
+          />
         </div>
 
         {/* Variance indicator */}
@@ -211,13 +202,12 @@ export default function ParentingTimeCard({
         )}
       </div>
 
-      {/* Parent Bars - Stacked vertically on left */}
+      {/* Parent Bars - Stacked vertically */}
       <div className="space-y-5">
         {/* Parent A */}
         <ParentBarSection
           name={parentAName}
           days={stats.parent_a.days}
-          percentage={stats.parent_a.percentage}
           color="sage"
           variance={stats.variance.parent_a}
           agreedPercentage={stats.agreed_schedule.parent_a_percentage}
@@ -227,7 +217,6 @@ export default function ParentingTimeCard({
         <ParentBarSection
           name={parentBName}
           days={stats.parent_b.days}
-          percentage={stats.parent_b.percentage}
           color="slate"
           variance={stats.variance.parent_b}
           agreedPercentage={stats.agreed_schedule.parent_b_percentage}
