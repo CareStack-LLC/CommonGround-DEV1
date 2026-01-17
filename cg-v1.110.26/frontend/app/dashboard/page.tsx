@@ -745,16 +745,27 @@ function DashboardContent() {
           setDashboardSummary(summaryResult);
         }
 
-        // Fetch parenting time stats for the first family file
-        try {
-          setCustodyStatsLoading(true);
-          const stats = await custodyTimeAPI.getFamilyStats(activeFiles[0].id, '30_days');
-          setFamilyCustodyStats(stats);
-        } catch (err) {
-          console.error('Failed to load custody time stats:', err);
-          setFamilyCustodyStats(null);
-        } finally {
+        // Fetch parenting time stats for a family file that has children
+        // Find the first active family file with children
+        const fileWithChildren = filesWithData.find(
+          f => f.familyFile.status === 'active' && (f.familyFile.children?.length ?? 0) > 0
+        );
+
+        if (fileWithChildren) {
+          try {
+            setCustodyStatsLoading(true);
+            const stats = await custodyTimeAPI.getFamilyStats(fileWithChildren.familyFile.id, '30_days');
+            setFamilyCustodyStats(stats);
+          } catch (err) {
+            console.error('Failed to load custody time stats:', err);
+            setFamilyCustodyStats(null);
+          } finally {
+            setCustodyStatsLoading(false);
+          }
+        } else {
+          // No family files with children - skip custody stats
           setCustodyStatsLoading(false);
+          setFamilyCustodyStats(null);
         }
       }
     } catch (error) {
@@ -1019,13 +1030,13 @@ function DashboardContent() {
             {/* Parenting Time Stats Widget */}
             {allChildren.length > 0 && activeFileIdsRef.current.length > 0 && (
               <CustodyDashboardWidget
-                familyFileId={activeFileIdsRef.current[0]}
+                familyFileId={familyCustodyStats?.family_file_id || activeFileIdsRef.current[0]}
                 familyStats={familyCustodyStats}
                 isLoading={custodyStatsLoading}
                 parentAName={user?.first_name || 'You'}
                 parentBName={dashboardSummary?.sender_name || 'Co-parent'}
                 currentUserId={user?.id}
-                onViewReport={() => router.push(`/family-files/${activeFileIdsRef.current[0]}/parenting-report`)}
+                onViewReport={() => router.push(`/family-files/${familyCustodyStats?.family_file_id || activeFileIdsRef.current[0]}/parenting-report`)}
               />
             )}
 
