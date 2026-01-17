@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { familyFilesAPI, quickAccordsAPI, agreementsAPI, FamilyFileDetail, QuickAccord, Agreement } from '@/lib/api';
+import { familyFilesAPI, quickAccordsAPI, agreementsAPI, getImageUrl, FamilyFileDetail, QuickAccord, Agreement } from '@/lib/api';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
@@ -899,6 +899,7 @@ function FamilyFileDetailContent() {
                     >
                       <CGAvatar
                         name={child.preferred_name || child.first_name}
+                        src={child.photo_url ? getImageUrl(child.photo_url) || undefined : undefined}
                         size="sm"
                         color="sage"
                       />
