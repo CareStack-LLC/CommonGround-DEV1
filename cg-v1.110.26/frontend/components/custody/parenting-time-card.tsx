@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import { Clock, Calendar, TrendingUp, TrendingDown, Scale } from 'lucide-react';
+import { Clock, Calendar, Users, TrendingUp, TrendingDown, CheckCircle } from 'lucide-react';
 
 interface ParentStats {
   user_id: string;
@@ -20,6 +20,12 @@ interface CustodyVariance {
   parent_b: number;
 }
 
+interface PeriodInfo {
+  start_date: string;
+  end_date: string;
+  total_days?: number;
+}
+
 interface ChildCustodyStats {
   child_id: string;
   child_name: string;
@@ -31,12 +37,16 @@ interface ChildCustodyStats {
   agreed_schedule: AgreedSchedule;
   variance: CustodyVariance;
   comparison_summary: string;
+  period?: PeriodInfo;
 }
 
 interface ParentingTimeCardProps {
   stats: ChildCustodyStats;
   parentAName?: string;
   parentBName?: string;
+  parentAColor?: string;
+  parentBColor?: string;
+  agreementStartDate?: string;
   className?: string;
   onPeriodChange?: (period: string) => void;
   currentPeriod?: string;
@@ -60,11 +70,11 @@ const PATTERN_LABELS: Record<string, string> = {
   'custom': 'Custom Schedule',
 };
 
-function VarianceIndicator({ variance, label }: { variance: number; label: string }) {
+function VarianceIndicator({ variance }: { variance: number }) {
   if (Math.abs(variance) <= 5) {
     return (
-      <span className="text-xs text-gray-500 flex items-center gap-1">
-        <Scale className="h-3 w-3" />
+      <span className="text-xs text-cg-sage flex items-center gap-1">
+        <CheckCircle className="h-3 w-3" />
         On track
       </span>
     );
@@ -72,17 +82,17 @@ function VarianceIndicator({ variance, label }: { variance: number; label: strin
 
   if (variance > 0) {
     return (
-      <span className="text-xs text-blue-600 flex items-center gap-1">
+      <span className="text-xs text-cg-slate flex items-center gap-1">
         <TrendingUp className="h-3 w-3" />
-        +{variance.toFixed(1)}% {label}
+        +{variance.toFixed(1)}%
       </span>
     );
   }
 
   return (
-    <span className="text-xs text-amber-600 flex items-center gap-1">
+    <span className="text-xs text-cg-amber flex items-center gap-1">
       <TrendingDown className="h-3 w-3" />
-      {variance.toFixed(1)}% {label}
+      {variance.toFixed(1)}%
     </span>
   );
 }
@@ -91,28 +101,98 @@ export default function ParentingTimeCard({
   stats,
   parentAName = 'Parent A',
   parentBName = 'Parent B',
+  parentAColor,
+  parentBColor,
+  agreementStartDate,
   className = '',
   onPeriodChange,
   currentPeriod = '30_days',
 }: ParentingTimeCardProps) {
-  // Calculate progress bar value (parent A's percentage out of 100)
-  const progressValue = stats.recorded_days > 0 ? stats.parent_a.percentage : 50;
+  // Calculate total tracked days
+  const totalTrackedDays = stats.parent_a.days + stats.parent_b.days;
 
-  // Determine bar colors based on variance
-  const getBarColor = () => {
-    const variance = Math.abs(stats.variance.parent_a);
-    if (variance <= 5) return 'bg-emerald-500';
-    if (variance <= 15) return 'bg-amber-500';
-    return 'bg-rose-500';
+  // Format agreement start date if provided
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  // Calculate days since agreement start
+  const daysSinceStart = agreementStartDate
+    ? Math.floor((Date.now() - new Date(agreementStartDate).getTime()) / (1000 * 60 * 60 * 24))
+    : stats.total_days;
+
+  // Individual bar component with access to stats
+  const ParentBarSection = ({
+    name,
+    days,
+    percentage,
+    color,
+    variance,
+    agreedPercentage,
+  }: {
+    name: string;
+    days: number;
+    percentage: number;
+    color: 'sage' | 'slate';
+    variance: number;
+    agreedPercentage: number;
+  }) => {
+    const barWidth = totalTrackedDays > 0 ? Math.max((days / totalTrackedDays) * 100, 2) : 2;
+    const colorClasses = color === 'sage' ? 'bg-cg-sage' : 'bg-cg-slate';
+    const bgClasses = color === 'sage' ? 'bg-cg-sage-subtle' : 'bg-cg-slate-subtle';
+    const textColorClasses = color === 'sage' ? 'text-cg-sage' : 'text-cg-slate';
+
+    return (
+      <div className="space-y-2">
+        {/* Parent name and stats */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-foreground truncate">{name}</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl font-bold text-foreground">{days}</span>
+            <span className="text-xs text-muted-foreground">days</span>
+          </div>
+        </div>
+
+        {/* Bar graph */}
+        <div className={`h-7 ${bgClasses} rounded-lg overflow-hidden relative`}>
+          <div
+            className={`h-full ${colorClasses} rounded-lg transition-all duration-700 ease-out flex items-center justify-end px-2.5`}
+            style={{ width: `${barWidth}%` }}
+          >
+            {barWidth > 20 && (
+              <span className="text-xs font-semibold text-white">
+                {percentage.toFixed(0)}%
+              </span>
+            )}
+          </div>
+          {barWidth <= 20 && (
+            <span className={`absolute top-1/2 -translate-y-1/2 left-2.5 text-xs font-semibold ${textColorClasses}`}>
+              {percentage.toFixed(0)}%
+            </span>
+          )}
+        </div>
+
+        {/* Variance indicator */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">
+            Agreed: {agreedPercentage}%
+          </span>
+          <VarianceIndicator variance={variance} />
+        </div>
+      </div>
+    );
   };
 
   return (
     <Card className={`p-5 ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-sage-600" />
-          <h3 className="font-semibold text-gray-900">Parenting Time</h3>
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-cg-sage/10 flex items-center justify-center">
+            <Clock className="h-4.5 w-4.5 text-cg-sage" />
+          </div>
+          <h3 className="font-semibold text-foreground">Parenting Time</h3>
         </div>
 
         {/* Period Selector */}
@@ -120,7 +200,7 @@ export default function ParentingTimeCard({
           <select
             value={currentPeriod}
             onChange={(e) => onPeriodChange(e.target.value)}
-            className="text-sm border-gray-200 rounded-lg px-2 py-1 focus:ring-sage-500 focus:border-sage-500"
+            className="text-sm border border-border rounded-lg px-3 py-1.5 bg-background text-foreground focus:ring-2 focus:ring-cg-sage/30 focus:border-cg-sage transition-all"
           >
             {PERIOD_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -131,81 +211,70 @@ export default function ParentingTimeCard({
         )}
       </div>
 
-      {/* Main Progress Bar */}
-      <div className="mb-4">
-        <div className="relative h-6 bg-gray-100 rounded-full overflow-hidden">
-          {/* Parent A side (left) */}
-          <div
-            className={`absolute left-0 top-0 h-full ${getBarColor()} transition-all duration-500`}
-            style={{ width: `${progressValue}%` }}
-          />
-          {/* Parent B side (right) - shown as remaining space */}
-          <div
-            className="absolute right-0 top-0 h-full bg-gray-300 transition-all duration-500"
-            style={{ width: `${100 - progressValue}%` }}
-          />
-          {/* Center marker for 50/50 */}
-          <div className="absolute left-1/2 top-0 w-0.5 h-full bg-white/50" />
-        </div>
-      </div>
-
-      {/* Parent Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      {/* Parent Bars - Stacked vertically on left */}
+      <div className="space-y-5">
         {/* Parent A */}
-        <div className="text-left">
-          <p className="text-sm font-medium text-gray-700 truncate">{parentAName}</p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-bold text-gray-900">
-              {stats.parent_a.percentage.toFixed(0)}%
-            </span>
-            <span className="text-sm text-gray-500">
-              ({stats.parent_a.days} days)
-            </span>
-          </div>
-          <VarianceIndicator variance={stats.variance.parent_a} label="above agreed" />
-        </div>
+        <ParentBarSection
+          name={parentAName}
+          days={stats.parent_a.days}
+          percentage={stats.parent_a.percentage}
+          color="sage"
+          variance={stats.variance.parent_a}
+          agreedPercentage={stats.agreed_schedule.parent_a_percentage}
+        />
 
         {/* Parent B */}
-        <div className="text-right">
-          <p className="text-sm font-medium text-gray-700 truncate">{parentBName}</p>
-          <div className="flex items-baseline gap-1 justify-end">
-            <span className="text-2xl font-bold text-gray-900">
-              {stats.parent_b.percentage.toFixed(0)}%
-            </span>
-            <span className="text-sm text-gray-500">
-              ({stats.parent_b.days} days)
-            </span>
-          </div>
-          <VarianceIndicator variance={stats.variance.parent_b} label="above agreed" />
-        </div>
+        <ParentBarSection
+          name={parentBName}
+          days={stats.parent_b.days}
+          percentage={stats.parent_b.percentage}
+          color="slate"
+          variance={stats.variance.parent_b}
+          agreedPercentage={stats.agreed_schedule.parent_b_percentage}
+        />
       </div>
 
-      {/* Agreed Schedule Info */}
-      <div className="border-t border-gray-100 pt-3">
+      {/* Footer - Agreement & Tracking Info */}
+      <div className="mt-5 pt-4 border-t border-border space-y-2">
+        {/* Schedule Pattern */}
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-gray-400" />
-            <span className="text-gray-600">
-              Agreed: {stats.agreed_schedule.pattern ?
-                PATTERN_LABELS[stats.agreed_schedule.pattern] || stats.agreed_schedule.pattern :
-                'Not specified'
-              }
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span className="text-muted-foreground">
+              {stats.agreed_schedule.pattern
+                ? PATTERN_LABELS[stats.agreed_schedule.pattern] || stats.agreed_schedule.pattern
+                : 'Custom schedule'}
             </span>
           </div>
-          <span className="text-gray-500">
+          <span className="text-muted-foreground font-medium">
             {stats.agreed_schedule.parent_a_percentage}/{stats.agreed_schedule.parent_b_percentage}
           </span>
         </div>
 
-        {/* Summary */}
-        <p className="text-xs text-gray-500 mt-2">
-          {stats.comparison_summary}
-        </p>
+        {/* Tracking Period */}
+        <div className="flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2">
+            <Users className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-muted-foreground">
+              {totalTrackedDays} days tracked
+              {stats.unknown_days > 0 && (
+                <span className="text-cg-amber ml-1">
+                  ({stats.unknown_days} untracked)
+                </span>
+              )}
+            </span>
+          </div>
+          {agreementStartDate && (
+            <span className="text-muted-foreground">
+              Since {formatDate(agreementStartDate)}
+            </span>
+          )}
+        </div>
 
-        {/* Data completeness indicator */}
-        {stats.unknown_days > 0 && (
-          <p className="text-xs text-amber-600 mt-1">
-            {stats.unknown_days} days without tracking data
+        {/* Summary */}
+        {stats.comparison_summary && (
+          <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+            {stats.comparison_summary}
           </p>
         )}
       </div>

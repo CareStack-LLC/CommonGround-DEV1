@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { childrenAPI, ChildProfile, getImageUrl, custodyTimeAPI, ChildCustodyStats, TimePeriod } from '@/lib/api';
+import { childrenAPI, ChildProfile, getImageUrl, custodyTimeAPI, ChildCustodyStats, TimePeriod, familyFilesAPI, FamilyFileDetail } from '@/lib/api';
 import { ParentingTimeCard } from '@/components/custody';
 import { useAuth } from '@/lib/auth-context';
 import { Navigation } from '@/components/navigation';
@@ -339,6 +339,9 @@ function ChildProfileContent() {
   const [custodyStatsLoading, setCustodyStatsLoading] = useState(true);
   const [custodyPeriod, setCustodyPeriod] = useState<TimePeriod>('30_days');
 
+  // Family file data for parent names
+  const [familyFile, setFamilyFile] = useState<FamilyFileDetail | null>(null);
+
   // Form states
   const [basicForm, setBasicForm] = useState({
     first_name: '',
@@ -397,6 +400,19 @@ function ChildProfileContent() {
   useEffect(() => {
     loadChild();
   }, [childId]);
+
+  // Load family file data for parent names
+  useEffect(() => {
+    const loadFamilyFile = async () => {
+      try {
+        const data = await familyFilesAPI.get(familyFileId);
+        setFamilyFile(data);
+      } catch (err) {
+        console.error('Failed to load family file:', err);
+      }
+    };
+    loadFamilyFile();
+  }, [familyFileId]);
 
   // Load custody stats
   useEffect(() => {
@@ -807,8 +823,8 @@ function ChildProfileContent() {
             variance: { parent_a: 0, parent_b: 0 },
             comparison_summary: 'Loading custody data...',
           }}
-          parentAName="Parent A"
-          parentBName="Parent B"
+          parentAName={familyFile?.parent_a_info?.first_name || 'Parent A'}
+          parentBName={familyFile?.parent_b_info?.first_name || 'Parent B'}
           currentPeriod={custodyPeriod}
           onPeriodChange={(period) => setCustodyPeriod(period as TimePeriod)}
         />
