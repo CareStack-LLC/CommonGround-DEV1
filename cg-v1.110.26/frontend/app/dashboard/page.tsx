@@ -137,11 +137,15 @@ function ChildCustodyCard({
   childData,
   coparentName,
   onWithMe,
+  myDays,
+  theirDays,
 }: {
   childStatus: ChildCustodyStatus;
   childData?: FamilyFileChild;
   coparentName?: string;
   onWithMe?: (childId: string) => void;
+  myDays?: number;
+  theirDays?: number;
 }) {
   const { timezone } = useAuth();
   const [imageError, setImageError] = useState(false);
@@ -150,6 +154,7 @@ function ChildCustodyCard({
   const statusColor = isWithYou ? 'bg-cg-sage' : 'bg-cg-slate';
   const statusTextColor = isWithYou ? 'text-cg-sage' : 'text-cg-slate';
   const hasNextExchange = !!childStatus.next_exchange_time;
+  const hasDaysData = myDays !== undefined || theirDays !== undefined;
 
   // Format next exchange time (timezone-aware)
   const formatNextExchange = () => {
@@ -267,6 +272,28 @@ function ChildCustodyCard({
                 : ''}
             </p>
           </>
+        )}
+
+        {/* Days with parent - custody time tracking */}
+        {hasDaysData && (
+          <div className="mt-3 pt-3 border-t border-border">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-cg-sage" />
+                <span className="text-sm text-muted-foreground">Your time</span>
+              </div>
+              <span className="text-lg font-bold text-cg-sage">{myDays ?? 0} <span className="text-xs font-normal text-muted-foreground">days</span></span>
+            </div>
+            {theirDays !== undefined && theirDays > 0 && (
+              <div className="flex items-center justify-between mt-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-cg-slate" />
+                  <span className="text-sm text-muted-foreground">{coparentName || 'Co-parent'}</span>
+                </div>
+                <span className="text-sm font-medium text-cg-slate">{theirDays} <span className="text-xs font-normal text-muted-foreground">days</span></span>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -950,6 +977,18 @@ function DashboardContent() {
                 {allCustodyStatuses.flatMap((custodyStatus) =>
                   (custodyStatus.children || []).map((childStatus) => {
                     const childData = allChildren.find(c => c.id === childStatus.child_id);
+                    // Look up custody time stats for this child
+                    const childStats = familyCustodyStats?.children.find(
+                      c => c.child_id === childStatus.child_id
+                    );
+                    // Determine if current user is parent A or B
+                    const isParentA = user?.id === familyCustodyStats?.parent_a_id;
+                    const myDays = childStats
+                      ? (isParentA ? childStats.parent_a.days : childStats.parent_b.days)
+                      : undefined;
+                    const theirDays = childStats
+                      ? (isParentA ? childStats.parent_b.days : childStats.parent_a.days)
+                      : undefined;
                     return (
                       <ChildCustodyCard
                         key={childStatus.child_id}
@@ -957,6 +996,8 @@ function DashboardContent() {
                         childData={childData}
                         coparentName={custodyStatus.coparent_name}
                         onWithMe={handleWithMe}
+                        myDays={myDays}
+                        theirDays={theirDays}
                       />
                     );
                   })
