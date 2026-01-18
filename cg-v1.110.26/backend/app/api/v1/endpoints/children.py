@@ -141,6 +141,7 @@ def _child_to_full_response(child) -> ChildProfileResponse:
         emergency_contacts=emergency_contacts,
         field_contributors=field_contributors,
         court_restricted_fields=court_restricted_fields,
+        current_custody_parent_id=child.current_custody_parent_id,
         is_active=child.is_active,
         created_at=child.created_at,
         updated_at=child.updated_at,
