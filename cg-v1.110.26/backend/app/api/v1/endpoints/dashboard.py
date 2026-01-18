@@ -233,6 +233,8 @@ async def create_test_event(
         family_file_id=family_file_id,
         title="Test Event - Doctor Appointment",
         description="This is a test event created for debugging",
+        event_type="appointment",  # Required field
+        custodial_parent_id=str(family_file.parent_a_id),  # Required field
         start_time=start_time,
         end_time=end_time,
         child_ids=child_ids,
