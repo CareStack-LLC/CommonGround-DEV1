@@ -146,8 +146,17 @@ async def list_family_files(
     service = FamilyFileService(db)
     family_files = await service.get_user_family_files(current_user)
 
+    # Build response with parent info
+    items = []
+    for ff in family_files:
+        item = _build_family_file_response(ff)
+        # Add parent info for name display
+        item["parent_a_info"] = _build_parent_info(ff.parent_a, ff.parent_a_role)
+        item["parent_b_info"] = _build_parent_info(ff.parent_b, ff.parent_b_role) if ff.parent_b else None
+        items.append(item)
+
     return {
-        "items": [_build_family_file_response(ff) for ff in family_files],
+        "items": items,
         "total": len(family_files)
     }
 

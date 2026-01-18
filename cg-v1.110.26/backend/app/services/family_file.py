@@ -201,6 +201,8 @@ class FamilyFileService:
             .options(
                 selectinload(FamilyFile.children),
                 selectinload(FamilyFile.quick_accords),
+                selectinload(FamilyFile.parent_a),  # Load parent A user info
+                selectinload(FamilyFile.parent_b),  # Load parent B user info
             )
             .where(
                 or_(

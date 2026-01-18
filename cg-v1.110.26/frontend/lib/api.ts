@@ -4444,6 +4444,14 @@ export const courtEventsAPI = {
 // Family Files API
 // ============================================================================
 
+export interface ParentInfo {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  role: string;
+}
+
 export interface FamilyFile {
   id: string;
   family_file_number: string;
@@ -4467,22 +4475,15 @@ export interface FamilyFile {
   is_complete: boolean;
   has_court_case: boolean;
   can_create_shared_care_agreement: boolean;
-}
-
-export interface ParentInfo {
-  id: string;
-  email: string;
-  first_name: string | null;
-  last_name: string | null;
-  role: string;
+  // Parent info (available from list and detail endpoints)
+  parent_a_info?: ParentInfo | null;
+  parent_b_info?: ParentInfo | null;
 }
 
 export interface FamilyFileDetail extends FamilyFile {
   children: FamilyFileChild[];
   active_agreement_count: number;
   quick_accord_count: number;
-  parent_a_info?: ParentInfo | null;
-  parent_b_info?: ParentInfo | null;
 }
 
 export interface FamilyFileCreate {
