@@ -171,6 +171,10 @@ class FamilyFileResponse(BaseModel):
     has_court_case: bool  # Has linked court custody case
     can_create_shared_care_agreement: bool
 
+    # Parent info with names (optional, included when relationships are loaded)
+    parent_a_info: Optional[ParentInfo] = None
+    parent_b_info: Optional[ParentInfo] = None
+
     class Config:
         from_attributes = True
 

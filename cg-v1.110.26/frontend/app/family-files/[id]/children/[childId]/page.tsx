@@ -333,7 +333,13 @@ function ChildProfileContent() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [checkingIn, setCheckingIn] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Track mounted state to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Custody stats state
   const [custodyStats, setCustodyStats] = useState<ChildCustodyStats | null>(null);
@@ -829,7 +835,7 @@ function ChildProfileContent() {
           {/* Quick Actions */}
           <div className="mt-6 pt-4 border-t border-border flex flex-wrap gap-3">
             {/* Check-in button - disabled if child is already with current user */}
-            {(() => {
+            {mounted && (() => {
               const isChildWithMe = child.current_custody_parent_id === user?.id;
               return (
                 <button
