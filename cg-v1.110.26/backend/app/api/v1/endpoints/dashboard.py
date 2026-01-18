@@ -186,3 +186,76 @@ async def regenerate_exchange_instances(
     )
 
     return result
+
+
+@router.post("/debug/create-test-event/{family_file_id}")
+async def create_test_event(
+    family_file_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Dict[str, Any]:
+    """
+    Debug endpoint: Create a test schedule event for tomorrow.
+    This bypasses normal validation to help debug the Coming Up section.
+    """
+    import uuid
+    from app.models.child import Child
+
+    # Verify user has access to family file
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == family_file_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+
+    if not family_file:
+        raise HTTPException(status_code=404, detail="Family file not found")
+
+    user_id_str = str(current_user.id)
+    if user_id_str != str(family_file.parent_a_id) and user_id_str != str(family_file.parent_b_id):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    # Get a child from this family file
+    children_result = await db.execute(
+        select(Child).where(Child.family_file_id == family_file_id).limit(1)
+    )
+    child = children_result.scalar_one_or_none()
+    child_ids = [str(child.id)] if child else []
+
+    # Create a test event for tomorrow at 10 AM
+    now = datetime.utcnow()
+    tomorrow = now + timedelta(days=1)
+    start_time = tomorrow.replace(hour=10, minute=0, second=0, microsecond=0)
+    end_time = start_time + timedelta(hours=1)
+
+    # Create event directly in the database
+    event = ScheduleEvent(
+        id=str(uuid.uuid4()),
+        family_file_id=family_file_id,
+        title="Test Event - Doctor Appointment",
+        description="This is a test event created for debugging",
+        start_time=start_time,
+        end_time=end_time,
+        child_ids=child_ids,
+        event_category="medical",
+        status="scheduled",
+        visibility="co_parent",
+        all_day=False,
+        is_exchange=False,
+        created_by=current_user.id,
+    )
+    db.add(event)
+    await db.commit()
+
+    return {
+        "success": True,
+        "event": {
+            "id": str(event.id),
+            "title": event.title,
+            "start_time": event.start_time.isoformat(),
+            "end_time": event.end_time.isoformat(),
+            "event_category": event.event_category,
+            "status": event.status,
+            "child_ids": event.child_ids,
+        },
+        "message": "Test event created for tomorrow. Refresh dashboard to see it in Coming Up."
+    }
