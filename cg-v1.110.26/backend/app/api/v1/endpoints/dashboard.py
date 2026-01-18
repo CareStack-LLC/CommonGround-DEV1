@@ -17,6 +17,7 @@ from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
 from app.models.schedule import ScheduleEvent
 from app.schemas.dashboard import DashboardSummary
 from app.services.dashboard import DashboardService
+from app.services.custody_exchange import CustodyExchangeService
 
 router = APIRouter()
 
@@ -152,3 +153,36 @@ async def debug_upcoming_events(
             for ev in schedule_events
         ],
     }
+
+
+@router.post("/regenerate-instances/{family_file_id}")
+async def regenerate_exchange_instances(
+    family_file_id: str,
+    weeks_ahead: int = 8,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Dict[str, Any]:
+    """
+    Regenerate future instances for all recurring custody exchanges.
+    Use this if exchange instances have run out (beyond the 8-week lookahead).
+    """
+    # Verify user has access to family file
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == family_file_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+
+    if not family_file:
+        raise HTTPException(status_code=404, detail="Family file not found")
+
+    user_id_str = str(current_user.id)
+    if user_id_str != str(family_file.parent_a_id) and user_id_str != str(family_file.parent_b_id):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    result = await CustodyExchangeService.regenerate_future_instances(
+        db=db,
+        family_file_id=family_file_id,
+        weeks_ahead=weeks_ahead
+    )
+
+    return result

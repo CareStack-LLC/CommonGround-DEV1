@@ -7,7 +7,7 @@ Handles creation, recurrence generation, and check-in logic.
 import uuid
 import secrets
 from datetime import datetime, timedelta
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict, Any
 from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -292,6 +292,134 @@ class CustodyExchangeService:
 
         await db.flush()
         return instances
+
+    @staticmethod
+    async def regenerate_future_instances(
+        db: AsyncSession,
+        family_file_id: str,
+        weeks_ahead: int = 8
+    ) -> Dict[str, Any]:
+        """
+        Regenerate future instances for all recurring exchanges in a family file.
+        This extends instances from now + weeks_ahead for exchanges that may have
+        run out of pre-generated instances.
+        """
+        from app.models.family_file import FamilyFile
+
+        # Get the family file to check for legacy_case_id
+        ff_result = await db.execute(
+            select(FamilyFile).where(FamilyFile.id == family_file_id)
+        )
+        family_file = ff_result.scalar_one_or_none()
+
+        if not family_file:
+            return {"error": "Family file not found", "exchanges_processed": 0}
+
+        # Build filter for exchanges
+        if family_file.legacy_case_id:
+            exchange_filter = or_(
+                CustodyExchange.family_file_id == family_file_id,
+                CustodyExchange.case_id == family_file.legacy_case_id
+            )
+        else:
+            exchange_filter = CustodyExchange.family_file_id == family_file_id
+
+        # Get all recurring exchanges
+        exchanges_result = await db.execute(
+            select(CustodyExchange)
+            .options(selectinload(CustodyExchange.instances))
+            .where(
+                and_(
+                    exchange_filter,
+                    CustodyExchange.is_recurring == True,
+                    CustodyExchange.status == "active"
+                )
+            )
+        )
+        exchanges = exchanges_result.scalars().all()
+
+        now = datetime.utcnow()
+        end_date = now + timedelta(weeks=weeks_ahead)
+        results = []
+
+        for exchange in exchanges:
+            # Get existing scheduled instance times
+            existing_times = set()
+            for inst in exchange.instances:
+                if inst.scheduled_time:
+                    existing_times.add(inst.scheduled_time.date())
+
+            # Generate new instances for dates that don't exist
+            new_instances = []
+            current_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+            while current_date <= end_date:
+                should_create = False
+
+                if exchange.recurrence_pattern == "weekly":
+                    if exchange.recurrence_days:
+                        if current_date.weekday() in [
+                            (d - 1) % 7 for d in exchange.recurrence_days
+                        ]:
+                            should_create = True
+                    else:
+                        if current_date.weekday() == exchange.scheduled_time.weekday():
+                            should_create = True
+                elif exchange.recurrence_pattern == "biweekly":
+                    days_diff = (current_date - exchange.scheduled_time.replace(
+                        hour=0, minute=0, second=0, microsecond=0
+                    )).days
+                    if days_diff >= 0 and days_diff % 14 == 0:
+                        should_create = True
+                elif exchange.recurrence_pattern == "monthly":
+                    if current_date.day == exchange.scheduled_time.day:
+                        should_create = True
+                elif exchange.recurrence_pattern == "custom":
+                    if exchange.recurrence_days and current_date.weekday() in [
+                        (d - 1) % 7 for d in exchange.recurrence_days
+                    ]:
+                        should_create = True
+
+                if should_create and current_date.date() not in existing_times:
+                    # Check for exceptions
+                    if exchange.recurrence_exceptions:
+                        date_str = current_date.strftime("%Y-%m-%d")
+                        if date_str in exchange.recurrence_exceptions:
+                            current_date += timedelta(days=1)
+                            continue
+
+                    instance_time = current_date.replace(
+                        hour=exchange.scheduled_time.hour,
+                        minute=exchange.scheduled_time.minute,
+                        second=0,
+                        microsecond=0
+                    )
+
+                    instance = CustodyExchangeInstance(
+                        id=str(uuid.uuid4()),
+                        exchange_id=exchange.id,
+                        scheduled_time=instance_time,
+                        status="scheduled",
+                    )
+                    db.add(instance)
+                    new_instances.append(instance)
+
+                current_date += timedelta(days=1)
+
+            results.append({
+                "exchange_id": str(exchange.id),
+                "exchange_title": exchange.title,
+                "new_instances_created": len(new_instances),
+                "new_instance_dates": [inst.scheduled_time.isoformat() for inst in new_instances]
+            })
+
+        await db.commit()
+
+        return {
+            "family_file_id": family_file_id,
+            "exchanges_processed": len(exchanges),
+            "results": results
+        }
 
     @staticmethod
     async def get_exchange(
