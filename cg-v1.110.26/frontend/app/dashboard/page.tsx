@@ -654,12 +654,14 @@ function DashboardContent() {
         familyFilesAPI.getCustodyStatus(id)
       );
 
-      // Also fetch dashboard summary for the first file
-      const summaryPromise = dashboardAPI.getSummary(activeFileIdsRef.current[0]);
+      // Fetch dashboard summaries for ALL active family files
+      const summaryPromises = activeFileIdsRef.current.map(id =>
+        dashboardAPI.getSummary(id).catch(() => null)
+      );
 
-      const [custodyResults, summaryResult] = await Promise.all([
+      const [custodyResults, summaryResults] = await Promise.all([
         Promise.allSettled(custodyPromises),
-        summaryPromise.catch(() => null),
+        Promise.all(summaryPromises),
       ]);
 
       // Collect successful custody statuses
@@ -669,8 +671,37 @@ function DashboardContent() {
 
       setAllCustodyStatuses(successfulStatuses);
 
-      if (summaryResult) {
-        setDashboardSummary(summaryResult);
+      // Merge summaries from all family files
+      const validSummaries = summaryResults.filter((s): s is DashboardSummary => s !== null);
+
+      if (validSummaries.length > 0) {
+        // Combine upcoming events from all family files and sort by start_time
+        const allUpcomingEvents = validSummaries
+          .flatMap(s => s.upcoming_events)
+          .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+          .slice(0, 10);
+
+        const mergedSummary: DashboardSummary = {
+          ...validSummaries[0],
+          upcoming_events: allUpcomingEvents,
+          next_event: allUpcomingEvents[0] || undefined,
+          pending_expenses_count: validSummaries.reduce((sum, s) => sum + s.pending_expenses_count, 0),
+          pending_expenses: validSummaries.flatMap(s => s.pending_expenses).slice(0, 5),
+          unread_messages_count: validSummaries.reduce((sum, s) => sum + s.unread_messages_count, 0),
+          unread_messages: validSummaries.flatMap(s => s.unread_messages).slice(0, 3),
+          pending_agreements_count: validSummaries.reduce((sum, s) => sum + s.pending_agreements_count, 0),
+          pending_agreements: validSummaries.flatMap(s => s.pending_agreements),
+          active_quick_accords_count: validSummaries.reduce((sum, s) => sum + s.active_quick_accords_count, 0),
+          active_quick_accords: validSummaries.flatMap(s => s.active_quick_accords).slice(0, 5),
+          unread_court_count: validSummaries.reduce((sum, s) => sum + s.unread_court_count, 0),
+          court_notifications: validSummaries.flatMap(s => s.court_notifications).slice(0, 5),
+          recent_activities: validSummaries.flatMap(s => s.recent_activities)
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            .slice(0, 10),
+          unread_activity_count: validSummaries.reduce((sum, s) => sum + s.unread_activity_count, 0),
+        };
+
+        setDashboardSummary(mergedSummary);
       }
     } catch (error) {
       console.error('Failed to refresh dashboard:', error);
@@ -726,15 +757,17 @@ function DashboardContent() {
           familyFilesAPI.getCustodyStatus(file.id)
         );
 
-        // Fetch dashboard summary for the first file
-        const summaryPromise = dashboardAPI.getSummary(activeFiles[0].id);
-
-        const [custodyResults, summaryResult] = await Promise.all([
-          Promise.allSettled(custodyPromises),
-          summaryPromise.catch((err) => {
-            console.error('Failed to load dashboard summary:', err);
+        // Fetch dashboard summaries for ALL active family files
+        const summaryPromises = activeFiles.map(file =>
+          dashboardAPI.getSummary(file.id).catch((err) => {
+            console.error(`Failed to load dashboard summary for ${file.id}:`, err);
             return null;
-          }),
+          })
+        );
+
+        const [custodyResults, summaryResults] = await Promise.all([
+          Promise.allSettled(custodyPromises),
+          Promise.all(summaryPromises),
         ]);
 
         // Collect successful custody statuses
@@ -744,12 +777,44 @@ function DashboardContent() {
 
         setAllCustodyStatuses(successfulStatuses);
 
-        if (summaryResult) {
-          console.log('Dashboard summary loaded:', summaryResult);
-          console.log('Upcoming events:', summaryResult.upcoming_events);
-          setDashboardSummary(summaryResult);
+        // Merge summaries from all family files
+        const validSummaries = summaryResults.filter((s): s is DashboardSummary => s !== null);
+
+        if (validSummaries.length > 0) {
+          // Combine upcoming events from all family files and sort by start_time
+          const allUpcomingEvents = validSummaries
+            .flatMap(s => s.upcoming_events)
+            .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+            .slice(0, 10); // Limit to 10 events
+
+          // Use first summary as base, but merge events from all
+          const mergedSummary: DashboardSummary = {
+            ...validSummaries[0],
+            // Merge all upcoming events
+            upcoming_events: allUpcomingEvents,
+            next_event: allUpcomingEvents[0] || undefined,
+            // Sum up counts from all family files
+            pending_expenses_count: validSummaries.reduce((sum, s) => sum + s.pending_expenses_count, 0),
+            pending_expenses: validSummaries.flatMap(s => s.pending_expenses).slice(0, 5),
+            unread_messages_count: validSummaries.reduce((sum, s) => sum + s.unread_messages_count, 0),
+            unread_messages: validSummaries.flatMap(s => s.unread_messages).slice(0, 3),
+            pending_agreements_count: validSummaries.reduce((sum, s) => sum + s.pending_agreements_count, 0),
+            pending_agreements: validSummaries.flatMap(s => s.pending_agreements),
+            active_quick_accords_count: validSummaries.reduce((sum, s) => sum + s.active_quick_accords_count, 0),
+            active_quick_accords: validSummaries.flatMap(s => s.active_quick_accords).slice(0, 5),
+            unread_court_count: validSummaries.reduce((sum, s) => sum + s.unread_court_count, 0),
+            court_notifications: validSummaries.flatMap(s => s.court_notifications).slice(0, 5),
+            recent_activities: validSummaries.flatMap(s => s.recent_activities)
+              .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+              .slice(0, 10),
+            unread_activity_count: validSummaries.reduce((sum, s) => sum + s.unread_activity_count, 0),
+          };
+
+          console.log('Dashboard summaries merged from', validSummaries.length, 'family files');
+          console.log('Total upcoming events:', allUpcomingEvents.length);
+          setDashboardSummary(mergedSummary);
         } else {
-          console.log('No dashboard summary returned');
+          console.log('No dashboard summaries returned');
         }
 
         // Fetch parenting time stats for a family file that has children
