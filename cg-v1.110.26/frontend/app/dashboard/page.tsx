@@ -23,7 +23,6 @@ import {
   UpcomingEvent,
   FamilyCustodyStats,
 } from '@/lib/api';
-import { CustodyDashboardWidget } from '@/components/custody';
 import {
   Calendar,
   MessageSquare,
@@ -139,6 +138,8 @@ function ChildCustodyCard({
   onWithMe,
   myDays,
   theirDays,
+  familyFileId,
+  onClick,
 }: {
   childStatus: ChildCustodyStatus;
   childData?: FamilyFileChild;
@@ -146,6 +147,8 @@ function ChildCustodyCard({
   onWithMe?: (childId: string) => void;
   myDays?: number;
   theirDays?: number;
+  familyFileId?: string;
+  onClick?: () => void;
 }) {
   const { timezone } = useAuth();
   const [imageError, setImageError] = useState(false);
@@ -185,7 +188,10 @@ function ChildCustodyCard({
   };
 
   return (
-    <div className="cg-card overflow-hidden">
+    <div
+      className={`cg-card overflow-hidden ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+      onClick={onClick}
+    >
       {/* Top accent bar */}
       <div className={`h-1.5 ${statusColor}`} />
 
@@ -217,7 +223,10 @@ function ChildCustodyCard({
           {/* "With Me" button */}
           {!isWithYou && onWithMe && (
             <button
-              onClick={() => onWithMe(childStatus.child_id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onWithMe(childStatus.child_id);
+              }}
               className="px-3 py-1.5 text-xs font-medium bg-cg-sage text-white rounded-lg hover:bg-cg-sage-light transition-colors flex-shrink-0"
             >
               With Me
@@ -235,7 +244,7 @@ function ChildCustodyCard({
                 </span>
               )}
               {' '}
-              {nextExchangeStr && <>until <span className="font-medium">{nextExchangeStr}</span></>}
+              {nextExchangeStr && <span className="font-medium">{nextExchangeStr}</span>}
             </p>
           </div>
         ) : (
@@ -274,7 +283,7 @@ function ChildCustodyCard({
           </>
         )}
 
-        {/* Days with parent - custody time tracking */}
+        {/* Days with parent - custody time tracking (logged-in parent only) */}
         {hasDaysData && (
           <div className="mt-3 pt-3 border-t border-border">
             <div className="flex items-center justify-between">
@@ -284,15 +293,6 @@ function ChildCustodyCard({
               </div>
               <span className="text-lg font-bold text-cg-sage">{myDays ?? 0} <span className="text-xs font-normal text-muted-foreground">days</span></span>
             </div>
-            {theirDays !== undefined && theirDays > 0 && (
-              <div className="flex items-center justify-between mt-1">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-cg-slate" />
-                  <span className="text-sm text-muted-foreground">{coparentName || 'Co-parent'}</span>
-                </div>
-                <span className="text-sm font-medium text-cg-slate">{theirDays} <span className="text-xs font-normal text-muted-foreground">days</span></span>
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -994,6 +994,8 @@ function DashboardContent() {
                         onWithMe={handleWithMe}
                         myDays={myDays}
                         theirDays={theirDays}
+                        familyFileId={custodyStatus.family_file_id}
+                        onClick={() => router.push(`/family-files/${custodyStatus.family_file_id}/children/${childStatus.child_id}`)}
                       />
                     );
                   })
@@ -1242,28 +1244,6 @@ function DashboardContent() {
                   ))}
                 </div>
               </section>
-            )}
-
-            {/* Parenting Time Stats Widget - After Family Files */}
-            {allChildren.length > 0 && activeFileIdsRef.current.length > 0 && (
-              <CustodyDashboardWidget
-                familyFileId={familyCustodyStats?.family_file_id || activeFileIdsRef.current[0]}
-                familyStats={familyCustodyStats}
-                childrenData={allChildren}
-                isLoading={custodyStatsLoading}
-                parentAName={
-                  custodyStatsFile?.parent_a_info?.first_name ||
-                  custodyStatsFile?.parent_a_info?.email?.split('@')[0] ||
-                  'Parent A'
-                }
-                parentBName={
-                  custodyStatsFile?.parent_b_info?.first_name ||
-                  custodyStatsFile?.parent_b_info?.email?.split('@')[0] ||
-                  'Parent B'
-                }
-                currentUserId={user?.id}
-                onViewReport={() => router.push(`/family-files/${familyCustodyStats?.family_file_id || activeFileIdsRef.current[0]}/parenting-report`)}
-              />
             )}
 
             {/* Recent Activity */}
