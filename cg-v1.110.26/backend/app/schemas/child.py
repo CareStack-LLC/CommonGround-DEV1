@@ -205,6 +205,9 @@ class ChildProfileResponse(BaseModel):
     # Court Access Controls
     court_restricted_fields: Optional[List[str]] = None
 
+    # Custody Tracking
+    current_custody_parent_id: Optional[str] = None
+
     # Status
     is_active: bool
     created_at: datetime

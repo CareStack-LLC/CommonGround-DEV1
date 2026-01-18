@@ -1,7 +1,7 @@
 # ClearFund - Purpose-Locked Financial Obligations System
 
-**Last Updated:** January 11, 2026
-**Version:** 1.1.0
+**Last Updated:** January 17, 2026
+**Version:** 1.5.0
 **Module:** Financial Tracking & Expense Management
 
 ---

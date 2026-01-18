@@ -1,7 +1,7 @@
 # CommonGround V1 - Technical Stack Breakdown
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
+**Last Updated:** January 17, 2026
+**Version:** 1.5.0
 
 ---
 

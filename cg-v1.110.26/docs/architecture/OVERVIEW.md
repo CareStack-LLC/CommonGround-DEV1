@@ -1,8 +1,8 @@
 # CommonGround V1 - Executive System Overview
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
-**Status:** Production MVP
+**Last Updated:** January 17, 2026
+**Version:** 1.5.0
+**Status:** Production
 
 ---
 
@@ -32,19 +32,22 @@ CommonGround addresses the core challenges of co-parenting after separation:
 | Hostile communication | ARIA AI filters and rewrites toxic messages |
 | Schedule conflicts | TimeBridge automated scheduling with compliance tracking |
 | Financial disputes | ClearFund transparent expense tracking and splitting |
-| Custody agreement confusion | Agreement Builder with 18-section wizard |
+| Custody agreement confusion | Agreement Builder with 7/18-section wizard (v2/v1) |
 | Court documentation needs | Export packages with integrity verification |
 | Child information sharing | Cubbie digital backpack for each child |
 | Limited family support | My Circle trusted contact network |
 | Child-parent communication | KidComs monitored video calls |
+| Parenting time disputes | Custody Time Tracking with visual reports |
+| Custody exchange verification | Silent Handoff with GPS and QR confirmation |
 
 ### Key Statistics
 
-- **Backend:** 191 Python files, ~25,000 lines of code
-- **Frontend:** 208 TypeScript/React files, ~15,000 lines of code
-- **Database:** 27+ SQLAlchemy models across 30+ tables
-- **API Endpoints:** 100+ REST endpoints across 20+ modules
-- **AI Integration:** Anthropic Claude + OpenAI fallback
+- **Backend:** 33 API endpoint modules, 30 models, 40 services, 27 schemas
+- **Frontend:** 123 pages, 109 components
+- **Database:** 80+ Alembic migrations, PostgreSQL + Redis
+- **API Endpoints:** 100+ REST endpoints across 33 modules
+- **AI Integration:** Anthropic Claude (primary) + OpenAI (fallback)
+- **Deployment:** Vercel (frontend), Render (backend), Supabase (database + auth)
 
 ---
 

@@ -1,7 +1,7 @@
 # KidComs - Child Communication System
 
-**Last Updated:** January 12, 2026
-**Version:** 1.2.0
+**Last Updated:** January 17, 2026
+**Version:** 1.5.0
 **Status:** Production Ready
 
 ---

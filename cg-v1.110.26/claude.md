@@ -2,35 +2,36 @@
 
 AI-powered co-parenting operating system that transforms high-conflict custody situations into collaborative partnerships.
 
+**Current Version:** 1.5.0 (January 2026)
+
 ## Quick Reference
 
 ### Common Commands
 
 ```bash
 # Backend
-cd mvp/backend
+cd backend
 source venv/bin/activate
 uvicorn app.main:app --reload --port 8000
 
 # Frontend
-cd mvp/frontend
+cd frontend
 npm run dev
 
 # Database
-cd mvp/backend
+cd backend
 alembic upgrade head                              # Apply migrations
 alembic revision --autogenerate -m "description"  # Create migration
 
 # Docker (full stack)
-cd mvp
 docker-compose up -d
 
 # Testing
-cd mvp/backend && pytest
-cd mvp/frontend && npm test
+cd backend && pytest
+cd frontend && npm test
 
 # Code quality
-cd mvp/backend
+cd backend
 black app/
 isort app/
 mypy app/
@@ -40,24 +41,24 @@ mypy app/
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
+- Production API: https://commonground-api-gdxg.onrender.com
 
 ## Project Structure
 
 ```
-mvp/
 ├── backend/                    # FastAPI + Python
 │   ├── app/
 │   │   ├── main.py             # Application entry
-│   │   ├── api/v1/endpoints/   # REST routes (20+ modules)
-│   │   ├── models/             # SQLAlchemy models (27+)
-│   │   ├── schemas/            # Pydantic schemas (25+)
-│   │   ├── services/           # Business logic (36+ modules)
+│   │   ├── api/v1/endpoints/   # REST routes (33 modules)
+│   │   ├── models/             # SQLAlchemy models (30)
+│   │   ├── schemas/            # Pydantic schemas (27)
+│   │   ├── services/           # Business logic (40 modules)
 │   │   └── core/               # Config, database, security
-│   └── alembic/                # Database migrations
+│   └── alembic/                # Database migrations (80+)
 │
 ├── frontend/                   # Next.js + React
-│   ├── app/                    # Pages and routes
-│   ├── components/             # Reusable components
+│   ├── app/                    # Pages and routes (123 pages)
+│   ├── components/             # Reusable components (109)
 │   └── lib/                    # API client, auth, utilities
 │
 └── docs/                       # Documentation
@@ -149,6 +150,14 @@ core/        → Configuration, database, security utilities
 
 ## Core Features
 
+### Family Files (Case Management)
+
+Central hub for co-parenting cases:
+- Unified dashboard aggregating data from all family files
+- Parent A/B role assignment with flexible permissions
+- Children profiles with photos and custody tracking
+- Legacy case migration support
+
 ### ARIA (AI Relationship Intelligence Assistant)
 
 3-tier sentiment analysis for message mediation:
@@ -165,12 +174,18 @@ core/        → Configuration, database, security utilities
 4. User accepts/modifies/rejects suggestion
 5. Track action in MessageFlag for analytics
 
+**ARIA Conversations:**
+- Agreement section guidance with structured extraction
+- Context-aware suggestions based on custody data
+- Multi-turn conversation support
+
 ### KidComs (Child Communication)
 
 - Video/voice calls via Daily.co
 - Text chat with ARIA monitoring
 - Circle management for approved contacts
 - Parental controls and call logging
+- Child wallet system for allowances
 
 ### Agreement Builder
 
@@ -185,45 +200,67 @@ core/        → Configuration, database, security utilities
 - Version history
 - Court-ready PDF generation
 
-### Schedule & Compliance
+### Schedule & Custody Tracking
 
 - Automated schedule from agreements
-- Exchange check-ins with compliance tracking
-- On-time/late/grace period monitoring
+- Custody exchange management with GPS verification
+- Silent handoff mode for contactless exchanges
+- QR code check-in confirmation
+- Recurring exchange instance generation
+- Custody time statistics and reports
+- Parenting time compliance metrics
 
 ### ClearFund (Expenses)
 
 - Expense request and approval workflow
 - Automatic splitting based on custody percentages
 - Payment tracking via Stripe
+- Financial obligations management
+- Court-ordered payment tracking
 
-### Court Export
+### Court Portal
 
-- Compliance metrics and analytics
+- GAL (Guardian ad Litem) dashboard
+- Case overview with compliance metrics
+- Court event scheduling (hearings, mediations)
 - Evidence compilation (messages, agreements, schedules)
-- SHA-256 integrity verification
+- SHA-256 integrity verification for exports
+- Court notification system
 
 ## Database Models
 
 Key models and relationships:
 
 ```
-User ─────┬── UserProfile (1:1)
-          ├── CaseParticipant (1:N)
-          └── Messages (1:N)
+User ─────────┬── UserProfile (1:1)
+              ├── FamilyFile (as parent_a or parent_b)
+              ├── CaseParticipant (1:N) [legacy]
+              └── Messages (1:N)
 
-Case ─────┬── CaseParticipant (1:N)
-          ├── Children (1:N)
-          ├── Agreements (1:N)
-          ├── Messages (1:N)
-          ├── ScheduleEvents (1:N)
-          └── AuditLogs (1:N)
+FamilyFile ───┬── Children (1:N)
+              ├── Agreements (1:N)
+              ├── Messages (1:N)
+              ├── ScheduleEvents (1:N)
+              ├── CustodyExchanges (1:N)
+              ├── Obligations (1:N) [ClearFund]
+              ├── CourtEvents (1:N)
+              └── AuditLogs (1:N)
 
-Agreement ┬── AgreementVersions (1:N)
-          └── AgreementSections (1:N)
+Child ────────┬── CustodyPeriods (1:N)
+              ├── MyTimeCollections (1:N)
+              └── TimeBlocks (1:N)
 
-Message ──┬── MessageFlags (1:N) [ARIA interventions]
-          └── MessageThread (N:1)
+CustodyExchange ─── CustodyExchangeInstance (1:N)
+                    [recurring instances with GPS check-ins]
+
+Agreement ────┬── AgreementVersions (1:N)
+              └── AgreementSections (1:N)
+
+Message ──────┬── MessageFlags (1:N) [ARIA interventions]
+              └── MessageThread (N:1)
+
+ARIAConversation ── ARIAMessage (1:N)
+                    [agreement guidance sessions]
 ```
 
 ## Environment Variables
@@ -258,22 +295,26 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 | Module | Endpoints |
 |--------|-----------|
-| Auth | POST /auth/register, POST /auth/login, POST /auth/refresh |
-| Cases | GET/POST /cases, GET/PUT /cases/{id}, POST /cases/{id}/accept |
-| Children | GET/POST /cases/{id}/children, PUT/DELETE /children/{id} |
+| Auth | POST /auth/register, POST /auth/login, POST /auth/refresh, POST /auth/mfa/* |
+| Family Files | GET/POST /family-files, GET/PUT /family-files/{id}, POST /family-files/{id}/invite |
+| Children | GET/POST /family-files/{id}/children, PUT/DELETE /children/{id}, POST /children/{id}/photo |
 | Agreements | GET/POST /agreements, PUT /agreements/{id}/sections/{section}, POST /agreements/{id}/approve |
-| Messages | GET/POST /messages, POST /messages/analyze |
-| Schedule | GET/POST /schedule/events, POST /exchanges/{id}/check-in |
+| Messages | GET/POST /messages, POST /messages/analyze, GET /messages/unread-count |
+| Schedule | GET/POST /schedule/events, GET /calendar/combined |
+| Exchanges | GET/POST /exchanges, POST /exchanges/{id}/check-in, GET /exchanges/case/{id}/upcoming |
+| Custody Time | GET /custody-time/child/{id}/stats, GET /custody-time/child/{id}/periods |
+| Dashboard | GET /dashboard/summary/{family_file_id} |
 | KidComs | POST /kidcoms/calls, GET /kidcoms/circle |
-| ClearFund | GET/POST /clearfund/expenses, POST /expenses/{id}/approve |
-| Court | POST /court/export |
+| ClearFund | GET/POST /clearfund/expenses, GET/POST /clearfund/obligations |
+| Court | GET /court/events, POST /court/events, GET /court/cases/{id}/overview |
+| Export | POST /export/generate, GET /export/templates |
 
 ## Testing
 
 ### Backend Tests
 
 ```bash
-cd mvp/backend
+cd backend
 pytest                          # Run all tests
 pytest tests/unit/              # Unit tests only
 pytest tests/integration/       # Integration tests
@@ -339,19 +380,20 @@ When generating ARIA responses or UI copy:
 
 ## Deployment
 
-| Service | Provider |
-|---------|----------|
-| Frontend | Vercel |
-| Backend | Railway |
-| Database | Supabase (PostgreSQL) |
-| Auth | Supabase Auth |
-| Cache | Redis Cloud / Upstash |
-| Video | Daily.co |
+| Service | Provider | URL |
+|---------|----------|-----|
+| Frontend | Vercel | https://common-ground-blue.vercel.app |
+| Backend | Render | https://commonground-api-gdxg.onrender.com |
+| Database | Supabase (PostgreSQL) | Supabase Dashboard |
+| Auth | Supabase Auth + TOTP MFA | Supabase Dashboard |
+| Cache | Redis Cloud / Upstash | - |
+| Video | Daily.co | - |
+| Payments | Stripe | - |
 
 ## Documentation
 
-See @mvp/docs for detailed documentation:
-- @mvp/docs/architecture/OVERVIEW.md - System overview
-- @mvp/docs/api/API_REFERENCE.md - Full API docs
-- @mvp/docs/features/ - Feature specifications
-- @mvp/docs/guides/SETUP_GUIDE.md - Setup instructions
+See `docs/` for detailed documentation:
+- `docs/architecture/OVERVIEW.md` - System overview
+- `docs/api/API_REFERENCE.md` - Full API docs
+- `docs/features/` - Feature specifications
+- `docs/guides/SETUP_GUIDE.md` - Setup instructions

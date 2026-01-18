@@ -1,7 +1,7 @@
 # Subscriptions & Feature Gating System
 
-**Last Updated:** January 15, 2026
-**Version:** 1.0.0
+**Last Updated:** January 17, 2026
+**Version:** 1.5.0
 **Module:** Subscription Management & Monetization
 
 ---

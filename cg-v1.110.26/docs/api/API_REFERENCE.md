@@ -1,8 +1,8 @@
 # CommonGround V1 - Complete API Reference
 
-**Last Updated:** January 15, 2026
-**API Version:** 1.4.0
-**Base URL:** `https://api.commonground.app/api/v1`
+**Last Updated:** January 17, 2026
+**API Version:** 1.5.0
+**Base URL:** `https://commonground-api-gdxg.onrender.com/api/v1`
 **Local Development:** `http://localhost:8000/api/v1`
 
 ---
@@ -16,8 +16,11 @@
 5. [Endpoints by Module](#endpoints-by-module)
    - [Auth](#auth-endpoints)
    - [Users](#users-endpoints)
-   - [Cases](#cases-endpoints)
+   - [Family Files](#family-files-endpoints)
+   - [Cases](#cases-endpoints) (legacy)
    - [Children](#children-endpoints)
+   - [Dashboard](#dashboard-endpoints)
+   - [Custody Time](#custody-time-endpoints)
    - [Messages](#messages-endpoints)
    - [ARIA](#aria-endpoints)
    - [Agreements](#agreements-endpoints)
@@ -543,7 +546,177 @@ Upload profile avatar.
 
 ---
 
-### Cases Endpoints
+### Family Files Endpoints
+
+Family Files are the primary organizational unit in CommonGround v1.5+, replacing the legacy Case system.
+
+#### GET /family-files
+
+List all family files for the current user.
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "name": "Smith Family",
+      "parent_a_id": "uuid",
+      "parent_b_id": "uuid",
+      "parent_a": { "id": "uuid", "email": "...", "first_name": "...", "last_name": "..." },
+      "parent_b": { "id": "uuid", "email": "...", "first_name": "...", "last_name": "..." },
+      "state": "CA",
+      "status": "active",
+      "children": [...],
+      "created_at": "2026-01-17T12:00:00Z"
+    }
+  ]
+}
+```
+
+#### POST /family-files
+
+Create a new family file.
+
+**Request:**
+```json
+{
+  "name": "Smith Family",
+  "state": "CA",
+  "county": "Los Angeles"
+}
+```
+
+#### GET /family-files/{id}
+
+Get family file details.
+
+#### PUT /family-files/{id}
+
+Update family file details.
+
+#### POST /family-files/{id}/invite
+
+Invite co-parent to join family file.
+
+**Request:**
+```json
+{
+  "email": "coparent@example.com",
+  "first_name": "Jane",
+  "last_name": "Smith"
+}
+```
+
+---
+
+### Dashboard Endpoints
+
+#### GET /dashboard/summary/{family_file_id}
+
+Get aggregated dashboard data for a family file.
+
+**Response:**
+```json
+{
+  "pending_expenses_count": 3,
+  "unread_messages_count": 5,
+  "agreements_needing_approval_count": 1,
+  "court_notifications_count": 0,
+  "upcoming_events": [
+    {
+      "id": "uuid",
+      "title": "School pickup",
+      "start_time": "2026-01-18T15:00:00Z",
+      "event_type": "exchange",
+      "event_category": "exchange"
+    }
+  ],
+  "next_event": {...}
+}
+```
+
+#### GET /dashboard/debug/events/{family_file_id}
+
+Debug endpoint showing all exchange and event data for troubleshooting.
+
+#### POST /dashboard/regenerate-instances/{family_file_id}
+
+Regenerate future instances for all recurring custody exchanges.
+
+**Query Parameters:**
+- `weeks_ahead` (int, default: 8): Number of weeks to generate instances for
+
+---
+
+### Custody Time Endpoints
+
+Track and report on actual custody time per child.
+
+#### GET /custody-time/child/{child_id}/stats
+
+Get custody time statistics for a child.
+
+**Query Parameters:**
+- `days` (int, default: 30): Number of days to analyze
+
+**Response:**
+```json
+{
+  "child_id": "uuid",
+  "child_name": "Emma Smith",
+  "period_days": 30,
+  "parent_a_days": 18,
+  "parent_b_days": 12,
+  "parent_a_name": "John Smith",
+  "parent_b_name": "Jane Smith",
+  "parent_a_percentage": 60.0,
+  "parent_b_percentage": 40.0
+}
+```
+
+#### GET /custody-time/child/{child_id}/periods
+
+Get custody periods (continuous stretches with one parent).
+
+**Query Parameters:**
+- `start_date` (date): Start of period
+- `end_date` (date): End of period
+
+**Response:**
+```json
+{
+  "periods": [
+    {
+      "id": "uuid",
+      "child_id": "uuid",
+      "parent_id": "uuid",
+      "parent_name": "John Smith",
+      "start_date": "2026-01-10",
+      "end_date": "2026-01-15",
+      "days": 5
+    }
+  ]
+}
+```
+
+#### POST /custody-time/child/{child_id}/record
+
+Record a custody day for a child.
+
+**Request:**
+```json
+{
+  "date": "2026-01-17",
+  "parent_id": "uuid"
+}
+```
+
+---
+
+### Cases Endpoints (Legacy)
+
+> **Note:** Cases are being replaced by Family Files. Use Family Files endpoints for new integrations.
 
 #### POST /cases
 Create a new case.

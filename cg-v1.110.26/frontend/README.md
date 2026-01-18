@@ -1,27 +1,31 @@
 # CommonGround Frontend
 
-**Framework:** Next.js 14 with App Router  
-**Language:** TypeScript  
-**Styling:** Tailwind CSS + shadcn/ui  
-**State Management:** React Context API  
-**Current Status:** ✅ MVP Complete + 18-Section Agreement Wizard
+**Framework:** Next.js 16 with App Router
+**Language:** TypeScript 5
+**Styling:** Tailwind CSS 4 + shadcn/ui
+**State Management:** React Context API
+**Version:** 1.5.0
 
 ---
 
-## 📋 Overview
+## Overview
 
-This is the frontend application for CommonGround, a co-parenting platform that helps separated parents communicate effectively, manage custody agreements, and track compliance with court orders.
+This is the frontend application for CommonGround, an AI-powered co-parenting platform that helps separated parents communicate effectively, manage custody agreements, and track compliance with court orders.
 
 **Key Features:**
-- 🔐 Authentication with Supabase
-- 💬 ARIA-powered messaging (AI sentiment analysis)
-- 📝 18-section custody agreement wizard
-- 📅 Calendar with compliance tracking
-- 📊 Real-time dashboards and metrics
+- Authentication with Supabase Auth + TOTP MFA
+- ARIA-powered messaging (AI sentiment analysis)
+- 7/18-section custody agreement wizard (v2/v1)
+- Calendar with custody exchange tracking
+- Custody time tracking with visual reports
+- Dashboard with multi-family file aggregation
+- KidComs video calling with Daily.co
+- My Circle trusted contact network
+- ClearFund expense management
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -31,7 +35,7 @@ This is the frontend application for CommonGround, a co-parenting platform that 
 
 ### Installation
 
-\`\`\`bash
+```bash
 # Install dependencies
 npm install
 
@@ -42,48 +46,87 @@ cp .env.example .env.local
 npm run dev
 
 # Open http://localhost:3000
-\`\`\`
+```
 
 ### Environment Variables
 
-Create \`.env.local\` with:
+Create `.env.local` with:
 
-\`\`\`bash
+```bash
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-\`\`\`
+```
 
 ---
 
-## 📱 Application Pages
+## Application Structure
 
-### Core Pages (8 total)
-1. **Landing** (\`/\`) - Marketing homepage
-2. **Auth** (\`/login\`, \`/register\`) - Authentication
-3. **Dashboard** (\`/dashboard\`) - Case overview
-4. **Cases** (\`/cases\`) - Case management
-5. **Messages** (\`/messages\`) - ARIA messaging
-6. **Agreements** (\`/agreements\`) - Agreement builder
-7. **Agreement Wizard** (\`/agreements/[id]/builder\`) - 18 sections ⭐ NEW
-8. **Schedule** (\`/schedule\`) - Calendar & compliance
+### Stats
+- **Pages:** 123 route pages
+- **Components:** 109 reusable components
+- **API Integration:** Full REST API client in `lib/api.ts`
 
-See [full documentation](../CLAUDE.md) for detailed page descriptions.
+### Key Routes
+
+| Route | Purpose |
+|-------|---------|
+| `/` | Marketing homepage |
+| `/login`, `/register` | Authentication |
+| `/dashboard` | Main dashboard with family files overview |
+| `/family-files` | Family file management |
+| `/family-files/[id]` | Individual family file detail |
+| `/messages` | ARIA-powered messaging |
+| `/agreements` | Agreement builder |
+| `/agreements/[id]/builder-v2` | 7-section agreement wizard (v2) |
+| `/schedule` | Calendar & custody exchanges |
+| `/kidcoms` | Video calling for children |
+| `/my-circle` | Trusted contacts management |
+| `/settings` | Account, billing, security, notifications |
+| `/court-portal` | GAL/Attorney portal |
+
+### Component Categories
+
+```
+components/
+├── ui/              # shadcn/ui primitives
+├── agreements/      # Agreement builder components
+├── dashboard/       # Dashboard widgets
+├── schedule/        # Calendar and exchange components
+├── kidcoms/         # Video call components
+├── messages/        # Messaging components
+└── shared/          # Shared utilities
+```
 
 ---
 
-## 📝 Next Steps (V1.1)
+## Development
 
-Planned for Weeks 13-18:
-- Agreement builder backend integration
-- Payment tracking (\`/expenses\`)
-- Court export wizard (\`/cases/[id]/export\`)
-- Email notifications settings
-- Mobile responsive improvements
+### Commands
 
-See [V1.1_ROADMAP.md](../V1.1_ROADMAP.md) for complete details.
+```bash
+npm run dev          # Start development server
+npm run build        # Production build
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run type-check   # Run TypeScript compiler
+```
+
+### Code Style
+
+- TypeScript strict mode enabled
+- ESLint + Prettier for code formatting
+- Tailwind CSS for styling
+- Functional components with hooks
+- Named exports preferred
 
 ---
 
-**Last Updated:** December 30, 2025  
-**Version:** MVP Complete + 18-Section Wizard
+## Deployment
+
+**Production:** Vercel at https://common-ground-blue.vercel.app
+
+---
+
+**Last Updated:** January 17, 2026
+**Version:** 1.5.0

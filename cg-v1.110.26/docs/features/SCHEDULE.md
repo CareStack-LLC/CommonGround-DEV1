@@ -1,8 +1,8 @@
 # TimeBridge - Parenting Time & Exchange Management
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
-**Module:** Schedule, Exchanges, Compliance Tracking
+**Last Updated:** January 17, 2026
+**Version:** 1.5.0
+**Module:** Schedule, Exchanges, Custody Time Tracking, Compliance
 
 ---
 
@@ -39,10 +39,13 @@ TimeBridge is CommonGround's comprehensive parenting time management system. It 
 | **Custody Exchanges** | First-class exchange entities with recurrence |
 | **Silent Handoff** | GPS-verified, contactless custody transfers |
 | **QR Confirmation** | Mutual verification without direct interaction |
+| **Custody Time Tracking** | Track actual parenting time with daily records |
+| **Parenting Time Stats** | Visual reports showing custody distribution |
 | **Compliance Tracking** | On-time metrics and trend analysis |
 | **My Time Collections** | Personal calendar organization |
 | **Privacy Controls** | Selective sharing of event details |
 | **Court Events** | Integration with court-scheduled hearings |
+| **Instance Regeneration** | Automatic generation of recurring exchange instances |
 
 ### System Principles
 

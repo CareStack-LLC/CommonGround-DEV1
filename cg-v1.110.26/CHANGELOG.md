@@ -5,6 +5,48 @@ All notable changes to CommonGround will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-01-17
+
+### Added
+
+#### Custody Time Tracking System
+- **Parenting Time Statistics** - Track actual custody time per child with visual reports
+- **Custody Day Records** - Log daily custody with parent assignment
+- **Custody Periods** - Track continuous custody periods with start/end times
+- **Custody Stats API** - `GET /custody-time/child/{id}/stats` returns time distribution
+- **Parenting Time Widget** - Dashboard card showing custody breakdown with bar graph
+- **"With Me" Check-in** - Quick button to record child is with you today
+
+#### Dashboard Enhancements
+- **Multi-Family File Aggregation** - Dashboard now fetches and merges data from ALL family files
+- **Coming Up Section** - Shows upcoming events across all family files, sorted by time
+- **Child Photos in Avatars** - Child profile photos displayed in dashboard status cards
+- **Custody Tracker Cards** - Visual cards showing current custody status per child
+- **Debug Endpoints** - `/dashboard/debug/events/{id}` for troubleshooting event display
+
+#### Exchange System Improvements
+- **Instance Regeneration** - `POST /dashboard/regenerate-instances/{id}` refreshes recurring instances
+- **Legacy Case ID Support** - Exchanges linked to legacy cases now appear in Coming Up
+- **Status-Based Filtering** - Only scheduled/pending instances shown in upcoming
+
+#### Security Enhancements
+- **Real MFA with TOTP** - Supabase TOTP-based multi-factor authentication
+- **Authenticator App Support** - QR code setup for Google Authenticator, Authy, etc.
+- **MFA Challenge Flow** - Secure verification during login
+
+#### Family File Improvements
+- **Parent Info in List** - Family files list includes parent names and details
+- **Child Profile Photos** - Photos displayed in children section
+
+### Fixed
+- **Dashboard Event Aggregation** - Fixed issue where only first family file's events were shown
+- **Custody Stats Fetching** - Properly fetch stats for family file with children
+- **Hydration Errors** - Fixed React hydration mismatches in custody components
+- **Parent Names Display** - Real parent names shown instead of "Parent A/B"
+- **CustodyDayRecord Creation** - Fixed "With Me" button to properly create records
+
+---
+
 ## [1.4.0] - 2026-01-15
 
 ### Added
@@ -489,6 +531,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.5.0 | 2026-01-17 | Custody Time Tracking, Dashboard Aggregation, Real MFA, Child Photos |
 | 1.4.0 | 2026-01-15 | GTM Subscription System, Grant Codes, Password Reset, Mini & Mega v3 |
 | 1.3.0 | 2026-01-12 | ARIA v2 support, Features page redesign, KidComs brand theming |
 | 1.2.0 | 2025-01-11 | SharedCare Agreement v2, 7-section format, Quick Accords |

@@ -1,7 +1,7 @@
 # CommonGround V1 - Local Development Setup Guide
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
+**Last Updated:** January 17, 2026
+**Version:** 1.5.0
 
 ---
 
@@ -68,7 +68,7 @@
 ```bash
 # Clone repository
 git clone https://github.com/your-org/commonground.git
-cd commonground/mvp
+cd commonground
 
 # Start all services
 docker-compose up -d
@@ -84,7 +84,7 @@ docker-compose up -d
 ```bash
 # 1. Clone repository
 git clone https://github.com/your-org/commonground.git
-cd commonground/mvp
+cd commonground
 
 # 2. Backend setup
 cd backend

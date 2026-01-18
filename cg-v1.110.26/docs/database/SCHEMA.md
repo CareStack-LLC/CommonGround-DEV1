@@ -1,9 +1,10 @@
 # CommonGround V1 - Complete Database Schema
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
+**Last Updated:** January 17, 2026
+**Version:** 1.5.0
 **Database:** PostgreSQL 15
 **ORM:** SQLAlchemy 2.0 (Async)
+**Migrations:** 80+ Alembic migrations
 
 ---
 
@@ -13,15 +14,18 @@
 2. [Entity Relationship Diagram](#entity-relationship-diagram)
 3. [Schema by Module](#schema-by-module)
    - [Core Tables](#core-tables)
-   - [Case Management](#case-management)
+   - [Family Files](#family-files)
+   - [Case Management (Legacy)](#case-management-legacy)
    - [Messaging & ARIA](#messaging--aria)
    - [Agreements](#agreements)
    - [ClearFund (Finance)](#clearfund-finance)
    - [Schedule & Exchanges](#schedule--exchanges)
+   - [Custody Tracking](#custody-tracking)
    - [KidComs (Video)](#kidcoms-video)
    - [Cubbie (Child Items)](#cubbie-child-items)
    - [My Circle](#my-circle)
    - [Court Portal](#court-portal)
+   - [Subscriptions](#subscriptions)
    - [Exports](#exports)
    - [Audit & Logging](#audit--logging)
 4. [Indexes](#indexes)
@@ -37,13 +41,15 @@
 
 | Metric | Count |
 |--------|-------|
-| Total Tables | 35 |
-| Core Tables | 5 |
-| Feature Tables | 25 |
+| Total Tables | 45+ |
+| Core Tables | 6 |
+| Family File Tables | 5 |
+| Feature Tables | 30 |
 | Audit Tables | 5 |
-| Total Columns | ~350 |
-| Foreign Keys | ~50 |
-| Indexes | ~40 |
+| Total Columns | ~450 |
+| Foreign Keys | ~60 |
+| Indexes | ~50 |
+| Alembic Migrations | 80+ |
 
 ### Naming Conventions
 
