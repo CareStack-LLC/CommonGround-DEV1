@@ -3560,6 +3560,9 @@ export interface ChildProfile extends ChildProfileBasic {
   full_name: string;
   display_name: string;
   updated_at: string;
+
+  // Custody tracking
+  current_custody_parent_id?: string | null;
 }
 
 export interface ChildListResponse {
