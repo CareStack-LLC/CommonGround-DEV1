@@ -79,35 +79,27 @@ const PERIOD_OPTIONS = [
   { value: 'ytd', label: 'YTD' },
 ];
 
-// Child custody summary row
+// Child custody summary row - shows only logged-in parent's time
 function ChildCustodyRow({
   child,
   childData,
-  parentAName,
-  parentBName,
   isParentA,
   onClick,
 }: {
   child: ChildCustodyStats;
   childData?: ChildData;
-  parentAName: string;
-  parentBName: string;
   isParentA: boolean;
   onClick?: () => void;
 }) {
   const [imageError, setImageError] = useState(false);
 
-  // Get days for each parent with their names
-  const myName = isParentA ? parentAName : parentBName;
-  const theirName = isParentA ? parentBName : parentAName;
+  // Get only the current user's days
   const myDays = isParentA ? child.parent_a.days : child.parent_b.days;
-  const theirDays = isParentA ? child.parent_b.days : child.parent_a.days;
   const totalTracked = child.recorded_days;
 
-  // Bar widths based on total days in period
+  // Bar width based on total days in period
   const periodTotalDays = child.total_days || 30;
   const myBarWidth = periodTotalDays > 0 ? Math.max((myDays / periodTotalDays) * 100, myDays > 0 ? 3 : 0) : 0;
-  const theirBarWidth = periodTotalDays > 0 ? Math.max((theirDays / periodTotalDays) * 100, theirDays > 0 ? 3 : 0) : 0;
 
   // Get photo URL
   const photoUrl = childData?.photo_url ? getImageUrl(childData.photo_url) : null;
@@ -136,38 +128,23 @@ function ChildCustodyRow({
       {/* Info */}
       <div className="flex-1 min-w-0">
         {/* Child name */}
-        <p className="font-medium text-foreground text-sm truncate mb-2">{child.child_name}</p>
+        <p className="font-medium text-foreground text-sm truncate mb-1.5">{child.child_name}</p>
 
-        {/* Your days (sage) */}
-        <div className="mb-1.5">
-          <div className="flex items-center justify-between mb-0.5">
-            <span className="text-xs font-medium text-cg-sage">{myName} (You)</span>
-            <span className="text-sm font-bold text-cg-sage">{myDays} days</span>
+        {/* Your days with progress bar */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1">
+            <div className="h-2 bg-cg-sage-subtle rounded-full overflow-hidden">
+              <div
+                className="h-full bg-cg-sage rounded-full transition-all duration-500"
+                style={{ width: `${myBarWidth}%` }}
+              />
+            </div>
           </div>
-          <div className="h-1.5 bg-cg-sage-subtle rounded-full overflow-hidden">
-            <div
-              className="h-full bg-cg-sage rounded-full transition-all duration-500"
-              style={{ width: `${myBarWidth}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Co-parent days (slate) */}
-        <div>
-          <div className="flex items-center justify-between mb-0.5">
-            <span className="text-xs font-medium text-cg-slate">{theirName}</span>
-            <span className="text-sm font-bold text-cg-slate">{theirDays} days</span>
-          </div>
-          <div className="h-1.5 bg-cg-slate-subtle rounded-full overflow-hidden">
-            <div
-              className="h-full bg-cg-slate rounded-full transition-all duration-500"
-              style={{ width: `${theirBarWidth}%` }}
-            />
-          </div>
+          <span className="text-sm font-bold text-cg-sage whitespace-nowrap">{myDays} {myDays === 1 ? 'day' : 'days'}</span>
         </div>
 
         {/* Tracking info */}
-        <div className="flex items-center justify-between mt-1.5">
+        <div className="mt-1">
           <span className="text-xs text-muted-foreground">
             {totalTracked > 0 ? `${totalTracked} days tracked` : 'No data yet'}
           </span>
@@ -270,8 +247,6 @@ export default function CustodyDashboardWidget({
                 key={child.child_id}
                 child={child}
                 childData={childData}
-                parentAName={parentAName}
-                parentBName={parentBName}
                 isParentA={isParentA}
                 onClick={() => router.push(`/family-files/${familyFileId}/children/${child.child_id}`)}
               />
