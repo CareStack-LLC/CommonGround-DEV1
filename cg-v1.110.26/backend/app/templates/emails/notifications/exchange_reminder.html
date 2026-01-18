@@ -1,0 +1,110 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Custody Exchange Reminder{% endblock %}
+
+{% block preheader %}Reminder: You have a custody exchange {{ time_label | default('coming up') }}.{% endblock %}
+
+{% block content %}
+<!-- Calendar Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <img src="{{ icons.calendar }}" alt="" width="48" height="48" style="display: inline-block;">
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Exchange Reminder
+</h1>
+
+<p style="color: #6B7B74; font-size: 18px; text-align: center; margin-bottom: 32px;">
+  You have a custody exchange <strong style="color: #4A6C58;">{{ time_label | default('coming up') }}</strong>
+</p>
+
+<!-- Exchange Details Card -->
+<div style="background-color: #E8F0EC; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Date & Time</span><br>
+        <strong style="color: #2D3A35; font-size: 18px;">{{ exchange_date }}</strong>
+        <span style="color: #4A6C58;"> at {{ exchange_time }}</span>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Location</span><br>
+        <strong style="color: #2D3A35;">{{ location | default('See agreement') }}</strong>
+        {% if location_url %}
+        <br><a href="{{ location_url }}" style="color: #4A6C58; font-size: 14px;">View on map</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% if children_names %}
+    <tr>
+      <td style="padding: 8px 0;">
+        <span style="color: #6B7B74; font-size: 14px;">Children</span><br>
+        <strong style="color: #2D3A35;">{{ children_names | join(', ') }}</strong>
+      </td>
+    </tr>
+    {% endif %}
+  </table>
+</div>
+
+<!-- Checklist -->
+<div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <h3 style="color: #2D3A35; font-size: 16px; margin: 0 0 16px 0;">
+    Exchange Checklist
+  </h3>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td width="24" valign="top" style="padding: 6px 0;">
+        <div style="width: 18px; height: 18px; border: 2px solid #4A6C58; border-radius: 4px;"></div>
+      </td>
+      <td style="padding: 6px 0 6px 12px; color: #2D3A35; font-size: 14px;">
+        Check in via the app when you arrive for GPS verification
+      </td>
+    </tr>
+    <tr>
+      <td width="24" valign="top" style="padding: 6px 0;">
+        <div style="width: 18px; height: 18px; border: 2px solid #4A6C58; border-radius: 4px;"></div>
+      </td>
+      <td style="padding: 6px 0 6px 12px; color: #2D3A35; font-size: 14px;">
+        Bring any required items (medication, school supplies, etc.)
+      </td>
+    </tr>
+    <tr>
+      <td width="24" valign="top" style="padding: 6px 0;">
+        <div style="width: 18px; height: 18px; border: 2px solid #4A6C58; border-radius: 4px;"></div>
+      </td>
+      <td style="padding: 6px 0 6px 12px; color: #2D3A35; font-size: 14px;">
+        Document any concerns via the app messaging
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- GPS Tip -->
+<div style="background-color: #F5F0E8; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td width="32" valign="top">
+        <img src="{{ icons.checkmark }}" alt="" width="24" height="24">
+      </td>
+      <td style="padding-left: 12px;">
+        <strong style="color: #4A6C58; font-size: 14px;">Tip: Check in for compliance records</strong>
+        <p style="margin: 4px 0 0 0; color: #6B7B74; font-size: 14px;">
+          Using the check-in feature creates a GPS-verified record of your on-time arrival.
+          This can be helpful for compliance documentation.
+        </p>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ exchange_url }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    View Exchange Details
+  </a>
+</div>
+{% endblock %}

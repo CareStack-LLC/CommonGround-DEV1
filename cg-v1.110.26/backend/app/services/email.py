@@ -1,14 +1,23 @@
 """
 Email notification service for sending transactional emails via SendGrid.
+
+Uses Jinja2 templates for consistent, branded email rendering.
 """
 
 import logging
-from typing import Optional, List
+from pathlib import Path
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
 from app.core.config import settings
+from app.templates.emails.images.email_icons import EMAIL_ICONS
 
 logger = logging.getLogger(__name__)
+
+# Template directory
+TEMPLATES_DIR = Path(__file__).parent.parent / "templates" / "emails"
 
 
 class EmailService:
@@ -17,19 +26,112 @@ class EmailService:
 
     In development mode (EMAIL_ENABLED=False), emails are logged to console.
     In production (EMAIL_ENABLED=True), emails are sent via SendGrid API.
+
+    Uses Jinja2 templates from backend/app/templates/emails/ for rendering.
     """
 
     def __init__(self):
-        """Initialize email service."""
+        """Initialize email service with Jinja2 environment."""
         self.enabled = settings.EMAIL_ENABLED
         self.from_email = settings.FROM_EMAIL
         self.from_name = getattr(settings, 'FROM_NAME', 'CommonGround')
         self.api_key = settings.SENDGRID_API_KEY
+        self.frontend_url = getattr(settings, 'FRONTEND_URL', 'https://common-ground-blue.vercel.app')
 
         # Validate configuration
         if self.enabled and not self.api_key:
             logger.warning("EMAIL_ENABLED is True but SENDGRID_API_KEY is not set. Emails will be logged only.")
             self.enabled = False
+
+        # Initialize Jinja2 environment
+        self.jinja_env = Environment(
+            loader=FileSystemLoader(str(TEMPLATES_DIR)),
+            autoescape=select_autoescape(['html', 'xml']),
+            trim_blocks=True,
+            lstrip_blocks=True
+        )
+
+    def _render_template(self, template_path: str, context: Dict[str, Any]) -> str:
+        """
+        Render a Jinja2 email template with the given context.
+
+        Args:
+            template_path: Path to template relative to emails directory (e.g., 'onboarding/welcome.html')
+            context: Dictionary of variables to pass to the template
+
+        Returns:
+            Rendered HTML string
+        """
+        # Always include icons in context
+        context.setdefault('icons', EMAIL_ICONS)
+        context.setdefault('frontend_url', self.frontend_url)
+        context.setdefault('current_year', datetime.now().year)
+
+        template = self.jinja_env.get_template(template_path)
+        return template.render(**context)
+
+    # ==================== Onboarding Emails ====================
+
+    async def send_welcome_email(
+        self,
+        to_email: str,
+        user_name: str,
+        dashboard_url: Optional[str] = None
+    ) -> bool:
+        """
+        Send welcome email to new users.
+
+        Args:
+            to_email: Recipient email
+            user_name: User's name
+            dashboard_url: Link to dashboard
+
+        Returns:
+            Success status
+        """
+        subject = "Welcome to CommonGround"
+
+        html_body = self._render_template('onboarding/welcome.html', {
+            'user_name': user_name,
+            'dashboard_url': dashboard_url or f"{self.frontend_url}/dashboard"
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_getting_started_email(
+        self,
+        to_email: str,
+        user_name: str,
+        completed_steps: List[str],
+        total_steps: int = 5,
+        continue_url: Optional[str] = None
+    ) -> bool:
+        """
+        Send getting started guide email.
+
+        Args:
+            to_email: Recipient email
+            user_name: User's name
+            completed_steps: List of completed step names
+            total_steps: Total number of steps
+            continue_url: Link to continue setup
+
+        Returns:
+            Success status
+        """
+        subject = "Complete Your CommonGround Setup"
+
+        html_body = self._render_template('onboarding/getting_started.html', {
+            'user_name': user_name,
+            'completed_steps': completed_steps,
+            'total_steps': total_steps,
+            'progress_percent': int((len(completed_steps) / total_steps) * 100),
+            'continue_url': continue_url or f"{self.frontend_url}/setup"
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    # ==================== Invitation Emails ====================
 
     async def send_case_invitation(
         self,
@@ -41,13 +143,13 @@ class EmailService:
         children_names: List[str]
     ) -> bool:
         """
-        Send case invitation email.
+        Send co-parent invitation email.
 
         Args:
             to_email: Recipient email
             to_name: Recipient name
             inviter_name: Name of person sending invitation
-            case_name: Name of the case
+            case_name: Name of the case/family file
             invitation_link: Link to accept invitation
             children_names: List of children's names
 
@@ -56,439 +158,56 @@ class EmailService:
         """
         subject = f"{inviter_name} invited you to collaborate on CommonGround"
 
-        children_list = ", ".join(children_names) if children_names else "your children"
-
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
-                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                .header h1 {{ margin: 0; font-size: 28px; font-weight: 600; }}
-                .header p {{ margin: 10px 0 0; opacity: 0.9; }}
-                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
-                .button {{
-                    display: inline-block;
-                    background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%);
-                    color: white;
-                    padding: 14px 32px;
-                    text-decoration: none;
-                    border-radius: 6px;
-                    margin: 20px 0;
-                    font-weight: 600;
-                }}
-                .feature-list {{ background: #f9fafb; padding: 20px; border-radius: 6px; margin: 20px 0; }}
-                .feature-list li {{ margin: 8px 0; }}
-                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>CommonGround</h1>
-                    <p>Co-Parenting Made Easier</p>
-                </div>
-                <div class="content">
-                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
-                    <p><strong>{inviter_name}</strong> has invited you to collaborate on <strong>{case_name}</strong> regarding {children_list}.</p>
-
-                    <div class="feature-list">
-                        <p style="margin-top: 0; font-weight: 600;">CommonGround helps co-parents:</p>
-                        <ul style="margin-bottom: 0;">
-                            <li>Create custody agreements together</li>
-                            <li>Communicate with AI-powered conflict prevention</li>
-                            <li>Track parenting time and exchanges</li>
-                            <li>Maintain objective records for court</li>
-                        </ul>
-                    </div>
-
-                    <p style="text-align: center;">
-                        <a href="{invitation_link}" class="button">Accept Invitation</a>
-                    </p>
-
-                    <p style="color: #666; font-size: 14px;"><em>This invitation link will expire in 7 days.</em></p>
-                </div>
-                <div class="footer">
-                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
-                    <p style="margin: 10px 0 0;">You received this email because {inviter_name} invited you to collaborate.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
+        html_body = self._render_template('invitations/parent_invite.html', {
+            'to_name': to_name,
+            'inviter_name': inviter_name,
+            'family_file_name': case_name,
+            'invitation_link': invitation_link,
+            'children_names': children_names,
+            'expiry_days': 7
+        })
 
         return await self._send_email(to_email, subject, html_body)
 
-    async def send_agreement_approval_needed(
+    async def send_professional_invitation(
         self,
         to_email: str,
         to_name: str,
+        inviter_name: str,
         case_name: str,
-        agreement_title: str,
-        approval_link: str
+        invitation_link: str,
+        role: str,
+        access_description: str,
+        case_reference: Optional[str] = None
     ) -> bool:
         """
-        Send notification that agreement needs approval.
+        Send professional (GAL/mediator/attorney) invitation email.
 
         Args:
             to_email: Recipient email
             to_name: Recipient name
+            inviter_name: Name of person sending invitation
             case_name: Name of the case
-            agreement_title: Title of the agreement
-            approval_link: Link to review and approve
+            invitation_link: Link to accept invitation
+            role: Professional role (e.g., 'Guardian ad Litem', 'Mediator')
+            access_description: Description of access level
+            case_reference: Court case reference number
 
         Returns:
             Success status
         """
-        subject = f"Agreement ready for your approval: {agreement_title}"
+        subject = f"Professional Access Request - {case_name}"
 
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
-                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: linear-gradient(135deg, #D4A574 0%, #C4956A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
-                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
-                .button {{
-                    display: inline-block;
-                    background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%);
-                    color: white;
-                    padding: 14px 32px;
-                    text-decoration: none;
-                    border-radius: 6px;
-                    margin: 20px 0;
-                    font-weight: 600;
-                }}
-                .agreement-box {{ background: #f9fafb; padding: 20px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #D4A574; }}
-                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Agreement Ready for Approval</h1>
-                </div>
-                <div class="content">
-                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
-                    <p>The parenting agreement for <strong>{case_name}</strong> is ready for your review and approval.</p>
-
-                    <div class="agreement-box">
-                        <p style="margin: 0;"><strong>Agreement:</strong> {agreement_title}</p>
-                    </div>
-
-                    <p>Please review the agreement carefully before approving. Once both parents approve, it will become active and can be used to generate your parenting schedule.</p>
-
-                    <p style="text-align: center;">
-                        <a href="{approval_link}" class="button">Review & Approve</a>
-                    </p>
-                </div>
-                <div class="footer">
-                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-
-        return await self._send_email(to_email, subject, html_body)
-
-    async def send_message_notification(
-        self,
-        to_email: str,
-        to_name: str,
-        sender_name: str,
-        case_name: str,
-        message_preview: str,
-        message_link: str,
-        was_flagged: bool = False
-    ) -> bool:
-        """
-        Send notification about new message.
-
-        Args:
-            to_email: Recipient email
-            to_name: Recipient name
-            sender_name: Name of message sender
-            case_name: Name of the case
-            message_preview: First 100 chars of message
-            message_link: Link to view message
-            was_flagged: Whether ARIA flagged the message
-
-        Returns:
-            Success status
-        """
-        subject = f"New message from {sender_name}"
-
-        aria_note = ""
-        if was_flagged:
-            aria_note = """
-            <div style="background: #FEF3C7; padding: 15px; border-radius: 6px; border-left: 4px solid #F59E0B; margin: 15px 0;">
-                <strong>ARIA Note:</strong> This message was reviewed by our AI assistant for tone to help maintain constructive communication.
-            </div>
-            """
-
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
-                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
-                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
-                .message-preview {{
-                    background: #f9fafb;
-                    padding: 20px;
-                    border-left: 4px solid #6B8E6B;
-                    margin: 20px 0;
-                    border-radius: 0 6px 6px 0;
-                }}
-                .button {{
-                    display: inline-block;
-                    background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%);
-                    color: white;
-                    padding: 14px 32px;
-                    text-decoration: none;
-                    border-radius: 6px;
-                    margin: 20px 0;
-                    font-weight: 600;
-                }}
-                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>New Message</h1>
-                </div>
-                <div class="content">
-                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
-                    <p><strong>{sender_name}</strong> sent you a message regarding <strong>{case_name}</strong>.</p>
-
-                    {aria_note}
-
-                    <div class="message-preview">
-                        <p style="margin: 0; color: #555;">{message_preview}...</p>
-                    </div>
-
-                    <p style="text-align: center;">
-                        <a href="{message_link}" class="button">View Full Message</a>
-                    </p>
-                </div>
-                <div class="footer">
-                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-
-        return await self._send_email(to_email, subject, html_body)
-
-    async def send_exchange_reminder(
-        self,
-        to_email: str,
-        to_name: str,
-        event_title: str,
-        event_time: datetime,
-        location: str,
-        children_names: List[str],
-        hours_before: int = 24
-    ) -> bool:
-        """
-        Send reminder about upcoming exchange.
-
-        Args:
-            to_email: Recipient email
-            to_name: Recipient name
-            event_title: Title of the event
-            event_time: Time of the exchange
-            location: Exchange location
-            children_names: List of children involved
-            hours_before: How many hours before (for subject)
-
-        Returns:
-            Success status
-        """
-        time_label = f"{hours_before} hours" if hours_before > 1 else "1 hour"
-        subject = f"Reminder: Exchange in {time_label}"
-
-        time_str = event_time.strftime("%A, %B %d at %I:%M %p")
-        children_list = ", ".join(children_names) if children_names else "your children"
-
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
-                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
-                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
-                .event-details {{
-                    background: #f9fafb;
-                    padding: 20px;
-                    border-left: 4px solid #6B8E6B;
-                    margin: 20px 0;
-                    border-radius: 0 6px 6px 0;
-                }}
-                .event-details p {{ margin: 8px 0; }}
-                .tip {{ background: #EFF6FF; padding: 15px; border-radius: 6px; margin: 20px 0; }}
-                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Exchange Reminder</h1>
-                </div>
-                <div class="content">
-                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
-                    <p>This is a reminder about your upcoming parenting time exchange.</p>
-
-                    <div class="event-details">
-                        <p><strong>Event:</strong> {event_title}</p>
-                        <p><strong>When:</strong> {time_str}</p>
-                        <p><strong>Where:</strong> {location}</p>
-                        <p><strong>Children:</strong> {children_list}</p>
-                    </div>
-
-                    <div class="tip">
-                        <strong>Tip:</strong> Check in when you arrive to maintain your on-time compliance record.
-                    </div>
-                </div>
-                <div class="footer">
-                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
-
-        return await self._send_email(to_email, subject, html_body)
-
-    async def send_compliance_report(
-        self,
-        to_email: str,
-        to_name: str,
-        case_name: str,
-        on_time_rate: float,
-        total_exchanges: int,
-        report_link: str
-    ) -> bool:
-        """
-        Send monthly compliance report.
-
-        Args:
-            to_email: Recipient email
-            to_name: Recipient name
-            case_name: Name of the case
-            on_time_rate: Percentage on-time (0-1)
-            total_exchanges: Total number of exchanges
-            report_link: Link to full report
-
-        Returns:
-            Success status
-        """
-        subject = f"Monthly Compliance Report - {case_name}"
-
-        on_time_pct = int(on_time_rate * 100)
-
-        # Determine status color
-        if on_time_pct >= 90:
-            status_color = "#10B981"  # Green
-            status_text = "Excellent"
-        elif on_time_pct >= 70:
-            status_color = "#F59E0B"  # Amber
-            status_text = "Good"
-        else:
-            status_color = "#EF4444"  # Red
-            status_text = "Needs Improvement"
-
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
-                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
-                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
-                .stats {{ display: flex; gap: 20px; margin: 20px 0; }}
-                .stat {{
-                    flex: 1;
-                    background: #f9fafb;
-                    padding: 20px;
-                    text-align: center;
-                    border-radius: 8px;
-                }}
-                .stat h3 {{ margin: 0; font-size: 32px; }}
-                .stat p {{ margin: 5px 0 0; color: #666; font-size: 14px; }}
-                .button {{
-                    display: inline-block;
-                    background: linear-gradient(135deg, #6B8E6B 0%, #7A9F7A 100%);
-                    color: white;
-                    padding: 14px 32px;
-                    text-decoration: none;
-                    border-radius: 6px;
-                    margin: 20px 0;
-                    font-weight: 600;
-                }}
-                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Monthly Compliance Report</h1>
-                </div>
-                <div class="content">
-                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
-                    <p>Here's your monthly compliance summary for <strong>{case_name}</strong>.</p>
-
-                    <div class="stats">
-                        <div class="stat">
-                            <h3 style="color: {status_color};">{on_time_pct}%</h3>
-                            <p>On-Time Rate</p>
-                            <p style="color: {status_color}; font-weight: 600;">{status_text}</p>
-                        </div>
-                        <div class="stat">
-                            <h3 style="color: #6B8E6B;">{total_exchanges}</h3>
-                            <p>Total Exchanges</p>
-                        </div>
-                    </div>
-
-                    <p style="text-align: center;">
-                        <a href="{report_link}" class="button">View Full Report</a>
-                    </p>
-
-                    <p style="color: #666; font-size: 13px; text-align: center;"><em>These metrics are court-admissible and demonstrate good faith compliance.</em></p>
-                </div>
-                <div class="footer">
-                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
+        html_body = self._render_template('invitations/professional_invite.html', {
+            'to_name': to_name,
+            'inviter_name': inviter_name,
+            'family_file_name': case_name,
+            'invitation_link': invitation_link,
+            'role': role,
+            'access_description': access_description,
+            'case_reference': case_reference,
+            'expiry_days': 7
+        })
 
         return await self._send_email(to_email, subject, html_body)
 
@@ -517,65 +236,180 @@ class EmailService:
         """
         subject = f"{inviter_name} invited you to connect with {child_name} on CommonGround"
 
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
-                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
-                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; }}
-                .button {{
-                    display: inline-block;
-                    background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-                    color: white;
-                    padding: 14px 32px;
-                    text-decoration: none;
-                    border-radius: 6px;
-                    margin: 20px 0;
-                    font-weight: 600;
-                }}
-                .feature-list {{ background: #f9fafb; padding: 20px; border-radius: 6px; margin: 20px 0; }}
-                .feature-list li {{ margin: 8px 0; }}
-                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>My Circle Invitation</h1>
-                </div>
-                <div class="content">
-                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
-                    <p><strong>{inviter_name}</strong> has invited you to join <strong>{child_name}'s</strong> Circle as their <strong>{relationship}</strong>.</p>
+        html_body = self._render_template('invitations/circle_invite.html', {
+            'to_name': to_name,
+            'inviter_name': inviter_name,
+            'child_name': child_name,
+            'invitation_link': invitation_link,
+            'relationship': relationship,
+            'expiry_days': 7
+        })
 
-                    <div class="feature-list">
-                        <p style="margin-top: 0; font-weight: 600;">As a Circle member, you can:</p>
-                        <ul style="margin-bottom: 0;">
-                            <li>Video call with {child_name} (with parental approval)</li>
-                            <li>Send monitored messages</li>
-                            <li>Stay connected with your family</li>
-                        </ul>
-                    </div>
+        return await self._send_email(to_email, subject, html_body)
 
-                    <p style="text-align: center;">
-                        <a href="{invitation_link}" class="button">Accept Invitation</a>
-                    </p>
+    # ==================== Notification Emails ====================
 
-                    <p style="color: #666; font-size: 14px;"><em>This invitation link will expire in 7 days.</em></p>
-                </div>
-                <div class="footer">
-                    <p style="margin: 0;">CommonGround - Where co-parents find common ground</p>
-                    <p style="margin: 10px 0 0;">You received this email because {inviter_name} invited you to join their family's Circle.</p>
-                </div>
-            </div>
-        </body>
-        </html>
+    async def send_message_notification(
+        self,
+        to_email: str,
+        to_name: str,
+        sender_name: str,
+        case_name: str,
+        message_preview: str,
+        message_link: str,
+        was_flagged: bool = False
+    ) -> bool:
         """
+        Send notification about new message.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            sender_name: Name of message sender
+            case_name: Name of the case
+            message_preview: First 100 chars of message
+            message_link: Link to view message
+            was_flagged: Whether ARIA flagged the message
+
+        Returns:
+            Success status
+        """
+        subject = f"New message from {sender_name}"
+
+        html_body = self._render_template('notifications/message_received.html', {
+            'to_name': to_name,
+            'sender_name': sender_name,
+            'family_file_name': case_name,
+            'message_preview': message_preview,
+            'message_url': message_link,
+            'aria_reviewed': was_flagged,
+            'sent_time': datetime.now().strftime('%B %d at %I:%M %p')
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_agreement_approval_needed(
+        self,
+        to_email: str,
+        to_name: str,
+        case_name: str,
+        agreement_title: str,
+        approval_link: str,
+        other_parent_name: Optional[str] = None,
+        sections_updated: Optional[List[str]] = None
+    ) -> bool:
+        """
+        Send notification that agreement needs approval.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            case_name: Name of the case
+            agreement_title: Title of the agreement
+            approval_link: Link to review and approve
+            other_parent_name: Name of other parent who updated
+            sections_updated: List of updated section names
+
+        Returns:
+            Success status
+        """
+        subject = f"Agreement ready for your approval: {agreement_title}"
+
+        html_body = self._render_template('notifications/agreement_approval.html', {
+            'to_name': to_name,
+            'family_file_name': case_name,
+            'agreement_title': agreement_title,
+            'review_url': approval_link,
+            'requester_name': other_parent_name,
+            'sections_updated': sections_updated,
+            'deadline': (datetime.now().replace(day=datetime.now().day + 7)).strftime('%B %d, %Y')
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_agreement_finalized(
+        self,
+        to_email: str,
+        to_name: str,
+        case_name: str,
+        agreement_title: str,
+        agreement_url: str,
+        parent_a_name: str,
+        parent_b_name: str,
+        effective_date: Optional[str] = None
+    ) -> bool:
+        """
+        Send notification that agreement has been finalized.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            case_name: Name of the case
+            agreement_title: Title of the agreement
+            agreement_url: Link to view agreement
+            parent_a_name: Name of parent A
+            parent_b_name: Name of parent B
+            effective_date: When agreement takes effect
+
+        Returns:
+            Success status
+        """
+        subject = f"Agreement Finalized: {agreement_title}"
+
+        html_body = self._render_template('notifications/agreement_finalized.html', {
+            'to_name': to_name,
+            'family_file_name': case_name,
+            'agreement_title': agreement_title,
+            'agreement_url': agreement_url,
+            'parent_a_name': parent_a_name,
+            'parent_b_name': parent_b_name,
+            'effective_date': effective_date or 'Immediately'
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_exchange_reminder(
+        self,
+        to_email: str,
+        to_name: str,
+        event_title: str,
+        event_time: datetime,
+        location: str,
+        children_names: List[str],
+        hours_before: int = 24,
+        exchange_url: Optional[str] = None,
+        location_url: Optional[str] = None
+    ) -> bool:
+        """
+        Send reminder about upcoming exchange.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            event_title: Title of the event
+            event_time: Time of the exchange
+            location: Exchange location
+            children_names: List of children involved
+            hours_before: How many hours before (for subject)
+            exchange_url: Link to view exchange details
+            location_url: Map link for location
+
+        Returns:
+            Success status
+        """
+        time_label = "tomorrow" if hours_before >= 24 else f"in {hours_before} hours"
+        subject = f"Reminder: Exchange {time_label}"
+
+        html_body = self._render_template('notifications/exchange_reminder.html', {
+            'to_name': to_name,
+            'time_label': time_label,
+            'exchange_date': event_time.strftime('%A, %B %d, %Y'),
+            'exchange_time': event_time.strftime('%I:%M %p'),
+            'location': location,
+            'location_url': location_url,
+            'children_names': children_names,
+            'exchange_url': exchange_url or f"{self.frontend_url}/schedule"
+        })
 
         return await self._send_email(to_email, subject, html_body)
 
@@ -585,7 +419,8 @@ class EmailService:
         to_name: str,
         caller_name: str,
         child_name: str,
-        call_link: str
+        call_link: str,
+        caller_relationship: Optional[str] = None
     ) -> bool:
         """
         Send notification about incoming KidComs call.
@@ -596,62 +431,336 @@ class EmailService:
             caller_name: Name of person calling
             child_name: Name of child involved
             call_link: Link to join call
+            caller_relationship: Relationship to child
 
         Returns:
             Success status
         """
         subject = f"{caller_name} is calling on CommonGround"
 
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }}
-                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                .header {{ background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                .header h1 {{ margin: 0; font-size: 24px; font-weight: 600; }}
-                .content {{ background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; border-top: none; text-align: center; }}
-                .button {{
-                    display: inline-block;
-                    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-                    color: white;
-                    padding: 16px 40px;
-                    text-decoration: none;
-                    border-radius: 6px;
-                    margin: 20px 0;
-                    font-weight: 600;
-                    font-size: 18px;
-                }}
-                .footer {{ text-align: center; padding: 20px; color: #666; font-size: 12px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px; background: #f9fafb; }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>Incoming Call</h1>
-                </div>
-                <div class="content">
-                    <h2 style="margin-top: 0;">Hi {to_name},</h2>
-                    <p style="font-size: 18px;"><strong>{caller_name}</strong> is trying to reach <strong>{child_name}</strong> on KidComs.</p>
-
-                    <p>
-                        <a href="{call_link}" class="button">Join Call</a>
-                    </p>
-
-                    <p style="color: #666; font-size: 14px;">If you can't join now, the caller will be notified.</p>
-                </div>
-                <div class="footer">
-                    <p style="margin: 0;">CommonGround KidComs - Safe communication for families</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
+        html_body = self._render_template('notifications/kidcoms_call.html', {
+            'to_name': to_name,
+            'caller_name': caller_name,
+            'child_name': child_name,
+            'call_url': call_link,
+            'caller_relationship': caller_relationship
+        })
 
         return await self._send_email(to_email, subject, html_body)
+
+    # ==================== Report Emails ====================
+
+    async def send_report_ready(
+        self,
+        to_email: str,
+        to_name: str,
+        report_type: str,
+        date_range: str,
+        family_file_name: str,
+        download_url: str,
+        highlights: Optional[List[Dict[str, str]]] = None,
+        expiry_date: Optional[str] = None
+    ) -> bool:
+        """
+        Send notification that a report is ready for download.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            report_type: Type of report (e.g., 'Custody Time', 'Communication')
+            date_range: Date range covered
+            family_file_name: Name of family file
+            download_url: Link to download report
+            highlights: List of dicts with 'label' and 'value' keys
+            expiry_date: When download link expires
+
+        Returns:
+            Success status
+        """
+        subject = f"Your {report_type} Report is Ready"
+
+        html_body = self._render_template('reports/report_ready.html', {
+            'to_name': to_name,
+            'report_type': report_type,
+            'date_range': date_range,
+            'family_file_name': family_file_name,
+            'download_url': download_url,
+            'highlights': highlights,
+            'expiry_date': expiry_date
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_compliance_report(
+        self,
+        to_email: str,
+        to_name: str,
+        case_name: str,
+        on_time_rate: float,
+        total_exchanges: int,
+        report_link: str,
+        month_name: Optional[str] = None,
+        year: Optional[int] = None,
+        on_time_count: Optional[int] = None,
+        completed_exchanges: Optional[int] = None,
+        missed_exchanges: Optional[int] = None,
+        gps_verified_count: Optional[int] = None,
+        message_count: Optional[int] = None
+    ) -> bool:
+        """
+        Send monthly compliance report.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            case_name: Name of the case
+            on_time_rate: Percentage on-time (0-1)
+            total_exchanges: Total number of exchanges
+            report_link: Link to full report
+            month_name: Month name for report
+            year: Year for report
+            on_time_count: Number of on-time exchanges
+            completed_exchanges: Number of completed exchanges
+            missed_exchanges: Number of missed exchanges
+            gps_verified_count: Number of GPS verified check-ins
+            message_count: Number of messages exchanged
+
+        Returns:
+            Success status
+        """
+        now = datetime.now()
+        subject = f"Monthly Compliance Report - {case_name}"
+
+        html_body = self._render_template('reports/compliance_monthly.html', {
+            'to_name': to_name,
+            'family_file_name': case_name,
+            'compliance_rate': int(on_time_rate * 100),
+            'total_exchanges': total_exchanges,
+            'full_report_url': report_link,
+            'month_name': month_name or now.strftime('%B'),
+            'year': year or now.year,
+            'on_time_count': on_time_count or int(total_exchanges * on_time_rate),
+            'completed_exchanges': completed_exchanges or total_exchanges,
+            'missed_exchanges': missed_exchanges or 0,
+            'gps_verified_count': gps_verified_count or 0,
+            'message_count': message_count or 0
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    # ==================== ClearFund Emails ====================
+
+    async def send_expense_request(
+        self,
+        to_email: str,
+        to_name: str,
+        requester_name: str,
+        expense_title: str,
+        expense_category: str,
+        total_amount: float,
+        your_share: float,
+        your_percentage: int,
+        approve_url: str,
+        expense_description: Optional[str] = None,
+        receipt_attached: bool = False,
+        children_names: Optional[List[str]] = None,
+        deadline: Optional[str] = None
+    ) -> bool:
+        """
+        Send expense request notification.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            requester_name: Name of person requesting
+            expense_title: Title/description of expense
+            expense_category: Category (medical, education, etc.)
+            total_amount: Total expense amount
+            your_share: Recipient's share to pay
+            your_percentage: Recipient's percentage
+            approve_url: Link to approve/review
+            expense_description: Detailed description
+            receipt_attached: Whether receipt was attached
+            children_names: Children this expense is for
+            deadline: Response deadline
+
+        Returns:
+            Success status
+        """
+        subject = f"Expense Request: {expense_title}"
+
+        html_body = self._render_template('clearfund/expense_request.html', {
+            'to_name': to_name,
+            'requester_name': requester_name,
+            'expense_title': expense_title,
+            'expense_category': expense_category,
+            'total_amount': total_amount,
+            'your_share': your_share,
+            'your_percentage': your_percentage,
+            'approve_url': approve_url,
+            'expense_description': expense_description,
+            'receipt_attached': receipt_attached,
+            'children_names': children_names,
+            'deadline': deadline
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_expense_approved(
+        self,
+        to_email: str,
+        to_name: str,
+        expense_title: str,
+        expense_category: str,
+        total_amount: float,
+        approver_name: str,
+        approved_date: str,
+        expense_url: str,
+        parent_a_name: str,
+        parent_a_amount: float,
+        parent_a_percentage: int,
+        parent_b_name: str,
+        parent_b_amount: float,
+        parent_b_percentage: int,
+        receipt_url: Optional[str] = None
+    ) -> bool:
+        """
+        Send expense approval notification.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            expense_title: Title of expense
+            expense_category: Category
+            total_amount: Total amount
+            approver_name: Who approved
+            approved_date: When approved
+            expense_url: Link to expense details
+            parent_a_name: Parent A name
+            parent_a_amount: Parent A share
+            parent_a_percentage: Parent A percentage
+            parent_b_name: Parent B name
+            parent_b_amount: Parent B share
+            parent_b_percentage: Parent B percentage
+            receipt_url: Link to receipt
+
+        Returns:
+            Success status
+        """
+        subject = f"Expense Approved: {expense_title}"
+
+        html_body = self._render_template('clearfund/expense_approved.html', {
+            'to_name': to_name,
+            'expense_title': expense_title,
+            'expense_category': expense_category,
+            'total_amount': total_amount,
+            'approver_name': approver_name,
+            'approved_date': approved_date,
+            'expense_url': expense_url,
+            'parent_a_name': parent_a_name,
+            'parent_a_amount': parent_a_amount,
+            'parent_a_percentage': parent_a_percentage,
+            'parent_b_name': parent_b_name,
+            'parent_b_amount': parent_b_amount,
+            'parent_b_percentage': parent_b_percentage,
+            'receipt_url': receipt_url
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_payment_reminder(
+        self,
+        to_email: str,
+        to_name: str,
+        amount_due: float,
+        due_date: str,
+        payment_url: str,
+        is_overdue: bool = False,
+        outstanding_items: Optional[List[Dict[str, Any]]] = None
+    ) -> bool:
+        """
+        Send payment reminder notification.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            amount_due: Total amount due
+            due_date: Payment due date
+            payment_url: Link to make payment
+            is_overdue: Whether payment is past due
+            outstanding_items: List of outstanding expenses
+
+        Returns:
+            Success status
+        """
+        subject = f"Payment Reminder: ${amount_due:.2f} Due"
+        if is_overdue:
+            subject = f"Overdue Payment: ${amount_due:.2f}"
+
+        html_body = self._render_template('clearfund/payment_reminder.html', {
+            'to_name': to_name,
+            'amount_due': amount_due,
+            'due_date': due_date,
+            'payment_url': payment_url,
+            'is_overdue': is_overdue,
+            'outstanding_items': outstanding_items or []
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    # ==================== Auth Emails ====================
+
+    async def send_security_alert(
+        self,
+        to_email: str,
+        to_name: str,
+        alert_type: str,
+        alert_message: str,
+        secure_account_url: str,
+        event_timestamp: str,
+        device_info: Optional[str] = None,
+        location: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        is_critical: bool = False,
+        alert_description: Optional[str] = None
+    ) -> bool:
+        """
+        Send security alert notification.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            alert_type: Type of alert (new login, password change, etc.)
+            alert_message: Detailed alert message
+            secure_account_url: Link to secure account
+            event_timestamp: When event occurred
+            device_info: Device information
+            location: Geographic location
+            ip_address: IP address
+            is_critical: Whether alert is critical
+            alert_description: Short description for intro
+
+        Returns:
+            Success status
+        """
+        subject = f"Security Alert: {alert_type}"
+
+        html_body = self._render_template('auth/security_alert.html', {
+            'to_name': to_name,
+            'alert_type': alert_type,
+            'alert_message': alert_message,
+            'secure_account_url': secure_account_url,
+            'event_timestamp': event_timestamp,
+            'device_info': device_info,
+            'location': location,
+            'ip_address': ip_address,
+            'is_critical': is_critical,
+            'alert_description': alert_description
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+    # ==================== Internal Methods ====================
 
     async def _send_email(
         self,
