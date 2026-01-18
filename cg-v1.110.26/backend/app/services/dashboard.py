@@ -485,13 +485,22 @@ class DashboardService:
             ))
 
         # Get upcoming custody exchanges
+        # Check both family_file_id and legacy_case_id for backwards compatibility
+        if family_file.legacy_case_id:
+            exchange_filter = or_(
+                CustodyExchange.family_file_id == family_file_id,
+                CustodyExchange.case_id == family_file.legacy_case_id
+            )
+        else:
+            exchange_filter = CustodyExchange.family_file_id == family_file_id
+
         exchanges_result = await db.execute(
             select(CustodyExchangeInstance)
             .options(selectinload(CustodyExchangeInstance.exchange))
             .join(CustodyExchange, CustodyExchangeInstance.exchange_id == CustodyExchange.id)
             .where(
                 and_(
-                    CustodyExchange.family_file_id == family_file_id,
+                    exchange_filter,
                     CustodyExchangeInstance.scheduled_time >= now,
                     CustodyExchangeInstance.scheduled_time <= week_later,
                     CustodyExchangeInstance.status.in_(["scheduled", "pending"])
