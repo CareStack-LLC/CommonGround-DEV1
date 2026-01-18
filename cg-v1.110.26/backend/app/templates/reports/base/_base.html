@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CommonGround Report{% endblock %}</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    {% include 'base/_brand.css' %}
+    {% include 'base/_print.css' %}
+    {% block extra_styles %}{% endblock %}
+  </style>
+</head>
+<body>
+  <!-- Cover Page -->
+  <div class="cover-page">
+    {% block cover %}
+    <div class="cover-header">
+      <div class="logo-area">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="22" fill="#4A6C58"/>
+          <path d="M24 12C17.373 12 12 17.373 12 24C12 30.627 17.373 36 24 36C30.627 36 36 30.627 36 24C36 17.373 30.627 12 24 12ZM24 33C19.029 33 15 28.971 15 24C15 19.029 19.029 15 24 15C28.971 15 33 19.029 33 24C33 28.971 28.971 33 24 33Z" fill="white"/>
+          <circle cx="24" cy="24" r="6" fill="white"/>
+        </svg>
+        <span class="logo-text">CommonGround</span>
+      </div>
+      <div class="report-badge">
+        <span class="badge badge-success">Official Report</span>
+      </div>
+    </div>
+
+    <div class="cover-content">
+      <h1 class="cover-title">{% block report_title %}Parent Report{% endblock %}</h1>
+      <p class="cover-subtitle">{% block report_subtitle %}{% endblock %}</p>
+
+      <div class="cover-meta">
+        <div class="meta-row">
+          <span class="meta-label">Family File:</span>
+          <span class="meta-value">{{ family_file.title }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">File Number:</span>
+          <span class="meta-value font-mono">{{ family_file.family_file_number }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Report Period:</span>
+          <span class="meta-value">{{ report_period.start.strftime('%B %d, %Y') }} - {{ report_period.end.strftime('%B %d, %Y') }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Generated:</span>
+          <span class="meta-value">{{ generated_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <p class="disclaimer">
+        This report is generated from data recorded within the CommonGround co-parenting platform.
+        All information is derived from user entries, system recordings, and verified platform activity.
+        This document may be used for personal reference or as supporting documentation.
+      </p>
+    </div>
+    {% endblock %}
+  </div>
+
+  <style>
+    .cover-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--spacing-2xl);
+      page-break-after: always;
+    }
+
+    .cover-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .logo-text {
+      font-size: 18pt;
+      font-weight: 600;
+      color: var(--cg-sage);
+    }
+
+    .cover-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--spacing-2xl) 0;
+    }
+
+    .cover-title {
+      font-size: 36pt;
+      font-weight: 700;
+      color: var(--cg-sage-dark);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .cover-subtitle {
+      font-size: 14pt;
+      color: var(--cg-text-secondary);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .cover-meta {
+      background: var(--cg-cream);
+      border: 1px solid var(--cg-border);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+    }
+
+    .meta-row {
+      display: flex;
+      padding: var(--spacing-sm) 0;
+      border-bottom: 1px solid var(--cg-border-light);
+    }
+
+    .meta-row:last-child {
+      border-bottom: none;
+    }
+
+    .meta-label {
+      width: 140px;
+      font-weight: 500;
+      color: var(--cg-text-secondary);
+    }
+
+    .meta-value {
+      flex: 1;
+      color: var(--cg-text-primary);
+    }
+
+    .cover-footer {
+      margin-top: auto;
+    }
+
+    .disclaimer {
+      font-size: 9pt;
+      color: var(--cg-text-muted);
+      line-height: 1.6;
+      padding: var(--spacing-md);
+      background: var(--cg-sand);
+      border-radius: var(--radius-md);
+    }
+  </style>
+
+  <!-- Report Content -->
+  <div class="report-content">
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Verification Footer (on last page) -->
+  {% block verification %}
+  <div class="verification-section">
+    <h3>Report Verification</h3>
+    <div class="verification-grid">
+      <div class="verification-item">
+        <span class="verification-label">Report ID</span>
+        <span class="verification-value font-mono">{{ report_id or 'RPT-' ~ generated_at.strftime('%Y%m%d%H%M%S') }}</span>
+      </div>
+      <div class="verification-item">
+        <span class="verification-label">Generated By</span>
+        <span class="verification-value">CommonGround Platform</span>
+      </div>
+      <div class="verification-item">
+        <span class="verification-label">Data Integrity</span>
+        <span class="verification-value"><span class="badge badge-success">Verified</span></span>
+      </div>
+    </div>
+    <p class="verification-note">
+      This report was automatically generated from verified platform data.
+      For questions or to request an official certified copy, contact support@commonground.app
+    </p>
+  </div>
+
+  <style>
+    .verification-section {
+      margin-top: var(--spacing-2xl);
+      padding: var(--spacing-lg);
+      background: var(--cg-sage-subtle);
+      border-radius: var(--radius-lg);
+      page-break-inside: avoid;
+    }
+
+    .verification-section h3 {
+      color: var(--cg-sage-dark);
+      margin-top: 0;
+    }
+
+    .verification-grid {
+      display: flex;
+      gap: var(--spacing-xl);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .verification-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-xs);
+    }
+
+    .verification-label {
+      font-size: 9pt;
+      color: var(--cg-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .verification-value {
+      font-weight: 500;
+    }
+
+    .verification-note {
+      font-size: 9pt;
+      color: var(--cg-text-secondary);
+      margin-bottom: 0;
+    }
+  </style>
+  {% endblock %}
+</body>
+</html>

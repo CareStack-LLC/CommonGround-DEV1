@@ -1,0 +1,271 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Custody Time Report - CommonGround{% endblock %}
+
+{% block report_title %}Custody Time Report{% endblock %}
+{% block report_subtitle %}Parenting Time Analysis and Compliance Summary{% endblock %}
+
+{% block content %}
+<!-- Executive Summary Section -->
+<section class="section">
+  <h2>Executive Summary</h2>
+
+  <div class="grid grid-4">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_days }}</div>
+      <div class="stat-label">Total Days</div>
+      <div class="stat-sublabel">in report period</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value" style="color: var(--cg-sage)">{{ "%.1f"|format(stats.parent_a_percentage) }}%</div>
+      <div class="stat-label">{{ parent_a_name }}</div>
+      <div class="stat-sublabel">{{ stats.parent_a_days }} days</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value slate">{{ "%.1f"|format(stats.parent_b_percentage) }}%</div>
+      <div class="stat-label">{{ parent_b_name }}</div>
+      <div class="stat-sublabel">{{ stats.parent_b_days }} days</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if exchange_stats.completion_rate >= 90 %}text-sage{% elif exchange_stats.completion_rate >= 70 %}amber{% else %}text-error{% endif %}">
+        {{ "%.0f"|format(exchange_stats.completion_rate) }}%
+      </div>
+      <div class="stat-label">Exchange Rate</div>
+      <div class="stat-sublabel">{{ exchange_stats.completed }}/{{ exchange_stats.total }} completed</div>
+    </div>
+  </div>
+</section>
+
+<!-- Parenting Time Split Section -->
+<section class="section">
+  <h2>Parenting Time Distribution</h2>
+
+  <div class="card keep-together">
+    <div class="grid grid-2">
+      <div class="chart-container" style="flex-direction: column;">
+        {{ split_donut_chart | safe }}
+        <div class="chart-legend" style="margin-top: 1rem;">
+          <div class="legend-item">
+            <span class="legend-dot sage"></span>
+            <span>{{ parent_a_name }}: {{ "%.1f"|format(stats.parent_a_percentage) }}% ({{ stats.parent_a_days }} days)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot slate"></span>
+            <span>{{ parent_b_name }}: {{ "%.1f"|format(stats.parent_b_percentage) }}% ({{ stats.parent_b_days }} days)</span>
+          </div>
+          {% if stats.unknown_days > 0 %}
+          <div class="legend-item">
+            <span class="legend-dot" style="background: var(--cg-border)"></span>
+            <span>Unrecorded: {{ stats.unknown_days }} days</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div>
+        <h3 class="mt-0">Time Split Summary</h3>
+        <p>
+          During the {{ stats.total_days }}-day report period,
+          <strong style="color: var(--cg-sage)">{{ parent_a_name }}</strong> had custody for
+          <strong>{{ stats.parent_a_days }} days ({{ "%.1f"|format(stats.parent_a_percentage) }}%)</strong>,
+          while <strong style="color: var(--cg-slate)">{{ parent_b_name }}</strong> had custody for
+          <strong>{{ stats.parent_b_days }} days ({{ "%.1f"|format(stats.parent_b_percentage) }}%)</strong>.
+        </p>
+
+        {% if comparison %}
+        <div class="note {% if comparison.variance|abs > 10 %}warning{% endif %}">
+          <strong>Compared to Agreement:</strong><br>
+          {% if comparison.variance > 0 %}
+          {{ parent_a_name }} had {{ "%.1f"|format(comparison.variance|abs) }}% more time than the agreed schedule.
+          {% elif comparison.variance < 0 %}
+          {{ parent_a_name }} had {{ "%.1f"|format(comparison.variance|abs) }}% less time than the agreed schedule.
+          {% else %}
+          The actual custody time matched the agreed schedule.
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if comparison %}
+<!-- Actual vs Agreed Section -->
+<section class="section">
+  <h2>Actual vs. Agreed Parenting Time</h2>
+
+  <div class="card keep-together">
+    <div class="grid grid-2">
+      <div>
+        <h4 class="mb-sm">{{ parent_a_name }}</h4>
+        {{ comparison_chart_a | safe }}
+      </div>
+      <div>
+        <h4 class="mb-sm">{{ parent_b_name }}</h4>
+        {{ comparison_chart_b | safe }}
+      </div>
+    </div>
+
+    <table style="margin-top: var(--spacing-lg);">
+      <thead>
+        <tr>
+          <th>Parent</th>
+          <th>Agreed</th>
+          <th>Actual</th>
+          <th>Variance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color: var(--cg-sage)">{{ parent_a_name }}</strong></td>
+          <td>{{ "%.1f"|format(comparison.agreed_a) }}%</td>
+          <td>{{ "%.1f"|format(stats.parent_a_percentage) }}%</td>
+          <td>
+            {% set var_a = stats.parent_a_percentage - comparison.agreed_a %}
+            <span class="badge {% if var_a|abs <= 5 %}badge-success{% elif var_a|abs <= 10 %}badge-warning{% else %}badge-error{% endif %}">
+              {% if var_a > 0 %}+{% endif %}{{ "%.1f"|format(var_a) }}%
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td><strong style="color: var(--cg-slate)">{{ parent_b_name }}</strong></td>
+          <td>{{ "%.1f"|format(comparison.agreed_b) }}%</td>
+          <td>{{ "%.1f"|format(stats.parent_b_percentage) }}%</td>
+          <td>
+            {% set var_b = stats.parent_b_percentage - comparison.agreed_b %}
+            <span class="badge {% if var_b|abs <= 5 %}badge-success{% elif var_b|abs <= 10 %}badge-warning{% else %}badge-error{% endif %}">
+              {% if var_b > 0 %}+{% endif %}{{ "%.1f"|format(var_b) }}%
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<!-- Exchange Compliance Section -->
+<section class="section">
+  <h2>Custody Exchange Compliance</h2>
+
+  <div class="grid grid-3">
+    <div class="stat-card">
+      <div class="stat-value">{{ exchange_stats.total }}</div>
+      <div class="stat-label">Scheduled</div>
+      <div class="stat-sublabel">total exchanges</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value text-sage">{{ exchange_stats.completed }}</div>
+      <div class="stat-label">Completed</div>
+      <div class="stat-sublabel">successful handoffs</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if exchange_stats.missed > 0 %}text-error{% else %}text-sage{% endif %}">
+        {{ exchange_stats.missed }}
+      </div>
+      <div class="stat-label">Missed</div>
+      <div class="stat-sublabel">no-shows</div>
+    </div>
+  </div>
+
+  {% if exchanges %}
+  <div class="card" style="margin-top: var(--spacing-lg);">
+    <div class="card-header">Exchange History</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Check-ins</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exchange in exchanges[:20] %}
+        <tr>
+          <td>{{ exchange.scheduled_date.strftime('%b %d, %Y') }}</td>
+          <td>{{ exchange.scheduled_time.strftime('%I:%M %p') if exchange.scheduled_time else 'N/A' }}</td>
+          <td>{{ exchange.exchange_type|title }}</td>
+          <td>
+            <span class="badge {% if exchange.status == 'completed' %}badge-success{% elif exchange.status == 'missed' %}badge-error{% else %}badge-info{% endif %}">
+              {{ exchange.status|title }}
+            </span>
+          </td>
+          <td>
+            {% if exchange.from_parent_checked_in and exchange.to_parent_checked_in %}
+              <span class="text-sage">Both parents</span>
+            {% elif exchange.from_parent_checked_in %}
+              <span>Drop-off parent only</span>
+            {% elif exchange.to_parent_checked_in %}
+              <span>Pick-up parent only</span>
+            {% else %}
+              <span class="text-muted">None</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if exchanges|length > 20 %}
+    <p class="text-muted text-center" style="margin-top: var(--spacing-md);">
+      Showing 20 of {{ exchanges|length }} exchanges. Full history available in platform.
+    </p>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+
+<!-- Children Section -->
+{% if children %}
+<section class="section">
+  <h2>Children Included</h2>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Days with {{ parent_a_name }}</th>
+          <th>Days with {{ parent_b_name }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for child in children %}
+        <tr>
+          <td><strong>{{ child.first_name }} {{ child.last_name }}</strong></td>
+          <td>{{ child.age }} years</td>
+          <td>
+            <div class="progress-bar" style="width: 100px; display: inline-block; margin-right: 8px; vertical-align: middle;">
+              <div class="progress-fill" style="width: {{ child.parent_a_percentage }}%;"></div>
+            </div>
+            {{ child.parent_a_days }}
+          </td>
+          <td>
+            <div class="progress-bar" style="width: 100px; display: inline-block; margin-right: 8px; vertical-align: middle;">
+              <div class="progress-fill slate" style="width: {{ child.parent_b_percentage }}%;"></div>
+            </div>
+            {{ child.parent_b_days }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<!-- Data Sources Note -->
+<div class="note info" style="margin-top: var(--spacing-2xl);">
+  <strong>How This Data Was Collected</strong><br>
+  Custody time is determined from: exchange check-ins (highest confidence),
+  completed custody exchanges, the agreed parenting schedule, and manual "With Me" confirmations.
+  Days without any recorded data are marked as unrecorded.
+</div>
+{% endblock %}

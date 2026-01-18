@@ -42,26 +42,30 @@ import {
  */
 
 // Self-service report types
+// reportType maps to the new parent-reports API endpoint
 const selfServiceReports = [
+  {
+    id: 'custody_time_report',
+    title: 'Custody Time Report',
+    description: 'Beautiful branded report with parenting time split, exchange compliance, and custody statistics.',
+    icon: Clock,
+    reportType: 'custody_time', // New branded report
+    sections: ['parenting_time', 'compliance_summary'],
+  },
   {
     id: 'communication_summary',
     title: 'Communication Summary',
     description: 'Export of all messages exchanged, including ARIA intervention suggestions and response times.',
     icon: MessageSquare,
+    reportType: 'communication', // Coming soon
     sections: ['communication_compliance', 'intervention_log'],
-  },
-  {
-    id: 'custody_time_report',
-    title: 'Custody Time Report',
-    description: 'Detailed breakdown of parenting time, exchange compliance, and custody statistics.',
-    icon: Clock,
-    sections: ['parenting_time', 'compliance_summary'],
   },
   {
     id: 'expense_summary',
     title: 'Expense Summary',
     description: 'Complete record of shared expenses, payment history, and financial compliance.',
     icon: DollarSign,
+    reportType: 'expense', // Coming soon
     sections: ['financial_compliance'],
   },
   {
@@ -69,6 +73,7 @@ const selfServiceReports = [
     title: 'Schedule & Events History',
     description: 'Calendar events, custody exchanges, and schedule modifications.',
     icon: Calendar,
+    reportType: 'schedule', // Coming soon
     sections: ['parenting_time', 'agreement_overview'],
   },
 ];
@@ -175,7 +180,7 @@ export default function ReportsSettingsPage() {
   }, []);
 
   // Generate self-service report
-  const handleGenerateReport = async (reportId: string, sections: string[]) => {
+  const handleGenerateReport = async (reportId: string, reportType: string) => {
     if (!selectedFamilyFile) {
       setError('Please select a family file first.');
       return;
@@ -185,49 +190,45 @@ export default function ReportsSettingsPage() {
     setError(null);
 
     try {
-      // Create export with selected sections
+      // Calculate date range (last 30 days)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const dateStart = thirtyDaysAgo.toISOString().split('T')[0];
+      const dateEnd = new Date().toISOString().split('T')[0];
 
-      const exportData = await exportsAPI.create({
-        case_id: selectedFamilyFile,
-        package_type: 'court',
-        date_start: thirtyDaysAgo.toISOString().split('T')[0],
-        date_end: new Date().toISOString().split('T')[0],
-        sections: sections,
-        redaction_level: 'standard',
-      });
-
-      // Poll for completion
-      let attempts = 0;
-      const maxAttempts = 30;
-      while (attempts < maxAttempts) {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        const status = await exportsAPI.get(exportData.id);
-        if (status.status === 'completed') {
-          // Download the PDF
-          const blob = await exportsAPI.download(exportData.id);
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `CommonGround-${reportId}-${new Date().toISOString().split('T')[0]}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-
-          setShowSuccess(reportId);
-          setTimeout(() => setShowSuccess(null), 5000);
-          break;
-        } else if (status.status === 'failed') {
-          throw new Error('Report generation failed');
+      // Use new parent-reports API for branded reports
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(
+        `${apiBase}/api/v1/parent-reports/generate/${reportType}?family_file_id=${selectedFamilyFile}&date_start=${dateStart}&date_end=${dateEnd}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
         }
-        attempts++;
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 501) {
+          throw new Error('This report type is coming soon!');
+        }
+        throw new Error(errorData.detail || 'Failed to generate report');
       }
 
-      if (attempts >= maxAttempts) {
-        throw new Error('Report generation timed out');
-      }
+      // Download the PDF directly
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `CommonGround-${reportId}-${dateEnd}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      setShowSuccess(reportId);
+      setTimeout(() => setShowSuccess(null), 5000);
     } catch (err: any) {
       console.error('Failed to generate report:', err);
       setError(err.message || 'Failed to generate report. Please try again.');
@@ -403,7 +404,7 @@ export default function ReportsSettingsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleGenerateReport(report.id, report.sections)}
+                    onClick={() => handleGenerateReport(report.id, report.reportType)}
                     disabled={isGenerating || !selectedFamilyFile}
                     className="w-full"
                   >

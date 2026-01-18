@@ -124,6 +124,7 @@ async def clear_all_data(session: AsyncSession):
         "time_blocks",
         "my_time_collections",
         "exchange_check_ins",
+        "custody_day_records",
         "custody_exchange_instances",
         "custody_exchanges",
         "schedule_events",
@@ -481,6 +482,124 @@ async def create_miller_family(session: AsyncSession, thomas: User, grace: User)
     return family_file
 
 
+async def create_custody_data(
+    session: AsyncSession,
+    family_file: FamilyFile,
+    parent_a: User,
+    parent_b: User,
+    children: list
+):
+    """
+    Create custody exchanges, instances, and day records for testing reports.
+
+    Creates 30 days of custody data with realistic patterns.
+    """
+    from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
+    from app.models.custody_day_record import CustodyDayRecord, DeterminationMethod
+
+    print(f"\n📊 Creating custody data for {family_file.title}...")
+
+    # Get children for this family file
+    result = await session.execute(
+        select(Child).where(Child.family_file_id == family_file.id)
+    )
+    children = result.scalars().all()
+
+    if not children:
+        print("   ⚠️ No children found, skipping custody data")
+        return
+
+    # Create a weekly custody exchange schedule
+    exchange_id = str(uuid.uuid4())
+    exchange = CustodyExchange(
+        id=exchange_id,
+        family_file_id=family_file.id,
+        from_parent_id=str(parent_a.id),
+        to_parent_id=str(parent_b.id),
+        child_ids=[str(c.id) for c in children],
+        exchange_type="in_person",
+        recurrence_rule="weekly",
+        location_name="Sunshine Elementary School",
+        location_address="123 School Lane, Los Angeles, CA 90210",
+        location_lat=34.0522,
+        location_lng=-118.2437,
+        scheduled_day_of_week=4,  # Friday
+        scheduled_time="18:00",
+        status="active",
+    )
+    session.add(exchange)
+    print(f"   ✓ Created weekly custody exchange schedule")
+
+    # Create exchange instances and custody day records for the past 30 days
+    today = date.today()
+    instances_created = 0
+    records_created = 0
+
+    # Alternating custody pattern: Parent A gets Mon-Thu, Parent B gets Fri-Sun
+    for days_ago in range(30, 0, -1):
+        record_date = today - timedelta(days=days_ago)
+        day_of_week = record_date.weekday()  # 0=Monday, 4=Friday, 6=Sunday
+
+        # Determine custodial parent based on day of week
+        # Parent A: Monday-Thursday (0-3)
+        # Parent B: Friday-Sunday (4-6)
+        if day_of_week < 4:
+            custodial_parent_id = str(parent_a.id)
+        else:
+            custodial_parent_id = str(parent_b.id)
+
+        # Create custody day records for each child
+        for child in children:
+            record = CustodyDayRecord(
+                id=str(uuid.uuid4()),
+                family_file_id=family_file.id,
+                child_id=str(child.id),
+                record_date=record_date,
+                custodial_parent_id=custodial_parent_id,
+                determination_method=DeterminationMethod.SCHEDULED.value,
+                confidence_score=80,
+            )
+            session.add(record)
+            records_created += 1
+
+        # Create exchange instances on Fridays (custody transfer day)
+        if day_of_week == 4:  # Friday
+            instance_id = str(uuid.uuid4())
+
+            # Alternate between different statuses for realism
+            week_number = days_ago // 7
+            if week_number % 5 == 0:
+                instance_status = "missed"
+                from_checked = False
+                to_checked = False
+            elif week_number % 4 == 0:
+                instance_status = "cancelled"
+                from_checked = False
+                to_checked = False
+            else:
+                instance_status = "completed"
+                from_checked = True
+                to_checked = True
+
+            instance = CustodyExchangeInstance(
+                id=instance_id,
+                exchange_id=exchange_id,
+                scheduled_date=record_date,
+                scheduled_time=datetime.combine(record_date, datetime.strptime("18:00", "%H:%M").time()),
+                status=instance_status,
+                from_parent_checked_in=from_checked,
+                to_parent_checked_in=to_checked,
+                from_parent_check_in_time=datetime.combine(record_date, datetime.strptime("17:55", "%H:%M").time()) if from_checked else None,
+                to_parent_check_in_time=datetime.combine(record_date, datetime.strptime("18:02", "%H:%M").time()) if to_checked else None,
+            )
+            session.add(instance)
+            instances_created += 1
+
+    await session.flush()
+    print(f"   ✓ Created {instances_created} exchange instances (4 weeks)")
+    print(f"   ✓ Created {records_created} custody day records (30 days × {len(children)} children)")
+
+
 async def create_my_time_collections(session: AsyncSession, family_files: list[tuple[FamilyFile, User, User]]):
     """
     Skip My Time collections for now - they depend on Cases.
@@ -527,7 +646,11 @@ async def seed_test_data():
             # Step 4: Create Miller Family
             miller_family = await create_miller_family(session, thomas, grace)
 
-            # Step 5: Create My Time Collections
+            # Step 5: Create custody data for reports
+            await create_custody_data(session, johnson_family, mike, tasha, [])
+            await create_custody_data(session, miller_family, thomas, grace, [])
+
+            # Step 6: Create My Time Collections
             await create_my_time_collections(session, [
                 (johnson_family, mike, tasha),
                 (miller_family, thomas, grace),
@@ -544,6 +667,9 @@ async def seed_test_data():
             print("   • 4 Children created (Emma, Liam, Sophie, Oliver)")
             print("   • 3 SharedCare Agreements created")
             print("   • 54 Agreement Sections created")
+            print("   • 2 Custody Exchange schedules created")
+            print("   • ~8 Exchange Instances created (4 weeks × 2 families)")
+            print("   • ~120 Custody Day Records created (30 days × 4 children)")
             print("\n🔑 Test Accounts:")
             print(f"   • Mike Johnson ({mike.email}) - Parent A in Johnson Family")
             print(f"   • Tasha Johnson ({tasha.email}) - Parent B in Johnson Family")
