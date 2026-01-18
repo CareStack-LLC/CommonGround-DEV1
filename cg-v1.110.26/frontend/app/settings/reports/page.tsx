@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { familyFilesAPI, exportsAPI } from '@/lib/api';
+import { familyFilesAPI, exportsAPI, FamilyFile } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,11 +40,6 @@ import {
  * Design: Two sections - Self-service reports and Professional investigation reports
  * Philosophy: "Give parents the documentation they need for their family's journey."
  */
-
-interface FamilyFile {
-  id: string;
-  case_name: string;
-}
 
 // Self-service report types
 const selfServiceReports = [
@@ -197,9 +192,9 @@ export default function ReportsSettingsPage() {
       const exportData = await exportsAPI.create({
         case_id: selectedFamilyFile,
         package_type: 'court',
-        date_range_start: thirtyDaysAgo.toISOString().split('T')[0],
-        date_range_end: new Date().toISOString().split('T')[0],
-        sections_included: sections,
+        date_start: thirtyDaysAgo.toISOString().split('T')[0],
+        date_end: new Date().toISOString().split('T')[0],
+        sections: sections,
         redaction_level: 'standard',
       });
 
@@ -347,7 +342,7 @@ export default function ReportsSettingsPage() {
             >
               {familyFiles.map((ff) => (
                 <option key={ff.id} value={ff.id}>
-                  {ff.case_name}
+                  {ff.title}
                 </option>
               ))}
             </select>
