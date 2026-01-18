@@ -5,7 +5,7 @@ import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
 import { cn } from '@/lib/utils';
-import { User, Bell, Shield, CreditCard, ChevronLeft } from 'lucide-react';
+import { User, Bell, Shield, CreditCard, ChevronLeft, FileText } from 'lucide-react';
 
 /**
  * CommonGround Settings Layout
@@ -45,6 +45,12 @@ const settingsNavItems: SettingsNavItem[] = [
     path: '/settings/security',
     icon: Shield,
     description: 'Password and login',
+  },
+  {
+    name: 'Reports',
+    path: '/settings/reports',
+    icon: FileText,
+    description: 'Documentation and court reports',
   },
 ];
 

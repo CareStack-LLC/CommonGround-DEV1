@@ -37,6 +37,7 @@ from app.api.v1.endpoints import (
     grants,
     push,
     custody_time,
+    reports,
 )
 
 api_router = APIRouter()
@@ -110,3 +111,6 @@ api_router.include_router(push.router, prefix="/push", tags=["Push Notifications
 
 # Custody Time - Parenting time tracking and reports
 api_router.include_router(custody_time.router, prefix="/custody-time", tags=["Custody Time"])
+
+# Reports - Professional investigation report requests
+api_router.include_router(reports.router, prefix="/reports", tags=["Professional Reports"])
