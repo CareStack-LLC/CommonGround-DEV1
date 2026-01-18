@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Literal, Optional
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func, cast, Date
 from sqlalchemy.ext.asyncio import AsyncSession
 from weasyprint import HTML, CSS
 
@@ -307,13 +307,13 @@ class ParentReportService:
 
         exchange_ids = [str(e.id) for e in exchanges]
 
-        # Get instances in date range
+        # Get instances in date range (scheduled_time is datetime, cast to date for comparison)
         result = await self.db.execute(
             select(CustodyExchangeInstance).where(
                 CustodyExchangeInstance.exchange_id.in_(exchange_ids),
-                CustodyExchangeInstance.scheduled_date >= date_start,
-                CustodyExchangeInstance.scheduled_date <= date_end,
-            ).order_by(CustodyExchangeInstance.scheduled_date.desc())
+                cast(CustodyExchangeInstance.scheduled_time, Date) >= date_start,
+                cast(CustodyExchangeInstance.scheduled_time, Date) <= date_end,
+            ).order_by(CustodyExchangeInstance.scheduled_time.desc())
         )
         return list(result.scalars().all())
 
