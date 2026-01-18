@@ -1133,12 +1133,12 @@ class CustodyExchangeService:
             if coparent:
                 coparent_name = f"{coparent.first_name} {coparent.last_name or ''}".strip()
 
-        # Get children
+        # Get children (include pending_approval, exclude only archived)
         children_result = await db.execute(
             select(Child).where(
                 and_(
                     Child.family_file_id == family_file_id,
-                    Child.status == "active"
+                    Child.status != "archived"
                 )
             )
         )
