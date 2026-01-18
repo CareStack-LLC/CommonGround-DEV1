@@ -17,6 +17,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
 from app.models.case import CaseParticipant
+from app.models.family_file import FamilyFile
 from app.models.export import CaseExport, ExportSection
 from app.schemas.export import (
     ExportRequest,
@@ -72,8 +73,14 @@ async def verify_case_participant(
     db: AsyncSession,
     user_id: str,
     case_id: str
-) -> CaseParticipant:
-    """Verify user is an active participant in the case."""
+) -> bool:
+    """Verify user has access to the case/family file.
+
+    Checks both:
+    1. CaseParticipant (legacy Case model)
+    2. FamilyFile (new model where user is parent_a or parent_b)
+    """
+    # Check CaseParticipant (legacy)
     result = await db.execute(
         select(CaseParticipant).where(
             and_(
@@ -85,13 +92,29 @@ async def verify_case_participant(
     )
     participant = result.scalar_one_or_none()
 
-    if not participant:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You don't have access to this case"
-        )
+    if participant:
+        return True
 
-    return participant
+    # Check FamilyFile (new model)
+    result = await db.execute(
+        select(FamilyFile).where(
+            and_(
+                FamilyFile.id == case_id,
+                FamilyFile.is_active == True,
+                (FamilyFile.parent_a_id == str(user_id)) |
+                (FamilyFile.parent_b_id == str(user_id))
+            )
+        )
+    )
+    family_file = result.scalar_one_or_none()
+
+    if family_file:
+        return True
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="You don't have access to this case"
+    )
 
 
 @router.post(

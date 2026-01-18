@@ -248,8 +248,9 @@ export default function ReportsSettingsPage() {
 
     try {
       // Send request to backend (will email CommonGround and create Stripe checkout)
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/reports/request-professional`,
+        `${apiBase}/api/v1/reports/request-professional`,
         {
           method: 'POST',
           headers: {
