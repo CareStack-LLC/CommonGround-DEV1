@@ -1012,28 +1012,6 @@ function DashboardContent() {
               </div>
             )}
 
-            {/* Parenting Time Stats Widget */}
-            {allChildren.length > 0 && activeFileIdsRef.current.length > 0 && (
-              <CustodyDashboardWidget
-                familyFileId={familyCustodyStats?.family_file_id || activeFileIdsRef.current[0]}
-                familyStats={familyCustodyStats}
-                childrenData={allChildren}
-                isLoading={custodyStatsLoading}
-                parentAName={
-                  custodyStatsFile?.parent_a_info?.first_name ||
-                  custodyStatsFile?.parent_a_info?.email?.split('@')[0] ||
-                  'Parent A'
-                }
-                parentBName={
-                  custodyStatsFile?.parent_b_info?.first_name ||
-                  custodyStatsFile?.parent_b_info?.email?.split('@')[0] ||
-                  'Parent B'
-                }
-                currentUserId={user?.id}
-                onViewReport={() => router.push(`/family-files/${familyCustodyStats?.family_file_id || activeFileIdsRef.current[0]}/parenting-report`)}
-              />
-            )}
-
             {/* Action Stream */}
             <section>
               <h3 className="text-sm font-medium text-cg-sage uppercase tracking-wide mb-3">
@@ -1264,6 +1242,28 @@ function DashboardContent() {
                   ))}
                 </div>
               </section>
+            )}
+
+            {/* Parenting Time Stats Widget - After Family Files */}
+            {allChildren.length > 0 && activeFileIdsRef.current.length > 0 && (
+              <CustodyDashboardWidget
+                familyFileId={familyCustodyStats?.family_file_id || activeFileIdsRef.current[0]}
+                familyStats={familyCustodyStats}
+                childrenData={allChildren}
+                isLoading={custodyStatsLoading}
+                parentAName={
+                  custodyStatsFile?.parent_a_info?.first_name ||
+                  custodyStatsFile?.parent_a_info?.email?.split('@')[0] ||
+                  'Parent A'
+                }
+                parentBName={
+                  custodyStatsFile?.parent_b_info?.first_name ||
+                  custodyStatsFile?.parent_b_info?.email?.split('@')[0] ||
+                  'Parent B'
+                }
+                currentUserId={user?.id}
+                onViewReport={() => router.push(`/family-files/${familyCustodyStats?.family_file_id || activeFileIdsRef.current[0]}/parenting-report`)}
+              />
             )}
 
             {/* Recent Activity */}
