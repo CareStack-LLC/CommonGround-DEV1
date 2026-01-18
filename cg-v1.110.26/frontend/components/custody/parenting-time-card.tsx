@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import { Clock, Calendar, Users, TrendingUp, TrendingDown, CheckCircle } from 'lucide-react';
+import { Clock, Users } from 'lucide-react';
 
 interface ParentStats {
   user_id: string;
@@ -59,44 +59,6 @@ const PERIOD_OPTIONS = [
   { value: 'all_time', label: 'All Time' },
 ];
 
-const PATTERN_LABELS: Record<string, string> = {
-  'week_on_week_off': 'Week On/Week Off',
-  'alternating_weeks': 'Alternating Weeks',
-  '2-2-3': '2-2-3 Rotation',
-  '5-2-2-5': '5-2-2-5 Pattern',
-  'every_other_weekend': 'Every Other Weekend',
-  'every_weekend': 'Every Weekend',
-  'primary_custody': 'Primary Custody',
-  'custom': 'Custom Schedule',
-};
-
-function VarianceIndicator({ variance }: { variance: number }) {
-  if (Math.abs(variance) <= 5) {
-    return (
-      <span className="text-xs text-cg-sage flex items-center gap-1">
-        <CheckCircle className="h-3 w-3" />
-        On track
-      </span>
-    );
-  }
-
-  if (variance > 0) {
-    return (
-      <span className="text-xs text-cg-slate flex items-center gap-1">
-        <TrendingUp className="h-3 w-3" />
-        +{variance.toFixed(1)}%
-      </span>
-    );
-  }
-
-  return (
-    <span className="text-xs text-cg-amber flex items-center gap-1">
-      <TrendingDown className="h-3 w-3" />
-      {variance.toFixed(1)}%
-    </span>
-  );
-}
-
 export default function ParentingTimeCard({
   stats,
   parentAName = 'Parent A',
@@ -130,14 +92,10 @@ export default function ParentingTimeCard({
     name,
     days,
     color,
-    variance,
-    agreedPercentage,
   }: {
     name: string;
     days: number;
     color: 'sage' | 'slate';
-    variance: number;
-    agreedPercentage: number;
   }) => {
     // Bar width = days / period total (e.g., 1 day out of 30 = 3.3%)
     // Minimum width of 1% so it's visible even with 0 days
@@ -152,7 +110,7 @@ export default function ParentingTimeCard({
           <span className="text-sm font-medium text-foreground truncate">{name}</span>
           <div className="flex items-baseline gap-1.5">
             <span className="text-2xl font-bold text-foreground">{days}</span>
-            <span className="text-xs text-muted-foreground">days</span>
+            <span className="text-xs text-muted-foreground">{days === 1 ? 'day' : 'days'}</span>
           </div>
         </div>
 
@@ -162,14 +120,6 @@ export default function ParentingTimeCard({
             className={`h-full ${colorClasses} rounded-lg transition-all duration-700 ease-out`}
             style={{ width: `${barWidth}%` }}
           />
-        </div>
-
-        {/* Variance indicator */}
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">
-            Agreed: {agreedPercentage}%
-          </span>
-          <VarianceIndicator variance={variance} />
         </div>
       </div>
     );
@@ -209,8 +159,6 @@ export default function ParentingTimeCard({
           name={parentAName}
           days={stats.parent_a.days}
           color="sage"
-          variance={stats.variance.parent_a}
-          agreedPercentage={stats.agreed_schedule.parent_a_percentage}
         />
 
         {/* Parent B */}
@@ -218,34 +166,16 @@ export default function ParentingTimeCard({
           name={parentBName}
           days={stats.parent_b.days}
           color="slate"
-          variance={stats.variance.parent_b}
-          agreedPercentage={stats.agreed_schedule.parent_b_percentage}
         />
       </div>
 
-      {/* Footer - Agreement & Tracking Info */}
-      <div className="mt-5 pt-4 border-t border-border space-y-2">
-        {/* Schedule Pattern */}
-        <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">
-              {stats.agreed_schedule.pattern
-                ? PATTERN_LABELS[stats.agreed_schedule.pattern] || stats.agreed_schedule.pattern
-                : 'Custom schedule'}
-            </span>
-          </div>
-          <span className="text-muted-foreground font-medium">
-            {stats.agreed_schedule.parent_a_percentage}/{stats.agreed_schedule.parent_b_percentage}
-          </span>
-        </div>
-
-        {/* Tracking Period */}
+      {/* Footer - Tracking Info */}
+      <div className="mt-5 pt-4 border-t border-border">
         <div className="flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
             <Users className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-muted-foreground">
-              {totalTrackedDays} days tracked
+              {totalTrackedDays} {totalTrackedDays === 1 ? 'day' : 'days'} tracked
               {stats.unknown_days > 0 && (
                 <span className="text-cg-amber ml-1">
                   ({stats.unknown_days} untracked)
@@ -259,13 +189,6 @@ export default function ParentingTimeCard({
             </span>
           )}
         </div>
-
-        {/* Summary */}
-        {stats.comparison_summary && (
-          <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-            {stats.comparison_summary}
-          </p>
-        )}
       </div>
     </Card>
   );
