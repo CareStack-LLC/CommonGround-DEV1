@@ -100,7 +100,7 @@ async def verify_case_participant(
         select(FamilyFile).where(
             and_(
                 FamilyFile.id == case_id,
-                FamilyFile.is_active == True,
+                FamilyFile.status == "active",
                 (FamilyFile.parent_a_id == str(user_id)) |
                 (FamilyFile.parent_b_id == str(user_id))
             )

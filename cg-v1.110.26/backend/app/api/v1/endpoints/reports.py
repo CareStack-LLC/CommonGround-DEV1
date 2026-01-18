@@ -111,7 +111,7 @@ async def request_professional_report(
     result = await db.execute(
         select(FamilyFile).where(
             FamilyFile.id == request.family_file_id,
-            FamilyFile.is_active == True,
+            FamilyFile.status == "active",
             (FamilyFile.parent_a_id == str(current_user.id)) |
             (FamilyFile.parent_b_id == str(current_user.id))
         )
