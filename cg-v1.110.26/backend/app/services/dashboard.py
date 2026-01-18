@@ -2,8 +2,11 @@
 Dashboard service - aggregates activity data for dashboard display.
 """
 
+import logging
 from datetime import datetime, timedelta
 from typing import Optional, List, Tuple
+
+logger = logging.getLogger(__name__)
 from sqlalchemy import select, and_, or_, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -467,6 +470,7 @@ class DashboardService:
             ).order_by(ScheduleEvent.start_time).limit(10)
         )
         events = events_result.scalars().all()
+        logger.info(f"Found {len(events)} schedule events")
 
         for ev in events:
             child_ids = ev.child_ids or []
@@ -486,6 +490,9 @@ class DashboardService:
 
         # Get upcoming custody exchanges
         # Check both family_file_id and legacy_case_id for backwards compatibility
+        logger.info(f"Dashboard upcoming events: family_file_id={family_file_id}, legacy_case_id={family_file.legacy_case_id}")
+        logger.info(f"Date range: {now} to {week_later}")
+
         if family_file.legacy_case_id:
             exchange_filter = or_(
                 CustodyExchange.family_file_id == family_file_id,
@@ -510,6 +517,7 @@ class DashboardService:
             .limit(10)
         )
         exchange_instances = exchanges_result.scalars().all()
+        logger.info(f"Found {len(exchange_instances)} custody exchange instances")
 
         for inst in exchange_instances:
             exchange = inst.exchange
@@ -581,6 +589,7 @@ class DashboardService:
         # Sort all items by start_time and take the first 10
         items.sort(key=lambda x: x.start_time)
         items = items[:10]
+        logger.info(f"Total upcoming events: {len(items)}")
 
         next_event = items[0] if items else None
 

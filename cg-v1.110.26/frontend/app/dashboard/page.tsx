@@ -590,6 +590,8 @@ function UpcomingEventItem({ event }: { event: UpcomingEvent }) {
 function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
   const router = useRouter();
 
+  console.log('UpcomingEventsList received events:', events);
+
   if (!events || events.length === 0) {
     return (
       <div className="cg-card p-4">
@@ -743,7 +745,11 @@ function DashboardContent() {
         setAllCustodyStatuses(successfulStatuses);
 
         if (summaryResult) {
+          console.log('Dashboard summary loaded:', summaryResult);
+          console.log('Upcoming events:', summaryResult.upcoming_events);
           setDashboardSummary(summaryResult);
+        } else {
+          console.log('No dashboard summary returned');
         }
 
         // Fetch parenting time stats for a family file that has children
