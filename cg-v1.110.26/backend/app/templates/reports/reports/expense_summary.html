@@ -1,0 +1,252 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Expense Summary - CommonGround{% endblock %}
+
+{% block report_title %}Expense Summary{% endblock %}
+{% block report_subtitle %}ClearFund Financial Obligations and Compliance Report{% endblock %}
+
+{% block content %}
+<!-- Executive Summary Section -->
+<section class="section">
+  <h2>Executive Summary</h2>
+
+  <div class="grid grid-4">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_obligations }}</div>
+      <div class="stat-label">Obligations</div>
+      <div class="stat-sublabel">in report period</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value">${{ "%.2f"|format(stats.total_amount) }}</div>
+      <div class="stat-label">Total Amount</div>
+      <div class="stat-sublabel">all expenses</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value text-sage">${{ "%.2f"|format(stats.funded_amount) }}</div>
+      <div class="stat-label">Funded</div>
+      <div class="stat-sublabel">{{ "%.0f"|format(stats.funding_rate) }}% of total</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if stats.compliance_rate >= 90 %}text-sage{% elif stats.compliance_rate >= 70 %}amber{% else %}text-error{% endif %}">
+        {{ "%.0f"|format(stats.compliance_rate) }}%
+      </div>
+      <div class="stat-label">Compliance</div>
+      <div class="stat-sublabel">obligations met</div>
+    </div>
+  </div>
+</section>
+
+<!-- Category Breakdown Section -->
+{% if categories %}
+<section class="section">
+  <h2>Spending by Category</h2>
+
+  <div class="card keep-together">
+    <div class="grid grid-2">
+      <div class="chart-container" style="flex-direction: column;">
+        {{ category_chart | safe }}
+      </div>
+
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>% of Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+            <tr>
+              <td><strong>{{ cat.name|replace('_', ' ')|title }}</strong></td>
+              <td>${{ "%.2f"|format(cat.amount) }}</td>
+              <td>{{ "%.1f"|format(cat.percentage) }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Parent Contributions Section -->
+<section class="section">
+  <h2>Parent Contributions</h2>
+
+  <div class="card keep-together">
+    {{ parent_chart | safe }}
+
+    <table style="margin-top: var(--spacing-lg);">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th style="color: var(--cg-sage)">{{ parent_a_name }}</th>
+          <th style="color: var(--cg-slate)">{{ parent_b_name }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Share Required</td>
+          <td>${{ "%.2f"|format(parent_a_stats.share_required) }}</td>
+          <td>${{ "%.2f"|format(parent_b_stats.share_required) }}</td>
+        </tr>
+        <tr>
+          <td>Amount Funded</td>
+          <td>${{ "%.2f"|format(parent_a_stats.amount_funded) }}</td>
+          <td>${{ "%.2f"|format(parent_b_stats.amount_funded) }}</td>
+        </tr>
+        <tr>
+          <td>Funding Rate</td>
+          <td>
+            <span class="badge {% if parent_a_stats.funding_rate >= 90 %}badge-success{% elif parent_a_stats.funding_rate >= 70 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(parent_a_stats.funding_rate) }}%
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if parent_b_stats.funding_rate >= 90 %}badge-success{% elif parent_b_stats.funding_rate >= 70 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(parent_b_stats.funding_rate) }}%
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td>Outstanding</td>
+          <td class="{% if parent_a_stats.outstanding > 0 %}text-error{% endif %}">
+            ${{ "%.2f"|format(parent_a_stats.outstanding) }}
+          </td>
+          <td class="{% if parent_b_stats.outstanding > 0 %}text-error{% endif %}">
+            ${{ "%.2f"|format(parent_b_stats.outstanding) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Obligation Status Section -->
+<section class="section">
+  <h2>Obligation Status</h2>
+
+  <div class="grid grid-5">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.open_count }}</div>
+      <div class="stat-label">Open</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.funded_count }}</div>
+      <div class="stat-label">Funded</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.verified_count }}</div>
+      <div class="stat-label">Verified</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value text-sage">{{ stats.completed_count }}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value {% if stats.overdue_count > 0 %}text-error{% endif %}">{{ stats.overdue_count }}</div>
+      <div class="stat-label">Overdue</div>
+    </div>
+  </div>
+</section>
+
+<!-- Obligation Details Section -->
+{% if obligations %}
+<section class="section">
+  <h2>Obligation Details</h2>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Amount</th>
+          <th>Split</th>
+          <th>Status</th>
+          <th>Funded</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ob in obligations[:20] %}
+        <tr>
+          <td><strong>{{ ob.title }}</strong></td>
+          <td>{{ ob.purpose_category|replace('_', ' ')|title }}</td>
+          <td>${{ "%.2f"|format(ob.total_amount) }}</td>
+          <td>
+            <span class="text-sage">{{ ob.petitioner_percentage }}%</span> /
+            <span class="slate">{{ 100 - ob.petitioner_percentage }}%</span>
+          </td>
+          <td>
+            <span class="badge {% if ob.status == 'completed' %}badge-success{% elif ob.status == 'funded' or ob.status == 'verified' %}badge-info{% elif ob.status == 'open' %}badge-warning{% else %}badge-error{% endif %}">
+              {{ ob.status|title }}
+            </span>
+          </td>
+          <td>
+            {% set funded_pct = (ob.amount_funded / ob.total_amount * 100) if ob.total_amount > 0 else 0 %}
+            <div class="progress-bar" style="width: 60px; display: inline-block; margin-right: 8px; vertical-align: middle;">
+              <div class="progress-fill" style="width: {{ funded_pct }}%;"></div>
+            </div>
+            {{ "%.0f"|format(funded_pct) }}%
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if obligations|length > 20 %}
+    <p class="text-muted text-center" style="margin-top: var(--spacing-md);">
+      Showing 20 of {{ obligations|length }} obligations. Full list available in platform.
+    </p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Overdue Obligations Alert -->
+{% if overdue_obligations %}
+<section class="section">
+  <h2>Overdue Obligations</h2>
+
+  <div class="card" style="border-color: var(--cg-error, #dc3545);">
+    <div class="card-header" style="background: rgba(220, 53, 69, 0.1); color: var(--cg-error, #dc3545);">
+      Action Required: {{ overdue_obligations|length }} Overdue Obligation(s)
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Due Date</th>
+          <th>Days Overdue</th>
+          <th>Outstanding</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ob in overdue_obligations %}
+        <tr>
+          <td><strong>{{ ob.title }}</strong></td>
+          <td>{{ ob.due_date.strftime('%b %d, %Y') if ob.due_date else 'N/A' }}</td>
+          <td class="text-error">{{ ob.days_overdue }} days</td>
+          <td class="text-error">${{ "%.2f"|format(ob.outstanding) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<!-- Data Sources Note -->
+<div class="note info" style="margin-top: var(--spacing-2xl);">
+  <strong>About ClearFund</strong><br>
+  ClearFund tracks shared child-related expenses with purpose-locked obligations.
+  Parents can fund their share via bank transfer or card, and verification ensures
+  funds are used as intended. Split percentages are typically based on the custody
+  agreement or income ratios.
+</div>
+{% endblock %}

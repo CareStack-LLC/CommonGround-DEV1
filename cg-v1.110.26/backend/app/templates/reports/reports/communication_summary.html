@@ -1,0 +1,254 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Communication Summary - CommonGround{% endblock %}
+
+{% block report_title %}Communication Summary{% endblock %}
+{% block report_subtitle %}ARIA Intervention Analysis and Message Compliance{% endblock %}
+
+{% block content %}
+<!-- Executive Summary Section -->
+<section class="section">
+  <h2>Executive Summary</h2>
+
+  <div class="grid grid-4">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_messages }}</div>
+      <div class="stat-label">Total Messages</div>
+      <div class="stat-sublabel">in report period</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if stats.flag_rate <= 10 %}text-sage{% elif stats.flag_rate <= 25 %}amber{% else %}text-error{% endif %}">
+        {{ stats.flagged_messages }}
+      </div>
+      <div class="stat-label">ARIA Interventions</div>
+      <div class="stat-sublabel">{{ "%.1f"|format(stats.flag_rate) }}% of messages</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if stats.good_faith_rate >= 70 %}text-sage{% elif stats.good_faith_rate >= 50 %}amber{% else %}text-error{% endif %}">
+        {{ "%.0f"|format(stats.good_faith_rate) }}%
+      </div>
+      <div class="stat-label">Good Faith Rate</div>
+      <div class="stat-sublabel">suggestions accepted</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if stats.health_score >= 80 %}text-sage{% elif stats.health_score >= 60 %}amber{% else %}text-error{% endif %}">
+        {{ stats.health_score }}
+      </div>
+      <div class="stat-label">Health Score</div>
+      <div class="stat-sublabel">0-100 scale</div>
+    </div>
+  </div>
+</section>
+
+<!-- ARIA Intervention Analysis Section -->
+<section class="section">
+  <h2>ARIA Intervention Analysis</h2>
+
+  <div class="card keep-together">
+    <div class="grid grid-2">
+      <div class="chart-container" style="flex-direction: column;">
+        {{ intervention_donut | safe }}
+        <div class="chart-legend" style="margin-top: 1rem;">
+          <div class="legend-item">
+            <span class="legend-dot sage"></span>
+            <span>Accepted: {{ stats.accepted }} ({{ "%.0f"|format(stats.accepted_rate) }}%)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: var(--cg-amber)"></span>
+            <span>Modified: {{ stats.modified }} ({{ "%.0f"|format(stats.modified_rate) }}%)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: var(--cg-error, #dc3545)"></span>
+            <span>Rejected: {{ stats.rejected }} ({{ "%.0f"|format(stats.rejected_rate) }}%)</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="mt-0">Understanding ARIA</h3>
+        <p>
+          ARIA (AI Relationship Intelligence Assistant) monitors messages for potential conflict
+          and suggests more constructive rewrites. When a message is flagged:
+        </p>
+        <ul>
+          <li><strong style="color: var(--cg-sage)">Accepted</strong> - Parent used ARIA's suggested rewrite</li>
+          <li><strong style="color: var(--cg-amber)">Modified</strong> - Parent edited the suggestion before sending</li>
+          <li><strong style="color: var(--cg-error, #dc3545)">Rejected</strong> - Parent sent original message unchanged</li>
+        </ul>
+
+        {% if stats.flagged_messages > 0 %}
+        <div class="note {% if stats.good_faith_rate >= 70 %}info{% elif stats.good_faith_rate >= 50 %}warning{% else %}warning{% endif %}">
+          <strong>Assessment:</strong>
+          {% if stats.good_faith_rate >= 70 %}
+          Both parents are demonstrating good faith by accepting ARIA's suggestions for more constructive communication.
+          {% elif stats.good_faith_rate >= 50 %}
+          Parents are showing moderate willingness to improve communication. There's room for improvement.
+          {% else %}
+          There may be challenges with communication cooperation. Consider reviewing ARIA's suggestions more carefully.
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Toxicity Categories Section -->
+{% if categories %}
+<section class="section">
+  <h2>Flagged Content Categories</h2>
+
+  <div class="card keep-together">
+    <p class="text-muted" style="margin-bottom: var(--spacing-md);">
+      Categories of concerning content detected by ARIA. A message may have multiple categories.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Occurrences</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in categories %}
+        <tr>
+          <td><strong>{{ cat.name|replace('_', ' ')|title }}</strong></td>
+          <td>{{ cat.count }}</td>
+          <td class="text-muted">{{ cat.description }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<!-- Per-Parent Analysis Section -->
+<section class="section">
+  <h2>Parent Communication Comparison</h2>
+
+  <div class="card keep-together">
+    {{ parent_comparison_chart | safe }}
+
+    <table style="margin-top: var(--spacing-lg);">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th style="color: var(--cg-sage)">{{ parent_a_name }}</th>
+          <th style="color: var(--cg-slate)">{{ parent_b_name }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Messages Sent</td>
+          <td>{{ parent_a_stats.messages_sent }}</td>
+          <td>{{ parent_b_stats.messages_sent }}</td>
+        </tr>
+        <tr>
+          <td>ARIA Interventions</td>
+          <td>{{ parent_a_stats.interventions }}</td>
+          <td>{{ parent_b_stats.interventions }}</td>
+        </tr>
+        <tr>
+          <td>Intervention Rate</td>
+          <td>
+            <span class="badge {% if parent_a_stats.intervention_rate <= 10 %}badge-success{% elif parent_a_stats.intervention_rate <= 25 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.1f"|format(parent_a_stats.intervention_rate) }}%
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if parent_b_stats.intervention_rate <= 10 %}badge-success{% elif parent_b_stats.intervention_rate <= 25 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.1f"|format(parent_b_stats.intervention_rate) }}%
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td>Suggestions Accepted</td>
+          <td>{{ parent_a_stats.accepted }}</td>
+          <td>{{ parent_b_stats.accepted }}</td>
+        </tr>
+        <tr>
+          <td>Good Faith Rate</td>
+          <td>
+            <span class="badge {% if parent_a_stats.good_faith_rate >= 70 %}badge-success{% elif parent_a_stats.good_faith_rate >= 50 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(parent_a_stats.good_faith_rate) }}%
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if parent_b_stats.good_faith_rate >= 70 %}badge-success{% elif parent_b_stats.good_faith_rate >= 50 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(parent_b_stats.good_faith_rate) }}%
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Average Toxicity Section -->
+{% if stats.avg_toxicity is defined %}
+<section class="section">
+  <h2>Toxicity Analysis</h2>
+
+  <div class="grid grid-3">
+    <div class="stat-card">
+      <div class="stat-value {% if stats.avg_toxicity <= 0.3 %}text-sage{% elif stats.avg_toxicity <= 0.5 %}amber{% else %}text-error{% endif %}">
+        {{ "%.2f"|format(stats.avg_toxicity) }}
+      </div>
+      <div class="stat-label">Avg. Toxicity</div>
+      <div class="stat-sublabel">0.0 - 1.0 scale</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.severe_count }}</div>
+      <div class="stat-label">Severe Flags</div>
+      <div class="stat-sublabel">high-severity issues</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if stats.trend == 'improving' %}text-sage{% elif stats.trend == 'worsening' %}text-error{% else %}amber{% endif %}">
+        {{ stats.trend|title }}
+      </div>
+      <div class="stat-label">Trend</div>
+      <div class="stat-sublabel">vs. previous period</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: var(--spacing-lg);">
+    <div class="card-header">Toxicity Scale Guide</div>
+    <div class="grid grid-4" style="padding: var(--spacing-md);">
+      <div style="text-align: center;">
+        <div class="badge badge-success" style="display: block;">0.0 - 0.3</div>
+        <small class="text-muted">Low/None</small>
+      </div>
+      <div style="text-align: center;">
+        <div class="badge badge-warning" style="display: block;">0.3 - 0.5</div>
+        <small class="text-muted">Medium</small>
+      </div>
+      <div style="text-align: center;">
+        <div class="badge badge-error" style="display: block;">0.5 - 0.7</div>
+        <small class="text-muted">High</small>
+      </div>
+      <div style="text-align: center;">
+        <div class="badge badge-error" style="display: block;">0.7 - 1.0</div>
+        <small class="text-muted">Severe</small>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Communication Patterns Note -->
+<div class="note info" style="margin-top: var(--spacing-2xl);">
+  <strong>About This Report</strong><br>
+  This report analyzes messaging patterns between parents through CommonGround's ARIA system.
+  ARIA interventions indicate moments where communication could be improved, not necessarily
+  wrongdoing. A high good faith rate shows willingness to communicate constructively.
+  Message content is not included in this report for privacy.
+</div>
+{% endblock %}

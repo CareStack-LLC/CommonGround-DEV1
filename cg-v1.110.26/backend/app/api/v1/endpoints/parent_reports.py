@@ -153,19 +153,19 @@ async def get_report_types() -> dict:
                 "id": "communication",
                 "name": "Communication Summary",
                 "description": "Message patterns, ARIA interventions, and response time analysis",
-                "available": False,  # Coming soon
+                "available": True,
             },
             {
                 "id": "expense",
                 "name": "Expense Summary",
                 "description": "ClearFund obligations, payment history, and financial compliance",
-                "available": False,  # Coming soon
+                "available": True,
             },
             {
                 "id": "schedule",
                 "name": "Schedule History",
                 "description": "Exchange records with GPS verification and event history",
-                "available": False,  # Coming soon
+                "available": True,
             },
         ]
     }

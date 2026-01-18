@@ -1,0 +1,249 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Schedule History - CommonGround{% endblock %}
+
+{% block report_title %}Schedule History{% endblock %}
+{% block report_subtitle %}Exchange Compliance and GPS Verification Report{% endblock %}
+
+{% block content %}
+<!-- Executive Summary Section -->
+<section class="section">
+  <h2>Executive Summary</h2>
+
+  <div class="grid grid-4">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_exchanges }}</div>
+      <div class="stat-label">Total Exchanges</div>
+      <div class="stat-sublabel">scheduled in period</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value text-sage">{{ stats.completed }}</div>
+      <div class="stat-label">Completed</div>
+      <div class="stat-sublabel">successful handoffs</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if stats.completion_rate >= 90 %}text-sage{% elif stats.completion_rate >= 70 %}amber{% else %}text-error{% endif %}">
+        {{ "%.0f"|format(stats.completion_rate) }}%
+      </div>
+      <div class="stat-label">Completion Rate</div>
+      <div class="stat-sublabel">exchanges completed</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if stats.gps_verification_rate >= 80 %}text-sage{% elif stats.gps_verification_rate >= 50 %}amber{% else %}text-error{% endif %}">
+        {{ "%.0f"|format(stats.gps_verification_rate) }}%
+      </div>
+      <div class="stat-label">GPS Verified</div>
+      <div class="stat-sublabel">location confirmed</div>
+    </div>
+  </div>
+</section>
+
+<!-- Compliance Overview Section -->
+<section class="section">
+  <h2>Exchange Compliance Overview</h2>
+
+  <div class="card keep-together">
+    <div class="grid grid-2">
+      <div class="chart-container" style="flex-direction: column;">
+        {{ outcome_donut | safe }}
+        <div class="chart-legend" style="margin-top: 1rem;">
+          <div class="legend-item">
+            <span class="legend-dot sage"></span>
+            <span>Completed: {{ stats.completed }}</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: var(--cg-error, #dc3545)"></span>
+            <span>Missed: {{ stats.missed }}</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-dot" style="background: var(--cg-border)"></span>
+            <span>Cancelled: {{ stats.cancelled }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="mt-0">Exchange Summary</h3>
+        <p>
+          During this {{ stats.total_days }}-day period, there were <strong>{{ stats.total_exchanges }} scheduled exchanges</strong>.
+          Of these, <strong class="text-sage">{{ stats.completed }}</strong> were completed successfully,
+          <strong class="text-error">{{ stats.missed }}</strong> were missed, and
+          <strong>{{ stats.cancelled }}</strong> were cancelled.
+        </p>
+
+        {% if stats.missed > 0 %}
+        <div class="note warning">
+          <strong>Missed Exchanges:</strong>
+          {{ stats.missed }} exchange(s) were not completed as scheduled.
+          This may indicate coordination issues between parents.
+        </div>
+        {% endif %}
+
+        {% if stats.completion_rate >= 90 %}
+        <div class="note info">
+          <strong>Excellent Compliance:</strong>
+          Both parents are demonstrating strong commitment to the exchange schedule.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GPS Verification Section -->
+{% if stats.gps_verified > 0 or stats.total_check_ins > 0 %}
+<section class="section">
+  <h2>GPS Verification</h2>
+
+  <div class="grid grid-3">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_check_ins }}</div>
+      <div class="stat-label">Total Check-ins</div>
+      <div class="stat-sublabel">GPS recorded</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value text-sage">{{ stats.gps_verified }}</div>
+      <div class="stat-label">In Geofence</div>
+      <div class="stat-sublabel">at designated location</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value">{{ "%.0f"|format(stats.avg_distance_meters) }}m</div>
+      <div class="stat-label">Avg Distance</div>
+      <div class="stat-sublabel">from exchange point</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: var(--spacing-lg);">
+    <div class="card-header">How GPS Verification Works</div>
+    <div style="padding: var(--spacing-md);">
+      <p class="text-muted">
+        When parents check in at an exchange, their device location is recorded and compared to the
+        designated exchange point. A check-in is "verified" when it falls within the geofence radius
+        (typically 100 meters). This provides objective evidence of compliance with exchange locations.
+      </p>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Parent Comparison Section -->
+<section class="section">
+  <h2>Parent Compliance Comparison</h2>
+
+  <div class="card keep-together">
+    {{ parent_comparison_chart | safe }}
+
+    <table style="margin-top: var(--spacing-lg);">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th style="color: var(--cg-sage)">{{ parent_a_name }}</th>
+          <th style="color: var(--cg-slate)">{{ parent_b_name }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Check-ins Completed</td>
+          <td>{{ parent_a_stats.check_ins }}</td>
+          <td>{{ parent_b_stats.check_ins }}</td>
+        </tr>
+        <tr>
+          <td>In Geofence</td>
+          <td>
+            <span class="badge {% if parent_a_stats.geofence_rate >= 80 %}badge-success{% elif parent_a_stats.geofence_rate >= 50 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(parent_a_stats.geofence_rate) }}%
+            </span>
+          </td>
+          <td>
+            <span class="badge {% if parent_b_stats.geofence_rate >= 80 %}badge-success{% elif parent_b_stats.geofence_rate >= 50 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(parent_b_stats.geofence_rate) }}%
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td>Avg Distance from Point</td>
+          <td>{{ "%.0f"|format(parent_a_stats.avg_distance) }}m</td>
+          <td>{{ "%.0f"|format(parent_b_stats.avg_distance) }}m</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Exchange Log Section -->
+{% if exchanges %}
+<section class="section">
+  <h2>Exchange Log</h2>
+
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>{{ parent_a_name }}</th>
+          <th>{{ parent_b_name }}</th>
+          <th>GPS</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exchange in exchanges[:25] %}
+        <tr>
+          <td>{{ exchange.scheduled_time.strftime('%b %d, %Y') }}</td>
+          <td>{{ exchange.scheduled_time.strftime('%I:%M %p') }}</td>
+          <td>
+            <span class="badge {% if exchange.status == 'completed' %}badge-success{% elif exchange.status == 'missed' %}badge-error{% elif exchange.status == 'cancelled' %}badge-info{% else %}badge-warning{% endif %}">
+              {{ exchange.status|title }}
+            </span>
+          </td>
+          <td>
+            {% if exchange.from_parent_checked_in %}
+              <span class="text-sage">Checked in</span>
+            {% else %}
+              <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if exchange.to_parent_checked_in %}
+              <span class="text-sage">Checked in</span>
+            {% else %}
+              <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if exchange.from_parent_in_geofence or exchange.to_parent_in_geofence %}
+              <span class="text-sage">Verified</span>
+            {% elif exchange.from_parent_checked_in or exchange.to_parent_checked_in %}
+              <span class="amber">Recorded</span>
+            {% else %}
+              <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if exchanges|length > 25 %}
+    <p class="text-muted text-center" style="margin-top: var(--spacing-md);">
+      Showing 25 of {{ exchanges|length }} exchanges. Full history available in platform.
+    </p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Data Sources Note -->
+<div class="note info" style="margin-top: var(--spacing-2xl);">
+  <strong>About This Report</strong><br>
+  Exchange data is collected from the CommonGround scheduling system. GPS coordinates are
+  recorded when parents check in at exchanges using the mobile app. Location accuracy
+  depends on device settings and conditions. All GPS data is secured and used only for
+  compliance verification.
+</div>
+{% endblock %}
