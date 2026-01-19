@@ -1158,7 +1158,7 @@ function FamilyFileDetailContent() {
                       className="w-full text-muted-foreground hover:text-foreground"
                       onClick={() => {
                         setIsInviteProfOpen(false);
-                        router.push('/find-professionals');
+                        router.push(`/find-professionals?familyFileId=${id}`);
                       }}
                     >
                       <Building2 className="h-4 w-4 mr-2" />
@@ -1301,7 +1301,7 @@ function FamilyFileDetailContent() {
                 variant="ghost"
                 size="sm"
                 className="w-full mt-3 text-muted-foreground hover:text-foreground"
-                onClick={() => router.push('/find-professionals')}
+                onClick={() => router.push(`/find-professionals?familyFileId=${id}`)}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 Browse Firm Directory

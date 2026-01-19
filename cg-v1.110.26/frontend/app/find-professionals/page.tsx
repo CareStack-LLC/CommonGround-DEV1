@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { familyFilesAPI, FirmDirectoryEntry, FirmPublicProfile, ProfessionalAccess } from '@/lib/api';
+import { familyFilesAPI, FirmDirectoryEntry, FirmPublicProfile, ProfessionalAccess, FamilyFile } from '@/lib/api';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
@@ -52,6 +52,7 @@ import {
   Send,
   Settings,
   RefreshCw,
+  FileText,
 } from 'lucide-react';
 
 const US_STATES = [
@@ -119,7 +120,7 @@ const FIRM_TYPES = [
 function FindProfessionalsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const familyFileId = searchParams.get('familyFileId');
+  const familyFileIdFromUrl = searchParams.get('familyFileId');
 
   const [firms, setFirms] = useState<FirmDirectoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -142,12 +143,57 @@ function FindProfessionalsContent() {
   const [existingProfessionals, setExistingProfessionals] = useState<ProfessionalAccess[]>([]);
   const [hasExistingFirm, setHasExistingFirm] = useState(false);
 
+  // Family file selection (when not provided in URL)
+  const [familyFiles, setFamilyFiles] = useState<FamilyFile[]>([]);
+  const [selectedFamilyFileId, setSelectedFamilyFileId] = useState<string | null>(familyFileIdFromUrl);
+  const [isLoadingFamilyFiles, setIsLoadingFamilyFiles] = useState(false);
+
+  // Derived familyFileId - prefer URL param, then selected
+  const familyFileId = familyFileIdFromUrl || selectedFamilyFileId;
+
+  // Load user's family files on mount if no familyFileId in URL
+  useEffect(() => {
+    const loadFamilyFiles = async () => {
+      if (familyFileIdFromUrl) {
+        // Already have it from URL, no need to fetch
+        setSelectedFamilyFileId(familyFileIdFromUrl);
+        return;
+      }
+
+      try {
+        setIsLoadingFamilyFiles(true);
+        const response = await familyFilesAPI.list();
+        const files = response.items || [];
+        setFamilyFiles(files);
+
+        // Auto-select if user has exactly one family file
+        if (files.length === 1) {
+          setSelectedFamilyFileId(files[0].id);
+          // Update URL to include the familyFileId
+          router.replace(`/find-professionals?familyFileId=${files[0].id}`);
+        }
+      } catch (err) {
+        console.error('Failed to load family files:', err);
+      } finally {
+        setIsLoadingFamilyFiles(false);
+      }
+    };
+
+    loadFamilyFiles();
+  }, [familyFileIdFromUrl, router]);
+
   useEffect(() => {
     searchFirms();
     if (familyFileId) {
       loadExistingProfessionals();
     }
   }, [familyFileId]);
+
+  const handleFamilyFileChange = (fileId: string) => {
+    setSelectedFamilyFileId(fileId);
+    // Update URL with the selected family file
+    router.replace(`/find-professionals?familyFileId=${fileId}`);
+  };
 
   const loadExistingProfessionals = async () => {
     if (!familyFileId) return;
@@ -592,14 +638,54 @@ function FindProfessionalsContent() {
                   </Alert>
                 )}
 
-                {/* No Family File Warning */}
-                {!familyFileId && (
+                {/* Family File Selection - show when no familyFileId but user has family files */}
+                {!familyFileId && familyFiles.length > 1 && (
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Select Family File</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Choose which family file to invite this firm to:
+                    </p>
+                    <div className="space-y-2">
+                      {familyFiles.map((file) => (
+                        <button
+                          key={file.id}
+                          onClick={() => handleFamilyFileChange(file.id)}
+                          className="w-full flex items-center justify-between p-3 rounded-xl border border-border hover:bg-muted/50 transition-colors text-left"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-cg-sage-subtle flex items-center justify-center">
+                              <FileText className="h-4 w-4 text-cg-sage" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-foreground text-sm">{file.title || 'Family File'}</div>
+                              <div className="text-xs text-muted-foreground">
+                                {file.family_file_number}
+                              </div>
+                            </div>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No Family File Warning - show when user has no family files */}
+                {!familyFileId && familyFiles.length === 0 && !isLoadingFamilyFiles && (
                   <Alert className="bg-cg-amber-subtle text-cg-amber border-cg-amber/30">
                     <AlertCircle className="h-4 w-4 text-cg-amber" />
                     <AlertDescription>
-                      To invite this firm, please go to your Family File first and click "Invite Professional".
+                      To invite this firm, please create a Family File first or go to your existing Family File and click "Invite Professional".
                     </AlertDescription>
                   </Alert>
+                )}
+
+                {/* Loading family files indicator */}
+                {!familyFileId && isLoadingFamilyFiles && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cg-sage" />
+                    Loading your family files...
+                  </div>
                 )}
 
                 {/* Existing Firm Warning */}
