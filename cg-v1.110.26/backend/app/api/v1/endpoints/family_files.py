@@ -946,6 +946,7 @@ async def list_family_file_professionals(
     result = {
         "professionals": professionals,
         "total": len(professionals),
+        "total_professionals": len(professionals),  # Alias for frontend compatibility
     }
 
     # Include pending access requests if requested
@@ -971,8 +972,66 @@ async def list_family_file_professionals(
         ]
         result["pending_requests"] = pending
         result["pending_count"] = len(pending)
+        result["total_pending"] = len(pending)  # Alias for frontend compatibility
 
     return result
+
+
+@router.post("/{family_file_id}/professionals/invite")
+async def invite_professional(
+    family_file_id: str,
+    email: str = Body(None),
+    firm_id: str = Body(None),
+    professional_id: str = Body(None),
+    scopes: list[str] = Body(None),
+    message: str = Body(None),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Invite a professional or firm to this Family File.
+
+    Can invite by:
+    - email: Send invitation to a professional by email
+    - firm_id: Invite a firm from the directory (firm assigns professional)
+    - professional_id + firm_id: Request a specific professional from a firm
+    """
+    ff_service = FamilyFileService(db)
+    await ff_service.get_family_file(family_file_id, current_user)
+
+    access_service = ProfessionalAccessService(db)
+
+    # If firm_id is provided, use the directory invitation flow
+    if firm_id:
+        try:
+            request = await access_service.invite_firm_from_directory(
+                family_file_id=family_file_id,
+                firm_id=firm_id,
+                inviter_user_id=str(current_user.id),
+                message=message,
+            )
+            return {
+                "request_id": str(request.id),
+                "message": "Invitation sent to firm. Awaiting other parent approval and firm acceptance."
+            }
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
+
+    # Email-based invitation (legacy flow)
+    if email:
+        # For now, return error - email invitations handled separately
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email invitations are not yet supported. Please use firm directory."
+        )
+
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Please provide either firm_id or email to invite a professional."
+    )
 
 
 @router.post("/{family_file_id}/invite-firm")
