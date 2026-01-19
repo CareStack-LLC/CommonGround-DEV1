@@ -832,6 +832,7 @@ async def approve_professional_access_request(
     if request.status == "approved" and not request.case_assignment_id:
         assignment_service = CaseAssignmentService(db)
         assignment_data = CaseAssignmentCreate(
+            family_file_id=family_file_id,
             assignment_role=AssignmentRole(request.requested_role) if request.requested_role else AssignmentRole.LEAD_ATTORNEY,
             access_scopes=request.requested_scopes or ["agreement", "schedule", "messages"],
             representing=request.representing or "both",
