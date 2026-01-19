@@ -973,3 +973,50 @@ async def list_family_file_professionals(
         result["pending_count"] = len(pending)
 
     return result
+
+
+@router.post("/{family_file_id}/invite-firm")
+async def invite_firm_from_directory(
+    family_file_id: str,
+    firm_id: str = Body(..., embed=True),
+    message: str = Body(None, embed=True),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Invite a firm from the directory to represent you.
+
+    Parents can browse the public firm directory and invite firms to their case.
+    The firm will receive the invitation and can assign a professional to the case.
+    The inviting parent automatically approves; the other parent still needs to approve.
+    """
+    ff_service = FamilyFileService(db)
+    await ff_service.get_family_file(family_file_id, current_user)
+
+    access_service = ProfessionalAccessService(db)
+
+    try:
+        request = await access_service.invite_firm_from_directory(
+            family_file_id=family_file_id,
+            firm_id=firm_id,
+            inviter_user_id=str(current_user.id),
+            message=message,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+    return {
+        "id": request.id,
+        "family_file_id": request.family_file_id,
+        "firm_id": request.firm_id,
+        "status": request.status,
+        "parent_a_approved": request.parent_a_approved,
+        "parent_b_approved": request.parent_b_approved,
+        "message": request.message,
+        "expires_at": request.expires_at,
+        "created_at": request.created_at,
+        "info": "Invitation sent to firm. Awaiting other parent approval and firm acceptance."
+    }

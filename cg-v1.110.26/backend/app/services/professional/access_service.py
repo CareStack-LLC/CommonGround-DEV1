@@ -227,6 +227,69 @@ class ProfessionalAccessService:
 
         return request
 
+    async def invite_firm_from_directory(
+        self,
+        family_file_id: str,
+        firm_id: str,
+        inviter_user_id: str,
+        message: Optional[str] = None,
+    ) -> ProfessionalAccessRequest:
+        """
+        Parent invites a firm from the directory to represent them.
+
+        Creates an access request with requested_by="parent" that the firm
+        can accept. The firm will then assign a specific professional.
+        """
+        # Validate family file
+        family_file = await self._get_family_file(family_file_id)
+        if not family_file:
+            raise ValueError("Family file not found")
+
+        # Verify inviter is a parent on the case
+        if str(family_file.parent_a_id) != inviter_user_id and str(family_file.parent_b_id) != inviter_user_id:
+            raise ValueError("You are not a parent on this family file")
+
+        # Validate firm exists and is public
+        from app.services.professional.firm_service import FirmService
+        firm_service = FirmService(self.db)
+        firm = await firm_service.get_firm(firm_id)
+        if not firm:
+            raise ValueError("Firm not found")
+        if not firm.is_public or not firm.is_active:
+            raise ValueError("Firm is not available in the directory")
+
+        # Check for existing pending request to this firm
+        existing = await self._get_pending_request(family_file_id, firm_id=firm_id)
+        if existing:
+            raise ValueError("Invitation already pending for this firm")
+
+        # Determine which parent is inviting
+        is_parent_a = str(family_file.parent_a_id) == inviter_user_id
+
+        request = ProfessionalAccessRequest(
+            id=str(uuid4()),
+            family_file_id=family_file_id,
+            firm_id=firm_id,
+            professional_id=None,  # Firm will assign a professional later
+            requested_by="parent",
+            requested_by_user_id=inviter_user_id,
+            requested_scopes=["read", "message"],  # Default scopes for invited firms
+            message=message,
+            status=AccessRequestStatus.PENDING.value,
+            # Parent who invites auto-approves
+            parent_a_approved=is_parent_a,
+            parent_b_approved=not is_parent_a,
+            parent_a_approved_at=datetime.utcnow() if is_parent_a else None,
+            parent_b_approved_at=datetime.utcnow() if not is_parent_a else None,
+            expires_at=datetime.utcnow() + timedelta(days=30),  # Longer expiry for directory invites
+        )
+
+        self.db.add(request)
+        await self.db.commit()
+        await self.db.refresh(request)
+
+        return request
+
     # -------------------------------------------------------------------------
     # Approval Flow
     # -------------------------------------------------------------------------
@@ -671,6 +734,32 @@ class ProfessionalAccessService:
         result = await self.db.execute(query)
         return list(result.scalars().all())
 
+    async def list_invitations_for_firm(
+        self,
+        firm_id: str,
+        status: Optional[AccessRequestStatus] = None,
+    ) -> list[ProfessionalAccessRequest]:
+        """List parent-initiated invitations sent to a firm from the directory."""
+        query = (
+            select(ProfessionalAccessRequest)
+            .options(
+                selectinload(ProfessionalAccessRequest.family_file),
+            )
+            .where(
+                and_(
+                    ProfessionalAccessRequest.firm_id == firm_id,
+                    ProfessionalAccessRequest.requested_by == "parent",
+                )
+            )
+        )
+
+        if status:
+            query = query.where(ProfessionalAccessRequest.status == status.value)
+
+        query = query.order_by(ProfessionalAccessRequest.created_at.desc())
+        result = await self.db.execute(query)
+        return list(result.scalars().all())
+
     async def list_pending_invitations_for_email(
         self,
         email: str,
@@ -805,6 +894,7 @@ class ProfessionalAccessService:
         family_file_id: str,
         professional_id: Optional[str] = None,
         email: Optional[str] = None,
+        firm_id: Optional[str] = None,
     ) -> Optional[ProfessionalAccessRequest]:
         """Check for existing pending request."""
         query = select(ProfessionalAccessRequest).where(
@@ -818,6 +908,8 @@ class ProfessionalAccessService:
             query = query.where(ProfessionalAccessRequest.professional_id == professional_id)
         elif email:
             query = query.where(ProfessionalAccessRequest.professional_email == email)
+        elif firm_id:
+            query = query.where(ProfessionalAccessRequest.firm_id == firm_id)
 
         result = await self.db.execute(query)
         return result.scalar_one_or_none()

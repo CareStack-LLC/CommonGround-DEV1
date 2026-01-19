@@ -718,8 +718,11 @@ async def get_directory_firm(
             detail="Firm not found.",
         )
 
+    # Get professional count
+    professional_count = await service.get_firm_member_count(str(firm.id))
+
     return FirmPublicResponse(
-        id=firm.id,
+        id=str(firm.id),
         name=firm.name,
         slug=firm.slug,
         firm_type=FirmType(firm.firm_type),
@@ -727,7 +730,153 @@ async def get_directory_firm(
         state=firm.state,
         logo_url=firm.logo_url,
         website=firm.website,
+        email=firm.email,
+        phone=firm.phone,
+        primary_color=firm.primary_color,
+        practice_areas=getattr(firm, 'practice_areas', None) or [],
+        professional_count=professional_count,
+        description=getattr(firm, 'description', None),
     )
+
+
+# =============================================================================
+# DIRECTORY INVITATIONS (Parent-initiated)
+# =============================================================================
+
+@router.get(
+    "/firms/{firm_id}/invitations",
+    summary="List parent invitations to firm",
+)
+async def list_firm_invitations(
+    firm_id: str,
+    status_filter: Optional[AccessRequestStatus] = Query(None, alias="status"),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    List invitations from parents to this firm (from directory search).
+
+    Only firm members can view invitations. Shows cases where parents
+    reached out through the directory looking for representation.
+    """
+    firm_service = FirmService(db)
+    membership = await firm_service.get_membership(profile.id, firm_id)
+    if not membership or membership.status != MembershipStatus.ACTIVE.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not an active member of this firm",
+        )
+
+    access_service = ProfessionalAccessService(db)
+    invitations = await access_service.list_invitations_for_firm(
+        firm_id=firm_id,
+        status=status_filter,
+    )
+
+    return {
+        "items": [
+            {
+                "id": inv.id,
+                "family_file_id": inv.family_file_id,
+                "family_file_number": inv.family_file.family_file_number if inv.family_file else None,
+                "requested_by_user_id": inv.requested_by_user_id,
+                "message": inv.message,
+                "status": inv.status,
+                "parent_a_approved": inv.parent_a_approved,
+                "parent_b_approved": inv.parent_b_approved,
+                "created_at": inv.created_at,
+                "expires_at": inv.expires_at,
+            }
+            for inv in invitations
+        ],
+        "total": len(invitations),
+    }
+
+
+@router.post(
+    "/firms/{firm_id}/invitations/{invitation_id}/accept",
+    summary="Accept parent invitation and assign professional",
+)
+async def accept_firm_invitation(
+    firm_id: str,
+    invitation_id: str,
+    assigned_professional_id: str = Body(..., embed=True, description="Professional from firm to assign"),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Accept a parent's invitation and assign a professional from the firm.
+
+    Only firm admins/partners can accept invitations. This assigns a specific
+    professional to the case and creates the case assignment once both parents
+    have approved.
+    """
+    firm_service = FirmService(db)
+    membership = await firm_service.get_membership(profile.id, firm_id)
+    if not membership or membership.status != MembershipStatus.ACTIVE.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not an active member of this firm",
+        )
+
+    # Check if user has permission to accept (admin/partner roles)
+    if membership.role not in [FirmRole.OWNER.value, FirmRole.PARTNER.value, FirmRole.ADMIN.value]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only firm owners, partners, or admins can accept invitations",
+        )
+
+    # Verify assigned professional is a member of the firm
+    assigned_membership = await firm_service.get_membership(assigned_professional_id, firm_id)
+    if not assigned_membership or assigned_membership.status != MembershipStatus.ACTIVE.value:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Assigned professional is not an active member of this firm",
+        )
+
+    access_service = ProfessionalAccessService(db)
+    invitation = await access_service.get_request(invitation_id)
+
+    if not invitation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invitation not found",
+        )
+
+    if invitation.firm_id != firm_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invitation is not for this firm",
+        )
+
+    if invitation.status != AccessRequestStatus.PENDING.value:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invitation is not pending (status: {invitation.status})",
+        )
+
+    # Update invitation with assigned professional
+    invitation.professional_id = assigned_professional_id
+
+    # If both parents have already approved, create assignment
+    if invitation.parent_a_approved and invitation.parent_b_approved:
+        invitation.status = AccessRequestStatus.APPROVED.value
+        invitation.approved_at = datetime.utcnow()
+
+        # Create case assignment
+        assignment = await access_service.create_assignment_from_request(invitation)
+        invitation.case_assignment_id = str(assignment.id)
+
+    await db.commit()
+    await db.refresh(invitation)
+
+    return {
+        "id": invitation.id,
+        "status": invitation.status,
+        "professional_id": invitation.professional_id,
+        "case_assignment_id": invitation.case_assignment_id,
+        "message": "Professional assigned" if invitation.status == AccessRequestStatus.PENDING.value else "Invitation accepted and access granted",
+    }
 
 
 # =============================================================================
