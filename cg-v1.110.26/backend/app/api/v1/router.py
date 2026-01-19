@@ -39,6 +39,7 @@ from app.api.v1.endpoints import (
     custody_time,
     reports,
     parent_reports,
+    professional,
 )
 
 api_router = APIRouter()
@@ -118,3 +119,6 @@ api_router.include_router(reports.router, prefix="/reports", tags=["Professional
 
 # Parent Reports - Self-service branded PDF reports
 api_router.include_router(parent_reports.router, prefix="/parent-reports", tags=["Parent Reports"])
+
+# Professional Portal - Attorneys, mediators, paralegals
+api_router.include_router(professional.router, prefix="/professional", tags=["Professional Portal"])
