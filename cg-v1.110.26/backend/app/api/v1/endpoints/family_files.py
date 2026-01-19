@@ -798,16 +798,38 @@ async def approve_professional_access_request(
 
     access_service = ProfessionalAccessService(db)
 
-    try:
-        request = await access_service.approve_request(request_id, current_user.id)
-    except ValueError as e:
+    # First get the current request state
+    request = await access_service.get_access_request(request_id)
+    if not request:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Access request not found"
         )
 
+    # If already approved but no assignment, just create assignment
+    if request.status == "approved" and not request.case_assignment_id:
+        pass  # Will create assignment below
+    elif request.status == "approved":
+        return {
+            "id": request.id,
+            "status": request.status,
+            "parent_a_approved": request.parent_a_approved,
+            "parent_b_approved": request.parent_b_approved,
+            "case_assignment_id": request.case_assignment_id,
+            "message": "Already approved and assignment exists"
+        }
+    else:
+        # Try to approve
+        try:
+            request = await access_service.approve_request(request_id, current_user.id)
+        except ValueError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
+
     # If fully approved (both parents), create case assignment
-    if request.status == "approved":
+    if request.status == "approved" and not request.case_assignment_id:
         assignment_service = CaseAssignmentService(db)
         assignment_data = CaseAssignmentCreate(
             assignment_role=AssignmentRole(request.requested_role) if request.requested_role else AssignmentRole.LEAD_ATTORNEY,
@@ -816,14 +838,21 @@ async def approve_professional_access_request(
             can_control_aria=True,
             can_message_client=True,
         )
-        assignment = await assignment_service.create_assignment(
-            professional_id=request.professional_id,
-            family_file_id=family_file_id,
-            data=assignment_data,
-            assigned_by=current_user.id,
-        )
-        request.case_assignment_id = assignment.id
-        await db.commit()
+        try:
+            assignment = await assignment_service.create_assignment(
+                professional_id=request.professional_id,
+                family_file_id=family_file_id,
+                data=assignment_data,
+                assigned_by=current_user.id,
+            )
+            request.case_assignment_id = assignment.id
+            await db.commit()
+        except ValueError as e:
+            # Assignment might already exist
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e)
+            )
 
     return {
         "id": request.id,
