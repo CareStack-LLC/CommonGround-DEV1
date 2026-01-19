@@ -182,7 +182,11 @@ export default function IntakeCenterPage() {
   }, [token, activeFirm, statusFilter, activeTab, invitationFilter]);
 
   const fetchIntakes = async () => {
-    if (!token) return;
+    if (!token) {
+      setIntakes([]);
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -200,9 +204,14 @@ export default function IntakeCenterPage() {
       if (response.ok) {
         const data = await response.json();
         setIntakes(data.items || data || []);
+      } else {
+        // Handle non-OK responses gracefully
+        console.warn("Intakes fetch returned:", response.status);
+        setIntakes([]);
       }
     } catch (error) {
       console.error("Error fetching intakes:", error);
+      setIntakes([]);
     } finally {
       setIsLoading(false);
     }
@@ -229,10 +238,14 @@ export default function IntakeCenterPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setInvitations(data || []);
+        setInvitations(data.items || data || []);
+      } else {
+        console.warn("Invitations fetch returned:", response.status);
+        setInvitations([]);
       }
     } catch (error) {
       console.error("Error fetching invitations:", error);
+      setInvitations([]);
     } finally {
       setInvitationsLoading(false);
     }
