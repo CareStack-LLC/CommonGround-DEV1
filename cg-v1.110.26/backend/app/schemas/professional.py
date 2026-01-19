@@ -161,12 +161,24 @@ class FirmPublicResponse(BaseModel):
     slug: str
     firm_type: FirmType
     city: Optional[str] = None
-    state: str
+    state: Optional[str] = None
     logo_url: Optional[str] = None
     website: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    primary_color: Optional[str] = None
+    practice_areas: list[str] = []
+    professional_count: int = 0
+    description: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+
+class FirmDirectoryResponse(BaseModel):
+    """Paginated firm directory response."""
+    items: list[FirmPublicResponse]
+    total: int
 
 
 class FirmWithMembers(FirmResponse):

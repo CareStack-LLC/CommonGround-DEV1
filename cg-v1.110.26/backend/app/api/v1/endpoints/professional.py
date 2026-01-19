@@ -37,6 +37,7 @@ from app.schemas.professional import (
     FirmUpdate,
     FirmResponse,
     FirmPublicResponse,
+    FirmDirectoryResponse,
     FirmWithMembers,
     # Membership
     FirmMemberInvite,
@@ -654,28 +655,28 @@ async def resend_invite(
 
 @router.get(
     "/directory",
-    response_model=list[FirmPublicResponse],
+    response_model=FirmDirectoryResponse,
     summary="Search public firms",
 )
 async def search_directory(
-    q: Optional[str] = Query(None, description="Search query"),
+    query: Optional[str] = Query(None, description="Search query"),
     state: Optional[str] = Query(None, max_length=2, description="State filter"),
     firm_type: Optional[FirmType] = Query(None, description="Firm type filter"),
     limit: int = Query(50, le=100),
-    offset: int = Query(0, ge=0),
+    skip: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ):
     """Search public firms for directory listing. Does not require authentication."""
     service = FirmService(db)
-    firms = await service.search_public_firms(
-        query=q,
+    firms, total = await service.search_public_firms_with_count(
+        query=query,
         state=state,
         firm_type=firm_type,
         limit=limit,
-        offset=offset,
+        offset=skip,
     )
 
-    return [
+    items = [
         FirmPublicResponse(
             id=f.id,
             name=f.name,
@@ -685,9 +686,17 @@ async def search_directory(
             state=f.state,
             logo_url=f.logo_url,
             website=f.website,
+            email=f.email,
+            phone=f.phone,
+            primary_color=f.primary_color,
+            practice_areas=f.practice_areas or [],
+            professional_count=getattr(f, 'professional_count', 0) or 0,
+            description=f.description,
         )
         for f in firms
     ]
+
+    return FirmDirectoryResponse(items=items, total=total)
 
 
 @router.get(

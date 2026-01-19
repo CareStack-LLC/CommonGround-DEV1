@@ -233,6 +233,11 @@ class Firm(Base, UUIDMixin, TimestampMixin):
     logo_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     primary_color: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)  # #RRGGBB
 
+    # Description and practice areas (for directory)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    practice_areas: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    # e.g., ["Family Law", "Custody", "Mediation", "Divorce"]
+
     # Settings
     settings: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     # e.g., {"default_intake_forms": ["FL-300", "FL-311"], "aria_provider": "claude"}

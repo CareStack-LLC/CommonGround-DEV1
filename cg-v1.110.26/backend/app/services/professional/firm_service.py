@@ -217,6 +217,73 @@ class FirmService:
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
 
+    async def search_public_firms_with_count(
+        self,
+        query: Optional[str] = None,
+        state: Optional[str] = None,
+        firm_type: Optional[FirmType] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> tuple[list[Firm], int]:
+        """Search public firms with total count and professional counts."""
+        # Build base condition
+        base_condition = and_(
+            Firm.is_public == True,
+            Firm.is_active == True,
+        )
+
+        # Build filters
+        filters = [base_condition]
+        if query:
+            search_term = f"%{query}%"
+            filters.append(
+                or_(
+                    Firm.name.ilike(search_term),
+                    Firm.city.ilike(search_term),
+                )
+            )
+        if state:
+            filters.append(Firm.state == state.upper())
+        if firm_type:
+            filters.append(Firm.firm_type == firm_type.value)
+
+        # Get total count
+        count_stmt = select(func.count(Firm.id)).where(and_(*filters))
+        count_result = await self.db.execute(count_stmt)
+        total = count_result.scalar() or 0
+
+        # Get firms with member counts
+        stmt = (
+            select(
+                Firm,
+                func.count(FirmMembership.id).label('professional_count')
+            )
+            .outerjoin(
+                FirmMembership,
+                and_(
+                    FirmMembership.firm_id == Firm.id,
+                    FirmMembership.status == MembershipStatus.ACTIVE.value,
+                )
+            )
+            .where(and_(*filters))
+            .group_by(Firm.id)
+            .order_by(Firm.name)
+            .limit(limit)
+            .offset(offset)
+        )
+
+        result = await self.db.execute(stmt)
+        rows = result.all()
+
+        # Attach professional_count to each firm object
+        firms = []
+        for row in rows:
+            firm = row[0]
+            firm.professional_count = row[1]
+            firms.append(firm)
+
+        return firms, total
+
     async def get_firm_member_count(self, firm_id: str) -> int:
         """Get the number of active members in a firm."""
         result = await self.db.execute(
