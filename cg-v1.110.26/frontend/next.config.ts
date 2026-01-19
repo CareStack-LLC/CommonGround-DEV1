@@ -9,7 +9,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",  // Tailwind + Google Fonts
       "img-src 'self' data: https: blob:",
       "font-src 'self' https://fonts.gstatic.com",  // Google Fonts
-      "connect-src 'self' http://localhost:8000 ws://localhost:8000 wss://*.daily.co https://*.daily.co https://commonground-api-gdxg.onrender.com https://*.onrender.com https://unpkg.com https://cdnjs.cloudflare.com https://*.stripe.com https://*.supabase.co wss://*.supabase.co",  // Backend API + Daily.co + CDNs + Stripe + Supabase
+      "connect-src 'self' http://localhost:8000 ws://localhost:8000 wss://*.daily.co https://*.daily.co https://commonground-api-gdxg.onrender.com https://*.onrender.com wss://*.onrender.com https://unpkg.com https://cdnjs.cloudflare.com https://*.stripe.com https://*.supabase.co wss://*.supabase.co",  // Backend API + Daily.co + CDNs + Stripe + Supabase + WebSocket
       "frame-src 'self' https://*.daily.co https://www.youtube.com https://www.youtube-nocookie.com https://js.stripe.com https://*.stripe.com",  // Allow Daily.co video iframe + YouTube + Stripe 3D Secure
       "media-src 'self' https://*.daily.co blob:",  // Allow media from Daily.co
       "worker-src 'self' blob:",  // PDF.js worker
