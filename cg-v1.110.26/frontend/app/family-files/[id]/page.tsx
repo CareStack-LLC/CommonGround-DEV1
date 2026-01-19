@@ -123,6 +123,7 @@ function FamilyFileDetailContent() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+  const [showRemoveProfConfirm, setShowRemoveProfConfirm] = useState(false);
   const [settingsError, setSettingsError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -565,6 +566,59 @@ function FamilyFileDetailContent() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setShowRemoveConfirm(false)}
+                              >
+                                Cancel
+                              </CGButton>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Remove Legal Professional */}
+                    {professionals.length > 0 && (
+                      <div className="space-y-2">
+                        {!showRemoveProfConfirm ? (
+                          <button
+                            onClick={() => setShowRemoveProfConfirm(true)}
+                            className="w-full flex items-center gap-3 p-3 rounded-xl border border-cg-amber/30 bg-cg-amber-subtle/30 hover:bg-cg-amber-subtle/50 hover:border-cg-amber/50 transition-all text-left"
+                          >
+                            <Briefcase className="h-5 w-5 text-cg-amber" />
+                            <div>
+                              <div className="font-medium text-foreground">Remove Legal Professional</div>
+                              <div className="text-sm text-muted-foreground">
+                                Revoke access for {professionals[0]?.firm_name || professionals[0]?.professional_name || 'your legal professional'}
+                              </div>
+                            </div>
+                          </button>
+                        ) : (
+                          <div className="p-4 rounded-xl border border-cg-amber/50 bg-cg-amber-subtle/30 space-y-3">
+                            <p className="text-sm text-foreground font-medium">
+                              Remove legal professional access?
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {professionals[0]?.firm_name || professionals[0]?.professional_name} will lose access to this family file.
+                              You can invite a new firm from the Professional Directory afterwards.
+                            </p>
+                            <div className="flex gap-2">
+                              <CGButton
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => {
+                                  if (professionals[0]?.assignment_id) {
+                                    handleRevokeProfessionalAccess(professionals[0].assignment_id);
+                                  }
+                                  setShowRemoveProfConfirm(false);
+                                }}
+                                disabled={isRevokingAccess !== null}
+                                className="bg-cg-amber text-white hover:bg-cg-amber/90"
+                              >
+                                {isRevokingAccess ? 'Removing...' : 'Yes, Remove'}
+                              </CGButton>
+                              <CGButton
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowRemoveProfConfirm(false)}
                               >
                                 Cancel
                               </CGButton>

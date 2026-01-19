@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { familyFilesAPI, FirmDirectoryEntry, FirmPublicProfile } from '@/lib/api';
+import { familyFilesAPI, FirmDirectoryEntry, FirmPublicProfile, ProfessionalAccess } from '@/lib/api';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
@@ -50,6 +50,8 @@ import {
   Sparkles,
   ChevronRight,
   Send,
+  Settings,
+  RefreshCw,
 } from 'lucide-react';
 
 const US_STATES = [
@@ -136,9 +138,27 @@ function FindProfessionalsContent() {
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [selectedProfessionalId, setSelectedProfessionalId] = useState<string | null>(null);
 
+  // Track existing professionals on the family file
+  const [existingProfessionals, setExistingProfessionals] = useState<ProfessionalAccess[]>([]);
+  const [hasExistingFirm, setHasExistingFirm] = useState(false);
+
   useEffect(() => {
     searchFirms();
-  }, []);
+    if (familyFileId) {
+      loadExistingProfessionals();
+    }
+  }, [familyFileId]);
+
+  const loadExistingProfessionals = async () => {
+    if (!familyFileId) return;
+    try {
+      const response = await familyFilesAPI.getProfessionalAccess(familyFileId);
+      setExistingProfessionals(response.professionals || []);
+      setHasExistingFirm((response.professionals || []).length > 0);
+    } catch (err) {
+      console.error('Failed to load existing professionals:', err);
+    }
+  };
 
   const searchFirms = async () => {
     try {
@@ -581,13 +601,45 @@ function FindProfessionalsContent() {
                     </AlertDescription>
                   </Alert>
                 )}
+
+                {/* Existing Firm Warning */}
+                {familyFileId && hasExistingFirm && (
+                  <Alert className="bg-cg-amber-subtle text-cg-amber border-cg-amber/30">
+                    <RefreshCw className="h-4 w-4 text-cg-amber" />
+                    <AlertDescription>
+                      You already have a legal professional on your case. To switch firms, you'll need to remove the current professional from your{' '}
+                      <button
+                        onClick={() => {
+                          setSelectedFirm(null);
+                          router.push(`/family-files/${familyFileId}/settings`);
+                        }}
+                        className="underline font-medium hover:no-underline"
+                      >
+                        Family File Settings
+                      </button>
+                      .
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
 
               <DialogFooter>
                 <CGButton variant="ghost" onClick={() => setSelectedFirm(null)}>
                   Close
                 </CGButton>
-                {familyFileId && (
+                {familyFileId && hasExistingFirm && (
+                  <CGButton
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedFirm(null);
+                      router.push(`/family-files/${familyFileId}/settings`);
+                    }}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Go to Settings to Switch Firm
+                  </CGButton>
+                )}
+                {familyFileId && !hasExistingFirm && (
                   <CGButton
                     variant="primary"
                     onClick={handleInviteFirm}

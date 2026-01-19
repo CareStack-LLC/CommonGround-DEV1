@@ -1020,3 +1020,40 @@ async def invite_firm_from_directory(
         "created_at": request.created_at,
         "info": "Invitation sent to firm. Awaiting other parent approval and firm acceptance."
     }
+
+
+@router.delete("/{family_file_id}/professionals/{assignment_id}")
+async def remove_professional(
+    family_file_id: str,
+    assignment_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Remove a professional from this Family File.
+
+    Parents can revoke a professional's access at any time.
+    This sets the assignment status to 'withdrawn'.
+    """
+    ff_service = FamilyFileService(db)
+    await ff_service.get_family_file(family_file_id, current_user)
+
+    access_service = ProfessionalAccessService(db)
+
+    try:
+        assignment = await access_service.revoke_professional_access(
+            family_file_id=family_file_id,
+            assignment_id=assignment_id,
+            revoker_user_id=str(current_user.id),
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+    return {
+        "id": assignment.id,
+        "status": assignment.status,
+        "message": "Professional access has been revoked"
+    }
