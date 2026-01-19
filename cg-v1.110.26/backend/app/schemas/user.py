@@ -24,6 +24,7 @@ class UserProfileResponse(BaseModel):
     subscription_tier: str
     subscription_status: str
     created_at: datetime
+    is_professional: bool = False
 
     class Config:
         from_attributes = True

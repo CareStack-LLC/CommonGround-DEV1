@@ -400,7 +400,9 @@ class ProfessionalAccessService:
         """
         Professional accepts a parent's invitation.
 
-        If the request is fully approved, create the case assignment.
+        Creates the case assignment immediately so the professional can see the case
+        on their dashboard. The assignment is created even if only one parent has
+        approved - dual-parent approval status can be tracked separately.
         """
         request = await self.get_request(request_id)
         if not request:
@@ -426,25 +428,25 @@ class ProfessionalAccessService:
         await self.db.commit()
         await self.db.refresh(request)
 
-        # If the request is approved by parents, create the assignment
-        if request.status == AccessRequestStatus.APPROVED.value:
-            # Determine assignment role from requested_role or default
-            assignment_role = AssignmentRole.LEAD_ATTORNEY
-            if request.requested_role:
-                try:
-                    assignment_role = AssignmentRole(request.requested_role)
-                except ValueError:
-                    pass  # Use default
+        # Create the assignment immediately when professional accepts
+        # This allows the case to show on the professional's dashboard
+        # Determine assignment role from requested_role or default
+        assignment_role = AssignmentRole.LEAD_ATTORNEY
+        if request.requested_role:
+            try:
+                assignment_role = AssignmentRole(request.requested_role)
+            except ValueError:
+                pass  # Use default
 
-            assignment = await self.create_assignment_from_request(
-                request=request,
-                assignment_role=assignment_role,
-                representing=request.representing or "both",
-            )
-            request.case_assignment_id = assignment.id
-            request.updated_at = datetime.utcnow()
-            await self.db.commit()
-            await self.db.refresh(request)
+        assignment = await self._create_assignment_for_accepted_request(
+            request=request,
+            assignment_role=assignment_role,
+            representing=request.representing or "both",
+        )
+        request.case_assignment_id = assignment.id
+        request.updated_at = datetime.utcnow()
+        await self.db.commit()
+        await self.db.refresh(request)
 
         return request
 
@@ -949,3 +951,90 @@ class ProfessionalAccessService:
                 "parent_b_approved_at": now,
             }
         return {}
+
+    async def _create_assignment_for_accepted_request(
+        self,
+        request: ProfessionalAccessRequest,
+        assignment_role: AssignmentRole = AssignmentRole.LEAD_ATTORNEY,
+        representing: str = "both",
+    ) -> CaseAssignment:
+        """
+        Create a case assignment when a professional accepts an invitation.
+
+        This is called regardless of parent approval status - the assignment is
+        created so the professional can see the case on their dashboard. The
+        dual-parent approval status is tracked on the access request.
+        """
+        if not request.professional_id:
+            raise ValueError("Request has no linked professional")
+
+        # Check for existing assignment
+        existing = await self._get_existing_assignment(
+            request.professional_id,
+            request.family_file_id,
+        )
+        if existing:
+            if existing.status == AssignmentStatus.ACTIVE.value:
+                raise ValueError("Professional already has an active assignment to this case")
+            # Reactivate existing assignment
+            existing.status = AssignmentStatus.ACTIVE.value
+            existing.access_scopes = request.requested_scopes
+            existing.assigned_at = datetime.utcnow()
+            existing.updated_at = datetime.utcnow()
+            await self.db.commit()
+            await self.db.refresh(existing)
+            return existing
+
+        # Load firm settings if firm is specified
+        firm_settings = {}
+        if request.firm_id:
+            firm = await self.db.execute(
+                select(Firm).where(Firm.id == request.firm_id)
+            )
+            firm = firm.scalar_one_or_none()
+            if firm and firm.settings:
+                firm_settings = firm.settings
+
+        # Determine ARIA control permissions based on role
+        aria_control_roles = [
+            AssignmentRole.LEAD_ATTORNEY.value,
+            AssignmentRole.MEDIATOR.value,
+            AssignmentRole.PARENTING_COORDINATOR.value,
+        ]
+        can_control_aria = assignment_role.value in aria_control_roles
+
+        # Override with firm setting if specified
+        if "can_control_aria_by_default" in firm_settings:
+            can_control_aria = firm_settings["can_control_aria_by_default"]
+
+        # Inherit ARIA preferences from firm
+        aria_preferences = {}
+        if "default_aria_settings" in firm_settings:
+            aria_preferences = firm_settings["default_aria_settings"]
+
+        # Determine messaging permissions
+        can_message = assignment_role.value != AssignmentRole.PARALEGAL.value
+        if "can_message_by_default" in firm_settings:
+            can_message = firm_settings["can_message_by_default"]
+
+        # Create new assignment
+        assignment = CaseAssignment(
+            id=str(uuid4()),
+            professional_id=request.professional_id,
+            firm_id=request.firm_id,
+            family_file_id=request.family_file_id,
+            assignment_role=assignment_role.value,
+            representing=representing,
+            access_scopes=request.requested_scopes,
+            can_control_aria=can_control_aria,
+            aria_preferences=aria_preferences if aria_preferences else None,
+            can_message_client=can_message,
+            status=AssignmentStatus.ACTIVE.value,
+            assigned_at=datetime.utcnow(),
+        )
+
+        self.db.add(assignment)
+        await self.db.commit()
+        await self.db.refresh(assignment)
+
+        return assignment

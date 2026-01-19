@@ -21,6 +21,7 @@ import {
   DollarSign,
   Users,
   Info,
+  Briefcase,
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
@@ -102,7 +103,7 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, profile, logout } = useAuth();
   const { unreadCount } = useNotification();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -216,6 +217,15 @@ export function Navigation() {
                             <Home className="h-4 w-4 text-muted-foreground" />
                             Dashboard
                           </button>
+                          {profile?.is_professional && (
+                            <button
+                              onClick={() => handleNavigation('/professional')}
+                              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-emerald-50 transition-smooth"
+                            >
+                              <Briefcase className="h-4 w-4 text-emerald-600" />
+                              Professional Portal
+                            </button>
+                          )}
                           <button
                             onClick={() => handleNavigation('/family-files')}
                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-cg-sage-subtle transition-smooth"
@@ -323,6 +333,19 @@ export function Navigation() {
                     <Home className="h-5 w-5" />
                     Dashboard
                   </button>
+                  {profile?.is_professional && (
+                    <button
+                      onClick={() => handleNavigation('/professional')}
+                      className={`w-full nav-item ${
+                        pathname?.startsWith('/professional')
+                          ? 'active'
+                          : ''
+                      }`}
+                    >
+                      <Briefcase className="h-5 w-5 text-emerald-600" />
+                      Professional Portal
+                    </button>
+                  )}
                   <button
                     onClick={() => handleNavigation('/family-files')}
                     className={`w-full nav-item ${

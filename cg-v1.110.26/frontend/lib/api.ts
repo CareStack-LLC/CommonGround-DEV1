@@ -354,6 +354,7 @@ export interface UserProfile {
   subscription_tier: string;
   subscription_status: string;
   created_at: string;
+  is_professional?: boolean;
 }
 
 export interface UserProfileUpdate {

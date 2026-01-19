@@ -11,6 +11,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.core.supabase import get_supabase_client
 from app.models.user import User, UserProfile
+from app.models.professional import ProfessionalProfile
 from app.schemas.user import (
     UserProfileResponse,
     UserProfileUpdate,
@@ -47,6 +48,12 @@ async def get_user_profile(
 
     profile = user.profile
 
+    # Check if user has a professional profile
+    prof_result = await db.execute(
+        select(ProfessionalProfile).where(ProfessionalProfile.user_id == current_user.id)
+    )
+    is_professional = prof_result.scalar_one_or_none() is not None
+
     return UserProfileResponse(
         id=profile.id,
         user_id=user.id,
@@ -65,6 +72,7 @@ async def get_user_profile(
         subscription_tier=profile.subscription_tier,
         subscription_status=profile.subscription_status,
         created_at=profile.created_at,
+        is_professional=is_professional,
     )
 
 
@@ -112,6 +120,12 @@ async def update_user_profile(
     await db.refresh(profile)
     await db.refresh(user)
 
+    # Check if user has a professional profile
+    prof_result = await db.execute(
+        select(ProfessionalProfile).where(ProfessionalProfile.user_id == current_user.id)
+    )
+    is_professional = prof_result.scalar_one_or_none() is not None
+
     return UserProfileResponse(
         id=profile.id,
         user_id=user.id,
@@ -130,6 +144,7 @@ async def update_user_profile(
         subscription_tier=profile.subscription_tier,
         subscription_status=profile.subscription_status,
         created_at=profile.created_at,
+        is_professional=is_professional,
     )
 
 
