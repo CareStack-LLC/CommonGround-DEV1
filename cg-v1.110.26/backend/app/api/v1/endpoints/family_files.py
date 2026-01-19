@@ -143,22 +143,44 @@ async def list_family_files(
     Returns:
         List of Family Files with summary information
     """
-    service = FamilyFileService(db)
-    family_files = await service.get_user_family_files(current_user)
+    import traceback
+    import logging
+    logger = logging.getLogger(__name__)
 
-    # Build response with parent info
-    items = []
-    for ff in family_files:
-        item = _build_family_file_response(ff)
-        # Add parent info for name display
-        item["parent_a_info"] = _build_parent_info(ff.parent_a, ff.parent_a_role)
-        item["parent_b_info"] = _build_parent_info(ff.parent_b, ff.parent_b_role) if ff.parent_b else None
-        items.append(item)
+    try:
+        service = FamilyFileService(db)
+        family_files = await service.get_user_family_files(current_user)
 
-    return {
-        "items": items,
-        "total": len(family_files)
-    }
+        # Build response with parent info
+        items = []
+        for ff in family_files:
+            try:
+                item = _build_family_file_response(ff)
+                # Add parent info for name display
+                item["parent_a_info"] = _build_parent_info(ff.parent_a, ff.parent_a_role)
+                item["parent_b_info"] = _build_parent_info(ff.parent_b, ff.parent_b_role) if ff.parent_b else None
+                items.append(item)
+            except Exception as item_err:
+                logger.error(f"Error building family file response for {ff.id}: {item_err}")
+                logger.error(traceback.format_exc())
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Error processing family file {ff.id}: {str(item_err)}"
+                )
+
+        return {
+            "items": items,
+            "total": len(family_files)
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error listing family files: {e}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to list family files: {str(e)}"
+        )
 
 
 @router.get("/invitations")
