@@ -72,7 +72,7 @@ class ParentInfo(BaseModel):
     email: str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    role: str  # mother, father, parent_a, parent_b
+    role: Optional[str] = None  # mother, father, parent_a, parent_b - can be None if not set
 
     class Config:
         from_attributes = True
