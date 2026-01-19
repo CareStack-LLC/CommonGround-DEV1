@@ -897,3 +897,79 @@ async def decline_professional_access_request(
         "decline_reason": request.decline_reason,
         "message": "Request declined"
     }
+
+
+@router.get("/{family_file_id}/professionals")
+async def list_family_file_professionals(
+    family_file_id: str,
+    include_pending: bool = False,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    List professionals who have access to this Family File.
+
+    Returns active case assignments and optionally pending access requests.
+    """
+    ff_service = FamilyFileService(db)
+    await ff_service.get_family_file(family_file_id, current_user)
+
+    assignment_service = CaseAssignmentService(db)
+    assignments = await assignment_service.list_assignments_for_family_file(family_file_id)
+
+    professionals = []
+    for assignment in assignments:
+        if assignment.status != "active":
+            continue
+
+        # Get professional info
+        prof = assignment.professional
+        user = prof.user if prof else None
+
+        professionals.append({
+            "assignment_id": assignment.id,
+            "professional_id": assignment.professional_id,
+            "firm_id": assignment.firm_id,
+            "firm_name": assignment.firm.name if assignment.firm else None,
+            "role": assignment.assignment_role,
+            "representing": assignment.representing,
+            "access_scopes": assignment.access_scopes,
+            "can_control_aria": assignment.can_control_aria,
+            "can_message_client": assignment.can_message_client,
+            "assigned_at": assignment.assigned_at,
+            "professional_name": f"{user.first_name} {user.last_name}" if user else None,
+            "professional_email": user.email if user else None,
+            "professional_type": prof.professional_type if prof else None,
+            "status": assignment.status,
+        })
+
+    result = {
+        "professionals": professionals,
+        "total": len(professionals),
+    }
+
+    # Include pending access requests if requested
+    if include_pending:
+        access_service = ProfessionalAccessService(db)
+        pending_requests = await access_service.list_requests_for_family_file(family_file_id)
+        pending = [
+            {
+                "request_id": r.id,
+                "professional_id": r.professional_id,
+                "firm_id": r.firm_id,
+                "requested_role": r.requested_role,
+                "requested_scopes": r.requested_scopes,
+                "status": r.status,
+                "message": r.message,
+                "parent_a_approved": r.parent_a_approved,
+                "parent_b_approved": r.parent_b_approved,
+                "created_at": r.created_at,
+                "expires_at": r.expires_at,
+            }
+            for r in pending_requests
+            if r.status == "pending"
+        ]
+        result["pending_requests"] = pending
+        result["pending_count"] = len(pending)
+
+    return result
