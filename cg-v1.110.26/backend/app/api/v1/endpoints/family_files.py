@@ -899,6 +899,41 @@ async def decline_professional_access_request(
     }
 
 
+# Alias routes for frontend compatibility (uses /professionals/requests/ path)
+@router.post("/{family_file_id}/professionals/requests/{request_id}/approve")
+async def approve_professional_request_alias(
+    family_file_id: str,
+    request_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Alias for approve_professional_access_request for frontend compatibility."""
+    return await approve_professional_access_request(
+        family_file_id=family_file_id,
+        request_id=request_id,
+        current_user=current_user,
+        db=db
+    )
+
+
+@router.post("/{family_file_id}/professionals/requests/{request_id}/decline")
+async def decline_professional_request_alias(
+    family_file_id: str,
+    request_id: str,
+    reason: str = Body(None, embed=True),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Alias for decline_professional_access_request for frontend compatibility."""
+    return await decline_professional_access_request(
+        family_file_id=family_file_id,
+        request_id=request_id,
+        reason=reason,
+        current_user=current_user,
+        db=db
+    )
+
+
 @router.get("/{family_file_id}/professionals")
 async def list_family_file_professionals(
     family_file_id: str,
