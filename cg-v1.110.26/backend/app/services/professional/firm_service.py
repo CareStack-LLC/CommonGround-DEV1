@@ -224,8 +224,12 @@ class FirmService:
         firm_type: Optional[FirmType] = None,
         limit: int = 50,
         offset: int = 0,
-    ) -> tuple[list[Firm], int]:
-        """Search public firms with total count and professional counts."""
+    ) -> tuple[list[dict], int]:
+        """Search public firms with total count and professional counts.
+
+        Returns dicts instead of Firm objects to avoid issues with
+        columns that may not exist in the database yet.
+        """
         # Build base condition
         base_condition = and_(
             Firm.is_public == True,
@@ -252,10 +256,20 @@ class FirmService:
         count_result = await self.db.execute(count_stmt)
         total = count_result.scalar() or 0
 
-        # Get firms with member counts
+        # Get firms with member counts - select only columns we know exist
         stmt = (
             select(
-                Firm,
+                Firm.id,
+                Firm.name,
+                Firm.slug,
+                Firm.firm_type,
+                Firm.city,
+                Firm.state,
+                Firm.logo_url,
+                Firm.website,
+                Firm.email,
+                Firm.phone,
+                Firm.primary_color,
                 func.count(FirmMembership.id).label('professional_count')
             )
             .outerjoin(
@@ -266,7 +280,19 @@ class FirmService:
                 )
             )
             .where(and_(*filters))
-            .group_by(Firm.id)
+            .group_by(
+                Firm.id,
+                Firm.name,
+                Firm.slug,
+                Firm.firm_type,
+                Firm.city,
+                Firm.state,
+                Firm.logo_url,
+                Firm.website,
+                Firm.email,
+                Firm.phone,
+                Firm.primary_color,
+            )
             .order_by(Firm.name)
             .limit(limit)
             .offset(offset)
@@ -275,12 +301,25 @@ class FirmService:
         result = await self.db.execute(stmt)
         rows = result.all()
 
-        # Attach professional_count to each firm object
+        # Return as dicts
         firms = []
         for row in rows:
-            firm = row[0]
-            firm.professional_count = row[1]
-            firms.append(firm)
+            firms.append({
+                'id': str(row.id),
+                'name': row.name,
+                'slug': row.slug,
+                'firm_type': row.firm_type,
+                'city': row.city,
+                'state': row.state,
+                'logo_url': row.logo_url,
+                'website': row.website,
+                'email': row.email,
+                'phone': row.phone,
+                'primary_color': row.primary_color,
+                'professional_count': row.professional_count,
+                'description': None,  # Column may not exist yet
+                'practice_areas': [],  # Column may not exist yet
+            })
 
         return firms, total
 
