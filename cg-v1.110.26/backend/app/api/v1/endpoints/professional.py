@@ -688,10 +688,10 @@ async def search_directory(
             website=f.website,
             email=f.email,
             phone=f.phone,
-            primary_color=f.primary_color,
-            practice_areas=f.practice_areas or [],
+            primary_color=getattr(f, 'primary_color', None),
+            practice_areas=getattr(f, 'practice_areas', None) or [],
             professional_count=getattr(f, 'professional_count', 0) or 0,
-            description=f.description,
+            description=getattr(f, 'description', None),
         )
         for f in firms
     ]
