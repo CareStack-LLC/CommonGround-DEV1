@@ -125,6 +125,48 @@ class FirmService:
         )
         return result.scalar_one_or_none()
 
+    async def get_public_firm_by_slug(self, slug: str) -> Optional[dict]:
+        """Get a public firm by slug for directory - selects only safe columns."""
+        stmt = select(
+            Firm.id,
+            Firm.name,
+            Firm.slug,
+            Firm.firm_type,
+            Firm.city,
+            Firm.state,
+            Firm.logo_url,
+            Firm.website,
+            Firm.email,
+            Firm.phone,
+            Firm.primary_color,
+            Firm.is_public,
+            Firm.is_active,
+        ).where(Firm.slug == slug)
+
+        result = await self.db.execute(stmt)
+        row = result.one_or_none()
+
+        if not row:
+            return None
+
+        return {
+            'id': str(row.id),
+            'name': row.name,
+            'slug': row.slug,
+            'firm_type': row.firm_type,
+            'city': row.city,
+            'state': row.state,
+            'logo_url': row.logo_url,
+            'website': row.website,
+            'email': row.email,
+            'phone': row.phone,
+            'primary_color': row.primary_color,
+            'is_public': row.is_public,
+            'is_active': row.is_active,
+            'description': None,  # Column may not exist yet
+            'practice_areas': [],  # Column may not exist yet
+        }
+
     async def update_firm(
         self,
         firm_id: str,

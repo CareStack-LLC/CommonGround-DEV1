@@ -710,32 +710,32 @@ async def get_directory_firm(
 ):
     """Get a firm's public profile by slug. Does not require authentication."""
     service = FirmService(db)
-    firm = await service.get_firm_by_slug(firm_slug)
+    firm = await service.get_public_firm_by_slug(firm_slug)
 
-    if not firm or not firm.is_public or not firm.is_active:
+    if not firm or not firm['is_public'] or not firm['is_active']:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Firm not found.",
         )
 
     # Get professional count
-    professional_count = await service.get_firm_member_count(str(firm.id))
+    professional_count = await service.get_firm_member_count(firm['id'])
 
     return FirmPublicResponse(
-        id=str(firm.id),
-        name=firm.name,
-        slug=firm.slug,
-        firm_type=FirmType(firm.firm_type),
-        city=firm.city,
-        state=firm.state,
-        logo_url=firm.logo_url,
-        website=firm.website,
-        email=firm.email,
-        phone=firm.phone,
-        primary_color=firm.primary_color,
-        practice_areas=getattr(firm, 'practice_areas', None) or [],
+        id=firm['id'],
+        name=firm['name'],
+        slug=firm['slug'],
+        firm_type=FirmType(firm['firm_type']),
+        city=firm['city'],
+        state=firm['state'],
+        logo_url=firm['logo_url'],
+        website=firm['website'],
+        email=firm['email'],
+        phone=firm['phone'],
+        primary_color=firm['primary_color'],
+        practice_areas=firm['practice_areas'] or [],
         professional_count=professional_count,
-        description=getattr(firm, 'description', None),
+        description=firm['description'],
     )
 
 
