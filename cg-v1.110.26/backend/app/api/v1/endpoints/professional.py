@@ -773,22 +773,38 @@ async def list_firm_invitations(
         status=status_filter,
     )
 
+    def build_invitation_response(inv):
+        ff = inv.family_file
+        parent_a = ff.parent_a if ff else None
+        parent_b = ff.parent_b if ff else None
+        return {
+            "id": inv.id,
+            "family_file_id": inv.family_file_id,
+            "family_file_number": ff.family_file_number if ff else None,
+            "family_file_title": ff.title if ff else None,
+            "state": ff.state if ff else None,
+            "county": ff.county if ff else None,
+            "children_count": len(ff.children) if ff and ff.children else 0,
+            "parent_a_name": f"{parent_a.first_name} {parent_a.last_name}" if parent_a else None,
+            "parent_b_name": f"{parent_b.first_name} {parent_b.last_name}" if parent_b else None,
+            "requested_by_user_id": inv.requested_by_user_id,
+            "requested_scopes": inv.requested_scopes or [],
+            "requested_role": inv.requested_role,
+            "representing": inv.representing,
+            "message": inv.message,
+            "status": inv.status,
+            "parent_a_approved": inv.parent_a_approved,
+            "parent_b_approved": inv.parent_b_approved,
+            "parent_a_approved_at": inv.parent_a_approved_at,
+            "parent_b_approved_at": inv.parent_b_approved_at,
+            "professional_id": inv.professional_id,
+            "case_assignment_id": inv.case_assignment_id,
+            "created_at": inv.created_at,
+            "expires_at": inv.expires_at,
+        }
+
     return {
-        "items": [
-            {
-                "id": inv.id,
-                "family_file_id": inv.family_file_id,
-                "family_file_number": inv.family_file.family_file_number if inv.family_file else None,
-                "requested_by_user_id": inv.requested_by_user_id,
-                "message": inv.message,
-                "status": inv.status,
-                "parent_a_approved": inv.parent_a_approved,
-                "parent_b_approved": inv.parent_b_approved,
-                "created_at": inv.created_at,
-                "expires_at": inv.expires_at,
-            }
-            for inv in invitations
-        ],
+        "items": [build_invitation_response(inv) for inv in invitations],
         "total": len(invitations),
     }
 
@@ -876,6 +892,74 @@ async def accept_firm_invitation(
         "professional_id": invitation.professional_id,
         "case_assignment_id": invitation.case_assignment_id,
         "message": "Professional assigned" if invitation.status == AccessRequestStatus.PENDING.value else "Invitation accepted and access granted",
+    }
+
+
+@router.post(
+    "/firms/{firm_id}/invitations/{invitation_id}/decline",
+    summary="Decline parent invitation to firm",
+)
+async def decline_firm_invitation(
+    firm_id: str,
+    invitation_id: str,
+    reason: Optional[str] = Body(None, embed=True, description="Optional reason for declining"),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Decline a parent's invitation.
+
+    Only firm owners, partners, or admins can decline invitations.
+    """
+    firm_service = FirmService(db)
+    membership = await firm_service.get_membership(profile.id, firm_id)
+    if not membership or membership.status != MembershipStatus.ACTIVE.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not an active member of this firm",
+        )
+
+    # Check if user has permission to decline (admin/partner roles)
+    if membership.role not in [FirmRole.OWNER.value, FirmRole.PARTNER.value, FirmRole.ADMIN.value]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only firm owners, partners, or admins can decline invitations",
+        )
+
+    access_service = ProfessionalAccessService(db)
+    invitation = await access_service.get_request(invitation_id)
+
+    if not invitation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invitation not found",
+        )
+
+    if invitation.firm_id != firm_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invitation is not for this firm",
+        )
+
+    if invitation.status != AccessRequestStatus.PENDING.value:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invitation is not pending (status: {invitation.status})",
+        )
+
+    # Update invitation status to declined
+    invitation.status = AccessRequestStatus.DECLINED.value
+    invitation.declined_at = datetime.utcnow()
+    invitation.decline_reason = reason
+
+    await db.commit()
+    await db.refresh(invitation)
+
+    return {
+        "id": invitation.id,
+        "status": invitation.status,
+        "decline_reason": invitation.decline_reason,
+        "message": "Invitation declined",
     }
 
 

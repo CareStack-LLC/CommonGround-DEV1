@@ -745,7 +745,11 @@ class ProfessionalAccessService:
         query = (
             select(ProfessionalAccessRequest)
             .options(
-                selectinload(ProfessionalAccessRequest.family_file),
+                selectinload(ProfessionalAccessRequest.family_file).options(
+                    selectinload(FamilyFile.parent_a),
+                    selectinload(FamilyFile.parent_b),
+                    selectinload(FamilyFile.children),
+                ),
             )
             .where(
                 and_(

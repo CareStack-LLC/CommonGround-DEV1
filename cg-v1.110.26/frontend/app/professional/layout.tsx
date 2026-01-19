@@ -331,6 +331,14 @@ function ProfessionalNavigation({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Calculate combined intake + firm invitations badge
+  const intakeAndInvitationsBadge = (() => {
+    const pendingIntakes = dashboardData?.pending_intakes || 0;
+    const pendingFirmInvitations = dashboardData?.pending_firm_invitations || 0;
+    const total = pendingIntakes + pendingFirmInvitations;
+    return total > 0 ? total.toString() : undefined;
+  })();
+
   const mainNavItems: { href: string; label: string; icon: React.ReactNode; badge?: string }[] = [
     {
       href: "/professional/dashboard",
@@ -347,7 +355,7 @@ function ProfessionalNavigation({
       href: "/professional/intake",
       label: "Intake",
       icon: <Bot className="h-4 w-4" />,
-      badge: dashboardData?.pending_intakes > 0 ? dashboardData.pending_intakes.toString() : undefined,
+      badge: intakeAndInvitationsBadge,
     },
     {
       href: "/professional/messages",
@@ -402,9 +410,16 @@ function ProfessionalNavigation({
 
             {/* Quick Actions */}
             <div className="flex items-center gap-2">
+              {dashboardData?.pending_firm_invitations > 0 && (
+                <Link href="/professional/intake?tab=invitations">
+                  <Badge className="text-xs bg-amber-100 text-amber-800 hover:bg-amber-200 cursor-pointer">
+                    {dashboardData.pending_firm_invitations} case invitation{dashboardData.pending_firm_invitations !== 1 ? "s" : ""}
+                  </Badge>
+                </Link>
+              )}
               {dashboardData?.pending_intakes > 0 && (
                 <Badge variant="warning" className="text-xs">
-                  {dashboardData.pending_intakes} pending intakes
+                  {dashboardData.pending_intakes} pending intake{dashboardData.pending_intakes !== 1 ? "s" : ""}
                 </Badge>
               )}
               <Button

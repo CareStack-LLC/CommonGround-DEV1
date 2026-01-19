@@ -60,8 +60,11 @@ class ProfessionalDashboardService:
         # Get pending intakes
         pending_intakes = await self._get_pending_intake_count(professional_id)
 
-        # Get pending approvals (access requests)
+        # Get pending approvals (access requests to individual professional)
         pending_approvals = await self._get_pending_approval_count(professional_id)
+
+        # Get pending firm invitations (parent-initiated requests to firms)
+        pending_firm_invitations = await self._get_pending_firm_invitations_count(professional_id)
 
         # Get unread messages
         unread_messages = await self._get_unread_message_count(professional_id)
@@ -79,6 +82,7 @@ class ProfessionalDashboardService:
             "case_count": case_count,
             "pending_intakes": pending_intakes,
             "pending_approvals": pending_approvals,
+            "pending_firm_invitations": pending_firm_invitations,
             "unread_messages": unread_messages,
             "upcoming_events": upcoming_events,
             "alerts": alerts,
@@ -374,6 +378,43 @@ class ProfessionalDashboardService:
             select(func.count(ProfessionalAccessRequest.id)).where(
                 and_(
                     ProfessionalAccessRequest.professional_id == professional_id,
+                    ProfessionalAccessRequest.status == AccessRequestStatus.PENDING.value,
+                    ProfessionalAccessRequest.requested_by == "parent",
+                )
+            )
+        )
+        return result.scalar() or 0
+
+    async def _get_pending_firm_invitations_count(
+        self,
+        professional_id: str,
+    ) -> int:
+        """
+        Count pending firm invitations (parent-initiated requests to firms).
+
+        Only counts invitations for firms where the professional is OWNER, ADMIN, or PARTNER.
+        """
+        # Get firm IDs where professional has admin-level access
+        admin_roles = ["OWNER", "ADMIN", "PARTNER"]
+        firm_result = await self.db.execute(
+            select(FirmMembership.firm_id).where(
+                and_(
+                    FirmMembership.professional_id == professional_id,
+                    FirmMembership.status == MembershipStatus.ACTIVE.value,
+                    FirmMembership.role.in_(admin_roles),
+                )
+            )
+        )
+        firm_ids = [row[0] for row in firm_result.fetchall()]
+
+        if not firm_ids:
+            return 0
+
+        # Count pending invitations for those firms
+        result = await self.db.execute(
+            select(func.count(ProfessionalAccessRequest.id)).where(
+                and_(
+                    ProfessionalAccessRequest.firm_id.in_(firm_ids),
                     ProfessionalAccessRequest.status == AccessRequestStatus.PENDING.value,
                     ProfessionalAccessRequest.requested_by == "parent",
                 )
