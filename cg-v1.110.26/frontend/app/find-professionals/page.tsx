@@ -629,7 +629,7 @@ function FindProfessionalsContent() {
                 </CGButton>
                 {familyFileId && hasExistingFirm && (
                   <CGButton
-                    variant="outline"
+                    variant="secondary"
                     onClick={() => {
                       setSelectedFirm(null);
                       router.push(`/family-files/${familyFileId}/settings`);
