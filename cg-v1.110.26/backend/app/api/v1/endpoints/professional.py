@@ -835,11 +835,11 @@ async def accept_firm_invitation(
             detail="Not an active member of this firm",
         )
 
-    # Check if user has permission to accept (admin/partner roles)
-    if membership.role not in [FirmRole.OWNER.value, FirmRole.PARTNER.value, FirmRole.ADMIN.value]:
+    # Check if user has permission to accept (owner/admin/attorney roles)
+    if membership.role not in [FirmRole.OWNER.value, FirmRole.ADMIN.value, FirmRole.ATTORNEY.value]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only firm owners, partners, or admins can accept invitations",
+            detail="Only firm owners, admins, or attorneys can accept invitations",
         )
 
     # Verify assigned professional is a member of the firm
@@ -872,27 +872,35 @@ async def accept_firm_invitation(
         )
 
     # Update invitation with assigned professional
-    invitation.professional_id = assigned_professional_id
+    try:
+        invitation.professional_id = assigned_professional_id
 
-    # If both parents have already approved, create assignment
-    if invitation.parent_a_approved and invitation.parent_b_approved:
-        invitation.status = AccessRequestStatus.APPROVED.value
-        invitation.approved_at = datetime.utcnow()
+        # If both parents have already approved, create assignment
+        if invitation.parent_a_approved and invitation.parent_b_approved:
+            invitation.status = AccessRequestStatus.APPROVED.value
+            invitation.approved_at = datetime.utcnow()
 
-        # Create case assignment
-        assignment = await access_service.create_assignment_from_request(invitation)
-        invitation.case_assignment_id = str(assignment.id)
+            # Create case assignment
+            assignment = await access_service.create_assignment_from_request(invitation)
+            invitation.case_assignment_id = str(assignment.id)
 
-    await db.commit()
-    await db.refresh(invitation)
+        await db.commit()
+        await db.refresh(invitation)
 
-    return {
-        "id": invitation.id,
-        "status": invitation.status,
-        "professional_id": invitation.professional_id,
-        "case_assignment_id": invitation.case_assignment_id,
-        "message": "Professional assigned" if invitation.status == AccessRequestStatus.PENDING.value else "Invitation accepted and access granted",
-    }
+        return {
+            "id": str(invitation.id),
+            "status": invitation.status,
+            "professional_id": invitation.professional_id,
+            "case_assignment_id": invitation.case_assignment_id,
+            "message": "Professional assigned" if invitation.status == AccessRequestStatus.PENDING.value else "Invitation accepted and access granted",
+        }
+    except Exception as e:
+        import traceback
+        error_detail = f"{type(e).__name__}: {str(e)}\n{traceback.format_exc()}"
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=error_detail,
+        )
 
 
 @router.post(
@@ -919,11 +927,11 @@ async def decline_firm_invitation(
             detail="Not an active member of this firm",
         )
 
-    # Check if user has permission to decline (admin/partner roles)
-    if membership.role not in [FirmRole.OWNER.value, FirmRole.PARTNER.value, FirmRole.ADMIN.value]:
+    # Check if user has permission to decline (owner/admin/attorney roles)
+    if membership.role not in [FirmRole.OWNER.value, FirmRole.ADMIN.value, FirmRole.ATTORNEY.value]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only firm owners, partners, or admins can decline invitations",
+            detail="Only firm owners, admins, or attorneys can decline invitations",
         )
 
     access_service = ProfessionalAccessService(db)
