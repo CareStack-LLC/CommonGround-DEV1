@@ -3,7 +3,17 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { familyFilesAPI, quickAccordsAPI, agreementsAPI, getImageUrl, FamilyFileDetail, QuickAccord, Agreement } from '@/lib/api';
+import {
+  familyFilesAPI,
+  quickAccordsAPI,
+  agreementsAPI,
+  getImageUrl,
+  FamilyFileDetail,
+  QuickAccord,
+  Agreement,
+  ProfessionalAccess,
+  ProfessionalAccessRequest,
+} from '@/lib/api';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
@@ -67,7 +77,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { IncomingCallBanner } from "@/components/kidcoms/incoming-call-banner";
 import { cn } from '@/lib/utils';
-import { Trash2, UserMinus, Pencil, Gavel } from 'lucide-react';
+import { Trash2, UserMinus, Pencil, Gavel, Briefcase, Building2, XCircle, CheckCircle2, ExternalLink } from 'lucide-react';
 
 /* =============================================================================
    Family File Detail Page - "The Sanctuary of Truth"
@@ -85,6 +95,17 @@ function FamilyFileDetailContent() {
   const [agreements, setAgreements] = useState<Agreement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Professional Access State
+  const [professionals, setProfessionals] = useState<ProfessionalAccess[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<ProfessionalAccessRequest[]>([]);
+  const [isInviteProfOpen, setIsInviteProfOpen] = useState(false);
+  const [profEmail, setProfEmail] = useState('');
+  const [isInvitingProf, setIsInvitingProf] = useState(false);
+  const [profInviteError, setProfInviteError] = useState<string | null>(null);
+  const [profInviteSuccess, setProfInviteSuccess] = useState<string | null>(null);
+  const [isRevokingAccess, setIsRevokingAccess] = useState<string | null>(null);
+  const [isProcessingRequest, setIsProcessingRequest] = useState<string | null>(null);
 
   // Invitation State
   const [isInviteOpen, setIsInviteOpen] = useState(false);
@@ -120,6 +141,9 @@ function FamilyFileDetailContent() {
       setFamilyFile(fileData);
       setQuickAccords(accordsData.items);
       setAgreements(agreementsData.items || []);
+
+      // Load professional access data (non-blocking)
+      loadProfessionalAccess();
     } catch (err: any) {
       console.error('Failed to load family file:', err);
       if (err.message?.includes('401') || err.message?.includes('Unauthorized')) {
@@ -129,6 +153,17 @@ function FamilyFileDetailContent() {
       setError(err.message || 'Failed to load family file');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadProfessionalAccess = async () => {
+    try {
+      const data = await familyFilesAPI.getProfessionalAccess(id);
+      setProfessionals(data.professionals || []);
+      setPendingRequests(data.pending_requests || []);
+    } catch (err) {
+      // Silently fail - professional access is optional
+      console.error('Failed to load professional access:', err);
     }
   };
 
@@ -210,6 +245,81 @@ function FamilyFileDetailContent() {
     setShowRemoveConfirm(false);
     setIsEditingTitle(false);
     setIsSettingsOpen(true);
+  };
+
+  // Professional Access Handlers
+  const handleInviteProfessional = async () => {
+    if (!profEmail) {
+      setProfInviteError('Please enter an email address');
+      return;
+    }
+
+    try {
+      setIsInvitingProf(true);
+      setProfInviteError(null);
+      setProfInviteSuccess(null);
+      await familyFilesAPI.inviteProfessional(id, { email: profEmail });
+      setProfInviteSuccess(`Invitation sent to ${profEmail}`);
+      setProfEmail('');
+      loadProfessionalAccess();
+      setTimeout(() => {
+        setIsInviteProfOpen(false);
+        setProfInviteSuccess(null);
+      }, 2000);
+    } catch (err: any) {
+      console.error('Failed to invite professional:', err);
+      setProfInviteError(err.message || 'Failed to send invitation');
+    } finally {
+      setIsInvitingProf(false);
+    }
+  };
+
+  const handleApproveRequest = async (requestId: string) => {
+    try {
+      setIsProcessingRequest(requestId);
+      await familyFilesAPI.approveProfessionalRequest(id, requestId);
+      loadProfessionalAccess();
+    } catch (err: any) {
+      console.error('Failed to approve request:', err);
+    } finally {
+      setIsProcessingRequest(null);
+    }
+  };
+
+  const handleDeclineRequest = async (requestId: string) => {
+    try {
+      setIsProcessingRequest(requestId);
+      await familyFilesAPI.declineProfessionalRequest(id, requestId);
+      loadProfessionalAccess();
+    } catch (err: any) {
+      console.error('Failed to decline request:', err);
+    } finally {
+      setIsProcessingRequest(null);
+    }
+  };
+
+  const handleRevokeProfessionalAccess = async (assignmentId: string) => {
+    try {
+      setIsRevokingAccess(assignmentId);
+      await familyFilesAPI.revokeProfessionalAccess(id, assignmentId);
+      loadProfessionalAccess();
+    } catch (err: any) {
+      console.error('Failed to revoke access:', err);
+    } finally {
+      setIsRevokingAccess(null);
+    }
+  };
+
+  const getProfessionalTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      attorney: 'Attorney',
+      paralegal: 'Paralegal',
+      mediator: 'Mediator',
+      parenting_coordinator: 'Parenting Coordinator',
+      intake_coordinator: 'Intake Coordinator',
+      practice_admin: 'Practice Admin',
+    };
+    return labels[type] || type;
   };
 
   const getRoleName = (role: string | null) => {
@@ -950,6 +1060,198 @@ function FamilyFileDetailContent() {
                   {new Date(familyFile.created_at).toLocaleDateString()}
                 </span>
               </div>
+            </CGCardContent>
+          </CGCard>
+
+          {/* Professional Access */}
+          <CGCard variant="elevated">
+            <CGCardHeader className="flex flex-row items-center justify-between">
+              <CGCardTitle className="flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-emerald-600" />
+                Legal Team
+              </CGCardTitle>
+              <Dialog open={isInviteProfOpen} onOpenChange={setIsInviteProfOpen}>
+                <DialogTrigger asChild>
+                  <CGButton variant="ghost" size="sm">
+                    <Plus className="h-4 w-4" />
+                  </CGButton>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Briefcase className="h-5 w-5 text-emerald-600" />
+                      Invite a Professional
+                    </DialogTitle>
+                    <DialogDescription>
+                      Invite an attorney, mediator, or other legal professional to access your family file.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="prof-email">Professional's Email</Label>
+                      <Input
+                        id="prof-email"
+                        placeholder="attorney@lawfirm.com"
+                        type="email"
+                        value={profEmail}
+                        onChange={(e) => setProfEmail(e.target.value)}
+                        className="focus-visible:ring-emerald-600"
+                      />
+                    </div>
+                    <CGButton
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        setIsInviteProfOpen(false);
+                        router.push('/find-professionals');
+                      }}
+                    >
+                      <Building2 className="h-4 w-4 mr-2" />
+                      Browse Firm Directory Instead
+                    </CGButton>
+                    {profInviteError && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{profInviteError}</AlertDescription>
+                      </Alert>
+                    )}
+                    {profInviteSuccess && (
+                      <Alert className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                        <CheckCircle className="h-4 w-4 text-emerald-600" />
+                        <AlertDescription>{profInviteSuccess}</AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                  <DialogFooter>
+                    <CGButton variant="ghost" onClick={() => setIsInviteProfOpen(false)}>
+                      Cancel
+                    </CGButton>
+                    <CGButton
+                      variant="secondary"
+                      className="bg-emerald-600 text-white hover:bg-emerald-700"
+                      onClick={handleInviteProfessional}
+                      disabled={isInvitingProf || !!profInviteSuccess}
+                    >
+                      {isInvitingProf ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4 mr-2" />
+                          Send Invite
+                        </>
+                      )}
+                    </CGButton>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </CGCardHeader>
+            <CGCardContent>
+              {/* Pending Access Requests */}
+              {pendingRequests.length > 0 && (
+                <div className="mb-4 space-y-2">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Pending Requests
+                  </div>
+                  {pendingRequests.map((request) => (
+                    <div
+                      key={request.id}
+                      className="flex items-center justify-between p-3 rounded-xl border border-amber-200 bg-amber-50"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                          <Briefcase className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-foreground text-sm">
+                            {request.professional_name || request.professional_email}
+                          </div>
+                          {request.firm_name && (
+                            <div className="text-xs text-muted-foreground">{request.firm_name}</div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CGButton
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50"
+                          onClick={() => handleApproveRequest(request.id)}
+                          disabled={isProcessingRequest === request.id}
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                        </CGButton>
+                        <CGButton
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-red-500 hover:bg-red-50"
+                          onClick={() => handleDeclineRequest(request.id)}
+                          disabled={isProcessingRequest === request.id}
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </CGButton>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Active Professionals */}
+              {professionals.length === 0 && pendingRequests.length === 0 ? (
+                <CGEmptyState
+                  icon={<Briefcase className="h-6 w-6" />}
+                  title="No professionals yet"
+                  description="Invite your attorney or mediator"
+                  size="sm"
+                />
+              ) : professionals.length > 0 ? (
+                <div className="space-y-2">
+                  {professionals.map((prof) => (
+                    <div
+                      key={prof.assignment_id}
+                      className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                          <Briefcase className="h-4 w-4 text-emerald-600" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-medium text-foreground text-sm truncate">
+                            {prof.professional_name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {getProfessionalTypeLabel(prof.professional_type)}
+                            {prof.firm_name && ` · ${prof.firm_name}`}
+                          </div>
+                        </div>
+                      </div>
+                      <CGButton
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-muted-foreground hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleRevokeProfessionalAccess(prof.assignment_id)}
+                        disabled={isRevokingAccess === prof.assignment_id}
+                      >
+                        <XCircle className="h-4 w-4" />
+                      </CGButton>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {/* Find Professionals Link */}
+              <CGButton
+                variant="ghost"
+                size="sm"
+                className="w-full mt-3 text-muted-foreground hover:text-foreground"
+                onClick={() => router.push('/find-professionals')}
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Browse Firm Directory
+              </CGButton>
             </CGCardContent>
           </CGCard>
         </div>

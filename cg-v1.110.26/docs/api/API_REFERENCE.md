@@ -1,7 +1,7 @@
 # CommonGround V1 - Complete API Reference
 
-**Last Updated:** January 17, 2026
-**API Version:** 1.5.0
+**Last Updated:** January 18, 2026
+**API Version:** 1.6.0
 **Base URL:** `https://commonground-api-gdxg.onrender.com/api/v1`
 **Local Development:** `http://localhost:8000/api/v1`
 
@@ -36,6 +36,7 @@
    - [Court Portal](#court-portal-endpoints)
    - [Exports](#exports-endpoints)
    - [Notifications](#notifications-endpoints)
+   - [Professional Portal](#professional-portal-endpoints)
 6. [Webhooks](#webhooks)
 7. [Rate Limiting](#rate-limiting)
 8. [SDK Examples](#sdk-examples)
@@ -2987,6 +2988,747 @@ Get notification preferences.
 
 ---
 
+### Professional Portal Endpoints
+
+> **v1.6.0:** New section for legal professional case management
+
+The Professional Portal provides a complete case management system for attorneys, mediators, paralegals, and other family law professionals.
+
+---
+
+#### GET /professional/profile
+Get current professional's profile.
+
+**Response (200):**
+```json
+{
+  "data": {
+    "id": "profile-uuid",
+    "user_id": "user-uuid",
+    "professional_type": "attorney",
+    "license_number": "CA12345",
+    "license_state": "CA",
+    "license_verified": true,
+    "credentials": {
+      "bar_number": "12345",
+      "certifications": ["family_law"]
+    },
+    "practice_areas": ["custody", "divorce", "mediation"],
+    "is_active": true,
+    "onboarded_at": "2026-01-15T10:00:00Z"
+  }
+}
+```
+
+---
+
+#### POST /professional/profile
+Create professional profile (onboarding).
+
+**Request:**
+```json
+{
+  "professional_type": "attorney",
+  "license_number": "CA12345",
+  "license_state": "CA",
+  "practice_areas": ["custody", "divorce"],
+  "credentials": {
+    "bar_number": "12345"
+  }
+}
+```
+
+**Response (201):**
+```json
+{
+  "data": {
+    "id": "profile-uuid",
+    "professional_type": "attorney",
+    "license_verified": false,
+    "is_active": true
+  }
+}
+```
+
+---
+
+#### PATCH /professional/profile
+Update professional profile.
+
+**Request:**
+```json
+{
+  "practice_areas": ["custody", "divorce", "mediation"],
+  "notification_preferences": {
+    "email_new_cases": true,
+    "email_daily_digest": true
+  }
+}
+```
+
+---
+
+#### GET /professional/firms
+List firms the professional belongs to.
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "firm-uuid",
+      "name": "Smith Family Law",
+      "slug": "smith-family-law",
+      "firm_type": "law_firm",
+      "role": "owner",
+      "member_count": 5,
+      "is_active": true
+    }
+  ]
+}
+```
+
+---
+
+#### POST /professional/firms
+Create a new firm.
+
+**Request:**
+```json
+{
+  "name": "Smith Family Law",
+  "firm_type": "law_firm",
+  "email": "contact@smithlaw.com",
+  "phone": "+1-555-123-4567",
+  "address": {
+    "line1": "123 Legal St",
+    "city": "Los Angeles",
+    "state": "CA",
+    "zip": "90001"
+  },
+  "is_public": true
+}
+```
+
+**Response (201):**
+```json
+{
+  "data": {
+    "id": "firm-uuid",
+    "name": "Smith Family Law",
+    "slug": "smith-family-law",
+    "firm_type": "law_firm"
+  }
+}
+```
+
+---
+
+#### GET /professional/firms/{firm_id}/members
+List firm members.
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "membership-uuid",
+      "professional_id": "prof-uuid",
+      "user_name": "John Smith",
+      "user_email": "john@smithlaw.com",
+      "role": "owner",
+      "status": "active",
+      "joined_at": "2026-01-01T10:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+#### POST /professional/firms/{firm_id}/members/invite
+Invite a new member to the firm.
+
+**Request:**
+```json
+{
+  "email": "newlawyer@smithlaw.com",
+  "role": "attorney",
+  "custom_permissions": {
+    "can_manage_templates": true
+  }
+}
+```
+
+**Response (201):**
+```json
+{
+  "data": {
+    "id": "membership-uuid",
+    "email": "newlawyer@smithlaw.com",
+    "role": "attorney",
+    "status": "invited",
+    "invited_at": "2026-01-18T10:00:00Z"
+  }
+}
+```
+
+---
+
+#### GET /professional/dashboard
+Get aggregated dashboard data.
+
+**Query Parameters:**
+- `firm_id`: Filter by specific firm (optional)
+
+**Response (200):**
+```json
+{
+  "data": {
+    "case_count": 15,
+    "pending_intakes": 3,
+    "pending_approvals": 2,
+    "unread_messages": 8,
+    "upcoming_events": [
+      {
+        "id": "event-uuid",
+        "title": "Status Hearing - Smith v. Jones",
+        "event_date": "2026-01-20",
+        "event_type": "hearing",
+        "is_mandatory": true
+      }
+    ],
+    "alerts": [
+      {
+        "type": "court_deadline",
+        "severity": "high",
+        "title": "Response Due",
+        "message": "Response to motion due in 3 days",
+        "case_id": "case-uuid"
+      }
+    ],
+    "recent_activity": [
+      {
+        "activity_type": "intake_completed",
+        "title": "New Client Intake",
+        "description": "Sarah Johnson completed intake",
+        "timestamp": "2026-01-18T09:30:00Z"
+      }
+    ]
+  }
+}
+```
+
+---
+
+#### GET /professional/cases
+List assigned cases.
+
+**Query Parameters:**
+- `status`: Filter by status (active, on_hold, completed)
+- `assignment_role`: Filter by role (lead_attorney, associate, paralegal)
+- `firm_id`: Filter by firm
+- `search`: Search case names
+- `page`, `per_page`: Pagination
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "family-file-uuid",
+      "case_name": "Smith v. Jones",
+      "assignment_role": "lead_attorney",
+      "representing": "parent_a",
+      "status": "active",
+      "parent_a": {
+        "id": "user-uuid",
+        "name": "John Smith"
+      },
+      "parent_b": {
+        "id": "user-uuid",
+        "name": "Jane Jones"
+      },
+      "children_count": 2,
+      "unread_messages": 3,
+      "next_event": {
+        "title": "Mediation Session",
+        "date": "2026-01-22"
+      }
+    }
+  ],
+  "meta": {
+    "total": 15,
+    "page": 1,
+    "per_page": 20
+  }
+}
+```
+
+---
+
+#### GET /professional/cases/{family_file_id}
+Get case overview.
+
+**Response (200):**
+```json
+{
+  "data": {
+    "id": "family-file-uuid",
+    "case_name": "Smith v. Jones",
+    "status": "active",
+    "assignment": {
+      "role": "lead_attorney",
+      "representing": "parent_a",
+      "access_scopes": ["agreement", "schedule", "messages", "financials"],
+      "can_control_aria": true,
+      "assigned_at": "2026-01-15T10:00:00Z"
+    },
+    "parent_a": {
+      "id": "user-uuid",
+      "name": "John Smith",
+      "email": "john@example.com",
+      "phone": "+1-555-111-2222"
+    },
+    "parent_b": {
+      "id": "user-uuid",
+      "name": "Jane Jones",
+      "email": "jane@example.com"
+    },
+    "children": [
+      {
+        "id": "child-uuid",
+        "first_name": "Emma",
+        "age": 8
+      }
+    ],
+    "agreements": [
+      {
+        "id": "agreement-uuid",
+        "type": "custody",
+        "status": "approved",
+        "approved_at": "2026-01-10T10:00:00Z"
+      }
+    ],
+    "compliance_summary": {
+      "exchange_compliance": 92,
+      "financial_compliance": 88,
+      "overall_score": 90
+    },
+    "aria_summary": {
+      "good_faith_score": 0.85,
+      "recent_interventions": 2,
+      "communication_trend": "improving"
+    }
+  }
+}
+```
+
+---
+
+#### GET /professional/cases/{family_file_id}/timeline
+Get chronological case timeline.
+
+**Query Parameters:**
+- `event_types`: Filter by types (message, exchange, agreement, court, aria)
+- `start_date`, `end_date`: Date range
+- `limit`, `offset`: Pagination
+
+**Response (200):**
+```json
+{
+  "data": {
+    "events": [
+      {
+        "id": "event-uuid",
+        "event_type": "message",
+        "title": "Message from John to Jane",
+        "description": "Regarding pickup time change",
+        "timestamp": "2026-01-18T14:30:00Z",
+        "metadata": {
+          "sender": "John Smith",
+          "flagged": false
+        }
+      },
+      {
+        "id": "event-uuid",
+        "event_type": "exchange",
+        "title": "Custody Exchange",
+        "status": "completed",
+        "timestamp": "2026-01-18T18:00:00Z",
+        "metadata": {
+          "location": "School",
+          "on_time": true
+        }
+      },
+      {
+        "id": "event-uuid",
+        "event_type": "aria",
+        "title": "ARIA Intervention",
+        "description": "Message rewrite suggested",
+        "timestamp": "2026-01-17T09:15:00Z",
+        "metadata": {
+          "intervention_type": "rewrite_suggested",
+          "action_taken": "accepted"
+        }
+      }
+    ],
+    "summary": {
+      "total_events": 45,
+      "messages": 30,
+      "exchanges": 8,
+      "agreements": 2,
+      "court_events": 3,
+      "aria_interventions": 5
+    }
+  }
+}
+```
+
+---
+
+#### GET /professional/cases/{family_file_id}/communications
+View parent-to-parent message threads.
+
+**Query Parameters:**
+- `flagged_only`: Show only ARIA-flagged messages
+- `start_date`, `end_date`: Date range
+- `limit`, `offset`: Pagination
+
+**Response (200):**
+```json
+{
+  "data": {
+    "threads": [
+      {
+        "id": "thread-uuid",
+        "participants": ["John Smith", "Jane Jones"],
+        "message_count": 15,
+        "last_message_at": "2026-01-18T14:30:00Z",
+        "flagged_count": 2
+      }
+    ],
+    "messages": [
+      {
+        "id": "message-uuid",
+        "sender": "John Smith",
+        "content": "Can we change pickup to 5pm?",
+        "sent_at": "2026-01-18T14:30:00Z",
+        "is_flagged": false,
+        "flag_details": null
+      }
+    ],
+    "stats": {
+      "total_messages": 150,
+      "flagged_messages": 8,
+      "intervention_rate": 0.05
+    }
+  }
+}
+```
+
+---
+
+#### GET /professional/cases/{family_file_id}/aria
+Get ARIA settings for case.
+
+**Response (200):**
+```json
+{
+  "data": {
+    "enabled": true,
+    "sensitivity_level": "high",
+    "intervention_mode": "suggest",
+    "blocked_categories": ["profanity", "threats"],
+    "allow_bypass": false,
+    "custom_triggers": [],
+    "last_updated_by": "prof-uuid",
+    "last_updated_at": "2026-01-15T10:00:00Z"
+  }
+}
+```
+
+---
+
+#### PATCH /professional/cases/{family_file_id}/aria
+Update ARIA settings.
+
+**Request:**
+```json
+{
+  "sensitivity_level": "medium",
+  "intervention_mode": "suggest",
+  "blocked_categories": ["profanity", "threats", "hostility"]
+}
+```
+
+---
+
+#### GET /professional/cases/{family_file_id}/aria/flags
+Get ARIA intervention history.
+
+**Query Parameters:**
+- `action_taken`: Filter by action (accepted, rejected, modified)
+- `limit`, `offset`: Pagination
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "flag-uuid",
+      "message_id": "message-uuid",
+      "original_content": "You never care about the kids!",
+      "suggested_content": "I feel concerned about coordination for the children's activities.",
+      "toxicity_score": 0.75,
+      "categories": ["blame", "hostility"],
+      "action_taken": "accepted",
+      "created_at": "2026-01-17T09:15:00Z"
+    }
+  ],
+  "meta": {
+    "total": 8,
+    "accepted": 5,
+    "rejected": 2,
+    "modified": 1
+  }
+}
+```
+
+---
+
+#### GET /professional/messages
+List all professional messages.
+
+**Query Parameters:**
+- `case_id`: Filter by case
+- `unread_only`: Show only unread
+- `limit`, `offset`: Pagination
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "message-uuid",
+      "case_id": "case-uuid",
+      "case_name": "Smith v. Jones",
+      "recipient": "John Smith",
+      "subject": "Document Request",
+      "content_preview": "Please provide the following...",
+      "is_read": false,
+      "sent_at": "2026-01-18T10:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+#### POST /professional/messages/case/{family_file_id}
+Send message to client.
+
+**Request:**
+```json
+{
+  "recipient_id": "user-uuid",
+  "subject": "Case Update",
+  "content": "I wanted to update you on the hearing scheduled for next week..."
+}
+```
+
+**Response (201):**
+```json
+{
+  "data": {
+    "id": "message-uuid",
+    "recipient_id": "user-uuid",
+    "subject": "Case Update",
+    "sent_at": "2026-01-18T11:00:00Z"
+  }
+}
+```
+
+---
+
+#### GET /professional/intake/sessions
+List intake sessions.
+
+**Query Parameters:**
+- `status`: Filter by status (draft, in_progress, completed, archived)
+- `firm_id`: Filter by firm
+- `limit`, `offset`: Pagination
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "session-uuid",
+      "client_name": "Sarah Johnson",
+      "client_email": "sarah@example.com",
+      "status": "completed",
+      "intake_type": "custody",
+      "created_at": "2026-01-17T14:00:00Z",
+      "completed_at": "2026-01-17T15:30:00Z",
+      "message_count": 24
+    }
+  ]
+}
+```
+
+---
+
+#### POST /professional/intake/sessions
+Create new intake session.
+
+**Request:**
+```json
+{
+  "client_name": "New Client",
+  "client_email": "client@example.com",
+  "client_phone": "+1-555-000-0000",
+  "intake_type": "custody",
+  "template_id": "template-uuid"
+}
+```
+
+---
+
+#### GET /professional/intake/sessions/{session_id}
+Get intake session details.
+
+**Response (200):**
+```json
+{
+  "data": {
+    "id": "session-uuid",
+    "client_name": "Sarah Johnson",
+    "status": "completed",
+    "messages": [
+      {
+        "role": "assistant",
+        "content": "Welcome! Let's start with some basic information.",
+        "timestamp": "2026-01-17T14:00:00Z"
+      },
+      {
+        "role": "user",
+        "content": "Hi, I'm looking for help with custody arrangements.",
+        "timestamp": "2026-01-17T14:01:00Z"
+      }
+    ],
+    "extracted_data": {
+      "client_info": {
+        "name": "Sarah Johnson",
+        "address": "456 Oak St, Los Angeles, CA"
+      },
+      "children": [
+        {
+          "name": "Emma Johnson",
+          "age": 8
+        }
+      ],
+      "custody_preferences": {
+        "schedule_type": "50-50",
+        "concerns": ["school schedule", "extracurriculars"]
+      }
+    },
+    "summary": "Sarah Johnson is seeking joint custody arrangements for her 8-year-old daughter Emma..."
+  }
+}
+```
+
+---
+
+#### GET /professional/access-requests
+List pending access requests.
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "request-uuid",
+      "family_file_id": "file-uuid",
+      "case_name": "New Client Case",
+      "requested_by": "parent",
+      "parent_name": "John Smith",
+      "requested_scopes": ["agreement", "schedule", "messages"],
+      "status": "pending",
+      "created_at": "2026-01-18T09:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+#### POST /professional/access-requests/{request_id}/accept
+Accept case invitation.
+
+**Request:**
+```json
+{
+  "assignment_role": "lead_attorney",
+  "representing": "parent_a"
+}
+```
+
+**Response (200):**
+```json
+{
+  "data": {
+    "assignment_id": "assignment-uuid",
+    "family_file_id": "file-uuid",
+    "status": "active"
+  }
+}
+```
+
+---
+
+#### POST /professional/access-requests/{request_id}/decline
+Decline case invitation.
+
+**Request:**
+```json
+{
+  "reason": "Conflict of interest"
+}
+```
+
+---
+
+#### GET /professional/directory
+Search public firm directory.
+
+**Query Parameters:**
+- `query`: Search term
+- `state`: Filter by state
+- `firm_type`: Filter by type (law_firm, mediation_practice, solo_practice)
+- `page`, `per_page`: Pagination
+
+**Response (200):**
+```json
+{
+  "data": [
+    {
+      "id": "firm-uuid",
+      "name": "Smith Family Law",
+      "slug": "smith-family-law",
+      "firm_type": "law_firm",
+      "city": "Los Angeles",
+      "state": "CA",
+      "practice_areas": ["custody", "divorce"],
+      "member_count": 5,
+      "logo_url": "https://..."
+    }
+  ]
+}
+```
+
+---
+
 ## Webhooks
 
 CommonGround can send webhooks for real-time event notifications.
@@ -3188,5 +3930,5 @@ This API reference is part of the comprehensive documentation suite:
 
 ---
 
-*Last Updated: January 10, 2026*
-*API Version: 1.0.0*
+*Last Updated: January 18, 2026*
+*API Version: 1.6.0*

@@ -5,6 +5,100 @@ All notable changes to CommonGround will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-01-18
+
+### Added
+
+#### Professional Portal - Complete Legal Practice Management System
+
+A comprehensive portal enabling attorneys, mediators, intake coordinators, and practice administrators to manage high-conflict custody cases efficiently within CommonGround.
+
+**Core Infrastructure:**
+- **Professional Profiles** - Complete onboarding for legal professionals with license verification
+- **Firm Management** - Create and manage law firms, mediation practices, or solo practices
+- **Team Collaboration** - Invite colleagues with role-based permissions (Owner, Admin, Attorney, Paralegal, Intake, Readonly)
+- **Firm Templates** - Shared intake forms and document templates across practice
+
+**Case Management:**
+- **Case Dashboard** - Aggregated view of all assigned cases with key metrics
+- **Case Assignment** - Assign cases by role (Lead Attorney, Associate, Paralegal, Mediator, Parenting Coordinator)
+- **Case Timeline** - Chronological event feed with filtering (messages, exchanges, agreements, court events, ARIA flags)
+- **Communications View** - Monitor parent-to-parent messages with ARIA intervention history
+- **Compliance Tracking** - Exchange compliance, financial obligations, court deadlines
+
+**ARIA Control Panel:**
+- **Professional ARIA Controls** - Adjust ARIA sensitivity levels for assigned cases
+- **Intervention History** - Review all ARIA flags, suggestions, and parent actions
+- **Good Faith Metrics** - Track communication quality trends over time
+- **Alert System** - Real-time notifications for concerning communication patterns
+
+**Professional-Client Messaging:**
+- **Secure Messaging** - Direct communication channel between professionals and clients
+- **Thread Management** - Organized conversation threads per case
+- **Audit Trail** - Complete logging of all professional communications
+
+**Access & Security:**
+- **Invitation System** - Parents can invite professionals by email or browse firm directory
+- **Dual-Parent Consent** - Both parents must approve professional access (configurable)
+- **Scoped Permissions** - Granular access control (agreements, schedules, messages, financials)
+- **Access Logging** - Complete audit trail of professional activity
+
+**Intake Center (ARIA Pro):**
+- **Intake Sessions** - Create and manage client intake with firm templates
+- **Transcript Review** - Full conversation transcripts with highlights
+- **Extracted Data** - Structured data extraction for court forms
+- **Session Status Tracking** - Draft, In Progress, Completed, Archived
+
+**Export & Reporting:**
+- **Court Packages** - Generate comprehensive case exports for court
+- **Timeline Exports** - Export chronological case history
+- **Compliance Reports** - Exchange and financial compliance summaries
+
+**Frontend Implementation:**
+- `/professional/dashboard` - Main dashboard with case load, alerts, upcoming events
+- `/professional/cases` - Case list with filters and quick actions
+- `/professional/cases/[id]` - Case overview with timeline, communications, ARIA, compliance
+- `/professional/intake` - Intake center for managing client interviews
+- `/professional/firm` - Firm settings, team management, templates
+- `/professional/profile` - Professional profile and license management
+- `/professional/access-requests` - Pending case invitations
+
+**New Database Models:**
+- `ProfessionalProfile` - User professional credentials and settings
+- `Firm` - Law firm / practice organization
+- `FirmMembership` - Many-to-many linking professionals to firms with roles
+- `CaseAssignment` - Professional assignment to family files
+- `FirmTemplate` - Shared intake and document templates
+- `ProfessionalAccessLog` - Audit logging for professional actions
+- `ProfessionalAccessRequest` - Invitation/access request workflow
+- `ProfessionalMessage` - Professional-client messaging
+
+**New API Endpoints:**
+- `GET/POST/PATCH /professional/profile` - Profile management
+- `GET/POST/PATCH/DELETE /professional/firms` - Firm CRUD
+- `GET/POST/PATCH/DELETE /professional/firms/{id}/members` - Team management
+- `GET /professional/dashboard` - Dashboard aggregation
+- `GET /professional/cases` - Case list with filters
+- `GET /professional/cases/{id}` - Case overview
+- `GET /professional/cases/{id}/timeline` - Case timeline
+- `GET /professional/cases/{id}/communications` - Message view
+- `GET/PATCH /professional/cases/{id}/aria` - ARIA controls
+- `GET/POST /professional/messages` - Professional messaging
+- `GET/POST /professional/intake/sessions` - Intake management
+- `GET/POST /professional/access-requests` - Access workflow
+
+### Changed
+- Dashboard now includes Professional Portal link for users with professional profiles
+- Firm directory available for parent case invitation workflows
+- Backend router includes new `/professional` prefix routes
+
+### Fixed
+- TypeScript build errors in Professional Portal frontend components
+- Missing UI components (accordion, avatar, dropdown-menu, progress, scroll-area, tabs)
+- Badge variant type mismatches in Professional Portal pages
+
+---
+
 ## [1.5.0] - 2026-01-17
 
 ### Added
@@ -531,6 +625,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.6.0 | 2026-01-18 | Professional Portal, Firm Management, Case Timeline, ARIA Controls, Legal Messaging |
 | 1.5.0 | 2026-01-17 | Custody Time Tracking, Dashboard Aggregation, Real MFA, Child Photos |
 | 1.4.0 | 2026-01-15 | GTM Subscription System, Grant Codes, Password Reset, Mini & Mega v3 |
 | 1.3.0 | 2026-01-12 | ARIA v2 support, Features page redesign, KidComs brand theming |

@@ -106,6 +106,14 @@ class IntakeSession(Base, UUIDMixin, TimestampMixin):
         String(36), ForeignKey("users.id"), index=True
     )
 
+    # Professional Portal context (optional - links to firm/assignment if via portal)
+    firm_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("firms.id"), nullable=True, index=True
+    )
+    case_assignment_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("case_assignments.id"), nullable=True, index=True
+    )
+
     # Access
     access_token: Mapped[str] = mapped_column(
         String(64), unique=True, default=generate_access_token

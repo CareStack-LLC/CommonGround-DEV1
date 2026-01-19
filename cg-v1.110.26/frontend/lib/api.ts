@@ -4572,6 +4572,72 @@ export interface CustodyStatusResponse {
   pending_override_request: boolean;
 }
 
+// Professional Access Types (for parent-side management)
+export interface ProfessionalAccess {
+  assignment_id: string;
+  professional_id: string;
+  professional_name: string;
+  professional_email: string;
+  professional_type: 'attorney' | 'paralegal' | 'mediator' | 'parenting_coordinator' | 'intake_coordinator' | 'practice_admin';
+  firm_id?: string;
+  firm_name?: string;
+  assignment_role: 'lead_attorney' | 'associate' | 'paralegal' | 'mediator' | 'parenting_coordinator' | 'intake_coordinator';
+  representing: 'parent_a' | 'parent_b' | 'both' | 'court';
+  access_scopes: string[];
+  can_control_aria: boolean;
+  can_message_client: boolean;
+  status: 'active' | 'on_hold' | 'completed' | 'withdrawn';
+  assigned_at: string;
+}
+
+export interface ProfessionalAccessRequest {
+  id: string;
+  family_file_id: string;
+  professional_id?: string;
+  professional_email: string;
+  professional_name?: string;
+  firm_id?: string;
+  firm_name?: string;
+  requested_by: 'parent' | 'professional';
+  requested_by_user_id: string;
+  requested_scopes: string[];
+  status: 'pending' | 'approved' | 'declined' | 'expired';
+  parent_a_approved: boolean;
+  parent_b_approved: boolean;
+  created_at: string;
+  expires_at?: string;
+}
+
+export interface FirmDirectoryEntry {
+  id: string;
+  slug: string;
+  name: string;
+  firm_type: 'law_firm' | 'mediation_practice' | 'court_services' | 'solo_practice';
+  email?: string;
+  phone?: string;
+  website?: string;
+  city?: string;
+  state?: string;
+  logo_url?: string;
+  primary_color?: string;
+  practice_areas: string[];
+  professional_count: number;
+}
+
+export interface FirmPublicProfile extends FirmDirectoryEntry {
+  description?: string;
+  address_line1?: string;
+  address_line2?: string;
+  zip_code?: string;
+  professionals: {
+    id: string;
+    name: string;
+    professional_type: string;
+    practice_areas: string[];
+    license_verified: boolean;
+  }[];
+}
+
 export const familyFilesAPI = {
   /**
    * List all Family Files for the current user
@@ -4701,6 +4767,164 @@ export const familyFilesAPI = {
     return fetchAPI<FamilyFile & { message: string }>(`/family-files/${id}/remove-parent-b`, {
       method: 'POST',
     });
+  },
+
+  // ==========================================================================
+  // Professional Access Management
+  // ==========================================================================
+
+  /**
+   * Get professional access data for a Family File
+   * Returns both active professionals and pending requests in one call
+   */
+  async getProfessionalAccess(familyFileId: string): Promise<{
+    professionals: ProfessionalAccess[];
+    pending_requests: ProfessionalAccessRequest[];
+    total_professionals: number;
+    total_pending: number;
+  }> {
+    const response = await fetchAPI<{
+      professionals: ProfessionalAccess[];
+      total_professionals: number;
+      pending_requests?: ProfessionalAccessRequest[];
+      total_pending?: number;
+    }>(`/family-files/${familyFileId}/professionals?include_pending=true`);
+
+    return {
+      professionals: response.professionals || [],
+      pending_requests: response.pending_requests || [],
+      total_professionals: response.total_professionals || 0,
+      total_pending: response.total_pending || 0,
+    };
+  },
+
+  /**
+   * List professionals with access to a Family File
+   * @deprecated Use getProfessionalAccess for combined data
+   */
+  async listProfessionals(familyFileId: string): Promise<{
+    items: ProfessionalAccess[];
+    total: number;
+  }> {
+    const data = await this.getProfessionalAccess(familyFileId);
+    return {
+      items: data.professionals,
+      total: data.total_professionals,
+    };
+  },
+
+  /**
+   * Get pending professional access requests for a Family File
+   * @deprecated Use getProfessionalAccess for combined data
+   */
+  async getPendingProfessionalRequests(familyFileId: string): Promise<{
+    items: ProfessionalAccessRequest[];
+    total: number;
+  }> {
+    const data = await this.getProfessionalAccess(familyFileId);
+    return {
+      items: data.pending_requests,
+      total: data.total_pending,
+    };
+  },
+
+  /**
+   * Invite a professional to a Family File (by email or firm selection)
+   */
+  async inviteProfessional(
+    familyFileId: string,
+    data: {
+      email?: string;
+      firm_id?: string;
+      professional_id?: string;
+      scopes?: string[];
+      message?: string;
+    }
+  ): Promise<{ request_id: string; message: string }> {
+    return fetchAPI<{ request_id: string; message: string }>(
+      `/family-files/${familyFileId}/professionals/invite`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  /**
+   * Approve a professional access request
+   */
+  async approveProfessionalRequest(
+    familyFileId: string,
+    requestId: string
+  ): Promise<{ assignment_id: string; message: string }> {
+    return fetchAPI<{ assignment_id: string; message: string }>(
+      `/family-files/${familyFileId}/professionals/requests/${requestId}/approve`,
+      { method: 'POST' }
+    );
+  },
+
+  /**
+   * Decline a professional access request
+   */
+  async declineProfessionalRequest(
+    familyFileId: string,
+    requestId: string,
+    reason?: string
+  ): Promise<{ message: string }> {
+    return fetchAPI<{ message: string }>(
+      `/family-files/${familyFileId}/professionals/requests/${requestId}/decline`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ reason }),
+      }
+    );
+  },
+
+  /**
+   * Revoke a professional's access to a Family File
+   */
+  async revokeProfessionalAccess(
+    familyFileId: string,
+    assignmentId: string
+  ): Promise<{ message: string }> {
+    return fetchAPI<{ message: string }>(
+      `/family-files/${familyFileId}/professionals/${assignmentId}`,
+      { method: 'DELETE' }
+    );
+  },
+
+  // ==========================================================================
+  // Firm Directory (for parents to browse and invite professionals)
+  // ==========================================================================
+
+  /**
+   * Search the public firm directory
+   */
+  async searchFirmDirectory(params?: {
+    query?: string;
+    state?: string;
+    firm_type?: string;
+    skip?: number;
+    limit?: number;
+  }): Promise<{ items: FirmDirectoryEntry[]; total: number }> {
+    const searchParams = new URLSearchParams();
+    if (params?.query) searchParams.append('query', params.query);
+    if (params?.state) searchParams.append('state', params.state);
+    if (params?.firm_type) searchParams.append('firm_type', params.firm_type);
+    if (params?.skip) searchParams.append('skip', params.skip.toString());
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
+
+    const queryString = searchParams.toString();
+    return fetchAPI<{ items: FirmDirectoryEntry[]; total: number }>(
+      `/professional/directory${queryString ? `?${queryString}` : ''}`
+    );
+  },
+
+  /**
+   * Get a firm's public profile from the directory
+   */
+  async getFirmProfile(firmSlug: string): Promise<FirmPublicProfile> {
+    return fetchAPI<FirmPublicProfile>(`/professional/directory/${firmSlug}`);
   },
 };
 
@@ -7009,6 +7233,444 @@ export const custodyTimeAPI = {
     familyFileId: string
   ): Promise<{ success: boolean; family_file_id: string; records_updated: number }> {
     return fetchAPI(`/custody-time/family/${familyFileId}/backfill-from-exchanges`, {
+      method: 'POST',
+    });
+  },
+};
+
+// =============================================================================
+// Professional Portal API
+// =============================================================================
+
+export interface ProfessionalProfile {
+  id: string;
+  user_id: string;
+  professional_type: string;
+  license_number?: string;
+  license_state?: string;
+  license_verified: boolean;
+  is_active: boolean;
+  user_first_name?: string;
+  user_last_name?: string;
+  user_email?: string;
+  firms?: FirmMembership[];
+}
+
+export interface Firm {
+  id: string;
+  name: string;
+  slug: string;
+  firm_type: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  is_active: boolean;
+}
+
+export interface FirmMembership {
+  firm_id: string;
+  firm_name: string;
+  firm_slug: string;
+  firm_type: string;
+  role: string;
+  status: string;
+}
+
+export interface CaseAssignment {
+  id: string;
+  professional_id: string;
+  firm_id?: string;
+  family_file_id: string;
+  assignment_role: string;
+  representing: string;
+  access_scopes: string[];
+  can_control_aria: boolean;
+  can_message_client: boolean;
+  status: string;
+  assigned_at: string;
+  family_file_number?: string;
+  firm_name?: string;
+}
+
+export interface ProfessionalDashboard {
+  case_count: number;
+  pending_intakes: number;
+  pending_approvals: number;
+  unread_messages: number;
+  upcoming_events: any[];
+  alerts: any[];
+  recent_activity: any[];
+}
+
+export interface TimelineEvent {
+  id: string;
+  event_type: string;
+  title: string;
+  description?: string;
+  timestamp: string;
+  metadata?: Record<string, any>;
+  severity?: string;
+  status?: string;
+}
+
+export interface TimelineSummary {
+  total_events: number;
+  messages: number;
+  exchanges: number;
+  agreements: number;
+  court_events: number;
+  aria_interventions: number;
+}
+
+export interface ARIASettings {
+  is_enabled: boolean;
+  sensitivity_level: string;
+  auto_rewrite: boolean;
+  notify_on_flag: boolean;
+  blocked_topics: string[];
+  custom_rules: Record<string, any>;
+}
+
+export interface ARIAMetrics {
+  total_messages_analyzed: number;
+  total_interventions: number;
+  intervention_rate: number;
+  acceptance_rate: number;
+  trend: string;
+  by_category: Record<string, number>;
+  good_faith_score_a: number;
+  good_faith_score_b: number;
+}
+
+export interface ARIAIntervention {
+  id: string;
+  message_id: string;
+  intervention_type: string;
+  trigger_text: string;
+  original_text: string;
+  suggested_text: string;
+  action_taken: string;
+  sender_role: string;
+  created_at: string;
+}
+
+export interface ProfessionalMessage {
+  id: string;
+  content: string;
+  sender_id: string;
+  sender_type: 'professional' | 'parent';
+  sender_name?: string;
+  is_read: boolean;
+  read_at?: string;
+  sent_at: string;
+  thread_id?: string;
+}
+
+export interface MessageThread {
+  id: string;
+  participant_name: string;
+  participant_role: string;
+  last_message: string;
+  last_message_at: string;
+  unread_count: number;
+}
+
+export const professionalAPI = {
+  // Profile
+  async getProfile(): Promise<ProfessionalProfile> {
+    return fetchAPI<ProfessionalProfile>('/professional/profile');
+  },
+
+  async updateProfile(data: Partial<ProfessionalProfile>): Promise<ProfessionalProfile> {
+    return fetchAPI<ProfessionalProfile>('/professional/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Dashboard
+  async getDashboard(firmId?: string): Promise<ProfessionalDashboard> {
+    const params = firmId ? `?firm_id=${firmId}` : '';
+    return fetchAPI<ProfessionalDashboard>(`/professional/dashboard${params}`);
+  },
+
+  async getAlerts(): Promise<any[]> {
+    return fetchAPI<any[]>('/professional/dashboard/alerts');
+  },
+
+  // Cases
+  async getCases(params?: {
+    status?: string;
+    firm_id?: string;
+    include_inactive?: boolean;
+  }): Promise<CaseAssignment[]> {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.append('status', params.status);
+    if (params?.firm_id) searchParams.append('firm_id', params.firm_id);
+    if (params?.include_inactive) searchParams.append('include_inactive', 'true');
+    return fetchAPI<CaseAssignment[]>(`/professional/cases?${searchParams.toString()}`);
+  },
+
+  async getCase(familyFileId: string): Promise<CaseAssignment> {
+    return fetchAPI<CaseAssignment>(`/professional/cases/${familyFileId}`);
+  },
+
+  // Timeline
+  async getTimeline(
+    familyFileId: string,
+    params?: {
+      event_types?: string[];
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<{ events: TimelineEvent[]; total: number }> {
+    const searchParams = new URLSearchParams();
+    if (params?.event_types) {
+      params.event_types.forEach(t => searchParams.append('event_types', t));
+    }
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
+    if (params?.offset) searchParams.append('offset', params.offset.toString());
+    return fetchAPI(`/professional/cases/${familyFileId}/timeline?${searchParams.toString()}`);
+  },
+
+  async getTimelineSummary(familyFileId: string): Promise<TimelineSummary> {
+    return fetchAPI<TimelineSummary>(`/professional/cases/${familyFileId}/timeline/summary`);
+  },
+
+  // ARIA
+  async getARIASettings(familyFileId: string): Promise<ARIASettings> {
+    return fetchAPI<ARIASettings>(`/professional/cases/${familyFileId}/aria`);
+  },
+
+  async updateARIASettings(familyFileId: string, data: Partial<ARIASettings>): Promise<ARIASettings> {
+    return fetchAPI<ARIASettings>(`/professional/cases/${familyFileId}/aria`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getARIAMetrics(familyFileId: string): Promise<ARIAMetrics> {
+    return fetchAPI<ARIAMetrics>(`/professional/cases/${familyFileId}/aria/metrics`);
+  },
+
+  async getARIAInterventions(
+    familyFileId: string,
+    limit: number = 10
+  ): Promise<{ items: ARIAIntervention[]; total: number }> {
+    return fetchAPI(`/professional/cases/${familyFileId}/aria/interventions?limit=${limit}`);
+  },
+
+  // Messaging
+  async getMessages(
+    familyFileId: string,
+    params?: { thread_id?: string; limit?: number }
+  ): Promise<{ items: ProfessionalMessage[]; total: number }> {
+    const searchParams = new URLSearchParams();
+    if (params?.thread_id) searchParams.append('thread_id', params.thread_id);
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
+    return fetchAPI(`/professional/cases/${familyFileId}/messages?${searchParams.toString()}`);
+  },
+
+  async getMessageThreads(familyFileId: string): Promise<{ items: MessageThread[]; total: number }> {
+    return fetchAPI(`/professional/cases/${familyFileId}/messages/threads`);
+  },
+
+  async sendMessage(
+    familyFileId: string,
+    data: { content: string; thread_id?: string }
+  ): Promise<ProfessionalMessage> {
+    return fetchAPI<ProfessionalMessage>(`/professional/cases/${familyFileId}/messages`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async markThreadAsRead(familyFileId: string, threadId: string): Promise<void> {
+    return fetchAPI(`/professional/cases/${familyFileId}/messages/threads/${threadId}/read`, {
+      method: 'POST',
+    });
+  },
+
+  async getUnreadCount(): Promise<{ count: number }> {
+    return fetchAPI('/professional/messages/unread-count');
+  },
+
+  // Firms
+  async getFirms(): Promise<Firm[]> {
+    return fetchAPI<Firm[]>('/professional/firms');
+  },
+
+  async createFirm(data: Partial<Firm>): Promise<Firm> {
+    return fetchAPI<Firm>('/professional/firms', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async inviteFirmMember(firmId: string, data: { email: string; role: string }): Promise<any> {
+    return fetchAPI(`/professional/firms/${firmId}/members/invite`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Access Requests
+  async getAccessRequests(): Promise<any[]> {
+    return fetchAPI('/professional/access-requests');
+  },
+
+  async acceptAccessRequest(requestId: string): Promise<any> {
+    return fetchAPI(`/professional/access-requests/${requestId}/accept`, {
+      method: 'POST',
+    });
+  },
+
+  async declineAccessRequest(requestId: string): Promise<any> {
+    return fetchAPI(`/professional/access-requests/${requestId}/decline`, {
+      method: 'POST',
+    });
+  },
+};
+
+// =============================================================================
+// Professional Intake API
+// =============================================================================
+
+export interface ProfessionalIntakeSession {
+  id: string;
+  client_name: string;
+  client_email: string;
+  client_phone?: string;
+  status: string;
+  intake_type: string;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+  message_count: number;
+  has_summary: boolean;
+  intake_link: string;
+  notes?: string;
+  firm_id?: string;
+  family_file_id?: string;
+  case_assignment_id?: string;
+}
+
+export interface IntakeMessage {
+  id: string;
+  role: 'assistant' | 'user';
+  content: string;
+  created_at: string;
+}
+
+export interface IntakeSummary {
+  client_info: {
+    name: string;
+    email: string;
+    phone?: string;
+    address?: string;
+  };
+  case_overview: string;
+  children: Array<{
+    name: string;
+    age: number;
+    special_needs?: string;
+  }>;
+  current_situation: string;
+  goals: string[];
+  concerns: string[];
+  other_party_info?: string;
+  timeline: string;
+  recommended_actions: string[];
+  confidence_score: number;
+}
+
+export interface IntakeExtractedData {
+  parties: any;
+  children: any[];
+  custody_preferences: any;
+  financial_info: any;
+  schedule_preferences: any;
+  special_considerations: string[];
+}
+
+export interface CreateIntakeRequest {
+  client_name: string;
+  client_email: string;
+  intake_type: string;
+  notes?: string;
+  firm_id?: string;
+}
+
+export const professionalIntakeAPI = {
+  // List intake sessions
+  async getSessions(params?: {
+    status?: string;
+    firm_id?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ items: IntakeSession[]; total: number }> {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.append('status', params.status);
+    if (params?.firm_id) searchParams.append('firm_id', params.firm_id);
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
+    if (params?.offset) searchParams.append('offset', params.offset.toString());
+    return fetchAPI(`/professional/intake/sessions?${searchParams.toString()}`);
+  },
+
+  // Get single session
+  async getSession(sessionId: string): Promise<IntakeSession> {
+    return fetchAPI<IntakeSession>(`/professional/intake/sessions/${sessionId}`);
+  },
+
+  // Create new intake session
+  async createSession(data: CreateIntakeRequest): Promise<IntakeSession> {
+    return fetchAPI<IntakeSession>('/professional/intake/sessions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Get session transcript
+  async getTranscript(sessionId: string): Promise<{ messages: IntakeMessage[] }> {
+    return fetchAPI(`/professional/intake/sessions/${sessionId}/transcript`);
+  },
+
+  // Get session outputs (summary + extracted data)
+  async getOutputs(sessionId: string): Promise<{
+    summary: IntakeSummary | null;
+    extracted_data: IntakeExtractedData | null;
+  }> {
+    return fetchAPI(`/professional/intake/sessions/${sessionId}/outputs`);
+  },
+
+  // Request clarification from client
+  async requestClarification(
+    sessionId: string,
+    data: { questions: string[] }
+  ): Promise<{ success: boolean }> {
+    return fetchAPI(`/professional/intake/sessions/${sessionId}/clarification`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Mark session as reviewed
+  async markReviewed(sessionId: string): Promise<IntakeSession> {
+    return fetchAPI<IntakeSession>(`/professional/intake/sessions/${sessionId}/review`, {
+      method: 'POST',
+    });
+  },
+
+  // Cancel session
+  async cancelSession(sessionId: string): Promise<{ success: boolean }> {
+    return fetchAPI(`/professional/intake/sessions/${sessionId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // Resend intake link
+  async resendLink(sessionId: string): Promise<{ success: boolean }> {
+    return fetchAPI(`/professional/intake/sessions/${sessionId}/resend`, {
       method: 'POST',
     });
   },
