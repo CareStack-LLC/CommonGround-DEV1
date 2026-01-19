@@ -174,6 +174,24 @@ from app.models.subscription import (
 )
 from app.models.push_subscription import PushSubscription
 from app.models.custody_day_record import CustodyDayRecord, DeterminationMethod
+from app.models.professional import (
+    ProfessionalProfile,
+    Firm,
+    FirmMembership,
+    CaseAssignment,
+    FirmTemplate,
+    ProfessionalAccessRequest,
+    ProfessionalMessage,
+    ProfessionalAccessLog,
+    ProfessionalType,
+    FirmType,
+    FirmRole,
+    AssignmentRole,
+    AssignmentStatus,
+    MembershipStatus,
+    AccessRequestStatus,
+    TemplateType,
+)
 
 __all__ = [
     "Base",
@@ -347,4 +365,21 @@ __all__ = [
     # Custody Time Tracking
     "CustodyDayRecord",
     "DeterminationMethod",
+    # Professional Portal
+    "ProfessionalProfile",
+    "Firm",
+    "FirmMembership",
+    "CaseAssignment",
+    "FirmTemplate",
+    "ProfessionalAccessRequest",
+    "ProfessionalMessage",
+    "ProfessionalAccessLog",
+    "ProfessionalType",
+    "FirmType",
+    "FirmRole",
+    "AssignmentRole",
+    "AssignmentStatus",
+    "MembershipStatus",
+    "AccessRequestStatus",
+    "TemplateType",
 ]
