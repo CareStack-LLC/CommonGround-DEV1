@@ -30,6 +30,8 @@ from app.schemas.family_file import (
 from app.schemas.agreement import AgreementCreateForFamilyFile
 from app.services.family_file import FamilyFileService
 from app.services.agreement import AgreementService
+from app.services.professional import ProfessionalAccessService, CaseAssignmentService
+from app.schemas.professional import CaseAssignmentCreate, AssignmentRole
 
 router = APIRouter()
 
@@ -732,4 +734,136 @@ async def list_agreements_for_family_file(
             for a in agreements
         ],
         "total": len(agreements)
+    }
+
+
+# ============================================================
+# Professional Access Request Endpoints
+# ============================================================
+
+@router.get("/{family_file_id}/professional-access-requests")
+async def list_professional_access_requests(
+    family_file_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    List pending professional access requests for a Family File.
+
+    Only parents of the family file can view these requests.
+    """
+    ff_service = FamilyFileService(db)
+    family_file = await ff_service.get_family_file(family_file_id, current_user)
+
+    access_service = ProfessionalAccessService(db)
+    requests = await access_service.list_requests_for_family_file(family_file_id)
+
+    return {
+        "items": [
+            {
+                "id": r.id,
+                "professional_id": r.professional_id,
+                "firm_id": r.firm_id,
+                "requested_role": r.requested_role,
+                "requested_scopes": r.requested_scopes,
+                "representing": r.representing,
+                "status": r.status,
+                "message": r.message,
+                "parent_a_approved": r.parent_a_approved,
+                "parent_b_approved": r.parent_b_approved,
+                "created_at": r.created_at,
+                "expires_at": r.expires_at,
+            }
+            for r in requests
+        ],
+        "total": len(requests)
+    }
+
+
+@router.post("/{family_file_id}/professional-access-requests/{request_id}/approve")
+async def approve_professional_access_request(
+    family_file_id: str,
+    request_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Approve a professional's access request.
+
+    - Both parents must approve before the professional gets access
+    - Once both approve, a case assignment is automatically created
+    """
+    ff_service = FamilyFileService(db)
+    family_file = await ff_service.get_family_file(family_file_id, current_user)
+
+    access_service = ProfessionalAccessService(db)
+
+    try:
+        request = await access_service.approve_request(request_id, current_user.id)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+    # If fully approved (both parents), create case assignment
+    if request.status == "approved":
+        assignment_service = CaseAssignmentService(db)
+        assignment_data = CaseAssignmentCreate(
+            assignment_role=AssignmentRole(request.requested_role) if request.requested_role else AssignmentRole.LEAD_ATTORNEY,
+            access_scopes=request.requested_scopes or ["agreement", "schedule", "messages"],
+            representing=request.representing or "both",
+            can_control_aria=True,
+            can_message_client=True,
+        )
+        assignment = await assignment_service.create_assignment(
+            professional_id=request.professional_id,
+            family_file_id=family_file_id,
+            data=assignment_data,
+            assigned_by=current_user.id,
+        )
+        request.case_assignment_id = assignment.id
+        await db.commit()
+
+    return {
+        "id": request.id,
+        "status": request.status,
+        "parent_a_approved": request.parent_a_approved,
+        "parent_b_approved": request.parent_b_approved,
+        "case_assignment_id": request.case_assignment_id,
+        "message": "Request approved" if request.status != "approved" else "Access granted - case assignment created"
+    }
+
+
+@router.post("/{family_file_id}/professional-access-requests/{request_id}/decline")
+async def decline_professional_access_request(
+    family_file_id: str,
+    request_id: str,
+    reason: str = Body(None, embed=True),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Decline a professional's access request.
+
+    Either parent can decline the request.
+    """
+    ff_service = FamilyFileService(db)
+    await ff_service.get_family_file(family_file_id, current_user)
+
+    access_service = ProfessionalAccessService(db)
+
+    try:
+        request = await access_service.decline_request(request_id, current_user.id, reason)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+    return {
+        "id": request.id,
+        "status": request.status,
+        "decline_reason": request.decline_reason,
+        "message": "Request declined"
     }
