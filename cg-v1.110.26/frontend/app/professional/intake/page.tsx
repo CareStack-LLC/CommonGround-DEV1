@@ -928,16 +928,11 @@ function FirmInvitationCard({
     return days > 0 ? days : 0;
   };
 
-  const handleAccept = async (professionalId?: string) => {
-    if (!token) return;
+  const handleAccept = async (professionalId: string) => {
+    if (!token || !professionalId) return;
 
     setIsAccepting(true);
     try {
-      const body: Record<string, string> = {};
-      if (professionalId) {
-        body.professional_id = professionalId;
-      }
-
       const response = await fetch(
         `${API_BASE}/api/v1/professional/firms/${firmId}/invitations/${invitation.id}/accept`,
         {
@@ -946,13 +941,16 @@ function FirmInvitationCard({
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(body),
+          body: JSON.stringify({ assigned_professional_id: professionalId }),
         }
       );
 
       if (response.ok) {
         setShowAssignDialog(false);
         onRefresh();
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Accept invitation error:", response.status, errorData);
       }
     } catch (error) {
       console.error("Error accepting invitation:", error);
@@ -1203,17 +1201,39 @@ function AssignProfessionalDialog({
   token: string | null;
   firmId: string;
   invitationId: string;
-  onAccept: (professionalId?: string) => void;
+  onAccept: (professionalId: string) => void;
   isAccepting: boolean;
   onCancel: () => void;
 }) {
   const [members, setMembers] = useState<FirmMember[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentProfessionalId, setCurrentProfessionalId] = useState<string>("");
   const [selectedProfessional, setSelectedProfessional] = useState<string>("self");
 
   useEffect(() => {
     fetchFirmMembers();
+    fetchCurrentProfessionalId();
   }, [token, firmId]);
+
+  const fetchCurrentProfessionalId = async () => {
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/v1/professional/profile`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentProfessionalId(data.id || "");
+      }
+    } catch (error) {
+      console.error("Error fetching professional profile:", error);
+    }
+  };
 
   const fetchFirmMembers = async () => {
     if (!token) return;
@@ -1240,7 +1260,7 @@ function AssignProfessionalDialog({
 
   const handleSubmit = () => {
     if (selectedProfessional === "self") {
-      onAccept();
+      onAccept(currentProfessionalId);
     } else {
       onAccept(selectedProfessional);
     }
@@ -1295,7 +1315,7 @@ function AssignProfessionalDialog({
         </Button>
         <Button
           onClick={handleSubmit}
-          disabled={isAccepting || loading}
+          disabled={isAccepting || loading || (selectedProfessional === "self" && !currentProfessionalId)}
           className="bg-emerald-600 hover:bg-emerald-700"
         >
           {isAccepting ? "Accepting..." : "Accept & Assign"}
