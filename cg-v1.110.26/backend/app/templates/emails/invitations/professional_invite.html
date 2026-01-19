@@ -1,0 +1,142 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Professional Access Invitation - CommonGround{% endblock %}
+
+{% block preheader %}You've been granted professional access to a CommonGround family file.{% endblock %}
+
+{% block header_style %}background: linear-gradient(135deg, #475569 0%, #64748B 100%);{% endblock %}
+
+{% block content %}
+<!-- Professional Badge -->
+<div style="text-align: center; margin-bottom: 24px;">
+  <img src="{{ icons.security }}" alt="" width="60" height="60" style="display: inline-block;">
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Professional Access Invitation
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  You've been granted {{ access_level | default('read-only') }} access to a family file on CommonGround.
+</p>
+
+<!-- Access Details Card -->
+<div style="background-color: #F5F0E8; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB;">
+        <span style="color: #6B7B74; font-size: 14px;">Invited By</span><br>
+        <strong style="color: #2D3A35;">{{ inviter_name }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB;">
+        <span style="color: #6B7B74; font-size: 14px;">Family File</span><br>
+        <strong style="color: #2D3A35;">{{ family_file_name | default('Family File') }}</strong>
+        {% if case_number %}
+        <span style="color: #6B7B74; font-size: 13px;"> ({{ case_number }})</span>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB;">
+        <span style="color: #6B7B74; font-size: 14px;">Your Role</span><br>
+        <strong style="color: #2D3A35;">{{ role | default('Guardian ad Litem') | title }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0;">
+        <span style="color: #6B7B74; font-size: 14px;">Access Level</span><br>
+        <strong style="color: #475569;">{{ access_level | default('Read-Only') | title }}</strong>
+        {% if access_duration %}
+        <span style="color: #6B7B74; font-size: 13px;"> • {{ access_duration }}</span>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- What You Can Access -->
+<h2 style="color: #2D3A35; font-size: 18px; margin-bottom: 16px;">
+  What You Can Access
+</h2>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+  <tr>
+    <td style="padding: 12px; background-color: #FFFBF5; border-radius: 8px; margin-bottom: 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="40" valign="top">
+            <img src="{{ icons.message }}" alt="" width="32" height="32">
+          </td>
+          <td style="padding-left: 12px;">
+            <strong style="color: #2D3A35;">Communication History</strong>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
+              Message threads between parents with timestamps
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr><td style="height: 8px;"></td></tr>
+  <tr>
+    <td style="padding: 12px; background-color: #FFFBF5; border-radius: 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="40" valign="top">
+            <img src="{{ icons.document }}" alt="" width="32" height="32">
+          </td>
+          <td style="padding-left: 12px;">
+            <strong style="color: #2D3A35;">Agreements & Documents</strong>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
+              Custody agreements and version history
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr><td style="height: 8px;"></td></tr>
+  <tr>
+    <td style="padding: 12px; background-color: #FFFBF5; border-radius: 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="40" valign="top">
+            <img src="{{ icons.calendar }}" alt="" width="32" height="32">
+          </td>
+          <td style="padding-left: 12px;">
+            <strong style="color: #2D3A35;">Schedule & Compliance</strong>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
+              Exchange records with GPS verification data
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ accept_url }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #475569; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    Accept Access
+  </a>
+</div>
+
+<!-- Security Note -->
+<div style="background-color: #E8F0EC; border-radius: 8px; padding: 16px; text-align: center;">
+  <img src="{{ icons.security }}" alt="" width="24" height="24" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+  <span style="color: #4A6C58; font-size: 14px; vertical-align: middle;">
+    <strong>Data Security:</strong> All access is logged and auditable. Exports include SHA-256 integrity verification.
+  </span>
+</div>
+
+<!-- Expiry Notice -->
+{% if expiry_days %}
+<p style="color: #94A3A0; font-size: 13px; text-align: center; margin-top: 24px;">
+  This invitation expires in {{ expiry_days }} days.
+</p>
+{% endif %}
+{% endblock %}

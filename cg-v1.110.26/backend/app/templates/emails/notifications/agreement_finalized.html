@@ -1,0 +1,105 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Agreement Finalized!{% endblock %}
+
+{% block preheader %}Great news! Your parenting agreement has been approved by both parents.{% endblock %}
+
+{% block header_style %}background: linear-gradient(135deg, #4A6C58 0%, #6B9B7A 100%);{% endblock %}
+
+{% block content %}
+<!-- Success Checkmark -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <div style="display: inline-block; width: 80px; height: 80px; background-color: #E8F0EC; border-radius: 50%; line-height: 80px;">
+    <img src="{{ icons.checkmark }}" alt="" width="40" height="40" style="display: inline-block; vertical-align: middle;">
+  </div>
+</div>
+
+<h1 style="color: #4A6C58; text-align: center; margin-bottom: 8px;">
+  Agreement Finalized!
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  Both parents have approved the agreement. It is now active and in effect.
+</p>
+
+<!-- Agreement Details Card -->
+<div style="background-color: #E8F0EC; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <h2 style="color: #4A6C58; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">
+    Finalized Agreement
+  </h2>
+  <p style="color: #2D3A35; font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">
+    {{ agreement_title | default('Parenting Agreement') }}
+  </p>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Effective Date</span><br>
+        <strong style="color: #2D3A35;">{{ effective_date | default('Immediately') }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Approved By</span><br>
+        <strong style="color: #2D3A35;">{{ parent_a_name }} & {{ parent_b_name }}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- What's Next -->
+<h2 style="color: #2D3A35; font-size: 18px; margin-bottom: 16px;">
+  What's Next?
+</h2>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+  <tr>
+    <td style="padding: 12px; background-color: #FFFBF5; border-radius: 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="40" valign="top">
+            <img src="{{ icons.calendar }}" alt="" width="32" height="32">
+          </td>
+          <td style="padding-left: 12px;">
+            <strong style="color: #2D3A35;">Schedules Auto-Generated</strong>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
+              Your custody schedule is now active based on the agreement terms
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr><td style="height: 8px;"></td></tr>
+  <tr>
+    <td style="padding: 12px; background-color: #FFFBF5; border-radius: 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="40" valign="top">
+            <img src="{{ icons.document }}" alt="" width="32" height="32">
+          </td>
+          <td style="padding-left: 12px;">
+            <strong style="color: #2D3A35;">Download PDF</strong>
+            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
+              Get a court-ready PDF of your finalized agreement
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ agreement_url }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    View Agreement
+  </a>
+</div>
+
+<!-- Celebration Note -->
+<p style="color: #4A6C58; font-size: 14px; text-align: center; margin: 0; font-style: italic;">
+  This is a significant step toward peaceful co-parenting. Well done!
+</p>
+{% endblock %}

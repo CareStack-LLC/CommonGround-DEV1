@@ -35,6 +35,7 @@ from app.api.v1.endpoints import (
     my_circle,
     subscriptions,
     grants,
+    professional,
 )
 
 api_router = APIRouter()
@@ -102,3 +103,6 @@ api_router.include_router(subscriptions.router, prefix="/subscriptions", tags=["
 
 # Grants - Nonprofit grant codes
 api_router.include_router(grants.router, prefix="/grants", tags=["Grant Codes"])
+
+# Professional Portal - Attorneys, mediators, paralegals
+api_router.include_router(professional.router, prefix="/professional", tags=["Professional Portal"])

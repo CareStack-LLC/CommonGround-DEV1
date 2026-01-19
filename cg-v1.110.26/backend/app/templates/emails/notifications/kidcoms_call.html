@@ -1,0 +1,61 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}{{ caller_name }} is calling{% endblock %}
+
+{% block preheader %}{{ caller_name }} is trying to reach {{ child_name }} on KidComs.{% endblock %}
+
+{% block header_style %}background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);{% endblock %}
+
+{% block content %}
+<!-- Video Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <img src="{{ icons.video }}" alt="" width="64" height="64" style="display: inline-block;">
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Incoming KidComs Call
+</h1>
+
+<p style="color: #6B7B74; font-size: 18px; text-align: center; margin-bottom: 32px;">
+  <strong style="color: #8B5CF6;">{{ caller_name }}</strong> is trying to connect with
+  <strong style="color: #2D3A35;">{{ child_name }}</strong>
+</p>
+
+<!-- Caller Info Card -->
+<div style="background-color: #F5F0F9; border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center;">
+  <div style="width: 80px; height: 80px; background-color: #8B5CF6; border-radius: 50%; margin: 0 auto 16px; line-height: 80px;">
+    <span style="color: white; font-size: 32px; font-weight: 600;">
+      {{ caller_name[:1] | upper }}
+    </span>
+  </div>
+  <p style="color: #2D3A35; font-size: 20px; font-weight: 600; margin: 0 0 4px 0;">
+    {{ caller_name }}
+  </p>
+  {% if caller_relationship %}
+  <p style="color: #7C3AED; font-size: 14px; margin: 0;">
+    {{ caller_relationship | title }}
+  </p>
+  {% endif %}
+</div>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ call_url }}"
+     style="display: inline-block; padding: 20px 60px; background-color: #8B5CF6; color: #FFFFFF; text-decoration: none; border-radius: 12px; font-size: 18px; font-weight: 600;">
+    Join Call
+  </a>
+</div>
+
+<!-- Info Note -->
+<div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 8px; padding: 16px; text-align: center;">
+  <p style="margin: 0; color: #6B7B74; font-size: 14px;">
+    If the call is missed, {{ caller_name }} will be notified.
+    You can always initiate a call through the KidComs section.
+  </p>
+</div>
+
+<!-- Safety Note -->
+<p style="color: #94A3A0; font-size: 13px; text-align: center; margin-top: 24px;">
+  KidComs calls are monitored for child safety. Call logs are maintained for your records.
+</p>
+{% endblock %}

@@ -1,7 +1,7 @@
 # CommonGround V1 - Error Handling Guide
 
-**Last Updated:** January 10, 2026
-**Version:** 1.0.0
+**Last Updated:** January 18, 2026
+**Version:** 1.6.0
 
 ---
 
@@ -309,6 +309,34 @@ def create_error_response(
 | `SYS_DATABASE_ERROR` | 500 | Database error | Database error occurred |
 | `SYS_MAINTENANCE` | 503 | System under maintenance | System is under maintenance |
 | `SYS_OVERLOADED` | 503 | System overloaded | System is busy. Please try again |
+
+### Professional Portal Errors (PROF_*) - v1.6.0
+
+| Code | HTTP | Description | User Message |
+|------|------|-------------|--------------|
+| `PROF_PROFILE_REQUIRED` | 403 | User doesn't have professional profile | Professional profile required. Please complete onboarding |
+| `PROF_PROFILE_INACTIVE` | 403 | Professional profile is deactivated | Your professional profile is inactive |
+| `PROF_LICENSE_UNVERIFIED` | 403 | License not yet verified | Your license is pending verification |
+| `PROF_FIRM_MEMBERSHIP_REQUIRED` | 403 | Not a member of any firm | You must be a member of a firm |
+| `PROF_FIRM_ACCESS_DENIED` | 403 | Not authorized for this firm | You don't have access to this firm |
+| `PROF_CASE_NOT_ASSIGNED` | 403 | Not assigned to this case | You are not assigned to this case |
+| `PROF_SCOPE_NOT_GRANTED` | 403 | Missing required access scope | You don't have permission for this action |
+| `PROF_ARIA_CONTROL_DENIED` | 403 | Cannot control ARIA for this case | You cannot modify ARIA settings for this case |
+| `PROF_CLIENT_MESSAGE_DENIED` | 403 | Cannot message this client | You cannot send messages to this client |
+| `PROF_ACCESS_REQUEST_NOT_FOUND` | 404 | Access request not found | Access request not found |
+| `PROF_ACCESS_REQUEST_EXPIRED` | 400 | Access request has expired | This access request has expired |
+| `PROF_ACCESS_REQUEST_DECLINED` | 400 | Access request was declined | This access request was declined |
+| `PROF_DUAL_CONSENT_REQUIRED` | 400 | Both parents must approve | Both parents must approve professional access |
+| `PROF_CONSENT_PENDING` | 400 | Waiting for parent consent | Waiting for parent approval |
+| `PROF_ALREADY_ASSIGNED` | 409 | Already assigned to this case | You are already assigned to this case |
+| `PROF_FIRM_SLUG_TAKEN` | 409 | Firm slug already in use | This firm URL is already taken |
+| `PROF_MEMBER_ALREADY_EXISTS` | 409 | Already a firm member | This person is already a member |
+| `PROF_INVITE_ALREADY_SENT` | 409 | Invitation already sent | An invitation has already been sent to this email |
+| `PROF_INTAKE_NOT_FOUND` | 404 | Intake session not found | Intake session not found |
+| `PROF_INTAKE_ALREADY_COMPLETED` | 400 | Intake already completed | This intake has already been completed |
+| `PROF_TEMPLATE_NOT_FOUND` | 404 | Template not found | Template not found |
+| `PROF_CANNOT_REMOVE_OWNER` | 400 | Cannot remove firm owner | Cannot remove the firm owner |
+| `PROF_LAST_ADMIN` | 400 | Cannot demote last admin | The firm must have at least one admin |
 
 ---
 

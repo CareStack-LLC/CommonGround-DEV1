@@ -2,7 +2,7 @@
 
 AI-powered co-parenting operating system that transforms high-conflict custody situations into collaborative partnerships.
 
-**Current Version:** 1.5.0 (January 2026)
+**Current Version:** 1.6.0 (January 2026)
 
 ## Quick Reference
 
@@ -227,6 +227,40 @@ Central hub for co-parenting cases:
 - SHA-256 integrity verification for exports
 - Court notification system
 
+### Professional Portal (New in 1.6.0)
+
+Complete legal practice management for family law professionals:
+
+**User Types:**
+- Attorneys (lead, associate)
+- Mediators / Parenting Coordinators
+- Paralegals
+- Intake Coordinators
+- Practice Administrators
+
+**Core Features:**
+- **Firm Management**: Create and manage law firms with team roles
+- **Case Dashboard**: View all assigned cases with alerts and metrics
+- **Case Timeline**: Chronological feed of messages, exchanges, court events
+- **ARIA Controls**: Adjust AI mediation settings per case
+- **Professional Messaging**: Secure attorney-client communication
+- **Intake Center**: Conduct and review AI-assisted client intakes
+- **Compliance Tracking**: Exchange and financial compliance metrics
+- **Court Exports**: Generate evidence packages for court
+
+**Access Model:**
+- Parents invite professionals by email or firm directory
+- Dual-parent consent (configurable)
+- Scoped permissions per case
+- Complete audit logging
+
+**Routes:**
+- `/professional/dashboard` - Practice overview
+- `/professional/cases` - Case load management
+- `/professional/cases/[id]/*` - Individual case views
+- `/professional/intake` - Intake session management
+- `/professional/firm` - Firm settings and team
+
 ## Database Models
 
 Key models and relationships:
@@ -261,6 +295,20 @@ Message ──────┬── MessageFlags (1:N) [ARIA interventions]
 
 ARIAConversation ── ARIAMessage (1:N)
                     [agreement guidance sessions]
+
+ProfessionalProfile ─── User (1:1)
+                    └── FirmMembership (1:N)
+                    └── CaseAssignment (1:N)
+
+Firm ─────────────┬── FirmMembership (1:N)
+                  └── FirmTemplate (1:N)
+
+CaseAssignment ───── FamilyFile (N:1)
+                 └── ProfessionalProfile (N:1)
+                 └── ProfessionalMessage (1:N)
+
+ProfessionalAccessRequest ── FamilyFile (N:1)
+                          [invitation/consent workflow]
 ```
 
 ## Environment Variables
@@ -308,6 +356,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 | ClearFund | GET/POST /clearfund/expenses, GET/POST /clearfund/obligations |
 | Court | GET /court/events, POST /court/events, GET /court/cases/{id}/overview |
 | Export | POST /export/generate, GET /export/templates |
+| Professional | GET/POST /professional/profile, GET/POST /professional/firms, GET /professional/cases |
+| Professional Cases | GET /professional/cases/{id}/timeline, GET /professional/cases/{id}/aria |
+| Professional Messaging | GET/POST /professional/messages, GET /professional/messages/case/{id} |
+| Professional Intake | GET/POST /professional/intake/sessions |
 
 ## Testing
 

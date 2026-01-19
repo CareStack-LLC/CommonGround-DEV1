@@ -1,0 +1,117 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Welcome to CommonGround{% endblock %}
+
+{% block preheader %}Welcome to CommonGround! Your journey to peaceful co-parenting starts here.{% endblock %}
+
+{% block content %}
+<!-- Welcome Icon -->
+<div style="text-align: center; margin-bottom: 24px;">
+  <img src="{{ icons.welcome }}" alt="" width="100" height="100" style="display: inline-block;">
+</div>
+
+<!-- Welcome Message -->
+<h1 style="text-align: center; color: #2D3A35; margin-bottom: 8px;">
+  Welcome to CommonGround{% if first_name %}, {{ first_name }}{% endif %}!
+</h1>
+
+<p style="text-align: center; color: #6B7B74; font-size: 18px; margin-bottom: 32px;">
+  Your journey to peaceful co-parenting starts here.
+</p>
+
+<!-- Mission Statement -->
+<div style="background-color: #E8F0EC; border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+  <p style="margin: 0; color: #4A6C58; font-size: 16px; line-height: 1.6; text-align: center;">
+    CommonGround helps co-parents communicate clearly, coordinate schedules,
+    and keep their children at the center of every decision.
+  </p>
+</div>
+
+<!-- Features Section -->
+<h2 style="color: #2D3A35; font-size: 20px; margin-bottom: 20px;">
+  Here's what you can do:
+</h2>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+  <!-- Feature 1: ARIA Communication -->
+  <tr>
+    <td style="padding: 16px 0; border-bottom: 1px solid #E8E3DB;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="48" valign="top">
+            <img src="{{ icons.message }}" alt="" width="40" height="40">
+          </td>
+          <td style="padding-left: 16px;">
+            <h3 style="margin: 0 0 4px 0; color: #2D3A35; font-size: 16px; font-weight: 600;">
+              ARIA-Assisted Messaging
+            </h3>
+            <p style="margin: 0; color: #6B7B74; font-size: 14px;">
+              Our AI assistant helps keep conversations constructive and child-focused,
+              reducing conflict before it starts.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Feature 2: Agreement Builder -->
+  <tr>
+    <td style="padding: 16px 0; border-bottom: 1px solid #E8E3DB;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="48" valign="top">
+            <img src="{{ icons.document }}" alt="" width="40" height="40">
+          </td>
+          <td style="padding-left: 16px;">
+            <h3 style="margin: 0 0 4px 0; color: #2D3A35; font-size: 16px; font-weight: 600;">
+              Custody Agreement Builder
+            </h3>
+            <p style="margin: 0; color: #6B7B74; font-size: 14px;">
+              Create comprehensive parenting plans together with guided sections
+              covering custody, schedules, holidays, and more.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- Feature 3: Schedule Coordination -->
+  <tr>
+    <td style="padding: 16px 0;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="48" valign="top">
+            <img src="{{ icons.calendar }}" alt="" width="40" height="40">
+          </td>
+          <td style="padding-left: 16px;">
+            <h3 style="margin: 0 0 4px 0; color: #2D3A35; font-size: 16px; font-weight: 600;">
+              Schedule & Exchange Tracking
+            </h3>
+            <p style="margin: 0; color: #6B7B74; font-size: 14px;">
+              Coordinate custody exchanges, track parenting time, and
+              maintain documented records with GPS verification.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin-top: 32px;">
+  <a href="{{ app_url | default('https://commonground.family') }}"
+     class="btn btn-primary"
+     style="display: inline-block; padding: 16px 40px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    Get Started
+  </a>
+</div>
+
+<!-- Help Note -->
+<p style="text-align: center; color: #94A3A0; font-size: 14px; margin-top: 24px;">
+  Questions? Our support team is here to help.<br>
+  <a href="{{ support_url | default('https://commonground.family/support') }}" style="color: #4A6C58;">Visit our Help Center</a>
+</p>
+{% endblock %}

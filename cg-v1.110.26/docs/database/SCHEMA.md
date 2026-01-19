@@ -1,7 +1,7 @@
 # CommonGround V1 - Complete Database Schema
 
-**Last Updated:** January 17, 2026
-**Version:** 1.5.0
+**Last Updated:** January 18, 2026
+**Version:** 1.6.0
 **Database:** PostgreSQL 15
 **ORM:** SQLAlchemy 2.0 (Async)
 **Migrations:** 80+ Alembic migrations
@@ -25,6 +25,7 @@
    - [Cubbie (Child Items)](#cubbie-child-items)
    - [My Circle](#my-circle)
    - [Court Portal](#court-portal)
+   - [Professional Portal](#professional-portal)
    - [Subscriptions](#subscriptions)
    - [Exports](#exports)
    - [Audit & Logging](#audit--logging)
@@ -41,15 +42,16 @@
 
 | Metric | Count |
 |--------|-------|
-| Total Tables | 45+ |
+| Total Tables | 55+ |
 | Core Tables | 6 |
 | Family File Tables | 5 |
-| Feature Tables | 30 |
-| Audit Tables | 5 |
-| Total Columns | ~450 |
-| Foreign Keys | ~60 |
-| Indexes | ~50 |
-| Alembic Migrations | 80+ |
+| Feature Tables | 35 |
+| Professional Portal Tables | 8 |
+| Audit Tables | 6 |
+| Total Columns | ~520 |
+| Foreign Keys | ~75 |
+| Indexes | ~60 |
+| Alembic Migrations | 85+ |
 
 ### Naming Conventions
 
@@ -1342,6 +1344,379 @@ CREATE INDEX idx_court_forms_case ON court_forms(case_id);
 
 ---
 
+### Professional Portal
+
+*Added in v1.6.0 - Legal practice management for family law professionals*
+
+#### professional_profiles
+
+```sql
+CREATE TABLE professional_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
+    -- Professional type
+    professional_type VARCHAR(50) NOT NULL,
+
+    -- License information
+    license_number VARCHAR(100),
+    license_state VARCHAR(50),
+    license_verified BOOLEAN DEFAULT FALSE,
+    license_verified_at TIMESTAMP WITH TIME ZONE,
+
+    -- Credentials and practice areas
+    credentials JSONB DEFAULT '{}',
+    practice_areas JSONB DEFAULT '[]',
+
+    -- Settings
+    default_intake_template_id UUID,
+    notification_preferences JSONB DEFAULT '{}',
+
+    -- Status
+    is_active BOOLEAN DEFAULT TRUE,
+    onboarded_at TIMESTAMP WITH TIME ZONE,
+
+    -- Legacy link
+    court_professional_id UUID,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id)
+);
+
+-- Indexes
+CREATE INDEX idx_professional_profiles_user ON professional_profiles(user_id);
+CREATE INDEX idx_professional_profiles_type ON professional_profiles(professional_type);
+CREATE INDEX idx_professional_profiles_active ON professional_profiles(is_active) WHERE is_active = TRUE;
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| professional_type | VARCHAR(50) | attorney, mediator, paralegal, intake_coordinator, practice_admin, parenting_coordinator |
+| credentials | JSONB | Bar numbers, certifications, etc. |
+| practice_areas | JSONB | ["custody", "divorce", "mediation", ...] |
+
+---
+
+#### firms
+
+```sql
+CREATE TABLE firms (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(100) UNIQUE NOT NULL,
+    firm_type VARCHAR(50) NOT NULL,
+
+    -- Contact information
+    email VARCHAR(255),
+    phone VARCHAR(20),
+    website VARCHAR(255),
+
+    -- Address
+    address_line1 VARCHAR(255),
+    address_line2 VARCHAR(255),
+    city VARCHAR(100),
+    state VARCHAR(50),
+    zip_code VARCHAR(20),
+
+    -- Branding
+    logo_url TEXT,
+    primary_color VARCHAR(20),
+
+    -- Settings
+    settings JSONB DEFAULT '{}',
+
+    -- Subscription
+    stripe_customer_id VARCHAR(255),
+    subscription_tier VARCHAR(50) DEFAULT 'free',
+    subscription_status VARCHAR(50) DEFAULT 'active',
+
+    -- Visibility
+    is_active BOOLEAN DEFAULT TRUE,
+    is_public BOOLEAN DEFAULT FALSE,
+
+    -- Ownership
+    created_by UUID NOT NULL REFERENCES users(id),
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes
+CREATE UNIQUE INDEX idx_firms_slug ON firms(slug);
+CREATE INDEX idx_firms_active ON firms(is_active) WHERE is_active = TRUE;
+CREATE INDEX idx_firms_public ON firms(is_public) WHERE is_public = TRUE;
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| firm_type | VARCHAR(50) | law_firm, mediation_practice, court_services, solo_practice |
+| subscription_tier | VARCHAR(50) | free, basic, professional, enterprise |
+| is_public | BOOLEAN | Listed in firm directory |
+
+---
+
+#### firm_memberships
+
+```sql
+CREATE TABLE firm_memberships (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    professional_id UUID NOT NULL REFERENCES professional_profiles(id) ON DELETE CASCADE,
+    firm_id UUID NOT NULL REFERENCES firms(id) ON DELETE CASCADE,
+
+    -- Role and permissions
+    role VARCHAR(50) NOT NULL,
+    custom_permissions JSONB DEFAULT '{}',
+
+    -- Status
+    status VARCHAR(50) DEFAULT 'active',
+
+    -- Invitation tracking
+    invited_at TIMESTAMP WITH TIME ZONE,
+    joined_at TIMESTAMP WITH TIME ZONE,
+    invited_by UUID REFERENCES users(id),
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(professional_id, firm_id)
+);
+
+-- Indexes
+CREATE INDEX idx_firm_memberships_professional ON firm_memberships(professional_id);
+CREATE INDEX idx_firm_memberships_firm ON firm_memberships(firm_id);
+CREATE INDEX idx_firm_memberships_status ON firm_memberships(status);
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| role | VARCHAR(50) | owner, admin, attorney, paralegal, intake, readonly |
+| status | VARCHAR(50) | active, invited, suspended, removed |
+
+---
+
+#### case_assignments
+
+```sql
+CREATE TABLE case_assignments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    professional_id UUID NOT NULL REFERENCES professional_profiles(id) ON DELETE CASCADE,
+    firm_id UUID NOT NULL REFERENCES firms(id) ON DELETE CASCADE,
+    family_file_id UUID NOT NULL REFERENCES family_files(id) ON DELETE CASCADE,
+    case_id UUID REFERENCES cases(id),
+
+    -- Role and representation
+    assignment_role VARCHAR(50) NOT NULL,
+    representing VARCHAR(20),
+
+    -- Access scopes
+    access_scopes JSONB DEFAULT '["agreement", "schedule", "messages", "financials", "compliance", "interventions"]',
+
+    -- ARIA control
+    can_control_aria BOOLEAN DEFAULT FALSE,
+    aria_preferences JSONB DEFAULT '{}',
+
+    -- Messaging
+    can_message_client BOOLEAN DEFAULT TRUE,
+
+    -- Status
+    status VARCHAR(50) DEFAULT 'active',
+
+    -- Timing
+    assigned_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    completed_at TIMESTAMP WITH TIME ZONE,
+
+    -- Notes
+    internal_notes TEXT,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_case_assignments_professional ON case_assignments(professional_id);
+CREATE INDEX idx_case_assignments_firm ON case_assignments(firm_id);
+CREATE INDEX idx_case_assignments_family_file ON case_assignments(family_file_id);
+CREATE INDEX idx_case_assignments_status ON case_assignments(status);
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| assignment_role | VARCHAR(50) | lead_attorney, associate, paralegal, mediator, parenting_coordinator, intake_coordinator |
+| representing | VARCHAR(20) | parent_a, parent_b, both, court |
+| access_scopes | JSONB | List of permitted access areas |
+| status | VARCHAR(50) | active, on_hold, completed, withdrawn |
+
+---
+
+#### firm_templates
+
+```sql
+CREATE TABLE firm_templates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    firm_id UUID NOT NULL REFERENCES firms(id) ON DELETE CASCADE,
+    created_by UUID NOT NULL REFERENCES users(id),
+
+    -- Template details
+    name VARCHAR(255) NOT NULL,
+    template_type VARCHAR(50) NOT NULL,
+    description TEXT,
+    content JSONB NOT NULL,
+
+    -- Version control
+    version INTEGER DEFAULT 1,
+    is_current BOOLEAN DEFAULT TRUE,
+
+    -- Status
+    is_active BOOLEAN DEFAULT TRUE,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_firm_templates_firm ON firm_templates(firm_id);
+CREATE INDEX idx_firm_templates_type ON firm_templates(template_type);
+CREATE INDEX idx_firm_templates_current ON firm_templates(firm_id, is_current) WHERE is_current = TRUE;
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| template_type | VARCHAR(50) | intake, agreement_draft, communication, report |
+
+---
+
+#### professional_access_requests
+
+```sql
+CREATE TABLE professional_access_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    family_file_id UUID NOT NULL REFERENCES family_files(id) ON DELETE CASCADE,
+
+    -- Professional (if known)
+    professional_id UUID REFERENCES professional_profiles(id),
+    professional_email VARCHAR(255) NOT NULL,
+    firm_id UUID REFERENCES firms(id),
+
+    -- Request source
+    requested_by VARCHAR(20) NOT NULL,
+    requested_by_user_id UUID NOT NULL REFERENCES users(id),
+
+    -- Requested permissions
+    requested_scopes JSONB DEFAULT '[]',
+
+    -- Status
+    status VARCHAR(20) DEFAULT 'pending',
+
+    -- Parent approvals
+    parent_a_approved BOOLEAN DEFAULT FALSE,
+    parent_b_approved BOOLEAN DEFAULT FALSE,
+    parent_a_approved_at TIMESTAMP WITH TIME ZONE,
+    parent_b_approved_at TIMESTAMP WITH TIME ZONE,
+
+    -- Outcome
+    approved_at TIMESTAMP WITH TIME ZONE,
+    declined_at TIMESTAMP WITH TIME ZONE,
+    decline_reason TEXT,
+
+    -- Expiration
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_professional_access_requests_family_file ON professional_access_requests(family_file_id);
+CREATE INDEX idx_professional_access_requests_professional ON professional_access_requests(professional_id);
+CREATE INDEX idx_professional_access_requests_email ON professional_access_requests(professional_email);
+CREATE INDEX idx_professional_access_requests_status ON professional_access_requests(status);
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| requested_by | VARCHAR(20) | parent, professional |
+| status | VARCHAR(20) | pending, approved, declined, expired |
+
+---
+
+#### professional_messages
+
+```sql
+CREATE TABLE professional_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    family_file_id UUID NOT NULL REFERENCES family_files(id) ON DELETE CASCADE,
+    case_assignment_id UUID NOT NULL REFERENCES case_assignments(id) ON DELETE CASCADE,
+
+    -- Sender/recipient
+    sender_id UUID NOT NULL REFERENCES users(id),
+    sender_type VARCHAR(20) NOT NULL,
+    recipient_id UUID NOT NULL REFERENCES users(id),
+
+    -- Message content
+    subject VARCHAR(255),
+    content TEXT NOT NULL,
+
+    -- Read status
+    is_read BOOLEAN DEFAULT FALSE,
+    read_at TIMESTAMP WITH TIME ZONE,
+
+    -- Threading
+    thread_id UUID REFERENCES professional_messages(id),
+
+    sent_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_professional_messages_family_file ON professional_messages(family_file_id);
+CREATE INDEX idx_professional_messages_assignment ON professional_messages(case_assignment_id);
+CREATE INDEX idx_professional_messages_sender ON professional_messages(sender_id);
+CREATE INDEX idx_professional_messages_recipient ON professional_messages(recipient_id);
+CREATE INDEX idx_professional_messages_unread ON professional_messages(recipient_id, is_read) WHERE is_read = FALSE;
+CREATE INDEX idx_professional_messages_thread ON professional_messages(thread_id);
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| sender_type | VARCHAR(20) | professional, parent |
+
+---
+
+#### professional_access_logs
+
+```sql
+CREATE TABLE professional_access_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    professional_id UUID NOT NULL REFERENCES professional_profiles(id) ON DELETE CASCADE,
+    firm_id UUID REFERENCES firms(id),
+    family_file_id UUID NOT NULL REFERENCES family_files(id) ON DELETE CASCADE,
+
+    -- Action details
+    action VARCHAR(50) NOT NULL,
+    resource_type VARCHAR(50),
+    resource_id UUID,
+    details JSONB DEFAULT '{}',
+
+    -- Request metadata
+    ip_address INET,
+    user_agent TEXT,
+
+    logged_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_professional_access_logs_professional ON professional_access_logs(professional_id);
+CREATE INDEX idx_professional_access_logs_family_file ON professional_access_logs(family_file_id);
+CREATE INDEX idx_professional_access_logs_action ON professional_access_logs(action);
+CREATE INDEX idx_professional_access_logs_date ON professional_access_logs(logged_at DESC);
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| action | VARCHAR(50) | view_messages, export_report, control_aria, send_intake, message_client, view_compliance, etc. |
+
+---
+
 ### Exports
 
 #### exports
@@ -1618,6 +1993,7 @@ REFERENCES parent_table(id) ON DELETE RESTRICT
 | 010 | 2026-01-08 | Add legal_access, court_events |
 | 011 | 2026-01-09 | Add exports, audit_logs |
 | 012 | 2026-01-10 | Add silent_handoff fields |
+| 013 | 2026-01-18 | Add professional_portal tables (v1.6.0) |
 
 ### Running Migrations
 
@@ -1717,5 +2093,5 @@ WHERE case_id = :case_id;
 
 ---
 
-*Last Updated: January 10, 2026*
-*Document Version: 1.0.0*
+*Last Updated: January 18, 2026*
+*Document Version: 1.6.0*

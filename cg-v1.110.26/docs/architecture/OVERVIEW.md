@@ -1,7 +1,7 @@
 # CommonGround V1 - Executive System Overview
 
-**Last Updated:** January 17, 2026
-**Version:** 1.5.0
+**Last Updated:** January 18, 2026
+**Version:** 1.6.0
 **Status:** Production
 
 ---
@@ -275,6 +275,24 @@ CommonGround addresses the core challenges of co-parenting after separation:
 - **GPS Verification:** Exchange location documentation
 - **Integrity Hash:** SHA-256 verification for authenticity
 
+### 11. Professional Portal (v1.6.0)
+**Purpose:** Legal practice management for family law professionals
+
+- **Firm Management:** Create law firms, invite team members, manage roles
+- **Case Dashboard:** Overview of all assigned cases with alerts and metrics
+- **Case Timeline:** Chronological feed of messages, exchanges, court events
+- **ARIA Controls:** Adjust AI mediation sensitivity and intervention settings
+- **Professional Messaging:** Secure attorney-client communication channel
+- **Intake Center:** Conduct AI-assisted client intakes with structured data extraction
+- **Compliance Tracking:** Exchange and financial compliance metrics
+- **Access Workflow:** Parent invitation with dual-consent, scoped permissions
+
+**User Types:**
+- Attorneys (lead, associate)
+- Mediators / Parenting Coordinators
+- Paralegals / Intake Coordinators
+- Practice Administrators
+
 ---
 
 ## Technology Summary
@@ -358,6 +376,7 @@ This document is part of the comprehensive CommonGround V1 documentation suite:
 | [KIDCOMS.md](../features/KIDCOMS.md) | Video communication system |
 | [CLEARFUND.md](../features/CLEARFUND.md) | Expense management |
 | [SCHEDULE.md](../features/SCHEDULE.md) | Calendar and exchanges |
+| [PROFESSIONAL_PORTAL.md](../features/PROFESSIONAL_PORTAL.md) | Legal practice management (v1.6.0) |
 
 ### Operational Documentation (/docs/)
 
@@ -365,6 +384,7 @@ This document is part of the comprehensive CommonGround V1 documentation suite:
 |----------|-------------|
 | [SETUP_GUIDE.md](../guides/SETUP_GUIDE.md) | Local development setup |
 | [DEPLOYMENT_GUIDE.md](../guides/DEPLOYMENT_GUIDE.md) | Production deployment |
+| [PROFESSIONAL_PORTAL_GUIDE.md](../guides/PROFESSIONAL_PORTAL_GUIDE.md) | Professional Portal workflow guide (v1.6.0) |
 | [ERROR_HANDLING.md](../errors/ERROR_HANDLING.md) | Error codes and handling |
 | [SECURITY.md](../operations/SECURITY.md) | Security architecture |
 
