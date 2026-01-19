@@ -946,11 +946,31 @@ async def list_family_file_professionals(
 
     Returns active case assignments and optionally pending access requests.
     """
-    ff_service = FamilyFileService(db)
-    await ff_service.get_family_file(family_file_id, current_user)
+    import traceback
+    import logging
+    logger = logging.getLogger(__name__)
 
-    assignment_service = CaseAssignmentService(db)
-    assignments = await assignment_service.list_assignments_for_family_file(family_file_id)
+    try:
+        ff_service = FamilyFileService(db)
+        await ff_service.get_family_file(family_file_id, current_user)
+    except Exception as e:
+        logger.error(f"Error getting family file: {e}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error getting family file: {str(e)}"
+        )
+
+    try:
+        assignment_service = CaseAssignmentService(db)
+        assignments = await assignment_service.list_assignments_for_family_file(family_file_id)
+    except Exception as e:
+        logger.error(f"Error listing assignments: {e}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error listing assignments: {str(e)}"
+        )
 
     professionals = []
     for assignment in assignments:
@@ -1038,6 +1058,9 @@ async def invite_professional(
 
     # If firm_id is provided, use the directory invitation flow
     if firm_id:
+        import traceback
+        import logging
+        logger = logging.getLogger(__name__)
         try:
             request = await access_service.invite_firm_from_directory(
                 family_file_id=family_file_id,
@@ -1053,6 +1076,13 @@ async def invite_professional(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e)
+            )
+        except Exception as e:
+            logger.error(f"Error inviting firm: {e}")
+            logger.error(traceback.format_exc())
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error inviting firm: {str(e)}"
             )
 
     # Email-based invitation (legacy flow)
