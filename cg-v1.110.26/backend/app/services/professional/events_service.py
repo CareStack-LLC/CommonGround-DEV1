@@ -370,13 +370,16 @@ class ProfessionalEventsService:
 
         conflicts = []
         for event in conflicting_events:
+            # Safely determine event type for conflict
+            conflict_event_type = event.professional_event_type or event.event_type or "meeting"
+            
             conflicts.append(
                 EventConflict(
                     event_id=str(event.id),
                     title=event.title,
                     start_time=event.start_time,
                     end_time=event.end_time,
-                    event_type=event.professional_event_type or event.event_type,
+                    event_type=conflict_event_type,
                     overlap_minutes=self._calculate_overlap_minutes(
                         start_time, end_time, event.start_time, event.end_time
                     ),
@@ -491,7 +494,8 @@ class ProfessionalEventsService:
         # Count by type
         by_type = {}
         for event in events:
-            event_type = event.professional_event_type or event.event_type
+            # Safely determine event type
+            event_type = event.professional_event_type or event.event_type or "other"
             if event_type not in by_type:
                 by_type[event_type] = 0
             by_type[event_type] += 1
@@ -560,24 +564,30 @@ class ProfessionalEventsService:
             )
             family_file_title = result.scalar_one_or_none()
 
+        # Safely determine event type
+        event_type_val = event.professional_event_type or event.event_type or "meeting"
+        # Ensure it matches expected enum strings, otherwise default to meeting
+        if event_type_val not in ["meeting", "court_hearing", "video_call", "document_deadline", "consultation", "deposition", "mediation", "other"]:
+            event_type_val = "meeting"
+
         return ProfessionalEventResponse(
             id=str(event.id),
             professional_id=str(event.professional_id) if event.professional_id else None,
             firm_id=None,  # Not stored in unified model
-            title=event.title,
+            title=event.title or "Untitled Event",
             description=event.description,
-            event_type=event.professional_event_type or event.event_type,
+            event_type=event_type_val,
             start_time=event.start_time,
             end_time=event.end_time,
             all_day=event.all_day,
-            timezone=event.timezone,
+            timezone=event.timezone or "UTC",
             location=event.location,
             virtual_meeting_url=event.virtual_meeting_url,
             family_file_id=str(event.family_file_id) if event.family_file_id else None,
             family_file_title=family_file_title,
             attendee_ids=[],  # Not stored in unified model
             attendee_emails=[],  # Not stored in unified model
-            parent_visibility=event.parent_visibility,
+            parent_visibility=event.parent_visibility or "none",
             is_recurring=False,  # Not supported yet in unified model
             recurrence_rule=None,
             parent_event_id=None,
