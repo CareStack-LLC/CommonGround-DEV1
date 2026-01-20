@@ -65,15 +65,36 @@ interface ParentMessage {
 }
 
 interface CommunicationStats {
+  // Backend fields
+  period_days?: number;
   total_messages: number;
-  messages_last_30_days: number;
-  avg_response_time_hours: number;
-  intervention_rate: number;
-  messages_by_parent: {
+  flagged_messages?: number;
+  flag_rate?: number;
+  messages_by_sender?: Record<string, number>;
+  recent_trend?: "increasing" | "decreasing" | "stable";
+  last_7_days?: number;
+  previous_7_days?: number;
+  // Legacy/optional fields for backwards compatibility
+  messages_last_30_days?: number;
+  avg_response_time_hours?: number;
+  intervention_rate?: number;
+  messages_by_parent?: {
     parent_a: number;
     parent_b: number;
   };
-  sentiment_trend: "improving" | "stable" | "declining";
+  sentiment_trend?: "improving" | "stable" | "declining";
+  // Enhanced stats
+  good_faith_scores?: {
+    parent_a: number;
+    parent_b: number;
+  };
+  flag_categories?: Record<string, number>;
+  topic_categories?: Record<string, number>;
+  weekly_message_counts?: Array<{
+    week: string;
+    count: number;
+    flagged: number;
+  }>;
 }
 
 export default function CommunicationsPage() {
@@ -191,8 +212,10 @@ export default function CommunicationsPage() {
   const getSentimentIcon = (trend: string) => {
     switch (trend) {
       case "improving":
+      case "increasing":
         return <TrendingUp className="h-4 w-4 text-green-500" />;
       case "declining":
+      case "decreasing":
         return <TrendingDown className="h-4 w-4 text-red-500" />;
       default:
         return <BarChart3 className="h-4 w-4 text-gray-500" />;
@@ -254,8 +277,8 @@ export default function CommunicationsPage() {
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-muted-foreground">Last 30 Days</p>
-                      <p className="text-2xl font-bold">{stats.messages_last_30_days}</p>
+                      <p className="text-xs text-muted-foreground">Last 7 Days</p>
+                      <p className="text-2xl font-bold">{stats.last_7_days ?? stats.messages_last_30_days ?? 0}</p>
                     </div>
                     <Calendar className="h-8 w-8 text-muted-foreground opacity-50" />
                   </div>
@@ -266,8 +289,12 @@ export default function CommunicationsPage() {
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-muted-foreground">ARIA Interventions</p>
-                      <p className="text-2xl font-bold">{(stats.intervention_rate * 100).toFixed(1)}%</p>
+                      <p className="text-xs text-muted-foreground">Flagged Messages</p>
+                      <p className="text-2xl font-bold">
+                        {stats.flag_rate != null ? `${stats.flag_rate}%` :
+                         stats.intervention_rate != null ? `${(stats.intervention_rate * 100).toFixed(1)}%` :
+                         `${stats.flagged_messages ?? 0}`}
+                      </p>
                     </div>
                     <Bot className="h-8 w-8 text-muted-foreground opacity-50" />
                   </div>
@@ -278,10 +305,12 @@ export default function CommunicationsPage() {
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-muted-foreground">Sentiment Trend</p>
+                      <p className="text-xs text-muted-foreground">Activity Trend</p>
                       <div className="flex items-center gap-2 mt-1">
-                        {getSentimentIcon(stats.sentiment_trend)}
-                        <span className="text-lg font-medium capitalize">{stats.sentiment_trend}</span>
+                        {getSentimentIcon(stats.recent_trend || stats.sentiment_trend || "stable")}
+                        <span className="text-lg font-medium capitalize">
+                          {stats.recent_trend || stats.sentiment_trend || "stable"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -290,45 +319,252 @@ export default function CommunicationsPage() {
             </div>
           )}
 
-          {/* Message Balance */}
+          {/* Enhanced Stats Grid */}
           {stats && (
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Message Balance</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Parent A</span>
-                      <span className="font-medium">{stats.messages_by_parent.parent_a}</span>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Message Balance - shows messages_by_parent or messages_by_sender */}
+              {(stats.messages_by_parent || stats.messages_by_sender) && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      Message Balance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {stats.messages_by_parent ? (
+                        <>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Parent A</span>
+                              <span className="font-medium">{stats.messages_by_parent.parent_a ?? 0}</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-blue-500 rounded-full"
+                                style={{
+                                  width: `${stats.total_messages > 0 ? ((stats.messages_by_parent.parent_a ?? 0) / stats.total_messages) * 100 : 0}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Parent B</span>
+                              <span className="font-medium">{stats.messages_by_parent.parent_b ?? 0}</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-purple-500 rounded-full"
+                                style={{
+                                  width: `${stats.total_messages > 0 ? ((stats.messages_by_parent.parent_b ?? 0) / stats.total_messages) * 100 : 0}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      ) : stats.messages_by_sender ? (
+                        <>
+                          {Object.entries(stats.messages_by_sender).slice(0, 2).map(([senderId, count], index) => (
+                            <div key={senderId}>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span>Sender {index + 1}</span>
+                                <span className="font-medium">{count}</span>
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-purple-500'}`}
+                                  style={{
+                                    width: `${stats.total_messages > 0 ? (count / stats.total_messages) * 100 : 0}%`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      ) : null}
                     </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-blue-500 rounded-full"
-                        style={{
-                          width: `${(stats.messages_by_parent.parent_a / stats.total_messages) * 100}%`,
-                        }}
-                      />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Good Faith Scores */}
+              {stats.good_faith_scores && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      Good Faith Scores
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      ARIA-assessed communication quality
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Parent A</span>
+                          <span className={`font-medium ${
+                            stats.good_faith_scores.parent_a >= 0.7 ? "text-emerald-600" :
+                            stats.good_faith_scores.parent_a >= 0.4 ? "text-amber-600" : "text-red-600"
+                          }`}>
+                            {Math.round(stats.good_faith_scores.parent_a * 100)}%
+                          </span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${
+                              stats.good_faith_scores.parent_a >= 0.7 ? "bg-emerald-500" :
+                              stats.good_faith_scores.parent_a >= 0.4 ? "bg-amber-500" : "bg-red-500"
+                            }`}
+                            style={{ width: `${stats.good_faith_scores.parent_a * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Parent B</span>
+                          <span className={`font-medium ${
+                            stats.good_faith_scores.parent_b >= 0.7 ? "text-emerald-600" :
+                            stats.good_faith_scores.parent_b >= 0.4 ? "text-amber-600" : "text-red-600"
+                          }`}>
+                            {Math.round(stats.good_faith_scores.parent_b * 100)}%
+                          </span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${
+                              stats.good_faith_scores.parent_b >= 0.7 ? "bg-emerald-500" :
+                              stats.good_faith_scores.parent_b >= 0.4 ? "bg-amber-500" : "bg-red-500"
+                            }`}
+                            style={{ width: `${stats.good_faith_scores.parent_b * 100}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>Parent B</span>
-                      <span className="font-medium">{stats.messages_by_parent.parent_b}</span>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* ARIA Flag Categories */}
+              {stats.flag_categories && Object.keys(stats.flag_categories).length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" />
+                      Flag Categories
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Types of ARIA interventions
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {Object.entries(stats.flag_categories)
+                        .sort(([, a], [, b]) => b - a)
+                        .slice(0, 5)
+                        .map(([category, count]) => (
+                          <div key={category} className="flex items-center justify-between">
+                            <span className="text-sm capitalize">
+                              {category.replace(/_/g, " ")}
+                            </span>
+                            <Badge variant="outline" className="text-xs">
+                              {count}
+                            </Badge>
+                          </div>
+                        ))}
                     </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-purple-500 rounded-full"
-                        style={{
-                          width: `${(stats.messages_by_parent.parent_b / stats.total_messages) * 100}%`,
-                        }}
-                      />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Topic Categories */}
+              {stats.topic_categories && Object.keys(stats.topic_categories).length > 0 && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4" />
+                      Discussion Topics
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Most frequent message categories
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {Object.entries(stats.topic_categories)
+                        .sort(([, a], [, b]) => b - a)
+                        .slice(0, 5)
+                        .map(([topic, count]) => (
+                          <div key={topic} className="flex items-center justify-between">
+                            <span className="text-sm capitalize">
+                              {topic.replace(/_/g, " ")}
+                            </span>
+                            <Badge variant="secondary" className="text-xs">
+                              {count}
+                            </Badge>
+                          </div>
+                        ))}
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Weekly Message Trend */}
+              {stats.weekly_message_counts && stats.weekly_message_counts.length > 0 && (
+                <Card className="md:col-span-2">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      Message Frequency Trend
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Weekly message volume over time
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-end justify-between gap-1 h-24">
+                      {stats.weekly_message_counts.map((week, index) => {
+                        const maxCount = Math.max(...stats.weekly_message_counts!.map(w => w.count));
+                        const height = maxCount > 0 ? (week.count / maxCount) * 100 : 0;
+                        const flaggedHeight = maxCount > 0 ? (week.flagged / maxCount) * 100 : 0;
+
+                        return (
+                          <div key={index} className="flex-1 flex flex-col items-center">
+                            <div className="w-full flex flex-col justify-end h-20 relative">
+                              <div
+                                className="w-full bg-purple-200 rounded-t transition-all"
+                                style={{ height: `${height}%` }}
+                              >
+                                <div
+                                  className="w-full bg-amber-400 rounded-t absolute bottom-0"
+                                  style={{ height: `${flaggedHeight}%` }}
+                                />
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-muted-foreground mt-1 truncate w-full text-center">
+                              {week.week}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="flex items-center justify-center gap-4 mt-3 text-xs">
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-purple-200 rounded" />
+                        <span className="text-muted-foreground">Total</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-3 h-3 bg-amber-400 rounded" />
+                        <span className="text-muted-foreground">Flagged</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
 
           {/* Message View */}
