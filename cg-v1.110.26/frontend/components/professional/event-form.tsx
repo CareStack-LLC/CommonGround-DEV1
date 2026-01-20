@@ -364,14 +364,14 @@ export function EventForm({
             Link to Case
           </Label>
           <Select
-            value={formData.family_file_id}
-            onValueChange={(v) => handleChange("family_file_id", v)}
+            value={formData.family_file_id || "none"}
+            onValueChange={(v) => handleChange("family_file_id", v === "none" ? "" : v)}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a case (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No case</SelectItem>
+              <SelectItem value="none">No case</SelectItem>
               {cases.map((caseItem) => (
                 <SelectItem key={caseItem.id} value={caseItem.id}>
                   {caseItem.title}
