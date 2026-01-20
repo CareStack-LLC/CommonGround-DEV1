@@ -1294,33 +1294,27 @@ function FirmInvitationCard({
                 </div>
               )}
 
-              {/* Approval status indicators */}
+              {/* Approval status indicator - only one parent needs to approve */}
               <div className="flex items-center gap-4 text-xs">
-                <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${
-                  invitation.parent_a_approved
-                    ? "bg-teal-50 text-teal-700"
-                    : "bg-slate-100 text-slate-500"
-                }`}>
-                  {invitation.parent_a_approved ? (
+                {(invitation.parent_a_approved || invitation.parent_b_approved) && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-teal-50 text-teal-700">
                     <CheckCircle2 className="h-3 w-3" />
-                  ) : (
-                    <Clock className="h-3 w-3" />
-                  )}
-                  <span>Parent A {invitation.parent_a_approved ? "Approved" : "Pending"}</span>
-                </div>
+                    <span>
+                      {invitation.parent_a_approved && invitation.parent_b_approved
+                        ? "Both Parents Approved"
+                        : invitation.parent_a_approved
+                        ? `${invitation.parent_a_name?.split(" ")[0] || "Parent A"} Approved`
+                        : `${invitation.parent_b_name?.split(" ")[0] || "Parent B"} Approved`}
+                    </span>
+                  </div>
+                )}
 
-                <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${
-                  invitation.parent_b_approved
-                    ? "bg-teal-50 text-teal-700"
-                    : "bg-slate-100 text-slate-500"
-                }`}>
-                  {invitation.parent_b_approved ? (
-                    <CheckCircle2 className="h-3 w-3" />
-                  ) : (
-                    <Clock className="h-3 w-3" />
-                  )}
-                  <span>Parent B {invitation.parent_b_approved ? "Approved" : "Pending"}</span>
-                </div>
+                {invitation.representing && (
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-blue-50 text-blue-700">
+                    <User className="h-3 w-3" />
+                    <span>Representing {invitation.representing === "parent_a" ? "Parent A" : "Parent B"}</span>
+                  </div>
+                )}
 
                 {expiryDays !== null && expiryDays <= 7 && (
                   <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${

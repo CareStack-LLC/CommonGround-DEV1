@@ -338,8 +338,8 @@ class ProfessionalAccessService:
             request.parent_b_approved = True
             request.parent_b_approved_at = now
 
-        # Check if fully approved (both parents)
-        if request.parent_a_approved and request.parent_b_approved:
+        # Only one parent needs to approve - professional represents one side
+        if request.parent_a_approved or request.parent_b_approved:
             request.status = AccessRequestStatus.APPROVED.value
             request.approved_at = now
 

@@ -875,8 +875,9 @@ async def accept_firm_invitation(
     try:
         invitation.professional_id = assigned_professional_id
 
-        # If both parents have already approved, create assignment
-        if invitation.parent_a_approved and invitation.parent_b_approved:
+        # Only one parent needs to approve - professional represents one side
+        # The requesting parent has already approved when creating the invitation
+        if invitation.parent_a_approved or invitation.parent_b_approved:
             invitation.status = AccessRequestStatus.APPROVED.value
             invitation.approved_at = datetime.utcnow()
 
