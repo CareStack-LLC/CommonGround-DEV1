@@ -143,6 +143,14 @@ class ProfessionalEventsService:
         )
         return result.scalar_one_or_none()
 
+    def _make_naive(self, dt: Optional[datetime]) -> Optional[datetime]:
+        """Convert timezone-aware datetime to naive (for database queries)."""
+        if dt is None:
+            return None
+        if dt.tzinfo is not None:
+            return dt.replace(tzinfo=None)
+        return dt
+
     async def list_events(
         self,
         db: AsyncSession,
@@ -172,6 +180,10 @@ class ProfessionalEventsService:
         Returns:
             Tuple of (list of events, total count)
         """
+        # Convert to naive datetimes for database queries
+        start_date = self._make_naive(start_date)
+        end_date = self._make_naive(end_date)
+
         # Build base query for professional events
         conditions = [ScheduleEvent.professional_id == professional_id]
 
