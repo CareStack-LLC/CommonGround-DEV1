@@ -1003,9 +1003,23 @@ async def get_invitation_case_preview(
             detail="Not an active member of this firm",
         )
 
-    # Get invitation
-    access_service = ProfessionalAccessService(db)
-    invitation = await access_service.get_request(invitation_id)
+    # Get invitation with family file and nested relationships
+    from sqlalchemy.orm import selectinload
+    from app.models.case import FamilyFile
+    from app.models.professional import ProfessionalAccessRequest
+
+    result = await db.execute(
+        select(ProfessionalAccessRequest)
+        .options(
+            selectinload(ProfessionalAccessRequest.family_file).options(
+                selectinload(FamilyFile.parent_a),
+                selectinload(FamilyFile.parent_b),
+                selectinload(FamilyFile.children),
+            )
+        )
+        .where(ProfessionalAccessRequest.id == invitation_id)
+    )
+    invitation = result.scalar_one_or_none()
 
     if not invitation:
         raise HTTPException(
@@ -1013,7 +1027,7 @@ async def get_invitation_case_preview(
             detail="Invitation not found",
         )
 
-    if invitation.firm_id != firm_id:
+    if str(invitation.firm_id) != firm_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invitation is not for this firm",
@@ -1027,8 +1041,8 @@ async def get_invitation_case_preview(
             detail="Family file not found",
         )
 
-    parent_a = ff.parent_a if ff else None
-    parent_b = ff.parent_b if ff else None
+    parent_a = ff.parent_a
+    parent_b = ff.parent_b
 
     # Build children preview
     children_preview = []
@@ -1121,7 +1135,7 @@ async def get_invitation_case_preview(
 
         if message_preview["total_messages_30d"] > 0:
             message_preview["flag_rate"] = round(
-                message_preview["flagged_messages_30d"] / message_preview["total_messages_30d"] * 100, 1
+                message_preview["flagged_messages_30d"] / message_preview["total_messages_30d"], 3
             )
 
         # Messages by parent
@@ -1188,17 +1202,17 @@ async def get_invitation_case_preview(
 
         if compliance_preview["total_exchanges_30d"] > 0:
             compliance_preview["exchange_completion_rate"] = round(
-                compliance_preview["completed_exchanges_30d"] / compliance_preview["total_exchanges_30d"] * 100, 1
+                compliance_preview["completed_exchanges_30d"] / compliance_preview["total_exchanges_30d"], 3
             )
 
-            # Determine overall health
+            # Determine overall health (thresholds are now decimals: 0.9 = 90%, 0.1 = 10%)
             rate = compliance_preview["exchange_completion_rate"]
             flag_rate = compliance_preview["communication_flag_rate"]
-            if rate >= 90 and flag_rate <= 10:
+            if rate >= 0.9 and flag_rate <= 0.1:
                 compliance_preview["overall_health"] = "excellent"
-            elif rate >= 75 and flag_rate <= 20:
+            elif rate >= 0.75 and flag_rate <= 0.2:
                 compliance_preview["overall_health"] = "good"
-            elif rate >= 50 and flag_rate <= 35:
+            elif rate >= 0.5 and flag_rate <= 0.35:
                 compliance_preview["overall_health"] = "fair"
             else:
                 compliance_preview["overall_health"] = "concerning"
