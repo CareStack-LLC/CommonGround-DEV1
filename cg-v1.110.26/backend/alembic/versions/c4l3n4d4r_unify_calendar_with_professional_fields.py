@@ -26,9 +26,7 @@ def upgrade() -> None:
     op.add_column('schedule_events', sa.Column(
         'professional_id',
         sa.String(length=36),
-        sa.ForeignKey('professional_profiles.id'),
-        nullable=True,
-        index=True
+        nullable=True
     ))
 
     # Professional event type (meeting, court_hearing, video_call, etc.)
@@ -80,24 +78,28 @@ def upgrade() -> None:
         nullable=True
     ))
 
-    # Create index for professional_id lookups (if not exists)
-    # Note: Index may already exist if migration was partially run
-    try:
-        op.create_index(
-            'ix_schedule_events_professional_id',
-            'schedule_events',
-            ['professional_id']
-        )
-    except Exception:
-        pass  # Index already exists
+    # Create foreign key constraint for professional_id
+    op.create_foreign_key(
+        'fk_schedule_events_professional_id',
+        'schedule_events',
+        'professional_profiles',
+        ['professional_id'],
+        ['id'],
+        ondelete='SET NULL'
+    )
+
+    # Create index for professional_id lookups
+    op.create_index(
+        'ix_schedule_events_professional_id',
+        'schedule_events',
+        ['professional_id']
+    )
 
 
 def downgrade() -> None:
     """Remove professional fields from schedule_events."""
-    try:
-        op.drop_index('ix_schedule_events_professional_id', 'schedule_events')
-    except Exception:
-        pass  # Index may not exist
+    op.drop_index('ix_schedule_events_professional_id', 'schedule_events')
+    op.drop_constraint('fk_schedule_events_professional_id', 'schedule_events', type_='foreignkey')
     op.drop_column('schedule_events', 'timezone')
     op.drop_column('schedule_events', 'notes')
     op.drop_column('schedule_events', 'color')
