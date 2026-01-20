@@ -22,78 +22,36 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Add professional fields to schedule_events for unified calendar."""
-    # Professional who created the event (if applicable)
-    op.add_column('schedule_events', sa.Column(
-        'professional_id',
-        sa.String(length=36),
-        nullable=True
-    ))
+    # Use raw SQL with IF NOT EXISTS for idempotency
+    conn = op.get_bind()
 
-    # Professional event type (meeting, court_hearing, video_call, etc.)
-    op.add_column('schedule_events', sa.Column(
-        'professional_event_type',
-        sa.String(length=50),
-        nullable=True
-    ))
+    # Add columns using IF NOT EXISTS (PostgreSQL syntax)
+    conn.execute(sa.text("""
+        ALTER TABLE schedule_events ADD COLUMN IF NOT EXISTS professional_id VARCHAR(36);
+        ALTER TABLE schedule_events ADD COLUMN IF NOT EXISTS professional_event_type VARCHAR(50);
+        ALTER TABLE schedule_events ADD COLUMN IF NOT EXISTS parent_visibility VARCHAR(20);
+        ALTER TABLE schedule_events ADD COLUMN IF NOT EXISTS virtual_meeting_url TEXT;
+        ALTER TABLE schedule_events ADD COLUMN IF NOT EXISTS reminder_minutes INTEGER;
+        ALTER TABLE schedule_events ADD COLUMN IF NOT EXISTS color VARCHAR(10);
+        ALTER TABLE schedule_events ADD COLUMN IF NOT EXISTS notes TEXT;
+        ALTER TABLE schedule_events ADD COLUMN IF NOT EXISTS timezone VARCHAR(50);
+    """))
 
-    # Parent visibility: none, required_parent, both_parents
-    op.add_column('schedule_events', sa.Column(
-        'parent_visibility',
-        sa.String(length=20),
-        nullable=True
-    ))
+    # Create foreign key constraint if not exists
+    conn.execute(sa.text("""
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_schedule_events_professional_id') THEN
+                ALTER TABLE schedule_events ADD CONSTRAINT fk_schedule_events_professional_id
+                FOREIGN KEY (professional_id) REFERENCES professional_profiles(id) ON DELETE SET NULL;
+            END IF;
+        END $$;
+    """))
 
-    # Virtual meeting URL for video calls
-    op.add_column('schedule_events', sa.Column(
-        'virtual_meeting_url',
-        sa.Text(),
-        nullable=True
-    ))
-
-    # Reminder in minutes before event
-    op.add_column('schedule_events', sa.Column(
-        'reminder_minutes',
-        sa.Integer(),
-        nullable=True
-    ))
-
-    # Color for calendar display
-    op.add_column('schedule_events', sa.Column(
-        'color',
-        sa.String(length=10),
-        nullable=True
-    ))
-
-    # Private notes (visible only to professional)
-    op.add_column('schedule_events', sa.Column(
-        'notes',
-        sa.Text(),
-        nullable=True
-    ))
-
-    # Timezone for the event
-    op.add_column('schedule_events', sa.Column(
-        'timezone',
-        sa.String(length=50),
-        nullable=True
-    ))
-
-    # Create foreign key constraint for professional_id
-    op.create_foreign_key(
-        'fk_schedule_events_professional_id',
-        'schedule_events',
-        'professional_profiles',
-        ['professional_id'],
-        ['id'],
-        ondelete='SET NULL'
-    )
-
-    # Create index for professional_id lookups
-    op.create_index(
-        'ix_schedule_events_professional_id',
-        'schedule_events',
-        ['professional_id']
-    )
+    # Create index if not exists
+    conn.execute(sa.text("""
+        CREATE INDEX IF NOT EXISTS ix_schedule_events_professional_id ON schedule_events(professional_id);
+    """))
 
 
 def downgrade() -> None:
