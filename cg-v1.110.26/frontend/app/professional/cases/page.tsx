@@ -111,10 +111,10 @@ export default function CasesListPage() {
   };
 
   const statusColors: Record<string, string> = {
-    active: "bg-emerald-100 text-emerald-800",
-    on_hold: "bg-amber-100 text-amber-800",
-    completed: "bg-blue-100 text-blue-800",
-    withdrawn: "bg-gray-100 text-gray-800",
+    active: "bg-teal-100 text-teal-800 border border-teal-200",
+    on_hold: "bg-amber-100 text-amber-800 border border-amber-200",
+    completed: "bg-blue-100 text-blue-800 border border-blue-200",
+    withdrawn: "bg-slate-100 text-slate-600 border border-slate-200",
   };
 
   return (
@@ -122,28 +122,34 @@ export default function CasesListPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Cases</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20">
+              <FolderOpen className="h-6 w-6" />
+            </div>
+            Cases
+          </h1>
+          <p className="text-slate-500 mt-1">
             {cases.length} total case{cases.length !== 1 && "s"} assigned
           </p>
         </div>
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardContent className="pt-4">
+      <Card className="border-slate-200">
+        <CardContent className="py-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
                 placeholder="Search by file number or role..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-9 border-slate-200 focus:border-teal-500 focus:ring-teal-500"
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-40">
+              <SelectTrigger className="w-full sm:w-40 border-slate-200">
+                <Filter className="h-4 w-4 mr-2 text-slate-400" />
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -155,7 +161,8 @@ export default function CasesListPage() {
               </SelectContent>
             </Select>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-full sm:w-48">
+              <SelectTrigger className="w-full sm:w-48 border-slate-200">
+                <Users className="h-4 w-4 mr-2 text-slate-400" />
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
               <SelectContent>
@@ -174,7 +181,7 @@ export default function CasesListPage() {
       {/* Cases List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
         </div>
       ) : filteredCases.length > 0 ? (
         <div className="space-y-3">
@@ -183,13 +190,15 @@ export default function CasesListPage() {
           ))}
         </div>
       ) : (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <FolderOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium text-foreground mb-2">No cases found</h3>
-            <p className="text-muted-foreground">
+        <Card className="border-slate-200 border-dashed bg-slate-50/50">
+          <CardContent className="py-16 text-center">
+            <div className="p-4 bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl w-fit mx-auto mb-6">
+              <FolderOpen className="h-10 w-10 text-teal-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">No cases found</h3>
+            <p className="text-slate-500 max-w-sm mx-auto">
               {searchQuery || roleFilter !== "all"
-                ? "Try adjusting your filters"
+                ? "Try adjusting your filters to find what you're looking for"
                 : "You don't have any assigned cases yet"}
             </p>
           </CardContent>
@@ -219,34 +228,43 @@ function CaseCard({
     });
   };
 
+  const statusAccent: Record<string, string> = {
+    active: "bg-gradient-to-r from-teal-400 to-teal-500",
+    on_hold: "bg-gradient-to-r from-amber-400 to-amber-500",
+    completed: "bg-gradient-to-r from-blue-400 to-blue-500",
+    withdrawn: "bg-slate-300",
+  };
+
   return (
     <Link href={`/professional/cases/${caseItem.family_file_id}`}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer">
-        <CardContent className="p-4">
+      <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-slate-200 hover:border-slate-300 overflow-hidden">
+        {/* Top accent bar based on status */}
+        <div className={`h-1 ${statusAccent[caseItem.status] || statusAccent.active}`} />
+        <CardContent className="p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
-                <FolderOpen className="h-6 w-6" />
+              <div className="p-3 bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl shadow-lg shadow-teal-500/20">
+                <FolderOpen className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground">
+                  <h3 className="font-semibold text-slate-900">
                     {caseItem.family_file_number || `Case ${caseItem.family_file_id.slice(0, 8)}`}
                   </h3>
                   <Badge className={statusColors[caseItem.status] || statusColors.active}>
                     {caseItem.status}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                <div className="flex items-center gap-3 mt-1.5 text-sm text-slate-500">
                   <span className="flex items-center gap-1">
                     <Users className="h-3.5 w-3.5" />
                     {representingLabels[caseItem.representing] || caseItem.representing}
                   </span>
-                  <span>|</span>
+                  <span className="text-slate-300">|</span>
                   <span>{roleLabels[caseItem.assignment_role] || caseItem.assignment_role}</span>
                   {caseItem.firm_name && (
                     <>
-                      <span>|</span>
+                      <span className="text-slate-300">|</span>
                       <span className="flex items-center gap-1">
                         <Building2 className="h-3.5 w-3.5" />
                         {caseItem.firm_name}
@@ -262,7 +280,7 @@ function CaseCard({
               <div className="hidden md:flex items-center gap-2">
                 {caseItem.can_control_aria && (
                   <div
-                    className="p-1.5 bg-purple-100 text-purple-600 rounded"
+                    className="p-2 bg-purple-100 text-purple-600 rounded-lg"
                     title="ARIA Control"
                   >
                     <Bot className="h-4 w-4" />
@@ -270,7 +288,7 @@ function CaseCard({
                 )}
                 {caseItem.can_message_client && (
                   <div
-                    className="p-1.5 bg-blue-100 text-blue-600 rounded"
+                    className="p-2 bg-blue-100 text-blue-600 rounded-lg"
                     title="Client Messaging"
                   >
                     <MessageSquare className="h-4 w-4" />
@@ -278,7 +296,7 @@ function CaseCard({
                 )}
                 {caseItem.access_scopes?.includes("schedule") && (
                   <div
-                    className="p-1.5 bg-amber-100 text-amber-600 rounded"
+                    className="p-2 bg-amber-100 text-amber-600 rounded-lg"
                     title="Schedule Access"
                   >
                     <Calendar className="h-4 w-4" />
@@ -287,11 +305,11 @@ function CaseCard({
               </div>
 
               <div className="text-right hidden sm:block">
-                <p className="text-xs text-muted-foreground">Assigned</p>
-                <p className="text-sm font-medium">{formatDate(caseItem.assigned_at)}</p>
+                <p className="text-xs text-slate-400">Assigned</p>
+                <p className="text-sm font-medium text-slate-700">{formatDate(caseItem.assigned_at)}</p>
               </div>
 
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
             </div>
           </div>
         </CardContent>
