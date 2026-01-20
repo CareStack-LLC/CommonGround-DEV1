@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   MessageSquare,
   Search,
@@ -50,15 +51,18 @@ interface Message {
   id: string;
   sender_id: string;
   sender_name: string;
+  sender_type: "professional" | "parent";
   sender_email?: string;
   recipient_id: string;
   recipient_name: string;
   case_id?: string;
   case_name?: string;
   family_file_id?: string;
+  case_assignment_id?: string;
   subject?: string;
   content: string;
   is_read: boolean;
+  sent_at?: string;
   created_at: string;
   updated_at?: string;
   thread_id?: string;
@@ -134,7 +138,7 @@ export default function MessagesPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setUnreadCount(data.count || 0);
+        setUnreadCount(data.unread_count || 0);
       }
     } catch (error) {
       console.error("Error fetching unread count:", error);
@@ -385,6 +389,8 @@ function MessageCard({
   message: Message;
   onMarkRead: () => void;
 }) {
+  const router = useRouter();
+
   const formatRelativeTime = (dateStr: string) => {
     const date = new Date(dateStr);
     const now = new Date();
@@ -419,52 +425,76 @@ function MessageCard({
     return content.slice(0, maxLength).trim() + "...";
   };
 
+  // Determine if this message was sent by the professional (us) or received
+  const isSentByMe = message.sender_type === "professional";
+
+  // The contact is the OTHER party in the conversation
+  const contactName = isSentByMe ? message.recipient_name : message.sender_name;
+  const contactInitials = contactName
+    ? contactName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
+    : "?";
+
+  const handleCardClick = () => {
+    if (message.family_file_id) {
+      router.push(`/professional/cases/${message.family_file_id}/messages`);
+    }
+  };
+
   return (
-    <Card className={`group hover:shadow-lg transition-all duration-300 cursor-pointer border-slate-200 hover:border-slate-300 overflow-hidden ${!message.is_read ? "bg-gradient-to-r from-blue-50/50 to-white" : ""}`}>
-      {/* Top accent bar for unread */}
-      {!message.is_read && (
+    <Card
+      className={`group hover:shadow-lg transition-all duration-300 cursor-pointer border-slate-200 hover:border-slate-300 overflow-hidden ${!message.is_read && !isSentByMe ? "bg-gradient-to-r from-blue-50/50 to-white" : ""}`}
+      onClick={handleCardClick}
+    >
+      {/* Top accent bar for unread received messages */}
+      {!message.is_read && !isSentByMe && (
         <div className="h-1 bg-gradient-to-r from-blue-400 to-blue-500" />
       )}
       <CardContent className="p-4">
         <div className="flex items-start gap-4">
           <Avatar className="h-11 w-11 shrink-0 ring-2 ring-white shadow-md">
-            <AvatarFallback className={`font-semibold ${!message.is_read ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white" : "bg-slate-100 text-slate-600"}`}>
-              {getInitials(message.sender_name || "?")}
+            <AvatarFallback className={`font-semibold ${!message.is_read && !isSentByMe ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white" : "bg-slate-100 text-slate-600"}`}>
+              {contactInitials}
             </AvatarFallback>
           </Avatar>
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <h3 className={`font-semibold truncate ${!message.is_read ? "text-slate-900" : "text-slate-600"}`}>
-                  {message.sender_name}
+                <h3 className={`font-semibold truncate ${!message.is_read && !isSentByMe ? "text-slate-900" : "text-slate-600"}`}>
+                  {contactName || "Unknown"}
                 </h3>
-                {!message.is_read && (
+                {isSentByMe ? (
+                  <Badge className="bg-teal-50 text-teal-700 border border-teal-200 shrink-0">
+                    <Send className="h-3 w-3 mr-1" />
+                    Sent
+                  </Badge>
+                ) : !message.is_read ? (
                   <Badge className="bg-blue-100 text-blue-700 border border-blue-200 shrink-0">
                     New
                   </Badge>
-                )}
+                ) : null}
               </div>
               <span className="text-xs text-slate-400 shrink-0">
-                {formatRelativeTime(message.created_at)}
+                {formatRelativeTime(message.sent_at || message.created_at)}
               </span>
             </div>
 
             {message.subject && (
-              <p className={`text-sm mt-0.5 ${!message.is_read ? "font-medium text-slate-800" : "text-slate-500"}`}>
+              <p className={`text-sm mt-0.5 ${!message.is_read && !isSentByMe ? "font-medium text-slate-800" : "text-slate-500"}`}>
                 {message.subject}
               </p>
             )}
 
             <p className="text-sm text-slate-500 mt-1.5 line-clamp-2">
+              {isSentByMe && <span className="text-slate-400">You: </span>}
               {truncateContent(message.content)}
             </p>
 
-            {message.case_name && (
+            {message.family_file_id && (
               <div className="flex items-center gap-2 mt-3">
                 <Badge variant="outline" className="text-xs bg-slate-50 border-slate-200 text-slate-600">
                   <Users className="h-3 w-3 mr-1" />
-                  {message.case_name}
+                  Case {message.family_file_id.slice(0, 8)}...
                 </Badge>
               </div>
             )}
@@ -480,19 +510,19 @@ function MessageCard({
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={(e) => {
                   e.stopPropagation();
-                  // Navigate to message detail
+                  handleCardClick();
                 }}>
                   <Eye className="h-4 w-4 mr-2" />
-                  View Full Message
+                  View Conversation
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={(e) => {
                   e.stopPropagation();
-                  // Reply functionality
+                  handleCardClick();
                 }}>
                   <Reply className="h-4 w-4 mr-2" />
                   Reply
                 </DropdownMenuItem>
-                {!message.is_read && (
+                {!message.is_read && !isSentByMe && (
                   <DropdownMenuItem onClick={(e) => {
                     e.stopPropagation();
                     onMarkRead();
