@@ -988,6 +988,60 @@ function NewIntakeForm({
   );
 }
 
+// Case Preview Types
+interface CasePreview {
+  family_file_id: string;
+  family_file_number: string | null;
+  family_file_title: string | null;
+  state: string | null;
+  county: string | null;
+  created_at: string | null;
+  parent_a_name: string | null;
+  parent_b_name: string | null;
+  children: Array<{
+    id: string;
+    first_name: string;
+    age: number | null;
+    has_special_needs: boolean;
+  }>;
+  agreement: {
+    has_active_agreement: boolean;
+    agreement_title: string | null;
+    total_sections: number;
+    completed_sections: number;
+    last_updated: string | null;
+    key_sections: string[];
+  };
+  compliance: {
+    exchange_completion_rate: number | null;
+    on_time_rate: number | null;
+    total_exchanges_30d: number;
+    completed_exchanges_30d: number;
+    communication_flag_rate: number | null;
+    overall_health: string;
+  };
+  messages: {
+    total_messages_30d: number;
+    flagged_messages_30d: number;
+    flag_rate: number;
+    parent_a_messages: number;
+    parent_b_messages: number;
+    last_message_at: string | null;
+  };
+  clearfund: {
+    total_obligations: number;
+    pending_obligations: number;
+    total_amount: number;
+    paid_amount: number;
+    overdue_amount: number;
+    categories: string[];
+  };
+  requested_role: string | null;
+  requested_scopes: string[];
+  representing: string | null;
+  message: string | null;
+}
+
 // Firm Invitation Card Component
 function FirmInvitationCard({
   invitation,
@@ -1004,6 +1058,7 @@ function FirmInvitationCard({
   const [isDeclining, setIsDeclining] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [showDeclineDialog, setShowDeclineDialog] = useState(false);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
 
   const formatRelativeTime = (dateStr: string) => {
@@ -1288,75 +1343,522 @@ function FirmInvitationCard({
           </div>
 
           {/* Actions - stacked for better visual hierarchy */}
-          {invitation.status === "pending" && (
-            <div className="flex flex-col items-stretch gap-2 shrink-0 min-w-[120px]">
-              <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-                <DialogTrigger asChild>
-                  <Button className="bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-600/20 transition-all" size="sm">
-                    <UserPlus className="h-4 w-4 mr-1.5" />
-                    Accept
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <AssignProfessionalDialog
-                    token={token}
-                    firmId={firmId}
-                    invitationId={invitation.id}
-                    onAccept={handleAccept}
-                    isAccepting={isAccepting}
-                    onCancel={() => setShowAssignDialog(false)}
-                  />
-                </DialogContent>
-              </Dialog>
+          <div className="flex flex-col items-stretch gap-2 shrink-0 min-w-[120px]">
+            {/* View Details Button - always show */}
+            <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200">
+                  <Eye className="h-4 w-4 mr-1.5" />
+                  View Details
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <InvitationPreviewModal
+                  invitation={invitation}
+                  token={token}
+                  firmId={firmId}
+                  onClose={() => setShowPreviewDialog(false)}
+                />
+              </DialogContent>
+            </Dialog>
 
-              <Dialog open={showDeclineDialog} onOpenChange={setShowDeclineDialog}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-700">
-                    Decline
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Decline Case Invitation</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to decline this case invitation? This action cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="decline_reason">Reason (Optional)</Label>
-                      <Textarea
-                        id="decline_reason"
-                        value={declineReason}
-                        onChange={(e) => setDeclineReason(e.target.value)}
-                        placeholder="Provide an optional reason for declining..."
-                        rows={3}
-                      />
+            {/* Accept/Decline buttons for pending invitations */}
+            {invitation.status === "pending" && (
+              <>
+                <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-600/20 transition-all" size="sm">
+                      <UserPlus className="h-4 w-4 mr-1.5" />
+                      Accept
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <AssignProfessionalDialog
+                      token={token}
+                      firmId={firmId}
+                      invitationId={invitation.id}
+                      onAccept={handleAccept}
+                      isAccepting={isAccepting}
+                      onCancel={() => setShowAssignDialog(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog open={showDeclineDialog} onOpenChange={setShowDeclineDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-700">
+                      Decline
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Decline Case Invitation</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to decline this case invitation? This action cannot be undone.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="decline_reason">Reason (Optional)</Label>
+                        <Textarea
+                          id="decline_reason"
+                          value={declineReason}
+                          onChange={(e) => setDeclineReason(e.target.value)}
+                          placeholder="Provide an optional reason for declining..."
+                          rows={3}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowDeclineDialog(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleDecline}
-                      disabled={isDeclining}
-                      variant="destructive"
-                    >
-                      {isDeclining ? "Declining..." : "Decline Invitation"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          )}
+                    <DialogFooter>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowDeclineDialog(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleDecline}
+                        disabled={isDeclining}
+                        variant="destructive"
+                      >
+                        {isDeclining ? "Declining..." : "Decline Invitation"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// Invitation Preview Modal Component
+function InvitationPreviewModal({
+  invitation,
+  token,
+  firmId,
+  onClose,
+}: {
+  invitation: FirmInvitation;
+  token: string | null;
+  firmId: string;
+  onClose: () => void;
+}) {
+  const [preview, setPreview] = useState<CasePreview | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchPreview();
+  }, [invitation.id]);
+
+  const fetchPreview = async () => {
+    if (!token || !firmId) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/v1/professional/firms/${firmId}/invitations/${invitation.id}/preview`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setPreview(data);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.detail || "Failed to load case preview");
+      }
+    } catch (err) {
+      console.error("Error fetching preview:", err);
+      setError("Failed to load case preview");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const healthColor = (health: string) => {
+    switch (health) {
+      case "good":
+        return "text-teal-600 bg-teal-50 border-teal-200";
+      case "moderate":
+        return "text-amber-600 bg-amber-50 border-amber-200";
+      case "concerning":
+        return "text-red-600 bg-red-50 border-red-200";
+      default:
+        return "text-slate-600 bg-slate-50 border-slate-200";
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };
+
+  const formatPercent = (value: number | null) => {
+    if (value === null) return "N/A";
+    return `${Math.round(value * 100)}%`;
+  };
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-3">
+          <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg">
+            <Eye className="h-4 w-4" />
+          </div>
+          Case Preview
+        </DialogTitle>
+        <DialogDescription>
+          {preview?.family_file_title || invitation.family_file_title || "Family File"} overview
+        </DialogDescription>
+      </DialogHeader>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
+        </div>
+      ) : error ? (
+        <div className="py-8 text-center">
+          <div className="p-3 bg-red-50 rounded-full w-fit mx-auto mb-4">
+            <AlertCircle className="h-6 w-6 text-red-500" />
+          </div>
+          <p className="text-sm text-slate-600">{error}</p>
+          <Button variant="outline" size="sm" className="mt-4" onClick={fetchPreview}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Try Again
+          </Button>
+        </div>
+      ) : preview ? (
+        <div className="space-y-6 py-4 max-h-[60vh] overflow-y-auto">
+          {/* Case Info Header */}
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Parents</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  {preview.parent_a_name && preview.parent_b_name
+                    ? `${preview.parent_a_name} & ${preview.parent_b_name}`
+                    : preview.parent_a_name || preview.parent_b_name || "Not specified"}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Location</p>
+                <p className="text-sm font-semibold text-slate-900">
+                  {[preview.county, preview.state].filter(Boolean).join(", ") || "Not specified"}
+                </p>
+              </div>
+            </div>
+
+            {preview.children.length > 0 && (
+              <div className="mt-4 pt-4 border-t border-slate-200">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Children</p>
+                <div className="flex flex-wrap gap-2">
+                  {preview.children.map((child) => (
+                    <div
+                      key={child.id}
+                      className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-1.5"
+                    >
+                      <Baby className="h-3.5 w-3.5 text-slate-400" />
+                      <span className="text-sm text-slate-700">{child.first_name}</span>
+                      {child.age !== null && (
+                        <span className="text-xs text-slate-500">({child.age}y)</span>
+                      )}
+                      {child.has_special_needs && (
+                        <Badge className="text-xs bg-purple-50 text-purple-600 border-purple-200">
+                          Special Needs
+                        </Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Overall Health Indicator */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-slate-600">Overall Case Health:</span>
+            <Badge className={`${healthColor(preview.compliance.overall_health)} capitalize`}>
+              {preview.compliance.overall_health}
+            </Badge>
+          </div>
+
+          {/* Agreement Summary */}
+          <div className="space-y-3">
+            <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+              <FileText className="h-4 w-4 text-blue-500" />
+              SharedCare Agreement
+            </h4>
+            <Card className="border-slate-200">
+              <CardContent className="p-4">
+                {preview.agreement.has_active_agreement ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-600">
+                        {preview.agreement.agreement_title || "Active Agreement"}
+                      </span>
+                      <Badge className="bg-teal-50 text-teal-600 border-teal-200">
+                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                        Active
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-teal-400 to-teal-500 rounded-full transition-all"
+                          style={{
+                            width: `${
+                              preview.agreement.total_sections > 0
+                                ? (preview.agreement.completed_sections / preview.agreement.total_sections) * 100
+                                : 0
+                            }%`,
+                          }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-slate-700">
+                        {preview.agreement.completed_sections}/{preview.agreement.total_sections} sections
+                      </span>
+                    </div>
+                    {preview.agreement.key_sections.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {preview.agreement.key_sections.slice(0, 5).map((section) => (
+                          <Badge key={section} variant="outline" className="text-xs bg-white">
+                            {section}
+                          </Badge>
+                        ))}
+                        {preview.agreement.key_sections.length > 5 && (
+                          <Badge variant="outline" className="text-xs bg-white text-slate-500">
+                            +{preview.agreement.key_sections.length - 5} more
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <p className="text-sm text-slate-500">No active agreement</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Compliance Overview */}
+          <div className="space-y-3">
+            <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+              <Shield className="h-4 w-4 text-purple-500" />
+              Compliance (Last 30 Days)
+            </h4>
+            <div className="grid grid-cols-2 gap-3">
+              <Card className="border-slate-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-slate-900">
+                    {formatPercent(preview.compliance.exchange_completion_rate)}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">Exchange Completion</p>
+                  <p className="text-xs text-slate-400">
+                    {preview.compliance.completed_exchanges_30d}/{preview.compliance.total_exchanges_30d} exchanges
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="border-slate-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-2xl font-bold text-slate-900">
+                    {formatPercent(preview.compliance.on_time_rate)}
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">On-Time Rate</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Message Trends */}
+          <div className="space-y-3">
+            <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+              <FileText className="h-4 w-4 text-amber-500" />
+              Communication (Last 30 Days)
+            </h4>
+            <Card className="border-slate-200">
+              <CardContent className="p-4">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-xl font-bold text-slate-900">{preview.messages.total_messages_30d}</p>
+                    <p className="text-xs text-slate-500">Total Messages</p>
+                  </div>
+                  <div>
+                    <p className={`text-xl font-bold ${
+                      preview.messages.flag_rate > 0.3 ? "text-red-600" :
+                      preview.messages.flag_rate > 0.15 ? "text-amber-600" : "text-teal-600"
+                    }`}>
+                      {preview.messages.flagged_messages_30d}
+                    </p>
+                    <p className="text-xs text-slate-500">Flagged</p>
+                  </div>
+                  <div>
+                    <p className={`text-xl font-bold ${
+                      preview.messages.flag_rate > 0.3 ? "text-red-600" :
+                      preview.messages.flag_rate > 0.15 ? "text-amber-600" : "text-teal-600"
+                    }`}>
+                      {Math.round(preview.messages.flag_rate * 100)}%
+                    </p>
+                    <p className="text-xs text-slate-500">Flag Rate</p>
+                  </div>
+                </div>
+                {preview.messages.total_messages_30d > 0 && (
+                  <div className="mt-4 pt-4 border-t border-slate-100">
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                      <span>Parent A: {preview.messages.parent_a_messages} msgs</span>
+                      <span>Parent B: {preview.messages.parent_b_messages} msgs</span>
+                    </div>
+                    <div className="flex h-2 mt-2 rounded-full overflow-hidden bg-slate-100">
+                      <div
+                        className="bg-blue-400"
+                        style={{
+                          width: `${
+                            preview.messages.total_messages_30d > 0
+                              ? (preview.messages.parent_a_messages / preview.messages.total_messages_30d) * 100
+                              : 50
+                          }%`,
+                        }}
+                      />
+                      <div
+                        className="bg-purple-400"
+                        style={{
+                          width: `${
+                            preview.messages.total_messages_30d > 0
+                              ? (preview.messages.parent_b_messages / preview.messages.total_messages_30d) * 100
+                              : 50
+                          }%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ClearFund Overview */}
+          <div className="space-y-3">
+            <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+              <Shield className="h-4 w-4 text-green-500" />
+              ClearFund Financial Overview
+            </h4>
+            <Card className="border-slate-200">
+              <CardContent className="p-4">
+                {preview.clearfund.total_obligations > 0 ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center">
+                        <p className="text-xl font-bold text-slate-900">
+                          {preview.clearfund.total_obligations}
+                        </p>
+                        <p className="text-xs text-slate-500">Total Obligations</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xl font-bold text-amber-600">
+                          {preview.clearfund.pending_obligations}
+                        </p>
+                        <p className="text-xs text-slate-500">Pending</p>
+                      </div>
+                    </div>
+                    <div className="border-t border-slate-100 pt-4 space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600">Total Amount</span>
+                        <span className="font-medium text-slate-900">
+                          {formatCurrency(preview.clearfund.total_amount)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600">Paid</span>
+                        <span className="font-medium text-teal-600">
+                          {formatCurrency(preview.clearfund.paid_amount)}
+                        </span>
+                      </div>
+                      {preview.clearfund.overdue_amount > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-600">Overdue</span>
+                          <span className="font-medium text-red-600">
+                            {formatCurrency(preview.clearfund.overdue_amount)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {preview.clearfund.categories.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-2">
+                        {preview.clearfund.categories.map((category) => (
+                          <Badge key={category} variant="outline" className="text-xs capitalize">
+                            {category.replace(/_/g, " ")}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-3">
+                    <p className="text-sm text-slate-500">No financial obligations recorded</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Request Details */}
+          {(preview.requested_role || preview.representing || preview.message) && (
+            <div className="space-y-3">
+              <h4 className="font-semibold text-slate-900 flex items-center gap-2">
+                <UserPlus className="h-4 w-4 text-slate-500" />
+                Invitation Details
+              </h4>
+              <Card className="border-slate-200">
+                <CardContent className="p-4 space-y-3">
+                  {preview.requested_role && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-slate-600">Requested Role</span>
+                      <Badge variant="outline" className="capitalize">
+                        {preview.requested_role.replace(/_/g, " ")}
+                      </Badge>
+                    </div>
+                  )}
+                  {preview.representing && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-slate-600">Representing</span>
+                      <span className="text-sm font-medium text-slate-900 capitalize">
+                        {preview.representing.replace(/_/g, " ")}
+                      </span>
+                    </div>
+                  )}
+                  {preview.message && (
+                    <div className="pt-2 border-t border-slate-100">
+                      <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
+                        Message from Parent
+                      </p>
+                      <p className="text-sm text-slate-700 italic">"{preview.message}"</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose}>
+          Close
+        </Button>
+      </DialogFooter>
+    </>
   );
 }
 

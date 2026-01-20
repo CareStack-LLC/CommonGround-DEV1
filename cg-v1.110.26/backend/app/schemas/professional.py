@@ -981,6 +981,87 @@ class CalendarSummary(BaseModel):
     period_end: str
 
 
+# =============================================================================
+# Invitation Case Preview Schemas
+# =============================================================================
+
+class InvitationAgreementPreview(BaseModel):
+    """Schema for agreement summary in invitation preview."""
+    has_active_agreement: bool = False
+    agreement_title: Optional[str] = None
+    total_sections: int = 0
+    completed_sections: int = 0
+    last_updated: Optional[datetime] = None
+    key_sections: list[str] = []  # Names of filled sections
+
+
+class InvitationCompliancePreview(BaseModel):
+    """Schema for compliance summary in invitation preview."""
+    exchange_completion_rate: Optional[float] = None
+    on_time_rate: Optional[float] = None
+    total_exchanges_30d: int = 0
+    completed_exchanges_30d: int = 0
+    communication_flag_rate: Optional[float] = None
+    overall_health: str = "unknown"  # excellent, good, fair, concerning, unknown
+
+
+class InvitationMessagePreview(BaseModel):
+    """Schema for message trends in invitation preview."""
+    total_messages_30d: int = 0
+    flagged_messages_30d: int = 0
+    flag_rate: float = 0.0
+    parent_a_messages: int = 0
+    parent_b_messages: int = 0
+    last_message_at: Optional[datetime] = None
+
+
+class InvitationClearFundPreview(BaseModel):
+    """Schema for ClearFund summary in invitation preview."""
+    total_obligations: int = 0
+    pending_obligations: int = 0
+    total_amount: float = 0.0
+    paid_amount: float = 0.0
+    overdue_amount: float = 0.0
+    categories: list[str] = []
+
+
+class InvitationChildPreview(BaseModel):
+    """Schema for child info in invitation preview."""
+    id: str
+    first_name: str
+    age: Optional[int] = None
+    has_special_needs: bool = False
+
+
+class InvitationCasePreview(BaseModel):
+    """Schema for full case preview on invitation."""
+    family_file_id: str
+    family_file_number: Optional[str] = None
+    family_file_title: Optional[str] = None
+    state: Optional[str] = None
+    county: Optional[str] = None
+    created_at: Optional[datetime] = None
+
+    # Parents info
+    parent_a_name: Optional[str] = None
+    parent_b_name: Optional[str] = None
+
+    # Children
+    children: list[InvitationChildPreview] = []
+
+    # Preview sections
+    agreement: InvitationAgreementPreview
+    compliance: InvitationCompliancePreview
+    messages: InvitationMessagePreview
+    clearfund: InvitationClearFundPreview
+
+    # Request info
+    requested_role: Optional[str] = None
+    requested_scopes: list[str] = []
+    representing: Optional[str] = None
+    message: Optional[str] = None
+
+
 # Forward references for nested models
 ProfessionalProfileWithFirms.model_rebuild()
 FirmWithMembers.model_rebuild()

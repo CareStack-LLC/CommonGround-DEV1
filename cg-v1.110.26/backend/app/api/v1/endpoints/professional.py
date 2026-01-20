@@ -971,6 +971,298 @@ async def decline_firm_invitation(
     }
 
 
+@router.get(
+    "/firms/{firm_id}/invitations/{invitation_id}/preview",
+    summary="Get case preview for invitation",
+)
+async def get_invitation_case_preview(
+    firm_id: str,
+    invitation_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Get detailed case preview for an invitation before accepting.
+
+    Returns agreement summary, compliance metrics, message trends,
+    and ClearFund overview to help professional evaluate the case.
+    """
+    from datetime import timedelta
+    from sqlalchemy import select, func, and_
+    from app.models.agreement import Agreement
+    from app.models.message import Message, MessageFlag
+    from app.models.payment import Obligation
+    from app.models.custody_exchange import CustodyExchangeInstance
+
+    # Verify firm membership
+    firm_service = FirmService(db)
+    membership = await firm_service.get_membership(profile.id, firm_id)
+    if not membership or membership.status != MembershipStatus.ACTIVE.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not an active member of this firm",
+        )
+
+    # Get invitation
+    access_service = ProfessionalAccessService(db)
+    invitation = await access_service.get_request(invitation_id)
+
+    if not invitation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invitation not found",
+        )
+
+    if invitation.firm_id != firm_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invitation is not for this firm",
+        )
+
+    # Get family file with relationships
+    ff = invitation.family_file
+    if not ff:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Family file not found",
+        )
+
+    parent_a = ff.parent_a if ff else None
+    parent_b = ff.parent_b if ff else None
+
+    # Build children preview
+    children_preview = []
+    if ff.children:
+        from datetime import date
+        for child in ff.children:
+            age = None
+            if child.date_of_birth:
+                today = date.today()
+                age = today.year - child.date_of_birth.year - (
+                    (today.month, today.day) < (child.date_of_birth.month, child.date_of_birth.day)
+                )
+            children_preview.append({
+                "id": str(child.id),
+                "first_name": child.first_name,
+                "age": age,
+                "has_special_needs": child.special_needs is not None and len(child.special_needs) > 0,
+            })
+
+    # Get agreement info
+    agreement_preview = {
+        "has_active_agreement": False,
+        "agreement_title": None,
+        "total_sections": 0,
+        "completed_sections": 0,
+        "last_updated": None,
+        "key_sections": [],
+    }
+
+    try:
+        agreement_result = await db.execute(
+            select(Agreement)
+            .where(Agreement.family_file_id == ff.id)
+            .where(Agreement.status.in_(["active", "pending_approval", "draft"]))
+            .order_by(Agreement.updated_at.desc())
+            .limit(1)
+        )
+        agreement = agreement_result.scalar_one_or_none()
+        if agreement:
+            agreement_preview["has_active_agreement"] = True
+            agreement_preview["agreement_title"] = agreement.title
+            agreement_preview["last_updated"] = agreement.updated_at
+
+            # Count sections from agreement_data
+            if agreement.agreement_data:
+                sections = agreement.agreement_data.get("sections", {})
+                total = 0
+                completed = 0
+                key_sections = []
+                for section_name, section_data in sections.items():
+                    total += 1
+                    if section_data and section_data.get("data"):
+                        completed += 1
+                        key_sections.append(section_name.replace("_", " ").title())
+                agreement_preview["total_sections"] = total
+                agreement_preview["completed_sections"] = completed
+                agreement_preview["key_sections"] = key_sections[:5]  # Top 5
+    except Exception:
+        pass  # Agreement data not critical
+
+    # Get message trends (last 30 days)
+    message_preview = {
+        "total_messages_30d": 0,
+        "flagged_messages_30d": 0,
+        "flag_rate": 0.0,
+        "parent_a_messages": 0,
+        "parent_b_messages": 0,
+        "last_message_at": None,
+    }
+
+    try:
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+
+        # Total messages
+        msg_count_result = await db.execute(
+            select(func.count(Message.id))
+            .where(Message.family_file_id == ff.id)
+            .where(Message.created_at >= thirty_days_ago)
+        )
+        message_preview["total_messages_30d"] = msg_count_result.scalar() or 0
+
+        # Flagged messages
+        flagged_result = await db.execute(
+            select(func.count(Message.id))
+            .where(Message.family_file_id == ff.id)
+            .where(Message.created_at >= thirty_days_ago)
+            .where(Message.was_flagged == True)
+        )
+        message_preview["flagged_messages_30d"] = flagged_result.scalar() or 0
+
+        if message_preview["total_messages_30d"] > 0:
+            message_preview["flag_rate"] = round(
+                message_preview["flagged_messages_30d"] / message_preview["total_messages_30d"] * 100, 1
+            )
+
+        # Messages by parent
+        if parent_a:
+            pa_result = await db.execute(
+                select(func.count(Message.id))
+                .where(Message.family_file_id == ff.id)
+                .where(Message.sender_id == str(parent_a.id))
+                .where(Message.created_at >= thirty_days_ago)
+            )
+            message_preview["parent_a_messages"] = pa_result.scalar() or 0
+
+        if parent_b:
+            pb_result = await db.execute(
+                select(func.count(Message.id))
+                .where(Message.family_file_id == ff.id)
+                .where(Message.sender_id == str(parent_b.id))
+                .where(Message.created_at >= thirty_days_ago)
+            )
+            message_preview["parent_b_messages"] = pb_result.scalar() or 0
+
+        # Last message
+        last_msg_result = await db.execute(
+            select(Message.created_at)
+            .where(Message.family_file_id == ff.id)
+            .order_by(Message.created_at.desc())
+            .limit(1)
+        )
+        last_msg = last_msg_result.scalar_one_or_none()
+        if last_msg:
+            message_preview["last_message_at"] = last_msg
+    except Exception:
+        pass  # Message data not critical
+
+    # Get compliance/exchange metrics
+    compliance_preview = {
+        "exchange_completion_rate": None,
+        "on_time_rate": None,
+        "total_exchanges_30d": 0,
+        "completed_exchanges_30d": 0,
+        "communication_flag_rate": message_preview["flag_rate"],
+        "overall_health": "unknown",
+    }
+
+    try:
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+
+        # Exchange instances in last 30 days
+        exchange_result = await db.execute(
+            select(func.count(CustodyExchangeInstance.id))
+            .where(CustodyExchangeInstance.family_file_id == ff.id)
+            .where(CustodyExchangeInstance.scheduled_date >= thirty_days_ago.date())
+        )
+        compliance_preview["total_exchanges_30d"] = exchange_result.scalar() or 0
+
+        # Completed exchanges
+        completed_result = await db.execute(
+            select(func.count(CustodyExchangeInstance.id))
+            .where(CustodyExchangeInstance.family_file_id == ff.id)
+            .where(CustodyExchangeInstance.scheduled_date >= thirty_days_ago.date())
+            .where(CustodyExchangeInstance.status == "completed")
+        )
+        compliance_preview["completed_exchanges_30d"] = completed_result.scalar() or 0
+
+        if compliance_preview["total_exchanges_30d"] > 0:
+            compliance_preview["exchange_completion_rate"] = round(
+                compliance_preview["completed_exchanges_30d"] / compliance_preview["total_exchanges_30d"] * 100, 1
+            )
+
+            # Determine overall health
+            rate = compliance_preview["exchange_completion_rate"]
+            flag_rate = compliance_preview["communication_flag_rate"]
+            if rate >= 90 and flag_rate <= 10:
+                compliance_preview["overall_health"] = "excellent"
+            elif rate >= 75 and flag_rate <= 20:
+                compliance_preview["overall_health"] = "good"
+            elif rate >= 50 and flag_rate <= 35:
+                compliance_preview["overall_health"] = "fair"
+            else:
+                compliance_preview["overall_health"] = "concerning"
+    except Exception:
+        pass  # Compliance data not critical
+
+    # Get ClearFund overview
+    clearfund_preview = {
+        "total_obligations": 0,
+        "pending_obligations": 0,
+        "total_amount": 0.0,
+        "paid_amount": 0.0,
+        "overdue_amount": 0.0,
+        "categories": [],
+    }
+
+    try:
+        # Get all obligations
+        obligations_result = await db.execute(
+            select(Obligation)
+            .where(Obligation.family_file_id == ff.id)
+        )
+        obligations = obligations_result.scalars().all()
+
+        categories_set = set()
+        for obl in obligations:
+            clearfund_preview["total_obligations"] += 1
+            clearfund_preview["total_amount"] += float(obl.amount or 0)
+
+            if obl.status == "pending":
+                clearfund_preview["pending_obligations"] += 1
+            elif obl.status == "funded" or obl.status == "completed":
+                clearfund_preview["paid_amount"] += float(obl.amount or 0)
+            elif obl.status == "overdue":
+                clearfund_preview["overdue_amount"] += float(obl.amount or 0)
+
+            if obl.category:
+                categories_set.add(obl.category)
+
+        clearfund_preview["categories"] = list(categories_set)[:5]
+    except Exception:
+        pass  # ClearFund data not critical
+
+    return {
+        "family_file_id": str(ff.id),
+        "family_file_number": ff.family_file_number,
+        "family_file_title": ff.title,
+        "state": ff.state,
+        "county": ff.county,
+        "created_at": ff.created_at,
+        "parent_a_name": f"{parent_a.first_name} {parent_a.last_name}" if parent_a else None,
+        "parent_b_name": f"{parent_b.first_name} {parent_b.last_name}" if parent_b else None,
+        "children": children_preview,
+        "agreement": agreement_preview,
+        "compliance": compliance_preview,
+        "messages": message_preview,
+        "clearfund": clearfund_preview,
+        "requested_role": invitation.requested_role,
+        "requested_scopes": invitation.requested_scopes or [],
+        "representing": invitation.representing,
+        "message": invitation.message,
+    }
+
+
 # =============================================================================
 # INVITATIONS (Accept flow)
 # =============================================================================
