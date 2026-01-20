@@ -993,7 +993,7 @@ async def get_invitation_case_preview(
     from app.models.agreement import Agreement
     from app.models.message import Message, MessageFlag
     from app.models.payment import Obligation
-    from app.models.custody_exchange import CustodyExchangeInstance
+    from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
 
     # Verify firm membership
     firm_service = FirmService(db)
@@ -1182,7 +1182,6 @@ async def get_invitation_case_preview(
     }
 
     try:
-        from app.models.custody_exchange import CustodyExchange
         thirty_days_ago = datetime.utcnow() - timedelta(days=30)
 
         # Exchange instances in last 30 days (join through CustodyExchange for family_file_id)
