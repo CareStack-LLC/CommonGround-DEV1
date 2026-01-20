@@ -297,6 +297,12 @@ class CalendarEvent(BaseModel):
     court_event: bool = False
     is_mandatory: Optional[bool] = None
     my_rsvp_status: Optional[str] = None
+    # Professional event fields (for unified calendar)
+    is_professional_event: bool = False
+    professional_event_type: Optional[str] = None  # meeting, court_hearing, etc.
+    created_by_professional: Optional[str] = None  # "Attorney" or similar label
+    color: Optional[str] = None  # Custom color for display
+    virtual_meeting_url: Optional[str] = None
 
 
 class CalendarResponse(BaseModel):
