@@ -113,27 +113,32 @@ interface FirmMember {
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   pending: {
     label: "Pending",
-    color: "bg-amber-100 text-amber-800",
+    color: "bg-amber-50 text-amber-700 border border-amber-200",
     icon: <Clock className="h-3.5 w-3.5" />,
   },
   in_progress: {
     label: "In Progress",
-    color: "bg-blue-100 text-blue-800",
+    color: "bg-blue-50 text-blue-700 border border-blue-200",
     icon: <Bot className="h-3.5 w-3.5" />,
   },
   completed: {
     label: "Completed",
-    color: "bg-emerald-100 text-emerald-800",
+    color: "bg-teal-50 text-teal-700 border border-teal-200",
     icon: <CheckCircle2 className="h-3.5 w-3.5" />,
+  },
+  needs_review: {
+    label: "Needs Review",
+    color: "bg-orange-50 text-orange-700 border border-orange-200",
+    icon: <AlertCircle className="h-3.5 w-3.5" />,
   },
   reviewed: {
     label: "Reviewed",
-    color: "bg-purple-100 text-purple-800",
+    color: "bg-purple-50 text-purple-700 border border-purple-200",
     icon: <Eye className="h-3.5 w-3.5" />,
   },
   cancelled: {
     label: "Cancelled",
-    color: "bg-gray-100 text-gray-800",
+    color: "bg-slate-50 text-slate-600 border border-slate-200",
     icon: <XCircle className="h-3.5 w-3.5" />,
   },
 };
@@ -143,23 +148,28 @@ export default function IntakeCenterPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Tab state from URL
+  // Tab and status state from URL
   const tabFromUrl = searchParams.get("tab");
+  const statusFromUrl = searchParams.get("status");
   const [activeTab, setActiveTab] = useState<"intakes" | "invitations">(
     tabFromUrl === "invitations" ? "invitations" : "intakes"
   );
 
-  // Intake state
+  // Intake state - read initial status from URL if provided
   const [intakes, setIntakes] = useState<IntakeSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(
+    tabFromUrl !== "invitations" && statusFromUrl ? statusFromUrl : "all"
+  );
   const [showNewIntakeDialog, setShowNewIntakeDialog] = useState(false);
 
-  // Firm invitation state
+  // Firm invitation state - read initial status from URL if provided
   const [invitations, setInvitations] = useState<FirmInvitation[]>([]);
   const [invitationsLoading, setInvitationsLoading] = useState(true);
-  const [invitationFilter, setInvitationFilter] = useState("pending");
+  const [invitationFilter, setInvitationFilter] = useState(
+    tabFromUrl === "invitations" && statusFromUrl ? statusFromUrl : "pending"
+  );
 
   // Update URL when tab changes
   const handleTabChange = (tab: "intakes" | "invitations") => {
@@ -292,8 +302,8 @@ export default function IntakeCenterPage() {
     total: intakes.length,
     pending: intakes.filter((i) => i.status === "pending").length,
     inProgress: intakes.filter((i) => i.status === "in_progress").length,
-    completed: intakes.filter((i) => i.status === "completed").length,
-    needsReview: intakes.filter((i) => i.status === "completed" && !i.has_summary).length,
+    completed: intakes.filter((i) => i.status === "completed" || i.status === "needs_review").length,
+    needsReview: intakes.filter((i) => i.status === "needs_review" || (i.status === "completed" && !i.has_summary)).length,
   };
 
   // Stats for invitations
@@ -309,13 +319,13 @@ export default function IntakeCenterPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-            <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+            <div className="p-2.5 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl shadow-lg shadow-purple-500/20">
               <Bot className="h-6 w-6" />
             </div>
             ARIA Pro Intake Center
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-slate-500 mt-1">
             Manage AI-powered intakes and case invitations
           </p>
         </div>
@@ -324,6 +334,7 @@ export default function IntakeCenterPage() {
             variant="outline"
             size="sm"
             onClick={activeTab === "intakes" ? fetchIntakes : fetchInvitations}
+            className="border-slate-300 hover:bg-slate-50"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
@@ -331,7 +342,7 @@ export default function IntakeCenterPage() {
           {activeTab === "intakes" && (
             <Dialog open={showNewIntakeDialog} onOpenChange={setShowNewIntakeDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-emerald-600 hover:bg-emerald-700">
+                <Button className="bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-600/20">
                   <Plus className="h-4 w-4 mr-2" />
                   New Intake
                 </Button>
@@ -353,35 +364,35 @@ export default function IntakeCenterPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-border">
+      <div className="flex border-b border-slate-200">
         <button
           onClick={() => handleTabChange("intakes")}
-          className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+          className={`px-5 py-3 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${
             activeTab === "intakes"
-              ? "border-emerald-600 text-emerald-600"
-              : "border-transparent text-muted-foreground hover:text-foreground"
+              ? "border-teal-600 text-teal-700 bg-teal-50/50"
+              : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
           }`}
         >
-          <Bot className="h-4 w-4 inline-block mr-2" />
+          <Bot className="h-4 w-4" />
           ARIA Intakes
           {intakeStats.total > 0 && (
-            <Badge variant="secondary" className="ml-2">
+            <Badge variant="secondary" className="ml-1 bg-slate-100 text-slate-600">
               {intakeStats.total}
             </Badge>
           )}
         </button>
         <button
           onClick={() => handleTabChange("invitations")}
-          className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+          className={`px-5 py-3 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${
             activeTab === "invitations"
-              ? "border-emerald-600 text-emerald-600"
-              : "border-transparent text-muted-foreground hover:text-foreground"
+              ? "border-teal-600 text-teal-700 bg-teal-50/50"
+              : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
           }`}
         >
-          <Users className="h-4 w-4 inline-block mr-2" />
+          <Users className="h-4 w-4" />
           Case Invitations
           {invitationStats.pending > 0 && (
-            <Badge className="ml-2 bg-amber-100 text-amber-800">
+            <Badge className="ml-1 bg-amber-100 text-amber-700 border border-amber-200">
               {invitationStats.pending}
             </Badge>
           )}
@@ -416,34 +427,35 @@ export default function IntakeCenterPage() {
             <StatCard
               label="Completed"
               value={intakeStats.completed}
-              color="emerald"
+              color="teal"
               active={statusFilter === "completed"}
               onClick={() => setStatusFilter("completed")}
             />
             <StatCard
               label="Needs Review"
               value={intakeStats.needsReview}
-              color="purple"
-              active={statusFilter === "reviewed"}
-              onClick={() => setStatusFilter("reviewed")}
+              color="orange"
+              active={statusFilter === "needs_review"}
+              onClick={() => setStatusFilter("needs_review")}
             />
           </div>
 
           {/* Filters */}
-          <Card>
-            <CardContent className="py-3">
-              <div className="flex flex-col sm:flex-row gap-4">
+          <Card className="border-slate-200 shadow-sm">
+            <CardContent className="py-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     placeholder="Search by client name or email..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
+                    className="pl-9 border-slate-200 focus:border-teal-500 focus:ring-teal-500/20"
                   />
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-40">
+                  <SelectTrigger className="w-full sm:w-44 border-slate-200">
+                    <Filter className="h-4 w-4 mr-2 text-slate-400" />
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -451,6 +463,7 @@ export default function IntakeCenterPage() {
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="in_progress">In Progress</SelectItem>
                     <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="needs_review">Needs Review</SelectItem>
                     <SelectItem value="reviewed">Reviewed</SelectItem>
                     <SelectItem value="cancelled">Cancelled</SelectItem>
                   </SelectContent>
@@ -462,7 +475,7 @@ export default function IntakeCenterPage() {
           {/* Intake List */}
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
             </div>
           ) : filteredIntakes.length > 0 ? (
             <div className="space-y-3">
@@ -471,22 +484,26 @@ export default function IntakeCenterPage() {
               ))}
             </div>
           ) : (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">No intake sessions</h3>
-                <p className="text-muted-foreground mb-4">
+            <Card className="border-slate-200 border-dashed bg-slate-50/50">
+              <CardContent className="py-16 text-center">
+                <div className="p-4 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl w-fit mx-auto mb-6">
+                  <FileText className="h-10 w-10 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No intake sessions</h3>
+                <p className="text-slate-500 mb-6 max-w-sm mx-auto">
                   {searchQuery || statusFilter !== "all"
-                    ? "Try adjusting your filters"
-                    : "Create your first intake session to get started"}
+                    ? "No results match your filters. Try adjusting your search criteria."
+                    : "Create your first intake session to get started with AI-powered client onboarding."}
                 </p>
-                <Button
-                  onClick={() => setShowNewIntakeDialog(true)}
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Intake
-                </Button>
+                {!(searchQuery || statusFilter !== "all") && (
+                  <Button
+                    onClick={() => setShowNewIntakeDialog(true)}
+                    className="bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-600/20"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Intake
+                  </Button>
+                )}
               </CardContent>
             </Card>
           )}
@@ -511,7 +528,7 @@ export default function IntakeCenterPage() {
             <StatCard
               label="Approved"
               value={invitationStats.approved}
-              color="emerald"
+              color="teal"
               active={invitationFilter === "approved"}
               onClick={() => setInvitationFilter("approved")}
             />
@@ -525,20 +542,21 @@ export default function IntakeCenterPage() {
           </div>
 
           {/* Filters */}
-          <Card>
-            <CardContent className="py-3">
-              <div className="flex flex-col sm:flex-row gap-4">
+          <Card className="border-slate-200 shadow-sm">
+            <CardContent className="py-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     placeholder="Search by parent name or case..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
+                    className="pl-9 border-slate-200 focus:border-teal-500 focus:ring-teal-500/20"
                   />
                 </div>
                 <Select value={invitationFilter} onValueChange={setInvitationFilter}>
-                  <SelectTrigger className="w-full sm:w-40">
+                  <SelectTrigger className="w-full sm:w-44 border-slate-200">
+                    <Filter className="h-4 w-4 mr-2 text-slate-400" />
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -554,18 +572,23 @@ export default function IntakeCenterPage() {
 
           {/* No Firm Selected Warning */}
           {!activeFirm ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">No Firm Selected</h3>
-                <p className="text-muted-foreground mb-4">
-                  Select a firm from your profile to view case invitations
+            <Card className="border-slate-200 border-dashed bg-slate-50/50">
+              <CardContent className="py-16 text-center">
+                <div className="p-4 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl w-fit mx-auto mb-6">
+                  <Building2 className="h-10 w-10 text-slate-500" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No Firm Selected</h3>
+                <p className="text-slate-500 mb-6 max-w-sm mx-auto">
+                  Select a firm from your profile to view and manage case invitations.
                 </p>
+                <Button variant="outline" asChild>
+                  <Link href="/professional/profile">Go to Profile</Link>
+                </Button>
               </CardContent>
             </Card>
           ) : invitationsLoading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
             </div>
           ) : filteredInvitations.length > 0 ? (
             <div className="space-y-3">
@@ -580,14 +603,16 @@ export default function IntakeCenterPage() {
               ))}
             </div>
           ) : (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">No case invitations</h3>
-                <p className="text-muted-foreground">
+            <Card className="border-slate-200 border-dashed bg-slate-50/50">
+              <CardContent className="py-16 text-center">
+                <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl w-fit mx-auto mb-6">
+                  <Users className="h-10 w-10 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">No case invitations</h3>
+                <p className="text-slate-500 max-w-sm mx-auto">
                   {searchQuery || invitationFilter !== "all"
-                    ? "Try adjusting your filters"
-                    : "When parents invite your firm from the directory, invitations will appear here"}
+                    ? "No results match your filters. Try adjusting your search criteria."
+                    : "When parents invite your firm from the professional directory, case invitations will appear here."}
                 </p>
               </CardContent>
             </Card>
@@ -608,28 +633,61 @@ function StatCard({
 }: {
   label: string;
   value: number;
-  color?: "amber" | "blue" | "emerald" | "purple";
+  color?: "amber" | "blue" | "teal" | "purple" | "orange";
   active: boolean;
   onClick: () => void;
 }) {
-  const colorClasses = {
-    amber: "text-amber-600",
-    blue: "text-blue-600",
-    emerald: "text-emerald-600",
-    purple: "text-purple-600",
+  const colorConfig = {
+    amber: {
+      text: "text-amber-600",
+      activeBg: "bg-gradient-to-br from-amber-50 to-amber-100/50",
+      activeBorder: "border-amber-300",
+      activeRing: "ring-amber-500/20",
+      icon: "bg-amber-100 text-amber-600",
+    },
+    blue: {
+      text: "text-blue-600",
+      activeBg: "bg-gradient-to-br from-blue-50 to-blue-100/50",
+      activeBorder: "border-blue-300",
+      activeRing: "ring-blue-500/20",
+      icon: "bg-blue-100 text-blue-600",
+    },
+    teal: {
+      text: "text-teal-600",
+      activeBg: "bg-gradient-to-br from-teal-50 to-teal-100/50",
+      activeBorder: "border-teal-300",
+      activeRing: "ring-teal-500/20",
+      icon: "bg-teal-100 text-teal-600",
+    },
+    purple: {
+      text: "text-purple-600",
+      activeBg: "bg-gradient-to-br from-purple-50 to-purple-100/50",
+      activeBorder: "border-purple-300",
+      activeRing: "ring-purple-500/20",
+      icon: "bg-purple-100 text-purple-600",
+    },
+    orange: {
+      text: "text-orange-600",
+      activeBg: "bg-gradient-to-br from-orange-50 to-orange-100/50",
+      activeBorder: "border-orange-300",
+      activeRing: "ring-orange-500/20",
+      icon: "bg-orange-100 text-orange-600",
+    },
   };
+
+  const config = color ? colorConfig[color] : null;
 
   return (
     <button
       onClick={onClick}
-      className={`p-3 rounded-lg border text-left transition-all ${
+      className={`p-4 rounded-xl border text-left transition-all duration-200 w-full ${
         active
-          ? "bg-emerald-50 border-emerald-200 ring-2 ring-emerald-500/20"
-          : "bg-card border-border hover:bg-muted/50"
+          ? `${config?.activeBg || "bg-gradient-to-br from-slate-50 to-slate-100/50"} ${config?.activeBorder || "border-slate-300"} ring-2 ${config?.activeRing || "ring-slate-500/20"} shadow-sm`
+          : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm"
       }`}
     >
-      <p className={`text-2xl font-bold ${color ? colorClasses[color] : ""}`}>{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={`text-2xl font-bold ${config?.text || "text-slate-900"}`}>{value}</p>
+      <p className="text-xs text-slate-500 mt-0.5 font-medium">{label}</p>
     </button>
   );
 }
@@ -662,18 +720,42 @@ function IntakeCard({
     return "Just now";
   };
 
+  // Determine status accent color for top bar
+  const statusAccent = () => {
+    switch (intake.status) {
+      case "pending":
+        return "bg-gradient-to-r from-amber-400 to-amber-500";
+      case "in_progress":
+        return "bg-gradient-to-r from-blue-400 to-blue-500";
+      case "completed":
+        return "bg-gradient-to-r from-teal-400 to-teal-500";
+      case "needs_review":
+        return "bg-gradient-to-r from-orange-400 to-orange-500";
+      case "reviewed":
+        return "bg-gradient-to-r from-purple-400 to-purple-500";
+      default:
+        return "bg-slate-300";
+    }
+  };
+
   return (
     <Link href={`/professional/intake/${intake.id}`}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 text-purple-600 rounded-lg">
-                <Bot className="h-6 w-6" />
+      <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer border-slate-200 hover:border-slate-300 overflow-hidden">
+        {/* Top accent bar based on status */}
+        <div className={`h-1 ${statusAccent()}`} />
+
+        <CardContent className="p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-4 flex-1">
+              {/* Icon with gradient */}
+              <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl shadow-lg shadow-purple-500/20 shrink-0">
+                <Bot className="h-5 w-5" />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground">
+
+              <div className="flex-1 min-w-0">
+                {/* Header with name and status */}
+                <div className="flex items-center gap-2 flex-wrap mb-2">
+                  <h3 className="font-semibold text-slate-900 text-base">
                     {intake.client_name || "Unnamed Client"}
                   </h3>
                   <Badge className={statusConfig.color}>
@@ -681,41 +763,62 @@ function IntakeCard({
                     <span className="ml-1">{statusConfig.label}</span>
                   </Badge>
                 </div>
-                <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <User className="h-3.5 w-3.5" />
-                    {intake.client_email}
-                  </span>
-                  <span>|</span>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {formatRelativeTime(intake.created_at)}
-                  </span>
-                  {intake.message_count > 0 && (
-                    <>
-                      <span>|</span>
-                      <span>{intake.message_count} messages</span>
-                    </>
+
+                {/* Client info row */}
+                <div className="bg-slate-50 rounded-lg p-3 mb-3">
+                  <div className="flex items-center gap-4 text-sm flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-white rounded-md shadow-sm">
+                        <User className="h-3.5 w-3.5 text-slate-500" />
+                      </div>
+                      <span className="text-slate-700">{intake.client_email}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-white rounded-md shadow-sm">
+                        <Calendar className="h-3.5 w-3.5 text-slate-500" />
+                      </div>
+                      <span className="text-slate-600">{formatRelativeTime(intake.created_at)}</span>
+                    </div>
+                    {intake.message_count > 0 && (
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 bg-white rounded-md shadow-sm">
+                          <FileText className="h-3.5 w-3.5 text-slate-500" />
+                        </div>
+                        <span className="text-slate-600">{intake.message_count} messages</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status indicators */}
+                <div className="flex items-center gap-2 flex-wrap">
+                  {intake.status === "completed" && !intake.has_summary && (
+                    <Badge className="bg-orange-50 text-orange-700 border border-orange-200">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      Needs Review
+                    </Badge>
+                  )}
+                  {intake.has_summary && (
+                    <Badge className="bg-teal-50 text-teal-700 border border-teal-200">
+                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                      Summary Ready
+                    </Badge>
+                  )}
+                  {intake.family_file_id && (
+                    <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                      <Users className="h-3 w-3 mr-1" />
+                      Linked to Case
+                    </Badge>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              {intake.status === "completed" && !intake.has_summary && (
-                <Badge variant="warning" className="shrink-0">
-                  Needs Review
-                </Badge>
-              )}
-              {intake.has_summary && (
-                <Badge variant="outline" className="bg-emerald-50 text-emerald-700 shrink-0">
-                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                  Summary Ready
-                </Badge>
-              )}
+            {/* Actions */}
+            <div className="flex items-center gap-2 shrink-0">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -735,7 +838,9 @@ function IntakeCard({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              <div className="p-1.5 rounded-full bg-slate-100 group-hover:bg-teal-100 transition-colors">
+                <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-teal-600 transition-colors" />
+              </div>
             </div>
           </div>
         </CardContent>
@@ -874,7 +979,7 @@ function NewIntakeForm({
         <Button
           type="submit"
           disabled={isSubmitting || !formData.client_name || !formData.client_email}
-          className="bg-emerald-600 hover:bg-emerald-700"
+          className="bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-600/20"
         >
           {isSubmitting ? "Creating..." : "Create & Send Link"}
         </Button>
@@ -993,22 +1098,22 @@ function FirmInvitationCard({
     switch (invitation.status) {
       case "pending":
         return (
-          <Badge className="bg-amber-100 text-amber-800">
-            <Clock className="h-3.5 w-3.5 mr-1" />
-            Pending
+          <Badge className="bg-amber-50 text-amber-700 border border-amber-200">
+            <Clock className="h-3 w-3 mr-1" />
+            Pending Review
           </Badge>
         );
       case "approved":
         return (
-          <Badge className="bg-emerald-100 text-emerald-800">
-            <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+          <Badge className="bg-teal-50 text-teal-700 border border-teal-200">
+            <CheckCircle2 className="h-3 w-3 mr-1" />
             Approved
           </Badge>
         );
       case "declined":
         return (
-          <Badge className="bg-gray-100 text-gray-800">
-            <XCircle className="h-3.5 w-3.5 mr-1" />
+          <Badge className="bg-slate-100 text-slate-600 border border-slate-200">
+            <XCircle className="h-3 w-3 mr-1" />
             Declined
           </Badge>
         );
@@ -1025,103 +1130,188 @@ function FirmInvitationCard({
     full: "Full Access",
   };
 
+  const scopeIcons: Record<string, React.ReactNode> = {
+    schedule: <Calendar className="h-3 w-3" />,
+    messages: <FileText className="h-3 w-3" />,
+    agreement: <FileText className="h-3 w-3" />,
+    financials: <Shield className="h-3 w-3" />,
+    full: <Shield className="h-3 w-3" />,
+  };
+
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
+    <Card className="group hover:shadow-lg transition-all duration-300 border-slate-200 hover:border-slate-300 overflow-hidden">
+      {/* Top accent bar based on status */}
+      <div className={`h-1 ${
+        invitation.status === "pending"
+          ? "bg-gradient-to-r from-amber-400 to-amber-500"
+          : invitation.status === "approved"
+          ? "bg-gradient-to-r from-teal-400 to-teal-500"
+          : "bg-slate-300"
+      }`} />
+
+      <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-4 flex-1">
-            <div className="p-3 bg-blue-100 text-blue-600 rounded-lg shrink-0">
-              <Users className="h-6 w-6" />
+            {/* Icon with gradient background */}
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl shadow-lg shadow-blue-500/20 shrink-0">
+              <Users className="h-5 w-5" />
             </div>
+
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-semibold text-foreground">
+              {/* Header with title and status */}
+              <div className="flex items-center gap-2 flex-wrap mb-2">
+                <h3 className="font-semibold text-slate-900 text-base">
                   {invitation.family_file_title || `Case ${invitation.family_file_number || invitation.family_file_id.slice(0, 8)}`}
                 </h3>
                 {statusBadge()}
               </div>
 
-              {/* Parents and children info */}
-              <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground flex-wrap">
-                {invitation.parent_a_name && invitation.parent_b_name ? (
-                  <span className="flex items-center gap-1">
-                    <User className="h-3.5 w-3.5" />
-                    {invitation.parent_a_name} & {invitation.parent_b_name}
-                  </span>
-                ) : invitation.parent_a_name || invitation.parent_b_name ? (
-                  <span className="flex items-center gap-1">
-                    <User className="h-3.5 w-3.5" />
-                    {invitation.parent_a_name || invitation.parent_b_name}
-                  </span>
-                ) : null}
-                {invitation.children_count > 0 && (
-                  <>
-                    <span className="hidden sm:inline">|</span>
-                    <span className="flex items-center gap-1">
-                      <Baby className="h-3.5 w-3.5" />
-                      {invitation.children_count} {invitation.children_count === 1 ? "child" : "children"}
-                    </span>
-                  </>
-                )}
-                {(invitation.state || invitation.county) && (
-                  <>
-                    <span className="hidden sm:inline">|</span>
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {[invitation.county, invitation.state].filter(Boolean).join(", ")}
-                    </span>
-                  </>
-                )}
+              {/* Parents and children info - in a cleaner card */}
+              <div className="bg-slate-50 rounded-lg p-3 mb-3">
+                <div className="flex items-center gap-4 text-sm flex-wrap">
+                  {invitation.parent_a_name && invitation.parent_b_name ? (
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-white rounded-md shadow-sm">
+                        <User className="h-3.5 w-3.5 text-slate-500" />
+                      </div>
+                      <span className="text-slate-700 font-medium">
+                        {invitation.parent_a_name} & {invitation.parent_b_name}
+                      </span>
+                    </div>
+                  ) : invitation.parent_a_name || invitation.parent_b_name ? (
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-white rounded-md shadow-sm">
+                        <User className="h-3.5 w-3.5 text-slate-500" />
+                      </div>
+                      <span className="text-slate-700 font-medium">
+                        {invitation.parent_a_name || invitation.parent_b_name}
+                      </span>
+                    </div>
+                  ) : null}
+
+                  {invitation.children_count > 0 && (
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-white rounded-md shadow-sm">
+                        <Baby className="h-3.5 w-3.5 text-slate-500" />
+                      </div>
+                      <span className="text-slate-600">
+                        {invitation.children_count} {invitation.children_count === 1 ? "child" : "children"}
+                      </span>
+                    </div>
+                  )}
+
+                  {(invitation.state || invitation.county) && (
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-white rounded-md shadow-sm">
+                        <MapPin className="h-3.5 w-3.5 text-slate-500" />
+                      </div>
+                      <span className="text-slate-600">
+                        {[invitation.county, invitation.state].filter(Boolean).join(", ")}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Message from parent */}
               {invitation.message && (
-                <p className="mt-2 text-sm text-muted-foreground italic line-clamp-2">
-                  "{invitation.message}"
-                </p>
+                <div className="bg-blue-50/50 border border-blue-100 rounded-lg p-3 mb-3">
+                  <p className="text-sm text-slate-600 italic line-clamp-2">
+                    "{invitation.message}"
+                  </p>
+                </div>
               )}
 
-              {/* Requested scopes */}
+              {/* Requested scopes as pills */}
               {invitation.requested_scopes && invitation.requested_scopes.length > 0 && (
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
-                  <span className="text-xs text-muted-foreground">Scopes:</span>
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Access Requested:</span>
                   {invitation.requested_scopes.map((scope) => (
-                    <Badge key={scope} variant="outline" className="text-xs">
+                    <Badge
+                      key={scope}
+                      variant="outline"
+                      className="text-xs bg-white border-slate-200 text-slate-600 gap-1"
+                    >
+                      {scopeIcons[scope]}
                       {scopeLabels[scope] || scope}
                     </Badge>
                   ))}
                 </div>
               )}
 
-              {/* Approval status */}
-              <div className="flex items-center gap-3 mt-2 text-xs">
-                <span className={invitation.parent_a_approved ? "text-emerald-600" : "text-muted-foreground"}>
-                  Parent A: {invitation.parent_a_approved ? "Approved" : "Pending"}
-                </span>
-                <span className={invitation.parent_b_approved ? "text-emerald-600" : "text-muted-foreground"}>
-                  Parent B: {invitation.parent_b_approved ? "Approved" : "Pending"}
-                </span>
+              {/* Approval status indicators */}
+              <div className="flex items-center gap-4 text-xs">
+                <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${
+                  invitation.parent_a_approved
+                    ? "bg-teal-50 text-teal-700"
+                    : "bg-slate-100 text-slate-500"
+                }`}>
+                  {invitation.parent_a_approved ? (
+                    <CheckCircle2 className="h-3 w-3" />
+                  ) : (
+                    <Clock className="h-3 w-3" />
+                  )}
+                  <span>Parent A {invitation.parent_a_approved ? "Approved" : "Pending"}</span>
+                </div>
+
+                <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${
+                  invitation.parent_b_approved
+                    ? "bg-teal-50 text-teal-700"
+                    : "bg-slate-100 text-slate-500"
+                }`}>
+                  {invitation.parent_b_approved ? (
+                    <CheckCircle2 className="h-3 w-3" />
+                  ) : (
+                    <Clock className="h-3 w-3" />
+                  )}
+                  <span>Parent B {invitation.parent_b_approved ? "Approved" : "Pending"}</span>
+                </div>
+
                 {expiryDays !== null && expiryDays <= 7 && (
-                  <span className={`${expiryDays <= 2 ? "text-red-600" : "text-amber-600"}`}>
-                    Expires in {expiryDays} {expiryDays === 1 ? "day" : "days"}
-                  </span>
+                  <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${
+                    expiryDays <= 2
+                      ? "bg-red-50 text-red-600"
+                      : "bg-amber-50 text-amber-600"
+                  }`}>
+                    <AlertCircle className="h-3 w-3" />
+                    <span>Expires in {expiryDays} {expiryDays === 1 ? "day" : "days"}</span>
+                  </div>
                 )}
               </div>
 
-              {/* Timestamps */}
-              <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+              {/* Timestamp */}
+              <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-400">
                 <Calendar className="h-3 w-3" />
                 Received {formatRelativeTime(invitation.created_at)}
               </div>
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Actions - stacked for better visual hierarchy */}
           {invitation.status === "pending" && (
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-col items-stretch gap-2 shrink-0 min-w-[120px]">
+              <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+                <DialogTrigger asChild>
+                  <Button className="bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-600/20 transition-all" size="sm">
+                    <UserPlus className="h-4 w-4 mr-1.5" />
+                    Accept
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <AssignProfessionalDialog
+                    token={token}
+                    firmId={firmId}
+                    invitationId={invitation.id}
+                    onAccept={handleAccept}
+                    isAccepting={isAccepting}
+                    onCancel={() => setShowAssignDialog(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+
               <Dialog open={showDeclineDialog} onOpenChange={setShowDeclineDialog}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-700">
                     Decline
                   </Button>
                 </DialogTrigger>
@@ -1160,25 +1350,6 @@ function FirmInvitationCard({
                       {isDeclining ? "Declining..." : "Decline Invitation"}
                     </Button>
                   </DialogFooter>
-                </DialogContent>
-              </Dialog>
-
-              <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-                <DialogTrigger asChild>
-                  <Button className="bg-emerald-600 hover:bg-emerald-700" size="sm">
-                    <UserPlus className="h-4 w-4 mr-1" />
-                    Accept
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <AssignProfessionalDialog
-                    token={token}
-                    firmId={firmId}
-                    invitationId={invitation.id}
-                    onAccept={handleAccept}
-                    isAccepting={isAccepting}
-                    onCancel={() => setShowAssignDialog(false)}
-                  />
                 </DialogContent>
               </Dialog>
             </div>
@@ -1280,7 +1451,7 @@ function AssignProfessionalDialog({
           <Label>Assign To</Label>
           {loading ? (
             <div className="flex items-center justify-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600" />
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-teal-600" />
             </div>
           ) : (
             <Select value={selectedProfessional} onValueChange={setSelectedProfessional}>
@@ -1316,7 +1487,7 @@ function AssignProfessionalDialog({
         <Button
           onClick={handleSubmit}
           disabled={isAccepting || loading || (selectedProfessional === "self" && !currentProfessionalId)}
-          className="bg-emerald-600 hover:bg-emerald-700"
+          className="bg-teal-600 hover:bg-teal-700 shadow-lg shadow-teal-600/20"
         >
           {isAccepting ? "Accepting..." : "Accept & Assign"}
         </Button>
