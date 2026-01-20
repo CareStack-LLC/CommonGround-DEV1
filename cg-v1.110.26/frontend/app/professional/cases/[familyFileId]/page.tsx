@@ -119,7 +119,7 @@ export default function CaseDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
       </div>
     );
   }
@@ -151,33 +151,33 @@ export default function CaseDetailPage() {
       </Link>
 
       {/* Case Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="p-4 bg-emerald-100 text-emerald-600 rounded-xl">
+      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <div className="p-4 bg-teal-100 text-teal-600 rounded-xl shrink-0">
             <FolderOpen className="h-8 w-8" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="text-2xl font-bold text-slate-900">
               {caseData.family_file_number || `Case ${familyFileId.slice(0, 8)}`}
             </h1>
             <div className="flex flex-wrap items-center gap-2 mt-1">
-              <Badge className="bg-emerald-100 text-emerald-800">{caseData.status}</Badge>
-              <span className="text-muted-foreground">|</span>
-              <span className="text-sm text-muted-foreground flex items-center gap-1">
+              <Badge className="bg-teal-100 text-teal-800">{caseData.status}</Badge>
+              <span className="text-slate-300">|</span>
+              <span className="text-sm text-slate-500 flex items-center gap-1">
                 <Users className="h-3.5 w-3.5" />
                 {representingLabels[caseData.representing]}
               </span>
-              <span className="text-muted-foreground">|</span>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-slate-300">|</span>
+              <span className="text-sm text-slate-500">
                 {roleLabels[caseData.assignment_role]}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           {caseData.can_control_aria && (
-            <Button asChild variant="outline" size="sm">
+            <Button asChild variant="outline" size="sm" className="whitespace-nowrap">
               <Link href={`/professional/cases/${familyFileId}/aria`}>
                 <Bot className="h-4 w-4 mr-2" />
                 ARIA Controls
@@ -185,7 +185,7 @@ export default function CaseDetailPage() {
             </Button>
           )}
           {caseData.can_message_client && (
-            <Button asChild size="sm">
+            <Button asChild size="sm" className="bg-teal-600 hover:bg-teal-700 text-white whitespace-nowrap">
               <Link href={`/professional/cases/${familyFileId}/messages`}>
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Message Client
@@ -238,7 +238,7 @@ export default function CaseDetailPage() {
             title="Communications"
             description="View parent-to-parent messages"
             icon={<MessageSquare className="h-6 w-6" />}
-            href={`/professional/cases/${familyFileId}/timeline?types=message`}
+            href={`/professional/cases/${familyFileId}/communications`}
             color="purple"
           />
         )}
@@ -249,16 +249,16 @@ export default function CaseDetailPage() {
             description="Manage AI intervention settings"
             icon={<Bot className="h-6 w-6" />}
             href={`/professional/cases/${familyFileId}/aria`}
-            color="emerald"
+            color="teal"
           />
         )}
 
         {caseData.access_scopes?.includes("schedule") && (
           <NavigationCard
             title="Schedule"
-            description="Custody exchanges and events"
+            description="Custody exchanges and check-ins"
             icon={<Calendar className="h-6 w-6" />}
-            href={`/professional/cases/${familyFileId}/timeline?types=exchange`}
+            href={`/professional/cases/${familyFileId}/schedule`}
             color="amber"
           />
         )}
@@ -266,10 +266,20 @@ export default function CaseDetailPage() {
         {caseData.access_scopes?.includes("agreement") && (
           <NavigationCard
             title="Agreement"
-            description="View custody agreement sections"
+            description="View custody agreement and compliance"
             icon={<FileText className="h-6 w-6" />}
-            href={`/professional/cases/${familyFileId}/timeline?types=agreement`}
+            href={`/professional/cases/${familyFileId}/agreement`}
             color="slate"
+          />
+        )}
+
+        {caseData.access_scopes?.includes("financials") && (
+          <NavigationCard
+            title="ClearFund"
+            description="Shared expenses and financial compliance"
+            icon={<Scale className="h-6 w-6" />}
+            href={`/professional/cases/${familyFileId}/clearfund`}
+            color="cyan"
           />
         )}
 
@@ -355,12 +365,12 @@ function NavigationCard({
   description: string;
   icon: React.ReactNode;
   href: string;
-  color: "blue" | "purple" | "emerald" | "amber" | "slate" | "cyan";
+  color: "blue" | "purple" | "teal" | "amber" | "slate" | "cyan";
 }) {
   const colorClasses = {
     blue: "bg-blue-100 text-blue-600",
     purple: "bg-purple-100 text-purple-600",
-    emerald: "bg-emerald-100 text-emerald-600",
+    teal: "bg-teal-100 text-teal-600",
     amber: "bg-amber-100 text-amber-600",
     slate: "bg-slate-100 text-slate-600",
     cyan: "bg-cyan-100 text-cyan-600",

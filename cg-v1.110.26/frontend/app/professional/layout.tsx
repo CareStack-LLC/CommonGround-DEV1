@@ -362,6 +362,11 @@ function ProfessionalNavigation({
       badge: dashboardData?.case_count?.toString(),
     },
     {
+      href: "/professional/calendar",
+      label: "Calendar",
+      icon: <Calendar className="h-4 w-4" />,
+    },
+    {
       href: "/professional/intake",
       label: "Intake",
       icon: <Bot className="h-4 w-4" />,
