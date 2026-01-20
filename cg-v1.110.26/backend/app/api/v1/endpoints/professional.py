@@ -992,7 +992,7 @@ async def get_invitation_case_preview(
     from sqlalchemy import select, func, and_
     from app.models.agreement import Agreement
     from app.models.message import Message, MessageFlag
-    from app.models.payment import Obligation
+    from app.models.clearfund import Obligation
     from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
 
     # Verify firm membership
@@ -1060,7 +1060,7 @@ async def get_invitation_case_preview(
                 "id": str(child.id),
                 "first_name": child.first_name,
                 "age": age,
-                "has_special_needs": child.special_needs is not None and len(child.special_needs) > 0,
+                "has_special_needs": bool(child.has_special_needs),
             })
 
     # Get agreement info
