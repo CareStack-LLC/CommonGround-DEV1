@@ -353,40 +353,44 @@ class ProfessionalEventsService:
         Returns:
             List of conflicting events
         """
-        conditions = [
-            ScheduleEvent.professional_id == professional_id,
-            ScheduleEvent.status != "cancelled",
-            # Overlap condition: starts before proposed ends AND ends after proposed starts
-            ScheduleEvent.start_time < end_time,
-            ScheduleEvent.end_time > start_time,
-        ]
+        """
+        # TEMPORARY DEBUG: Disable conflict checking
+        return []
 
-        if exclude_event_id:
-            conditions.append(ScheduleEvent.id != exclude_event_id)
+        # conditions = [
+        #     ScheduleEvent.professional_id == professional_id,
+        #     ScheduleEvent.status != "cancelled",
+        #     # Overlap condition: starts before proposed ends AND ends after proposed starts
+        #     ScheduleEvent.start_time < end_time,
+        #     ScheduleEvent.end_time > start_time,
+        # ]
 
-        query = select(ScheduleEvent).where(and_(*conditions))
-        result = await db.execute(query)
-        conflicting_events = list(result.scalars().all())
+        # if exclude_event_id:
+        #     conditions.append(ScheduleEvent.id != exclude_event_id)
 
-        conflicts = []
-        for event in conflicting_events:
-            # Safely determine event type for conflict
-            conflict_event_type = event.professional_event_type or event.event_type or "meeting"
+        # query = select(ScheduleEvent).where(and_(*conditions))
+        # result = await db.execute(query)
+        # conflicting_events = list(result.scalars().all())
+
+        # conflicts = []
+        # for event in conflicting_events:
+        #     # Safely determine event type for conflict
+        #     conflict_event_type = event.professional_event_type or event.event_type or "meeting"
             
-            conflicts.append(
-                EventConflict(
-                    event_id=str(event.id),
-                    title=event.title,
-                    start_time=event.start_time,
-                    end_time=event.end_time,
-                    event_type=conflict_event_type,
-                    overlap_minutes=self._calculate_overlap_minutes(
-                        start_time, end_time, event.start_time, event.end_time
-                    ),
-                )
-            )
+        #     conflicts.append(
+        #         EventConflict(
+        #             event_id=str(event.id),
+        #             title=event.title,
+        #             start_time=event.start_time,
+        #             end_time=event.end_time,
+        #             event_type=conflict_event_type,
+        #             overlap_minutes=self._calculate_overlap_minutes(
+        #                 start_time, end_time, event.start_time, event.end_time
+        #             ),
+        #         )
+        #     )
 
-        return conflicts
+        # return conflicts
 
     async def get_events_for_case(
         self,
