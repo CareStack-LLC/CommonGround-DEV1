@@ -36,8 +36,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useProfessionalAuth } from "../layout";
 import { EventForm } from "@/components/professional/event-form";
+import { Input } from "@/components/ui/input";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+// Helper for date input
+const toInputDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 // Helper function for API calls
 async function professionalFetch<T>(
@@ -372,6 +381,17 @@ export default function ProfessionalCalendarPage() {
               <Button variant="outline" size="icon" onClick={nextMonth}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
+              <Input
+                type="date"
+                value={toInputDate(currentDate)}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    const [y, m, d] = e.target.value.split("-").map(Number);
+                    setCurrentDate(new Date(y, m - 1, d));
+                  }
+                }}
+                className="w-auto"
+              />
               <Button variant="outline" onClick={goToToday}>
                 Today
               </Button>
@@ -554,7 +574,7 @@ export default function ProfessionalCalendarPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => {}}>Edit</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { }}>Edit</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleCancelEvent(selectedEvent.id)}>
                         Cancel Event
                       </DropdownMenuItem>
@@ -664,9 +684,9 @@ export default function ProfessionalCalendarPage() {
             initialData={
               selectedDate
                 ? {
-                    start_time: `${selectedDate.toISOString().slice(0, 10)}T09:00`,
-                    end_time: `${selectedDate.toISOString().slice(0, 10)}T10:00`,
-                  }
+                  start_time: `${selectedDate.toISOString().slice(0, 10)}T09:00`,
+                  end_time: `${selectedDate.toISOString().slice(0, 10)}T10:00`,
+                }
                 : undefined
             }
           />
