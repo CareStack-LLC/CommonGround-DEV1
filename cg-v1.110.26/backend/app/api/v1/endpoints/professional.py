@@ -1182,21 +1182,24 @@ async def get_invitation_case_preview(
     }
 
     try:
+        from app.models.custody_exchange import CustodyExchange
         thirty_days_ago = datetime.utcnow() - timedelta(days=30)
 
-        # Exchange instances in last 30 days
+        # Exchange instances in last 30 days (join through CustodyExchange for family_file_id)
         exchange_result = await db.execute(
             select(func.count(CustodyExchangeInstance.id))
-            .where(CustodyExchangeInstance.family_file_id == ff.id)
-            .where(CustodyExchangeInstance.scheduled_date >= thirty_days_ago.date())
+            .join(CustodyExchange, CustodyExchangeInstance.exchange_id == CustodyExchange.id)
+            .where(CustodyExchange.family_file_id == str(ff.id))
+            .where(CustodyExchangeInstance.scheduled_time >= thirty_days_ago)
         )
         compliance_preview["total_exchanges_30d"] = exchange_result.scalar() or 0
 
         # Completed exchanges
         completed_result = await db.execute(
             select(func.count(CustodyExchangeInstance.id))
-            .where(CustodyExchangeInstance.family_file_id == ff.id)
-            .where(CustodyExchangeInstance.scheduled_date >= thirty_days_ago.date())
+            .join(CustodyExchange, CustodyExchangeInstance.exchange_id == CustodyExchange.id)
+            .where(CustodyExchange.family_file_id == str(ff.id))
+            .where(CustodyExchangeInstance.scheduled_time >= thirty_days_ago)
             .where(CustodyExchangeInstance.status == "completed")
         )
         compliance_preview["completed_exchanges_30d"] = completed_result.scalar() or 0
