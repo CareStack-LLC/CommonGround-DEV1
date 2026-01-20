@@ -38,6 +38,16 @@ interface ProfessionalProfile {
   user_first_name?: string;
   user_last_name?: string;
   user_email?: string;
+  // Additional profile fields
+  practice_areas?: string[];
+  professional_phone?: string;
+  professional_email?: string;
+  credentials?: Record<string, unknown>;
+  // Profile enhancements
+  profile_photo_url?: string;
+  bio?: string;
+  years_of_experience?: number;
+  languages?: string[];
 }
 
 interface Firm {
@@ -201,8 +211,8 @@ export default function ProfessionalPortalLayout({
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
       </div>
     );
   }
@@ -222,41 +232,41 @@ export default function ProfessionalPortalLayout({
         refreshDashboard,
       }}
     >
-      <div className="min-h-screen bg-background flex flex-col">
-        {/* Header - Emerald for professional context */}
-        <header className="bg-emerald-950 text-white shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+      <div className="min-h-screen bg-slate-50 flex flex-col">
+        {/* Header - Distinguished Navy/Slate gradient for professional context */}
+        <header className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-xl border-b border-slate-700/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <Link href="/professional" className="flex items-center gap-3">
-                  <div className="p-1.5 bg-emerald-800 rounded-lg">
+                <Link href="/professional" className="flex items-center gap-3 group">
+                  <div className="p-2 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl shadow-lg shadow-teal-500/20 group-hover:shadow-teal-500/40 transition-all duration-300">
                     <Briefcase className="h-5 w-5" />
                   </div>
                   <div>
-                    <span className="text-lg font-bold tracking-tight">CommonGround</span>
-                    <Badge variant="secondary" className="ml-2 text-xs bg-emerald-800 text-emerald-100 border-0">
-                      Pro
+                    <span className="text-xl font-semibold tracking-tight bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">CommonGround</span>
+                    <Badge className="ml-2.5 text-[10px] font-semibold bg-teal-500/20 text-teal-300 border border-teal-500/30 hover:bg-teal-500/30">
+                      Professional
                     </Badge>
                   </div>
                 </Link>
               </div>
 
               {profile && !isOnboardingPage && (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-5">
                   {/* Firm Selector (if multiple firms) */}
                   {firms.length > 1 && (
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-900/50 rounded-lg">
-                      <Building2 className="h-4 w-4 text-emerald-300" />
+                    <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-slate-700/50 rounded-xl border border-slate-600/50 backdrop-blur-sm">
+                      <Building2 className="h-4 w-4 text-slate-400" />
                       <select
                         value={activeFirm?.id || ""}
                         onChange={(e) => {
                           const firm = firms.find((f) => f.id === e.target.value);
                           setActiveFirm(firm || null);
                         }}
-                        className="bg-transparent text-sm text-emerald-100 border-0 focus:ring-0 cursor-pointer"
+                        className="bg-transparent text-sm text-slate-200 border-0 focus:ring-0 cursor-pointer font-medium"
                       >
                         {firms.map((firm) => (
-                          <option key={firm.id} value={firm.id} className="bg-emerald-900 text-white">
+                          <option key={firm.id} value={firm.id} className="bg-slate-800 text-white">
                             {firm.name}
                           </option>
                         ))}
@@ -265,16 +275,16 @@ export default function ProfessionalPortalLayout({
                   )}
 
                   <div className="text-right hidden sm:block">
-                    <div className="font-medium text-sm">{displayName}</div>
+                    <div className="font-semibold text-sm text-white">{displayName}</div>
                     {typeInfo && (
-                      <div className="text-xs text-emerald-200">{typeInfo.label}</div>
+                      <div className="text-xs text-slate-400 font-medium">{typeInfo.label}</div>
                     )}
                   </div>
                   <Button
                     onClick={logout}
                     variant="ghost"
                     size="sm"
-                    className="text-emerald-200 hover:text-white hover:bg-emerald-800"
+                    className="text-slate-400 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all duration-200"
                   >
                     <LogOut className="h-4 w-4 sm:mr-2" />
                     <span className="hidden sm:inline">Sign Out</span>
@@ -296,20 +306,20 @@ export default function ProfessionalPortalLayout({
         </main>
 
         {/* Footer */}
-        <footer className="bg-secondary/50 border-t border-border mt-auto">
+        <footer className="bg-slate-100 border-t border-slate-200 mt-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-slate-500">
               <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                <span>CommonGround Professional Portal</span>
+                <Shield className="h-4 w-4 text-teal-600" />
+                <span className="font-medium">CommonGround Professional Portal</span>
               </div>
               <div className="flex items-center gap-4 text-xs">
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cg-success" />
+                <span className="flex items-center gap-1.5 bg-teal-50 text-teal-700 px-2.5 py-1 rounded-full font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
                   HIPAA Compliant
                 </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="flex items-center gap-1.5 bg-slate-200 text-slate-600 px-2.5 py-1 rounded-full font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-500" />
                   All actions logged
                 </span>
               </div>
@@ -376,10 +386,10 @@ function ProfessionalNavigation({
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="bg-card border-b border-border shadow-sm hidden md:block">
+      <nav className="bg-white border-b border-slate-200 shadow-sm hidden md:block">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between">
-            <div className="flex gap-1">
+            <div className="flex gap-0.5">
               {mainNavItems.map((item) => (
                 <NavLink
                   key={item.href}
@@ -393,7 +403,7 @@ function ProfessionalNavigation({
               ))}
 
               <div className="flex items-center">
-                <div className="h-6 w-px bg-border mx-2" />
+                <div className="h-6 w-px bg-slate-200 mx-3" />
               </div>
 
               {toolsNavItems.map((item) => (
@@ -409,27 +419,27 @@ function ProfessionalNavigation({
             </div>
 
             {/* Quick Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               {dashboardData?.pending_firm_invitations > 0 && (
                 <Link href="/professional/intake?tab=invitations">
-                  <Badge className="text-xs bg-amber-100 text-amber-800 hover:bg-amber-200 cursor-pointer">
+                  <Badge className="text-xs bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 cursor-pointer transition-colors font-medium">
                     {dashboardData.pending_firm_invitations} case invitation{dashboardData.pending_firm_invitations !== 1 ? "s" : ""}
                   </Badge>
                 </Link>
               )}
               {dashboardData?.pending_intakes > 0 && (
-                <Badge variant="warning" className="text-xs">
+                <Badge className="text-xs bg-teal-50 text-teal-700 border border-teal-200 font-medium">
                   {dashboardData.pending_intakes} pending intake{dashboardData.pending_intakes !== 1 ? "s" : ""}
                 </Badge>
               )}
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-muted-foreground hover:text-foreground relative"
+                className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 relative rounded-lg"
               >
                 <Bell className="h-4 w-4" />
                 {dashboardData?.alerts?.length > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 h-4 w-4 bg-rose-500 rounded-full text-[10px] text-white flex items-center justify-center font-medium shadow-sm">
                     {dashboardData.alerts.length}
                   </span>
                 )}
@@ -440,27 +450,27 @@ function ProfessionalNavigation({
       </nav>
 
       {/* Mobile Navigation */}
-      <nav className="bg-card border-b border-border shadow-sm md:hidden">
-        <div className="px-4 py-2 flex items-center justify-between">
+      <nav className="bg-white border-b border-slate-200 shadow-sm md:hidden">
+        <div className="px-4 py-3 flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            <span>Menu</span>
+            <span className="font-medium">Menu</span>
           </Button>
 
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm font-semibold text-slate-700">
             {pathname.split("/").pop()?.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) ||
               "Dashboard"}
           </span>
 
-          <Button variant="ghost" size="sm" className="relative">
+          <Button variant="ghost" size="sm" className="relative text-slate-500 hover:text-slate-700 hover:bg-slate-100">
             <Bell className="h-4 w-4" />
             {dashboardData?.alerts?.length > 0 && (
-              <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 h-4 w-4 bg-rose-500 rounded-full text-[10px] text-white flex items-center justify-center font-medium">
                 {dashboardData.alerts.length}
               </span>
             )}
@@ -468,24 +478,24 @@ function ProfessionalNavigation({
         </div>
 
         {mobileMenuOpen && (
-          <div className="border-t border-border bg-card px-4 py-3 space-y-1">
+          <div className="border-t border-slate-200 bg-slate-50 px-4 py-3 space-y-1">
             {[...mainNavItems, ...toolsNavItems].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   pathname.startsWith(item.href)
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "text-foreground hover:bg-muted"
+                    ? "bg-teal-50 text-teal-700 border border-teal-200 shadow-sm"
+                    : "text-slate-700 hover:bg-white hover:shadow-sm"
                 }`}
               >
-                <span className="flex items-center gap-2">
+                <span className="flex items-center gap-2.5">
                   {item.icon}
                   {item.label}
                 </span>
                 {item.badge && (
-                  <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-500 text-white rounded-full">
+                  <span className="px-2 py-0.5 text-[10px] font-bold bg-teal-500 text-white rounded-full">
                     {item.badge}
                   </span>
                 )}
@@ -517,16 +527,16 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
+      className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
         isActive
-          ? "border-emerald-600 text-emerald-600"
-          : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+          ? "border-teal-600 text-teal-700 bg-teal-50/50"
+          : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300"
       }`}
     >
       {icon}
       {children}
       {badge && (
-        <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-500 text-white rounded-full">
+        <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-teal-500 text-white rounded-full shadow-sm">
           {badge}
         </span>
       )}
