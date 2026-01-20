@@ -498,7 +498,7 @@ class ProfessionalEventsService:
         by_type = {}
         for event in events:
             # Safely determine event type
-            event_type = event.professional_event_type or event.event_type or "other"
+            event_type = str(event.professional_event_type or event.event_type or "other")
             if event_type not in by_type:
                 by_type[event_type] = 0
             by_type[event_type] += 1
@@ -569,7 +569,7 @@ class ProfessionalEventsService:
 
         # Safely determine event type
         event_type_val = event.professional_event_type or event.event_type or "meeting"
-        # Ensure it matches expected enum strings, otherwise default to meeting
+        event_type_val = str(event.professional_event_type or event.event_type or "meeting")
         if event_type_val not in ["meeting", "court_hearing", "video_call", "document_deadline", "consultation", "deposition", "mediation", "other"]:
             event_type_val = "meeting"
 
