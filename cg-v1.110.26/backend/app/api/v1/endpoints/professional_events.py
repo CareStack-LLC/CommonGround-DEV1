@@ -59,7 +59,7 @@ async def get_professional_context(
     return profile
 
 
-@router.get("/", response_model=ProfessionalEventListResponse)
+@router.get("", response_model=ProfessionalEventListResponse)
 async def list_events(
     start_date: Optional[datetime] = Query(None, description="Filter events starting on or after this date"),
     end_date: Optional[datetime] = Query(None, description="Filter events ending on or before this date"),
@@ -104,7 +104,7 @@ async def list_events(
     )
 
 
-@router.post("/", response_model=dict, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def create_event(
     event_data: ProfessionalEventCreate,
     check_conflicts: bool = Query(True, description="Check for scheduling conflicts"),
