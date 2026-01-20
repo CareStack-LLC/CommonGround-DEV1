@@ -1005,7 +1005,7 @@ async def get_invitation_case_preview(
 
     # Get invitation with family file and nested relationships
     from sqlalchemy.orm import selectinload
-    from app.models.case import FamilyFile
+    from app.models.family_file import FamilyFile
     from app.models.professional import ProfessionalAccessRequest
 
     result = await db.execute(
