@@ -202,24 +202,28 @@ export default function CaseDetailPage() {
           value={timelineSummary?.total_events || 0}
           icon={<Clock className="h-5 w-5" />}
           href={`/professional/cases/${familyFileId}/timeline`}
+          color="blue"
         />
         <QuickStat
           label="Messages"
           value={timelineSummary?.messages || 0}
           icon={<MessageSquare className="h-5 w-5" />}
           href={`/professional/cases/${familyFileId}/timeline?types=message`}
+          color="purple"
         />
         <QuickStat
           label="Exchanges"
           value={timelineSummary?.exchanges || 0}
           icon={<Calendar className="h-5 w-5" />}
           href={`/professional/cases/${familyFileId}/timeline?types=exchange`}
+          color="amber"
         />
         <QuickStat
           label="Court Events"
           value={timelineSummary?.court_events || 0}
           icon={<Scale className="h-5 w-5" />}
           href={`/professional/cases/${familyFileId}/timeline?types=court`}
+          color="teal"
         />
       </div>
 
@@ -295,15 +299,15 @@ export default function CaseDetailPage() {
       </div>
 
       {/* Access Scopes Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Your Access</CardTitle>
-          <CardDescription>Data you can view for this case</CardDescription>
+      <Card className="border-slate-200">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold text-slate-900">Your Access</CardTitle>
+          <CardDescription className="text-slate-500">Data you can view for this case</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
             {caseData.access_scopes?.map((scope) => (
-              <Badge key={scope} variant="outline" className="capitalize">
+              <Badge key={scope} variant="outline" className="capitalize bg-slate-50 text-slate-700 border-slate-200">
                 {scope.replace("_", " ")}
               </Badge>
             ))}
@@ -330,22 +334,34 @@ function QuickStat({
   value,
   icon,
   href,
+  color = "slate",
 }: {
   label: string;
   value: number;
   icon: React.ReactNode;
   href: string;
+  color?: "blue" | "purple" | "amber" | "teal" | "slate";
 }) {
+  const colorConfig = {
+    blue: "from-blue-500 to-blue-600 shadow-blue-500/20",
+    purple: "from-purple-500 to-purple-600 shadow-purple-500/20",
+    amber: "from-amber-500 to-amber-600 shadow-amber-500/20",
+    teal: "from-teal-500 to-teal-600 shadow-teal-500/20",
+    slate: "from-slate-500 to-slate-600 shadow-slate-500/20",
+  };
+
   return (
     <Link href={href}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-        <CardContent className="pt-4">
+      <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer h-full border-slate-200 hover:border-slate-300">
+        <CardContent className="pt-5 pb-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="text-2xl font-bold mt-1">{value}</p>
+              <p className="text-xs text-slate-500 font-medium">{label}</p>
+              <p className="text-2xl font-bold text-slate-900 mt-1">{value}</p>
             </div>
-            <div className="p-2 bg-muted rounded-lg text-muted-foreground">{icon}</div>
+            <div className={`p-3 bg-gradient-to-br ${colorConfig[color]} text-white rounded-xl shadow-lg`}>
+              {icon}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -368,24 +384,24 @@ function NavigationCard({
   color: "blue" | "purple" | "teal" | "amber" | "slate" | "cyan";
 }) {
   const colorClasses = {
-    blue: "bg-blue-100 text-blue-600",
-    purple: "bg-purple-100 text-purple-600",
-    teal: "bg-teal-100 text-teal-600",
-    amber: "bg-amber-100 text-amber-600",
-    slate: "bg-slate-100 text-slate-600",
-    cyan: "bg-cyan-100 text-cyan-600",
+    blue: "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20",
+    purple: "bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/20",
+    teal: "bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-500/20",
+    amber: "bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/20",
+    slate: "bg-gradient-to-br from-slate-500 to-slate-600 text-white shadow-lg shadow-slate-500/20",
+    cyan: "bg-gradient-to-br from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/20",
   };
 
   return (
     <Link href={href}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+      <Card className="group hover:shadow-lg transition-all duration-300 cursor-pointer h-full border-slate-200 hover:border-slate-300">
         <CardContent className="pt-6">
           <div className="flex items-start justify-between">
-            <div className={`p-3 rounded-lg ${colorClasses[color]}`}>{icon}</div>
-            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            <div className={`p-3 rounded-xl ${colorClasses[color]}`}>{icon}</div>
+            <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
           </div>
-          <h3 className="font-semibold text-foreground mt-4">{title}</h3>
-          <p className="text-sm text-muted-foreground mt-1">{description}</p>
+          <h3 className="font-semibold text-slate-900 mt-4">{title}</h3>
+          <p className="text-sm text-slate-500 mt-1">{description}</p>
         </CardContent>
       </Card>
     </Link>
