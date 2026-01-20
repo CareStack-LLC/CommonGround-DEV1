@@ -353,7 +353,6 @@ class ProfessionalEventsService:
         Returns:
             List of conflicting events
         """
-        """
         # TEMPORARY DEBUG: Disable conflict checking
         return []
 
