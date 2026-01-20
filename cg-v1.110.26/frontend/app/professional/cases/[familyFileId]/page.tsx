@@ -247,15 +247,13 @@ export default function CaseDetailPage() {
           />
         )}
 
-        {caseData.can_control_aria && (
-          <NavigationCard
-            title="ARIA Controls"
-            description="Manage AI intervention settings"
-            icon={<Bot className="h-6 w-6" />}
-            href={`/professional/cases/${familyFileId}/aria`}
-            color="teal"
-          />
-        )}
+        <NavigationCard
+          title="ClearFund"
+          description="Shared expenses and financial tracking"
+          icon={<Scale className="h-6 w-6" />}
+          href={`/professional/cases/${familyFileId}/clearfund`}
+          color="teal"
+        />
 
         {caseData.access_scopes?.includes("schedule") && (
           <NavigationCard
@@ -274,16 +272,6 @@ export default function CaseDetailPage() {
             icon={<FileText className="h-6 w-6" />}
             href={`/professional/cases/${familyFileId}/agreement`}
             color="slate"
-          />
-        )}
-
-        {caseData.access_scopes?.includes("financials") && (
-          <NavigationCard
-            title="ClearFund"
-            description="Shared expenses and financial compliance"
-            icon={<Scale className="h-6 w-6" />}
-            href={`/professional/cases/${familyFileId}/clearfund`}
-            color="cyan"
           />
         )}
 
