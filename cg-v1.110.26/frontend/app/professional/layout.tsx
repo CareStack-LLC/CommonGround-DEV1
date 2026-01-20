@@ -150,8 +150,15 @@ export default function ProfessionalPortalLayout({
       } else if (response.status === 404) {
         // No professional profile - redirect to onboarding
         router.push("/professional/onboarding");
+      } else if (response.status === 401) {
+        // Authentication failed - clear tokens and redirect to login
+        console.error("Authentication failed - token may be expired");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        setToken(null);
+        router.push("/login?redirect=/professional");
       } else {
-        console.error("Failed to fetch professional profile");
+        console.error("Failed to fetch professional profile:", response.status);
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
