@@ -890,7 +890,7 @@ class ProfessionalEventBase(BaseModel):
     start_time: datetime
     end_time: datetime
     all_day: bool = False
-    timezone: str = "UTC"
+    timezone: Optional[str] = "UTC"
     location: Optional[str] = None
     virtual_meeting_url: Optional[str] = None
     family_file_id: Optional[str] = None
@@ -899,7 +899,7 @@ class ProfessionalEventBase(BaseModel):
     parent_visibility: EventVisibility = EventVisibility.NONE
     is_recurring: bool = False
     recurrence_rule: Optional[str] = None
-    reminder_minutes: Optional[list[int]] = None
+    reminder_minutes: Optional[int] = None  # Single value, not list (matches model)
     notes: Optional[str] = None
     color: Optional[str] = None
 
@@ -926,7 +926,7 @@ class ProfessionalEventUpdate(BaseModel):
     parent_visibility: Optional[EventVisibility] = None
     is_recurring: Optional[bool] = None
     recurrence_rule: Optional[str] = None
-    reminder_minutes: Optional[list[int]] = None
+    reminder_minutes: Optional[int] = None  # Single value, not list (matches model)
     notes: Optional[str] = None
     color: Optional[str] = None
     is_cancelled: Optional[bool] = None
@@ -935,7 +935,7 @@ class ProfessionalEventUpdate(BaseModel):
 class ProfessionalEventResponse(ProfessionalEventBase):
     """Schema for professional event response."""
     id: str
-    professional_id: str
+    professional_id: Optional[str] = None  # Can be None for non-professional events
     firm_id: Optional[str] = None
     family_file_title: Optional[str] = None
     parent_event_id: Optional[str] = None
