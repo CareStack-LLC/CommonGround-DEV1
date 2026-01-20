@@ -101,6 +101,25 @@ class TemplateType(str, Enum):
     REPORT_TEMPLATE = "report_template"
 
 
+class EventType(str, Enum):
+    """Types of professional calendar events."""
+    MEETING = "meeting"
+    COURT_HEARING = "court_hearing"
+    VIDEO_CALL = "video_call"
+    DOCUMENT_DEADLINE = "document_deadline"
+    CONSULTATION = "consultation"
+    DEPOSITION = "deposition"
+    MEDIATION = "mediation"
+    OTHER = "other"
+
+
+class EventVisibility(str, Enum):
+    """Who can see the event."""
+    NONE = "none"                     # Only the professional
+    REQUIRED_PARENT = "required_parent"  # Parent(s) required to attend
+    BOTH_PARENTS = "both_parents"        # Both parents can see
+
+
 # =============================================================================
 # Helper Functions
 # =============================================================================
@@ -674,3 +693,84 @@ class ProfessionalAccessLog(Base, UUIDMixin, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<ProfessionalAccessLog {self.action} at {self.logged_at}>"
+
+
+class ProfessionalEvent(Base, UUIDMixin, TimestampMixin):
+    """
+    Calendar events for professionals.
+
+    Supports meetings, court hearings, video calls, deadlines, etc.
+    Can optionally be linked to a case and made visible to parents.
+    """
+
+    __tablename__ = "professional_events"
+
+    # Owner
+    professional_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("professional_profiles.id"), index=True
+    )
+    firm_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("firms.id"), nullable=True, index=True
+    )
+
+    # Event details
+    title: Mapped[str] = mapped_column(String(200))
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    event_type: Mapped[str] = mapped_column(String(50), default=EventType.MEETING.value)
+
+    # Timing
+    start_time: Mapped[datetime] = mapped_column(DateTime, index=True)
+    end_time: Mapped[datetime] = mapped_column(DateTime, index=True)
+    all_day: Mapped[bool] = mapped_column(Boolean, default=False)
+    timezone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+
+    # Location
+    location: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    virtual_meeting_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+
+    # Case link (optional)
+    family_file_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("family_files.id"), nullable=True, index=True
+    )
+
+    # Attendees
+    attendee_ids: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    attendee_emails: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+
+    # Visibility to parents
+    parent_visibility: Mapped[str] = mapped_column(
+        String(20), default=EventVisibility.NONE.value
+    )
+
+    # Recurrence
+    is_recurring: Mapped[bool] = mapped_column(Boolean, default=False)
+    recurrence_rule: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    parent_event_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("professional_events.id"), nullable=True
+    )
+
+    # Reminder
+    reminder_minutes: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    # Notes (private to professional)
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Display
+    color: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+
+    # Cancellation
+    is_cancelled: Mapped[bool] = mapped_column(Boolean, default=False)
+    cancelled_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    cancellation_reason: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+
+    # Relationships
+    professional: Mapped["ProfessionalProfile"] = relationship(
+        "ProfessionalProfile", backref="events"
+    )
+    firm: Mapped[Optional["Firm"]] = relationship("Firm", backref="events")
+    family_file: Mapped[Optional["FamilyFile"]] = relationship(
+        "FamilyFile", backref="professional_events"
+    )
+
+    def __repr__(self) -> str:
+        return f"<ProfessionalEvent {self.title} ({self.event_type})>"

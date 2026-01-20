@@ -19,6 +19,8 @@ from app.models.professional import (
     MembershipStatus,
     AccessRequestStatus,
     TemplateType,
+    EventType,
+    EventVisibility,
 )
 from app.models.court import AccessScope
 
@@ -874,6 +876,109 @@ class IntakeSessionListResponse(BaseModel):
     total: int
     limit: int
     offset: int
+
+
+# =============================================================================
+# Professional Event Schemas
+# =============================================================================
+
+class ProfessionalEventBase(BaseModel):
+    """Base schema for professional calendar events."""
+    title: str = Field(..., max_length=200)
+    description: Optional[str] = None
+    event_type: EventType = EventType.MEETING
+    start_time: datetime
+    end_time: datetime
+    all_day: bool = False
+    timezone: str = "UTC"
+    location: Optional[str] = None
+    virtual_meeting_url: Optional[str] = None
+    family_file_id: Optional[str] = None
+    attendee_ids: Optional[list[str]] = None
+    attendee_emails: Optional[list[str]] = None
+    parent_visibility: EventVisibility = EventVisibility.NONE
+    is_recurring: bool = False
+    recurrence_rule: Optional[str] = None
+    reminder_minutes: Optional[list[int]] = None
+    notes: Optional[str] = None
+    color: Optional[str] = None
+
+
+class ProfessionalEventCreate(ProfessionalEventBase):
+    """Schema for creating a professional event."""
+    pass
+
+
+class ProfessionalEventUpdate(BaseModel):
+    """Schema for updating a professional event."""
+    title: Optional[str] = Field(None, max_length=200)
+    description: Optional[str] = None
+    event_type: Optional[EventType] = None
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
+    all_day: Optional[bool] = None
+    timezone: Optional[str] = None
+    location: Optional[str] = None
+    virtual_meeting_url: Optional[str] = None
+    family_file_id: Optional[str] = None
+    attendee_ids: Optional[list[str]] = None
+    attendee_emails: Optional[list[str]] = None
+    parent_visibility: Optional[EventVisibility] = None
+    is_recurring: Optional[bool] = None
+    recurrence_rule: Optional[str] = None
+    reminder_minutes: Optional[list[int]] = None
+    notes: Optional[str] = None
+    color: Optional[str] = None
+    is_cancelled: Optional[bool] = None
+
+
+class ProfessionalEventResponse(ProfessionalEventBase):
+    """Schema for professional event response."""
+    id: str
+    professional_id: str
+    firm_id: Optional[str] = None
+    family_file_title: Optional[str] = None
+    parent_event_id: Optional[str] = None
+    is_cancelled: bool = False
+    cancelled_at: Optional[datetime] = None
+    cancellation_reason: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class EventConflict(BaseModel):
+    """Schema for a scheduling conflict."""
+    event_id: str
+    title: str
+    start_time: datetime
+    end_time: datetime
+    event_type: str
+    overlap_minutes: int
+
+
+class ConflictCheckResponse(BaseModel):
+    """Schema for conflict check results."""
+    has_conflicts: bool
+    conflicts: list[EventConflict]
+
+
+class ProfessionalEventListResponse(BaseModel):
+    """Schema for paginated event list."""
+    events: list[ProfessionalEventResponse]
+    total: int
+    limit: int
+    offset: int
+
+
+class CalendarSummary(BaseModel):
+    """Schema for calendar summary statistics."""
+    total_events: int
+    active_events: int
+    cancelled_events: int
+    events_by_type: dict[str, int]
+    period_start: str
+    period_end: str
 
 
 # Forward references for nested models

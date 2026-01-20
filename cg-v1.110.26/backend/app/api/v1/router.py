@@ -40,6 +40,7 @@ from app.api.v1.endpoints import (
     reports,
     parent_reports,
     professional,
+    professional_events,
 )
 
 api_router = APIRouter()
@@ -122,3 +123,6 @@ api_router.include_router(parent_reports.router, prefix="/parent-reports", tags=
 
 # Professional Portal - Attorneys, mediators, paralegals
 api_router.include_router(professional.router, prefix="/professional", tags=["Professional Portal"])
+
+# Professional Calendar Events
+api_router.include_router(professional_events.router, prefix="/professional/events", tags=["Professional Events"])
