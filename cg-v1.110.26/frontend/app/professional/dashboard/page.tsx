@@ -40,16 +40,16 @@ export default function ProfessionalDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">
+          <h1 className="text-2xl font-bold text-slate-900">
             Welcome back, {profile?.user_first_name || "Professional"}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-slate-500">
             Here's what's happening with your cases today.
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white shrink-0">
           <Link href="/professional/cases">
             View All Cases
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -129,11 +129,20 @@ export default function ProfessionalDashboardPage() {
         {/* Upcoming Events */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-500" />
-              Upcoming Events
-            </CardTitle>
-            <CardDescription>Next 7 days</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-blue-500" />
+                  Upcoming Events
+                </CardTitle>
+                <CardDescription>Next 7 days</CardDescription>
+              </div>
+              <Link href="/professional/calendar">
+                <Button variant="outline" size="sm" className="text-xs">
+                  View Calendar
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent>
             {dashboardData.upcoming_events?.length > 0 ? (
@@ -141,11 +150,23 @@ export default function ProfessionalDashboardPage() {
                 {dashboardData.upcoming_events.slice(0, 5).map((event: any, index: number) => (
                   <EventItem key={index} event={event} />
                 ))}
+                <Link href="/professional/calendar" className="block">
+                  <Button variant="ghost" className="w-full text-slate-500 hover:text-slate-700">
+                    View all events
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>No upcoming events</p>
+                <p className="mb-4">No upcoming events</p>
+                <Link href="/professional/calendar">
+                  <Button variant="outline" size="sm">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    Open Calendar
+                  </Button>
+                </Link>
               </div>
             )}
           </CardContent>
