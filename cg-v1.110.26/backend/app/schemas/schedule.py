@@ -131,12 +131,12 @@ class EventAttendanceResponse(BaseModel):
 class ScheduleEventCreate(BaseModel):
     """Create a new schedule event."""
 
-    collection_id: str
+    collection_id: Optional[str] = None  # Made optional for professional events
     agreement_id: Optional[str] = None  # SharedCare Agreement context
     title: str = Field(..., min_length=1)
     start_time: datetime
     end_time: datetime
-    child_ids: List[str]
+    child_ids: List[str] = []  # Made optional for professional events
     description: Optional[str] = None
     location: Optional[str] = None
     location_shared: bool = False
@@ -149,6 +149,23 @@ class ScheduleEventCreate(BaseModel):
         pattern=r"^(general|medical|school|sports|exchange)$"
     )
     category_data: Optional[Dict[str, Any]] = None  # Category-specific fields
+
+    # Professional calendar fields (optional - set by professional calendar endpoints)
+    professional_id: Optional[str] = None  # Set automatically from authenticated professional
+    professional_event_type: Optional[str] = Field(
+        None,
+        pattern=r"^(meeting|court_hearing|video_call|document_deadline|consultation|deposition|mediation|other)$"
+    )
+    parent_visibility: Optional[str] = Field(
+        None,
+        pattern=r"^(none|required_parent|both_parents)$"
+    )  # Controls if parents see this event
+    virtual_meeting_url: Optional[str] = None
+    reminder_minutes: Optional[int] = Field(None, ge=0, le=10080)  # Max 1 week
+    color: Optional[str] = Field(None, pattern=r"^#[0-9A-Fa-f]{6}$")
+    notes: Optional[str] = None  # Private notes
+    timezone: Optional[str] = None
+    family_file_id: Optional[str] = None  # For professional events linked to a case
 
 
 class ScheduleEventUpdate(BaseModel):
@@ -193,6 +210,17 @@ class ScheduleEventResponse(BaseModel):
     category_data: Optional[Dict[str, Any]] = None  # Filtered based on visibility
     created_at: datetime
     updated_at: datetime
+
+    # Professional calendar fields
+    professional_id: Optional[str] = None
+    professional_event_type: Optional[str] = None
+    parent_visibility: Optional[str] = None  # none, required_parent, both_parents
+    virtual_meeting_url: Optional[str] = None
+    reminder_minutes: Optional[int] = None
+    color: Optional[str] = None
+    notes: Optional[str] = None  # Only included for the professional who created it
+    timezone: Optional[str] = None
+    is_professional_event: bool = False  # Helper to identify professional events
 
     class Config:
         from_attributes = True

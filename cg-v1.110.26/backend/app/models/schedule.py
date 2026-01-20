@@ -126,8 +126,33 @@ class ScheduleEvent(Base, UUIDMixin, TimestampMixin):
     modification_requested_by: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
     modification_approved_by: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
 
+    # Professional calendar fields (for unified calendar support)
+    professional_id: Mapped[Optional[str]] = mapped_column(
+        String(36),
+        ForeignKey("professional_profiles.id"),
+        nullable=True,
+        index=True
+    )  # Professional who created the event (if applicable)
+    professional_event_type: Mapped[Optional[str]] = mapped_column(
+        String(50),
+        nullable=True
+    )  # meeting, court_hearing, video_call, document_deadline, consultation, deposition, mediation
+    parent_visibility: Mapped[Optional[str]] = mapped_column(
+        String(20),
+        nullable=True
+    )  # none, required_parent, both_parents - controls if parents see this event
+    virtual_meeting_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    reminder_minutes: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    color: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)  # Hex color for display
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Private notes (professional only)
+    timezone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+
     # Relationships
     case: Mapped["Case"] = relationship("Case", back_populates="schedule_events")
+    professional: Mapped[Optional["ProfessionalProfile"]] = relationship(
+        "ProfessionalProfile",
+        foreign_keys=[professional_id]
+    )
     collection: Mapped[Optional["MyTimeCollection"]] = relationship(
         "MyTimeCollection",
         back_populates="events",

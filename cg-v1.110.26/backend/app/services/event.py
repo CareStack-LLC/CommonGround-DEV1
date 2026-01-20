@@ -67,7 +67,7 @@ class EventService:
     @staticmethod
     async def create_event(
         db: AsyncSession,
-        collection_id: str,
+        collection_id: Optional[str],
         user_id: str,
         title: str,
         start_time: datetime,
@@ -80,7 +80,17 @@ class EventService:
         all_day: bool = False,
         attendance_invites: Optional[List[Dict[str, str]]] = None,
         event_category: str = "general",
-        category_data: Optional[Dict[str, Any]] = None
+        category_data: Optional[Dict[str, Any]] = None,
+        # Professional calendar fields
+        professional_id: Optional[str] = None,
+        professional_event_type: Optional[str] = None,
+        parent_visibility: Optional[str] = None,
+        virtual_meeting_url: Optional[str] = None,
+        reminder_minutes: Optional[int] = None,
+        color: Optional[str] = None,
+        notes: Optional[str] = None,
+        timezone: Optional[str] = None,
+        family_file_id: Optional[str] = None  # Direct family file for professional events
     ) -> ScheduleEvent:
         """
         Create a new event.
@@ -106,17 +116,31 @@ class EventService:
         Raises:
             ValueError: If validation fails
         """
-        # Verify collection ownership
-        collection_result = await db.execute(
-            select(MyTimeCollection).where(MyTimeCollection.id == collection_id)
-        )
-        collection = collection_result.scalar_one_or_none()
+        # For professional events, collection is optional
+        collection = None
+        event_case_id = None
+        event_family_file_id = family_file_id
 
-        if not collection:
-            raise ValueError("Collection not found")
+        if collection_id:
+            # Verify collection ownership (parent events)
+            collection_result = await db.execute(
+                select(MyTimeCollection).where(MyTimeCollection.id == collection_id)
+            )
+            collection = collection_result.scalar_one_or_none()
 
-        if collection.owner_id != user_id:
-            raise ValueError("You can only create events in your own collections")
+            if not collection:
+                raise ValueError("Collection not found")
+
+            if not professional_id and collection.owner_id != user_id:
+                raise ValueError("You can only create events in your own collections")
+
+            event_case_id = collection.case_id
+            event_family_file_id = collection.family_file_id or family_file_id
+        elif professional_id and family_file_id:
+            # Professional event with direct family_file_id
+            event_family_file_id = family_file_id
+        elif not professional_id:
+            raise ValueError("Collection is required for parent events")
 
         # Validate times
         if end_time <= start_time:
@@ -126,11 +150,20 @@ class EventService:
         start_time = normalize_datetime(start_time)
         end_time = normalize_datetime(end_time)
 
-        # Create event - set case_id or family_file_id based on collection
+        # Determine visibility based on professional parent_visibility
+        effective_visibility = visibility
+        if professional_id and parent_visibility:
+            # Map professional visibility to parent visibility
+            if parent_visibility == "none":
+                effective_visibility = "private"
+            else:  # required_parent or both_parents
+                effective_visibility = "co_parent"
+
+        # Create event
         event = ScheduleEvent(
             id=str(uuid.uuid4()),
-            case_id=collection.case_id,
-            family_file_id=collection.family_file_id,  # Support Family File context
+            case_id=event_case_id,
+            family_file_id=event_family_file_id,
             collection_id=collection_id,
             created_by=user_id,
             title=title,
@@ -141,12 +174,21 @@ class EventService:
             child_ids=child_ids or [],
             location=location,
             location_shared=location_shared,
-            visibility=visibility,
-            event_type="event",  # MVP: generic events only
-            event_category=event_category,  # V2: category-specific forms
+            visibility=effective_visibility,
+            event_type=professional_event_type or "event",
+            event_category=event_category,
             category_data=category_data,
             custodial_parent_id=user_id,
-            status="scheduled"
+            status="scheduled",
+            # Professional fields
+            professional_id=professional_id,
+            professional_event_type=professional_event_type,
+            parent_visibility=parent_visibility,
+            virtual_meeting_url=virtual_meeting_url,
+            reminder_minutes=reminder_minutes,
+            color=color,
+            notes=notes,
+            timezone=timezone,
         )
 
         db.add(event)

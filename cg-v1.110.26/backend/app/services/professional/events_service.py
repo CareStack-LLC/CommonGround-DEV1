@@ -1,39 +1,39 @@
 """
 Professional Events Service.
 
-Handles calendar event management for professionals including:
-- Event CRUD operations
+UNIFIED CALENDAR IMPLEMENTATION:
+Uses ScheduleEvent model to store professional events so they can appear
+on parent calendars when parent_visibility allows it.
+
+Features:
+- Event CRUD operations using ScheduleEvent
 - Basic overlap conflict detection for the same professional
 - Date range filtering
-- Recurring event support
+- Integration with parent calendar
 """
 
 from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
+import uuid as uuid_module
 
 from sqlalchemy import and_, or_, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.professional import (
-    ProfessionalEvent,
-    ProfessionalProfile,
-    EventType,
-    EventVisibility,
-)
+from app.models.schedule import ScheduleEvent
+from app.models.professional import ProfessionalProfile
 from app.models.family_file import FamilyFile
 from app.schemas.professional import (
     ProfessionalEventCreate,
     ProfessionalEventUpdate,
     ProfessionalEventResponse,
     EventConflict,
-    ConflictCheckResponse,
 )
 
 
 class ProfessionalEventsService:
-    """Service for managing professional calendar events."""
+    """Service for managing professional calendar events using unified ScheduleEvent model."""
 
     async def create_event(
         self,
@@ -42,9 +42,9 @@ class ProfessionalEventsService:
         event_data: ProfessionalEventCreate,
         firm_id: Optional[str] = None,
         check_conflicts: bool = True,
-    ) -> tuple[ProfessionalEvent, list[EventConflict]]:
+    ) -> tuple[ScheduleEvent, list[EventConflict]]:
         """
-        Create a new calendar event.
+        Create a new calendar event using the unified ScheduleEvent model.
 
         Args:
             db: Database session
@@ -70,28 +70,44 @@ class ProfessionalEventsService:
                 end_time=event_data.end_time,
             )
 
-        # Create the event
-        event = ProfessionalEvent(
-            professional_id=professional_id,
-            firm_id=firm_id,
+        # Map parent_visibility to visibility for parent calendar integration
+        visibility = "private"
+        if event_data.parent_visibility and event_data.parent_visibility != "none":
+            visibility = "co_parent"
+
+        # Get professional profile to link user
+        prof_result = await db.execute(
+            select(ProfessionalProfile).where(ProfessionalProfile.id == professional_id)
+        )
+        professional = prof_result.scalar_one_or_none()
+        created_by = str(professional.user_id) if professional else professional_id
+
+        # Create the event using ScheduleEvent model
+        event = ScheduleEvent(
+            id=str(uuid_module.uuid4()),
+            family_file_id=event_data.family_file_id,
+            created_by=created_by,
             title=event_data.title,
             description=event_data.description,
-            event_type=event_data.event_type,
             start_time=event_data.start_time,
             end_time=event_data.end_time,
             all_day=event_data.all_day,
-            timezone=event_data.timezone,
             location=event_data.location,
-            virtual_meeting_url=event_data.virtual_meeting_url,
-            family_file_id=event_data.family_file_id,
-            attendee_ids=event_data.attendee_ids,
-            attendee_emails=event_data.attendee_emails,
+            visibility=visibility,
+            status="scheduled",
+            event_type=event_data.event_type or "meeting",
+            event_category="general",
+            child_ids=[],
+            custodial_parent_id=created_by,
+            # Professional-specific fields
+            professional_id=professional_id,
+            professional_event_type=event_data.event_type,
             parent_visibility=event_data.parent_visibility,
-            is_recurring=event_data.is_recurring,
-            recurrence_rule=event_data.recurrence_rule,
+            virtual_meeting_url=event_data.virtual_meeting_url,
             reminder_minutes=event_data.reminder_minutes,
-            notes=event_data.notes,
             color=event_data.color or self._get_default_color(event_data.event_type),
+            notes=event_data.notes,
+            timezone=event_data.timezone,
         )
 
         db.add(event)
@@ -105,7 +121,7 @@ class ProfessionalEventsService:
         db: AsyncSession,
         event_id: str,
         professional_id: str,
-    ) -> Optional[ProfessionalEvent]:
+    ) -> Optional[ScheduleEvent]:
         """
         Get a single event by ID.
 
@@ -118,10 +134,10 @@ class ProfessionalEventsService:
             Event if found and accessible, None otherwise
         """
         result = await db.execute(
-            select(ProfessionalEvent).where(
+            select(ScheduleEvent).where(
                 and_(
-                    ProfessionalEvent.id == event_id,
-                    ProfessionalEvent.professional_id == professional_id,
+                    ScheduleEvent.id == event_id,
+                    ScheduleEvent.professional_id == professional_id,
                 )
             )
         )
@@ -138,7 +154,7 @@ class ProfessionalEventsService:
         include_cancelled: bool = False,
         limit: int = 100,
         offset: int = 0,
-    ) -> tuple[list[ProfessionalEvent], int]:
+    ) -> tuple[list[ScheduleEvent], int]:
         """
         List events for a professional with optional filters.
 
@@ -156,30 +172,30 @@ class ProfessionalEventsService:
         Returns:
             Tuple of (list of events, total count)
         """
-        # Build base query
-        conditions = [ProfessionalEvent.professional_id == professional_id]
+        # Build base query for professional events
+        conditions = [ScheduleEvent.professional_id == professional_id]
 
         if start_date:
-            conditions.append(ProfessionalEvent.end_time >= start_date)
+            conditions.append(ScheduleEvent.end_time >= start_date)
         if end_date:
-            conditions.append(ProfessionalEvent.start_time <= end_date)
+            conditions.append(ScheduleEvent.start_time <= end_date)
         if event_type:
-            conditions.append(ProfessionalEvent.event_type == event_type)
+            conditions.append(ScheduleEvent.professional_event_type == event_type)
         if family_file_id:
-            conditions.append(ProfessionalEvent.family_file_id == family_file_id)
+            conditions.append(ScheduleEvent.family_file_id == family_file_id)
         if not include_cancelled:
-            conditions.append(ProfessionalEvent.is_cancelled == False)
+            conditions.append(ScheduleEvent.status != "cancelled")
 
         # Get total count
-        count_query = select(func.count()).select_from(ProfessionalEvent).where(and_(*conditions))
+        count_query = select(func.count()).select_from(ScheduleEvent).where(and_(*conditions))
         total_result = await db.execute(count_query)
         total_count = total_result.scalar() or 0
 
         # Get events
         query = (
-            select(ProfessionalEvent)
+            select(ScheduleEvent)
             .where(and_(*conditions))
-            .order_by(ProfessionalEvent.start_time)
+            .order_by(ScheduleEvent.start_time)
             .offset(offset)
             .limit(limit)
         )
@@ -196,7 +212,7 @@ class ProfessionalEventsService:
         professional_id: str,
         update_data: ProfessionalEventUpdate,
         check_conflicts: bool = True,
-    ) -> tuple[Optional[ProfessionalEvent], list[EventConflict]]:
+    ) -> tuple[Optional[ScheduleEvent], list[EventConflict]]:
         """
         Update an existing event.
 
@@ -232,15 +248,25 @@ class ProfessionalEventsService:
                 exclude_event_id=event_id,
             )
 
-        # Update fields
+        # Update fields from update_data
         update_dict = update_data.model_dump(exclude_unset=True)
         for field, value in update_dict.items():
-            if hasattr(event, field):
+            if field == "event_type":
+                # Map to professional_event_type
+                event.professional_event_type = value
+                event.event_type = value
+            elif field == "is_cancelled" and value:
+                event.status = "cancelled"
+                event.cancelled_at = datetime.utcnow()
+            elif field == "parent_visibility":
+                event.parent_visibility = value
+                # Update visibility for parent calendar
+                if value == "none":
+                    event.visibility = "private"
+                else:
+                    event.visibility = "co_parent"
+            elif hasattr(event, field):
                 setattr(event, field, value)
-
-        # Handle cancellation
-        if update_data.is_cancelled and not event.cancelled_at:
-            event.cancelled_at = datetime.utcnow()
 
         await db.commit()
         await db.refresh(event)
@@ -278,7 +304,7 @@ class ProfessionalEventsService:
         event_id: str,
         professional_id: str,
         reason: Optional[str] = None,
-    ) -> Optional[ProfessionalEvent]:
+    ) -> Optional[ScheduleEvent]:
         """
         Cancel an event (soft delete).
 
@@ -295,7 +321,7 @@ class ProfessionalEventsService:
         if not event:
             return None
 
-        event.is_cancelled = True
+        event.status = "cancelled"
         event.cancelled_at = datetime.utcnow()
         event.cancellation_reason = reason
 
@@ -328,17 +354,17 @@ class ProfessionalEventsService:
             List of conflicting events
         """
         conditions = [
-            ProfessionalEvent.professional_id == professional_id,
-            ProfessionalEvent.is_cancelled == False,
+            ScheduleEvent.professional_id == professional_id,
+            ScheduleEvent.status != "cancelled",
             # Overlap condition: starts before proposed ends AND ends after proposed starts
-            ProfessionalEvent.start_time < end_time,
-            ProfessionalEvent.end_time > start_time,
+            ScheduleEvent.start_time < end_time,
+            ScheduleEvent.end_time > start_time,
         ]
 
         if exclude_event_id:
-            conditions.append(ProfessionalEvent.id != exclude_event_id)
+            conditions.append(ScheduleEvent.id != exclude_event_id)
 
-        query = select(ProfessionalEvent).where(and_(*conditions))
+        query = select(ScheduleEvent).where(and_(*conditions))
         result = await db.execute(query)
         conflicting_events = list(result.scalars().all())
 
@@ -350,7 +376,7 @@ class ProfessionalEventsService:
                     title=event.title,
                     start_time=event.start_time,
                     end_time=event.end_time,
-                    event_type=event.event_type,
+                    event_type=event.professional_event_type or event.event_type,
                     overlap_minutes=self._calculate_overlap_minutes(
                         start_time, end_time, event.start_time, event.end_time
                     ),
@@ -366,7 +392,7 @@ class ProfessionalEventsService:
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
         include_cancelled: bool = False,
-    ) -> list[ProfessionalEvent]:
+    ) -> list[ScheduleEvent]:
         """
         Get all professional events linked to a specific case.
 
@@ -380,19 +406,22 @@ class ProfessionalEventsService:
         Returns:
             List of events for the case
         """
-        conditions = [ProfessionalEvent.family_file_id == family_file_id]
+        conditions = [
+            ScheduleEvent.family_file_id == family_file_id,
+            ScheduleEvent.professional_id.isnot(None),  # Only professional events
+        ]
 
         if start_date:
-            conditions.append(ProfessionalEvent.end_time >= start_date)
+            conditions.append(ScheduleEvent.end_time >= start_date)
         if end_date:
-            conditions.append(ProfessionalEvent.start_time <= end_date)
+            conditions.append(ScheduleEvent.start_time <= end_date)
         if not include_cancelled:
-            conditions.append(ProfessionalEvent.is_cancelled == False)
+            conditions.append(ScheduleEvent.status != "cancelled")
 
         query = (
-            select(ProfessionalEvent)
+            select(ScheduleEvent)
             .where(and_(*conditions))
-            .order_by(ProfessionalEvent.start_time)
+            .order_by(ScheduleEvent.start_time)
         )
 
         result = await db.execute(query)
@@ -404,7 +433,7 @@ class ProfessionalEventsService:
         professional_id: str,
         days: int = 7,
         limit: int = 10,
-    ) -> list[ProfessionalEvent]:
+    ) -> list[ScheduleEvent]:
         """
         Get upcoming events for a professional.
 
@@ -462,14 +491,14 @@ class ProfessionalEventsService:
         # Count by type
         by_type = {}
         for event in events:
-            event_type = event.event_type
+            event_type = event.professional_event_type or event.event_type
             if event_type not in by_type:
                 by_type[event_type] = 0
             by_type[event_type] += 1
 
         # Count active vs cancelled
-        active_count = len([e for e in events if not e.is_cancelled])
-        cancelled_count = len([e for e in events if e.is_cancelled])
+        active_count = len([e for e in events if e.status != "cancelled"])
+        cancelled_count = len([e for e in events if e.status == "cancelled"])
 
         return {
             "total_events": total,
@@ -498,31 +527,31 @@ class ProfessionalEventsService:
     def _get_default_color(self, event_type: str) -> str:
         """Get default color for an event type."""
         color_map = {
-            EventType.MEETING.value: "#3B82F6",  # Blue
-            EventType.COURT_HEARING.value: "#DC2626",  # Red
-            EventType.VIDEO_CALL.value: "#10B981",  # Green
-            EventType.DOCUMENT_DEADLINE.value: "#F59E0B",  # Amber
-            EventType.CONSULTATION.value: "#8B5CF6",  # Purple
-            EventType.DEPOSITION.value: "#6366F1",  # Indigo
-            EventType.MEDIATION.value: "#EC4899",  # Pink
-            EventType.OTHER.value: "#6B7280",  # Gray
+            "meeting": "#3B82F6",  # Blue
+            "court_hearing": "#DC2626",  # Red
+            "video_call": "#10B981",  # Green
+            "document_deadline": "#F59E0B",  # Amber
+            "consultation": "#8B5CF6",  # Purple
+            "deposition": "#6366F1",  # Indigo
+            "mediation": "#EC4899",  # Pink
+            "other": "#6B7280",  # Gray
         }
-        return color_map.get(event_type, "#6B7280")
+        return color_map.get(event_type or "other", "#6B7280")
 
     async def to_response(
         self,
         db: AsyncSession,
-        event: ProfessionalEvent,
+        event: ScheduleEvent,
     ) -> ProfessionalEventResponse:
         """
-        Convert event model to response schema with resolved fields.
+        Convert ScheduleEvent model to ProfessionalEventResponse schema.
 
         Args:
             db: Database session
-            event: Event model
+            event: ScheduleEvent model
 
         Returns:
-            Event response with resolved family file title
+            ProfessionalEventResponse with resolved family file title
         """
         family_file_title = None
         if event.family_file_id:
@@ -533,11 +562,11 @@ class ProfessionalEventsService:
 
         return ProfessionalEventResponse(
             id=str(event.id),
-            professional_id=str(event.professional_id),
-            firm_id=str(event.firm_id) if event.firm_id else None,
+            professional_id=str(event.professional_id) if event.professional_id else None,
+            firm_id=None,  # Not stored in unified model
             title=event.title,
             description=event.description,
-            event_type=event.event_type,
+            event_type=event.professional_event_type or event.event_type,
             start_time=event.start_time,
             end_time=event.end_time,
             all_day=event.all_day,
@@ -546,16 +575,16 @@ class ProfessionalEventsService:
             virtual_meeting_url=event.virtual_meeting_url,
             family_file_id=str(event.family_file_id) if event.family_file_id else None,
             family_file_title=family_file_title,
-            attendee_ids=event.attendee_ids,
-            attendee_emails=event.attendee_emails,
+            attendee_ids=[],  # Not stored in unified model
+            attendee_emails=[],  # Not stored in unified model
             parent_visibility=event.parent_visibility,
-            is_recurring=event.is_recurring,
-            recurrence_rule=event.recurrence_rule,
-            parent_event_id=str(event.parent_event_id) if event.parent_event_id else None,
+            is_recurring=False,  # Not supported yet in unified model
+            recurrence_rule=None,
+            parent_event_id=None,
             reminder_minutes=event.reminder_minutes,
             notes=event.notes,
             color=event.color,
-            is_cancelled=event.is_cancelled,
+            is_cancelled=event.status == "cancelled",
             cancelled_at=event.cancelled_at,
             cancellation_reason=event.cancellation_reason,
         )
