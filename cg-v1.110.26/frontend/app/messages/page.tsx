@@ -39,7 +39,7 @@ interface FamilyFileWithAgreements {
  * The Neutral Zone - ARIA-Protected Co-Parenting Chat
  *
  * Design Philosophy: Safe space for communication
- * - User bubbles: Sage Green
+ * - User bubbles: Teal
  * - Partner bubbles: Neutral Grey
  * - ARIA Guardian: Glowing amber presence
  */
@@ -79,7 +79,7 @@ function MessageBubble({
       {/* Avatar */}
       {showAvatar && (
         <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-          isOwn ? 'bg-cg-sage' : 'bg-cg-slate'
+          isOwn ? 'bg-[#2C5F5D]' : 'bg-cg-slate'
         }`}>
           <span className="text-xs font-medium text-white">
             {isOwn ? 'You' : (userName?.charAt(0) || 'P')}
@@ -136,7 +136,7 @@ function MessageBubble({
           isOwn ? 'justify-end' : 'justify-start'
         }`}>
           <span>{formatTime(message.sent_at)}</span>
-          {isOwn && <CheckCheck className="h-3 w-3 text-cg-sage" />}
+          {isOwn && <CheckCheck className="h-3 w-3 text-[#2C5F5D]" />}
         </div>
       </div>
     </div>
@@ -147,8 +147,8 @@ function MessageBubble({
 function EmptyChatState({ onCompose }: { onCompose: () => void }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-      <div className="w-20 h-20 rounded-full bg-cg-sage-subtle flex items-center justify-center mb-6">
-        <Shield className="h-10 w-10 text-cg-sage" />
+      <div className="w-20 h-20 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center mb-6">
+        <Shield className="h-10 w-10 text-[#2C5F5D]" />
       </div>
       <h3 className="text-xl font-semibold text-foreground mb-2">
         The Neutral Zone
@@ -185,13 +185,13 @@ function ChatHeader({
           {onBack && (
             <button
               onClick={onBack}
-              className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-cg-sage-subtle transition-smooth flex-shrink-0"
+              className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-smooth flex-shrink-0"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
           )}
-          <div className="w-10 h-10 rounded-full bg-cg-sage-subtle flex items-center justify-center flex-shrink-0">
-            <Users className="h-5 w-5 text-cg-sage" />
+          <div className="w-10 h-10 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center flex-shrink-0">
+            <Users className="h-5 w-5 text-[#2C5F5D]" />
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="font-semibold text-foreground truncate">{familyFileName}</h2>
@@ -225,7 +225,7 @@ function ConversationSelector({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-cg-sage border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#2C5F5D] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -233,8 +233,8 @@ function ConversationSelector({
   if (familyFilesWithAgreements.length === 0) {
     return (
       <div className="text-center py-8 px-4">
-        <div className="w-16 h-16 rounded-full bg-cg-sage-subtle flex items-center justify-center mx-auto mb-4">
-          <Users className="h-8 w-8 text-cg-sage" />
+        <div className="w-16 h-16 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center mx-auto mb-4">
+          <Users className="h-8 w-8 text-[#2C5F5D]" />
         </div>
         <h3 className="font-medium text-foreground mb-2">No Family Files</h3>
         <p className="text-sm text-muted-foreground mb-4">
@@ -256,13 +256,13 @@ function ConversationSelector({
             onClick={() => onSelectFamilyFile(item.familyFile)}
             className={`w-full text-left p-3 rounded-xl transition-smooth ${
               selectedFamilyFile?.id === item.familyFile.id && !selectedAgreement
-                ? 'bg-cg-sage-subtle border border-cg-sage/30'
+                ? 'bg-[#2C5F5D]/10 border border-[#2C5F5D]/30'
                 : 'hover:bg-muted'
             }`}
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-cg-sage-subtle flex items-center justify-center flex-shrink-0">
-                <Users className="h-5 w-5 text-cg-sage" />
+              <div className="w-10 h-10 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center flex-shrink-0">
+                <Users className="h-5 w-5 text-[#2C5F5D]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-foreground truncate">{item.familyFile.title}</p>
@@ -282,7 +282,7 @@ function ConversationSelector({
                   onClick={() => onSelectAgreement(agreement)}
                   className={`w-full text-left p-2.5 rounded-lg transition-smooth flex items-center gap-2 ${
                     selectedAgreement?.id === agreement.id
-                      ? 'bg-cg-sage text-white'
+                      ? 'bg-[#2C5F5D] text-white'
                       : 'hover:bg-muted text-foreground'
                   }`}
                 >
@@ -307,7 +307,7 @@ function ConversationSelector({
                 <p className="text-xs text-muted-foreground mb-2">No agreements yet</p>
                 <Link
                   href={`/agreements?familyFileId=${item.familyFile.id}`}
-                  className="text-xs font-medium text-cg-sage hover:underline"
+                  className="text-xs font-medium text-[#2C5F5D] hover:underline"
                 >
                   Create Agreement
                 </Link>
@@ -583,8 +583,8 @@ function MessagesContent() {
                 >
                   <ArrowLeft className="h-5 w-5 text-muted-foreground" />
                 </button>
-                <h1 className="text-xl font-semibold text-foreground flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-cg-sage" />
+                <h1 className="text-xl font-semibold text-foreground flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <MessageSquare className="h-5 w-5 text-[#2C5F5D]" />
                   Comms
                 </h1>
               </div>
@@ -612,10 +612,10 @@ function MessagesContent() {
             {!selectedAgreement ? (
               /* No Agreement Selected */
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                <div className="w-24 h-24 rounded-full bg-cg-sage-subtle flex items-center justify-center mb-6">
-                  <Shield className="h-12 w-12 text-cg-sage" />
+                <div className="w-24 h-24 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center mb-6">
+                  <Shield className="h-12 w-12 text-[#2C5F5D]" />
                 </div>
-                <h2 className="text-2xl font-semibold text-foreground mb-3">
+                <h2 className="text-2xl font-semibold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   Welcome to The Neutral Zone
                 </h2>
                 <p className="text-muted-foreground max-w-md mb-2">
