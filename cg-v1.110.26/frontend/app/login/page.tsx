@@ -6,13 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { APIError } from '@/lib/api';
 import { signInWithGoogle, signInWithApple } from '@/lib/supabase';
-import { Loader2, Mail, Lock, ArrowRight, Leaf } from 'lucide-react';
-
-/* =============================================================================
-   LOGIN PAGE
-   Design: Organic Minimalist ("The Sanctuary of Truth")
-   Palette: Sage Green (#4A6C58), Slate Blue (#475569), Warm Sand
-   ============================================================================= */
+import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,7 +22,6 @@ export default function LoginPage() {
     setOauthLoading('google');
     try {
       await signInWithGoogle();
-      // Redirect happens automatically via Supabase OAuth
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
       setOauthLoading(null);
@@ -40,7 +33,6 @@ export default function LoginPage() {
     setOauthLoading('apple');
     try {
       await signInWithApple();
-      // Redirect happens automatically via Supabase OAuth
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in with Apple');
       setOauthLoading(null);
@@ -67,20 +59,37 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-cg-sand">
-      {/* Decorative Background Elements */}
+    <div className="min-h-screen flex flex-col bg-[#FFF8F3]">
+      {/* Organic decorative background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-cg-sage-subtle/50 to-transparent rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-cg-slate-subtle/30 to-transparent rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" />
+        <div
+          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl opacity-[0.04]"
+          style={{ background: 'radial-gradient(circle, #2C5F5D 0%, transparent 70%)' }}
+        />
+        <div
+          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.03]"
+          style={{ background: 'radial-gradient(circle, #D97757 0%, transparent 70%)' }}
+        />
       </div>
 
       {/* Header */}
       <header className="relative z-10 p-6">
-        <Link href="/" className="inline-flex items-center gap-2 text-foreground hover:text-cg-sage transition-colors">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cg-sage to-cg-sage-dark flex items-center justify-center">
-            <Leaf className="h-5 w-5 text-white" />
+        <Link
+          href="/"
+          className="inline-flex items-center gap-3 text-[#2C3E50] hover:text-[#2C5F5D] transition-colors group"
+        >
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2C5F5D] to-[#1e4442] flex items-center justify-center shadow-sm">
+            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v12M6 12h12"/>
+            </svg>
           </div>
-          <span className="font-serif text-xl font-semibold">CommonGround</span>
+          <span
+            className="text-xl font-bold tracking-tight"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            CommonGround
+          </span>
         </Link>
       </header>
 
@@ -88,21 +97,24 @@ export default function LoginPage() {
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {/* Welcome Card */}
-          <div className="bg-card rounded-3xl shadow-lg border border-border/50 p-8 sm:p-10">
+          <div className="bg-white rounded-3xl shadow-xl border border-[#2C5F5D]/10 p-8 sm:p-10">
             {/* Header */}
             <div className="text-center mb-8">
-              <h1 className="font-serif text-2xl sm:text-3xl font-bold text-foreground mb-2">
+              <h1
+                className="text-3xl sm:text-4xl font-bold text-[#2C3E50] mb-3"
+                style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              >
                 Welcome Back
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-gray-600 text-base">
                 Sign in to continue your co-parenting journey
               </p>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-cg-error-subtle border border-cg-error/20 rounded-xl">
-                <p className="text-sm text-cg-error font-medium">{error}</p>
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-sm text-red-700 font-medium">{error}</p>
               </div>
             )}
 
@@ -110,12 +122,12 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email Field */}
               <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-medium text-foreground">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
                   Email
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-muted-foreground" />
+                    <Mail className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
                     id="email"
@@ -125,7 +137,7 @@ export default function LoginPage() {
                     placeholder="you@example.com"
                     required
                     disabled={isLoading}
-                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-cg-sage focus:border-transparent transition-all disabled:opacity-50"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2C5F5D] focus:ring-2 focus:ring-[#2C5F5D]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -133,19 +145,19 @@ export default function LoginPage() {
               {/* Password Field */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="block text-sm font-medium text-foreground">
+                  <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
                     Password
                   </label>
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-cg-sage hover:text-cg-sage-dark transition-colors"
+                    className="text-sm text-[#2C5F5D] hover:text-[#1e4442] font-medium transition-colors"
                   >
                     Forgot password?
                   </Link>
                 </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-muted-foreground" />
+                    <Lock className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
                     id="password"
@@ -155,7 +167,7 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     required
                     disabled={isLoading}
-                    className="w-full pl-12 pr-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-cg-sage focus:border-transparent transition-all disabled:opacity-50"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2C5F5D] focus:ring-2 focus:ring-[#2C5F5D]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -164,7 +176,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading || oauthLoading !== null}
-                className="w-full py-3.5 px-6 rounded-xl bg-cg-sage hover:bg-cg-sage-dark text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+                className="w-full py-4 px-6 rounded-xl bg-[#2C5F5D] hover:bg-[#1e4442] text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
               >
                 {isLoading ? (
                   <>
@@ -180,13 +192,13 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* OAuth Divider */}
-            <div className="relative my-6">
+            {/* Divider */}
+            <div className="relative my-7">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
+                <div className="w-full border-t-2 border-gray-100" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-card px-4 text-sm text-muted-foreground">
+                <span className="bg-white px-4 text-sm text-gray-500 font-medium">
                   or continue with
                 </span>
               </div>
@@ -199,10 +211,10 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading || oauthLoading !== null}
-                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-background hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {oauthLoading === 'google' ? (
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
                 ) : (
                   <svg className="h-5 w-5" viewBox="0 0 24 24">
                     <path
@@ -223,7 +235,7 @@ export default function LoginPage() {
                     />
                   </svg>
                 )}
-                <span className="text-sm font-medium text-foreground">Google</span>
+                <span className="text-sm font-semibold text-gray-700">Google</span>
               </button>
 
               {/* Apple Sign In */}
@@ -231,26 +243,26 @@ export default function LoginPage() {
                 type="button"
                 onClick={handleAppleSignIn}
                 disabled={isLoading || oauthLoading !== null}
-                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-background hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl border-2 border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {oauthLoading === 'apple' ? (
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
                 ) : (
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="h-5 w-5 text-gray-900" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
                   </svg>
                 )}
-                <span className="text-sm font-medium text-foreground">Apple</span>
+                <span className="text-sm font-semibold text-gray-700">Apple</span>
               </button>
             </div>
 
-            {/* Divider */}
+            {/* Register Divider */}
             <div className="relative my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
+                <div className="w-full border-t-2 border-gray-100" />
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-card px-4 text-sm text-muted-foreground">
+                <span className="bg-white px-4 text-sm text-gray-500 font-medium">
                   New to CommonGround?
                 </span>
               </div>
@@ -259,7 +271,7 @@ export default function LoginPage() {
             {/* Register Link */}
             <Link
               href="/register"
-              className="block w-full py-3.5 px-6 rounded-xl border-2 border-cg-sage text-cg-sage hover:bg-cg-sage-subtle font-medium transition-all text-center"
+              className="block w-full py-4 px-6 rounded-xl border-2 border-[#2C5F5D] text-[#2C5F5D] hover:bg-[#2C5F5D] hover:text-white font-semibold transition-all text-center"
             >
               Create an Account
             </Link>
@@ -267,25 +279,25 @@ export default function LoginPage() {
 
           {/* Trust Indicators */}
           <div className="mt-8 text-center">
-            <p className="text-sm text-muted-foreground mb-4">Trusted by thousands of co-parents</p>
-            <div className="flex items-center justify-center gap-6 text-muted-foreground/60">
-              <div className="flex items-center gap-1.5">
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+            <p className="text-sm text-gray-600 mb-4 font-medium">Trusted by thousands of co-parents</p>
+            <div className="flex items-center justify-center gap-6 text-gray-500">
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-[#2C5F5D]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span className="text-xs">Secure</span>
+                <span className="text-xs font-medium">Secure</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-[#D97757]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span className="text-xs">Court-Ready</span>
+                <span className="text-xs font-medium">Court-Ready</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-[#2C5F5D]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                 </svg>
-                <span className="text-xs">Child-Focused</span>
+                <span className="text-xs font-medium">Child-Focused</span>
               </div>
             </div>
           </div>
@@ -294,10 +306,10 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 text-center">
-        <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-          <Link href="/legal/privacy" className="hover:text-cg-sage transition-colors">Privacy</Link>
-          <Link href="/legal/terms" className="hover:text-cg-sage transition-colors">Terms</Link>
-          <Link href="/help" className="hover:text-cg-sage transition-colors">Help</Link>
+        <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
+          <Link href="/legal/privacy" className="hover:text-[#2C5F5D] transition-colors font-medium">Privacy</Link>
+          <Link href="/legal/terms" className="hover:text-[#2C5F5D] transition-colors font-medium">Terms</Link>
+          <Link href="/help" className="hover:text-[#2C5F5D] transition-colors font-medium">Help</Link>
         </div>
       </footer>
     </div>
