@@ -1,4 +1,5 @@
-import { Metadata } from 'next';
+'use client';
+
 import Link from 'next/link';
 import {
   Shield,
@@ -11,11 +12,6 @@ import {
   Check,
   Sparkles,
 } from 'lucide-react';
-
-export const metadata: Metadata = {
-  title: 'For Parents | CommonGround - Conflict-Free Co-Parenting',
-  description: 'End the chaos. Safe messaging, automatic expense tracking, and court-ready documentation. Join 10,000+ parents creating peace for their children.',
-};
 
 export default function ParentsLandingPage() {
   return (

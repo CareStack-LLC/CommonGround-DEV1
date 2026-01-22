@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/auth-context';
+import { useAuth } from '@/lib/auth-context';
 import { useEffect } from 'react';
 import {
   MessageSquare,

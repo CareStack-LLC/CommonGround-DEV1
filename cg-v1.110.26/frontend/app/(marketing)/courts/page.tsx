@@ -1,4 +1,5 @@
-import { Metadata } from 'next';
+'use client';
+
 import Link from 'next/link';
 import {
   Scale,
@@ -18,11 +19,6 @@ import {
   Fingerprint,
   Archive,
 } from 'lucide-react';
-
-export const metadata: Metadata = {
-  title: 'For Courts | CommonGround - Evidence-Based Custody Decisions',
-  description: 'Objective, verified data for family court decisions. Cryptographically secured evidence, comprehensive timelines, and unbiased reporting for GALs and judicial professionals.',
-};
 
 export default function CourtsLandingPage() {
   return (

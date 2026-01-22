@@ -1,4 +1,5 @@
-import { Metadata } from 'next';
+'use client';
+
 import Link from 'next/link';
 import {
   Briefcase,
@@ -17,11 +18,6 @@ import {
   FileCheck,
   Scale,
 } from 'lucide-react';
-
-export const metadata: Metadata = {
-  title: 'For Attorneys | CommonGround - Family Law Practice Platform',
-  description: 'Streamline your family law practice. Save 10+ hours/week with automated case management, client communication, and court-ready evidence exports.',
-};
 
 export default function LawyersLandingPage() {
   return (
