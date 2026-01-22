@@ -20,6 +20,7 @@ import {
   AlertCircle,
   FileSignature,
   Loader2,
+  ChevronLeft,
 } from 'lucide-react';
 
 interface FamilyFileAgreement {
@@ -39,8 +40,17 @@ interface FamilyFileWithAgreements extends FamilyFileDetail {
   agreements?: FamilyFileAgreement[];
 }
 
+/**
+ * SharedCare Agreements - Legal Document Management
+ *
+ * Design Philosophy: Professional, trustworthy, organized
+ * - Clear status indicators with contextual colors
+ * - Clean card-based layout for easy scanning
+ * - Prominent ARIA vs Wizard choice
+ */
+
 /* =============================================================================
-   HELPER COMPONENTS - Editorial Aesthetic
+   HELPER COMPONENTS
    ============================================================================= */
 
 function FamilyFileCard({
@@ -55,30 +65,34 @@ function FamilyFileCard({
   return (
     <button
       onClick={onSelect}
-      className={`w-full text-left p-4 rounded-xl transition-all duration-200 ${
-        isSelected
-          ? 'bg-cg-sage-subtle border-2 border-cg-sage shadow-sm'
-          : 'bg-card border-2 border-transparent hover:bg-accent/50 hover:border-border'
-      }`}
+      className={`
+        w-full text-left p-4 rounded-xl transition-all duration-200
+        ${isSelected
+          ? 'bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 border-2 border-[#2C5F5D] shadow-sm'
+          : 'bg-white border-2 border-slate-200 hover:border-slate-300 hover:shadow-sm'
+        }
+      `}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
-            className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-              isSelected ? 'bg-cg-sage text-white' : 'bg-muted text-muted-foreground'
+            className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-sm ${
+              isSelected
+                ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white'
+                : 'bg-slate-100 text-slate-600'
             }`}
           >
             <FolderOpen className="h-5 w-5" />
           </div>
           <div>
-            <p className={`font-medium ${isSelected ? 'text-cg-sage' : 'text-foreground'}`}>
+            <p className={`font-semibold ${isSelected ? 'text-[#2C5F5D]' : 'text-slate-900'}`}>
               {familyFile.title}
             </p>
-            <p className="text-xs text-muted-foreground">{familyFile.family_file_number}</p>
+            <p className="text-xs text-slate-500">{familyFile.family_file_number}</p>
           </div>
         </div>
         {familyFile.has_court_case && (
-          <span className="px-2 py-1 bg-cg-amber-subtle text-cg-amber text-xs font-medium rounded-full flex items-center gap-1">
+          <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full flex items-center gap-1">
             <Scale className="h-3 w-3" />
             Court
           </span>
@@ -92,32 +106,32 @@ function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { icon: React.ReactNode; className: string; label: string }> = {
     active: {
       icon: <CheckCircle className="h-3.5 w-3.5" />,
-      className: 'bg-cg-success-subtle text-cg-success border-cg-success/20',
+      className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
       label: 'Active',
     },
     approved: {
       icon: <CheckCircle className="h-3.5 w-3.5" />,
-      className: 'bg-cg-success-subtle text-cg-success border-cg-success/20',
+      className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
       label: 'Approved',
     },
     pending_approval: {
       icon: <Clock className="h-3.5 w-3.5" />,
-      className: 'bg-cg-amber-subtle text-cg-amber border-cg-amber/20',
+      className: 'bg-amber-100 text-amber-700 border-amber-200',
       label: 'Pending Approval',
     },
     draft: {
       icon: <FileText className="h-3.5 w-3.5" />,
-      className: 'bg-cg-slate-subtle text-cg-slate border-cg-slate/20',
+      className: 'bg-slate-100 text-slate-700 border-slate-200',
       label: 'Draft',
     },
     rejected: {
       icon: <AlertCircle className="h-3.5 w-3.5" />,
-      className: 'bg-cg-error-subtle text-cg-error border-cg-error/20',
+      className: 'bg-red-100 text-red-700 border-red-200',
       label: 'Rejected',
     },
     expired: {
       icon: <AlertCircle className="h-3.5 w-3.5" />,
-      className: 'bg-cg-warning-subtle text-cg-warning border-cg-warning/20',
+      className: 'bg-orange-100 text-orange-700 border-orange-200',
       label: 'Expired',
     },
   };
@@ -126,7 +140,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border ${className}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border ${className}`}
     >
       {icon}
       {label}
@@ -144,19 +158,23 @@ function AgreementCard({
   return (
     <button
       onClick={onClick}
-      className="w-full text-left cg-card-interactive p-5 group"
+      className="
+        w-full text-left bg-white border border-slate-200 rounded-2xl p-5
+        hover:shadow-lg hover:border-slate-300 transition-all duration-200
+        group
+      "
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className="w-10 h-10 rounded-lg bg-cg-sage-subtle flex items-center justify-center flex-shrink-0">
-            <FileSignature className="h-5 w-5 text-cg-sage" />
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <FileSignature className="h-5 w-5 text-[#2C5F5D]" />
           </div>
-          <div className="min-w-0">
-            <h3 className="font-serif font-semibold text-foreground truncate group-hover:text-cg-sage transition-colors">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-slate-900 truncate group-hover:text-[#2C5F5D] transition-colors">
               {agreement.title}
             </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5 font-medium">
               {agreement.agreement_number} • Version {agreement.version}
             </p>
           </div>
@@ -166,7 +184,7 @@ function AgreementCard({
 
       {/* Details */}
       <div className="pl-[52px]">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-slate-600 font-medium">
           Created {new Date(agreement.created_at).toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
@@ -176,22 +194,22 @@ function AgreementCard({
 
         {/* Pending Approval Status */}
         {agreement.status === 'pending_approval' && (
-          <div className="mt-3 p-3 bg-cg-amber-subtle/50 rounded-lg border border-cg-amber/10">
-            <p className="text-xs font-medium text-cg-amber mb-2">Awaiting Approvals</p>
-            <div className="flex gap-4 text-xs text-cg-amber/80">
-              <span className="flex items-center gap-1.5">
+          <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+            <p className="text-xs font-semibold text-amber-800 mb-2">Awaiting Approvals</p>
+            <div className="flex gap-4 text-xs text-amber-700">
+              <span className="flex items-center gap-1.5 font-medium">
                 {agreement.petitioner_approved ? (
-                  <CheckCircle className="h-3.5 w-3.5 text-cg-success" />
+                  <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
                 ) : (
-                  <div className="h-3.5 w-3.5 rounded-full border border-current" />
+                  <div className="h-3.5 w-3.5 rounded-full border-2 border-current" />
                 )}
                 Parent A
               </span>
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.5 font-medium">
                 {agreement.respondent_approved ? (
-                  <CheckCircle className="h-3.5 w-3.5 text-cg-success" />
+                  <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
                 ) : (
-                  <div className="h-3.5 w-3.5 rounded-full border border-current" />
+                  <div className="h-3.5 w-3.5 rounded-full border-2 border-current" />
                 )}
                 Parent B
               </span>
@@ -202,9 +220,9 @@ function AgreementCard({
         {/* Active/Approved Status */}
         {(agreement.status === 'approved' || agreement.status === 'active') &&
           agreement.effective_date && (
-            <div className="mt-3 p-3 bg-cg-success-subtle/50 rounded-lg border border-cg-success/10">
-              <p className="text-xs text-cg-success">
-                <span className="font-medium">Effective:</span>{' '}
+            <div className="mt-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+              <p className="text-xs text-emerald-700">
+                <span className="font-semibold">Effective:</span>{' '}
                 {new Date(agreement.effective_date).toLocaleDateString('en-US', {
                   month: 'long',
                   day: 'numeric',
@@ -216,9 +234,9 @@ function AgreementCard({
       </div>
 
       {/* Footer */}
-      <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Click to view details</span>
-        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-cg-sage group-hover:translate-x-1 transition-all" />
+      <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
+        <span className="text-xs text-slate-500 font-medium">Click to view details</span>
+        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-[#2C5F5D] group-hover:translate-x-1 transition-all" />
       </div>
     </button>
   );
@@ -233,18 +251,26 @@ function EmptyAgreementsState({
 }) {
   return (
     <div className="text-center py-16 px-6">
-      <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-cg-sage-subtle to-cg-amber-subtle flex items-center justify-center">
-        <FileSignature className="h-10 w-10 text-cg-sage" />
+      <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-sm">
+        <FileSignature className="h-12 w-12 text-[#2C5F5D]" />
       </div>
-      <h3 className="font-serif text-xl font-semibold text-foreground mb-2">
+      <h3 className="text-xl font-bold text-slate-900 mb-2">
         No Agreements Yet
       </h3>
-      <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+      <p className="text-slate-600 mb-8 max-w-sm mx-auto leading-relaxed">
         Create your first SharedCare Agreement to establish clear guidelines for your co-parenting arrangement.
       </p>
       {canCreate && (
-        <button onClick={onCreate} className="cg-btn-primary">
-          <Plus className="h-4 w-4 mr-2" />
+        <button
+          onClick={onCreate}
+          className="
+            inline-flex items-center gap-2 px-6 py-3
+            bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+            rounded-xl font-medium shadow-md hover:shadow-lg
+            transition-all duration-200 hover:-translate-y-0.5
+          "
+        >
+          <Plus className="h-4 w-4" />
           Create First Agreement
         </button>
       )}
@@ -268,14 +294,14 @@ function BuilderChoiceModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-card rounded-2xl shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300">
         {/* Header */}
-        <div className="p-6 border-b border-border">
-          <h2 className="font-serif text-2xl font-semibold text-foreground">
+        <div className="p-6 border-b border-slate-200">
+          <h2 className="text-2xl font-bold text-slate-900">
             Create Your Agreement
           </h2>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-slate-600 mt-1">
             Choose how you'd like to build your parenting agreement
           </p>
         </div>
@@ -286,32 +312,37 @@ function BuilderChoiceModal({
           <button
             onClick={onSelectAria}
             disabled={isCreating}
-            className="w-full text-left p-5 border-2 border-cg-amber/30 rounded-xl hover:border-cg-amber hover:bg-cg-amber-subtle/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="
+              w-full text-left p-5 border-2 border-amber-200 rounded-xl
+              hover:border-amber-400 hover:bg-amber-50
+              transition-all disabled:opacity-50 disabled:cursor-not-allowed
+              group shadow-sm hover:shadow-md
+            "
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-cg-amber flex items-center justify-center text-white flex-shrink-0 aria-glow">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white flex-shrink-0 shadow-md aria-glow">
                 <Sparkles className="h-6 w-6" />
               </div>
               <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground group-hover:text-cg-amber transition-colors">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-bold text-slate-900 group-hover:text-amber-700 transition-colors">
                     Talk to ARIA
                   </h3>
-                  <span className="px-2 py-0.5 bg-cg-amber-subtle text-cg-amber text-xs font-medium rounded-full">
+                  <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
                     Recommended
                   </span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   Have a natural conversation about your custody arrangement. ARIA will ask questions and create your agreement.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <span className="px-2 py-1 bg-cg-amber-subtle text-cg-amber text-xs rounded-full">
+                  <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
                     Conversational
                   </span>
-                  <span className="px-2 py-1 bg-cg-amber-subtle text-cg-amber text-xs rounded-full">
+                  <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
                     Faster
                   </span>
-                  <span className="px-2 py-1 bg-cg-amber-subtle text-cg-amber text-xs rounded-full">
+                  <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
                     AI-Powered
                   </span>
                 </div>
@@ -323,27 +354,32 @@ function BuilderChoiceModal({
           <button
             onClick={onSelectWizard}
             disabled={isCreating}
-            className="w-full text-left p-5 border-2 border-cg-sage/30 rounded-xl hover:border-cg-sage hover:bg-cg-sage-subtle/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="
+              w-full text-left p-5 border-2 border-[#2C5F5D]/30 rounded-xl
+              hover:border-[#2C5F5D] hover:bg-[#2C5F5D]/5
+              transition-all disabled:opacity-50 disabled:cursor-not-allowed
+              group shadow-sm hover:shadow-md
+            "
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-cg-sage flex items-center justify-center text-white flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center text-white flex-shrink-0 shadow-md">
                 <FileText className="h-6 w-6" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-foreground group-hover:text-cg-sage transition-colors">
+                <h3 className="font-bold text-slate-900 group-hover:text-[#2C5F5D] transition-colors mb-1">
                   Step-by-Step Wizard
                 </h3>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   Fill out structured forms with clear sections for custody schedules, holidays, and more.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <span className="px-2 py-1 bg-cg-sage-subtle text-cg-sage text-xs rounded-full">
+                  <span className="px-2 py-1 bg-[#2C5F5D]/10 text-[#2C5F5D] text-xs font-medium rounded-full">
                     Structured
                   </span>
-                  <span className="px-2 py-1 bg-cg-sage-subtle text-cg-sage text-xs rounded-full">
+                  <span className="px-2 py-1 bg-[#2C5F5D]/10 text-[#2C5F5D] text-xs font-medium rounded-full">
                     Traditional
                   </span>
-                  <span className="px-2 py-1 bg-cg-sage-subtle text-cg-sage text-xs rounded-full">
+                  <span className="px-2 py-1 bg-[#2C5F5D]/10 text-[#2C5F5D] text-xs font-medium rounded-full">
                     Detailed
                   </span>
                 </div>
@@ -353,11 +389,16 @@ function BuilderChoiceModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-border bg-muted/30 rounded-b-2xl">
+        <div className="p-6 border-t border-slate-200 bg-slate-50 rounded-b-2xl">
           <button
             onClick={onClose}
             disabled={isCreating}
-            className="w-full cg-btn-secondary"
+            className="
+              w-full px-4 py-2.5 bg-white border border-slate-300
+              text-slate-700 rounded-xl font-medium
+              hover:bg-slate-50 transition-colors
+              disabled:opacity-50 disabled:cursor-not-allowed
+            "
           >
             Cancel
           </button>
@@ -469,48 +510,60 @@ function AgreementsListContent() {
   const canCreateAgreement = selectedFamilyFile && !selectedFamilyFile.has_court_case;
 
   return (
-    <div className="min-h-screen bg-background pb-20 lg:pb-0">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 pb-20 lg:pb-0">
       <Navigation />
 
       {/* Page Header */}
-      <div className="bg-card border-b border-border">
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
-              <FileSignature className="h-6 w-6 text-cg-sage" />
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="p-2 -ml-2 rounded-xl hover:bg-slate-100 transition-colors"
+              aria-label="Go back"
+            >
+              <ChevronLeft className="h-5 w-5 text-slate-600" />
+            </button>
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center shadow-md">
+              <FileSignature className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="font-serif text-2xl font-semibold text-foreground">
+              <h1 className="text-3xl font-bold text-slate-900">
                 Agreements
               </h1>
-              <p className="text-sm text-muted-foreground">
-                The Living Documents that guide your co-parenting
+              <p className="text-sm text-slate-600">
+                Living documents that guide your co-parenting
               </p>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar - Family File Selection */}
           <div className="w-full lg:w-80 lg:flex-shrink-0">
-            <div className="cg-card p-5 sticky top-8">
-              <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <FolderOpen className="h-4 w-4 text-cg-sage" />
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sticky top-8">
+              <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                <FolderOpen className="h-4 w-4 text-[#2C5F5D]" />
                 Family Files
               </h2>
 
               {isLoadingFamilyFiles ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-cg-sage" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#2C5F5D]" />
                 </div>
               ) : familyFiles.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-sm text-muted-foreground mb-4">No family files</p>
+                  <p className="text-sm text-slate-600 mb-4">No family files</p>
                   <Link href="/family-files/new">
-                    <button className="cg-btn-primary text-sm py-2">
-                      <Plus className="h-4 w-4 mr-1" />
+                    <button className="
+                      inline-flex items-center gap-2 px-4 py-2 text-sm
+                      bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+                      rounded-xl font-medium shadow-md hover:shadow-lg
+                      transition-all duration-200 hover:-translate-y-0.5
+                    ">
+                      <Plus className="h-4 w-4" />
                       Create Family File
                     </button>
                   </Link>
@@ -533,15 +586,15 @@ function AgreementsListContent() {
           {/* Main Area - Agreements */}
           <div className="flex-1 min-w-0">
             {!selectedFamilyFile ? (
-              <div className="cg-card">
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
                 <div className="text-center py-16 px-6">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                    <FileText className="h-8 w-8 text-muted-foreground" />
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+                    <FileText className="h-10 w-10 text-slate-400" />
                   </div>
-                  <h3 className="font-serif text-lg font-semibold text-foreground mb-2">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">
                     Select a Family File
                   </h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-slate-600">
                     Choose a family file from the sidebar to view and manage agreements
                   </p>
                 </div>
@@ -550,14 +603,14 @@ function AgreementsListContent() {
               <div className="space-y-6">
                 {/* Court Case Notice */}
                 {selectedFamilyFile.has_court_case && (
-                  <div className="cg-card p-5 bg-cg-amber-subtle/50 border-cg-amber/20">
+                  <div className="bg-white rounded-2xl border border-amber-200 shadow-sm p-5 bg-gradient-to-r from-amber-50 to-transparent">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-cg-amber/20 flex items-center justify-center flex-shrink-0">
-                        <Scale className="h-5 w-5 text-cg-amber" />
+                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <Scale className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">Court Custody Case Active</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <h3 className="font-semibold text-slate-900">Court Custody Case Active</h3>
+                        <p className="text-sm text-slate-600 mt-1 leading-relaxed">
                           This family file has an active Court Custody Case. New SharedCare Agreements cannot be created. Use QuickAccords for situational agreements.
                         </p>
                       </div>
@@ -566,36 +619,41 @@ function AgreementsListContent() {
                 )}
 
                 {/* Family File Header */}
-                <div className="cg-card p-5">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
-                      <h2 className="font-serif text-xl font-semibold text-foreground">
+                      <h2 className="text-xl font-bold text-slate-900">
                         {selectedFamilyFile.title}
                       </h2>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-slate-600">
                         SharedCare Agreements
                       </p>
                     </div>
                     <button
                       onClick={() => setShowBuilderChoice(true)}
                       disabled={isCreatingAgreement || !canCreateAgreement}
-                      className={`cg-btn-primary ${
-                        !canCreateAgreement ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
+                      className={`
+                        inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium
+                        transition-all duration-200
+                        ${!canCreateAgreement || isCreatingAgreement
+                          ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                          : 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
+                        }
+                      `}
                     >
                       {isCreatingAgreement ? (
                         <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          <Loader2 className="h-4 w-4 animate-spin" />
                           Creating...
                         </>
                       ) : !canCreateAgreement ? (
                         <>
-                          <Lock className="h-4 w-4 mr-2" />
+                          <Lock className="h-4 w-4" />
                           Locked
                         </>
                       ) : (
                         <>
-                          <Plus className="h-4 w-4 mr-2" />
+                          <Plus className="h-4 w-4" />
                           Create Agreement
                         </>
                       )}
@@ -607,28 +665,28 @@ function AgreementsListContent() {
                 {isLoadingAgreements && (
                   <div className="flex items-center justify-center py-16">
                     <div className="text-center">
-                      <Loader2 className="h-10 w-10 animate-spin text-cg-sage mx-auto" />
-                      <p className="mt-4 text-muted-foreground">Loading agreements...</p>
+                      <Loader2 className="h-10 w-10 animate-spin text-[#2C5F5D] mx-auto" />
+                      <p className="mt-4 text-slate-600 font-medium">Loading agreements...</p>
                     </div>
                   </div>
                 )}
 
                 {/* Error State */}
                 {error && (
-                  <div className="cg-card p-5 bg-cg-error-subtle border-cg-error/20">
+                  <div className="bg-white rounded-2xl border border-red-200 shadow-sm p-5 bg-gradient-to-r from-red-50 to-transparent">
                     <div className="flex items-start gap-3">
-                      <AlertCircle className="h-5 w-5 text-cg-error flex-shrink-0" />
-                      <div>
-                        <p className="font-medium text-cg-error">Failed to load agreements</p>
-                        <p className="text-sm text-cg-error/80 mt-1">{error}</p>
+                      <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-semibold text-red-900">Failed to load agreements</p>
+                        <p className="text-sm text-red-700 mt-1">{error}</p>
+                        <button
+                          onClick={() => loadAgreements(selectedFamilyFile.id)}
+                          className="mt-3 px-4 py-2 bg-white border border-red-300 text-red-700 rounded-xl text-sm font-medium hover:bg-red-50 transition-colors"
+                        >
+                          Try Again
+                        </button>
                       </div>
                     </div>
-                    <button
-                      onClick={() => loadAgreements(selectedFamilyFile.id)}
-                      className="mt-4 cg-btn-secondary text-sm"
-                    >
-                      Try Again
-                    </button>
                   </div>
                 )}
 
@@ -636,7 +694,7 @@ function AgreementsListContent() {
                 {!isLoadingAgreements &&
                   !error &&
                   (!selectedFamilyFile.agreements || selectedFamilyFile.agreements.length === 0) && (
-                    <div className="cg-card">
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
                       <EmptyAgreementsState
                         canCreate={canCreateAgreement || false}
                         onCreate={() => setShowBuilderChoice(true)}
