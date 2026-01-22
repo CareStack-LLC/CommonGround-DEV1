@@ -29,6 +29,7 @@ import {
   MapPin,
   CheckCircle2,
   AlertCircle,
+  Sparkles,
 } from 'lucide-react';
 
 interface FamilyFileWithAgreements {
@@ -37,15 +38,15 @@ interface FamilyFileWithAgreements {
 }
 
 /**
- * TimeBridge - Shared Calendar View
+ * TimeBridge - Shared Calendar & Schedule Coordination
  *
- * Design Philosophy: "Google Calendar meets Airbnb"
- * - Split view: Month + Agenda
- * - Custody Ribbon showing mom/dad days
- * - Clean, organized, clarity-first
+ * Design Philosophy: Clean, organized, clarity-first calendar view
+ * - Split view: Month calendar + event management
+ * - Custody visualization showing parenting time
+ * - Professional, polished interface for busy parents
  */
 
-// Tab Button Component
+// Tab Button Component with enhanced styling
 function TabButton({
   active,
   icon: Icon,
@@ -62,26 +63,34 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`relative flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-sm font-medium rounded-xl transition-smooth flex-shrink-0 ${
-        active
-          ? 'bg-cg-sage text-white'
-          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-      }`}
+      className={`
+        group relative flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium
+        rounded-xl transition-all duration-200 flex-shrink-0
+        ${
+          active
+            ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white shadow-sm'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+        }
+      `}
     >
-      <Icon className="h-4 w-4 flex-shrink-0" />
-      <span className="hidden sm:inline whitespace-nowrap">{label}</span>
+      <Icon className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${active ? '' : 'group-hover:scale-110'}`} />
+      <span className="hidden sm:inline whitespace-nowrap font-medium">{label}</span>
       {badge && (
-        <span className={`hidden sm:inline text-xs px-1.5 py-0.5 rounded-md ${
-          active ? 'bg-white/20' : 'bg-muted'
-        }`}>
+        <span className={`
+          hidden sm:inline text-xs px-2 py-0.5 rounded-md font-medium
+          ${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}
+        `}>
           {badge}
         </span>
+      )}
+      {active && (
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
       )}
     </button>
   );
 }
 
-// Quick Action Card
+// Quick Action Card with enhanced visual design
 function QuickActionCard({
   icon: Icon,
   title,
@@ -96,52 +105,77 @@ function QuickActionCard({
   onClick: () => void;
 }) {
   const colorClasses = {
-    sage: 'bg-cg-sage-subtle text-cg-sage hover:border-cg-sage/30',
-    purple: 'bg-purple-50 text-purple-700 hover:border-purple-300',
-    amber: 'bg-cg-amber-subtle text-cg-amber hover:border-cg-amber/30',
+    sage: {
+      bg: 'bg-gradient-to-br from-[#2C5F5D]/5 to-[#2C5F5D]/10',
+      icon: 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white',
+      text: 'text-[#2C5F5D]',
+      hover: 'hover:from-[#2C5F5D]/10 hover:to-[#2C5F5D]/15 hover:shadow-md',
+      border: 'border-[#2C5F5D]/10 hover:border-[#2C5F5D]/20',
+    },
+    purple: {
+      bg: 'bg-gradient-to-br from-purple-50/80 to-purple-100/50',
+      icon: 'bg-gradient-to-br from-purple-600 to-purple-700 text-white',
+      text: 'text-purple-700',
+      hover: 'hover:from-purple-100/80 hover:to-purple-200/50 hover:shadow-md',
+      border: 'border-purple-100 hover:border-purple-200',
+    },
+    amber: {
+      bg: 'bg-gradient-to-br from-amber-50/80 to-amber-100/50',
+      icon: 'bg-gradient-to-br from-amber-600 to-amber-700 text-white',
+      text: 'text-amber-700',
+      hover: 'hover:from-amber-100/80 hover:to-amber-200/50 hover:shadow-md',
+      border: 'border-amber-100 hover:border-amber-200',
+    },
   };
+
+  const classes = colorClasses[color];
 
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-3 p-4 rounded-xl border border-transparent transition-smooth ${colorClasses[color]}`}
+      className={`
+        group flex items-center gap-3 p-4 rounded-xl border transition-all duration-200
+        ${classes.bg} ${classes.hover} ${classes.border}
+      `}
     >
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-        color === 'sage' ? 'bg-cg-sage/10' :
-        color === 'purple' ? 'bg-purple-100' :
-        'bg-cg-amber/10'
-      }`}>
+      <div className={`
+        w-11 h-11 rounded-xl flex items-center justify-center shadow-sm
+        transition-transform duration-200 group-hover:scale-110
+        ${classes.icon}
+      `}>
         <Icon className="h-5 w-5" />
       </div>
-      <div className="text-left">
-        <p className="font-medium">{title}</p>
-        <p className="text-xs opacity-70">{description}</p>
+      <div className="text-left flex-1">
+        <p className={`font-semibold ${classes.text}`}>{title}</p>
+        <p className="text-xs text-slate-600 mt-0.5">{description}</p>
       </div>
+      <ChevronLeft className={`h-4 w-4 rotate-180 opacity-0 -translate-x-2 transition-all duration-200 group-hover:opacity-50 group-hover:translate-x-0 ${classes.text}`} />
     </button>
   );
 }
 
-// Custody Legend
+// Custody Legend with refined styling
 function CustodyLegend() {
   return (
-    <div className="flex items-center gap-2 sm:gap-4 text-xs overflow-x-auto">
-      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-        <div className="w-3 h-3 rounded-sm bg-cg-sage" />
-        <span className="text-muted-foreground whitespace-nowrap">Mom's Time</span>
+    <div className="flex items-center gap-4 text-xs bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100">
+      <span className="text-slate-500 font-medium mr-1">Legend:</span>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] shadow-sm" />
+        <span className="text-slate-700 font-medium whitespace-nowrap">Your Time</span>
       </div>
-      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-        <div className="w-3 h-3 rounded-sm bg-cg-slate" />
-        <span className="text-muted-foreground whitespace-nowrap">Dad's Time</span>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-slate-400 to-slate-500 shadow-sm" />
+        <span className="text-slate-700 font-medium whitespace-nowrap">Their Time</span>
       </div>
-      <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-        <div className="w-3 h-3 rounded-sm bg-purple-500" />
-        <span className="text-muted-foreground whitespace-nowrap">Exchange</span>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-purple-500 to-purple-600 shadow-sm" />
+        <span className="text-slate-700 font-medium whitespace-nowrap">Exchange</span>
       </div>
     </div>
   );
 }
 
-// Family File Selector
+// Family File Selector with enhanced styling
 function FamilyFileSelector({
   familyFiles,
   selected,
@@ -158,7 +192,13 @@ function FamilyFileSelector({
       <select
         value={selected?.id || ''}
         onChange={(e) => onSelect(e.target.value)}
-        className="appearance-none bg-card border border-border rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-cg-sage/20 focus:border-cg-sage transition-smooth cursor-pointer"
+        className="
+          appearance-none bg-white border border-slate-200 rounded-xl
+          px-4 py-2.5 pr-10 text-sm font-medium text-slate-900
+          focus:outline-none focus:ring-2 focus:ring-[#2C5F5D]/20 focus:border-[#2C5F5D]
+          transition-all cursor-pointer hover:border-slate-300
+          shadow-sm
+        "
       >
         {familyFiles.map((item) => (
           <option key={item.familyFile.id} value={item.familyFile.id}>
@@ -166,7 +206,7 @@ function FamilyFileSelector({
           </option>
         ))}
       </select>
-      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
     </div>
   );
 }
@@ -331,12 +371,13 @@ function ScheduleContent() {
   // Loading State
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 pb-20 lg:pb-0">
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center">
-            <div className="w-12 h-12 border-2 border-cg-sage border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="mt-4 text-muted-foreground">Loading TimeBridge...</p>
+            <div className="w-14 h-14 border-3 border-[#2C5F5D] border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="mt-6 text-slate-600 font-medium">Loading TimeBridge...</p>
+            <p className="mt-2 text-sm text-slate-500">Syncing your schedule</p>
           </div>
         </div>
       </div>
@@ -346,22 +387,27 @@ function ScheduleContent() {
   // Empty State
   if (!selectedFamilyFile) {
     return (
-      <div className="min-h-screen bg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 pb-20 lg:pb-0">
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center max-w-md px-6">
-            <div className="w-20 h-20 rounded-full bg-cg-sage-subtle flex items-center justify-center mx-auto mb-6">
-              <Calendar className="h-10 w-10 text-cg-sage" />
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center mx-auto mb-6 shadow-sm">
+              <Calendar className="h-12 w-12 text-[#2C5F5D]" />
             </div>
-            <h2 className="text-2xl font-semibold text-foreground mb-3">
+            <h2 className="text-2xl font-bold text-slate-900 mb-3">
               Welcome to TimeBridge
             </h2>
-            <p className="text-muted-foreground mb-6">
-              Create or join a Family File to start coordinating your co-parenting schedule.
+            <p className="text-slate-600 mb-8 leading-relaxed">
+              Your shared calendar for coordinating parenting time, exchanges, and important events.
             </p>
             <Link
               href="/family-files"
-              className="cg-btn-primary inline-flex items-center gap-2"
+              className="
+                inline-flex items-center gap-2 px-6 py-3
+                bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+                rounded-xl font-medium shadow-md hover:shadow-lg
+                transition-all duration-200 hover:-translate-y-0.5
+              "
             >
               <Users className="h-4 w-4" />
               Go to Family Files
@@ -375,36 +421,38 @@ function ScheduleContent() {
   const currentFamilyFileData = familyFilesWithAgreements.find(f => f.familyFile.id === selectedFamilyFile.id);
 
   return (
-    <div className="min-h-screen bg-background pb-24 lg:pb-8 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 pb-24 lg:pb-8">
       <Navigation />
 
       {/* Page Header */}
-      <header className="border-b border-border bg-card">
+      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {/* Top Row */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
+              <div className="flex items-center gap-3 mb-2">
                 <button
                   onClick={() => router.push('/dashboard')}
-                  className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
+                  className="p-2 -ml-2 rounded-xl hover:bg-slate-100 transition-colors"
                   aria-label="Go back"
                 >
-                  <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+                  <ChevronLeft className="h-5 w-5 text-slate-600" />
                 </button>
-                <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
-                  <Calendar className="h-5 w-5 text-cg-sage" />
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center shadow-md">
+                  <Calendar className="h-5 w-5 text-white" />
                 </div>
-                TimeBridge
-              </h1>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                <h1 className="text-3xl font-bold text-slate-900">
+                  TimeBridge
+                </h1>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-slate-600 ml-14">
                 <Users className="h-4 w-4" />
-                <span>{selectedFamilyFile.title}</span>
+                <span className="font-medium">{selectedFamilyFile.title}</span>
                 {selectedAgreement && (
                   <>
-                    <span className="text-border">•</span>
+                    <span className="text-slate-300">•</span>
                     <FileText className="h-4 w-4" />
-                    <span>{selectedAgreement.title}</span>
+                    <span className="font-medium">{selectedAgreement.title}</span>
                   </>
                 )}
               </div>
@@ -422,7 +470,13 @@ function ScheduleContent() {
                   <select
                     value={selectedAgreement?.id || ''}
                     onChange={(e) => handleAgreementChange(e.target.value)}
-                    className="appearance-none bg-card border border-border rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-cg-sage/20 focus:border-cg-sage transition-smooth cursor-pointer"
+                    className="
+                      appearance-none bg-white border border-slate-200 rounded-xl
+                      px-4 py-2.5 pr-10 text-sm font-medium text-slate-900
+                      focus:outline-none focus:ring-2 focus:ring-[#2C5F5D]/20 focus:border-[#2C5F5D]
+                      transition-all cursor-pointer hover:border-slate-300
+                      shadow-sm
+                    "
                   >
                     <option value="">All Agreements</option>
                     {currentFamilyFileData.agreements.map(agreement => (
@@ -431,7 +485,7 @@ function ScheduleContent() {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                 </div>
               )}
             </div>
@@ -464,17 +518,17 @@ function ScheduleContent() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 overflow-x-hidden">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {error && (
-          <div className="mb-6 flex items-center gap-3 p-4 bg-cg-error-subtle border border-cg-error/20 rounded-xl">
-            <AlertCircle className="h-5 w-5 text-cg-error flex-shrink-0" />
-            <p className="text-sm text-cg-error">{error}</p>
+          <div className="mb-6 flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm text-red-700 font-medium">{error}</p>
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-          <div className="flex items-center gap-2 p-1 bg-muted rounded-xl overflow-x-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div className="flex items-center gap-2 p-1.5 bg-white rounded-xl border border-slate-200 shadow-sm">
             <TabButton
               active={activeTab === 'calendar'}
               icon={Calendar}
@@ -500,7 +554,7 @@ function ScheduleContent() {
         </div>
 
         {/* Tab Content */}
-        <div className="cg-card p-4 sm:p-6">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6">
           {activeTab === 'calendar' && (
             <CalendarView
               key={calendarKey}
