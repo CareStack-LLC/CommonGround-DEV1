@@ -567,6 +567,12 @@ class QuickAccordService:
         }
         event_type = event_type_mapping.get(quick_accord.purpose_category, "special")
 
+        # Build description with ARIA attribution
+        description_parts = []
+        if quick_accord.purpose_description:
+            description_parts.append(quick_accord.purpose_description)
+        description_parts.append(f"Created by ARIA based on QuickAccord: {quick_accord.title}")
+
         # Create the schedule event
         schedule_event = ScheduleEvent(
             id=str(uuid.uuid4()),
@@ -581,7 +587,7 @@ class QuickAccordService:
             custodial_parent_id=quick_accord.initiated_by,
             child_ids=quick_accord.child_ids or [],
             title=quick_accord.title,
-            description=quick_accord.purpose_description,
+            description="\n\n".join(description_parts),
             location=quick_accord.location,
             visibility="co_parent",
             location_shared=True,
@@ -650,6 +656,12 @@ class QuickAccordService:
             quick_accord.purpose_category, "other"
         )
 
+        # Build description with ARIA attribution
+        description_parts = []
+        if quick_accord.purpose_description:
+            description_parts.append(quick_accord.purpose_description)
+        description_parts.append(f"Created by ARIA based on QuickAccord: {quick_accord.title}")
+
         # Create the obligation
         obligation = Obligation(
             id=str(uuid.uuid4()),
@@ -659,7 +671,7 @@ class QuickAccordService:
             source_id=quick_accord.id,
             purpose_category=expense_category,
             title=f"Expense: {quick_accord.title}",
-            description=quick_accord.purpose_description,
+            description="\n\n".join(description_parts),
             child_ids=quick_accord.child_ids or [],
             total_amount=total_amount,
             petitioner_share=petitioner_share,

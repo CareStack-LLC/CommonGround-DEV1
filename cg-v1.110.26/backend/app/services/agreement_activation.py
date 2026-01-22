@@ -159,8 +159,8 @@ class AgreementActivationService:
                     created_by=activated_by
                 )
                 if template:
-                    result.recurring_obligations_created = 1
-                    result.obligation_instances_created = instances_count
+                    result.recurring_obligations_created += 1
+                    result.obligation_instances_created += instances_count
                     logger.info(
                         f"Created child support template with {instances_count} instances "
                         f"for agreement {agreement.id}"
@@ -168,6 +168,27 @@ class AgreementActivationService:
             except Exception as e:
                 logger.error(f"Failed to create child support obligations for agreement {agreement.id}: {e}")
                 result.errors.append(f"Failed to create child support obligations: {str(e)}")
+
+        # Create recurring expense templates (volleyball, medicine, etc.)
+        if expense_data:
+            try:
+                templates_created, instances_created = await self._create_recurring_expense_templates(
+                    family_file=family_file,
+                    agreement=agreement,
+                    expense_data=expense_data,
+                    child_ids=child_ids,
+                    created_by=activated_by
+                )
+                if templates_created > 0:
+                    result.recurring_obligations_created += templates_created
+                    result.obligation_instances_created += instances_created
+                    logger.info(
+                        f"Created {templates_created} recurring expense templates with {instances_created} instances "
+                        f"for agreement {agreement.id}"
+                    )
+            except Exception as e:
+                logger.error(f"Failed to create recurring expense templates for agreement {agreement.id}: {e}")
+                result.errors.append(f"Failed to create recurring expense templates: {str(e)}")
 
         await self.db.commit()
         return result
@@ -626,7 +647,8 @@ class AgreementActivationService:
             is_recurring=is_recurring,
             recurrence_pattern=recurrence_pattern,
             recurrence_days=recurrence_days,
-            status="active"
+            status="active",
+            special_instructions=f"Created by ARIA based on agreement: {agreement.title}"
         )
 
         self.db.add(exchange)
@@ -879,7 +901,7 @@ class AgreementActivationService:
             source_id=agreement.id,
             purpose_category="child_support",
             title=f"Child Support - {child_support_data.frequency.capitalize()}",
-            description=f"Recurring child support payment from agreement",
+            description=f"Recurring child support payment. Created by ARIA based on agreement: {agreement.title}",
             child_ids=child_ids,
             total_amount=amount,
             petitioner_share=amount if payer_id == family_file.parent_a_id else Decimal("0"),
@@ -960,7 +982,7 @@ class AgreementActivationService:
                 source_id=template.agreement_id,
                 purpose_category="child_support",
                 title=f"Child Support - {due_date.strftime('%B %Y')}",
-                description=f"Monthly child support payment",
+                description=template.description,  # Inherit description from template
                 child_ids=template.child_ids,
                 total_amount=template.total_amount,
                 petitioner_share=template.petitioner_share,
@@ -1054,3 +1076,269 @@ class AgreementActivationService:
                 dates.append(dt)
 
         return dates
+
+    async def _create_recurring_expense_templates(
+        self,
+        family_file: FamilyFile,
+        agreement: Agreement,
+        expense_data: ExpenseData,
+        child_ids: List[str],
+        created_by: str,
+        months_ahead: int = 6
+    ) -> tuple[int, int]:
+        """
+        Create recurring expense templates from agreement.
+
+        This extracts specific recurring expenses mentioned in the agreement
+        (e.g., "volleyball classes $100/month", "therapy $150/week") and creates
+        recurring obligation templates for each.
+
+        Args:
+            family_file: The family file
+            agreement: The agreement being activated
+            expense_data: Extracted expense configuration (for split ratio)
+            child_ids: List of child IDs affected
+            created_by: User ID creating the obligations
+            months_ahead: How many months of instances to generate
+
+        Returns:
+            Tuple of (templates_created, total_instances_created)
+        """
+        templates_created = 0
+        total_instances = 0
+
+        # Extract recurring expenses from agreement sections
+        recurring_expenses = await self._extract_recurring_expenses(agreement)
+
+        if not recurring_expenses:
+            return 0, 0
+
+        # Determine split percentages from expense_data
+        petitioner_percentage = 50  # Default 50/50
+        if expense_data and expense_data.split_ratio:
+            petitioner_percentage, _ = parse_split_ratio(expense_data.split_ratio)
+
+        # Create template for each recurring expense
+        for expense in recurring_expenses:
+            try:
+                template, instances_count = await self._create_single_expense_template(
+                    family_file=family_file,
+                    agreement=agreement,
+                    expense=expense,
+                    child_ids=child_ids,
+                    petitioner_percentage=petitioner_percentage,
+                    created_by=created_by,
+                    months_ahead=months_ahead
+                )
+                if template:
+                    templates_created += 1
+                    total_instances += instances_count
+            except Exception as e:
+                logger.error(f"Failed to create expense template for {expense.get('category')}: {e}")
+                continue
+
+        return templates_created, total_instances
+
+    async def _extract_recurring_expenses(self, agreement: Agreement) -> List[Dict[str, Any]]:
+        """
+        Extract recurring expenses from agreement sections.
+
+        Looks for structured_data with 'recurring_expenses' field containing:
+        [
+            {
+                "category": "extracurricular",  # or "medical", "education", etc.
+                "description": "Volleyball classes",
+                "amount": 100.00,
+                "frequency": "monthly",  # "weekly", "biweekly", "monthly"
+                "due_day": 1  # Optional: day of month (1-28)
+            }
+        ]
+
+        Args:
+            agreement: The agreement to extract from
+
+        Returns:
+            List of recurring expense dictionaries
+        """
+        result = await self.db.execute(
+            select(AgreementSection).where(
+                AgreementSection.agreement_id == agreement.id
+            )
+        )
+        sections = result.scalars().all()
+
+        all_recurring_expenses = []
+
+        for section in sections:
+            if not section.structured_data:
+                continue
+
+            # Check if this section has recurring_expenses
+            recurring_expenses = section.structured_data.get("recurring_expenses")
+            if recurring_expenses and isinstance(recurring_expenses, list):
+                all_recurring_expenses.extend(recurring_expenses)
+
+        return all_recurring_expenses
+
+    async def _create_single_expense_template(
+        self,
+        family_file: FamilyFile,
+        agreement: Agreement,
+        expense: Dict[str, Any],
+        child_ids: List[str],
+        petitioner_percentage: int,
+        created_by: str,
+        months_ahead: int = 6
+    ) -> tuple[Optional[Obligation], int]:
+        """
+        Create a single recurring expense template with instances.
+
+        Args:
+            family_file: The family file
+            agreement: The agreement
+            expense: Expense dictionary with category, description, amount, frequency
+            child_ids: List of child IDs
+            petitioner_percentage: Split percentage for petitioner (parent_a)
+            created_by: User ID
+            months_ahead: Months to generate ahead
+
+        Returns:
+            Tuple of (template obligation, number of instances created)
+        """
+        # Extract expense details
+        category = expense.get("category", "other")
+        description = expense.get("description", "Recurring expense")
+        amount = Decimal(str(expense.get("amount", 0)))
+        frequency = expense.get("frequency", "monthly")
+        due_day = expense.get("due_day", 1)
+
+        if amount <= 0:
+            logger.warning(f"Skipping expense template with zero or negative amount: {description}")
+            return None, 0
+
+        # Build recurrence rule
+        recurrence_rule = self._build_recurrence_rule(frequency=frequency, due_day=due_day)
+
+        # Calculate shares
+        petitioner_share = amount * Decimal(petitioner_percentage) / 100
+        respondent_share = amount - petitioner_share
+
+        # Create template obligation
+        template = Obligation(
+            id=str(uuid.uuid4()),
+            family_file_id=family_file.id,
+            agreement_id=agreement.id,
+            source_type="agreement",
+            source_id=agreement.id,
+            purpose_category=category,
+            title=f"{description} - {frequency.capitalize()}",
+            description=f"Recurring {description}. Created by ARIA based on agreement: {agreement.title}",
+            child_ids=child_ids,
+            total_amount=amount,
+            petitioner_share=petitioner_share,
+            respondent_share=respondent_share,
+            petitioner_percentage=petitioner_percentage,
+            split_from_agreement=True,
+            status="template",
+            is_recurring=True,
+            recurrence_rule=recurrence_rule,
+            verification_required=True,
+            receipt_required=True,
+            created_by=created_by,
+        )
+
+        self.db.add(template)
+        await self.db.flush()
+
+        # Generate instances
+        instances_count = await self._generate_expense_instances(
+            template=template,
+            family_file=family_file,
+            months_ahead=months_ahead
+        )
+
+        return template, instances_count
+
+    async def _generate_expense_instances(
+        self,
+        template: Obligation,
+        family_file: FamilyFile,
+        months_ahead: int = 6
+    ) -> int:
+        """
+        Generate obligation instances from a recurring expense template.
+
+        Unlike child support (which has a specific payer), expense obligations
+        create funding records for BOTH parents based on split ratio.
+
+        Args:
+            template: The template obligation with recurrence_rule
+            family_file: The family file
+            months_ahead: Number of months to generate ahead
+
+        Returns:
+            Number of instances created
+        """
+        # Get recurrence dates
+        now = datetime.utcnow()
+        end_date = now + relativedelta(months=months_ahead)
+        dates = self._get_recurrence_dates(
+            recurrence_rule=template.recurrence_rule,
+            start_date=now,
+            end_date=end_date
+        )
+
+        count = 0
+        for due_date in dates:
+            # Create instance obligation
+            instance = Obligation(
+                id=str(uuid.uuid4()),
+                family_file_id=family_file.id,
+                agreement_id=template.agreement_id,
+                parent_obligation_id=template.id,
+                source_type="agreement",
+                source_id=template.agreement_id,
+                purpose_category=template.purpose_category,
+                title=f"{template.title} - {due_date.strftime('%B %Y')}",
+                description=template.description,  # Inherit ARIA attribution
+                child_ids=template.child_ids,
+                total_amount=template.total_amount,
+                petitioner_share=template.petitioner_share,
+                respondent_share=template.respondent_share,
+                petitioner_percentage=template.petitioner_percentage,
+                split_from_agreement=True,
+                due_date=due_date,
+                status="open",
+                is_recurring=False,
+                verification_required=template.verification_required,
+                receipt_required=template.receipt_required,
+                created_by=template.created_by,
+            )
+            self.db.add(instance)
+            await self.db.flush()
+
+            # Create funding records for BOTH parents (split expense)
+            if family_file.parent_a_id and template.petitioner_share > 0:
+                funding_a = ObligationFunding(
+                    id=str(uuid.uuid4()),
+                    obligation_id=instance.id,
+                    parent_id=family_file.parent_a_id,
+                    amount_required=template.petitioner_share,
+                    amount_funded=Decimal("0"),
+                )
+                self.db.add(funding_a)
+
+            if family_file.parent_b_id and template.respondent_share > 0:
+                funding_b = ObligationFunding(
+                    id=str(uuid.uuid4()),
+                    obligation_id=instance.id,
+                    parent_id=family_file.parent_b_id,
+                    amount_required=template.respondent_share,
+                    amount_funded=Decimal("0"),
+                )
+                self.db.add(funding_b)
+
+            count += 1
+
+        await self.db.flush()
+        return count
