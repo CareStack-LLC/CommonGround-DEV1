@@ -761,9 +761,9 @@ function ChildProfileContent() {
       )}
 
       {/* Profile Header */}
-      <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+      <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-md">
         {/* Decorative Header */}
-        <div className="h-20 sm:h-24 bg-gradient-to-r from-cg-sage via-cg-sage/90 to-cg-sage/70 relative">
+        <div className="h-20 sm:h-24 bg-gradient-to-br from-[#2C5F5D] via-[#2C5F5D]/90 to-[#1f4644] relative">
           {/* Subtle pattern overlay */}
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
         </div>
@@ -833,7 +833,7 @@ function ChildProfileContent() {
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-6 pt-4 border-t border-border flex flex-wrap gap-3">
+          <div className="mt-6 pt-4 border-t border-slate-200 flex flex-wrap gap-3">
             {/* Check-in button - disabled if child is already with current user */}
             {mounted && (() => {
               const isChildWithMe = child.current_custody_parent_id === user?.id;
@@ -841,10 +841,10 @@ function ChildProfileContent() {
                 <button
                   onClick={handleWithMeCheckIn}
                   disabled={checkingIn || isChildWithMe}
-                  className={`px-4 py-2.5 rounded-xl transition-all shadow-sm inline-flex items-center gap-2 ${
+                  className={`px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2 font-medium ${
                     isChildWithMe
-                      ? 'bg-cg-sage/20 text-cg-sage cursor-not-allowed'
-                      : 'bg-cg-sage text-white hover:bg-cg-sage/90 hover:shadow-md disabled:opacity-50'
+                      ? 'bg-[#2C5F5D]/10 text-[#2C5F5D] cursor-not-allowed border-2 border-[#2C5F5D]/20'
+                      : 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50'
                   }`}
                 >
                   {checkingIn ? (
@@ -867,7 +867,7 @@ function ChildProfileContent() {
               );
             })()}
             <Link href={`/family-files/${familyFileId}/children/${childId}/cubbie`}>
-              <button className="px-4 py-2.5 bg-card border border-border text-foreground rounded-xl hover:bg-muted transition-all shadow-sm hover:shadow-md inline-flex items-center gap-2">
+              <button className="px-5 py-2.5 bg-white border-2 border-slate-200 text-slate-900 rounded-xl hover:border-[#2C5F5D]/30 hover:bg-slate-50 transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2 font-medium hover:scale-[1.02] active:scale-[0.98]">
                 <Package className="h-4 w-4" />
                 {child.first_name}'s Cubbie
               </button>

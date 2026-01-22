@@ -158,7 +158,8 @@ function ChildCustodyCard({
   const statusColor = isWithYou ? 'bg-[#2C5F5D]' : 'bg-cg-slate';
   const statusTextColor = isWithYou ? 'text-[#2C5F5D]' : 'text-cg-slate';
   const hasNextExchange = !!childStatus.next_exchange_time;
-  const hasDaysData = myDays !== undefined || theirDays !== undefined;
+  // Always show days data if defined, even if 0
+  const hasDaysData = myDays !== undefined;
 
   // Format next exchange time (timezone-aware)
   const formatNextExchange = () => {
@@ -284,18 +285,16 @@ function ChildCustodyCard({
           </>
         )}
 
-        {/* Days with parent - custody time tracking (logged-in parent only) */}
-        {hasDaysData && (
-          <div className="mt-3 pt-3 border-t border-border">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#2C5F5D]" />
-                <span className="text-sm text-muted-foreground">Your time</span>
-              </div>
-              <span className="text-lg font-bold text-[#2C5F5D]">{myDays ?? 0} <span className="text-xs font-normal text-muted-foreground">days</span></span>
+        {/* Days with parent - custody time tracking (always show) */}
+        <div className="mt-3 pt-3 border-t border-slate-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-[#2C5F5D]" />
+              <span className="text-sm text-slate-600 font-medium">Days since agreement active</span>
             </div>
+            <span className="text-lg font-bold text-[#2C5F5D]">{myDays ?? 0} <span className="text-xs font-normal text-slate-500">days</span></span>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

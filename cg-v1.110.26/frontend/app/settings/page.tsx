@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { User, Bell, Shield, CreditCard, FileText, ArrowRight } from 'lucide-react';
+import { User, Bell, CreditCard, FileText, ArrowRight } from 'lucide-react';
 
 /**
  * Settings Hub Page
@@ -71,24 +71,6 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-br from-[#2C5F5D]/5 via-white to-[#2C5F5D]/5 rounded-2xl p-8 border border-[#2C5F5D]/10">
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] rounded-xl shadow-md">
-            <Shield className="h-6 w-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-xl font-semibold text-slate-900 mb-2">
-              Account Settings
-            </h2>
-            <p className="text-slate-600 leading-relaxed">
-              Manage your CommonGround account settings, preferences, and security options.
-              All settings are encrypted and only accessible to you.
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Settings Cards Grid */}
       <div className="grid gap-6 md:grid-cols-2">
         {settingCards.map((card) => {

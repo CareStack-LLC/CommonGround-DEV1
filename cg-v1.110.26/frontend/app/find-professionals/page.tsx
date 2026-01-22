@@ -402,76 +402,76 @@ function FindProfessionalsContent() {
           </CGCardContent>
         </CGCard>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {firms.map((firm) => (
-            <CGCard
+            <button
               key={firm.id}
-              variant="elevated"
-              className="cursor-pointer hover:shadow-lg transition-shadow"
               onClick={() => handleViewFirm(firm.slug)}
+              className="group text-left bg-white rounded-xl p-6 border-2 border-slate-200 hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
-              <CGCardContent className="py-5">
-                <div className="flex items-start gap-4">
-                  {firm.logo_url ? (
-                    <img
-                      src={firm.logo_url}
-                      alt={firm.name}
-                      className="w-12 h-12 rounded-xl object-contain bg-muted"
-                    />
-                  ) : (
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{ backgroundColor: firm.primary_color || '#4A6C58' }}
-                    >
-                      <Building2 className="h-6 w-6 text-white" />
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground truncate">{firm.name}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <CGBadge variant="default" className="text-xs">
-                        {getFirmTypeLabel(firm.firm_type)}
-                      </CGBadge>
-                    </div>
+              <div className="flex items-start gap-4 mb-4">
+                {firm.logo_url ? (
+                  <img
+                    src={firm.logo_url}
+                    alt={firm.name}
+                    className="w-14 h-14 rounded-xl object-contain bg-slate-50 p-2 border border-slate-200"
+                  />
+                ) : (
+                  <div
+                    className="w-14 h-14 rounded-xl flex items-center justify-center shadow-sm"
+                    style={{ backgroundColor: firm.primary_color || '#2C5F5D' }}
+                  >
+                    <Building2 className="h-7 w-7 text-white" />
                   </div>
-                </div>
-
-                {(firm.city || firm.state) && (
-                  <div className="flex items-center gap-2 mt-4 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>
-                      {firm.city && `${firm.city}, `}{firm.state}
+                )}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-slate-900 truncate group-hover:text-[#2C5F5D] transition-colors">
+                    {firm.name}
+                  </h3>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="text-xs px-2 py-0.5 rounded-lg bg-[#2C5F5D]/10 text-[#2C5F5D] font-medium">
+                      {getFirmTypeLabel(firm.firm_type)}
                     </span>
                   </div>
-                )}
-
-                {firm.practice_areas && firm.practice_areas.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-3">
-                    {firm.practice_areas.slice(0, 3).map((area) => (
-                      <span
-                        key={area}
-                        className="text-xs px-2 py-0.5 rounded-full bg-cg-sage-subtle text-cg-sage"
-                      >
-                        {area}
-                      </span>
-                    ))}
-                    {firm.practice_areas.length > 3 && (
-                      <span className="text-xs text-muted-foreground">
-                        +{firm.practice_areas.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Users className="h-4 w-4" />
-                    <span>{firm.professional_count} professionals</span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </div>
-              </CGCardContent>
-            </CGCard>
+              </div>
+
+              {(firm.city || firm.state) && (
+                <div className="flex items-center gap-2 mb-3 text-sm text-slate-600">
+                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                  <span>
+                    {firm.city && `${firm.city}, `}{firm.state}
+                  </span>
+                </div>
+              )}
+
+              {firm.practice_areas && firm.practice_areas.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {firm.practice_areas.slice(0, 3).map((area) => (
+                    <span
+                      key={area}
+                      className="text-xs px-2 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium"
+                    >
+                      {area}
+                    </span>
+                  ))}
+                  {firm.practice_areas.length > 3 && (
+                    <span className="text-xs text-slate-500 py-1">
+                      +{firm.practice_areas.length - 3} more
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                <div className="flex items-center gap-1.5 text-sm text-slate-600">
+                  <Users className="h-4 w-4" />
+                  <span className="font-medium">{firm.professional_count}</span>
+                  <span>professional{firm.professional_count !== 1 ? 's' : ''}</span>
+                </div>
+                <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-[#2C5F5D] group-hover:translate-x-1 transition-all duration-200" />
+              </div>
+            </button>
           ))}
         </div>
       )}
@@ -482,27 +482,36 @@ function FindProfessionalsContent() {
           {selectedFirm && (
             <>
               <DialogHeader>
-                <div className="flex items-start gap-4">
-                  {selectedFirm.logo_url ? (
-                    <img
-                      src={selectedFirm.logo_url}
-                      alt={selectedFirm.name}
-                      className="w-14 h-14 rounded-xl object-contain bg-muted"
-                    />
-                  ) : (
-                    <div
-                      className="w-14 h-14 rounded-xl flex items-center justify-center"
-                      style={{ backgroundColor: selectedFirm.primary_color || '#4A6C58' }}
-                    >
-                      <Building2 className="h-7 w-7 text-white" />
+                <div className="bg-gradient-to-br from-[#2C5F5D]/5 via-white to-[#2C5F5D]/5 rounded-xl p-4 border border-[#2C5F5D]/10">
+                  <div className="flex items-start gap-4">
+                    {selectedFirm.logo_url ? (
+                      <img
+                        src={selectedFirm.logo_url}
+                        alt={selectedFirm.name}
+                        className="w-16 h-16 rounded-xl object-contain bg-white p-2 shadow-sm"
+                      />
+                    ) : (
+                      <div
+                        className="w-16 h-16 rounded-xl flex items-center justify-center shadow-sm"
+                        style={{ backgroundColor: selectedFirm.primary_color || '#2C5F5D' }}
+                      >
+                        <Building2 className="h-8 w-8 text-white" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <DialogTitle className="text-xl font-bold text-slate-900">{selectedFirm.name}</DialogTitle>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#2C5F5D]/10 text-[#2C5F5D]">
+                          {getFirmTypeLabel(selectedFirm.firm_type)}
+                        </span>
+                        {selectedFirm.city && (
+                          <span className="inline-flex items-center gap-1 text-sm text-slate-600">
+                            <MapPin className="h-3.5 w-3.5" />
+                            {selectedFirm.city}, {selectedFirm.state}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  <div>
-                    <DialogTitle className="text-xl">{selectedFirm.name}</DialogTitle>
-                    <DialogDescription>
-                      {getFirmTypeLabel(selectedFirm.firm_type)}
-                      {selectedFirm.city && ` · ${selectedFirm.city}, ${selectedFirm.state}`}
-                    </DialogDescription>
                   </div>
                 </div>
               </DialogHeader>
