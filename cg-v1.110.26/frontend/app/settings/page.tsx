@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { User, Bell, CreditCard, FileText, ArrowRight } from 'lucide-react';
+import { User, Bell, Shield, CreditCard, FileText, ArrowRight } from 'lucide-react';
 
 /**
  * Settings Hub Page
