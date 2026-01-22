@@ -45,7 +45,7 @@ import {
 /**
  * CommonGround Dashboard - "The Morning Brief"
  *
- * Design: Organic Minimalist
+ * Design: Warm Earth Tones
  * Philosophy: Situational awareness for the busy parent
  * Key Elements: Greeting, Custody Status, Action Stream
  */
@@ -155,8 +155,8 @@ function ChildCustodyCard({
   const [imageError, setImageError] = useState(false);
   const isWithYou = childStatus.with_current_user;
   const progress = childStatus.progress_percentage || 0;
-  const statusColor = isWithYou ? 'bg-cg-sage' : 'bg-cg-slate';
-  const statusTextColor = isWithYou ? 'text-cg-sage' : 'text-cg-slate';
+  const statusColor = isWithYou ? 'bg-[#2C5F5D]' : 'bg-cg-slate';
+  const statusTextColor = isWithYou ? 'text-[#2C5F5D]' : 'text-cg-slate';
   const hasNextExchange = !!childStatus.next_exchange_time;
   const hasDaysData = myDays !== undefined || theirDays !== undefined;
 
@@ -228,7 +228,7 @@ function ChildCustodyCard({
                 e.stopPropagation();
                 onWithMe(childStatus.child_id);
               }}
-              className="px-3 py-1.5 text-xs font-medium bg-cg-sage text-white rounded-lg hover:bg-cg-sage-light transition-colors flex-shrink-0"
+              className="px-3 py-1.5 text-xs font-medium bg-[#2C5F5D] text-white rounded-lg hover:bg-[#1e4442] transition-colors flex-shrink-0"
             >
               With Me
             </button>
@@ -260,7 +260,7 @@ function ChildCustodyCard({
             <div className="relative mb-2">
               <div className="cg-progress h-2.5 rounded-full">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${isWithYou ? 'cg-progress-bar' : 'bg-cg-slate/60'}`}
+                  className={`h-full rounded-full transition-all duration-500 ${isWithYou ? 'bg-gradient-to-r from-[#2C5F5D] to-[#1e4442]' : 'bg-cg-slate/60'}`}
                   style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
                 />
               </div>
@@ -289,10 +289,10 @@ function ChildCustodyCard({
           <div className="mt-3 pt-3 border-t border-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-cg-sage" />
+                <div className="w-2 h-2 rounded-full bg-[#2C5F5D]" />
                 <span className="text-sm text-muted-foreground">Your time</span>
               </div>
-              <span className="text-lg font-bold text-cg-sage">{myDays ?? 0} <span className="text-xs font-normal text-muted-foreground">days</span></span>
+              <span className="text-lg font-bold text-[#2C5F5D]">{myDays ?? 0} <span className="text-xs font-normal text-muted-foreground">days</span></span>
             </div>
           </div>
         )}
@@ -319,7 +319,7 @@ function CustodyStatusCard({
   if (!custodyStatus || children.length === 0) {
     return (
       <div className="cg-card overflow-hidden">
-        <div className="h-2 bg-cg-sage" />
+        <div className="h-2 bg-[#2C5F5D]" />
         <div className="p-5">
           <p className="text-sm text-muted-foreground">
             Set up custody exchanges to see status
@@ -333,8 +333,8 @@ function CustodyStatusCard({
   if (!custodyStatus.children || custodyStatus.children.length === 0) {
     const allWithYou = custodyStatus.all_with_current_user;
     const statusText = allWithYou ? 'Kids are with You' : `Kids are with ${coparentName || 'co-parent'}`;
-    const statusColor = allWithYou ? 'bg-cg-sage' : 'bg-cg-slate';
-    const statusTextColor = allWithYou ? 'text-cg-sage' : 'text-cg-slate';
+    const statusColor = allWithYou ? 'bg-[#2C5F5D]' : 'bg-cg-slate';
+    const statusTextColor = allWithYou ? 'text-[#2C5F5D]' : 'text-cg-slate';
     const progress = custodyStatus.progress_percentage || 0;
     const hasNextExchange = !!custodyStatus.next_exchange_time;
 
@@ -384,7 +384,7 @@ function CustodyStatusCard({
               <div className="relative mb-2">
                 <div className="cg-progress h-2.5 rounded-full">
                   <div
-                    className={`h-full rounded-full transition-all duration-500 ${allWithYou ? 'cg-progress-bar' : 'bg-cg-slate/60'}`}
+                    className={`h-full rounded-full transition-all duration-500 ${allWithYou ? 'bg-gradient-to-r from-[#2C5F5D] to-[#1e4442]' : 'bg-cg-slate/60'}`}
                     style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
                   />
                 </div>
@@ -482,8 +482,8 @@ function QuickActionButton({
       onClick={onClick}
       className="flex flex-col items-center gap-2 p-4 cg-card-interactive"
     >
-      <div className="w-12 h-12 bg-cg-sage-subtle rounded-xl flex items-center justify-center">
-        <Icon className="w-5 h-5 text-cg-sage" />
+      <div className="w-12 h-12 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center">
+        <Icon className="w-5 h-5 text-[#2C5F5D]" />
       </div>
       <span className="text-sm font-medium text-foreground">{label}</span>
     </button>
@@ -500,9 +500,9 @@ function getCategoryStyles(category: string) {
     case 'school':
       return { bg: 'bg-cg-amber-subtle', color: 'text-cg-amber', Icon: FileText };
     case 'sports':
-      return { bg: 'bg-cg-sage-subtle', color: 'text-cg-sage', Icon: Users };
+      return { bg: 'bg-[#2C5F5D]/10', color: 'text-[#2C5F5D]', Icon: Users };
     default:
-      return { bg: 'bg-cg-sage-subtle', color: 'text-cg-sage', Icon: Calendar };
+      return { bg: 'bg-[#2C5F5D]/10', color: 'text-[#2C5F5D]', Icon: Calendar };
   }
 }
 
@@ -578,7 +578,7 @@ function UpcomingEventItem({ event }: { event: UpcomingEvent }) {
         </p>
       </div>
       <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
-        <span className="text-xs font-medium text-cg-sage bg-cg-sage-subtle px-2 py-0.5 rounded-full">
+        <span className="text-xs font-medium text-[#2C5F5D] bg-[#2C5F5D]/10 px-2 py-0.5 rounded-full">
           {timeRemaining}
         </span>
         <span className="text-xs text-muted-foreground">{dayLabel}</span>
@@ -597,8 +597,8 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
     return (
       <div className="cg-card p-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-cg-sage-subtle rounded-lg flex items-center justify-center flex-shrink-0">
-            <CheckCircle className="w-5 h-5 text-cg-sage" />
+          <div className="w-10 h-10 bg-[#2C5F5D]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+            <CheckCircle className="w-5 h-5 text-[#2C5F5D]" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-foreground">All caught up!</p>
@@ -620,7 +620,7 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
         <div className="p-2 border-t border-border/50 bg-muted/30">
           <button
             onClick={() => router.push('/schedule')}
-            className="w-full text-center text-sm text-cg-sage hover:text-cg-sage-light font-medium py-1 transition-colors"
+            className="w-full text-center text-sm text-[#2C5F5D] hover:text-[#1e4442] font-medium py-1 transition-colors"
           >
             View full schedule →
           </button>
@@ -1064,8 +1064,8 @@ function DashboardContent() {
         <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
             <div className="text-center">
-              <div className="w-12 h-12 bg-cg-sage/20 rounded-full flex items-center justify-center mx-auto animate-pulse">
-                <div className="w-6 h-6 bg-cg-sage rounded-full" />
+              <div className="w-12 h-12 bg-[#2C5F5D]/20 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                <div className="w-6 h-6 bg-[#2C5F5D] rounded-full" />
               </div>
               <p className="mt-4 text-muted-foreground">Loading your dashboard...</p>
             </div>
@@ -1082,10 +1082,10 @@ function DashboardContent() {
       <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
         {/* Header with Greeting */}
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
             {greeting},
           </h1>
-          <h2 className="text-2xl sm:text-3xl font-semibold text-cg-sage">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-[#2C5F5D]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
             {user?.first_name}
           </h2>
         </div>
@@ -1094,10 +1094,10 @@ function DashboardContent() {
           // Getting Started
           <div className="space-y-6">
             <div className="cg-card-elevated p-8 text-center">
-              <div className="w-16 h-16 bg-cg-sage-subtle rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <FolderOpen className="w-8 h-8 text-cg-sage" />
+              <div className="w-16 h-16 bg-[#2C5F5D]/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <FolderOpen className="w-8 h-8 text-[#2C5F5D]" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+              <h3 className="text-xl font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 Welcome to CommonGround
               </h3>
               <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
@@ -1115,8 +1115,8 @@ function DashboardContent() {
             {/* Quick Info Cards */}
             <div className="grid grid-cols-2 gap-4">
               <div className="cg-card p-4">
-                <div className="w-10 h-10 bg-cg-sage-subtle rounded-xl flex items-center justify-center mb-3">
-                  <MessageSquare className="w-5 h-5 text-cg-sage" />
+                <div className="w-10 h-10 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center mb-3">
+                  <MessageSquare className="w-5 h-5 text-[#2C5F5D]" />
                 </div>
                 <h4 className="font-medium text-foreground">ARIA Messaging</h4>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -1124,8 +1124,8 @@ function DashboardContent() {
                 </p>
               </div>
               <div className="cg-card p-4">
-                <div className="w-10 h-10 bg-cg-sage-subtle rounded-xl flex items-center justify-center mb-3">
-                  <Calendar className="w-5 h-5 text-cg-sage" />
+                <div className="w-10 h-10 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center mb-3">
+                  <Calendar className="w-5 h-5 text-[#2C5F5D]" />
                 </div>
                 <h4 className="font-medium text-foreground">Shared Calendar</h4>
                 <p className="text-sm text-muted-foreground mt-1">
@@ -1174,7 +1174,7 @@ function DashboardContent() {
             {/* Fallback if no custody data but children exist */}
             {allChildren.length > 0 && allCustodyStatuses.length === 0 && (
               <div className="cg-card overflow-hidden">
-                <div className="h-2 bg-cg-sage" />
+                <div className="h-2 bg-[#2C5F5D]" />
                 <div className="p-5">
                   <p className="text-sm text-muted-foreground">
                     Set up custody exchanges to see status
@@ -1185,7 +1185,7 @@ function DashboardContent() {
 
             {/* Action Stream */}
             <section>
-              <h3 className="text-sm font-medium text-cg-sage uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide mb-3">
                 Action Stream
               </h3>
               <div className="space-y-3">
@@ -1196,8 +1196,8 @@ function DashboardContent() {
                  dashboardSummary.pending_agreements_count === 0 &&
                  dashboardSummary.unread_court_count === 0 && (
                   <div className="cg-card p-4 flex items-center gap-3">
-                    <div className="w-12 h-12 bg-cg-sage-subtle rounded-xl flex items-center justify-center">
-                      <CheckCircle className="w-5 h-5 text-cg-sage" />
+                    <div className="w-12 h-12 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center">
+                      <CheckCircle className="w-5 h-5 text-[#2C5F5D]" />
                     </div>
                     <div>
                       <p className="font-semibold text-foreground">All caught up!</p>
@@ -1246,8 +1246,8 @@ function DashboardContent() {
                   return (
                     <ActionStreamItem
                       icon={FileText}
-                      iconBg="bg-cg-sage-subtle"
-                      iconColor="text-cg-sage"
+                      iconBg="bg-[#2C5F5D]/10"
+                      iconColor="text-[#2C5F5D]"
                       title="Agreement Approval"
                       subtitle={
                         count === 1
@@ -1294,8 +1294,8 @@ function DashboardContent() {
                   return (
                     <ActionStreamItem
                       icon={CheckCircle}
-                      iconBg="bg-cg-sage-subtle"
-                      iconColor="text-cg-sage"
+                      iconBg="bg-[#2C5F5D]/10"
+                      iconColor="text-[#2C5F5D]"
                       title="QuickAccord Active"
                       subtitle={
                         count === 1
@@ -1341,7 +1341,7 @@ function DashboardContent() {
 
             {/* Upcoming Events */}
             <section>
-              <h3 className="text-sm font-medium text-cg-sage uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide mb-3">
                 Coming Up
               </h3>
               <UpcomingEventsList events={dashboardSummary?.upcoming_events} />
@@ -1349,7 +1349,7 @@ function DashboardContent() {
 
             {/* Quick Actions */}
             <section>
-              <h3 className="text-sm font-medium text-cg-sage uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide mb-3">
                 Quick Actions
               </h3>
               <div className="grid grid-cols-4 gap-3">
@@ -1380,12 +1380,12 @@ function DashboardContent() {
             {familyFilesWithData.length > 0 && (
               <section>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-cg-sage uppercase tracking-wide">
+                  <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide">
                     Family Files
                   </h3>
                   <button
                     onClick={() => router.push('/family-files')}
-                    className="text-sm text-cg-sage hover:text-cg-sage-light transition-colors"
+                    className="text-sm text-[#2C5F5D] hover:text-[#1e4442] transition-colors"
                   >
                     View all
                   </button>
@@ -1397,8 +1397,8 @@ function DashboardContent() {
                       onClick={() => router.push(`/family-files/${familyFile.id}`)}
                       className="w-full cg-card p-4 flex items-center gap-4 text-left hover:shadow-md transition-smooth"
                     >
-                      <div className="w-10 h-10 bg-cg-sage-subtle rounded-xl flex items-center justify-center">
-                        <FolderOpen className="w-5 h-5 text-cg-sage" />
+                      <div className="w-10 h-10 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center">
+                        <FolderOpen className="w-5 h-5 text-[#2C5F5D]" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-foreground truncate">
@@ -1417,7 +1417,7 @@ function DashboardContent() {
 
             {/* Recent Activity */}
             <section>
-              <h3 className="text-sm font-medium text-cg-sage uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide mb-3">
                 Recent Activity
               </h3>
               <div className="cg-card">

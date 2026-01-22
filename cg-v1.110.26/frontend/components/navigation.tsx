@@ -26,7 +26,7 @@ import {
 import { useState, useRef, useEffect } from 'react';
 
 /**
- * CommonGround Navigation Component - Organic Minimalist Design
+ * CommonGround Navigation Component - Warm Earth Tones
  *
  * Design: Clean, warm, mobile-first with bottom nav.
  * Philosophy: "Navigation should feel natural and unobtrusive"
@@ -69,7 +69,7 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
       className={`flex items-center gap-2 cursor-pointer ${className}`}
       onClick={onClick}
     >
-      <div className="w-9 h-9 bg-cg-sage rounded-xl flex items-center justify-center">
+      <div className="w-9 h-9 bg-[#2C5F5D] rounded-xl flex items-center justify-center">
         <svg
           width="20"
           height="20"
@@ -93,7 +93,7 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
           <circle cx="12" cy="12" r="2.5" fill="white" />
         </svg>
       </div>
-      <span className="text-lg font-semibold text-foreground hidden sm:inline">
+      <span className="text-lg font-semibold text-foreground hidden sm:inline" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
         CommonGround
       </span>
     </div>
@@ -169,7 +169,7 @@ export function Navigation() {
                   {/* Notifications - Only for signed in users */}
                   <button
                     onClick={() => router.push('/activities')}
-                    className="relative p-2 rounded-xl hover:bg-cg-sage-subtle transition-smooth"
+                    className="relative p-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-smooth"
                     aria-label={unreadCount > 0 ? `${unreadCount} unread notifications` : 'Notifications'}
                   >
                     <Bell className="h-5 w-5 text-muted-foreground" />
@@ -185,10 +185,10 @@ export function Navigation() {
                   <div className="relative" ref={userMenuRef}>
                     <button
                       onClick={() => setUserMenuOpen(!userMenuOpen)}
-                      className="flex items-center gap-2 p-1.5 pr-3 rounded-full hover:bg-cg-sage-subtle transition-smooth"
+                      className="flex items-center gap-2 p-1.5 pr-3 rounded-full hover:bg-[#2C5F5D]/10 transition-smooth"
                     >
-                      <div className="w-8 h-8 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-                        <span className="text-sm font-medium text-cg-sage">{initials}</span>
+                      <div className="w-8 h-8 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center">
+                        <span className="text-sm font-medium text-[#2C5F5D]">{initials}</span>
                       </div>
                       <ChevronDown
                         className={`h-4 w-4 text-muted-foreground transition-transform hidden sm:block ${
@@ -212,7 +212,7 @@ export function Navigation() {
                         <div className="py-1">
                           <button
                             onClick={() => handleNavigation('/dashboard')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-cg-sage-subtle transition-smooth"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-[#2C5F5D]/10 transition-smooth"
                           >
                             <Home className="h-4 w-4 text-muted-foreground" />
                             Dashboard
@@ -228,21 +228,21 @@ export function Navigation() {
                           )}
                           <button
                             onClick={() => handleNavigation('/family-files')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-cg-sage-subtle transition-smooth"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-[#2C5F5D]/10 transition-smooth"
                           >
                             <FolderHeart className="h-4 w-4 text-muted-foreground" />
                             Family Files
                           </button>
                           <button
                             onClick={() => handleNavigation('/settings')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-cg-sage-subtle transition-smooth"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-[#2C5F5D]/10 transition-smooth"
                           >
                             <Settings className="h-4 w-4 text-muted-foreground" />
                             Settings
                           </button>
                           <button
                             onClick={() => handleNavigation('/help')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-cg-sage-subtle transition-smooth"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-[#2C5F5D]/10 transition-smooth"
                           >
                             <HelpCircle className="h-4 w-4 text-muted-foreground" />
                             Help Center
@@ -274,7 +274,7 @@ export function Navigation() {
                   </Link>
                   <Link
                     href="/register"
-                    className="bg-cg-sage text-white font-medium px-5 py-2 rounded-full text-sm transition-all duration-200 hover:bg-cg-sage/90 hover:shadow-lg"
+                    className="bg-[#2C5F5D] text-white font-medium px-5 py-2 rounded-full text-sm transition-all duration-200 hover:bg-[#2C5F5D]/90 hover:shadow-lg"
                   >
                     Get Started Free
                   </Link>
@@ -283,7 +283,7 @@ export function Navigation() {
 
               {/* Mobile Menu Toggle */}
               <button
-                className="lg:hidden p-2 rounded-xl hover:bg-cg-sage-subtle transition-smooth"
+                className="lg:hidden p-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-smooth"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle navigation menu"
               >
@@ -378,8 +378,8 @@ export function Navigation() {
               {user ? (
                 <div className="mt-4 pt-4 border-t border-border">
                   <div className="flex items-center gap-3 px-4">
-                    <div className="w-10 h-10 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-                      <span className="text-sm font-medium text-cg-sage">{initials}</span>
+                    <div className="w-10 h-10 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center">
+                      <span className="text-sm font-medium text-[#2C5F5D]">{initials}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-foreground truncate">
@@ -408,7 +408,7 @@ export function Navigation() {
                   <Link
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-center bg-cg-sage text-white font-medium py-2.5 rounded-xl hover:bg-cg-sage/90 transition-colors"
+                    className="block w-full text-center bg-[#2C5F5D] text-white font-medium py-2.5 rounded-xl hover:bg-[#2C5F5D]/90 transition-colors"
                   >
                     Get Started Free
                   </Link>

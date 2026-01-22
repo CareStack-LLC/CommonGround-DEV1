@@ -104,7 +104,7 @@ function FamilyFilesContent() {
       );
     }
     return (
-      <CGBadge variant="sage">
+      <CGBadge className="bg-[#2C5F5D]/10 text-[#2C5F5D] border-[#2C5F5D]/20">
         <CheckCircle className="h-3 w-3 mr-1" />
         Active
       </CGBadge>
@@ -134,8 +134,8 @@ function FamilyFilesContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="relative">
-          <div className="w-16 h-16 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-            <Sparkles className="h-8 w-8 text-cg-sage animate-pulse" />
+          <div className="w-16 h-16 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center">
+            <Sparkles className="h-8 w-8 text-[#2C5F5D] animate-pulse" />
           </div>
         </div>
         <p className="mt-4 text-muted-foreground font-medium">Loading your family files...</p>
@@ -149,7 +149,7 @@ function FamilyFilesContent() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <p className="text-sm text-muted-foreground mb-1">{getGreeting()}</p>
-          <h1 className="text-2xl font-semibold text-foreground">Family Files</h1>
+          <h1 className="text-2xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Family Files</h1>
           <p className="text-muted-foreground mt-1">
             Manage your co-parenting arrangements
           </p>
@@ -176,23 +176,23 @@ function FamilyFilesContent() {
       {invitations.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-cg-sage-subtle flex items-center justify-center">
-              <Mail className="h-4 w-4 text-cg-sage" />
+            <div className="w-8 h-8 rounded-lg bg-[#2C5F5D]/10 flex items-center justify-center">
+              <Mail className="h-4 w-4 text-[#2C5F5D]" />
             </div>
-            <h2 className="text-lg font-semibold text-foreground">Pending Invitations</h2>
+            <h2 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pending Invitations</h2>
           </div>
           <div className="space-y-3">
             {invitations.map((invitation) => (
               <CGCard
                 key={invitation.id}
                 variant="default"
-                className="border-cg-sage/30 bg-cg-sage-subtle/20"
+                className="border-[#2C5F5D]/30 bg-[#2C5F5D]/5"
               >
                 <CGCardContent className="py-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
-                        <FolderHeart className="h-6 w-6 text-cg-sage" />
+                      <div className="w-12 h-12 rounded-xl bg-[#2C5F5D]/10 flex items-center justify-center">
+                        <FolderHeart className="h-6 w-6 text-[#2C5F5D]" />
                       </div>
                       <div>
                         <h3 className="font-medium text-foreground">{invitation.title}</h3>
@@ -243,7 +243,7 @@ function FamilyFilesContent() {
             <div className="w-8 h-8 rounded-lg bg-cg-slate-subtle flex items-center justify-center">
               <FolderHeart className="h-4 w-4 text-cg-slate" />
             </div>
-            <h2 className="text-lg font-semibold text-foreground">Your Family Files</h2>
+            <h2 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Your Family Files</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {familyFiles.map((file) => (
@@ -256,8 +256,8 @@ function FamilyFilesContent() {
                 <CGCardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center flex-shrink-0">
-                        <FolderHeart className="h-5 w-5 text-cg-sage" />
+                      <div className="w-10 h-10 rounded-xl bg-[#2C5F5D]/10 flex items-center justify-center flex-shrink-0">
+                        <FolderHeart className="h-5 w-5 text-[#2C5F5D]" />
                       </div>
                       <div className="min-w-0">
                         <CGCardTitle className="text-base truncate">{file.title}</CGCardTitle>
