@@ -19,6 +19,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user, get_current_child_user, get_current_circle_user
 from app.services.daily_video import daily_service
 from app.services.push import push_service
+from app.core.websocket import manager
 from app.models.user import User
 from app.models.family_file import FamilyFile
 from app.models.child import Child
@@ -346,8 +347,22 @@ async def create_session(
                         "caller_name": caller_name
                     }
                 )
+
+                # WS5: Broadcast incoming call via WebSocket for real-time updates
+                await manager.broadcast_to_case({
+                    "type": "kidcoms_call_incoming",
+                    "family_file_id": session.family_file_id,
+                    "session_id": str(session.id),
+                    "child_id": str(child.id),
+                    "child_name": child_name,
+                    "caller_id": str(current_user.id),
+                    "caller_name": caller_name,
+                    "session_type": session.session_type,
+                    "timestamp": datetime.utcnow().isoformat()
+                }, session.family_file_id)
+
         except Exception as e:
-            logger.warning(f"Failed to send push notification for KidComs call: {e}")
+            logger.warning(f"Failed to send notification for KidComs call: {e}")
 
     return _session_to_response(session)
 
@@ -808,7 +823,43 @@ async def create_child_session(
             detail="Failed to generate meeting token. Please try again."
         )
 
-    # TODO: Send notification to target contact about incoming call
+    # Send notification to target contact about incoming call
+    try:
+        child_name = child.display_name
+
+        # Send push notification to target
+        if target_user_id:
+            await push_service.send_notification(
+                db=db,
+                user_id=str(target_user_id),
+                title=f"Incoming KidComs Call",
+                body=f"{child_name} is calling you",
+                url=f"/kidcoms?session={session.id}",
+                tag="kidcoms-call",
+                data={
+                    "session_id": str(session.id),
+                    "child_id": str(current_child.child_id),
+                    "caller_name": child_name
+                }
+            )
+
+        # WS5: Broadcast incoming call via WebSocket for real-time updates
+        await manager.broadcast_to_case({
+            "type": "kidcoms_call_incoming",
+            "family_file_id": family_file_id,
+            "session_id": str(session.id),
+            "child_id": str(current_child.child_id),
+            "child_name": child_name,
+            "caller_id": str(current_child.id),
+            "caller_name": child_name,
+            "session_type": session.session_type,
+            "target_user_id": str(target_user_id) if target_user_id else None,
+            "target_contact_id": str(target_circle_contact_id) if target_circle_contact_id else None,
+            "timestamp": datetime.utcnow().isoformat()
+        }, family_file_id)
+
+    except Exception as e:
+        logger.warning(f"Failed to send notification for child-initiated KidComs call: {e}")
 
     return KidComsJoinResponse(
         session_id=session.id,
@@ -1157,7 +1208,44 @@ async def create_circle_contact_session(
             detail="Failed to generate meeting token. Please try again."
         )
 
-    # TODO: Send notification to child/parents about incoming call
+    # Send notification to child/parents about incoming call
+    try:
+        contact_name = contact.contact_name
+        child_name = child.display_name
+
+        # Notify both parents about the incoming call
+        for parent_id in [family_file.parent_a_id, family_file.parent_b_id]:
+            if parent_id:
+                await push_service.send_notification(
+                    db=db,
+                    user_id=str(parent_id),
+                    title=f"Incoming KidComs Call",
+                    body=f"{contact_name} is calling {child_name}",
+                    url=f"/kidcoms?session={session.id}",
+                    tag="kidcoms-call",
+                    data={
+                        "session_id": str(session.id),
+                        "child_id": str(child.id),
+                        "caller_name": contact_name
+                    }
+                )
+
+        # WS5: Broadcast incoming call via WebSocket for real-time updates
+        await manager.broadcast_to_case({
+            "type": "kidcoms_call_incoming",
+            "family_file_id": str(family_file_id),
+            "session_id": str(session.id),
+            "child_id": str(child.id),
+            "child_name": child_name,
+            "caller_id": str(contact.id),
+            "caller_name": contact_name,
+            "session_type": session.session_type,
+            "caller_type": ParticipantType.CIRCLE_CONTACT.value,
+            "timestamp": datetime.utcnow().isoformat()
+        }, str(family_file_id))
+
+    except Exception as e:
+        logger.warning(f"Failed to send notification for circle contact KidComs call: {e}")
 
     return KidComsJoinResponse(
         session_id=session.id,

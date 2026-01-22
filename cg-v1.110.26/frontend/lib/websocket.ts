@@ -35,7 +35,245 @@ export interface UserStatusEvent {
   status: 'online' | 'offline';
 }
 
-export type WebSocketEventType = 'new_message' | 'typing' | 'user_status' | 'status' | 'error' | 'pong';
+// WS5: New real-time event types
+export interface ExchangeCreatedEvent {
+  type: 'exchange_created';
+  family_file_id: string;
+  exchange_id: string;
+  exchange: {
+    id: string;
+    title: string;
+    exchange_type: string;
+    scheduled_time: string;
+    location: string;
+    is_recurring: boolean;
+    status: string;
+  };
+  timestamp: string;
+}
+
+export interface ExchangeUpdatedEvent {
+  type: 'exchange_updated';
+  family_file_id: string;
+  exchange_id: string;
+  exchange: {
+    id: string;
+    title: string;
+    exchange_type: string;
+    scheduled_time: string;
+    location: string;
+    status: string;
+  };
+  timestamp: string;
+}
+
+export interface ExchangeCheckinEvent {
+  type: 'exchange_checkin';
+  family_file_id: string;
+  exchange_id: string;
+  parent_id: string;
+  checkin_type: string;
+  location?: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    in_geofence?: boolean;
+    distance_meters?: number;
+  };
+  timestamp: string;
+}
+
+export interface ObligationCreatedEvent {
+  type: 'obligation_created';
+  family_file_id: string;
+  obligation_id: string;
+  obligation: {
+    id: string;
+    title: string;
+    purpose_category: string;
+    total_amount: string;
+    status: string;
+    due_date?: string;
+  };
+  timestamp: string;
+}
+
+export interface ObligationUpdatedEvent {
+  type: 'obligation_updated';
+  family_file_id: string;
+  obligation_id: string;
+  obligation: {
+    id: string;
+    title: string;
+    status: string;
+    amount_funded?: string;
+    total_amount?: string;
+  };
+  timestamp: string;
+}
+
+export interface PaymentReceivedEvent {
+  type: 'payment_received';
+  family_file_id: string;
+  obligation_id: string;
+  payer_id: string;
+  amount: string;
+  timestamp: string;
+}
+
+export interface BalanceChangedEvent {
+  type: 'balance_changed';
+  family_file_id: string;
+  balance: Record<string, unknown>;
+  timestamp: string;
+}
+
+export interface DashboardUpdateEvent {
+  type: 'dashboard_update';
+  family_file_id: string;
+  summary: Record<string, unknown>;
+  timestamp: string;
+}
+
+// WS6: Geofence notifications
+export interface GeofenceEntryEvent {
+  type: 'geofence_entry';
+  family_file_id: string;
+  exchange_id: string;
+  parent_id: string;
+  parent_name: string;
+  location: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    distance_meters?: number;
+  };
+  message: string;
+  timestamp: string;
+}
+
+// WS5: Schedule Event real-time notifications
+export interface EventCreatedEvent {
+  type: 'event_created';
+  family_file_id: string;
+  case_id: string;
+  event_id: string;
+  event: {
+    id: string;
+    title: string;
+    start_time: string;
+    end_time: string;
+    event_category: string;
+    visibility: string;
+    location?: string;
+  };
+  timestamp: string;
+}
+
+export interface EventUpdatedEvent {
+  type: 'event_updated';
+  family_file_id: string;
+  case_id: string;
+  event_id: string;
+  event: {
+    id: string;
+    title: string;
+    start_time: string;
+    end_time: string;
+    event_category: string;
+    visibility: string;
+    location?: string;
+  };
+  timestamp: string;
+}
+
+export interface EventDeletedEvent {
+  type: 'event_deleted';
+  family_file_id: string;
+  case_id: string;
+  event_id: string;
+  timestamp: string;
+}
+
+// WS5: Agreement real-time notifications
+export interface AgreementCreatedEvent {
+  type: 'agreement_created';
+  case_id: string;
+  agreement_id: string;
+  agreement: {
+    id: string;
+    title: string;
+    status: string;
+    version: number;
+  };
+  timestamp: string;
+}
+
+export interface AgreementUpdatedEvent {
+  type: 'agreement_updated';
+  case_id: string;
+  agreement_id: string;
+  section_id: string;
+  section_number: number;
+  is_completed: boolean;
+  timestamp: string;
+}
+
+export interface AgreementApprovedEvent {
+  type: 'agreement_approved';
+  case_id: string;
+  family_file_id: string;
+  agreement_id: string;
+  agreement: {
+    id: string;
+    title: string;
+    status: string;
+    petitioner_approved: boolean;
+    respondent_approved: boolean;
+  };
+  user_role: string;
+  timestamp: string;
+}
+
+// KidComs Call Notifications
+export interface KidComsCallIncomingEvent {
+  type: 'kidcoms_call_incoming';
+  family_file_id: string;
+  session_id: string;
+  child_id: string;
+  child_name: string;
+  caller_id: string;
+  caller_name: string;
+  session_type: string;
+  caller_type?: string;
+  target_user_id?: string;
+  target_contact_id?: string;
+  timestamp: string;
+}
+
+export type WebSocketEventType =
+  | 'new_message'
+  | 'typing'
+  | 'user_status'
+  | 'exchange_created'
+  | 'exchange_updated'
+  | 'exchange_checkin'
+  | 'obligation_created'
+  | 'obligation_updated'
+  | 'payment_received'
+  | 'balance_changed'
+  | 'dashboard_update'
+  | 'geofence_entry'
+  | 'event_created'
+  | 'event_updated'
+  | 'event_deleted'
+  | 'agreement_created'
+  | 'agreement_updated'
+  | 'agreement_approved'
+  | 'kidcoms_call_incoming'
+  | 'status'
+  | 'error'
+  | 'pong';
 
 class WebSocketClient {
   private ws: WebSocket | null = null;

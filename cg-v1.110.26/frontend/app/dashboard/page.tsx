@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { useWebSocket } from '@/contexts/websocket-context';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
@@ -629,12 +630,28 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
   );
 }
 
-// Auto-refresh interval in milliseconds (30 seconds)
-const AUTO_REFRESH_INTERVAL = 30000;
+// WS5: No polling - dashboard now fully WebSocket-based with window focus refresh as fallback
 
 function DashboardContent() {
   const { user } = useAuth();
   const router = useRouter();
+  const {
+    subscribe,
+    unsubscribe,
+    onExchangeCreated,
+    onExchangeUpdated,
+    onExchangeCheckin,
+    onObligationCreated,
+    onObligationUpdated,
+    onPaymentReceived,
+    onDashboardUpdate,
+    onEventCreated,
+    onEventUpdated,
+    onEventDeleted,
+    onAgreementCreated,
+    onAgreementUpdated,
+    onAgreementApproved,
+  } = useWebSocket();
   const [familyFilesWithData, setFamilyFilesWithData] = useState<FamilyFileWithData[]>([]);
   const [allCustodyStatuses, setAllCustodyStatuses] = useState<CustodyStatusResponse[]>([]);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
@@ -854,18 +871,99 @@ function DashboardContent() {
     loadDashboardData();
   }, [loadDashboardData]);
 
-  // Auto-refresh polling
+  // WS5: WebSocket subscriptions and real-time event handling
   useEffect(() => {
-    // Don't start polling until initial load is complete
-    if (isLoading) return;
+    // Subscribe to all active family files
+    activeFileIdsRef.current.forEach(familyFileId => {
+      subscribe(familyFileId);
+    });
 
-    const intervalId = setInterval(() => {
-      refreshSummary();
-    }, AUTO_REFRESH_INTERVAL);
+    // Set up event listeners for real-time updates
+    const unsubscribeFns = [
+      onExchangeCreated(() => {
+        console.log('[Dashboard] Exchange created - refreshing...');
+        refreshSummary();
+      }),
+      onExchangeUpdated(() => {
+        console.log('[Dashboard] Exchange updated - refreshing...');
+        refreshSummary();
+      }),
+      onExchangeCheckin(() => {
+        console.log('[Dashboard] Exchange check-in - refreshing...');
+        refreshSummary();
+      }),
+      onObligationCreated(() => {
+        console.log('[Dashboard] Obligation created - refreshing...');
+        refreshSummary();
+      }),
+      onObligationUpdated(() => {
+        console.log('[Dashboard] Obligation updated - refreshing...');
+        refreshSummary();
+      }),
+      onPaymentReceived(() => {
+        console.log('[Dashboard] Payment received - refreshing...');
+        refreshSummary();
+      }),
+      onDashboardUpdate(() => {
+        console.log('[Dashboard] Dashboard update - refreshing...');
+        refreshSummary();
+      }),
+      // WS5: Event notifications
+      onEventCreated(() => {
+        console.log('[Dashboard] Event created - refreshing...');
+        refreshSummary();
+      }),
+      onEventUpdated(() => {
+        console.log('[Dashboard] Event updated - refreshing...');
+        refreshSummary();
+      }),
+      onEventDeleted(() => {
+        console.log('[Dashboard] Event deleted - refreshing...');
+        refreshSummary();
+      }),
+      // WS5: Agreement notifications
+      onAgreementCreated(() => {
+        console.log('[Dashboard] Agreement created - refreshing...');
+        refreshSummary();
+      }),
+      onAgreementUpdated(() => {
+        console.log('[Dashboard] Agreement updated - refreshing...');
+        refreshSummary();
+      }),
+      onAgreementApproved(() => {
+        console.log('[Dashboard] Agreement approved - refreshing...');
+        refreshSummary();
+      }),
+    ];
 
-    // Cleanup on unmount
-    return () => clearInterval(intervalId);
-  }, [isLoading, refreshSummary]);
+    // Cleanup: unsubscribe from WebSocket and remove listeners
+    return () => {
+      activeFileIdsRef.current.forEach(familyFileId => {
+        unsubscribe(familyFileId);
+      });
+      unsubscribeFns.forEach(fn => fn());
+    };
+  }, [
+    subscribe,
+    unsubscribe,
+    onExchangeCreated,
+    onExchangeUpdated,
+    onExchangeCheckin,
+    onObligationCreated,
+    onObligationUpdated,
+    onPaymentReceived,
+    onDashboardUpdate,
+    onEventCreated,
+    onEventUpdated,
+    onEventDeleted,
+    onAgreementCreated,
+    onAgreementUpdated,
+    onAgreementApproved,
+    refreshSummary,
+  ]);
+
+  // WS5: Polling removed - dashboard now relies entirely on WebSocket updates
+  // The window focus refresh below provides fallback when user returns to tab
 
   // Refresh when window regains focus (user comes back to tab)
   useEffect(() => {

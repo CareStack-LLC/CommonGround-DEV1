@@ -21,6 +21,7 @@ from app.models.my_time_collection import MyTimeCollection
 from app.models.case import CaseParticipant
 from app.models.family_file import FamilyFile
 from app.services.time_block import TimeBlockService, normalize_datetime
+from app.core.websocket import manager
 
 
 async def _check_event_access(
@@ -210,6 +211,26 @@ class EventService:
         await db.flush()
         await db.refresh(event)
 
+        # WS5: Broadcast event creation for real-time updates
+        if event.visibility == "co_parent" and (event.family_file_id or event.case_id):
+            broadcast_id = event.family_file_id or event.case_id
+            await manager.broadcast_to_case({
+                "type": "event_created",
+                "family_file_id": event.family_file_id,
+                "case_id": event.case_id,
+                "event_id": event.id,
+                "event": {
+                    "id": event.id,
+                    "title": event.title,
+                    "start_time": event.start_time.isoformat(),
+                    "end_time": event.end_time.isoformat(),
+                    "event_category": event.event_category,
+                    "visibility": event.visibility,
+                    "location": event.location if event.location_shared else None,
+                },
+                "timestamp": datetime.utcnow().isoformat()
+            }, broadcast_id)
+
         return event
 
     @staticmethod
@@ -397,6 +418,26 @@ class EventService:
         await db.flush()
         await db.refresh(event)
 
+        # WS5: Broadcast event update for real-time updates
+        if event.visibility == "co_parent" and (event.family_file_id or event.case_id):
+            broadcast_id = event.family_file_id or event.case_id
+            await manager.broadcast_to_case({
+                "type": "event_updated",
+                "family_file_id": event.family_file_id,
+                "case_id": event.case_id,
+                "event_id": event.id,
+                "event": {
+                    "id": event.id,
+                    "title": event.title,
+                    "start_time": event.start_time.isoformat(),
+                    "end_time": event.end_time.isoformat(),
+                    "event_category": event.event_category,
+                    "visibility": event.visibility,
+                    "location": event.location if event.location_shared else None,
+                },
+                "timestamp": datetime.utcnow().isoformat()
+            }, broadcast_id)
+
         return event
 
     @staticmethod
@@ -427,11 +468,26 @@ class EventService:
         if event.created_by != user_id:
             raise ValueError("Only the creator can delete this event")
 
+        # Store broadcast data before cancelling
+        should_broadcast = event.visibility == "co_parent" and (event.family_file_id or event.case_id)
+        if should_broadcast:
+            broadcast_id = event.family_file_id or event.case_id
+
         event.status = "cancelled"
         event.cancelled_at = datetime.utcnow()
         event.cancelled_by = user_id
         event.updated_at = datetime.utcnow()
         await db.flush()
+
+        # WS5: Broadcast event deletion for real-time updates
+        if should_broadcast:
+            await manager.broadcast_to_case({
+                "type": "event_deleted",
+                "family_file_id": event.family_file_id,
+                "case_id": event.case_id,
+                "event_id": event.id,
+                "timestamp": datetime.utcnow().isoformat()
+            }, broadcast_id)
 
         return True
 
@@ -741,3 +797,127 @@ class EventService:
             "conflicts": all_conflicts,
             "can_proceed": True  # MVP: conflicts are warnings, not blockers
         }
+
+    @staticmethod
+    async def check_in_with_gps(
+        db: AsyncSession,
+        event_id: str,
+        user_id: str,
+        latitude: float,
+        longitude: float,
+        device_accuracy: float = 0
+    ) -> "ExchangeCheckIn":
+        """
+        WS6: GPS check-in for medical/school/sports events with geofence verification.
+
+        Args:
+            db: Database session
+            event_id: Event UUID
+            user_id: User checking in
+            latitude: GPS latitude
+            longitude: GPS longitude
+            device_accuracy: Device accuracy in meters
+
+        Returns:
+            CheckIn record
+
+        Raises:
+            HTTPException: If event not found or access denied
+        """
+        from fastapi import HTTPException, status
+        from app.models.schedule import ExchangeCheckIn
+        from app.models.user import User
+        from app.services.geolocation import GeolocationService
+        from app.services.realtime import realtime_service
+
+        # Get event
+        result = await db.execute(
+            select(ScheduleEvent).where(ScheduleEvent.id == event_id)
+        )
+        event = result.scalar_one_or_none()
+
+        if not event:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Event not found"
+            )
+
+        # Verify access
+        case_or_ff_id = event.family_file_id or event.case_id
+        if not case_or_ff_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Event has no associated case or family file"
+            )
+
+        has_access, _, _ = await _check_event_access(db, case_or_ff_id, user_id)
+        if not has_access:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Access denied to this event"
+            )
+
+        # Parse geofence data from category_data
+        geofence_lat = None
+        geofence_lng = None
+        geofence_radius = 100  # Default 100 meters
+
+        if event.category_data:
+            geofence_lat = event.category_data.get("geofence_lat")
+            geofence_lng = event.category_data.get("geofence_lng")
+            geofence_radius = event.category_data.get("geofence_radius", 100)
+
+        # Calculate distance and geofence status
+        in_geofence = False
+        distance_meters = 0.0
+
+        if geofence_lat and geofence_lng:
+            in_geofence, distance_meters = GeolocationService.is_within_geofence(
+                latitude, longitude,
+                geofence_lat, geofence_lng,
+                geofence_radius,
+                device_accuracy
+            )
+
+        # Create check-in record
+        check_in = ExchangeCheckIn(
+            event_id=event_id,
+            user_id=user_id,
+            checked_in_at=datetime.utcnow(),
+            check_in_method="gps",
+            latitude=latitude,
+            longitude=longitude,
+            device_accuracy=device_accuracy,
+            in_geofence=in_geofence,
+            distance_from_location=distance_meters
+        )
+
+        db.add(check_in)
+        await db.commit()
+        await db.refresh(check_in)
+
+        # WS6: Broadcast geofence entry notification if within geofence
+        if in_geofence and event.family_file_id:
+            # Get user name
+            result = await db.execute(
+                select(User).where(User.id == user_id)
+            )
+            user = result.scalar_one_or_none()
+
+            if user:
+                parent_name = f"{user.first_name} {user.last_name}".strip() or "Parent"
+
+                await realtime_service.broadcast_geofence_entry(
+                    family_file_id=event.family_file_id,
+                    exchange_id=event_id,  # Use event_id as exchange_id
+                    parent_id=user_id,
+                    parent_name=parent_name,
+                    location={
+                        "latitude": latitude,
+                        "longitude": longitude,
+                        "accuracy": device_accuracy,
+                        "distance_meters": distance_meters
+                    }
+                )
+
+        return check_in

@@ -99,20 +99,6 @@ export function MessageCompose({
     }
   };
 
-  const handleAccept = () => {
-    if (analysis?.suggestion) {
-      handleSendDirect(analysis.suggestion);
-    }
-  };
-
-  const handleModify = (newMessage: string) => {
-    handleSendDirect(newMessage);
-  };
-
-  const handleReject = (newMessage: string) => {
-    handleSendDirect(newMessage);
-  };
-
   const handleSendAnyway = () => {
     handleSendDirect(message);
   };
@@ -175,9 +161,6 @@ export function MessageCompose({
         <ARIAIntervention
           analysis={analysis}
           originalMessage={message}
-          onAccept={handleAccept}
-          onModify={handleModify}
-          onReject={handleReject}
           onSendAnyway={handleSendAnyway}
           onCancel={handleCancel}
         />

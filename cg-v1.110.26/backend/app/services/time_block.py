@@ -514,16 +514,94 @@ class TimeBlockService:
         # Convert to neutral busy periods
         busy_periods = []
         for block in blocks:
-            busy_periods.append({
-                "start_time": block.start_time.isoformat(),
-                "end_time": block.end_time.isoformat(),
-                "label": "Busy",  # No details
-                "color": "#94A3B8",  # Neutral gray
-                "type": "busy",
-                "details_hidden": True
-            })
-
-        # TODO: Expand recurring blocks within date range
-        # For MVP, we'll just show the base block
+            if block.is_recurring:
+                # Expand recurring block into individual instances
+                expanded = TimeBlockService._expand_recurring_block(
+                    block, start_date, end_date
+                )
+                busy_periods.extend(expanded)
+            else:
+                # Non-recurring block - add as-is
+                busy_periods.append({
+                    "start_time": block.start_time.isoformat(),
+                    "end_time": block.end_time.isoformat(),
+                    "label": "Busy",  # No details
+                    "color": "#94A3B8",  # Neutral gray
+                    "type": "busy",
+                    "details_hidden": True
+                })
 
         return busy_periods
+
+    @staticmethod
+    def _expand_recurring_block(
+        block: TimeBlock,
+        range_start: datetime,
+        range_end: datetime
+    ) -> List[dict]:
+        """
+        Expand a recurring time block into individual instances within date range.
+
+        Args:
+            block: Recurring TimeBlock
+            range_start: Start of date range
+            range_end: End of date range
+
+        Returns:
+            List of busy period dictionaries (one per occurrence)
+        """
+        instances = []
+
+        # Determine effective start date (max of block start and range start)
+        current_date = max(block.start_time.date(), range_start.date())
+
+        # Determine effective end date
+        effective_end = range_end.date()
+        if block.recurrence_end_date:
+            effective_end = min(effective_end, block.recurrence_end_date)
+
+        # Extract time components from base block
+        start_time_of_day = block.start_time.time()
+        end_time_of_day = block.end_time.time()
+
+        if block.recurrence_pattern == "daily":
+            # Generate daily instances
+            while current_date <= effective_end:
+                instance_start = datetime.combine(current_date, start_time_of_day)
+                instance_end = datetime.combine(current_date, end_time_of_day)
+
+                instances.append({
+                    "start_time": instance_start.isoformat(),
+                    "end_time": instance_end.isoformat(),
+                    "label": "Busy",
+                    "color": "#94A3B8",
+                    "type": "busy",
+                    "details_hidden": True
+                })
+
+                current_date += timedelta(days=1)
+
+        elif block.recurrence_pattern == "weekly":
+            # Generate weekly instances (only on specified days)
+            if not block.recurrence_days:
+                return instances
+
+            while current_date <= effective_end:
+                # Check if current day of week is in recurrence_days
+                # 0 = Monday, 6 = Sunday
+                if current_date.weekday() in block.recurrence_days:
+                    instance_start = datetime.combine(current_date, start_time_of_day)
+                    instance_end = datetime.combine(current_date, end_time_of_day)
+
+                    instances.append({
+                        "start_time": instance_start.isoformat(),
+                        "end_time": instance_end.isoformat(),
+                        "label": "Busy",
+                        "color": "#94A3B8",
+                        "type": "busy",
+                        "details_hidden": True
+                    })
+
+                current_date += timedelta(days=1)
+
+        return instances

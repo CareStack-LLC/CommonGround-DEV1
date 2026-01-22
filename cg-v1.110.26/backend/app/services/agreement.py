@@ -31,6 +31,7 @@ from app.services.case import CaseService
 from app.services.family_file import FamilyFileService
 from app.services.email import EmailService
 from app.core.config import settings
+from app.core.websocket import manager
 
 
 class AgreementService:
@@ -103,6 +104,20 @@ class AgreementService:
 
             await self.db.commit()
             await self.db.refresh(agreement)
+
+            # WS5: Broadcast agreement creation for real-time updates
+            await manager.broadcast_to_case({
+                "type": "agreement_created",
+                "case_id": agreement.case_id,
+                "agreement_id": agreement.id,
+                "agreement": {
+                    "id": agreement.id,
+                    "title": agreement.title,
+                    "status": agreement.status,
+                    "version": agreement.version,
+                },
+                "timestamp": datetime.utcnow().isoformat()
+            }, agreement.case_id)
 
             return agreement
 
@@ -326,6 +341,17 @@ class AgreementService:
 
             await self.db.commit()
             await self.db.refresh(section)
+
+            # WS5: Broadcast agreement update for real-time updates
+            await manager.broadcast_to_case({
+                "type": "agreement_updated",
+                "case_id": agreement.case_id,
+                "agreement_id": agreement.id,
+                "section_id": section.id,
+                "section_number": section.section_number,
+                "is_completed": section.is_completed,
+                "timestamp": datetime.utcnow().isoformat()
+            }, agreement.case_id)
 
             return section
 
@@ -827,6 +853,25 @@ class AgreementService:
 
             await self.db.commit()
             await self.db.refresh(agreement)
+
+            # WS5: Broadcast agreement approval for real-time updates
+            broadcast_id = agreement.family_file_id or agreement.case_id
+            if broadcast_id:
+                await manager.broadcast_to_case({
+                    "type": "agreement_approved",
+                    "case_id": agreement.case_id,
+                    "family_file_id": agreement.family_file_id,
+                    "agreement_id": agreement.id,
+                    "agreement": {
+                        "id": agreement.id,
+                        "title": agreement.title,
+                        "status": agreement.status,
+                        "petitioner_approved": agreement.petitioner_approved,
+                        "respondent_approved": agreement.respondent_approved,
+                    },
+                    "user_role": user_role,
+                    "timestamp": datetime.utcnow().isoformat()
+                }, broadcast_id)
 
             return agreement
 

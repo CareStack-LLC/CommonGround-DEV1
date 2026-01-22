@@ -1,122 +1,110 @@
 'use client';
 
-import { useState } from 'react';
 import { ARIAAnalysisResponse } from '@/lib/api';
 import {
   Sparkles,
   CheckCircle,
   AlertTriangle,
   XCircle,
-  Edit3,
-  RefreshCw,
   Send,
   X,
   ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
+import { useState } from 'react';
 
 interface ARIAInterventionProps {
   analysis: ARIAAnalysisResponse;
   originalMessage: string;
-  onAccept: () => void;
-  onModify: (newMessage: string) => void;
-  onReject: (newMessage: string) => void;
   onSendAnyway: () => void;
   onCancel: () => void;
 }
 
 /**
- * ARIA Guardian Intervention Component
+ * WS3: ARIA Intervention Component (Flag Only)
  *
- * Design: Amber glowing guardian aesthetic
- * - Warm amber colors for attention
- * - Soft, non-threatening design
- * - Clear action paths
+ * Simplified to show toxicity warnings without suggesting rewrites.
+ * Users must revise their own messages.
  */
 export function ARIAIntervention({
   analysis,
   originalMessage,
-  onAccept,
-  onModify,
-  onReject,
   onSendAnyway,
   onCancel,
 }: ARIAInterventionProps) {
-  const [action, setAction] = useState<'none' | 'modify' | 'reject'>('none');
-  const [editedMessage, setEditedMessage] = useState(analysis.suggestion || '');
   const [showDetails, setShowDetails] = useState(false);
 
   const getLevelConfig = (level: string) => {
     switch (level) {
       case 'green':
         return {
-          bg: 'bg-cg-success-subtle',
-          border: 'border-cg-success/30',
-          icon: <CheckCircle className="h-6 w-6 text-cg-success" />,
+          bg: 'bg-green-50',
+          border: 'border-green-200',
+          icon: <CheckCircle className="h-6 w-6 text-green-600" />,
           title: 'Message looks good!',
           subtitle: 'Your message maintains a constructive tone.',
-          color: 'text-cg-success',
+          color: 'text-green-700',
         };
       case 'yellow':
         return {
-          bg: 'bg-cg-amber-subtle',
-          border: 'border-cg-amber/30',
-          icon: <Sparkles className="h-6 w-6 text-cg-amber" />,
-          title: 'ARIA has a suggestion',
-          subtitle: 'A small adjustment could improve the tone.',
-          color: 'text-cg-amber',
+          bg: 'bg-amber-50',
+          border: 'border-amber-300',
+          icon: <Sparkles className="h-6 w-6 text-amber-600" />,
+          title: 'Tone Check',
+          subtitle: 'This message may be misunderstood.',
+          color: 'text-amber-700',
         };
       case 'orange':
         return {
-          bg: 'bg-cg-warning-subtle',
-          border: 'border-cg-warning/50',
-          icon: <AlertTriangle className="h-6 w-6 text-cg-warning" />,
-          title: 'Tone check recommended',
-          subtitle: 'This message may escalate conflict.',
-          color: 'text-cg-warning',
+          bg: 'bg-orange-50',
+          border: 'border-orange-400',
+          icon: <AlertTriangle className="h-6 w-6 text-orange-600" />,
+          title: 'Conflict Risk',
+          subtitle: 'This message is likely to escalate conflict.',
+          color: 'text-orange-700',
         };
       case 'red':
         return {
-          bg: 'bg-cg-error-subtle',
-          border: 'border-cg-error/30',
-          icon: <XCircle className="h-6 w-6 text-cg-error" />,
+          bg: 'bg-red-50',
+          border: 'border-red-400',
+          icon: <XCircle className="h-6 w-6 text-red-600" />,
           title: 'Message Blocked',
           subtitle: 'This message violates safety policies and cannot be sent.',
-          color: 'text-cg-error',
+          color: 'text-red-700',
         };
       default:
         return {
-          bg: 'bg-cg-amber-subtle',
-          border: 'border-cg-amber/30',
-          icon: <Sparkles className="h-6 w-6 text-cg-amber" />,
+          bg: 'bg-amber-50',
+          border: 'border-amber-300',
+          icon: <Sparkles className="h-6 w-6 text-amber-600" />,
           title: 'ARIA Review',
           subtitle: 'Analysis complete.',
-          color: 'text-cg-amber',
+          color: 'text-amber-700',
         };
     }
   };
 
   const config = getLevelConfig(analysis.block_send ? 'red' : analysis.toxicity_level);
-  // Strictly prevent sending if block_send is true
-  const canSendAnyway = !analysis.block_send && analysis.toxicity_level !== 'red'; // Double safety check
+  const canSendAnyway = !analysis.block_send;
 
   return (
-    <div className={`aria-guardian ${config.bg} ${config.border} overflow-hidden max-h-[92vh] sm:max-h-[90vh] flex flex-col`}>
-      {/* Header - Compact on mobile */}
-      <div className="p-3 sm:p-5 flex-shrink-0">
-        <div className="flex items-start gap-2 sm:gap-4">
-          {/* Animated Icon - Smaller on mobile */}
+    <div className={`rounded-xl border-2 ${config.border} ${config.bg} overflow-hidden`}>
+      {/* Header */}
+      <div className="p-5">
+        <div className="flex items-start gap-4">
+          {/* Icon */}
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/50 flex items-center justify-center aria-glow">
-              <div className="scale-90 sm:scale-100">{config.icon}</div>
+            <div className="w-12 h-12 rounded-full bg-white/70 flex items-center justify-center">
+              {config.icon}
             </div>
           </div>
 
           {/* Title & Subtitle */}
           <div className="flex-1 min-w-0">
-            <h3 className={`font-semibold text-base sm:text-lg ${config.color}`}>
+            <h3 className={`font-semibold text-lg ${config.color}`}>
               {config.title}
             </h3>
-            <p className="text-xs sm:text-sm text-foreground/70 mt-0.5">
+            <p className="text-sm text-gray-700 mt-1">
               {config.subtitle}
             </p>
           </div>
@@ -124,226 +112,118 @@ export function ARIAIntervention({
           {/* Close Button */}
           <button
             onClick={onCancel}
-            className="p-1.5 sm:p-2 rounded-lg hover:bg-black/5 transition-smooth flex-shrink-0"
+            className="p-2 rounded-lg hover:bg-black/5 transition-colors"
           >
-            <X className="h-4 w-4 sm:h-5 sm:w-5 text-foreground/50" />
+            <X className="h-5 w-5 text-gray-500" />
           </button>
         </div>
 
-        {/* Explanation - Hidden on mobile, shown in details */}
+        {/* Explanation */}
         {analysis.explanation && (
-          <p className="hidden sm:block mt-3 text-sm text-foreground leading-relaxed">
+          <div className="mt-4 text-sm text-gray-700 leading-relaxed">
             {analysis.explanation}
-          </p>
+          </div>
         )}
 
-        {/* Conflict Risk Meter - More compact */}
-        <div className="mt-3 sm:mt-4">
-          <div className="flex justify-between items-center mb-1.5">
-            <span className="text-xs font-medium text-foreground/70">Conflict Risk</span>
-            <span className="text-xs font-semibold text-foreground">
+        {/* Conflict Risk Meter */}
+        <div className="mt-4">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-medium text-gray-600">Conflict Risk</span>
+            <span className="text-xs font-semibold text-gray-800">
               {Math.round(analysis.toxicity_score * 100)}%
             </span>
           </div>
-          <div className="h-1.5 sm:h-2 bg-white/50 rounded-full overflow-hidden">
+          <div className="h-2 bg-white/60 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${analysis.toxicity_level === 'green'
-                  ? 'bg-cg-success'
+              className={`h-full rounded-full transition-all duration-500 ${
+                analysis.toxicity_level === 'green'
+                  ? 'bg-green-500'
                   : analysis.toxicity_level === 'yellow'
-                    ? 'bg-cg-amber'
-                    : analysis.toxicity_level === 'orange'
-                      ? 'bg-cg-warning'
-                      : 'bg-cg-error'
-                }`}
+                  ? 'bg-amber-500'
+                  : analysis.toxicity_level === 'orange'
+                  ? 'bg-orange-500'
+                  : 'bg-red-500'
+              }`}
               style={{ width: `${analysis.toxicity_score * 100}%` }}
             />
           </div>
         </div>
+      </div>
 
-        {/* Expandable Details - Includes explanation on mobile */}
-        <div className="mt-2 sm:mt-4">
+      {/* Detected Issues (Collapsible) */}
+      {analysis.categories && analysis.categories.length > 0 && (
+        <div className="px-5 pb-4">
           <button
             onClick={() => setShowDetails(!showDetails)}
-            className="flex items-center gap-2 text-xs font-medium text-foreground/70 hover:text-foreground transition-smooth"
+            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
           >
-            <ChevronDown className={`h-4 w-4 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
-            {showDetails ? 'Hide details' : 'Show details'}
+            {showDetails ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+            <span>Detected Issues ({analysis.categories.length})</span>
           </button>
 
           {showDetails && (
-            <div className="mt-2 sm:mt-3 space-y-2 sm:space-y-3 animate-in slide-in-from-top-2 duration-200">
-              {/* Explanation on mobile */}
-              {analysis.explanation && (
-                <p className="sm:hidden text-xs text-foreground leading-relaxed">
-                  {analysis.explanation}
-                </p>
-              )}
-
-              {/* Categories */}
-              {analysis.categories.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-foreground/70 mb-1.5">Detected patterns:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {analysis.categories.map((category, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-0.5 bg-white/50 rounded-lg text-xs font-medium text-foreground/80 capitalize"
-                      >
-                        {category.replace(/_/g, ' ').toLowerCase()}
-                      </span>
-                    ))}
-                  </div>
+            <div className="mt-3 space-y-2">
+              {analysis.categories.map((category, idx) => (
+                <div
+                  key={idx}
+                  className="text-xs bg-white/60 px-3 py-2 rounded-lg border border-gray-200"
+                >
+                  <span className="font-medium capitalize">{category}</span>
+                  {analysis.triggers && analysis.triggers[idx] && (
+                    <span className="text-gray-600 ml-2">
+                      • {analysis.triggers[idx]}
+                    </span>
+                  )}
                 </div>
-              )}
-
-              {/* Triggers */}
-              {analysis.triggers.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-foreground/70 mb-1.5">Specific concerns:</p>
-                  <ul className="space-y-0.5">
-                    {analysis.triggers.map((trigger, index) => (
-                      <li key={index} className="text-xs text-foreground/70 pl-3 relative">
-                        <span className="absolute left-0">•</span>
-                        "{trigger}"
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              ))}
             </div>
           )}
         </div>
-      </div>
+      )}
 
-      {/* Messages Comparison - Scrollable area */}
-      <div className="border-t border-black/5 overflow-y-auto flex-1 min-h-0">
-        <div className="p-3 sm:p-5 space-y-3 sm:space-y-4">
-          {/* Original Message */}
-          <div>
-            <p className="text-xs font-medium text-foreground/70 mb-1.5">Your message:</p>
-            <div className="p-2.5 sm:p-3 bg-white/30 rounded-xl text-sm text-foreground border border-black/5">
-              {originalMessage}
-            </div>
-          </div>
+      {/* Actions */}
+      <div className="px-5 pb-5 pt-2 border-t border-gray-200/50">
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Edit Message Button (Primary) */}
+          <button
+            onClick={onCancel}
+            className="flex-1 px-4 py-3 bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-medium rounded-xl transition-all shadow-sm hover:shadow"
+          >
+            Edit Message
+          </button>
 
-          {/* Suggestion */}
-          {analysis.suggestion && action === 'none' && (
-            <div>
-              <p className="text-xs font-medium text-foreground/70 mb-1.5 flex items-center gap-1.5">
-                <Sparkles className="h-3 w-3 text-cg-amber" />
-                ARIA's suggestion:
-              </p>
-              <div className="p-2.5 sm:p-3 bg-white rounded-xl text-sm text-foreground border-2 border-cg-amber/30 shadow-sm">
-                {analysis.suggestion}
-              </div>
-            </div>
-          )}
-
-          {/* Edit Mode */}
-          {(action === 'modify' || action === 'reject') && (
-            <div>
-              <p className="text-xs font-medium text-foreground/70 mb-1.5">
-                {action === 'modify' ? 'Edit the suggestion:' : 'Write your alternative:'}
-              </p>
-              <textarea
-                value={editedMessage}
-                onChange={(e) => setEditedMessage(e.target.value)}
-                placeholder="Type your message here..."
-                className="w-full p-2.5 sm:p-3 bg-white rounded-xl text-sm text-foreground border-2 border-cg-sage/30 focus:border-cg-sage focus:ring-2 focus:ring-cg-sage/20 outline-none transition-all resize-none"
-                rows={3}
-                autoFocus
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Actions - Fixed at bottom, compact on mobile */}
-      <div className="border-t border-black/5 p-3 sm:p-5 bg-white/30 flex-shrink-0">
-        {action === 'none' ? (
-          <div className="space-y-2">
-            {/* Primary Action - Accept Suggestion */}
-            {analysis.suggestion && (
-              <button
-                onClick={onAccept}
-                className="w-full cg-btn-primary flex items-center justify-center gap-2 py-2.5 sm:py-3"
-              >
-                <CheckCircle className="h-4 w-4" />
-                Use ARIA's Suggestion
-              </button>
-            )}
-
-            {/* Secondary Actions + Send/Cancel in one row on mobile */}
-            <div className="flex gap-2">
-              {analysis.suggestion && (
-                <button
-                  onClick={() => setAction('modify')}
-                  className="flex-1 cg-btn-secondary flex items-center justify-center gap-1.5 py-2"
-                >
-                  <Edit3 className="h-4 w-4" />
-                  Edit
-                </button>
-              )}
-
-              <button
-                onClick={() => {
-                  setEditedMessage('');
-                  setAction('reject');
-                }}
-                className="flex-1 cg-btn-secondary flex items-center justify-center gap-1.5 py-2"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Rewrite
-              </button>
-            </div>
-
-            {/* Send Anyway / Cancel - Inline on mobile */}
-            <div className="flex gap-2">
-              {canSendAnyway && (
-                <button
-                  onClick={onSendAnyway}
-                  className="flex-1 text-xs sm:text-sm font-medium text-foreground/60 hover:text-foreground py-1.5 transition-smooth"
-                >
-                  Send Original
-                </button>
-              )}
-              <button
-                onClick={onCancel}
-                className="flex-1 text-xs sm:text-sm font-medium text-foreground/60 hover:text-foreground py-1.5 transition-smooth"
-              >
-                Cancel
-              </button>
-            </div>
-
-            {!canSendAnyway && (
-              <p className="text-xs text-cg-error text-center pt-1 font-medium">
-                {analysis.block_send
-                  ? "This message violates safety guidelines."
-                  : "Revision required before sending."}
-              </p>
-            )}
-          </div>
-        ) : (
-          /* Edit Mode Actions */
-          <div className="space-y-2">
+          {/* Send Anyway Button (If Allowed) */}
+          {canSendAnyway && (
             <button
-              onClick={() => action === 'modify' ? onModify(editedMessage) : onReject(editedMessage)}
-              disabled={!editedMessage.trim()}
-              className="w-full cg-btn-primary flex items-center justify-center gap-2 py-2.5 sm:py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={onSendAnyway}
+              className={`flex-1 px-4 py-3 font-medium rounded-xl transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 ${
+                analysis.toxicity_level === 'green'
+                  ? 'bg-green-600 hover:bg-green-700 text-white'
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
+              }`}
             >
               <Send className="h-4 w-4" />
-              Send Message
+              <span>Send Anyway</span>
             </button>
-            <button
-              onClick={() => {
-                setAction('none');
-                setEditedMessage(analysis.suggestion || '');
-              }}
-              className="w-full text-xs sm:text-sm font-medium text-foreground/60 hover:text-foreground py-1.5 transition-smooth"
-            >
-              Back
-            </button>
-          </div>
+          )}
+
+          {/* Blocked - Cannot Send */}
+          {!canSendAnyway && (
+            <div className="flex-1 px-4 py-3 bg-red-100 text-red-700 font-medium rounded-xl text-center border-2 border-red-300">
+              Cannot Send
+            </div>
+          )}
+        </div>
+
+        {/* Warning Text */}
+        {canSendAnyway && analysis.toxicity_level !== 'green' && (
+          <p className="mt-3 text-xs text-center text-gray-600">
+            Messages sent despite warnings may be reviewed by court or legal professionals.
+          </p>
         )}
       </div>
     </div>

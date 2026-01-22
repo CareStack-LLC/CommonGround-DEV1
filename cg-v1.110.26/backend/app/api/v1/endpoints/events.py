@@ -382,3 +382,57 @@ async def check_event_conflicts(
     )
 
     return ConflictCheckResponse(**result)
+
+
+@router.post(
+    "/{event_id}/check-in/gps",
+    status_code=status.HTTP_201_CREATED,
+    summary="GPS check-in for event",
+    description="WS6: Check in to medical/school/sports event with GPS verification"
+)
+async def check_in_with_gps(
+    event_id: str,
+    latitude: float = Query(..., description="GPS latitude"),
+    longitude: float = Query(..., description="GPS longitude"),
+    device_accuracy: float = Query(0, description="Device accuracy in meters"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    WS6: GPS check-in for events (medical appointments, school hearings, sports, etc.).
+
+    Similar to silent handoff for exchanges, but for general calendar events.
+    Records arrival time, location, and verifies if within geofence (if configured).
+
+    If within geofence, broadcasts real-time notification to co-parent.
+
+    Args:
+        event_id: Event UUID
+        latitude: GPS latitude
+        longitude: GPS longitude
+        device_accuracy: Device-reported GPS accuracy
+
+    Returns:
+        Check-in record with geofence verification
+    """
+    check_in = await EventService.check_in_with_gps(
+        db=db,
+        event_id=event_id,
+        user_id=current_user.id,
+        latitude=latitude,
+        longitude=longitude,
+        device_accuracy=device_accuracy
+    )
+
+    return {
+        "id": str(check_in.id),
+        "event_id": str(check_in.event_id),
+        "user_id": str(check_in.user_id),
+        "checked_in_at": check_in.checked_in_at.isoformat(),
+        "check_in_method": check_in.check_in_method,
+        "in_geofence": check_in.in_geofence,
+        "distance_from_location": check_in.distance_from_location,
+        "latitude": check_in.latitude,
+        "longitude": check_in.longitude,
+        "device_accuracy": check_in.device_accuracy
+    }
