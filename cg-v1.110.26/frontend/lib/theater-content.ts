@@ -29,6 +29,30 @@ export interface TheaterContentLibrary {
 export const theaterContent: TheaterContentLibrary = {
   videos: [
     {
+      id: 'crunch',
+      title: 'Crunch',
+      url: '/kidsComms/Crunch.mp4',
+      thumbnail: '/kidsComms/posters/crunch-poster.jpg',
+      duration: '4:30',
+      description: 'Animated short film about an alien who loves cereal',
+    },
+    {
+      id: 'johnny-express',
+      title: 'Johnny Express',
+      url: '/kidsComms/Johnny Express.mp4',
+      thumbnail: '/kidsComms/posters/johnny-express-poster.jpg',
+      duration: '5:15',
+      description: 'Funny space delivery adventure',
+    },
+    {
+      id: 'the-bread',
+      title: 'The Bread',
+      url: '/kidsComms/The Bread.mp4',
+      thumbnail: '/kidsComms/posters/the-bread-poster.jpg',
+      duration: '2:45',
+      description: 'Charming animated story about bread',
+    },
+    {
       id: 'minions',
       title: 'Minions Clip',
       url: '/kidsComms/minions-clip.mp4',
@@ -54,6 +78,14 @@ export const theaterContent: TheaterContentLibrary = {
     },
   ],
   storybooks: [
+    {
+      id: 'luna-midnight',
+      title: 'Luna and Midnight',
+      url: '/kidsComms/Luna_And_Midnight_.pdf',
+      cover: '/kidsComms/covers/luna-midnight-cover.jpg',
+      pages: 24,
+      author: 'Children\'s Book',
+    },
     {
       id: 'my-family',
       title: 'My Family',
