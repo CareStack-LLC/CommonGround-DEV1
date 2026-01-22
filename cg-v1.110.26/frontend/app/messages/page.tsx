@@ -47,12 +47,12 @@ interface FamilyFileWithAgreements {
 // ARIA Guardian indicator component
 function ARIAGuardianBadge() {
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 bg-cg-amber-subtle border border-cg-amber/20 rounded-full">
+    <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-xl shadow-sm">
       <div className="relative">
-        <div className="w-2 h-2 bg-cg-amber rounded-full" />
-        <div className="absolute inset-0 w-2 h-2 bg-cg-amber rounded-full animate-ping opacity-50" />
+        <div className="w-2 h-2 bg-amber-500 rounded-full" />
+        <div className="absolute inset-0 w-2 h-2 bg-amber-500 rounded-full animate-ping opacity-50" />
       </div>
-      <span className="text-xs font-medium text-cg-amber">ARIA Protected</span>
+      <span className="text-xs font-semibold text-amber-600">ARIA Protected</span>
     </div>
   );
 }
@@ -78,22 +78,22 @@ function MessageBubble({
     <div className={`flex gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}>
       {/* Avatar */}
       {showAvatar && (
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-          isOwn ? 'bg-[#2C5F5D]' : 'bg-cg-slate'
+        <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
+          isOwn ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644]' : 'bg-gradient-to-br from-slate-400 to-slate-500'
         }`}>
-          <span className="text-xs font-medium text-white">
+          <span className="text-xs font-semibold text-white">
             {isOwn ? 'You' : (userName?.charAt(0) || 'P')}
           </span>
         </div>
       )}
-      {!showAvatar && <div className="w-8" />}
+      {!showAvatar && <div className="w-9" />}
 
       {/* Bubble */}
       <div className={`max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
         <div className={`relative group ${
           isOwn
-            ? 'chat-bubble-user'
-            : 'chat-bubble-other'
+            ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white px-4 py-3 rounded-2xl shadow-md'
+            : 'bg-white text-slate-900 px-4 py-3 rounded-2xl shadow-md border border-slate-200'
         }`}>
           {/* ARIA Review Badge */}
           {message.was_flagged && (
@@ -179,23 +179,23 @@ function ChatHeader({
   onBack?: () => void;
 }) {
   return (
-    <div className="bg-card border-b border-border flex-shrink-0">
+    <div className="bg-white border-b-2 border-slate-200 flex-shrink-0 shadow-sm">
       <div className="flex items-center justify-between p-4 gap-2">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {onBack && (
             <button
               onClick={onBack}
-              className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-smooth flex-shrink-0"
+              className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-all duration-200 flex-shrink-0"
             >
-              <ChevronLeft className="h-5 w-5" />
+              <ChevronLeft className="h-5 w-5 text-slate-600" />
             </button>
           )}
-          <div className="w-10 h-10 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
             <Users className="h-5 w-5 text-[#2C5F5D]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="font-semibold text-foreground truncate">{familyFileName}</h2>
-            <p className="text-xs text-muted-foreground truncate">{agreementTitle}</p>
+            <h2 className="font-bold text-slate-900 truncate">{familyFileName}</h2>
+            <p className="text-xs text-slate-600 truncate">{agreementTitle}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -254,19 +254,19 @@ function ConversationSelector({
           {/* Family File Header */}
           <button
             onClick={() => onSelectFamilyFile(item.familyFile)}
-            className={`w-full text-left p-3 rounded-xl transition-smooth ${
+            className={`w-full text-left p-3 rounded-xl transition-all duration-200 ${
               selectedFamilyFile?.id === item.familyFile.id && !selectedAgreement
-                ? 'bg-[#2C5F5D]/10 border border-[#2C5F5D]/30'
-                : 'hover:bg-muted'
+                ? 'bg-gradient-to-r from-[#2C5F5D]/10 to-[#2C5F5D]/5 border-2 border-[#2C5F5D]/30 shadow-sm'
+                : 'hover:bg-slate-50 border-2 border-transparent'
             }`}
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
                 <Users className="h-5 w-5 text-[#2C5F5D]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-foreground truncate">{item.familyFile.title}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="font-bold text-slate-900 truncate">{item.familyFile.title}</p>
+                <p className="text-xs text-slate-600">
                   {item.agreements.length} agreement{item.agreements.length !== 1 ? 's' : ''}
                 </p>
               </div>
@@ -280,17 +280,17 @@ function ConversationSelector({
                 <button
                   key={agreement.id}
                   onClick={() => onSelectAgreement(agreement)}
-                  className={`w-full text-left p-2.5 rounded-lg transition-smooth flex items-center gap-2 ${
+                  className={`w-full text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 shadow-sm ${
                     selectedAgreement?.id === agreement.id
-                      ? 'bg-[#2C5F5D] text-white'
-                      : 'hover:bg-muted text-foreground'
+                      ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white scale-[1.02]'
+                      : 'bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 hover:border-[#2C5F5D]/30'
                   }`}
                 >
                   <FileText className="h-4 w-4 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{agreement.title}</p>
-                    <span className={`text-xs ${
-                      selectedAgreement?.id === agreement.id ? 'text-white/70' : 'text-muted-foreground'
+                    <p className="text-sm font-semibold truncate">{agreement.title}</p>
+                    <span className={`text-xs font-medium ${
+                      selectedAgreement?.id === agreement.id ? 'text-white/80' : 'text-slate-600'
                     }`}>
                       {agreement.status === 'approved' || agreement.status === 'active' ? 'Active' : agreement.status}
                     </span>
@@ -653,11 +653,11 @@ function MessagesContent() {
                     <>
                       {/* ARIA Welcome Message */}
                       <div className="flex justify-center mb-6">
-                        <div className="aria-guardian px-4 py-3 flex items-center gap-3 max-w-md">
-                          <div className="w-8 h-8 rounded-full bg-cg-amber/20 flex items-center justify-center flex-shrink-0 aria-glow">
-                            <Sparkles className="h-4 w-4 text-cg-amber" />
+                        <div className="bg-gradient-to-r from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-2xl px-5 py-4 flex items-center gap-3 max-w-md shadow-md">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <Sparkles className="h-5 w-5 text-amber-600" />
                           </div>
-                          <p className="text-sm text-foreground">
+                          <p className="text-sm font-medium text-slate-700 leading-relaxed">
                             ARIA Guardian is monitoring this conversation to help maintain a constructive tone.
                           </p>
                         </div>
