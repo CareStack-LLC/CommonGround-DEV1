@@ -18,6 +18,8 @@ import {
   PenTool,
   FolderHeart,
   Sparkles,
+  ChevronLeft,
+  Shield,
 } from 'lucide-react';
 import {
   circleAPI,
@@ -29,7 +31,6 @@ import {
 } from '@/lib/api';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
-import { PageContainer } from '@/components/layout';
 
 interface Child {
   id: string;
@@ -45,6 +46,16 @@ interface FamilyFile {
   status: string;
   children?: Child[];
 }
+
+/**
+ * KidComs - Safe Child Communication
+ *
+ * Design Philosophy: Playful yet secure
+ * - Friendly, approachable interface for child communication
+ * - Clear parental controls and safety indicators
+ * - Professional trust signals for parents
+ * - Vibrant but not overwhelming colors
+ */
 
 function KidComsContent() {
   const router = useRouter();
@@ -166,13 +177,13 @@ function KidComsContent() {
   function getSessionStatusIcon(status: string) {
     switch (status) {
       case 'active':
-        return <Phone className="h-4 w-4 text-cg-success animate-pulse" />;
+        return <Phone className="h-4 w-4 text-emerald-600 animate-pulse" />;
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-muted-foreground" />;
+        return <CheckCircle className="h-4 w-4 text-slate-400" />;
       case 'cancelled':
-        return <XCircle className="h-4 w-4 text-cg-error" />;
+        return <XCircle className="h-4 w-4 text-red-600" />;
       default:
-        return <Clock className="h-4 w-4 text-cg-amber" />;
+        return <Clock className="h-4 w-4 text-amber-600" />;
     }
   }
 
@@ -191,77 +202,83 @@ function KidComsContent() {
 
   if (!familyFileId) {
     return (
-      <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-20 lg:pb-0">
         <Navigation />
-        <PageContainer>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-8">
             {/* Page Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                    <Video className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <h1 className="text-2xl font-semibold text-foreground">KidComs</h1>
-                </div>
-                <p className="text-muted-foreground ml-[52px]">Safe video calls with your circle</p>
+            <header className="text-center">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <Video className="h-10 w-10 text-white" />
               </div>
-            </div>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">KidComs</h1>
+              <p className="text-slate-600">Safe video calls with your circle</p>
+            </header>
 
             {error && (
-              <div className="flex items-center gap-3 p-4 bg-cg-error-subtle border border-cg-error/20 rounded-xl">
-                <XCircle className="h-5 w-5 text-cg-error flex-shrink-0" />
-                <p className="text-sm text-cg-error">{error}</p>
+              <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl max-w-2xl mx-auto">
+                <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                <p className="text-sm text-red-700 font-medium">{error}</p>
               </div>
             )}
 
             {/* Select Family File */}
-            <div className="cg-card-elevated p-8 text-center">
-              <div className="w-20 h-20 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-4">
-                <FolderHeart className="h-10 w-10 text-purple-400" />
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center max-w-4xl mx-auto">
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 flex items-center justify-center mx-auto mb-6">
+                <FolderHeart className="h-12 w-12 text-purple-600" />
               </div>
-              <h2 className="text-xl font-semibold text-foreground mb-2">Select a Family File</h2>
-              <p className="text-muted-foreground mb-6">Choose a family file to access KidComs features</p>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Select a Family File</h2>
+              <p className="text-slate-600 mb-8">Choose a family file to access KidComs features</p>
 
               {isLoading ? (
                 <div className="flex justify-center py-8">
-                  <div className="w-10 h-10 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-12 h-12 border-3 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : familyFiles.length === 0 ? (
                 <div className="py-4">
-                  <p className="text-muted-foreground mb-4">You don&apos;t have any family files yet.</p>
+                  <p className="text-slate-600 mb-6">You don't have any family files yet.</p>
                   <button
                     onClick={() => router.push('/family-files/new')}
-                    className="cg-btn-primary"
+                    className="
+                      inline-flex items-center gap-2 px-6 py-3
+                      bg-gradient-to-br from-purple-500 to-purple-600 text-white
+                      rounded-xl font-medium shadow-md hover:shadow-lg
+                      transition-all duration-200 hover:-translate-y-0.5
+                    "
                   >
+                    <Plus className="h-4 w-4" />
                     Create Family File
                   </button>
                 </div>
               ) : (
-                <div className="grid gap-4 sm:grid-cols-2 text-left max-w-2xl mx-auto">
+                <div className="grid gap-4 sm:grid-cols-2 text-left">
                   {familyFiles.map((ff) => (
                     <button
                       key={ff.id}
                       onClick={() => selectFamilyFile(ff.id)}
-                      className="cg-card p-5 text-left hover:border-purple-300 hover:shadow-md transition-all group"
+                      className="
+                        bg-white border border-slate-200 rounded-2xl p-5 text-left
+                        hover:border-purple-300 hover:shadow-lg transition-all
+                        group
+                      "
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="font-semibold text-foreground mb-1 group-hover:text-purple-600 transition-colors">{ff.title}</h3>
-                          <p className="text-sm text-muted-foreground">{ff.family_file_number}</p>
+                          <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-purple-600 transition-colors">{ff.title}</h3>
+                          <p className="text-sm text-slate-500 font-medium">{ff.family_file_number}</p>
                         </div>
-                        <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                        <span className={`px-2.5 py-1 text-xs rounded-full font-semibold ${
                           ff.status === 'active'
-                            ? 'bg-cg-success-subtle text-cg-success'
-                            : 'bg-muted text-muted-foreground'
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-slate-100 text-slate-600'
                         }`}>
                           {ff.status}
                         </span>
                       </div>
                       {ff.children && ff.children.length > 0 && (
-                        <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                        <div className="mt-4 flex items-center gap-2 text-sm text-slate-600">
                           <Users className="h-4 w-4" />
-                          <span>
+                          <span className="font-medium">
                             {ff.children.length} {ff.children.length === 1 ? 'child' : 'children'}
                           </span>
                         </div>
@@ -272,274 +289,307 @@ function KidComsContent() {
               )}
             </div>
           </div>
-        </PageContainer>
+        </div>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-20 lg:pb-0">
         <Navigation />
         <div className="flex flex-col items-center justify-center py-20">
           <div className="relative">
-            <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center">
-              <Sparkles className="h-8 w-8 text-purple-500 animate-pulse" />
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+              <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
           </div>
-          <p className="mt-4 text-muted-foreground font-medium">Loading KidComs...</p>
+          <p className="mt-6 text-slate-600 font-medium">Loading KidComs...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-24 lg:pb-8">
       <Navigation />
-      <PageContainer>
-        <div className="space-y-6">
-          {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+      {/* Page Header */}
+      <header className="border-b border-purple-200 bg-white/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                <Video className="h-5 w-5 text-purple-600" />
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="p-2 -ml-2 rounded-xl hover:bg-purple-100 transition-colors"
+                aria-label="Go back"
+              >
+                <ChevronLeft className="h-5 w-5 text-slate-600" />
+              </button>
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-md">
+                <Video className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-foreground">KidComs</h1>
-                <p className="text-muted-foreground text-sm">Safe video calls with your circle</p>
+                <h1 className="text-3xl font-bold text-slate-900">KidComs</h1>
+                <p className="text-sm text-slate-600">Safe video calls with your circle</p>
               </div>
             </div>
             <button
               onClick={() => router.push(`/kidcoms/settings?case=${familyFileId}`)}
-              className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+              className="p-2.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"
+              aria-label="Settings"
             >
               <Settings className="h-5 w-5" />
             </button>
           </div>
+        </div>
+      </header>
 
-          {error && (
-            <div className="flex items-center gap-3 p-4 bg-cg-error-subtle border border-cg-error/20 rounded-xl">
-              <XCircle className="h-5 w-5 text-cg-error flex-shrink-0" />
-              <p className="text-sm text-cg-error">{error}</p>
-            </div>
-          )}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl mb-6">
+            <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm text-red-700 font-medium">{error}</p>
+          </div>
+        )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Child Selection & Quick Actions */}
-            <div className="lg:col-span-1 space-y-6">
-              {/* Child Selector */}
-              {children.length > 0 && (
-                <div className="cg-card p-5">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Select Child</h3>
-                  <div className="space-y-2">
-                    {children.map((child) => (
-                      <button
-                        key={child.id}
-                        onClick={() => setSelectedChild(child)}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
-                          selectedChild?.id === child.id
-                            ? 'bg-purple-50 border-2 border-purple-400 shadow-sm'
-                            : 'bg-muted/30 hover:bg-muted/50 border-2 border-transparent'
-                        }`}
-                      >
-                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-semibold">
-                          {(child.preferred_name || child.first_name)[0]}
-                        </div>
-                        <span className="font-medium text-foreground">
-                          {child.preferred_name || child.first_name}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Quick Actions */}
-              <div className="cg-card p-5">
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">Quick Actions</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => startVideoCall()}
-                    disabled={!selectedChild || isStartingSession}
-                    className="flex flex-col items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition-colors disabled:opacity-50"
-                  >
-                    {isStartingSession ? (
-                      <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
-                    ) : (
-                      <Video className="h-8 w-8 text-purple-600" />
-                    )}
-                    <span className="mt-2 text-sm font-medium text-purple-700">Video Call</span>
-                  </button>
-                  <button
-                    disabled
-                    className="flex flex-col items-center p-4 bg-muted/50 rounded-xl opacity-50 cursor-not-allowed"
-                  >
-                    <MessageCircle className="h-8 w-8 text-muted-foreground" />
-                    <span className="mt-2 text-sm font-medium text-muted-foreground">Chat</span>
-                  </button>
-                  <button
-                    disabled
-                    className="flex flex-col items-center p-4 bg-muted/50 rounded-xl opacity-50 cursor-not-allowed"
-                  >
-                    <Film className="h-8 w-8 text-muted-foreground" />
-                    <span className="mt-2 text-sm font-medium text-muted-foreground">Theater</span>
-                  </button>
-                  <button
-                    disabled
-                    className="flex flex-col items-center p-4 bg-muted/50 rounded-xl opacity-50 cursor-not-allowed"
-                  >
-                    <Gamepad2 className="h-8 w-8 text-muted-foreground" />
-                    <span className="mt-2 text-sm font-medium text-muted-foreground">Arcade</span>
-                  </button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Child Selection & Quick Actions */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Child Selector */}
+            {children.length > 0 && (
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-purple-600" />
+                  Select Child
+                </h3>
+                <div className="space-y-2">
+                  {children.map((child) => (
+                    <button
+                      key={child.id}
+                      onClick={() => setSelectedChild(child)}
+                      className={`
+                        w-full flex items-center gap-3 p-3 rounded-xl transition-all
+                        ${selectedChild?.id === child.id
+                          ? 'bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-400 shadow-sm'
+                          : 'bg-slate-50 hover:bg-slate-100 border-2 border-transparent'
+                        }
+                      `}
+                    >
+                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-md">
+                        {(child.preferred_name || child.first_name)[0]}
+                      </div>
+                      <span className="font-semibold text-slate-900">
+                        {child.preferred_name || child.first_name}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
+            )}
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+              <h3 className="text-sm font-semibold text-slate-900 mb-4">Quick Actions</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => startVideoCall()}
+                  disabled={!selectedChild || isStartingSession}
+                  className="
+                    flex flex-col items-center p-4 rounded-xl transition-all
+                    bg-gradient-to-br from-purple-500 to-purple-600 text-white
+                    hover:shadow-lg hover:-translate-y-0.5
+                    disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
+                  "
+                >
+                  {isStartingSession ? (
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  ) : (
+                    <Video className="h-8 w-8" />
+                  )}
+                  <span className="mt-2 text-sm font-semibold">Video Call</span>
+                </button>
+                <button
+                  disabled
+                  className="flex flex-col items-center p-4 bg-slate-100 rounded-xl opacity-50 cursor-not-allowed"
+                >
+                  <MessageCircle className="h-8 w-8 text-slate-400" />
+                  <span className="mt-2 text-sm font-medium text-slate-600">Chat</span>
+                  <span className="text-xs text-slate-500 mt-0.5">Soon</span>
+                </button>
+                <button
+                  disabled
+                  className="flex flex-col items-center p-4 bg-slate-100 rounded-xl opacity-50 cursor-not-allowed"
+                >
+                  <Film className="h-8 w-8 text-slate-400" />
+                  <span className="mt-2 text-sm font-medium text-slate-600">Theater</span>
+                  <span className="text-xs text-slate-500 mt-0.5">Soon</span>
+                </button>
+                <button
+                  disabled
+                  className="flex flex-col items-center p-4 bg-slate-100 rounded-xl opacity-50 cursor-not-allowed"
+                >
+                  <Gamepad2 className="h-8 w-8 text-slate-400" />
+                  <span className="mt-2 text-sm font-medium text-slate-600">Arcade</span>
+                  <span className="text-xs text-slate-500 mt-0.5">Soon</span>
+                </button>
+              </div>
             </div>
+          </div>
 
-            {/* Center Column - Circle Contacts */}
-            <div className="lg:col-span-1">
-              <div className="cg-card p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-foreground">My Circle</h3>
-                  <button
-                    onClick={() => router.push(`/kidcoms/circle?case=${familyFileId}`)}
-                    className="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1"
-                  >
-                    <Plus className="h-4 w-4" />
-                    <span>Add</span>
-                  </button>
-                </div>
+          {/* Center Column - Circle Contacts */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-slate-900">My Circle</h3>
+                <button
+                  onClick={() => router.push(`/kidcoms/circle?case=${familyFileId}`)}
+                  className="
+                    flex items-center gap-1.5 px-3 py-1.5 text-sm
+                    bg-purple-100 text-purple-700 rounded-lg
+                    hover:bg-purple-200 transition-colors font-medium
+                  "
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Add</span>
+                </button>
+              </div>
 
-                {contacts.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
-                      <Users className="h-8 w-8 text-muted-foreground/50" />
-                    </div>
-                    <p className="text-foreground font-medium mb-1">No circle contacts yet</p>
-                    <p className="text-sm text-muted-foreground">
-                      Add trusted contacts to start video calls
-                    </p>
+              {contacts.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-10 w-10 text-purple-600" />
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {contacts.map((contact) => (
-                      <div
-                        key={contact.id}
-                        className="flex items-center justify-between p-3 bg-muted/30 rounded-xl"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-cg-sage-subtle flex items-center justify-center text-cg-sage font-semibold">
-                            {contact.contact_name[0]}
-                          </div>
-                          <div>
-                            <p className="font-medium text-foreground">{contact.contact_name}</p>
-                            <p className="text-xs text-muted-foreground capitalize">
-                              {contact.relationship_type.replace('_', ' ')}
-                            </p>
-                          </div>
+                  <p className="font-semibold text-slate-900 mb-1">No circle contacts yet</p>
+                  <p className="text-sm text-slate-600">
+                    Add trusted contacts to start video calls
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {contacts.map((contact) => (
+                    <div
+                      key={contact.id}
+                      className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-purple-200 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center text-white font-bold shadow-sm">
+                          {contact.contact_name[0]}
                         </div>
-                        <div className="flex items-center gap-2">
-                          {contact.can_communicate ? (
-                            <button
-                              onClick={() => startVideoCall(contact.id)}
-                              disabled={isStartingSession}
-                              className="p-2 bg-cg-success-subtle hover:bg-cg-success/20 rounded-full transition-colors"
-                            >
-                              <Phone className="h-4 w-4 text-cg-success" />
-                            </button>
-                          ) : (
-                            <span className="text-xs text-cg-amber bg-cg-amber-subtle px-2 py-1 rounded-full font-medium">
-                              Pending
-                            </span>
-                          )}
+                        <div>
+                          <p className="font-semibold text-slate-900">{contact.contact_name}</p>
+                          <p className="text-xs text-slate-600 capitalize font-medium">
+                            {contact.relationship_type.replace('_', ' ')}
+                          </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Right Column - Recent Sessions */}
-            <div className="lg:col-span-1 space-y-6">
-              <div className="cg-card p-5">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Recent Sessions</h3>
-
-                {sessions.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
-                      <Clock className="h-8 w-8 text-muted-foreground/50" />
+                      <div className="flex items-center gap-2">
+                        {contact.can_communicate ? (
+                          <button
+                            onClick={() => startVideoCall(contact.id)}
+                            disabled={isStartingSession}
+                            className="
+                              p-2 bg-emerald-100 hover:bg-emerald-200 rounded-full
+                              transition-colors shadow-sm
+                            "
+                          >
+                            <Phone className="h-4 w-4 text-emerald-700" />
+                          </button>
+                        ) : (
+                          <span className="text-xs text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full font-semibold">
+                            Pending
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-foreground font-medium mb-1">No sessions yet</p>
-                    <p className="text-sm text-muted-foreground">
-                      Start a video call to see it here
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {sessions.map((session) => (
-                      <button
-                        key={session.id}
-                        onClick={() => {
-                          if (session.status === 'active' || session.status === 'waiting') {
-                            router.push(`/kidcoms/${session.id}?case=${familyFileId}`);
-                          }
-                        }}
-                        className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${
-                          session.status === 'active' || session.status === 'waiting'
-                            ? 'bg-purple-50 hover:bg-purple-100 cursor-pointer'
-                            : 'bg-muted/30 cursor-default'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-white rounded-lg shadow-sm">
-                            {getSessionTypeIcon(session.session_type)}
-                          </div>
-                          <div className="text-left">
-                            <p className="font-medium text-foreground">
-                              {session.title || 'Video Call'}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {session.started_at
-                                ? new Date(session.started_at).toLocaleDateString()
-                                : 'Scheduled'}
-                            </p>
-                          </div>
-                        </div>
-                        {getSessionStatusIcon(session.status)}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Feature Status */}
-              {settings && (
-                <div className="cg-card p-5">
-                  <h3 className="text-sm font-medium text-muted-foreground mb-3">Features</h3>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${settings.allowed_features.video ? 'bg-cg-success' : 'bg-muted-foreground/30'}`} />
-                      <span className="text-foreground">Video</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${settings.allowed_features.chat ? 'bg-cg-success' : 'bg-muted-foreground/30'}`} />
-                      <span className="text-foreground">Chat</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${settings.allowed_features.theater ? 'bg-cg-success' : 'bg-muted-foreground/30'}`} />
-                      <span className="text-foreground">Theater</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${settings.allowed_features.arcade ? 'bg-cg-success' : 'bg-muted-foreground/30'}`} />
-                      <span className="text-foreground">Arcade</span>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
           </div>
+
+          {/* Right Column - Recent Sessions */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">Recent Sessions</h3>
+
+              {sessions.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 flex items-center justify-center mx-auto mb-4">
+                    <Clock className="h-10 w-10 text-purple-600" />
+                  </div>
+                  <p className="font-semibold text-slate-900 mb-1">No sessions yet</p>
+                  <p className="text-sm text-slate-600">
+                    Start a video call to see it here
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {sessions.map((session) => (
+                    <button
+                      key={session.id}
+                      onClick={() => {
+                        if (session.status === 'active' || session.status === 'waiting') {
+                          router.push(`/kidcoms/${session.id}?case=${familyFileId}`);
+                        }
+                      }}
+                      className={`
+                        w-full flex items-center justify-between p-3 rounded-xl transition-all
+                        ${session.status === 'active' || session.status === 'waiting'
+                          ? 'bg-purple-50 hover:bg-purple-100 cursor-pointer border border-purple-200'
+                          : 'bg-slate-50 cursor-default border border-slate-100'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                          {getSessionTypeIcon(session.session_type)}
+                        </div>
+                        <div className="text-left">
+                          <p className="font-semibold text-slate-900">
+                            {session.title || 'Video Call'}
+                          </p>
+                          <p className="text-xs text-slate-600 font-medium">
+                            {session.started_at
+                              ? new Date(session.started_at).toLocaleDateString()
+                              : 'Scheduled'}
+                          </p>
+                        </div>
+                      </div>
+                      {getSessionStatusIcon(session.status)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Feature Status */}
+            {settings && (
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                <h3 className="text-sm font-semibold text-slate-900 mb-4">Enabled Features</h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.video ? 'bg-emerald-500 shadow-sm' : 'bg-slate-300'}`} />
+                    <span className="text-slate-900 font-medium">Video</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.chat ? 'bg-emerald-500 shadow-sm' : 'bg-slate-300'}`} />
+                    <span className="text-slate-900 font-medium">Chat</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.theater ? 'bg-emerald-500 shadow-sm' : 'bg-slate-300'}`} />
+                    <span className="text-slate-900 font-medium">Theater</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.arcade ? 'bg-emerald-500 shadow-sm' : 'bg-slate-300'}`} />
+                    <span className="text-slate-900 font-medium">Arcade</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </PageContainer>
+      </main>
     </div>
   );
 }
@@ -548,13 +598,13 @@ export default function KidComsPage() {
   return (
     <ProtectedRoute>
       <Suspense fallback={
-        <div className="min-h-screen bg-cg-background">
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
           <Navigation />
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center">
-              <Sparkles className="h-8 w-8 text-purple-500 animate-pulse" />
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+              <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
-            <p className="mt-4 text-muted-foreground font-medium">Loading KidComs...</p>
+            <p className="mt-6 text-slate-600 font-medium">Loading KidComs...</p>
           </div>
         </div>
       }>
