@@ -120,12 +120,18 @@ async def create_event(
     profile = await get_professional_context(db, current_user)
 
     # Get firm_id from first active membership if available
+    # Note: Using direct query to avoid async lazy loading issues
     firm_id = None
-    if profile.firm_memberships:
-        for membership in profile.firm_memberships:
-            if membership.is_active:
-                firm_id = str(membership.firm_id)
-                break
+    from app.models.professional import FirmMembership
+    membership_result = await db.execute(
+        select(FirmMembership).where(
+            FirmMembership.professional_id == profile.id,
+            FirmMembership.is_active == True,
+        ).limit(1)
+    )
+    membership = membership_result.scalar_one_or_none()
+    if membership:
+        firm_id = str(membership.firm_id)
 
     try:
         event, conflicts = await events_service.create_event(

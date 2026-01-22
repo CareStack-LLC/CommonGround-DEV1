@@ -34,6 +34,7 @@ from app.models.case import Case, CaseParticipant
 from app.models.family_file import FamilyFile
 from app.models.user import User
 from app.services.access_control import check_case_or_family_file_access, AccessResult
+from app.services.realtime import realtime_service, RealtimeEventType
 from app.schemas.clearfund import (
     ObligationCreate,
     ObligationUpdate,
@@ -218,6 +219,22 @@ class ClearFundService:
 
             await self.db.commit()
             await self.db.refresh(obligation)
+
+            # WS5: Broadcast obligation creation via WebSocket
+            broadcast_id = obligation.family_file_id or obligation.case_id
+            if broadcast_id:
+                await realtime_service.broadcast_obligation_created(
+                    family_file_id=broadcast_id,
+                    obligation_id=str(obligation.id),
+                    obligation_data={
+                        "id": str(obligation.id),
+                        "title": obligation.title,
+                        "purpose_category": obligation.purpose_category,
+                        "total_amount": str(obligation.total_amount),
+                        "status": obligation.status,
+                        "due_date": obligation.due_date.isoformat() if obligation.due_date else None,
+                    }
+                )
 
             return obligation
 
@@ -445,6 +462,22 @@ class ClearFundService:
 
             await self.db.commit()
             await self.db.refresh(obligation)
+
+            # WS5: Broadcast obligation update via WebSocket
+            broadcast_id = obligation.family_file_id or obligation.case_id
+            if broadcast_id:
+                await realtime_service.broadcast_obligation_updated(
+                    family_file_id=broadcast_id,
+                    obligation_id=str(obligation.id),
+                    obligation_data={
+                        "id": str(obligation.id),
+                        "title": obligation.title,
+                        "status": obligation.status,
+                        "due_date": obligation.due_date.isoformat() if obligation.due_date else None,
+                        "notes": obligation.notes,
+                    }
+                )
+
             return obligation
 
         except Exception as e:
@@ -477,6 +510,22 @@ class ClearFundService:
 
             await self.db.commit()
             await self.db.refresh(obligation)
+
+            # WS5: Broadcast obligation cancellation via WebSocket
+            broadcast_id = obligation.family_file_id or obligation.case_id
+            if broadcast_id:
+                await realtime_service.broadcast_obligation_updated(
+                    family_file_id=broadcast_id,
+                    obligation_id=str(obligation.id),
+                    obligation_data={
+                        "id": str(obligation.id),
+                        "title": obligation.title,
+                        "status": "cancelled",
+                        "cancelled_at": obligation.cancelled_at.isoformat() if obligation.cancelled_at else None,
+                        "cancellation_reason": reason,
+                    }
+                )
+
             return obligation
 
         except Exception as e:
@@ -574,6 +623,30 @@ class ClearFundService:
 
             await self.db.commit()
             await self.db.refresh(funding)
+
+            # WS5: Broadcast payment received via WebSocket
+            broadcast_id = obligation.family_file_id or obligation.case_id
+            if broadcast_id:
+                await realtime_service.broadcast_payment_received(
+                    family_file_id=broadcast_id,
+                    obligation_id=str(obligation.id),
+                    payer_id=user.id,
+                    amount=str(data.amount)
+                )
+
+                # Also broadcast obligation update with new funding status
+                await realtime_service.broadcast_obligation_updated(
+                    family_file_id=broadcast_id,
+                    obligation_id=str(obligation.id),
+                    obligation_data={
+                        "id": str(obligation.id),
+                        "title": obligation.title,
+                        "status": obligation.status,
+                        "amount_funded": str(obligation.amount_funded),
+                        "total_amount": str(obligation.total_amount),
+                    }
+                )
+
             return funding
 
         except HTTPException:
@@ -803,6 +876,21 @@ class ClearFundService:
 
             await self.db.commit()
             await self.db.refresh(obligation)
+
+            # WS5: Broadcast obligation completion via WebSocket
+            broadcast_id = obligation.family_file_id or obligation.case_id
+            if broadcast_id:
+                await realtime_service.broadcast_obligation_updated(
+                    family_file_id=broadcast_id,
+                    obligation_id=str(obligation.id),
+                    obligation_data={
+                        "id": str(obligation.id),
+                        "title": obligation.title,
+                        "status": "completed",
+                        "completed_at": obligation.completed_at.isoformat() if obligation.completed_at else None,
+                    }
+                )
+
             return obligation
 
         except Exception as e:
@@ -940,7 +1028,32 @@ class ClearFundService:
         petitioner_paid = totals.get(petitioner_id, Decimal("0"))
         respondent_paid = totals.get(respondent_id, Decimal("0"))
 
-        # Calculate what each party owes from open obligations
+        # Calculate what each party owes from ALL obligations (not just open ones)
+        # We need total obligation amounts to calculate accurate balances
+        all_obligations_result = await self.db.execute(
+            select(
+                func.sum(Obligation.petitioner_share).label("petitioner_total"),
+                func.sum(Obligation.respondent_share).label("respondent_total")
+            )
+            .where(
+                and_(
+                    obligation_filter,
+                    Obligation.status.notin_(["cancelled", "expired"])  # Include completed
+                )
+            )
+        )
+        all_shares_row = all_obligations_result.one_or_none()
+
+        petitioner_total_owed = Decimal(str(all_shares_row.petitioner_total or 0)) if all_shares_row else Decimal("0")
+        respondent_total_owed = Decimal(str(all_shares_row.respondent_total or 0)) if all_shares_row else Decimal("0")
+
+        # Calculate balance = total_owed - total_paid
+        # Positive = they still owe money
+        # Negative = they overpaid (are owed money back)
+        petitioner_balance = petitioner_total_owed - petitioner_paid
+        respondent_balance = respondent_total_owed - respondent_paid
+
+        # Calculate what each party CURRENTLY owes from OPEN obligations only
         # The Obligation model has petitioner_share and respondent_share fields
         open_obligations_result = await self.db.execute(
             select(
@@ -1023,11 +1136,11 @@ class ClearFundService:
             case_id=effective_case_id,
             petitioner_id=petitioner_id or "",
             respondent_id=respondent_id or "",
-            petitioner_balance=petitioner_paid,
-            respondent_balance=respondent_paid,
+            petitioner_balance=petitioner_balance,  # Fixed: now shows owed - paid
+            respondent_balance=respondent_balance,  # Fixed: now shows owed - paid
             petitioner_owes_respondent=petitioner_owes,
             respondent_owes_petitioner=respondent_owes,
-            net_balance=respondent_owes - petitioner_owes,  # Positive = respondent owes more
+            net_balance=petitioner_balance - respondent_balance,  # Fixed: positive = petitioner owes more
             total_obligations_open=metrics.total_open,
             total_obligations_funded=metrics.total_funded,
             total_obligations_completed=metrics.total_completed,

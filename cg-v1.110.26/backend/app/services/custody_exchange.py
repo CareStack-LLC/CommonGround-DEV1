@@ -17,6 +17,7 @@ from app.models.case import Case, CaseParticipant
 from app.models.family_file import FamilyFile
 from app.services.geolocation import GeolocationService
 from app.services.custody_time import CustodyTimeService
+from app.services.realtime import realtime_service, RealtimeEventType
 from app.utils.timezone import strip_tz
 
 
@@ -197,6 +198,23 @@ class CustodyExchangeService:
             .where(CustodyExchange.id == exchange.id)
         )
         exchange = result.scalar_one()
+
+        # WS5: Broadcast exchange creation via WebSocket
+        broadcast_id = exchange.family_file_id or exchange.case_id
+        if broadcast_id:
+            await realtime_service.broadcast_exchange_created(
+                family_file_id=broadcast_id,
+                exchange_id=str(exchange.id),
+                exchange_data={
+                    "id": str(exchange.id),
+                    "title": exchange.title,
+                    "exchange_type": exchange.exchange_type,
+                    "scheduled_time": exchange.scheduled_time.isoformat() if exchange.scheduled_time else None,
+                    "location": exchange.location,
+                    "is_recurring": exchange.is_recurring,
+                    "status": exchange.status,
+                }
+            )
 
         return exchange
 
@@ -583,6 +601,22 @@ class CustodyExchangeService:
         await db.commit()
         await db.refresh(exchange)
 
+        # WS5: Broadcast exchange update via WebSocket
+        broadcast_id = exchange.family_file_id or exchange.case_id
+        if broadcast_id:
+            await realtime_service.broadcast_exchange_updated(
+                family_file_id=broadcast_id,
+                exchange_id=str(exchange.id),
+                exchange_data={
+                    "id": str(exchange.id),
+                    "title": exchange.title,
+                    "exchange_type": exchange.exchange_type,
+                    "scheduled_time": exchange.scheduled_time.isoformat() if exchange.scheduled_time else None,
+                    "location": exchange.location,
+                    "status": exchange.status,
+                }
+            )
+
         return exchange
 
     @staticmethod
@@ -638,6 +672,30 @@ class CustodyExchangeService:
         instance.updated_at = datetime.utcnow()
         await db.commit()
         await db.refresh(instance)
+
+        # WS5: Broadcast check-in via WebSocket
+        broadcast_id = exchange.family_file_id or exchange.case_id
+        if broadcast_id:
+            # Determine checkin type based on which parent checked in
+            checkin_type = None
+            if user_id == exchange.from_parent_id:
+                checkin_type = "from_parent"
+            elif user_id == exchange.to_parent_id:
+                checkin_type = "to_parent"
+            else:
+                # Fallback for unassigned parents
+                if instance.from_parent_checked_in and not instance.to_parent_checked_in:
+                    checkin_type = "from_parent"
+                elif instance.to_parent_checked_in:
+                    checkin_type = "to_parent"
+
+            await realtime_service.broadcast_exchange_checkin(
+                family_file_id=broadcast_id,
+                exchange_id=str(exchange.id),
+                parent_id=user_id,
+                checkin_type=checkin_type or "unknown",
+                location=None  # No GPS data in basic check-in
+            )
 
         return instance
 
@@ -1073,6 +1131,61 @@ class CustodyExchangeService:
         instance.updated_at = now
         await db.commit()
         await db.refresh(instance)
+
+        # WS5: Broadcast GPS check-in via WebSocket
+        broadcast_id = exchange.family_file_id or exchange.case_id
+        if broadcast_id:
+            # Determine checkin type based on which parent checked in
+            checkin_type = None
+            if user_id == exchange.from_parent_id:
+                checkin_type = "from_parent"
+            elif user_id == exchange.to_parent_id:
+                checkin_type = "to_parent"
+            else:
+                # Fallback for unassigned parents
+                if instance.from_parent_checked_in and not instance.to_parent_checked_in:
+                    checkin_type = "from_parent"
+                elif instance.to_parent_checked_in:
+                    checkin_type = "to_parent"
+
+            await realtime_service.broadcast_exchange_checkin(
+                family_file_id=broadcast_id,
+                exchange_id=str(exchange.id),
+                parent_id=user_id,
+                checkin_type=checkin_type or "unknown",
+                location={
+                    "latitude": latitude,
+                    "longitude": longitude,
+                    "accuracy": device_accuracy,
+                    "in_geofence": in_geofence,
+                    "distance_meters": distance_meters
+                }
+            )
+
+            # WS6: Broadcast geofence entry notification if within geofence
+            if in_geofence:
+                # Get user name for notification
+                from app.models.user import User
+                result = await db.execute(
+                    select(User).where(User.id == user_id)
+                )
+                user = result.scalar_one_or_none()
+
+                if user:
+                    parent_name = f"{user.first_name} {user.last_name}".strip() or "Parent"
+
+                    await realtime_service.broadcast_geofence_entry(
+                        family_file_id=broadcast_id,
+                        exchange_id=str(exchange.id),
+                        parent_id=user_id,
+                        parent_name=parent_name,
+                        location={
+                            "latitude": latitude,
+                            "longitude": longitude,
+                            "accuracy": device_accuracy,
+                            "distance_meters": distance_meters
+                        }
+                    )
 
         return instance
 

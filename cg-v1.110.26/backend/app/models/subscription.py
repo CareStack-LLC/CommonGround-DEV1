@@ -2,7 +2,7 @@
 Subscription models for CommonGround pricing tiers and nonprofit grants.
 
 This module contains models for:
-- SubscriptionPlan: Defines available plans (Starter, Plus, Family+)
+- SubscriptionPlan: Defines available plans (Web Starter, Plus, Complete)
 - GrantCode: Nonprofit promo codes that unlock paid tiers
 - GrantRedemption: Tracks grant code usage by users
 - ClearFundFee: Tracks per-payout fees for free tier users
@@ -28,7 +28,7 @@ from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
 # Subscription tier codes
-SUBSCRIPTION_TIERS = ["starter", "plus", "family_plus"]
+SUBSCRIPTION_TIERS = ["web_starter", "plus", "complete"]
 
 # Subscription statuses
 SUBSCRIPTION_STATUSES = ["trial", "active", "past_due", "cancelled", "grant"]
@@ -45,7 +45,7 @@ class SubscriptionPlan(Base, UUIDMixin, TimestampMixin):
     Defines available subscription plans.
 
     This is reference data that should be seeded, not user-created.
-    Plans: starter (free), plus ($12/mo), family_plus ($25/mo)
+    Plans: web_starter (free), plus ($17.99/mo), complete ($34.99/mo)
     """
 
     __tablename__ = "subscription_plans"
@@ -53,7 +53,7 @@ class SubscriptionPlan(Base, UUIDMixin, TimestampMixin):
     # Plan identification
     plan_code: Mapped[str] = mapped_column(
         String(30), unique=True, index=True, nullable=False
-    )  # "starter", "plus", "family_plus"
+    )  # "web_starter", "plus", "complete"
 
     # Stripe integration
     stripe_product_id: Mapped[Optional[str]] = mapped_column(
@@ -234,8 +234,8 @@ class ClearFundFee(Base, UUIDMixin, TimestampMixin):
     """
     Tracks $1.50 per-payout fees for free tier users.
 
-    Free tier users pay a fee on each ClearFund payout.
-    Plus and Family+ users are exempt from this fee.
+    Web Starter (free) users pay a fee on each ClearFund payout.
+    Plus and Complete users are exempt from this fee.
     """
 
     __tablename__ = "clearfund_fees"

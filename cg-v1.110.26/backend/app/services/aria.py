@@ -458,10 +458,8 @@ class ARIAService:
         # Generate explanation
         explanation = self._generate_explanation(categories)
 
-        # Generate suggestion if needed
-        suggestion = None
-        if toxicity_level != ToxicityLevel.NONE:
-            suggestion = self._generate_suggestion(message, categories, toxicity_level)
+        # WS3: Removed suggestion generation - ARIA now only flags, does not rewrite
+        # Users are responsible for their own message revisions
 
         return SentimentAnalysis(
             original_message=message,
@@ -470,7 +468,7 @@ class ARIAService:
             categories=categories,
             triggers=list(set(triggers)),  # Deduplicate
             explanation=explanation,
-            suggestion=suggestion,
+            suggestion=None,  # WS3: Always None - no more suggestions
             is_flagged=toxicity_level != ToxicityLevel.NONE,
             block_send=block_send,
             timestamp=datetime.utcnow()
@@ -561,67 +559,23 @@ class ARIAService:
         else:
             return f"⚠️ Court Context Warning: This message {', '.join(issues[:-1])}, and {issues[-1]}."
 
-    def _generate_suggestion(
-        self,
-        message: str,
-        categories: List[ToxicityCategory],
-        toxicity_level: ToxicityLevel
-    ) -> str:
-        """
-        Generate a gentler alternative message.
-        
-        New Logic:
-        1. High/Severe Toxicity -> Template Response (BIFF Method)
-        2. Low/Medium Toxicity -> Intelligent Phrase Replacement
-        """
-        import random
-
-        # STRATEGY 1: TEMPLATE RESPONSE (For Severe Toxicity Only)
-        # If the message is severely toxic/threatening, we suggest a complete reset.
-        # For High toxicity (0.6-0.85), we now try to replacement phrases first to salvage the intent.
-        if toxicity_level == ToxicityLevel.SEVERE:
-            # For severe messages, suggest a complete rewrite using BIFF method
-            # on the category.
-            # Prioritize categories for template selection
-            priority_order = [
-                ToxicityCategory.THREATENING,
-                ToxicityCategory.HOSTILITY,
-                ToxicityCategory.INSULT,
-                ToxicityCategory.PROFANITY,
-                ToxicityCategory.BLAME
-            ]
-            
-            for category in priority_order:
-                if category in categories and category in self.TEMPLATES:
-                    return random.choice(self.TEMPLATES[category])
-            
-            # Fallback template if no specific category match
-            return "I am feeling frustrated. I would like to pause this conversation and return to it later when I can be more productive."
-
-        # STRATEGY 2: INTELLIGENT REPLACEMENT (For Low/Medium Toxicity)
-        suggestion = message
-
-        # Apply phrase-based replacements
-        for pattern, replacement in self.SUGGESTIONS.items():
-            suggestion = re.sub(pattern, replacement, suggestion, flags=re.IGNORECASE)
-
-        # Remove profanity that wasn't caught by replacements
-        for pattern in self.PROFANITY_PATTERNS:
-            suggestion = re.sub(pattern, '', suggestion, flags=re.IGNORECASE)
-
-        # Clean up extra spaces
-        suggestion = re.sub(r'\s+', ' ', suggestion).strip()
-
-        # If ALL CAPS, convert to normal case
-        if ToxicityCategory.ALL_CAPS in categories:
-            sentences = suggestion.split('. ')
-            suggestion = '. '.join(s.capitalize() if s else s for s in sentences)
-
-        # Fallback if suggesting an empty string or overly short message
-        if len(suggestion) < 3:
-             return "I understand your perspective. Let's discuss the logistics."
-
-        return suggestion
+    # WS3: DEPRECATED - Suggestion generation removed
+    # ARIA now only flags toxic language, does not rewrite messages
+    # Users are responsible for their own revisions
+    #
+    # def _generate_suggestion(
+    #     self,
+    #     message: str,
+    #     categories: List[ToxicityCategory],
+    #     toxicity_level: ToxicityLevel
+    # ) -> str:
+    #     """
+    #     [DEPRECATED] Generate a gentler alternative message.
+    #
+    #     This functionality has been removed per WS3. ARIA now only flags
+    #     potentially problematic language without suggesting rewrites.
+    #     """
+    #     pass
 
     def get_intervention_message(self, analysis: SentimentAnalysis) -> Dict[str, Any]:
         """
@@ -656,7 +610,7 @@ class ARIAService:
             "header": level_headers.get(analysis.toxicity_level, "Communication Alert"),
             "explanation": analysis.explanation,
             "original_message": analysis.original_message,
-            "suggestion": analysis.suggestion,
+            # WS3: Removed suggestion field - no more rewrites
             "toxicity_score": analysis.toxicity_score,
             "categories": [cat.value for cat in analysis.categories],
             "court_reminder": court_reminders.get(analysis.toxicity_level, "Remember, this is court documentation."),
