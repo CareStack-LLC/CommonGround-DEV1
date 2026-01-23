@@ -295,15 +295,11 @@ export default function MyCircleManagementPage({ params }: PageParams) {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
           <Navigation />
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-                <Sparkles className="h-8 w-8 text-cg-sage animate-pulse" />
-              </div>
-            </div>
-            <p className="mt-4 text-muted-foreground font-medium">Loading My Circle...</p>
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="w-14 h-14 border-3 border-teal-500/20 border-t-teal-500 rounded-full animate-spin" />
+            <p className="mt-4 text-slate-600 font-medium">Loading My Circle...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -312,39 +308,43 @@ export default function MyCircleManagementPage({ params }: PageParams) {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
         <Navigation />
-        <PageContainer>
+        <PageContainer background="transparent">
           <div className="space-y-8">
             {/* Page Header */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-start gap-4">
               <button
                 onClick={() => router.back()}
-                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors mt-1"
               >
-                <ArrowLeft className="h-5 w-5" />
+                <ArrowLeft className="h-5 w-5 text-slate-600" />
               </button>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
-                  <Users className="h-5 w-5 text-cg-sage" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-semibold text-foreground">My Circle</h1>
-                  <p className="text-muted-foreground text-sm">Manage trusted contacts who can communicate with your children</p>
-                </div>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/10 to-teal-600/5 flex items-center justify-center shadow-md">
+                    <Users className="h-6 w-6 text-teal-600" />
+                  </div>
+                  My Circle
+                </h1>
+                <p className="text-slate-600 font-medium mt-1">Manage trusted contacts who can communicate with your children</p>
               </div>
             </div>
 
             {error && (
-              <div className="flex items-center gap-3 p-4 bg-cg-error-subtle border border-cg-error/20 rounded-xl">
-                <X className="h-5 w-5 text-cg-error flex-shrink-0" />
-                <p className="text-sm text-cg-error flex-1">{error}</p>
-                <button
-                  onClick={() => setError(null)}
-                  className="text-cg-error/70 hover:text-cg-error"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <X className="h-5 w-5 text-red-600" />
+                  </div>
+                  <p className="text-red-700 font-medium flex-1">{error}</p>
+                  <button
+                    onClick={() => setError(null)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             )}
 
@@ -352,27 +352,27 @@ export default function MyCircleManagementPage({ params }: PageParams) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
                 onClick={() => setShowInviteModal(true)}
-                className="cg-card flex items-center gap-4 p-4 hover:shadow-md transition-all"
+                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-teal-300 transition-all p-6 flex items-center gap-4 group"
               >
-                <div className="p-3 bg-cg-sage-subtle rounded-xl">
-                  <UserPlus className="h-6 w-6 text-cg-sage" />
+                <div className="p-3 bg-gradient-to-br from-teal-500/10 to-teal-600/5 rounded-xl group-hover:from-teal-500/20 group-hover:to-teal-600/10 transition-all">
+                  <UserPlus className="h-6 w-6 text-teal-600" />
                 </div>
                 <div className="text-left">
-                  <h3 className="font-semibold text-foreground">Invite Contact</h3>
-                  <p className="text-sm text-muted-foreground">Add someone to your circle</p>
+                  <h3 className="font-bold text-slate-900">Invite Contact</h3>
+                  <p className="text-sm text-slate-600">Add someone to your circle</p>
                 </div>
               </button>
 
               <button
                 onClick={() => setShowChildSetupModal(true)}
-                className="cg-card flex items-center gap-4 p-4 hover:shadow-md transition-all"
+                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-purple-300 transition-all p-6 flex items-center gap-4 group"
               >
-                <div className="p-3 bg-purple-100 rounded-xl">
+                <div className="p-3 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl group-hover:from-purple-500/20 group-hover:to-purple-600/10 transition-all">
                   <Users className="h-6 w-6 text-purple-600" />
                 </div>
                 <div className="text-left">
-                  <h3 className="font-semibold text-foreground">Setup Child</h3>
-                  <p className="text-sm text-muted-foreground">Create child login account</p>
+                  <h3 className="font-bold text-slate-900">Setup Child</h3>
+                  <p className="text-sm text-slate-600">Create child login account</p>
                 </div>
               </button>
 
@@ -381,14 +381,14 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                   navigator.clipboard.writeText(childLoginUrl);
                   alert('Child login link copied!');
                 }}
-                className="cg-card flex items-center gap-4 p-4 hover:shadow-md transition-all"
+                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-slate-300 transition-all p-6 flex items-center gap-4 group"
               >
-                <div className="p-3 bg-cg-slate-subtle rounded-xl">
-                  <QrCode className="h-6 w-6 text-cg-slate" />
+                <div className="p-3 bg-gradient-to-br from-slate-500/10 to-slate-600/5 rounded-xl group-hover:from-slate-500/20 group-hover:to-slate-600/10 transition-all">
+                  <QrCode className="h-6 w-6 text-slate-600" />
                 </div>
                 <div className="text-left">
-                  <h3 className="font-semibold text-foreground">Child Login Link</h3>
-                  <p className="text-sm text-muted-foreground">Copy link for child device</p>
+                  <h3 className="font-bold text-slate-900">Child Login Link</h3>
+                  <p className="text-sm text-slate-600">Copy link for child device</p>
                 </div>
               </button>
             </div>
@@ -396,20 +396,20 @@ export default function MyCircleManagementPage({ params }: PageParams) {
             {/* Circle Contacts */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-foreground">Circle Contacts</h2>
-                <span className="text-sm text-muted-foreground">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</span>
+                <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Circle Contacts</h2>
+                <span className="text-sm text-slate-600 font-medium">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</span>
               </div>
 
               {contacts.length === 0 ? (
-                <div className="cg-card p-8 text-center">
-                  <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-muted-foreground" />
+                <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-12 text-center">
+                  <div className="w-20 h-20 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-6">
+                    <Users className="h-10 w-10 text-teal-500" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">No contacts yet</h3>
-                  <p className="text-muted-foreground text-sm mb-4">Invite trusted people to your circle</p>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No contacts yet</h3>
+                  <p className="text-slate-600 mb-6">Invite trusted people to your circle</p>
                   <button
                     onClick={() => setShowInviteModal(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/90 transition-colors"
+                    className="cg-btn-primary flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl"
                   >
                     <UserPlus className="h-4 w-4" />
                     Invite Contact
@@ -440,7 +440,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                     return (
                       <div
                         key={contact.id}
-                        className="cg-card p-4 hover:shadow-md transition-all"
+                        className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-teal-300 transition-all p-6"
                       >
                         <div className="flex items-center gap-4">
                           {/* Avatar with Room Badge */}

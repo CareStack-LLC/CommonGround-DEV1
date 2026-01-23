@@ -16,7 +16,7 @@ import {
   Film,
   Gamepad2,
   PenTool,
-  ChevronLeft,
+  ArrowLeft,
   Heart,
   Sparkles,
   ChevronRight,
@@ -30,16 +30,6 @@ import {
   KidComsSettings,
 } from '@/lib/api';
 import { IncomingCallBanner } from '@/components/kidcoms/incoming-call-banner';
-import {
-  CGCard,
-  CGCardHeader,
-  CGCardTitle,
-  CGCardContent,
-  CGButton,
-  CGBadge,
-  CGAvatar,
-  CGEmptyState,
-} from '@/components/cg';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
 import { PageContainer } from '@/components/layout';
@@ -170,13 +160,13 @@ export default function KidComsPage() {
   function getSessionStatusBadge(status: string) {
     switch (status) {
       case 'active':
-        return <CGBadge variant="sage">Active</CGBadge>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-200">Active</span>;
       case 'completed':
-        return <CGBadge variant="default">Completed</CGBadge>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">Completed</span>;
       case 'cancelled':
-        return <CGBadge variant="error">Cancelled</CGBadge>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-red-50 text-red-700 text-xs font-medium border border-red-200">Cancelled</span>;
       default:
-        return <CGBadge variant="amber">Waiting</CGBadge>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-medium border border-amber-200">Waiting</span>;
     }
   }
 
@@ -198,15 +188,11 @@ export default function KidComsPage() {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-cg-background">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
           <Navigation />
-          <div className="flex flex-col items-center justify-center pt-32">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-                <Sparkles className="h-8 w-8 text-cg-sage animate-pulse" />
-              </div>
-            </div>
-            <p className="mt-4 text-muted-foreground font-medium">Loading KidComs...</p>
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="w-14 h-14 border-3 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+            <p className="mt-4 text-slate-600 font-medium">Loading KidComs...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -215,320 +201,312 @@ export default function KidComsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
         <Navigation />
 
         {/* Incoming Call Banner */}
         <IncomingCallBanner familyFileId={familyFileId} />
 
-        <PageContainer>
+        <PageContainer background="transparent">
           {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => router.push(`/family-files/${familyFileId}`)}
-                className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
-                aria-label="Go back"
-              >
-                <ChevronLeft className="h-5 w-5 text-muted-foreground" />
-              </button>
-              <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
-                <Video className="h-5 w-5 text-cg-sage" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold text-foreground">KidComs</h1>
-                <p className="text-sm text-muted-foreground">{familyTitle}</p>
+          <div className="flex items-start gap-4 mb-8">
+            <button
+              onClick={() => router.push(`/family-files/${familyFileId}`)}
+              className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors mt-1"
+            >
+              <ArrowLeft className="h-5 w-5 text-slate-600" />
+            </button>
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
+                  <Video className="h-6 w-6 text-purple-600" />
+                </div>
+                KidComs
+              </h1>
+              <p className="text-slate-600 font-medium mt-1">
+                Safe video communication for {familyTitle}
+              </p>
+            </div>
+            <button
+              onClick={() => router.push(`/family-files/${familyFileId}/kidcoms/settings`)}
+              className="cg-btn-secondary flex items-center gap-2 shadow-md hover:shadow-lg"
+            >
+              <Settings className="h-4 w-4" />
+              Settings
+            </button>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                  <XCircle className="h-5 w-5 text-red-600" />
+                </div>
+                <p className="text-red-700 font-medium">{error}</p>
               </div>
             </div>
-            <CGButton
-              variant="secondary"
-              size="sm"
-              onClick={() => router.push(`/family-files/${familyFileId}/kidcoms/settings`)}
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
-            </CGButton>
-          </div>
-        {/* Error */}
-        {error && (
-          <CGCard variant="default" className="mb-6 border-cg-error/30 bg-cg-error-subtle">
-            <CGCardContent className="py-4">
-              <div className="flex items-center gap-3">
-                <XCircle className="h-5 w-5 text-cg-error" />
-                <p className="text-cg-error font-medium">{error}</p>
-              </div>
-            </CGCardContent>
-          </CGCard>
-        )}
+          )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Child Selection & Quick Actions */}
           <div className="lg:col-span-1 space-y-6">
             {/* Child Selector */}
             {children.length > 0 && (
-              <CGCard variant="elevated">
-                <CGCardHeader>
-                  <CGCardTitle className="text-base">Select Child</CGCardTitle>
-                </CGCardHeader>
-                <CGCardContent>
-                  <div className="space-y-2">
-                    {children.map((child) => (
-                      <button
-                        key={child.id}
-                        onClick={() => setSelectedChild(child)}
-                        className={cn(
-                          'w-full flex items-center gap-3 p-3 rounded-xl transition-all',
-                          selectedChild?.id === child.id
-                            ? 'bg-purple-100 ring-2 ring-purple-500'
-                            : 'bg-muted/50 hover:bg-muted'
-                        )}
-                      >
-                        <CGAvatar
-                          name={child.preferred_name || child.first_name}
-                          size="md"
-                          color={selectedChild?.id === child.id ? 'sage' : 'slate'}
-                        />
-                        <span className="font-medium text-foreground">
-                          {child.preferred_name || child.first_name}
-                        </span>
-                        {selectedChild?.id === child.id && (
-                          <CheckCircle className="h-5 w-5 text-purple-600 ml-auto" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </CGCardContent>
-              </CGCard>
+              <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+                <h2 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Select Child</h2>
+                <div className="space-y-2">
+                  {children.map((child) => (
+                    <button
+                      key={child.id}
+                      onClick={() => setSelectedChild(child)}
+                      className={cn(
+                        'w-full flex items-center gap-3 p-3 rounded-xl transition-all border-2',
+                        selectedChild?.id === child.id
+                          ? 'bg-purple-50 border-purple-300 shadow-sm'
+                          : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                      )}
+                    >
+                      <div className={cn(
+                        "w-10 h-10 rounded-full flex items-center justify-center font-bold",
+                        selectedChild?.id === child.id
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-slate-200 text-slate-600'
+                      )}>
+                        {(child.preferred_name || child.first_name).charAt(0)}
+                      </div>
+                      <span className="font-bold text-slate-900">
+                        {child.preferred_name || child.first_name}
+                      </span>
+                      {selectedChild?.id === child.id && (
+                        <CheckCircle className="h-5 w-5 text-purple-600 ml-auto" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Quick Actions */}
-            <CGCard variant="elevated">
-              <CGCardHeader>
-                <CGCardTitle className="text-base">Quick Actions</CGCardTitle>
-              </CGCardHeader>
-              <CGCardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => startVideoCall()}
-                    disabled={!selectedChild || isStartingSession}
-                    className={cn(
-                      'flex flex-col items-center p-4 rounded-xl transition-all',
-                      'bg-purple-50 hover:bg-purple-100 active:scale-95',
-                      'disabled:opacity-50 disabled:hover:bg-purple-50 disabled:active:scale-100'
-                    )}
-                  >
-                    {isStartingSession ? (
-                      <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
-                    ) : (
-                      <Video className="h-8 w-8 text-purple-600" />
-                    )}
-                    <span className="mt-2 text-sm font-medium text-purple-700">Video</span>
-                  </button>
-                  <button
-                    onClick={() => startVoiceCall()}
-                    disabled={!selectedChild || isStartingSession}
-                    className={cn(
-                      'flex flex-col items-center p-4 rounded-xl transition-all',
-                      'bg-cg-sage-subtle hover:bg-cg-sage/20 active:scale-95',
-                      'disabled:opacity-50 disabled:hover:bg-cg-sage-subtle disabled:active:scale-100'
-                    )}
-                  >
-                    {isStartingSession ? (
-                      <Loader2 className="h-8 w-8 text-cg-sage animate-spin" />
-                    ) : (
-                      <Phone className="h-8 w-8 text-cg-sage" />
-                    )}
-                    <span className="mt-2 text-sm font-medium text-cg-sage">Voice</span>
-                  </button>
-                  <button
-                    onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
-                    className={cn(
-                      'flex flex-col items-center p-4 rounded-xl transition-all',
-                      'bg-teal-50 hover:bg-teal-100 active:scale-95'
-                    )}
-                  >
-                    <Heart className="h-8 w-8 text-teal-600" />
-                    <span className="mt-2 text-sm font-medium text-teal-700">My Circle</span>
-                  </button>
-                  <button
-                    disabled
-                    className="flex flex-col items-center p-4 bg-muted rounded-xl opacity-50 cursor-not-allowed"
-                  >
-                    <MessageCircle className="h-8 w-8 text-muted-foreground" />
-                    <span className="mt-2 text-sm font-medium text-muted-foreground">Chat</span>
-                  </button>
-                </div>
-              </CGCardContent>
-            </CGCard>
+            <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+              <h2 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Quick Actions</h2>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => startVideoCall()}
+                  disabled={!selectedChild || isStartingSession}
+                  className={cn(
+                    'flex flex-col items-center p-4 rounded-xl transition-all border-2',
+                    'bg-purple-50 border-purple-200 hover:border-purple-300 hover:shadow-md active:scale-95',
+                    'disabled:opacity-50 disabled:hover:border-purple-200 disabled:active:scale-100'
+                  )}
+                >
+                  {isStartingSession ? (
+                    <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
+                  ) : (
+                    <Video className="h-8 w-8 text-purple-600" />
+                  )}
+                  <span className="mt-2 text-sm font-bold text-purple-700">Video Call</span>
+                </button>
+                <button
+                  onClick={() => startVoiceCall()}
+                  disabled={!selectedChild || isStartingSession}
+                  className={cn(
+                    'flex flex-col items-center p-4 rounded-xl transition-all border-2',
+                    'bg-blue-50 border-blue-200 hover:border-blue-300 hover:shadow-md active:scale-95',
+                    'disabled:opacity-50 disabled:hover:border-blue-200 disabled:active:scale-100'
+                  )}
+                >
+                  {isStartingSession ? (
+                    <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                  ) : (
+                    <Phone className="h-8 w-8 text-blue-600" />
+                  )}
+                  <span className="mt-2 text-sm font-bold text-blue-700">Voice Call</span>
+                </button>
+                <button
+                  onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
+                  className={cn(
+                    'flex flex-col items-center p-4 rounded-xl transition-all border-2',
+                    'bg-teal-50 border-teal-200 hover:border-teal-300 hover:shadow-md active:scale-95'
+                  )}
+                >
+                  <Heart className="h-8 w-8 text-teal-600" />
+                  <span className="mt-2 text-sm font-bold text-teal-700">My Circle</span>
+                </button>
+                <button
+                  disabled
+                  className="flex flex-col items-center p-4 border-2 border-slate-200 bg-slate-50 rounded-xl opacity-50 cursor-not-allowed"
+                >
+                  <MessageCircle className="h-8 w-8 text-slate-400" />
+                  <span className="mt-2 text-sm font-bold text-slate-500">Chat</span>
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Center Column - Circle Contacts */}
           <div className="lg:col-span-1">
-            <CGCard variant="elevated">
-              <CGCardHeader className="flex flex-row items-center justify-between">
-                <CGCardTitle className="flex items-center gap-2">
+            <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   <Heart className="h-5 w-5 text-teal-500" />
                   My Circle
-                </CGCardTitle>
-                <CGButton
-                  variant="ghost"
-                  size="sm"
+                </h2>
+                <button
                   onClick={() => router.push(`/family-files/${familyFileId}/my-circle?tab=contacts`)}
+                  className="text-sm text-[#2C5F5D] hover:text-[#1a4746] font-medium flex items-center gap-1"
                 >
-                  <Settings className="h-4 w-4 mr-1" />
+                  <Settings className="h-4 w-4" />
                   Manage
-                </CGButton>
-              </CGCardHeader>
-              <CGCardContent>
-                {contacts.length === 0 ? (
-                  <CGEmptyState
-                    icon={<Users className="h-6 w-6" />}
-                    title="No circle contacts yet"
-                    description="Add trusted contacts to your circle"
-                    action={{
-                      label: "Add Contacts",
-                      onClick: () => router.push(`/family-files/${familyFileId}/my-circle`),
-                    }}
-                    size="sm"
-                  />
-                ) : (
-                  <div className="space-y-3">
-                    {contacts.map((contact) => (
-                      <div
-                        key={contact.id}
-                        className="flex items-center justify-between p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <CGAvatar name={contact.contact_name} size="md" color="sage" />
-                          <div>
-                            <p className="font-medium text-foreground">{contact.contact_name}</p>
-                            <p className="text-xs text-muted-foreground capitalize">
-                              {contact.relationship_type.replace('_', ' ')}
-                            </p>
-                          </div>
+                </button>
+              </div>
+              {contacts.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-8 w-8 text-teal-500" />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No circle contacts yet</h3>
+                  <p className="text-slate-600 mb-4">Add trusted contacts to your circle</p>
+                  <button
+                    onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
+                    className="cg-btn-primary flex items-center gap-2 mx-auto"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Contacts
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {contacts.map((contact) => (
+                    <div
+                      key={contact.id}
+                      className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-200"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-700">
+                          {contact.contact_name.charAt(0)}
                         </div>
-                        <div className="flex items-center gap-2">
-                          {contact.can_communicate ? (
-                            <button
-                              onClick={() => startVideoCall(contact.id)}
-                              disabled={isStartingSession}
-                              className="p-2 bg-cg-sage-subtle hover:bg-cg-sage/20 rounded-full transition-colors disabled:opacity-50"
-                            >
-                              <Phone className="h-4 w-4 text-cg-sage" />
-                            </button>
-                          ) : (
-                            <CGBadge variant="amber">Pending</CGBadge>
-                          )}
+                        <div>
+                          <p className="font-bold text-slate-900">{contact.contact_name}</p>
+                          <p className="text-xs text-slate-600 capitalize">
+                            {contact.relationship_type.replace('_', ' ')}
+                          </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CGCardContent>
-            </CGCard>
+                      <div className="flex items-center gap-2">
+                        {contact.can_communicate ? (
+                          <button
+                            onClick={() => startVideoCall(contact.id)}
+                            disabled={isStartingSession}
+                            className="p-2 bg-purple-100 hover:bg-purple-200 text-purple-600 rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            <Phone className="h-4 w-4" />
+                          </button>
+                        ) : (
+                          <span className="text-xs px-2 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200">Pending</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right Column - Recent Sessions */}
           <div className="lg:col-span-1 space-y-6">
-            <CGCard variant="elevated">
-              <CGCardHeader>
-                <CGCardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-cg-slate" />
-                  Recent Sessions
-                </CGCardTitle>
-              </CGCardHeader>
-              <CGCardContent>
-                {sessions.length === 0 ? (
-                  <CGEmptyState
-                    icon={<Clock className="h-6 w-6" />}
-                    title="No sessions yet"
-                    description="Start a video call to see it here"
-                    size="sm"
-                  />
-                ) : (
-                  <div className="space-y-3">
-                    {sessions.map((session) => (
-                      <button
-                        key={session.id}
-                        onClick={() => {
-                          if (session.status === 'active' || session.status === 'waiting') {
-                            router.push(`/family-files/${familyFileId}/kidcoms/session/${session.id}`);
-                          }
-                        }}
-                        className={cn(
-                          'w-full flex items-center justify-between p-3 rounded-xl transition-all',
-                          session.status === 'active' || session.status === 'waiting'
-                            ? 'bg-purple-50 hover:bg-purple-100 cursor-pointer'
-                            : 'bg-muted/50 cursor-default'
-                        )}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center">
-                            {getSessionTypeIcon(session.session_type)}
-                          </div>
-                          <div className="text-left">
-                            <p className="font-medium text-foreground">
-                              {session.title || 'Video Call'}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {session.started_at
-                                ? new Date(session.started_at).toLocaleDateString()
-                                : 'Scheduled'}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {getSessionStatusBadge(session.status)}
-                          {(session.status === 'active' || session.status === 'waiting') && (
-                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                          )}
-                        </div>
-                      </button>
-                    ))}
+            <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <Clock className="h-5 w-5 text-slate-600" />
+                Recent Sessions
+              </h2>
+              {sessions.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                    <Clock className="h-6 w-6 text-slate-400" />
                   </div>
-                )}
-              </CGCardContent>
-            </CGCard>
+                  <p className="text-sm text-slate-600 mb-1 font-medium">No sessions yet</p>
+                  <p className="text-xs text-slate-500">Start a video call to see it here</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {sessions.map((session) => (
+                    <button
+                      key={session.id}
+                      onClick={() => {
+                        if (session.status === 'active' || session.status === 'waiting') {
+                          router.push(`/family-files/${familyFileId}/kidcoms/session/${session.id}`);
+                        }
+                      }}
+                      className={cn(
+                        'w-full flex items-center justify-between p-3 rounded-xl transition-all border-2',
+                        session.status === 'active' || session.status === 'waiting'
+                          ? 'bg-purple-50 border-purple-200 hover:border-purple-300 cursor-pointer'
+                          : 'bg-slate-50 border-slate-200 cursor-default'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center">
+                          {getSessionTypeIcon(session.session_type)}
+                        </div>
+                        <div className="text-left">
+                          <p className="font-bold text-slate-900">
+                            {session.title || 'Video Call'}
+                          </p>
+                          <p className="text-xs text-slate-600">
+                            {session.started_at
+                              ? new Date(session.started_at).toLocaleDateString()
+                              : 'Scheduled'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getSessionStatusBadge(session.status)}
+                        {(session.status === 'active' || session.status === 'waiting') && (
+                          <ChevronRight className="h-4 w-4 text-slate-400" />
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Feature Status */}
             {settings && (
-              <CGCard variant="default">
-                <CGCardHeader>
-                  <CGCardTitle className="text-base">Features</CGCardTitle>
-                </CGCardHeader>
-                <CGCardContent>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        'w-2.5 h-2.5 rounded-full',
-                        settings.allowed_features.video ? 'bg-cg-sage' : 'bg-muted-foreground/30'
-                      )} />
-                      <span className="text-sm text-muted-foreground">Video</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        'w-2.5 h-2.5 rounded-full',
-                        settings.allowed_features.chat ? 'bg-cg-sage' : 'bg-muted-foreground/30'
-                      )} />
-                      <span className="text-sm text-muted-foreground">Chat</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        'w-2.5 h-2.5 rounded-full',
-                        settings.allowed_features.theater ? 'bg-cg-sage' : 'bg-muted-foreground/30'
-                      )} />
-                      <span className="text-sm text-muted-foreground">Theater</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        'w-2.5 h-2.5 rounded-full',
-                        settings.allowed_features.arcade ? 'bg-cg-sage' : 'bg-muted-foreground/30'
-                      )} />
-                      <span className="text-sm text-muted-foreground">Arcade</span>
-                    </div>
+              <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+                <h2 className="text-base font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Enabled Features</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className={cn(
+                      'w-3 h-3 rounded-full',
+                      settings.allowed_features.video ? 'bg-emerald-500' : 'bg-slate-300'
+                    )} />
+                    <span className="text-sm text-slate-700 font-medium">Video</span>
                   </div>
-                </CGCardContent>
-              </CGCard>
+                  <div className="flex items-center gap-2">
+                    <div className={cn(
+                      'w-3 h-3 rounded-full',
+                      settings.allowed_features.chat ? 'bg-emerald-500' : 'bg-slate-300'
+                    )} />
+                    <span className="text-sm text-slate-700 font-medium">Chat</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={cn(
+                      'w-3 h-3 rounded-full',
+                      settings.allowed_features.theater ? 'bg-emerald-500' : 'bg-slate-300'
+                    )} />
+                    <span className="text-sm text-slate-700 font-medium">Theater</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className={cn(
+                      'w-3 h-3 rounded-full',
+                      settings.allowed_features.arcade ? 'bg-emerald-500' : 'bg-slate-300'
+                    )} />
+                    <span className="text-sm text-slate-700 font-medium">Arcade</span>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>

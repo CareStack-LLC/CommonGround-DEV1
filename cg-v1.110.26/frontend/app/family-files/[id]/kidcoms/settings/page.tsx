@@ -16,6 +16,8 @@ import {
   Users,
   Shield,
   Save,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import { kidcomsAPI, familyFilesAPI, KidComsSettings, KidComsSettingsUpdate } from '@/lib/api';
 import { Navigation } from '@/components/navigation';
@@ -115,13 +117,11 @@ export default function KidComsSettingsPage() {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-cg-background">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
           <Navigation />
-          <div className="flex flex-col items-center justify-center pt-32">
-            <div className="w-16 h-16 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-              <Sparkles className="h-8 w-8 text-cg-sage animate-pulse" />
-            </div>
-            <p className="mt-4 text-muted-foreground font-medium">Loading Settings...</p>
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="w-14 h-14 border-3 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+            <p className="mt-4 text-slate-600 font-medium">Loading Settings...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -131,10 +131,10 @@ export default function KidComsSettingsPage() {
   if (!settings) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-cg-background">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
           <Navigation />
-          <div className="flex flex-col items-center justify-center pt-32">
-            <p className="text-muted-foreground">Failed to load settings</p>
+          <div className="flex flex-col items-center justify-center py-32">
+            <p className="text-slate-600 font-medium">Failed to load settings</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -143,62 +143,79 @@ export default function KidComsSettingsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
         <Navigation />
 
-        <PageContainer>
+        <PageContainer background="transparent">
           {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
-                <Settings className="h-5 w-5 text-cg-sage" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold text-foreground">KidComs Settings</h1>
-                <p className="text-sm text-muted-foreground">{familyTitle}</p>
-              </div>
+          <div className="flex items-start gap-4 mb-8">
+            <button
+              onClick={() => router.push(`/family-files/${familyFileId}/kidcoms`)}
+              className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors mt-1"
+            >
+              <ChevronLeft className="h-5 w-5 text-slate-600" />
+            </button>
+            <div className="flex-1">
+              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
+                  <Settings className="h-6 w-6 text-purple-600" />
+                </div>
+                KidComs Settings
+              </h1>
+              <p className="text-slate-600 font-medium mt-1">{familyTitle}</p>
             </div>
-            <CGButton
+            <button
               onClick={handleSave}
               disabled={isSaving}
-              variant="primary"
+              className="cg-btn-primary flex items-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
               ) : (
-                <Save className="h-4 w-4 mr-2" />
+                <>
+                  <Save className="h-4 w-4" />
+                  Save Changes
+                </>
               )}
-              Save Changes
-            </CGButton>
+            </button>
           </div>
 
           {error && (
-            <CGCard variant="default" className="mb-6 border-cg-error/30 bg-cg-error-subtle">
-              <CGCardContent className="py-4">
-                <p className="text-cg-error font-medium">{error}</p>
-              </CGCardContent>
-            </CGCard>
+            <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                  <XCircle className="h-5 w-5 text-red-600" />
+                </div>
+                <p className="text-red-700 font-medium">{error}</p>
+              </div>
+            </div>
           )}
 
           {success && (
-            <CGCard variant="default" className="mb-6 border-cg-success/30 bg-cg-success-subtle">
-              <CGCardContent className="py-4">
-                <p className="text-cg-success font-medium">{success}</p>
-              </CGCardContent>
-            </CGCard>
+            <div className="mb-6 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="h-5 w-5 text-emerald-600" />
+                </div>
+                <p className="text-emerald-700 font-medium">{success}</p>
+              </div>
+            </div>
           )}
 
           <div className="space-y-6">
 
           {/* Circle Approval */}
-          <CGCard variant="elevated">
-            <CGCardHeader>
-              <CGCardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-cg-sage" />
-                Circle Approval
-              </CGCardTitle>
-            </CGCardHeader>
-            <CGCardContent>
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/5 flex items-center justify-center">
+                <Users className="h-4 w-4 text-blue-600" />
+              </div>
+              Circle Approval
+            </h2>
+            <div>
               <p className="text-sm text-muted-foreground mb-4">
                 Control how circle contacts are approved for video calls
               </p>
@@ -230,18 +247,18 @@ export default function KidComsSettingsPage() {
                   </div>
                 </label>
               </div>
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
 
           {/* Features */}
-          <CGCard variant="elevated">
-            <CGCardHeader>
-              <CGCardTitle className="flex items-center gap-2">
-                <Video className="h-5 w-5 text-cg-sage" />
-                Allowed Features
-              </CGCardTitle>
-            </CGCardHeader>
-            <CGCardContent>
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center">
+                <Video className="h-4 w-4 text-purple-600" />
+              </div>
+              Allowed Features
+            </h2>
+            <div>
               <p className="text-sm text-muted-foreground mb-4">
                 Enable or disable KidComs features for your family
               </p>
@@ -272,18 +289,18 @@ export default function KidComsSettingsPage() {
                   </label>
                 ))}
               </div>
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
 
           {/* Session Limits */}
-          <CGCard variant="elevated">
-            <CGCardHeader>
-              <CGCardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-cg-sage" />
-                Session Limits
-              </CGCardTitle>
-            </CGCardHeader>
-            <CGCardContent>
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
+                <Clock className="h-4 w-4 text-amber-600" />
+              </div>
+              Session Limits
+            </h2>
+            <div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
@@ -325,18 +342,18 @@ export default function KidComsSettingsPage() {
                   />
                 </div>
               </div>
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
 
           {/* Parental Controls */}
-          <CGCard variant="elevated">
-            <CGCardHeader>
-              <CGCardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-cg-sage" />
-                Parental Controls
-              </CGCardTitle>
-            </CGCardHeader>
-            <CGCardContent>
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center">
+                <Shield className="h-4 w-4 text-emerald-600" />
+              </div>
+              Parental Controls
+            </h2>
+            <div>
               <div className="space-y-4">
                 <label className="flex items-center justify-between p-3 border border-border rounded-lg">
                   <div>
@@ -375,18 +392,18 @@ export default function KidComsSettingsPage() {
                   />
                 </label>
               </div>
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
 
           {/* Notifications */}
-          <CGCard variant="elevated">
-            <CGCardHeader>
-              <CGCardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5 text-cg-sage" />
-                Notifications
-              </CGCardTitle>
-            </CGCardHeader>
-            <CGCardContent>
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500/10 to-teal-600/5 flex items-center justify-center">
+                <Bell className="h-4 w-4 text-teal-600" />
+              </div>
+              Notifications
+            </h2>
+            <div>
               <div className="space-y-4">
                 <label className="flex items-center justify-between p-3 border border-border rounded-lg">
                   <div>
@@ -425,8 +442,8 @@ export default function KidComsSettingsPage() {
                   />
                 </label>
               </div>
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
           </div>
         </PageContainer>
       </div>
