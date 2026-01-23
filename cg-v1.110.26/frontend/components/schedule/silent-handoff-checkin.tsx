@@ -125,6 +125,20 @@ export default function SilentHandoffCheckIn({
     return `${(meters / 1000).toFixed(1)}km`;
   };
 
+  const formatMinutesHumanReadable = (totalMinutes: number) => {
+    const mins = Math.round(totalMinutes);
+    if (mins < 60) {
+      return `${mins} minute${mins !== 1 ? 's' : ''}`;
+    }
+    const hours = Math.floor(mins / 60);
+    const remainingMins = mins % 60;
+    const hourStr = `${hours} hour${hours !== 1 ? 's' : ''}`;
+    if (remainingMins === 0) {
+      return hourStr;
+    }
+    return `${hourStr} ${remainingMins} minute${remainingMins !== 1 ? 's' : ''}`;
+  };
+
   // Success state
   if (checkInSuccess) {
     const isInGeofence = checkInSuccess.from_parent_in_geofence || checkInSuccess.to_parent_in_geofence;
@@ -276,7 +290,7 @@ export default function SilentHandoffCheckIn({
                     Check-in window is open
                   </p>
                   <p className="text-sm text-green-700 dark:text-green-400">
-                    {Math.round(windowStatus.minutes_remaining)} minutes remaining
+                    {formatMinutesHumanReadable(windowStatus.minutes_remaining)} remaining
                   </p>
                 </div>
               ) : windowStatus.is_before_window ? (
@@ -285,7 +299,7 @@ export default function SilentHandoffCheckIn({
                     Check-in window opens soon
                   </p>
                   <p className="text-sm text-amber-700 dark:text-amber-400">
-                    In {Math.round(windowStatus.minutes_until_window)} minutes
+                    In {formatMinutesHumanReadable(windowStatus.minutes_until_window)}
                   </p>
                 </div>
               ) : (

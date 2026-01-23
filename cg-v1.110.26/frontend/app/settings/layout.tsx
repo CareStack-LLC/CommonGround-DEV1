@@ -87,11 +87,8 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
 
         {/* Settings Layout: Sidebar + Content */}
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Navigation - Hidden on mobile subpages */}
-          <nav className={cn(
-            "w-full lg:w-64 flex-shrink-0",
-            isSubpage && "hidden lg:block"
-          )}>
+          {/* Sidebar Navigation - Always hidden on mobile, only show on desktop */}
+          <nav className="w-full lg:w-64 flex-shrink-0 hidden lg:block">
             <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-2 space-y-1">
               {settingsNavItems.map((item) => {
                 const isActive = pathname === item.path;
@@ -119,11 +116,8 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
           </nav>
 
-          {/* Main Content - Full width on mobile subpages */}
-          <div className={cn(
-            "flex-1 min-w-0",
-            isSubpage && "w-full"
-          )}>
+          {/* Main Content - Full width on mobile */}
+          <div className="flex-1 min-w-0">
             {children}
           </div>
         </div>

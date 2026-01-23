@@ -257,9 +257,39 @@
 
 ---
 
+## 👔 Professional Portal Login Credentials
+
+**Password for all professionals:** `Demo2026!`
+
+| Firm | Email | Name | Type |
+|------|-------|------|------|
+| Harbor Family Law Group | attorney@harborfamilylaw.com | Michael Chen | Attorney |
+| Pasadena Family Mediation Center | mediate@pfmc.com | Sarah Thompson | Mediator |
+| Irvine Custody Solutions | contact@irvinecustody.com | David Park | Attorney |
+| Compton Community Legal Aid | help@comptonlegal.org | Angela Washington | Attorney |
+| Carson Family Advocates | advocates@carsonfamily.com | Marcus Rivera | Attorney |
+| Downtown LA Family Law Partners | partners@lafamilylaw.com | Jennifer Kim | Attorney |
+| Redlands Family Justice Center | justice@redlandsfamily.org | Robert Martinez | Attorney |
+| Riverside Co-Parenting Institute | institute@riversidecopi.com | Lisa Nguyen | Parenting Coordinator |
+| Culver City Collaborative Law | collab@culvercitylaw.com | Daniel Foster | Attorney |
+| Lakewood Family Mediation Services | mediate@lakewoodfms.com | Patricia Hughes | Mediator |
+| South Bay Children's Law Center | children@southbaylaw.org | Amanda Brooks | Attorney |
+| Orange County Family Solutions | solutions@ocfamily.com | Christopher Lee | Attorney |
+| San Gabriel Valley Legal Group | sgv@legalgroup.com | Maria Garcia | Attorney |
+| Inglewood Family Advocacy | advocacy@inglewoodfamily.com | Kevin Johnson | Attorney |
+| West LA Co-Parenting Counsel | counsel@westlacpc.com | Rachel Anderson | Parenting Coordinator |
+
+**How to access Professional Portal:**
+1. Go to https://common-ground-blue.vercel.app/login
+2. Sign in with professional email + `Demo2026!`
+3. Navigate to /professional
+4. Complete onboarding to claim your firm (if prompted)
+
+---
+
 ## 📊 Demo Data Summary
 
-**Total Users:** 14 parents
+**Total Users:** 14 parents + 15 professionals = 29
 **Total Family Files:** 7
 **Total Children:** 12
 **Total Agreements:** 7 (each with 7 sections)
@@ -268,7 +298,8 @@
 **Total Obligations:** 34 (child support + expenses)
 **Total Quick Accords:** 14
 **Total Schedule Events:** 60
-**Total Professional Firms:** 15
+**Total Professional Firms:** 15 (with login credentials)
+**Total Professional Users:** 15
 
 ---
 
@@ -328,7 +359,7 @@ echo "SEED" | python -m scripts.seed_demo_socal_complete
 - All data is fictional but realistic
 - ARIA sentiment analysis is active on messages
 - Custody tracking is enabled for all families
-- Professional firms are visible in the directory but have no login credentials yet
+- Professional firms are visible in the directory with login credentials (see Professional Portal section)
 - Agreement sections have been updated from 18 to 7 sections (v2_standard format)
 
 ---
