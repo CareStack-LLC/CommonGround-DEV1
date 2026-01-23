@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, Suspense } from 'react';
+import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { ProtectedRoute } from '@/components/protected-route';
@@ -14,12 +14,13 @@ import {
   AlertTriangle,
   Shield,
   Clock,
+  User,
 } from 'lucide-react';
 
-// Daily.co types (simplified)
+// Daily.co types
 declare global {
   interface Window {
-    DailyIframe: any;
+    Daily: any;
   }
 }
 
@@ -39,6 +40,19 @@ interface ARIAWarning {
   termination_delay?: number;
 }
 
+interface Participant {
+  session_id: string;
+  user_id?: string;
+  user_name?: string;
+  local: boolean;
+  video: boolean;
+  audio: boolean;
+  tracks: {
+    video?: { state: string; track?: MediaStreamTrack };
+    audio?: { state: string; track?: MediaStreamTrack };
+  };
+}
+
 function ParentCallContent() {
   const { user, profile } = useAuth();
   const router = useRouter();
@@ -48,17 +62,20 @@ function ParentCallContent() {
 
   const [callObject, setCallObject] = useState<any>(null);
   const [session, setSession] = useState<CallSession | null>(null);
-  const [participants, setParticipants] = useState<any[]>([]);
+  const [participants, setParticipants] = useState<Map<string, Participant>>(new Map());
   const [isAudioOn, setIsAudioOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(callType === 'video');
   const [ariaWarning, setAriaWarning] = useState<ARIAWarning | null>(null);
   const [callDuration, setCallDuration] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isInitiating, setIsInitiating] = useState(true);
+  const [isJoined, setIsJoined] = useState(false);
 
   const callStartTime = useRef<number>(0);
   const durationInterval = useRef<NodeJS.Timeout | null>(null);
   const ws = useRef<WebSocket | null>(null);
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
 
   // Format duration
   const formatDuration = (seconds: number) => {
@@ -66,6 +83,57 @@ function ParentCallContent() {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Update video elements when participants change
+  const updateVideoElements = useCallback((daily: any) => {
+    if (!daily) return;
+
+    const participantsList = daily.participants();
+
+    // Update local video
+    const local = participantsList.local;
+    if (local && localVideoRef.current) {
+      const videoTrack = local.tracks?.video;
+      if (videoTrack?.state === 'playable' && videoTrack.persistentTrack) {
+        const stream = new MediaStream([videoTrack.persistentTrack]);
+        if (localVideoRef.current.srcObject !== stream) {
+          localVideoRef.current.srcObject = stream;
+        }
+      } else {
+        localVideoRef.current.srcObject = null;
+      }
+    }
+
+    // Update remote video (first non-local participant)
+    const remoteParticipants = Object.values(participantsList).filter((p: any) => !p.local);
+    if (remoteParticipants.length > 0 && remoteVideoRef.current) {
+      const remote = remoteParticipants[0] as any;
+      const videoTrack = remote.tracks?.video;
+      if (videoTrack?.state === 'playable' && videoTrack.persistentTrack) {
+        const stream = new MediaStream([videoTrack.persistentTrack]);
+        if (remoteVideoRef.current.srcObject !== stream) {
+          remoteVideoRef.current.srcObject = stream;
+        }
+      } else {
+        remoteVideoRef.current.srcObject = null;
+      }
+    }
+
+    // Update participants state
+    const newParticipants = new Map<string, Participant>();
+    Object.entries(participantsList).forEach(([id, p]: [string, any]) => {
+      newParticipants.set(id, {
+        session_id: p.session_id,
+        user_id: p.user_id,
+        user_name: p.user_name,
+        local: p.local,
+        video: p.tracks?.video?.state === 'playable',
+        audio: p.tracks?.audio?.state === 'playable',
+        tracks: p.tracks,
+      });
+    });
+    setParticipants(newParticipants);
+  }, []);
 
   // Initialize call
   useEffect(() => {
@@ -90,22 +158,29 @@ function ParentCallContent() {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to create call session');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.detail || 'Failed to create call session');
         }
 
         const sessionData: CallSession = await response.json();
         setSession(sessionData);
 
-        // Load Daily.co iframe script
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/@daily-co/daily-js';
-        script.async = true;
-        script.onload = () => {
+        // Load Daily.co script
+        if (!window.Daily) {
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/@daily-co/daily-js';
+          script.async = true;
+          script.onload = () => {
+            joinDailyCall(sessionData);
+          };
+          script.onerror = () => {
+            setError('Failed to load video call library');
+            setIsInitiating(false);
+          };
+          document.body.appendChild(script);
+        } else {
           joinDailyCall(sessionData);
-        };
-        document.body.appendChild(script);
-
-        setIsInitiating(false);
+        }
       } catch (err: any) {
         console.error('Failed to initiate call:', err);
         setError(err.message || 'Failed to start call');
@@ -128,100 +203,129 @@ function ParentCallContent() {
     };
   }, [familyFileId, callType, user]);
 
-  // Join Daily.co call
-  const joinDailyCall = (sessionData: CallSession) => {
-    if (!window.DailyIframe) return;
+  // Join Daily.co call using call object (custom UI)
+  const joinDailyCall = async (sessionData: CallSession) => {
+    if (!window.Daily) return;
 
-    const daily = window.DailyIframe.createFrame({
-      iframeStyle: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        border: 0,
-      },
-      showLeaveButton: false,
-      showFullscreenButton: true,
-    });
+    try {
+      // Create call object (not iframe) for custom UI
+      const daily = window.Daily.createCallObject({
+        audioSource: true,
+        videoSource: callType === 'video',
+      });
 
-    setCallObject(daily);
+      setCallObject(daily);
 
-    // Join call - start with video off for audio-only calls
-    daily.join({
-      url: sessionData.room_url,
-      token: sessionData.token,
-      userName: profile?.preferred_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || user?.email || 'Parent',
-      startVideoOff: callType === 'audio',
-      startAudioOff: false,
-    });
+      // Event listeners
+      daily.on('joined-meeting', () => {
+        console.log('Joined meeting');
+        setIsJoined(true);
+        setIsInitiating(false);
+        callStartTime.current = Date.now();
+        durationInterval.current = setInterval(() => {
+          setCallDuration(Math.floor((Date.now() - callStartTime.current) / 1000));
+        }, 1000);
+        updateVideoElements(daily);
+      });
 
-    // Event listeners
-    daily.on('joined-meeting', () => {
-      callStartTime.current = Date.now();
-      durationInterval.current = setInterval(() => {
-        setCallDuration(Math.floor((Date.now() - callStartTime.current) / 1000));
-      }, 1000);
-    });
+      daily.on('participant-joined', (event: any) => {
+        console.log('Participant joined:', event.participant.user_name);
+        updateVideoElements(daily);
+      });
 
-    daily.on('participant-joined', (event: any) => {
-      setParticipants(prev => [...prev, event.participant]);
-    });
+      daily.on('participant-updated', () => {
+        updateVideoElements(daily);
+      });
 
-    daily.on('participant-left', (event: any) => {
-      setParticipants(prev => prev.filter(p => p.session_id !== event.participant.session_id));
-    });
+      daily.on('participant-left', (event: any) => {
+        console.log('Participant left:', event.participant.user_name);
+        updateVideoElements(daily);
+      });
 
-    daily.on('left-meeting', () => {
-      handleEndCall();
-    });
+      daily.on('track-started', () => {
+        updateVideoElements(daily);
+      });
 
-    // Setup WebSocket for ARIA warnings
-    setupWebSocket(sessionData.session_id);
+      daily.on('track-stopped', () => {
+        updateVideoElements(daily);
+      });
+
+      daily.on('left-meeting', () => {
+        handleEndCall();
+      });
+
+      daily.on('error', (error: any) => {
+        console.error('Daily error:', error);
+        setError(error.errorMsg || 'Call error occurred');
+      });
+
+      // Join the call
+      await daily.join({
+        url: sessionData.room_url,
+        token: sessionData.token,
+        userName: profile?.preferred_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || user?.email || 'Parent',
+        startVideoOff: callType === 'audio',
+        startAudioOff: false,
+      });
+
+      // Setup WebSocket for ARIA warnings
+      setupWebSocket(sessionData.session_id);
+    } catch (err: any) {
+      console.error('Failed to join call:', err);
+      setError(err.message || 'Failed to join call');
+      setIsInitiating(false);
+    }
   };
 
   // Setup WebSocket for ARIA warnings
   const setupWebSocket = (sessionId: string) => {
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
-    const wsConnection = new WebSocket(`${wsUrl}/ws`);
+    // Build WebSocket URL from API URL
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    // Convert http(s) to ws(s) and use /ws path (not /api/v1/ws)
+    const wsUrl = apiUrl.replace(/^http/, 'ws').replace(/\/api\/v1$/, '');
 
-    wsConnection.onopen = () => {
-      console.log('WebSocket connected for ARIA monitoring');
-    };
+    try {
+      const wsConnection = new WebSocket(`${wsUrl}/ws`);
 
-    wsConnection.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'aria_intervention' && data.session_id === sessionId) {
-          handleARIAWarning(data);
+      wsConnection.onopen = () => {
+        console.log('WebSocket connected for ARIA monitoring');
+      };
+
+      wsConnection.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'aria_intervention' && data.session_id === sessionId) {
+            handleARIAWarning(data);
+          }
+          if (data.type === 'call_terminated' && data.session_id === sessionId) {
+            alert('This call has been terminated by ARIA due to severe communication violations.');
+            handleEndCall();
+          }
+        } catch (err) {
+          console.error('Failed to parse WebSocket message:', err);
         }
-        if (data.type === 'call_terminated' && data.session_id === sessionId) {
-          alert('This call has been terminated by ARIA due to severe communication violations.');
-          handleEndCall();
-        }
-      } catch (err) {
-        console.error('Failed to parse WebSocket message:', err);
-      }
-    };
+      };
 
-    wsConnection.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+      wsConnection.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        // Don't show error to user - ARIA monitoring is optional
+      };
 
-    ws.current = wsConnection;
+      ws.current = wsConnection;
+    } catch (err) {
+      console.error('Failed to setup WebSocket:', err);
+    }
   };
 
   // Handle ARIA warning
   const handleARIAWarning = (warning: ARIAWarning) => {
     setAriaWarning(warning);
 
-    // Auto-dismiss warning after delay (if not terminating)
     if (!warning.should_terminate) {
       setTimeout(() => {
         setAriaWarning(null);
       }, 10000);
     } else {
-      // Show countdown for termination
       setTimeout(() => {
         if (callObject) {
           callObject.leave();
@@ -267,7 +371,7 @@ function ParentCallContent() {
     }
 
     if (callObject) {
-      callObject.destroy();
+      await callObject.destroy();
     }
 
     if (ws.current) {
@@ -276,6 +380,15 @@ function ParentCallContent() {
 
     router.push('/messages');
   };
+
+  // Get remote participant info
+  const getRemoteParticipant = () => {
+    const remote = Array.from(participants.values()).find(p => !p.local);
+    return remote;
+  };
+
+  const remoteParticipant = getRemoteParticipant();
+  const participantCount = participants.size;
 
   if (error) {
     return (
@@ -288,7 +401,7 @@ function ParentCallContent() {
           <p className="text-slate-600 mb-6">{error}</p>
           <button
             onClick={() => router.push('/messages')}
-            className="px-6 py-3 bg-[var(--portal-primary,#2C5F5D)] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg"
+            className="px-6 py-3 bg-[#2C5F5D] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg"
           >
             Back to Messages
           </button>
@@ -301,7 +414,7 @@ function ParentCallContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
         <div className="text-center">
-          <div className="w-20 h-20 border-4 border-[var(--portal-primary,#2C5F5D)]/30 border-t-[var(--portal-primary,#2C5F5D)] rounded-full animate-spin mx-auto mb-6"></div>
+          <div className="w-20 h-20 border-4 border-[#2C5F5D]/30 border-t-[#2C5F5D] rounded-full animate-spin mx-auto mb-6"></div>
           <h2 className="text-white text-xl font-semibold mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
             {callType === 'audio' ? 'Starting Audio Call...' : 'Starting Video Call...'}
           </h2>
@@ -312,28 +425,71 @@ function ParentCallContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 relative">
-      {/* Daily.co iframe container */}
-      <div id="daily-call-container" className="absolute inset-0" />
-
-      {/* Audio-only call overlay - show when no video */}
-      {callType === 'audio' && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-          <div className="text-center">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[var(--portal-primary,#2C5F5D)] to-[var(--portal-primary,#2C5F5D)]/70 flex items-center justify-center mx-auto mb-6 shadow-2xl animate-pulse">
+    <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 flex flex-col">
+      {/* Main Video Area */}
+      <div className="flex-1 relative">
+        {/* Remote Participant (Full Screen) */}
+        {callType === 'video' ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            {remoteParticipant?.video ? (
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center">
+                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#2C5F5D] to-[#2C5F5D]/70 flex items-center justify-center mb-4 shadow-2xl">
+                  <User className="h-16 w-16 text-white" />
+                </div>
+                <p className="text-white text-xl font-medium" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  {remoteParticipant?.user_name || 'Waiting for other parent...'}
+                </p>
+                {!remoteParticipant && (
+                  <p className="text-slate-400 text-sm mt-2">They&apos;ll appear here when they join</p>
+                )}
+              </div>
+            )}
+          </div>
+        ) : (
+          // Audio-only call UI
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="w-36 h-36 rounded-full bg-gradient-to-br from-[#2C5F5D] to-[#2C5F5D]/70 flex items-center justify-center mb-6 shadow-2xl">
               <Phone className="h-16 w-16 text-white" />
             </div>
             <h2 className="text-2xl font-semibold text-white mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-              Audio Call
+              {remoteParticipant?.user_name || 'Audio Call'}
             </h2>
-            <p className="text-slate-400">Voice only - no video</p>
+            <p className="text-slate-400">
+              {remoteParticipant ? 'Voice call connected' : 'Waiting for other parent...'}
+            </p>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Local Video (Picture-in-Picture) */}
+        {callType === 'video' && isVideoOn && (
+          <div className="absolute top-4 right-4 w-32 h-44 md:w-40 md:h-56 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-800">
+            <video
+              ref={localVideoRef}
+              autoPlay
+              playsInline
+              muted
+              className="w-full h-full object-cover mirror"
+              style={{ transform: 'scaleX(-1)' }}
+            />
+            <div className="absolute bottom-2 left-2 right-2">
+              <p className="text-white text-xs font-medium bg-black/50 rounded-lg px-2 py-1 text-center truncate">
+                You
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* ARIA Warning Overlay */}
       {ariaWarning && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-lg w-full px-4">
+        <div className="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto md:w-full md:max-w-lg z-50">
           <div className={`rounded-2xl p-5 shadow-2xl backdrop-blur-sm ${
             ariaWarning.severity === 'severe'
               ? 'bg-gradient-to-r from-red-500/95 to-orange-500/95'
@@ -350,7 +506,7 @@ function ParentCallContent() {
                 <p className="text-sm opacity-95 mb-2">{ariaWarning.warning_message}</p>
                 {ariaWarning.should_terminate && (
                   <p className="text-xs font-semibold bg-white/20 rounded-lg px-3 py-2">
-                    Call will be terminated in {ariaWarning.termination_delay || 10} seconds unless communication improves.
+                    Call will be terminated in {ariaWarning.termination_delay || 10} seconds.
                   </p>
                 )}
               </div>
@@ -359,9 +515,9 @@ function ParentCallContent() {
         </div>
       )}
 
-      {/* Call Controls - Mobile-optimized bottom bar */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/98 to-transparent pb-safe z-40">
-        <div className="max-w-xl mx-auto px-4 py-6 md:py-8">
+      {/* Call Controls - Bottom Bar */}
+      <div className="bg-gradient-to-t from-slate-900 via-slate-900/98 to-transparent p-4 pb-8 md:p-6">
+        <div className="max-w-xl mx-auto">
           {/* Call Info */}
           <div className="text-center mb-5">
             <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2.5 mb-3">
@@ -370,12 +526,12 @@ function ParentCallContent() {
             </div>
             <div className="flex items-center justify-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-              <Shield className="h-4 w-4 text-[var(--portal-primary,#2C5F5D)]" />
+              <Shield className="h-4 w-4 text-[#2C5F5D]" />
               <span className="text-sm text-white/70">ARIA Guardian Active</span>
             </div>
           </div>
 
-          {/* Control Buttons - Larger touch targets for mobile */}
+          {/* Control Buttons */}
           <div className="flex justify-center items-center gap-5">
             {/* Audio Toggle */}
             <button
@@ -394,7 +550,7 @@ function ParentCallContent() {
               )}
             </button>
 
-            {/* End Call - Larger and prominent */}
+            {/* End Call */}
             <button
               onClick={handleEndCall}
               className="w-16 h-16 md:w-18 md:h-18 rounded-full bg-red-500 hover:bg-red-600 transition-all shadow-xl flex items-center justify-center border-2 border-red-400"
@@ -426,7 +582,7 @@ function ParentCallContent() {
           {/* Participant Count */}
           <div className="text-center mt-4">
             <p className="text-sm text-white/50">
-              {participants.length + 1} participant{participants.length !== 0 ? 's' : ''} in call
+              {participantCount} participant{participantCount !== 1 ? 's' : ''} in call
             </p>
           </div>
         </div>
@@ -441,7 +597,7 @@ export default function ParentCallPage() {
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
           <div className="text-center">
-            <div className="w-20 h-20 border-4 border-[var(--portal-primary,#2C5F5D)]/30 border-t-[var(--portal-primary,#2C5F5D)] rounded-full animate-spin mx-auto mb-6"></div>
+            <div className="w-20 h-20 border-4 border-[#2C5F5D]/30 border-t-[#2C5F5D] rounded-full animate-spin mx-auto mb-6"></div>
             <h2 className="text-white text-xl font-semibold mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Preparing Call...</h2>
             <p className="text-slate-400 text-sm">Setting up secure connection</p>
           </div>
