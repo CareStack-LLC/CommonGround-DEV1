@@ -48,6 +48,23 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/debug-daily")
+async def debug_daily_config():
+    """Debug endpoint to check Daily.co configuration (remove in production)."""
+    import os
+    from app.core.config import settings
+
+    return {
+        "api_key_from_settings": bool(getattr(settings, 'DAILY_API_KEY', None)),
+        "api_key_from_env": bool(os.environ.get('DAILY_API_KEY')),
+        "api_key_length_settings": len(getattr(settings, 'DAILY_API_KEY', '') or ''),
+        "api_key_length_env": len(os.environ.get('DAILY_API_KEY', '')),
+        "domain_from_settings": getattr(settings, 'DAILY_DOMAIN', 'not set'),
+        "daily_service_has_key": bool(daily_service.api_key),
+        "daily_service_key_length": len(daily_service.api_key or ''),
+    }
+
+
 @router.post("/", response_model=CallSessionJoinResponse)
 async def initiate_call(
     call_create: CallSessionCreate,
