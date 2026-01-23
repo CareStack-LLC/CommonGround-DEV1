@@ -22,8 +22,15 @@ class DailyVideoService:
     """Service for interacting with Daily.co API."""
 
     def __init__(self):
-        self.api_key = getattr(settings, 'DAILY_API_KEY', None)
-        self.domain = getattr(settings, 'DAILY_DOMAIN', 'cg-mvp.daily.co')
+        import os
+        # Try settings first, then fall back to direct env var
+        self.api_key = getattr(settings, 'DAILY_API_KEY', None) or os.environ.get('DAILY_API_KEY')
+        self.domain = getattr(settings, 'DAILY_DOMAIN', None) or os.environ.get('DAILY_DOMAIN', 'cg-mvp.daily.co')
+
+        if self.api_key:
+            logger.info(f"DailyVideoService initialized with API key (length: {len(self.api_key)})")
+        else:
+            logger.warning("DailyVideoService initialized WITHOUT API key - will use mock mode")
 
     @property
     def headers(self) -> Dict[str, str]:
