@@ -208,6 +208,9 @@ class ParentCallService:
             raise ValueError(f"Call session {session_id} not found")
 
         # Generate meeting token
+        # For audio-only calls, start with video off
+        is_audio_only = session.call_type == "audio"
+
         token = await self.daily_service.create_meeting_token(
             room_name=session.daily_room_name,
             user_name=user_name,
@@ -215,6 +218,7 @@ class ParentCallService:
             is_owner=True,  # All parents are owners
             exp_minutes=session.max_duration_minutes if hasattr(session, 'max_duration_minutes') else 120,
             enable_recording=session.recording_enabled,
+            start_video_off=is_audio_only,  # Disable video for audio-only calls
         )
 
         # Update session status
