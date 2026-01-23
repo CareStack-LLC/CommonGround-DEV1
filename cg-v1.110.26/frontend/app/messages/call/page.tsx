@@ -76,6 +76,7 @@ function ParentCallContent() {
   const ws = useRef<WebSocket | null>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteAudioRef = useRef<HTMLAudioElement>(null);
 
   // Format duration
   const formatDuration = (seconds: number) => {
@@ -84,38 +85,58 @@ function ParentCallContent() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Update video elements when participants change
+  // Update video/audio elements when participants change
   const updateVideoElements = useCallback((daily: any) => {
     if (!daily) return;
 
     const participantsList = daily.participants();
+    console.log('Updating participants:', Object.keys(participantsList));
 
     // Update local video
     const local = participantsList.local;
     if (local && localVideoRef.current) {
       const videoTrack = local.tracks?.video;
-      if (videoTrack?.state === 'playable' && videoTrack.persistentTrack) {
-        const stream = new MediaStream([videoTrack.persistentTrack]);
-        if (localVideoRef.current.srcObject !== stream) {
-          localVideoRef.current.srcObject = stream;
-        }
-      } else {
+      const trackToUse = videoTrack?.persistentTrack || videoTrack?.track;
+      console.log('Local video track state:', videoTrack?.state, 'hasTrack:', !!trackToUse);
+
+      if (trackToUse && videoTrack?.state === 'playable') {
+        localVideoRef.current.srcObject = new MediaStream([trackToUse]);
+        localVideoRef.current.play().catch(e => console.log('Local video play error:', e));
+      } else if (!trackToUse || videoTrack?.state === 'off') {
         localVideoRef.current.srcObject = null;
       }
     }
 
-    // Update remote video (first non-local participant)
+    // Update remote video and audio (first non-local participant)
     const remoteParticipants = Object.values(participantsList).filter((p: any) => !p.local);
-    if (remoteParticipants.length > 0 && remoteVideoRef.current) {
+    if (remoteParticipants.length > 0) {
       const remote = remoteParticipants[0] as any;
-      const videoTrack = remote.tracks?.video;
-      if (videoTrack?.state === 'playable' && videoTrack.persistentTrack) {
-        const stream = new MediaStream([videoTrack.persistentTrack]);
-        if (remoteVideoRef.current.srcObject !== stream) {
-          remoteVideoRef.current.srcObject = stream;
+      console.log('Remote participant:', remote.user_name);
+
+      // Remote video
+      if (remoteVideoRef.current) {
+        const videoTrack = remote.tracks?.video;
+        const trackToUse = videoTrack?.persistentTrack || videoTrack?.track;
+        console.log('Remote video track state:', videoTrack?.state, 'hasTrack:', !!trackToUse);
+
+        if (trackToUse && videoTrack?.state === 'playable') {
+          remoteVideoRef.current.srcObject = new MediaStream([trackToUse]);
+          remoteVideoRef.current.play().catch(e => console.log('Remote video play error:', e));
+        } else if (!trackToUse || videoTrack?.state === 'off') {
+          remoteVideoRef.current.srcObject = null;
         }
-      } else {
-        remoteVideoRef.current.srcObject = null;
+      }
+
+      // Remote audio - CRITICAL for hearing the other person!
+      if (remoteAudioRef.current) {
+        const audioTrack = remote.tracks?.audio;
+        const trackToUse = audioTrack?.persistentTrack || audioTrack?.track;
+        console.log('Remote audio track state:', audioTrack?.state, 'hasTrack:', !!trackToUse);
+
+        if (trackToUse && (audioTrack?.state === 'playable' || audioTrack?.state === 'loading')) {
+          remoteAudioRef.current.srcObject = new MediaStream([trackToUse]);
+          remoteAudioRef.current.play().catch(e => console.log('Remote audio play error:', e));
+        }
       }
     }
 
@@ -426,19 +447,23 @@ function ParentCallContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 flex flex-col">
+      {/* Hidden audio element for remote participant audio - CRITICAL for sound! */}
+      <audio ref={remoteAudioRef} autoPlay playsInline />
+
       {/* Main Video Area */}
       <div className="flex-1 relative">
         {/* Remote Participant (Full Screen) */}
         {callType === 'video' ? (
           <div className="absolute inset-0 flex items-center justify-center">
-            {remoteParticipant?.video ? (
-              <video
-                ref={remoteVideoRef}
-                autoPlay
-                playsInline
-                className="w-full h-full object-cover"
-              />
-            ) : (
+            {/* Always render video element so it's ready for tracks */}
+            <video
+              ref={remoteVideoRef}
+              autoPlay
+              playsInline
+              className={`w-full h-full object-cover ${remoteParticipant?.video ? '' : 'hidden'}`}
+            />
+            {/* Show placeholder when no video */}
+            {!remoteParticipant?.video && (
               <div className="flex flex-col items-center justify-center">
                 <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#2C5F5D] to-[#2C5F5D]/70 flex items-center justify-center mb-4 shadow-2xl">
                   <User className="h-16 w-16 text-white" />
@@ -467,15 +492,15 @@ function ParentCallContent() {
           </div>
         )}
 
-        {/* Local Video (Picture-in-Picture) */}
-        {callType === 'video' && isVideoOn && (
-          <div className="absolute top-4 right-4 w-32 h-44 md:w-40 md:h-56 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-800">
+        {/* Local Video (Picture-in-Picture) - Always render for video calls */}
+        {callType === 'video' && (
+          <div className={`absolute top-4 right-4 w-32 h-44 md:w-40 md:h-56 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-slate-800 ${isVideoOn ? '' : 'hidden'}`}>
             <video
               ref={localVideoRef}
               autoPlay
               playsInline
               muted
-              className="w-full h-full object-cover mirror"
+              className="w-full h-full object-cover"
               style={{ transform: 'scaleX(-1)' }}
             />
             <div className="absolute bottom-2 left-2 right-2">
