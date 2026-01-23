@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { familyFilesAPI, FamilyFileCreate } from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -17,7 +15,6 @@ import {
   ArrowLeft,
   Plus,
   Trash2,
-  User,
   Baby,
   Mail,
 } from 'lucide-react';
@@ -105,15 +102,20 @@ function NewFamilyFileContent() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+        <button
+          onClick={() => router.back()}
+          className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5 text-slate-600" />
+        </button>
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <FolderHeart className="h-6 w-6 text-primary" />
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
+              <FolderHeart className="h-6 w-6 text-[#2C5F5D]" />
+            </div>
             New Family File
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-slate-600 font-medium mt-1">
             Create a new co-parenting arrangement
           </p>
         </div>
@@ -128,33 +130,34 @@ function NewFamilyFileContent() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Basic Information</CardTitle>
-            <CardDescription>
+        <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Basic Information</h2>
+            <p className="text-sm text-slate-600 font-medium mt-1">
               Give your Family File a name and set your role
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            </p>
+          </div>
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="title">Family File Title *</Label>
+              <Label htmlFor="title" className="text-sm font-medium text-slate-900">Family File Title *</Label>
               <Input
                 id="title"
                 placeholder="e.g., Smith Family - Emma & Jake"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
+                className="mt-1"
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-slate-600 font-medium mt-1">
                 A friendly name for your co-parenting arrangement
               </p>
             </div>
 
             <div>
-              <Label htmlFor="parentARole">Your Role</Label>
+              <Label htmlFor="parentARole" className="text-sm font-medium text-slate-900">Your Role</Label>
               <select
                 id="parentARole"
-                className="w-full mt-1 rounded-md border border-input bg-background px-3 py-2"
+                className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] focus:border-[#2C5F5D]"
                 value={parentARole}
                 onChange={(e) => setParentARole(e.target.value)}
               >
@@ -164,38 +167,41 @@ function NewFamilyFileContent() {
                 <option value="parent_b">Parent B</option>
               </select>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Co-Parent Invitation */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Mail className="h-5 w-5" />
+        <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
+                <Mail className="h-5 w-5 text-[#2C5F5D]" />
+              </div>
               Invite Co-Parent (Optional)
-            </CardTitle>
-            <CardDescription>
+            </h2>
+            <p className="text-sm text-slate-600 font-medium mt-1">
               Send an invitation to your co-parent to join this Family File
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            </p>
+          </div>
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="parentBEmail">Co-Parent Email</Label>
+              <Label htmlFor="parentBEmail" className="text-sm font-medium text-slate-900">Co-Parent Email</Label>
               <Input
                 id="parentBEmail"
                 type="email"
                 placeholder="coparent@example.com"
                 value={parentBEmail}
                 onChange={(e) => setParentBEmail(e.target.value)}
+                className="mt-1"
               />
             </div>
 
             {parentBEmail && (
               <div>
-                <Label htmlFor="parentBRole">Co-Parent Role</Label>
+                <Label htmlFor="parentBRole" className="text-sm font-medium text-slate-900">Co-Parent Role</Label>
                 <select
                   id="parentBRole"
-                  className="w-full mt-1 rounded-md border border-input bg-background px-3 py-2"
+                  className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] focus:border-[#2C5F5D]"
                   value={parentBRole}
                   onChange={(e) => setParentBRole(e.target.value)}
                 >
@@ -206,23 +212,23 @@ function NewFamilyFileContent() {
                 </select>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Location */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Jurisdiction (Optional)</CardTitle>
-            <CardDescription>
+        <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Jurisdiction (Optional)</h2>
+            <p className="text-sm text-slate-600 font-medium mt-1">
               State and county for legal context
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2">
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label htmlFor="state">State</Label>
+              <Label htmlFor="state" className="text-sm font-medium text-slate-900">State</Label>
               <select
                 id="state"
-                className="w-full mt-1 rounded-md border border-input bg-background px-3 py-2"
+                className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] focus:border-[#2C5F5D]"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
               >
@@ -233,71 +239,76 @@ function NewFamilyFileContent() {
               </select>
             </div>
             <div>
-              <Label htmlFor="county">County</Label>
+              <Label htmlFor="county" className="text-sm font-medium text-slate-900">County</Label>
               <Input
                 id="county"
                 placeholder="e.g., Los Angeles"
                 value={county}
                 onChange={(e) => setCounty(e.target.value)}
+                className="mt-1"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Children */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Baby className="h-5 w-5" />
+        <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
+                <Baby className="h-5 w-5 text-[#2C5F5D]" />
+              </div>
               Children (Optional)
-            </CardTitle>
-            <CardDescription>
+            </h2>
+            <p className="text-sm text-slate-600 font-medium mt-1">
               Add children now or later. Child profiles require both parents to approve.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            </p>
+          </div>
+          <div className="space-y-4">
             {children.map((child, index) => (
-              <div key={index} className="p-4 border rounded-lg space-y-3">
+              <div key={index} className="p-4 border-2 border-slate-200 rounded-xl bg-slate-50 space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">Child {index + 1}</span>
-                  <Button
+                  <span className="font-bold text-slate-900">Child {index + 1}</span>
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="sm"
                     onClick={() => removeChild(index)}
+                    className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center transition-colors"
                   >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </button>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
-                    <Label>First Name *</Label>
+                    <Label className="text-sm font-medium text-slate-900">First Name *</Label>
                     <Input
                       placeholder="First name"
                       value={child.first_name}
                       onChange={(e) => updateChild(index, 'first_name', e.target.value)}
+                      className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label>Last Name *</Label>
+                    <Label className="text-sm font-medium text-slate-900">Last Name *</Label>
                     <Input
                       placeholder="Last name"
                       value={child.last_name}
                       onChange={(e) => updateChild(index, 'last_name', e.target.value)}
+                      className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label>Date of Birth *</Label>
+                    <Label className="text-sm font-medium text-slate-900">Date of Birth *</Label>
                     <Input
                       type="date"
                       value={child.date_of_birth}
                       onChange={(e) => updateChild(index, 'date_of_birth', e.target.value)}
+                      className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label>Gender</Label>
+                    <Label className="text-sm font-medium text-slate-900">Gender</Label>
                     <select
-                      className="w-full mt-1 rounded-md border border-input bg-background px-3 py-2"
+                      className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] focus:border-[#2C5F5D]"
                       value={child.gender || ''}
                       onChange={(e) => updateChild(index, 'gender', e.target.value)}
                     >
@@ -311,21 +322,33 @@ function NewFamilyFileContent() {
               </div>
             ))}
 
-            <Button type="button" variant="outline" onClick={addChild}>
-              <Plus className="h-4 w-4 mr-2" />
+            <button
+              type="button"
+              onClick={addChild}
+              className="cg-btn-secondary flex items-center gap-2 shadow-md hover:shadow-lg"
+            >
+              <Plus className="h-4 w-4" />
               Add Child
-            </Button>
-          </CardContent>
-        </Card>
+            </button>
+          </div>
+        </div>
 
         {/* Submit */}
         <div className="flex justify-end gap-3">
-          <Button type="button" variant="outline" onClick={() => router.back()}>
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="cg-btn-secondary shadow-md hover:shadow-lg"
+          >
             Cancel
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="cg-btn-primary shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             {isSubmitting ? 'Creating...' : 'Create Family File'}
-          </Button>
+          </button>
         </div>
       </form>
     </div>
@@ -335,7 +358,7 @@ function NewFamilyFileContent() {
 export default function NewFamilyFilePage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
         <Navigation />
         <PageContainer>
           <NewFamilyFileContent />
