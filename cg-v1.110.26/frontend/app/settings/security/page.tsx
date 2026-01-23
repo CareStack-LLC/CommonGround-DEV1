@@ -33,6 +33,7 @@ import {
   EyeOff,
   Loader2,
   X,
+  Mail,
 } from 'lucide-react';
 
 /**
@@ -287,22 +288,22 @@ export default function SecuritySettingsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Page Title */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground">
+        <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
           Security Settings
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground font-medium mt-1">
           Manage your password and account security
         </p>
       </div>
 
       {/* Success Alert */}
       {showSuccess && (
-        <Alert className="bg-cg-success-subtle border-cg-success/20">
-          <CheckCircle className="h-4 w-4 text-cg-success" />
-          <AlertDescription className="text-cg-success">
+        <Alert className="bg-cg-success-subtle border-2 border-cg-success/20 rounded-2xl shadow-lg">
+          <CheckCircle className="h-5 w-5 text-cg-success" />
+          <AlertDescription className="text-cg-success font-semibold">
             Your password has been changed successfully.
           </AlertDescription>
         </Alert>
@@ -310,20 +311,22 @@ export default function SecuritySettingsPage() {
 
       {/* Error Alert */}
       {error && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+        <Alert variant="destructive" className="border-2 rounded-2xl shadow-lg">
+          <AlertTriangle className="h-5 w-5" />
+          <AlertDescription className="font-semibold">{error}</AlertDescription>
         </Alert>
       )}
 
       {/* Change Password */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Lock className="h-5 w-5 text-muted-foreground" />
+      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-md">
+              <Lock className="h-5 w-5 text-[#2C5F5D]" />
+            </div>
             Change Password
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="font-medium">
             Choose a strong password to keep your account secure
           </CardDescription>
         </CardHeader>
@@ -409,13 +412,15 @@ export default function SecuritySettingsPage() {
       </Card>
 
       {/* Two-Factor Authentication */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Shield className="h-5 w-5 text-muted-foreground" />
+      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <div className="p-2 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-xl shadow-md">
+              <Shield className="h-5 w-5 text-red-600" />
+            </div>
             Two-Factor Authentication
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="font-medium">
             Add an extra layer of security to your account
           </CardDescription>
         </CardHeader>
@@ -537,13 +542,15 @@ export default function SecuritySettingsPage() {
       </Card>
 
       {/* Active Sessions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Monitor className="h-5 w-5 text-muted-foreground" />
+      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <div className="p-2 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl shadow-md">
+              <Monitor className="h-5 w-5 text-purple-600" />
+            </div>
             Active Sessions
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="font-medium">
             Devices where you're currently signed in
           </CardDescription>
         </CardHeader>
@@ -552,14 +559,14 @@ export default function SecuritySettingsPage() {
             {sessions.map((session) => (
               <div
                 key={session.id}
-                className="flex items-center justify-between py-3 border-b border-border last:border-0"
+                className="flex items-center justify-between py-3 border-b border-slate-200 last:border-0"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-secondary rounded-lg">
-                    <Monitor className="h-4 w-4 text-muted-foreground" />
+                  <div className="p-2 bg-gradient-to-br from-slate-500/10 to-slate-600/5 rounded-xl shadow-md">
+                    <Monitor className="h-4 w-4 text-slate-600" />
                   </div>
                   <div>
-                    <p className="font-medium flex items-center gap-2">
+                    <p className="font-bold text-slate-900 flex items-center gap-2">
                       {session.device}
                       {session.isCurrent && (
                         <Badge variant="default" size="sm">
@@ -567,7 +574,7 @@ export default function SecuritySettingsPage() {
                         </Badge>
                       )}
                     </p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-slate-600 font-medium">
                       {session.location} • {session.lastActive}
                     </p>
                   </div>
@@ -585,7 +592,7 @@ export default function SecuritySettingsPage() {
             ))}
           </div>
 
-          <div className="mt-4 pt-4 border-t border-border">
+          <div className="mt-4 pt-4 border-t border-slate-200">
             <Button
               variant="destructive"
               onClick={handleLogoutAllDevices}
@@ -599,18 +606,23 @@ export default function SecuritySettingsPage() {
       </Card>
 
       {/* Account Email */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Account Email</CardTitle>
-          <CardDescription>
+      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
+              <Mail className="h-5 w-5 text-blue-600" />
+            </div>
+            Account Email
+          </CardTitle>
+          <CardDescription className="font-medium">
             The email address associated with your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">{user?.email}</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="font-bold text-slate-900">{user?.email}</p>
+              <p className="text-sm text-slate-600 font-medium">
                 Contact support to change your email address
               </p>
             </div>

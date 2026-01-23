@@ -80,28 +80,28 @@ export default function SettingsPage() {
             <button
               key={card.path}
               onClick={() => handleCardClick(card.path)}
-              className="group text-left bg-white rounded-xl p-6 border-2 border-slate-200
-                hover:border-[#2C5F5D]/30 hover:shadow-lg transition-all duration-200
+              className="group text-left bg-white rounded-2xl p-8 border-2 border-slate-200 shadow-lg
+                hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-300
                 hover:scale-[1.02] active:scale-[0.98]"
             >
-              <div className="flex items-start justify-between gap-4 mb-4">
+              <div className="flex items-start justify-between gap-4 mb-5">
                 <div className={`
-                  p-3 rounded-xl bg-gradient-to-br ${card.iconBgGradient}
-                  group-hover:shadow-md transition-shadow duration-200
+                  p-4 rounded-2xl bg-gradient-to-br ${card.iconBgGradient} shadow-md
+                  group-hover:shadow-lg group-hover:scale-110 transition-all duration-300
                 `}>
-                  <Icon className={`h-6 w-6 ${card.iconColor}`} />
+                  <Icon className={`h-7 w-7 ${card.iconColor}`} />
                 </div>
 
-                <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-[#2C5F5D]
-                  group-hover:translate-x-1 transition-all duration-200" />
+                <ArrowRight className="h-6 w-6 text-slate-400 group-hover:text-[#2C5F5D]
+                  group-hover:translate-x-1 transition-all duration-300" />
               </div>
 
-              <h3 className="text-lg font-semibold text-slate-900 mb-2 group-hover:text-[#2C5F5D]
-                transition-colors duration-200">
+              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-[#2C5F5D]
+                transition-colors duration-300" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 {card.title}
               </h3>
 
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed font-medium">
                 {card.description}
               </p>
             </button>
@@ -110,11 +110,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Help Section */}
-      <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-        <div className="flex items-start gap-3">
-          <div className="p-2 bg-white rounded-lg border border-slate-200">
+      <div className="bg-white rounded-2xl p-6 border-2 border-slate-200 shadow-lg">
+        <div className="flex items-start gap-4">
+          <div className="p-3 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl shadow-md">
             <svg
-              className="h-5 w-5 text-[#2C5F5D]"
+              className="h-6 w-6 text-[#2C5F5D]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -128,10 +128,10 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div className="flex-1">
-            <h4 className="text-sm font-medium text-slate-900 mb-1">
+            <h4 className="text-base font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
               Need help with settings?
             </h4>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-slate-600 font-medium">
               Visit our Help Center or contact support for assistance with your account configuration.
             </p>
           </div>

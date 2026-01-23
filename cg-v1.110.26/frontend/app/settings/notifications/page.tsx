@@ -255,19 +255,19 @@ export default function NotificationSettingsPage() {
     <div className="space-y-6">
       {/* Page Title */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground">
+        <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
           Notification Settings
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-slate-600 font-medium">
           Choose how you want to be notified about important updates
         </p>
       </div>
 
       {/* Error Alert */}
       {error && (
-        <Alert className="bg-red-50 border-red-200">
+        <Alert className="bg-red-50 border-red-200 rounded-2xl shadow-lg">
           <AlertCircle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-600">
+          <AlertDescription className="text-red-600 font-medium">
             {error}
           </AlertDescription>
         </Alert>
@@ -275,9 +275,9 @@ export default function NotificationSettingsPage() {
 
       {/* Success Alert */}
       {showSuccess && (
-        <Alert className="bg-cg-success-subtle border-cg-success/20">
-          <CheckCircle className="h-4 w-4 text-cg-success" />
-          <AlertDescription className="text-cg-success">
+        <Alert className="bg-emerald-50 border-emerald-200 rounded-2xl shadow-lg">
+          <CheckCircle className="h-4 w-4 text-emerald-600" />
+          <AlertDescription className="text-emerald-600 font-medium">
             Your notification preferences have been saved.
           </AlertDescription>
         </Alert>
@@ -285,17 +285,23 @@ export default function NotificationSettingsPage() {
 
       {/* Push Notifications Status */}
       {pushSupported && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              {pushSubscribed ? (
-                <Bell className="h-5 w-5 text-cg-primary" />
-              ) : (
-                <BellOff className="h-5 w-5 text-muted-foreground" />
-              )}
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className={`p-2 rounded-xl shadow-md ${
+                pushSubscribed
+                  ? 'bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5'
+                  : 'bg-gradient-to-br from-slate-500/10 to-slate-600/5'
+              }`}>
+                {pushSubscribed ? (
+                  <Bell className="h-5 w-5 text-[#2C5F5D]" />
+                ) : (
+                  <BellOff className="h-5 w-5 text-slate-600" />
+                )}
+              </div>
               Browser Push Notifications
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="font-medium">
               {pushSubscribed
                 ? 'Push notifications are enabled for this browser'
                 : pushPermission === 'denied'
@@ -332,10 +338,12 @@ export default function NotificationSettingsPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Quick Actions</CardTitle>
-            <CardDescription>
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              Quick Actions
+            </CardTitle>
+            <CardDescription className="font-medium">
               Quickly enable or disable all notifications
             </CardDescription>
           </CardHeader>
@@ -352,16 +360,18 @@ export default function NotificationSettingsPage() {
         </Card>
 
         {/* Notification Categories */}
-        <Card>
-          <CardHeader>
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-base">Notification Types</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  Notification Types
+                </CardTitle>
+                <CardDescription className="font-medium">
                   Choose which notifications you'd like to receive
                 </CardDescription>
               </div>
-              <div className="hidden sm:flex gap-8 text-sm font-medium text-muted-foreground">
+              <div className="hidden sm:flex gap-8 text-sm font-bold text-slate-600">
                 <div className="flex items-center gap-2 w-16 justify-center">
                   <Mail className="h-4 w-4" />
                   Email
@@ -384,14 +394,14 @@ export default function NotificationSettingsPage() {
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-cg-primary/10 rounded-lg">
-                          <Icon className="h-4 w-4 text-cg-primary" />
+                        <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-md">
+                          <Icon className="h-4 w-4 text-[#2C5F5D]" />
                         </div>
                         <div>
-                          <Label className="font-medium">
+                          <Label className="font-bold text-slate-900">
                             {category.name}
                           </Label>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-slate-600 font-medium">
                             {category.description}
                           </p>
                         </div>
@@ -434,10 +444,10 @@ export default function NotificationSettingsPage() {
         </Card>
 
         {/* Info Card */}
-        <Card className="bg-cg-primary-subtle border-cg-primary/20">
+        <Card className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardContent className="py-4">
-            <p className="text-sm text-muted-foreground">
-              <strong className="text-foreground">Note:</strong> Some
+            <p className="text-sm text-slate-600 font-medium">
+              <strong className="text-slate-900">Note:</strong> Some
               notifications (like court-ordered communications) cannot be
               disabled and will always be delivered for legal compliance.
             </p>

@@ -311,17 +311,17 @@ export default function ReportsSettingsPage() {
     <div className="space-y-6">
       {/* Page Title */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground">
+        <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
           Reports & Documentation
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-slate-600 font-medium">
           Generate reports and request professional documentation for legal proceedings
         </p>
       </div>
 
       {/* Error Alert */}
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="rounded-2xl shadow-lg">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -329,10 +329,12 @@ export default function ReportsSettingsPage() {
 
       {/* Family File Selector */}
       {familyFiles.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2">
-              <FileCheck className="h-5 w-5 text-muted-foreground" />
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-md">
+                <FileCheck className="h-5 w-5 text-[#2C5F5D]" />
+              </div>
               Select Family File
             </CardTitle>
           </CardHeader>
@@ -340,7 +342,7 @@ export default function ReportsSettingsPage() {
             <select
               value={selectedFamilyFile}
               onChange={(e) => setSelectedFamilyFile(e.target.value)}
-              className="flex h-10 w-full max-w-md rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-10 w-full max-w-md rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F5D]"
             >
               {familyFiles.map((ff) => (
                 <option key={ff.id} value={ff.id}>
@@ -353,8 +355,8 @@ export default function ReportsSettingsPage() {
       )}
 
       {familyFiles.length === 0 && (
-        <Alert>
-          <AlertDescription>
+        <Alert className="rounded-2xl shadow-lg">
+          <AlertDescription className="font-medium">
             You don't have any family files yet. Reports will be available once you create or join a family file.
           </AlertDescription>
         </Alert>
@@ -362,14 +364,18 @@ export default function ReportsSettingsPage() {
 
       {/* Self-Service Reports Section */}
       <div>
-        <div className="flex items-center gap-2 mb-4">
-          <Download className="h-5 w-5 text-cg-primary" />
-          <h3 className="text-lg font-medium">Self-Service Reports</h3>
-          <span className="text-xs bg-cg-success/10 text-cg-success px-2 py-0.5 rounded-full">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
+            <Download className="h-5 w-5 text-emerald-600" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            Self-Service Reports
+          </h3>
+          <span className="text-xs bg-emerald-500/10 text-emerald-600 font-bold px-3 py-1 rounded-full shadow-sm">
             Free
           </span>
         </div>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="text-sm text-slate-600 font-medium mb-4">
           Download PDF reports instantly. Data from the last 30 days.
         </p>
 
@@ -380,23 +386,25 @@ export default function ReportsSettingsPage() {
             const isSuccess = showSuccess === report.id;
 
             return (
-              <Card key={report.id} className="relative">
+              <Card key={report.id} className="relative border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-[#2C5F5D]/30 transition-all duration-300">
                 {isSuccess && (
-                  <div className="absolute inset-0 bg-cg-success/10 rounded-lg flex items-center justify-center z-10">
-                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-lg flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-cg-success" />
-                      <span className="font-medium text-cg-success">Downloaded!</span>
+                  <div className="absolute inset-0 bg-emerald-500/10 rounded-2xl flex items-center justify-center z-10">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-xl flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-emerald-600" />
+                      <span className="font-bold text-emerald-600">Downloaded!</span>
                     </div>
                   </div>
                 )}
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Icon className="h-5 w-5 text-muted-foreground" />
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
+                      <Icon className="h-5 w-5 text-blue-600" />
+                    </div>
                     {report.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-slate-600 font-medium">
                     {report.description}
                   </p>
                 </CardContent>
@@ -406,7 +414,7 @@ export default function ReportsSettingsPage() {
                     size="sm"
                     onClick={() => handleGenerateReport(report.id, report.reportType)}
                     disabled={isGenerating || !selectedFamilyFile}
-                    className="w-full"
+                    className="w-full border-2"
                   >
                     {isGenerating ? (
                       <>
@@ -432,14 +440,18 @@ export default function ReportsSettingsPage() {
 
       {/* Professional Reports Section */}
       <div>
-        <div className="flex items-center gap-2 mb-4">
-          <Scale className="h-5 w-5 text-cg-amber" />
-          <h3 className="text-lg font-medium">Professional Investigation Reports</h3>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
+            <Scale className="h-5 w-5 text-amber-600" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            Professional Investigation Reports
+          </h3>
         </div>
-        <p className="text-sm text-muted-foreground mb-2">
+        <p className="text-sm text-slate-600 font-medium mb-2">
           Court-ready documentation prepared by our team. Includes expert analysis, chain of custody verification, and branded formatting.
         </p>
-        <p className="text-xs text-muted-foreground mb-4">
+        <p className="text-xs text-slate-600 font-medium mb-4">
           Reports are typically delivered within 3-5 business days. Rush delivery available.
         </p>
 
@@ -451,30 +463,32 @@ export default function ReportsSettingsPage() {
             const showForm = showRequestForm === report.id;
 
             return (
-              <Card key={report.id} className="relative">
+              <Card key={report.id} className="relative border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-amber-600/30 transition-all duration-300">
                 {isSuccess && (
-                  <div className="absolute inset-0 bg-cg-success/10 rounded-lg flex items-center justify-center z-10">
-                    <div className="bg-white dark:bg-gray-900 rounded-lg p-4 shadow-lg flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-cg-success" />
-                      <span className="font-medium text-cg-success">Request submitted!</span>
+                  <div className="absolute inset-0 bg-emerald-500/10 rounded-2xl flex items-center justify-center z-10">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-xl flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-emerald-600" />
+                      <span className="font-bold text-emerald-600">Request submitted!</span>
                     </div>
                   </div>
                 )}
-                <CardHeader>
+                <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-lg bg-cg-amber/10">
-                        <Icon className="h-5 w-5 text-cg-amber" />
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-600/5 shadow-md">
+                        <Icon className="h-6 w-6 text-amber-600" />
                       </div>
                       <div>
-                        <CardTitle className="text-base">{report.title}</CardTitle>
-                        <CardDescription className="mt-1">
+                        <CardTitle className="text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                          {report.title}
+                        </CardTitle>
+                        <CardDescription className="mt-1 font-medium">
                           {report.description}
                         </CardDescription>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-2xl font-bold text-foreground">
+                      <span className="text-2xl font-bold text-slate-900">
                         ${report.price}
                       </span>
                     </div>
@@ -482,11 +496,11 @@ export default function ReportsSettingsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-foreground">Includes:</p>
-                    <ul className="grid gap-1 text-sm text-muted-foreground">
+                    <p className="text-sm font-bold text-slate-900">Includes:</p>
+                    <ul className="grid gap-2 text-sm text-slate-600">
                       {report.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-center gap-2">
-                          <CheckCircle className="h-3.5 w-3.5 text-cg-success flex-shrink-0" />
+                        <li key={idx} className="flex items-center gap-2 font-medium">
+                          <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
                           {feature}
                         </li>
                       ))}
@@ -626,20 +640,22 @@ export default function ReportsSettingsPage() {
       </div>
 
       {/* Help Section */}
-      <Card className="bg-muted/50">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Shield className="h-5 w-5 text-muted-foreground" />
+      <Card className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-2xl shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-md">
+              <Shield className="h-5 w-5 text-[#2C5F5D]" />
+            </div>
             About Our Reports
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm text-muted-foreground">
+        <CardContent className="space-y-3 text-sm text-slate-600 font-medium">
           <p>
-            <strong>Self-Service Reports</strong> are generated automatically from your CommonGround data.
+            <strong className="text-slate-900">Self-Service Reports</strong> are generated automatically from your CommonGround data.
             They're perfect for personal records, attorney meetings, or mediation sessions.
           </p>
           <p>
-            <strong>Professional Investigation Reports</strong> are prepared by our documentation team.
+            <strong className="text-slate-900">Professional Investigation Reports</strong> are prepared by our documentation team.
             They include expert analysis, are formatted for court submission, and come with a
             chain of custody certificate verifying data integrity.
           </p>
@@ -648,7 +664,7 @@ export default function ReportsSettingsPage() {
             Professional reports can be independently verified using the export number at{' '}
             <a
               href="/verify"
-              className="text-cg-primary hover:underline"
+              className="text-[#2C5F5D] hover:underline font-bold"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -659,7 +675,7 @@ export default function ReportsSettingsPage() {
             Questions? Contact us at{' '}
             <a
               href="mailto:reports@commonground.app"
-              className="text-cg-primary hover:underline"
+              className="text-[#2C5F5D] hover:underline font-bold"
             >
               reports@commonground.app
             </a>

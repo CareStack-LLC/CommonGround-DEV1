@@ -371,20 +371,24 @@ export default function BillingSettingsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold text-foreground">Billing & Subscription</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            Billing & Subscription
+          </h2>
+          <p className="text-slate-600 font-medium">
             Manage your subscription and payment information
           </p>
         </div>
 
         {/* Current Plan */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Crown className="h-5 w-5 text-cg-amber" />
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
+                <Crown className="h-5 w-5 text-amber-600" />
+              </div>
               Current Plan
             </CardTitle>
-            <CardDescription>Your current subscription tier</CardDescription>
+            <CardDescription className="font-medium">Your current subscription tier</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 mb-4">
@@ -414,9 +418,9 @@ export default function BillingSettingsPage() {
         </Card>
 
         {/* Coming Soon Notice */}
-        <Alert className="bg-cg-sage-subtle border-cg-sage/20">
-          <Sparkles className="h-4 w-4 text-cg-sage" />
-          <AlertDescription className="text-cg-sage">
+        <Alert className="bg-purple-50 border-purple-200 rounded-2xl shadow-lg">
+          <Sparkles className="h-4 w-4 text-purple-600" />
+          <AlertDescription className="text-purple-600 font-medium">
             <strong>Subscription management coming soon!</strong>
             <br />
             Upgrade options and billing management will be available shortly. For now, enjoy your current plan features.
@@ -430,42 +434,46 @@ export default function BillingSettingsPage() {
     <div className="space-y-6">
       {/* Page Title */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground">Billing & Subscription</h2>
-        <p className="text-muted-foreground">
+        <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          Billing & Subscription
+        </h2>
+        <p className="text-slate-600 font-medium">
           Manage your subscription and payment information
         </p>
       </div>
 
       {/* Success/Error Alerts */}
       {successMessage && (
-        <Alert className="bg-cg-success-subtle border-cg-success/20">
-          <CheckCircle className="h-4 w-4 text-cg-success" />
-          <AlertDescription className="text-cg-success">{successMessage}</AlertDescription>
+        <Alert className="bg-emerald-50 border-emerald-200 rounded-2xl shadow-lg">
+          <CheckCircle className="h-4 w-4 text-emerald-600" />
+          <AlertDescription className="text-emerald-600 font-medium">{successMessage}</AlertDescription>
         </Alert>
       )}
 
       {redeemSuccess && (
-        <Alert className="bg-cg-success-subtle border-cg-success/20">
-          <CheckCircle className="h-4 w-4 text-cg-success" />
-          <AlertDescription className="text-cg-success">{redeemSuccess}</AlertDescription>
+        <Alert className="bg-emerald-50 border-emerald-200 rounded-2xl shadow-lg">
+          <CheckCircle className="h-4 w-4 text-emerald-600" />
+          <AlertDescription className="text-emerald-600 font-medium">{redeemSuccess}</AlertDescription>
         </Alert>
       )}
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="rounded-2xl shadow-lg">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       {/* Current Plan */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Crown className="h-5 w-5 text-cg-amber" />
+      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
+              <Crown className="h-5 w-5 text-amber-600" />
+            </div>
             Current Plan
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="font-medium">
             {isGrantUser
               ? `You have access through a nonprofit grant`
               : isPaidUser
@@ -542,13 +550,15 @@ export default function BillingSettingsPage() {
 
       {/* Plan Options */}
       {!isGrantUser && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles className="h-5 w-5 text-cg-amber" />
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="p-2 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl shadow-md">
+                <Sparkles className="h-5 w-5 text-purple-600" />
+              </div>
               Choose Your Plan
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="font-medium">
               Select the plan that best fits your co-parenting needs
             </CardDescription>
           </CardHeader>
@@ -719,13 +729,15 @@ export default function BillingSettingsPage() {
 
       {/* Grant Code Redemption */}
       {!isPaidUser && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Gift className="h-5 w-5 text-cg-sage" />
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
+                <Gift className="h-5 w-5 text-emerald-600" />
+              </div>
               Have a Grant Code?
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="font-medium">
               DV nonprofits and partner organizations provide grant codes for free access to premium
               features.
             </CardDescription>
@@ -783,13 +795,15 @@ export default function BillingSettingsPage() {
 
       {/* Billing Information */}
       {isPaidUser && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <CreditCard className="h-5 w-5 text-muted-foreground" />
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+              </div>
               Payment Method
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="font-medium">
               Manage your payment method and billing details through the secure Stripe portal.
             </CardDescription>
           </CardHeader>

@@ -141,19 +141,19 @@ export default function AccountSettingsPage() {
     <div className="space-y-6">
       {/* Page Title */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground">
+        <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
           Account Settings
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-slate-600 font-medium">
           Manage your profile and contact information
         </p>
       </div>
 
       {/* Success Alert */}
       {showSuccess && (
-        <Alert className="bg-cg-success-subtle border-cg-success/20">
-          <CheckCircle className="h-4 w-4 text-cg-success" />
-          <AlertDescription className="text-cg-success">
+        <Alert className="bg-emerald-50 border-emerald-200 rounded-2xl shadow-lg">
+          <CheckCircle className="h-4 w-4 text-emerald-600" />
+          <AlertDescription className="text-emerald-600 font-medium">
             Your changes have been saved successfully.
           </AlertDescription>
         </Alert>
@@ -161,20 +161,22 @@ export default function AccountSettingsPage() {
 
       {/* Error Alert */}
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="rounded-2xl shadow-lg">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Profile Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <User className="h-5 w-5 text-muted-foreground" />
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
+                <User className="h-5 w-5 text-blue-600" />
+              </div>
               Profile Information
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="font-medium">
               Your name as it appears throughout the app
             </CardDescription>
           </CardHeader>
@@ -224,13 +226,15 @@ export default function AccountSettingsPage() {
         </Card>
 
         {/* Contact Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Mail className="h-5 w-5 text-muted-foreground" />
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
+                <Mail className="h-5 w-5 text-emerald-600" />
+              </div>
               Contact Information
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="font-medium">
               How we can reach you for important updates
             </CardDescription>
           </CardHeader>
@@ -297,13 +301,15 @@ export default function AccountSettingsPage() {
         </Card>
 
         {/* Address Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <MapPin className="h-5 w-5 text-muted-foreground" />
+        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
+                <MapPin className="h-5 w-5 text-amber-600" />
+              </div>
               Address
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="font-medium">
               Used for court forms and exchange location defaults
             </CardDescription>
           </CardHeader>
