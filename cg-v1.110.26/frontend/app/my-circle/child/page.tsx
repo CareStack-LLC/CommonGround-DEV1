@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, ArrowLeft, Delete, LogIn } from 'lucide-react';
 import { myCircleAPI, ChildAvatar } from '@/lib/api';
+import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
 
 const DEFAULT_AVATARS: ChildAvatar[] = [
   { id: 'lion', emoji: '🦁', name: 'Lion' },
@@ -122,16 +123,23 @@ function ChildLoginContent() {
 
   if (!familyFileId) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-400 via-pink-400 to-orange-300 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Subtle decorative elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
+          <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
+          <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
+        </div>
+
+        <div className="relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
+          <KidComsLogo size="md" className="mb-6" />
           <div className="text-6xl mb-4">🔍</div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Oops!</h1>
+          <h1 className="text-2xl font-bold text-[#2C5F5D] mb-2">Oops!</h1>
           <p className="text-gray-600 mb-6">
             We need your family code to log you in. Ask a parent to help you scan the QR code.
           </p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-purple-500 text-white rounded-full font-semibold hover:bg-purple-600 transition-colors"
+            className="px-6 py-3 bg-[#2C5F5D] text-white rounded-full font-semibold hover:bg-[#2C5F5D]/90 transition-all hover:scale-105"
           >
             Go Home
           </button>
@@ -141,15 +149,23 @@ function ChildLoginContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-400 via-pink-400 to-orange-300 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Subtle decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
+        <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
+        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
+        <div className="absolute bottom-32 left-0 w-2/3 h-px bg-[#2C5F5D]" />
+      </div>
+
+      <div className="relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full">
         {step === 'username' ? (
           <>
             {/* Username Selection */}
             <div className="text-center mb-6">
+              <KidComsLogo size="md" className="mb-4" />
               <div className="text-6xl mb-2">👋</div>
-              <h1 className="text-3xl font-bold text-gray-800">Hi there!</h1>
-              <p className="text-gray-500 mt-1">Who are you?</p>
+              <h1 className="text-3xl font-bold text-[#2C5F5D]">Hi there!</h1>
+              <p className="text-gray-600 mt-1">Who are you?</p>
             </div>
 
             {/* Avatar Grid */}
@@ -158,7 +174,7 @@ function ChildLoginContent() {
                 <button
                   key={avatar.id}
                   onClick={() => handleUsernameSelect(avatar.name)}
-                  className="flex flex-col items-center p-3 rounded-2xl bg-gray-50 hover:bg-purple-100 hover:scale-105 transition-all"
+                  className="flex flex-col items-center p-3 rounded-2xl bg-gray-50 hover:bg-[#2C5F5D]/10 hover:scale-105 transition-all border border-transparent hover:border-[#2C5F5D]/20"
                 >
                   <span className="text-4xl">{avatar.emoji}</span>
                   <span className="text-xs text-gray-600 mt-1 truncate w-full text-center">
@@ -180,12 +196,12 @@ function ChildLoginContent() {
                     setStep('pin');
                   }
                 }}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 focus:outline-none text-lg"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#2C5F5D] focus:outline-none text-lg"
               />
               {username && (
                 <button
                   onClick={() => setStep('pin')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#2C5F5D] text-white rounded-lg hover:bg-[#2C5F5D]/90 hover:scale-105 transition-all"
                 >
                   <LogIn className="h-5 w-5" />
                 </button>
@@ -202,13 +218,13 @@ function ChildLoginContent() {
                   setPin('');
                   setError(null);
                 }}
-                className="absolute top-4 left-4 p-2 text-gray-500 hover:text-gray-700"
+                className="absolute top-4 left-4 p-2 text-gray-500 hover:text-[#2C5F5D] transition-colors"
               >
                 <ArrowLeft className="h-6 w-6" />
               </button>
               <div className="text-6xl mb-2">🔐</div>
-              <h1 className="text-2xl font-bold text-gray-800">Hi {username}!</h1>
-              <p className="text-gray-500 mt-1">Enter your secret PIN</p>
+              <h1 className="text-2xl font-bold text-[#2C5F5D]">Hi {username}!</h1>
+              <p className="text-gray-600 mt-1">Enter your secret PIN</p>
             </div>
 
             {/* PIN Display */}
@@ -218,7 +234,7 @@ function ChildLoginContent() {
                   key={i}
                   className={`w-14 h-14 rounded-2xl border-3 flex items-center justify-center text-2xl font-bold transition-all ${
                     pin[i]
-                      ? 'bg-purple-500 border-purple-500 text-white'
+                      ? 'bg-[#2C5F5D] border-[#2C5F5D] text-white'
                       : 'bg-gray-100 border-gray-200'
                   }`}
                 >
@@ -241,7 +257,7 @@ function ChildLoginContent() {
                   key={digit}
                   onClick={() => handlePinDigit(digit.toString())}
                   disabled={isLoading}
-                  className="p-4 text-2xl font-bold bg-gray-100 hover:bg-purple-100 rounded-2xl transition-colors disabled:opacity-50"
+                  className="p-4 text-2xl font-bold bg-gray-100 hover:bg-[#2C5F5D]/10 hover:border-[#2C5F5D]/20 border border-transparent rounded-2xl transition-all disabled:opacity-50"
                 >
                   {digit}
                 </button>
@@ -256,14 +272,14 @@ function ChildLoginContent() {
               <button
                 onClick={() => handlePinDigit('0')}
                 disabled={isLoading}
-                className="p-4 text-2xl font-bold bg-gray-100 hover:bg-purple-100 rounded-2xl transition-colors disabled:opacity-50"
+                className="p-4 text-2xl font-bold bg-gray-100 hover:bg-[#2C5F5D]/10 hover:border-[#2C5F5D]/20 border border-transparent rounded-2xl transition-all disabled:opacity-50"
               >
                 0
               </button>
               <button
                 onClick={handlePinBackspace}
                 disabled={isLoading}
-                className="p-4 bg-yellow-100 hover:bg-yellow-200 text-yellow-600 rounded-2xl transition-colors flex items-center justify-center disabled:opacity-50"
+                className="p-4 bg-[#D97757]/20 hover:bg-[#D97757]/30 text-[#D97757] rounded-2xl transition-colors flex items-center justify-center disabled:opacity-50"
               >
                 <Delete className="h-6 w-6" />
               </button>
@@ -271,7 +287,7 @@ function ChildLoginContent() {
 
             {/* Loading */}
             {isLoading && (
-              <div className="mt-6 flex items-center justify-center gap-2 text-purple-600">
+              <div className="mt-6 flex items-center justify-center gap-2 text-[#2C5F5D]">
                 <Loader2 className="h-5 w-5 animate-spin" />
                 <span>Logging in...</span>
               </div>
@@ -292,8 +308,8 @@ export default function ChildLoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-purple-50 to-pink-50 flex items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-purple-600" />
+        <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+          <Loader2 className="h-12 w-12 animate-spin text-[#2C5F5D]" />
         </div>
       }
     >
