@@ -57,36 +57,52 @@ const settingsNavItems: SettingsNavItem[] = [
 function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const isSettingsHome = pathname === '/settings';
+  const isSubpage = pathname !== '/settings';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation />
 
       <PageContainer className="pb-32">
-        {/* Back to Dashboard */}
+        {/* Back Navigation - Desktop always shows "Back to Dashboard", Mobile shows context-aware */}
         <button
-          onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-smooth mb-6"
+          onClick={() => {
+            if (isSubpage) {
+              // On mobile subpages, go back to settings hub
+              router.push('/settings');
+            } else {
+              // On settings home, go to dashboard
+              router.push('/dashboard');
+            }
+          }}
+          className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors mb-6"
         >
           <ChevronLeft className="h-4 w-4" />
-          Back to Dashboard
+          <span className="lg:hidden">{isSubpage ? 'Back to Settings' : 'Back to Dashboard'}</span>
+          <span className="hidden lg:inline">Back to Dashboard</span>
         </button>
 
-        {/* Settings Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
-            Settings
-          </h1>
-          <p className="mt-1 text-muted-foreground">
-            Manage your account preferences and security
-          </p>
-        </div>
+        {/* Settings Header - Only show on settings home on mobile */}
+        {(isSettingsHome || !isSubpage) && (
+          <div className="mb-8 lg:block" style={{ display: isSubpage ? 'none' : 'block' }}>
+            <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              Settings
+            </h1>
+            <p className="mt-1 text-slate-600 font-medium">
+              Manage your account preferences and security
+            </p>
+          </div>
+        )}
 
         {/* Settings Layout: Sidebar + Content */}
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Navigation */}
-          <nav className="w-full lg:w-64 flex-shrink-0">
-            <div className="bg-card rounded-lg border border-border p-2 space-y-1">
+          {/* Sidebar Navigation - Hidden on mobile subpages */}
+          <nav className={cn(
+            "w-full lg:w-64 flex-shrink-0",
+            isSubpage && "hidden lg:block"
+          )}>
+            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-2 space-y-1">
               {settingsNavItems.map((item) => {
                 const isActive = pathname === item.path;
                 const Icon = item.icon;
@@ -96,16 +112,16 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
                     key={item.path}
                     onClick={() => router.push(item.path)}
                     className={cn(
-                      'w-full flex items-start gap-3 px-3 py-3 rounded-lg text-left transition-smooth',
+                      'w-full flex items-start gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200',
                       isActive
-                        ? 'bg-cg-primary/10 text-cg-primary border border-cg-primary/20'
-                        : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                        ? 'bg-[#2C5F5D]/10 text-[#2C5F5D] border-2 border-[#2C5F5D]/20 shadow-md'
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-2 border-transparent'
                     )}
                   >
                     <Icon className="h-5 w-5 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-medium block">{item.name}</span>
-                      <span className="text-xs opacity-75">{item.description}</span>
+                      <span className="font-bold block">{item.name}</span>
+                      <span className="text-xs opacity-75 font-medium">{item.description}</span>
                     </div>
                   </button>
                 );
@@ -113,8 +129,11 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
           </nav>
 
-          {/* Main Content */}
-          <div className="flex-1 min-w-0">
+          {/* Main Content - Full width on mobile subpages */}
+          <div className={cn(
+            "flex-1 min-w-0",
+            isSubpage && "w-full"
+          )}>
             {children}
           </div>
         </div>
