@@ -7,6 +7,7 @@ import { KidContactCard } from '@/components/kidcoms/kid-contact-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
 import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
 import { kidcomsAPI } from '@/lib/api';
+import { Users } from 'lucide-react';
 
 interface ChildUserData {
   userId: string;
@@ -42,7 +43,6 @@ export default function MyCirclePage() {
       const userStr = localStorage.getItem('child_user');
       const contactsStr = localStorage.getItem('child_contacts');
 
-      // Validate token and user data exist
       if (!token || !userStr) {
         router.push('/my-circle/child');
         return;
@@ -50,7 +50,6 @@ export default function MyCirclePage() {
 
       const user = JSON.parse(userStr) as ChildUserData;
 
-      // CRITICAL: Validate family file ID
       if (!user.familyFileId) {
         console.error('Missing family file ID');
         localStorage.clear();
@@ -60,7 +59,6 @@ export default function MyCirclePage() {
 
       setUserData(user);
 
-      // Load contacts if available
       if (contactsStr) {
         try {
           const parsedContacts = JSON.parse(contactsStr) as ChildContact[];
@@ -91,7 +89,6 @@ export default function MyCirclePage() {
 
       const response = await kidcomsAPI.createChildSession(sessionData);
 
-      // Store session info for the call page
       localStorage.setItem(
         'child_call_session',
         JSON.stringify({
@@ -104,19 +101,17 @@ export default function MyCirclePage() {
         })
       );
 
-      // Navigate to call page
       router.push(`/my-circle/child/call?session=${response.session_id}`);
     } catch (error) {
       console.error('Failed to start call:', error);
-      alert('Could not start call. Please try again! 😊');
+      alert('Could not start call. Please try again!');
       setIsStartingCall(false);
     }
   }
 
-  // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
         <div className="text-center">
           <ARIAMascot state="loading" greeting="Loading your circle..." />
         </div>
@@ -124,20 +119,20 @@ export default function MyCirclePage() {
     );
   }
 
-  // Empty state - no contacts
   if (contacts.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 pb-24">
-        {/* Header */}
-        <header className="bg-white/90 backdrop-blur-sm border-b-2 border-purple-100">
+      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] pb-24">
+        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
           <div className="max-w-2xl mx-auto px-6 py-6">
             <KidComsLogo size="sm" className="mb-3" />
-            <h1 className="text-2xl font-black text-gray-800">MY CIRCLE</h1>
-            <p className="text-gray-600 mt-1">Call someone you love!</p>
+            <div className="flex items-center gap-2">
+              <Users className="w-8 h-8 text-[#2C5F5D]" />
+              <h1 className="text-2xl font-bold text-[#2C3E50]">MY CIRCLE</h1>
+            </div>
+            <p className="text-gray-600 mt-1">Connect with family and friends</p>
           </div>
         </header>
 
-        {/* Empty State */}
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center px-6">
             <ARIAMascot
@@ -147,42 +142,58 @@ export default function MyCirclePage() {
           </div>
         </div>
 
-        {/* Bottom Navigation */}
         <KidBottomNav />
       </div>
     );
   }
 
-  // Normal state with contacts
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 pb-24">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b-2 border-purple-100">
-        <div className="max-w-2xl mx-auto px-6 py-6">
-          <KidComsLogo size="sm" className="mb-3" />
-          <h1 className="text-2xl font-black text-gray-800">MY CIRCLE</h1>
-          <p className="text-gray-600 mt-1">Call someone you love!</p>
-        </div>
-      </header>
+    <div className="min-h-screen relative pb-24 bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+      {/* Subtle decorative lines */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
+        <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
+        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
+      </div>
 
-      {/* Contact List */}
-      <main className="max-w-2xl mx-auto px-6 py-6">
-        <div className="space-y-4">
-          {contacts.map((contact) => (
-            <KidContactCard
-              key={contact.contact_id}
-              contact={contact}
-              onCall={() => handleCall(contact, 'voice')}
-              onVideo={() => handleCall(contact, 'video')}
-            />
-          ))}
-        </div>
-      </main>
+      <div className="relative z-10">
+        {/* Header */}
+        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
+          <div className="max-w-2xl mx-auto px-6 py-6">
+            <KidComsLogo size="sm" className="mb-3" />
+            <div className="flex items-center gap-3">
+              <Users className="w-10 h-10 text-[#2C5F5D]" />
+              <div>
+                <h1 className="text-3xl font-bold text-[#2C3E50]">My Circle</h1>
+                <p className="text-gray-600 text-sm">
+                  {contacts.length} {contacts.length === 1 ? 'person' : 'people'} to call
+                </p>
+              </div>
+            </div>
+          </div>
+        </header>
 
-      {/* Bottom Navigation */}
+        {/* Main Content */}
+        <main className="max-w-2xl mx-auto px-6 py-6">
+          <div className="space-y-4">
+            {contacts.map((contact) => (
+              <div
+                key={contact.contact_id}
+                className="group transform hover:scale-[1.01] transition-all duration-200"
+              >
+                <KidContactCard
+                  contact={contact}
+                  onCall={() => handleCall(contact, 'voice')}
+                  onVideo={() => handleCall(contact, 'video')}
+                  className="border border-gray-200 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
+                />
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+
       <KidBottomNav />
 
-      {/* Loading overlay when starting a call */}
       {isStartingCall && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="text-center">

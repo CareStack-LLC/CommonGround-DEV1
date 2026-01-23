@@ -7,6 +7,7 @@ import { KidMovieCard } from '@/components/kidcoms/kid-movie-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
 import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
 import { theaterContent } from '@/lib/theater-content';
+import { Film } from 'lucide-react';
 
 interface ChildUserData {
   userId: string;
@@ -30,7 +31,6 @@ export default function MoviesPage() {
       const token = localStorage.getItem('child_token');
       const userStr = localStorage.getItem('child_user');
 
-      // Validate token and user data exist
       if (!token || !userStr) {
         router.push('/my-circle/child');
         return;
@@ -38,7 +38,6 @@ export default function MoviesPage() {
 
       const user = JSON.parse(userStr) as ChildUserData;
 
-      // CRITICAL: Validate family file ID
       if (!user.familyFileId) {
         console.error('Missing family file ID');
         localStorage.clear();
@@ -56,17 +55,15 @@ export default function MoviesPage() {
   }
 
   function handleVideoSelect(video: typeof theaterContent.videos[0]) {
-    console.log('Selected video:', video);
     router.push(`/my-circle/child/movies/${video.id}`);
   }
 
   const videos = theaterContent.videos;
   const featuredVideo = videos[0];
 
-  // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
         <div className="text-center">
           <ARIAMascot state="loading" greeting="Loading movies..." />
         </div>
@@ -74,20 +71,20 @@ export default function MoviesPage() {
     );
   }
 
-  // Empty state - no videos
   if (videos.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 pb-24">
-        {/* Header */}
-        <header className="bg-white/90 backdrop-blur-sm border-b-2 border-purple-100">
+      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] pb-24">
+        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
           <div className="max-w-5xl mx-auto px-6 py-6">
             <KidComsLogo size="sm" className="mb-3" />
-            <h1 className="text-2xl font-black text-gray-800">MOVIES</h1>
-            <p className="text-gray-600 mt-1">Watch fun videos!</p>
+            <div className="flex items-center gap-3">
+              <Film className="w-10 h-10 text-[#2C5F5D]" />
+              <h1 className="text-2xl font-bold text-[#2C3E50]">MOVIES</h1>
+            </div>
+            <p className="text-gray-600 mt-1">Watch fun videos</p>
           </div>
         </header>
 
-        {/* Empty State */}
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center px-6">
             <ARIAMascot
@@ -97,55 +94,79 @@ export default function MoviesPage() {
           </div>
         </div>
 
-        {/* Bottom Navigation */}
         <KidBottomNav />
       </div>
     );
   }
 
-  // Normal state with videos
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50 pb-24">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b-2 border-purple-100">
-        <div className="max-w-5xl mx-auto px-6 py-6">
-          <KidComsLogo size="sm" className="mb-3" />
-          <h1 className="text-2xl font-black text-gray-800">MOVIES</h1>
-          <p className="text-gray-600 mt-1">Watch fun videos!</p>
-        </div>
-      </header>
+    <div className="min-h-screen relative pb-24 bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+      {/* Subtle decorative lines */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
+        <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
+        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-6 py-6 space-y-6">
-        {/* Featured Movie Section */}
-        {featuredVideo && (
+      <div className="relative z-10">
+        {/* Header */}
+        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
+          <div className="max-w-5xl mx-auto px-6 py-6">
+            <KidComsLogo size="sm" className="mb-3" />
+            <div className="flex items-center gap-3">
+              <Film className="w-10 h-10 text-[#2C5F5D]" />
+              <div>
+                <h1 className="text-3xl font-bold text-[#2C3E50]">Movies</h1>
+                <p className="text-gray-600 text-sm">Watch and enjoy</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+          {/* Featured Movie Section */}
+          {featuredVideo && (
+            <section>
+              <h2 className="text-xl font-bold text-[#2C3E50] mb-4 flex items-center gap-2">
+                <span className="w-1 h-6 bg-[#D97757] rounded-full"></span>
+                Featured Movie
+              </h2>
+              <div className="max-w-2xl mx-auto">
+                <div className="group transform hover:scale-[1.02] transition-all duration-200">
+                  <KidMovieCard
+                    video={featuredVideo}
+                    onClick={() => handleVideoSelect(featuredVideo)}
+                    className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
+                  />
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* All Movies Grid */}
           <section>
-            <h2 className="text-lg font-bold text-gray-700 mb-3">NEW MOVIE</h2>
-            <div className="max-w-md">
-              <KidMovieCard
-                video={featuredVideo}
-                onClick={() => handleVideoSelect(featuredVideo)}
-              />
+            <h2 className="text-xl font-bold text-[#2C3E50] mb-4 flex items-center gap-2">
+              <span className="w-1 h-6 bg-[#2C5F5D] rounded-full"></span>
+              All Movies
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {videos.map((video) => (
+                <div
+                  key={video.id}
+                  className="group transform hover:scale-[1.02] transition-all duration-200"
+                >
+                  <KidMovieCard
+                    video={video}
+                    onClick={() => handleVideoSelect(video)}
+                    className="border border-gray-200 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
+                  />
+                </div>
+              ))}
             </div>
           </section>
-        )}
+        </main>
+      </div>
 
-        {/* All Movies Grid */}
-        <section>
-          <h2 className="text-lg font-bold text-gray-700 mb-3">ALL MOVIES</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {videos.map((video) => (
-              <KidMovieCard
-                key={video.id}
-                video={video}
-                onClick={() => handleVideoSelect(video)}
-              />
-            ))}
-          </div>
-        </section>
-      </main>
-
-      {/* Bottom Navigation */}
       <KidBottomNav />
     </div>
   );
