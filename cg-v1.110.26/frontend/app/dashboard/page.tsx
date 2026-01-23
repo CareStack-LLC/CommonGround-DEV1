@@ -191,16 +191,16 @@ function ChildCustodyCard({
 
   return (
     <div
-      className={`cg-card overflow-hidden ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+      className={`bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden ${onClick ? 'cursor-pointer hover:border-[#2C5F5D]/30 hover:scale-[1.01]' : ''}`}
       onClick={onClick}
     >
       {/* Top accent bar */}
-      <div className={`h-1.5 ${statusColor}`} />
+      <div className={`h-2 ${statusColor}`} />
 
-      <div className="p-4">
+      <div className="p-5">
         {/* Child header with "With Me" button */}
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-cg-amber-subtle flex items-center justify-center flex-shrink-0 overflow-hidden">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 overflow-hidden ring-2 ring-white shadow-md">
             {childData?.photo_url && !imageError ? (
               <img
                 src={getImageUrl(childData.photo_url) || ''}
@@ -209,13 +209,13 @@ function ChildCustodyCard({
                 onError={() => setImageError(true)}
               />
             ) : (
-              <span className="text-sm font-semibold text-cg-amber">
+              <span className="text-base font-bold text-[#2C5F5D]">
                 {childStatus.child_first_name.charAt(0)}
               </span>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-foreground truncate">
+            <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
               {childStatus.child_first_name}
             </p>
             <p className={`text-sm font-medium ${statusTextColor}`}>
@@ -229,7 +229,7 @@ function ChildCustodyCard({
                 e.stopPropagation();
                 onWithMe(childStatus.child_id);
               }}
-              className="px-3 py-1.5 text-xs font-medium bg-[#2C5F5D] text-white rounded-lg hover:bg-[#1e4442] transition-colors flex-shrink-0"
+              className="px-4 py-2 text-xs font-bold bg-gradient-to-r from-[#2C5F5D] to-[#1f4644] text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0"
             >
               With Me
             </button>
@@ -286,13 +286,13 @@ function ChildCustodyCard({
         )}
 
         {/* Days with parent - custody time tracking (always show) */}
-        <div className="mt-3 pt-3 border-t border-slate-200">
+        <div className="mt-4 pt-4 border-t-2 border-slate-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#2C5F5D]" />
-              <span className="text-sm text-slate-600 font-medium">Days since agreement active</span>
+              <div className="w-2.5 h-2.5 rounded-full bg-[#2C5F5D] shadow-sm" />
+              <span className="text-sm text-slate-700 font-semibold">Days since agreement active</span>
             </div>
-            <span className="text-lg font-bold text-[#2C5F5D]">{myDays ?? 0} <span className="text-xs font-normal text-slate-500">days</span></span>
+            <span className="text-2xl font-bold text-[#2C5F5D]">{myDays ?? 0} <span className="text-xs font-medium text-slate-400">days</span></span>
           </div>
         </div>
       </div>
@@ -449,19 +449,19 @@ function ActionStreamItem({
   return (
     <button
       onClick={onClick}
-      className="w-full cg-card-interactive p-4 flex items-center gap-4 text-left"
+      className="w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
     >
-      <div className={`w-12 h-12 ${iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-        <Icon className={`w-5 h-5 ${iconColor}`} />
+      <div className={`w-14 h-14 ${iconBg} rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300`}>
+        <Icon className={`w-6 h-6 ${iconColor}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-foreground">{title}</p>
-        <p className="text-sm text-muted-foreground truncate">{subtitle}</p>
+        <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{title}</p>
+        <p className="text-sm text-muted-foreground truncate font-medium">{subtitle}</p>
       </div>
       {hasNotification && (
-        <div className="w-2.5 h-2.5 bg-cg-error rounded-full flex-shrink-0" />
+        <div className="w-3 h-3 bg-cg-error rounded-full flex-shrink-0 shadow-md animate-pulse" />
       )}
-      <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+      <ChevronRight className="w-5 h-5 text-slate-400 flex-shrink-0 group-hover:text-[#2C5F5D] group-hover:translate-x-1 transition-all duration-300" />
     </button>
   );
 }
@@ -479,12 +479,12 @@ function QuickActionButton({
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-2 p-4 cg-card-interactive"
+      className="group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border-2 border-slate-200 hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-300 hover:scale-105"
     >
-      <div className="w-12 h-12 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center">
-        <Icon className="w-5 h-5 text-[#2C5F5D]" />
+      <div className="w-14 h-14 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+        <Icon className="w-6 h-6 text-[#2C5F5D]" />
       </div>
-      <span className="text-sm font-medium text-foreground">{label}</span>
+      <span className="text-sm font-bold text-foreground">{label}</span>
     </button>
   );
 }
@@ -564,23 +564,23 @@ function UpcomingEventItem({ event }: { event: UpcomingEvent }) {
   return (
     <button
       onClick={() => router.push('/schedule')}
-      className="w-full p-3 flex items-center gap-3 text-left hover:bg-muted/50 transition-colors rounded-lg"
+      className="w-full p-4 flex items-center gap-4 text-left hover:bg-slate-50 transition-all duration-200 rounded-xl group"
     >
-      <div className={`w-10 h-10 ${bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
-        <Icon className={`w-5 h-5 ${color}`} />
+      <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-200`}>
+        <Icon className={`w-6 h-6 ${color}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-foreground truncate">{getDisplayTitle()}</p>
-        <p className="text-sm text-muted-foreground truncate">
+        <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{getDisplayTitle()}</p>
+        <p className="text-sm text-muted-foreground truncate font-medium">
           {timeLabel}
           {subtitle && ` • ${subtitle}`}
         </p>
       </div>
-      <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
-        <span className="text-xs font-medium text-[#2C5F5D] bg-[#2C5F5D]/10 px-2 py-0.5 rounded-full">
+      <div className="flex flex-col items-end gap-1 flex-shrink-0">
+        <span className="text-xs font-bold text-white bg-gradient-to-r from-[#2C5F5D] to-[#1f4644] px-3 py-1 rounded-full shadow-md">
           {timeRemaining}
         </span>
-        <span className="text-xs text-muted-foreground">{dayLabel}</span>
+        <span className="text-xs text-muted-foreground font-semibold">{dayLabel}</span>
       </div>
     </button>
   );
@@ -594,14 +594,14 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
 
   if (!events || events.length === 0) {
     return (
-      <div className="cg-card p-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#2C5F5D]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-            <CheckCircle className="w-5 h-5 text-[#2C5F5D]" />
+      <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+            <CheckCircle className="w-6 h-6 text-[#2C5F5D]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-foreground">All caught up!</p>
-            <p className="text-sm text-muted-foreground">No upcoming events in the next 7 days</p>
+            <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
+            <p className="text-sm text-muted-foreground font-medium">No upcoming events in the next 7 days</p>
           </div>
         </div>
       </div>
@@ -609,17 +609,17 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
   }
 
   return (
-    <div className="cg-card overflow-hidden">
-      <div className="max-h-[280px] overflow-y-auto divide-y divide-border/50">
+    <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg">
+      <div className="max-h-[280px] overflow-y-auto divide-y-2 divide-slate-100">
         {events.map((event) => (
           <UpcomingEventItem key={event.id} event={event} />
         ))}
       </div>
       {events.length > 3 && (
-        <div className="p-2 border-t border-border/50 bg-muted/30">
+        <div className="p-3 border-t-2 border-slate-100 bg-slate-50">
           <button
             onClick={() => router.push('/schedule')}
-            className="w-full text-center text-sm text-[#2C5F5D] hover:text-[#1e4442] font-medium py-1 transition-colors"
+            className="w-full text-center text-sm text-[#2C5F5D] hover:text-[#1e4442] font-bold py-2 transition-all duration-200 hover:scale-105"
           >
             View full schedule →
           </button>
@@ -1090,42 +1090,42 @@ function DashboardContent() {
         {needsSetup ? (
           // Getting Started
           <div className="space-y-6">
-            <div className="cg-card-elevated p-8 text-center">
-              <div className="w-16 h-16 bg-[#2C5F5D]/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <FolderOpen className="w-8 h-8 text-[#2C5F5D]" />
+            <div className="bg-white rounded-3xl border-2 border-slate-200 p-10 text-center shadow-2xl">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <FolderOpen className="w-10 h-10 text-[#2C5F5D]" />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h3 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 Welcome to CommonGround
               </h3>
-              <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
+              <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
                 Create a Family File to get started with co-parenting tools, shared calendars, and secure messaging.
               </p>
               <button
                 onClick={() => router.push('/family-files/new')}
-                className="cg-btn-primary inline-flex items-center gap-2"
+                className="bg-gradient-to-r from-[#2C5F5D] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
               >
                 Create Family File
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-5 h-5" />
               </button>
             </div>
 
             {/* Quick Info Cards */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="cg-card p-4">
-                <div className="w-10 h-10 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center mb-3">
-                  <MessageSquare className="w-5 h-5 text-[#2C5F5D]" />
+              <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+                  <MessageSquare className="w-6 h-6 text-[#2C5F5D]" />
                 </div>
-                <h4 className="font-medium text-foreground">ARIA Messaging</h4>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>ARIA Messaging</h4>
+                <p className="text-sm text-muted-foreground mt-2 font-medium">
                   AI-powered communication that reduces conflict
                 </p>
               </div>
-              <div className="cg-card p-4">
-                <div className="w-10 h-10 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center mb-3">
-                  <Calendar className="w-5 h-5 text-[#2C5F5D]" />
+              <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+                  <Calendar className="w-6 h-6 text-[#2C5F5D]" />
                 </div>
-                <h4 className="font-medium text-foreground">Shared Calendar</h4>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Shared Calendar</h4>
+                <p className="text-sm text-muted-foreground mt-2 font-medium">
                   Track custody schedules and exchanges
                 </p>
               </div>
@@ -1192,13 +1192,13 @@ function DashboardContent() {
                  dashboardSummary.unread_messages_count === 0 &&
                  dashboardSummary.pending_agreements_count === 0 &&
                  dashboardSummary.unread_court_count === 0 && (
-                  <div className="cg-card p-4 flex items-center gap-3">
-                    <div className="w-12 h-12 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center">
-                      <CheckCircle className="w-5 h-5 text-[#2C5F5D]" />
+                  <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
+                    <div className="w-14 h-14 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center shadow-md">
+                      <CheckCircle className="w-7 h-7 text-[#2C5F5D]" />
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground">All caught up!</p>
-                      <p className="text-sm text-muted-foreground">No pending items to review</p>
+                      <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
+                      <p className="text-sm text-muted-foreground font-medium">No pending items to review</p>
                     </div>
                   </div>
                 )}
@@ -1393,20 +1393,20 @@ function DashboardContent() {
                     <button
                       key={familyFile.id}
                       onClick={() => router.push(`/family-files/${familyFile.id}`)}
-                      className="w-full cg-card p-4 flex items-center gap-4 text-left hover:shadow-md transition-smooth"
+                      className="group w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
                     >
-                      <div className="w-10 h-10 bg-[#2C5F5D]/10 rounded-xl flex items-center justify-center">
-                        <FolderOpen className="w-5 h-5 text-[#2C5F5D]" />
+                      <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <FolderOpen className="w-6 h-6 text-[#2C5F5D]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground truncate">
+                        <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                           {familyFile.title}
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground font-medium">
                           {familyFile.children?.length || 0} children
                         </p>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[#2C5F5D] group-hover:translate-x-1 transition-all duration-300" />
                     </button>
                   ))}
                 </div>
