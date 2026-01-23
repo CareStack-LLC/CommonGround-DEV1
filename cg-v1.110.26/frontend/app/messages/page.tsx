@@ -47,12 +47,13 @@ interface FamilyFileWithAgreements {
 // ARIA Guardian indicator component
 function ARIAGuardianBadge() {
   return (
-    <div className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-xl shadow-sm">
+    <div className="flex items-center gap-1.5 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 bg-gradient-to-r from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-xl shadow-md">
       <div className="relative">
         <div className="w-2 h-2 bg-amber-500 rounded-full" />
         <div className="absolute inset-0 w-2 h-2 bg-amber-500 rounded-full animate-ping opacity-50" />
       </div>
-      <span className="text-xs font-semibold text-amber-600">ARIA Protected</span>
+      <span className="text-xs font-bold text-amber-600 hidden sm:inline">ARIA Protected</span>
+      <span className="text-xs font-bold text-amber-600 sm:hidden">ARIA</span>
     </div>
   );
 }
@@ -75,25 +76,25 @@ function MessageBubble({
   };
 
   return (
-    <div className={`flex gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}>
+    <div className={`flex gap-2 sm:gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}>
       {/* Avatar */}
       {showAvatar && (
-        <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
+        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
           isOwn ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644]' : 'bg-gradient-to-br from-slate-400 to-slate-500'
         }`}>
-          <span className="text-xs font-semibold text-white">
+          <span className="text-xs font-bold text-white">
             {isOwn ? 'You' : (userName?.charAt(0) || 'P')}
           </span>
         </div>
       )}
-      {!showAvatar && <div className="w-9" />}
+      {!showAvatar && <div className="w-8 sm:w-9" />}
 
       {/* Bubble */}
-      <div className={`max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
+      <div className={`max-w-[80%] sm:max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
         <div className={`relative group ${
           isOwn
-            ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white px-4 py-3 rounded-2xl shadow-md'
-            : 'bg-white text-slate-900 px-4 py-3 rounded-2xl shadow-md border border-slate-200'
+            ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
+            : 'bg-white text-slate-900 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg border-2 border-slate-200'
         }`}>
           {/* ARIA Review Badge */}
           {message.was_flagged && (
@@ -146,20 +147,20 @@ function MessageBubble({
 // Empty chat state
 function EmptyChatState({ onCompose }: { onCompose: () => void }) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-      <div className="w-20 h-20 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center mb-6">
-        <Shield className="h-10 w-10 text-[#2C5F5D]" />
+    <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 text-center">
+      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
+        <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-[#2C5F5D]" />
       </div>
-      <h3 className="text-xl font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
         The Neutral Zone
       </h3>
-      <p className="text-muted-foreground max-w-sm mb-6">
+      <p className="text-sm sm:text-base text-slate-600 font-medium max-w-sm mb-4 sm:mb-6">
         This is a safe space for co-parenting communication. ARIA Guardian monitors conversations
         to help maintain a constructive tone.
       </p>
       <button
         onClick={onCompose}
-        className="cg-btn-primary flex items-center gap-2"
+        className="cg-btn-primary flex items-center gap-2 text-sm sm:text-base px-4 py-2 sm:px-6 sm:py-3"
       >
         <Send className="h-4 w-4" />
         Start Conversation
@@ -179,23 +180,23 @@ function ChatHeader({
   onBack?: () => void;
 }) {
   return (
-    <div className="bg-white border-b-2 border-slate-200 flex-shrink-0 shadow-sm">
-      <div className="flex items-center justify-between p-4 gap-2">
-        <div className="flex items-center gap-3 min-w-0 flex-1">
+    <div className="bg-white border-b-2 border-slate-200 flex-shrink-0 shadow-md">
+      <div className="flex items-center justify-between p-3 sm:p-4 gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           {onBack && (
             <button
               onClick={onBack}
-              className="lg:hidden p-2 -ml-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-all duration-200 flex-shrink-0"
+              className="lg:hidden p-1.5 sm:p-2 -ml-1 sm:-ml-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-all duration-200 flex-shrink-0"
             >
               <ChevronLeft className="h-5 w-5 text-slate-600" />
             </button>
           )}
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-md">
             <Users className="h-5 w-5 text-[#2C5F5D]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFileName}</h2>
-            <p className="text-xs text-slate-600 truncate">{agreementTitle}</p>
+            <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFileName}</h2>
+            <p className="text-xs text-slate-600 truncate font-medium">{agreementTitle}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -577,21 +578,27 @@ function MessagesContent() {
             absolute lg:relative inset-0 lg:inset-auto z-20 lg:z-auto
           `}>
             {/* Sidebar Header */}
-            <div className="p-4 border-b border-border">
-              <div className="flex items-center gap-2">
+            <div className="p-4 border-b-2 border-slate-200 bg-white">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => router.back()}
-                  className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
+                  className="p-2 -ml-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-all duration-200 flex-shrink-0"
                   aria-label="Go back"
                 >
-                  <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+                  <ArrowLeft className="h-5 w-5 text-slate-600" />
                 </button>
-                <h1 className="text-xl font-semibold text-foreground flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                  <MessageSquare className="h-5 w-5 text-[#2C5F5D]" />
-                  Comms
-                </h1>
+                <div className="flex items-center gap-2 flex-1">
+                  <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-sm">
+                    <MessageSquare className="h-5 w-5 text-[#2C5F5D]" />
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                      Comms
+                    </h1>
+                    <p className="text-xs text-slate-600 font-medium">The Neutral Zone</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground mt-1 ml-9">The Neutral Zone</p>
             </div>
 
             {/* Conversations List */}
@@ -645,7 +652,7 @@ function MessagesContent() {
                 />
 
                 {/* Messages Area */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
                   {isLoadingMessages ? (
                     <div className="flex items-center justify-center h-full">
                       <div className="w-8 h-8 border-2 border-cg-sage border-t-transparent rounded-full animate-spin" />
@@ -655,12 +662,12 @@ function MessagesContent() {
                   ) : (
                     <>
                       {/* ARIA Welcome Message */}
-                      <div className="flex justify-center mb-6">
-                        <div className="bg-gradient-to-r from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-2xl px-5 py-4 flex items-center gap-3 max-w-md shadow-md">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center flex-shrink-0 shadow-sm">
-                            <Sparkles className="h-5 w-5 text-amber-600" />
+                      <div className="flex justify-center mb-4 sm:mb-6">
+                        <div className="bg-gradient-to-r from-amber-500/10 to-amber-600/5 border-2 border-amber-500/20 rounded-2xl px-3 py-3 sm:px-5 sm:py-4 flex items-center gap-2 sm:gap-3 max-w-md shadow-lg">
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center flex-shrink-0 shadow-md">
+                            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                           </div>
-                          <p className="text-sm font-medium text-slate-700 leading-relaxed">
+                          <p className="text-xs sm:text-sm font-bold text-slate-700 leading-relaxed">
                             ARIA Guardian is monitoring this conversation to help maintain a constructive tone.
                           </p>
                         </div>
@@ -706,7 +713,7 @@ function MessagesContent() {
 
                 {/* Compose Area */}
                 {showCompose ? (
-                  <div className="border-t border-border p-4 bg-card flex-shrink-0">
+                  <div className="border-t-2 border-slate-200 p-3 sm:p-4 bg-white flex-shrink-0 shadow-inner">
                     {getOtherParentId() ? (
                       <MessageCompose
                         caseId={selectedAgreement.case_id || undefined}
@@ -717,11 +724,11 @@ function MessagesContent() {
                         ariaEnabled={true}
                       />
                     ) : (
-                      <div className="aria-guardian p-4 flex items-center gap-3">
-                        <AlertTriangle className="h-5 w-5 text-cg-amber flex-shrink-0" />
+                      <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 sm:p-4 flex items-center gap-2 sm:gap-3 shadow-md">
+                        <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0" />
                         <div>
-                          <p className="font-medium text-foreground">Waiting for co-parent</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="font-bold text-slate-900 text-sm sm:text-base">Waiting for co-parent</p>
+                          <p className="text-xs sm:text-sm text-slate-600 font-medium">
                             The other parent needs to join before you can exchange messages.
                           </p>
                         </div>
@@ -729,27 +736,27 @@ function MessagesContent() {
                     )}
                     <button
                       onClick={() => setShowCompose(false)}
-                      className="mt-3 text-sm text-muted-foreground hover:text-foreground transition-smooth"
+                      className="mt-3 text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors"
                     >
                       Cancel
                     </button>
                   </div>
                 ) : (
                   /* Quick Compose Button */
-                  <div className="border-t border-border p-4 bg-card flex-shrink-0">
+                  <div className="border-t-2 border-slate-200 p-3 sm:p-4 bg-white flex-shrink-0 shadow-inner">
                     <button
                       onClick={() => setShowCompose(true)}
                       disabled={!getOtherParentId()}
-                      className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-smooth ${
+                      className={`w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-xl border-2 transition-all duration-200 ${
                         getOtherParentId()
-                          ? 'border-border hover:border-cg-sage hover:bg-cg-sage-subtle/50 cursor-pointer'
-                          : 'border-border bg-muted cursor-not-allowed opacity-60'
+                          ? 'border-slate-200 hover:border-[#2C5F5D] hover:bg-[#2C5F5D]/5 cursor-pointer shadow-md hover:shadow-lg'
+                          : 'border-slate-200 bg-slate-50 cursor-not-allowed opacity-60'
                       }`}
                     >
-                      <div className="w-8 h-8 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-                        <Send className="h-4 w-4 text-cg-sage" />
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-sm">
+                        <Send className="h-4 w-4 text-[#2C5F5D]" />
                       </div>
-                      <span className="text-muted-foreground">
+                      <span className="text-sm sm:text-base text-slate-600 font-medium">
                         {getOtherParentId() ? 'Write a message...' : 'Waiting for co-parent to join'}
                       </span>
                     </button>
