@@ -374,18 +374,21 @@ function FamilyFileDetailContent() {
   if (error || !familyFile) {
     return (
       <div className="space-y-4">
-        <CGButton variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
           Back
-        </CGButton>
-        <CGCard variant="default" className="border-cg-error/30 bg-cg-error-subtle">
-          <CGCardContent className="py-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-cg-error" />
-              <p className="text-cg-error font-medium">{error || 'Family File not found'}</p>
+        </button>
+        <div className="bg-white border-2 border-red-200 rounded-2xl shadow-lg p-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/10 to-red-600/5 flex items-center justify-center shadow-md">
+              <AlertCircle className="h-5 w-5 text-red-500" />
             </div>
-          </CGCardContent>
-        </CGCard>
+            <p className="text-red-600 font-bold">{error || 'Family File not found'}</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -428,11 +431,13 @@ function FamilyFileDetailContent() {
           </SheetTrigger>
           <SheetContent className="w-full sm:max-w-md overflow-y-auto">
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                <Settings className="h-5 w-5 text-cg-sage" />
+              <SheetTitle className="flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
+                  <Settings className="h-5 w-5 text-[#2C5F5D]" />
+                </div>
                 Family File Settings
               </SheetTitle>
-              <SheetDescription>
+              <SheetDescription className="text-slate-600 font-medium">
                 Manage your family file settings and preferences
               </SheetDescription>
             </SheetHeader>
@@ -448,46 +453,43 @@ function FamilyFileDetailContent() {
 
               {/* Edit Title Section */}
               <div className="space-y-3">
-                <Label className="text-sm font-medium text-foreground">Family File Name</Label>
+                <Label className="text-sm font-medium text-slate-900">Family File Name</Label>
                 {isEditingTitle ? (
                   <div className="space-y-3">
                     <Input
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
                       placeholder="Enter family file name"
-                      className="focus-visible:ring-cg-sage"
+                      className="focus-visible:ring-[#2C5F5D] border-2"
                     />
                     <div className="flex gap-2">
-                      <CGButton
-                        variant="primary"
-                        size="sm"
+                      <button
                         onClick={handleSaveTitle}
                         disabled={isSavingTitle || !newTitle.trim()}
+                        className="cg-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isSavingTitle ? 'Saving...' : 'Save'}
-                      </CGButton>
-                      <CGButton
-                        variant="ghost"
-                        size="sm"
+                      </button>
+                      <button
                         onClick={() => {
                           setIsEditingTitle(false);
                           setNewTitle(familyFile?.title || '');
                         }}
+                        className="cg-btn-secondary"
                       >
                         Cancel
-                      </CGButton>
+                      </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50 border border-border/50">
-                    <span className="text-foreground font-medium">{familyFile?.title}</span>
-                    <CGButton
-                      variant="ghost"
-                      size="sm"
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border-2 border-slate-200">
+                    <span className="text-slate-900 font-medium">{familyFile?.title}</span>
+                    <button
                       onClick={() => setIsEditingTitle(true)}
+                      className="w-8 h-8 rounded-lg hover:bg-slate-200 flex items-center justify-center transition-colors"
                     >
-                      <Pencil className="h-4 w-4" />
-                    </CGButton>
+                      <Pencil className="h-4 w-4 text-slate-600" />
+                    </button>
                   </div>
                 )}
               </div>
@@ -497,18 +499,19 @@ function FamilyFileDetailContent() {
 
               {/* Send to Court Section */}
               <div className="space-y-3">
-                <Label className="text-sm font-medium text-foreground">Court Filing</Label>
-                <p className="text-sm text-muted-foreground">
+                <Label className="text-sm font-medium text-slate-900">Court Filing</Label>
+                <p className="text-sm text-slate-600 font-medium">
                   Start the FL-300/FL-311 process to submit your family file to the court.
                 </p>
-                <CGButton
-                  variant="secondary"
-                  className="w-full justify-start"
+                <button
                   onClick={() => router.push(`/family-files/${id}/court-filing`)}
+                  className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-purple-200 bg-purple-50 hover:bg-purple-100 hover:border-purple-300 transition-all text-left"
                 >
-                  <Gavel className="h-4 w-4 mr-3" />
-                  Send Family File to Court
-                </CGButton>
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
+                    <Gavel className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <span className="font-bold text-slate-900">Send Family File to Court</span>
+                </button>
               </div>
 
               {/* Danger Zone - Only for Parent A */}
@@ -518,8 +521,8 @@ function FamilyFileDetailContent() {
 
                   <div className="space-y-4">
                     <div>
-                      <Label className="text-sm font-medium text-cg-error">Danger Zone</Label>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <Label className="text-sm font-medium text-red-600">Danger Zone</Label>
+                      <p className="text-sm text-slate-600 font-medium mt-1">
                         These actions cannot be undone.
                       </p>
                     </div>
@@ -530,41 +533,40 @@ function FamilyFileDetailContent() {
                         {!showRemoveConfirm ? (
                           <button
                             onClick={() => setShowRemoveConfirm(true)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl border border-cg-amber/30 bg-cg-amber-subtle/30 hover:bg-cg-amber-subtle/50 hover:border-cg-amber/50 transition-all text-left"
+                            className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-amber-200 bg-amber-50 hover:bg-amber-100 hover:border-amber-300 transition-all text-left"
                           >
-                            <UserMinus className="h-5 w-5 text-cg-amber" />
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center shadow-md">
+                              <UserMinus className="h-5 w-5 text-amber-600" />
+                            </div>
                             <div>
-                              <div className="font-medium text-foreground">Remove Co-Parent</div>
-                              <div className="text-sm text-muted-foreground">
+                              <div className="font-bold text-slate-900">Remove Co-Parent</div>
+                              <div className="text-sm text-slate-600 font-medium">
                                 Revoke their access to this family file
                               </div>
                             </div>
                           </button>
                         ) : (
-                          <div className="p-4 rounded-xl border border-cg-amber/50 bg-cg-amber-subtle/30 space-y-3">
-                            <p className="text-sm text-foreground font-medium">
+                          <div className="p-4 rounded-xl border-2 border-amber-300 bg-amber-50 space-y-3">
+                            <p className="text-sm text-slate-900 font-bold">
                               Are you sure you want to remove the co-parent?
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-slate-600 font-medium">
                               They will lose access to this family file and all shared data.
                             </p>
                             <div className="flex gap-2">
-                              <CGButton
-                                variant="secondary"
-                                size="sm"
+                              <button
                                 onClick={handleRemoveParentB}
                                 disabled={isRemovingParent}
-                                className="bg-cg-amber text-white hover:bg-cg-amber/90"
+                                className="px-4 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
                                 {isRemovingParent ? 'Removing...' : 'Yes, Remove'}
-                              </CGButton>
-                              <CGButton
-                                variant="ghost"
-                                size="sm"
+                              </button>
+                              <button
                                 onClick={() => setShowRemoveConfirm(false)}
+                                className="px-4 py-2 rounded-lg bg-slate-100 text-slate-900 font-medium hover:bg-slate-200 transition-colors"
                               >
                                 Cancel
-                              </CGButton>
+                              </button>
                             </div>
                           </div>
                         )}
@@ -577,29 +579,29 @@ function FamilyFileDetailContent() {
                         {!showRemoveProfConfirm ? (
                           <button
                             onClick={() => setShowRemoveProfConfirm(true)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl border border-cg-amber/30 bg-cg-amber-subtle/30 hover:bg-cg-amber-subtle/50 hover:border-cg-amber/50 transition-all text-left"
+                            className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-amber-200 bg-amber-50 hover:bg-amber-100 hover:border-amber-300 transition-all text-left"
                           >
-                            <Briefcase className="h-5 w-5 text-cg-amber" />
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center shadow-md">
+                              <Briefcase className="h-5 w-5 text-amber-600" />
+                            </div>
                             <div>
-                              <div className="font-medium text-foreground">Remove Legal Professional</div>
-                              <div className="text-sm text-muted-foreground">
+                              <div className="font-bold text-slate-900">Remove Legal Professional</div>
+                              <div className="text-sm text-slate-600 font-medium">
                                 Revoke access for {professionals[0]?.firm_name || professionals[0]?.professional_name || 'your legal professional'}
                               </div>
                             </div>
                           </button>
                         ) : (
-                          <div className="p-4 rounded-xl border border-cg-amber/50 bg-cg-amber-subtle/30 space-y-3">
-                            <p className="text-sm text-foreground font-medium">
+                          <div className="p-4 rounded-xl border-2 border-amber-300 bg-amber-50 space-y-3">
+                            <p className="text-sm text-slate-900 font-bold">
                               Remove legal professional access?
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-slate-600 font-medium">
                               {professionals[0]?.firm_name || professionals[0]?.professional_name} will lose access to this family file.
                               You can invite a new firm from the Professional Directory afterwards.
                             </p>
                             <div className="flex gap-2">
-                              <CGButton
-                                variant="secondary"
-                                size="sm"
+                              <button
                                 onClick={() => {
                                   if (professionals[0]?.assignment_id) {
                                     handleRevokeProfessionalAccess(professionals[0].assignment_id);
@@ -607,17 +609,16 @@ function FamilyFileDetailContent() {
                                   setShowRemoveProfConfirm(false);
                                 }}
                                 disabled={isRevokingAccess !== null}
-                                className="bg-cg-amber text-white hover:bg-cg-amber/90"
+                                className="px-4 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
                                 {isRevokingAccess ? 'Removing...' : 'Yes, Remove'}
-                              </CGButton>
-                              <CGButton
-                                variant="ghost"
-                                size="sm"
+                              </button>
+                              <button
                                 onClick={() => setShowRemoveProfConfirm(false)}
+                                className="px-4 py-2 rounded-lg bg-slate-100 text-slate-900 font-medium hover:bg-slate-200 transition-colors"
                               >
                                 Cancel
-                              </CGButton>
+                              </button>
                             </div>
                           </div>
                         )}
@@ -630,41 +631,40 @@ function FamilyFileDetailContent() {
                         {!showDeleteConfirm ? (
                           <button
                             onClick={() => setShowDeleteConfirm(true)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl border border-cg-error/30 bg-cg-error-subtle/30 hover:bg-cg-error-subtle/50 hover:border-cg-error/50 transition-all text-left"
+                            className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-red-200 bg-red-50 hover:bg-red-100 hover:border-red-300 transition-all text-left"
                           >
-                            <Trash2 className="h-5 w-5 text-cg-error" />
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/10 to-red-600/5 flex items-center justify-center shadow-md">
+                              <Trash2 className="h-5 w-5 text-red-600" />
+                            </div>
                             <div>
-                              <div className="font-medium text-cg-error">Delete Family File</div>
-                              <div className="text-sm text-muted-foreground">
+                              <div className="font-bold text-red-600">Delete Family File</div>
+                              <div className="text-sm text-slate-600 font-medium">
                                 Permanently delete this family file and all data
                               </div>
                             </div>
                           </button>
                         ) : (
-                          <div className="p-4 rounded-xl border border-cg-error/50 bg-cg-error-subtle/30 space-y-3">
-                            <p className="text-sm text-foreground font-medium">
+                          <div className="p-4 rounded-xl border-2 border-red-300 bg-red-50 space-y-3">
+                            <p className="text-sm text-slate-900 font-bold">
                               Are you absolutely sure?
                             </p>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-slate-600 font-medium">
                               This will permanently delete the family file, all agreements, messages, and related data. This action cannot be undone.
                             </p>
                             <div className="flex gap-2">
-                              <CGButton
-                                variant="secondary"
-                                size="sm"
+                              <button
                                 onClick={handleDelete}
                                 disabled={isDeleting}
-                                className="bg-cg-error text-white hover:bg-cg-error/90"
+                                className="px-4 py-2 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
                                 {isDeleting ? 'Deleting...' : 'Yes, Delete Everything'}
-                              </CGButton>
-                              <CGButton
-                                variant="ghost"
-                                size="sm"
+                              </button>
+                              <button
                                 onClick={() => setShowDeleteConfirm(false)}
+                                className="px-4 py-2 rounded-lg bg-slate-100 text-slate-900 font-medium hover:bg-slate-200 transition-colors"
                               >
                                 Cancel
-                              </CGButton>
+                              </button>
                             </div>
                           </div>
                         )}
@@ -673,9 +673,11 @@ function FamilyFileDetailContent() {
 
                     {/* Court Case Warning */}
                     {familyFile?.has_court_case && (
-                      <div className="p-3 rounded-xl bg-muted/50 border border-border/50">
-                        <p className="text-sm text-muted-foreground">
-                          <Scale className="h-4 w-4 inline mr-2" />
+                      <div className="p-4 rounded-xl bg-slate-50 border-2 border-slate-200 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md flex-shrink-0">
+                          <Scale className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <p className="text-sm text-slate-600 font-medium">
                           Removal and deletion are disabled because this family file is linked to a court case.
                         </p>
                       </div>
