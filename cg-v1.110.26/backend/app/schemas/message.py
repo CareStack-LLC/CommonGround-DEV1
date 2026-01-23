@@ -258,3 +258,33 @@ class TrendResponse(BaseModel):
     case_id: str
     data_points: List[TrendDataPoint]
     overall_trend: str
+
+
+# Message Attachments
+
+class MessageAttachmentResponse(BaseModel):
+    """Response model for message attachment."""
+
+    id: str
+    message_id: str
+    family_file_id: str
+    file_name: str
+    file_type: str  # MIME type
+    file_size: int  # bytes
+    file_category: str  # image, document, audio, video
+    storage_path: str
+    storage_url: str
+    sha256_hash: str
+    virus_scanned: bool
+    uploaded_by: str
+    uploaded_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class AttachmentUploadResponse(BaseModel):
+    """Response after uploading an attachment."""
+
+    attachment: MessageAttachmentResponse
+    message: str = "Attachment uploaded successfully"

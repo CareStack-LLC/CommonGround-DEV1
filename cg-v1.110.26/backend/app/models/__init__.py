@@ -35,6 +35,7 @@ from app.models.agreement import (
     generate_shared_care_number,
 )
 from app.models.message import Message, MessageFlag, MessageThread
+from app.models.message_attachment import MessageAttachment
 from app.models.schedule import ScheduleEvent, ExchangeCheckIn
 from app.models.my_time_collection import MyTimeCollection
 from app.models.time_block import TimeBlock
@@ -191,6 +192,15 @@ from app.models.professional import (
     MembershipStatus,
     AccessRequestStatus,
     TemplateType,
+)
+from app.models.parent_call import (
+    ParentCallRoom,
+    ParentCallSession,
+    CallTranscriptChunk,
+    CallFlag,
+    CallType,
+    CallStatus,
+    CallSeverity,
 )
 
 __all__ = [
@@ -382,4 +392,13 @@ __all__ = [
     "MembershipStatus",
     "AccessRequestStatus",
     "TemplateType",
+    # Parent Communication
+    "MessageAttachment",
+    "ParentCallRoom",
+    "ParentCallSession",
+    "CallTranscriptChunk",
+    "CallFlag",
+    "CallType",
+    "CallStatus",
+    "CallSeverity",
 ]

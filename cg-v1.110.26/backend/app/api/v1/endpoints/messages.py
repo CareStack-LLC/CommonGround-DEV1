@@ -5,7 +5,7 @@ Handles parent-to-parent communication with AI-powered conflict prevention.
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, desc
 
@@ -13,6 +13,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
 from app.models.message import Message, MessageFlag, MessageThread
+from app.models.message_attachment import MessageAttachment
 from app.models.case import Case, CaseParticipant
 from app.models.child import Child
 from app.models.family_file import FamilyFile
@@ -24,15 +25,26 @@ from app.schemas.message import (
     ARIAAnalysisResponse,
     AnalyticsResponse,
     ThreadCreate,
-    ThreadResponse
+    ThreadResponse,
+    MessageAttachmentResponse,
+    AttachmentUploadResponse,
 )
 from app.services.aria import aria_service
 from app.services.activity import log_message_activity
 from app.services.push import push_service
+from app.services.storage import (
+    storage_service,
+    StorageBucket,
+    build_attachment_path,
+    validate_attachment,
+)
 from app.core.websocket import manager
 from datetime import datetime
 import uuid
 import hashlib
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter()
@@ -987,5 +999,244 @@ async def get_conversation_health(
         case_id=case_id,
         period_days=period_days
     )
-    
+
     return health
+
+
+# ========================================
+# Message Attachment Endpoints
+# ========================================
+
+
+@router.post("/{message_id}/attachments", response_model=AttachmentUploadResponse)
+async def upload_message_attachment(
+    message_id: str,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Upload an attachment to a message.
+
+    Args:
+        message_id: Message ID to attach file to
+        file: File upload (max 150MB)
+
+    Returns:
+        Attachment details
+
+    Raises:
+        404: Message not found or no access
+        400: Invalid file type or size
+    """
+    # Get message and verify access
+    result = await db.execute(
+        select(Message).where(Message.id == message_id)
+    )
+    message = result.scalar_one_or_none()
+
+    if not message:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Message not found"
+        )
+
+    # Verify user is sender or recipient
+    if message.sender_id != current_user.id and message.recipient_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have access to this message"
+        )
+
+    # Read file content
+    file_content = await file.read()
+    file_size = len(file_content)
+
+    # Validate file
+    is_valid, file_category, error_message = validate_attachment(
+        content_type=file.content_type or "application/octet-stream",
+        file_size=file_size
+    )
+
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error_message
+        )
+
+    # Generate SHA-256 hash for integrity
+    sha256_hash = hashlib.sha256(file_content).hexdigest()
+
+    # Determine family_file_id (prefer family_file_id, fall back to case)
+    family_file_id = message.family_file_id
+    if not family_file_id and message.case_id:
+        # Legacy: Get family file from case
+        case_result = await db.execute(
+            select(Case).where(Case.id == message.case_id)
+        )
+        case = case_result.scalar_one_or_none()
+        if case and case.family_file_id:
+            family_file_id = case.family_file_id
+
+    if not family_file_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot upload attachment: no family file associated with message"
+        )
+
+    # Build storage path
+    storage_path = build_attachment_path(
+        family_file_id=family_file_id,
+        message_id=message_id,
+        filename=file.filename or f"attachment-{uuid.uuid4()}"
+    )
+
+    # Upload to Supabase Storage
+    try:
+        storage_url = await storage_service.upload_file(
+            bucket=StorageBucket.MESSAGE_ATTACHMENTS,
+            path=storage_path,
+            file_content=file_content,
+            content_type=file.content_type or "application/octet-stream",
+            upsert=True
+        )
+    except Exception as e:
+        logger.error(f"Failed to upload attachment: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload file to storage"
+        )
+
+    # Create attachment record
+    attachment = MessageAttachment(
+        message_id=message_id,
+        family_file_id=family_file_id,
+        file_name=file.filename or "unnamed",
+        file_type=file.content_type or "application/octet-stream",
+        file_size=file_size,
+        file_category=file_category or "document",
+        storage_path=storage_path,
+        storage_url=storage_url,
+        sha256_hash=sha256_hash,
+        virus_scanned=False,  # TODO: Integrate virus scanning service
+        uploaded_by=current_user.id,
+        uploaded_at=datetime.utcnow(),
+    )
+
+    db.add(attachment)
+    await db.commit()
+    await db.refresh(attachment)
+
+    logger.info(f"User {current_user.id} uploaded attachment {attachment.id} to message {message_id}")
+
+    return {
+        "attachment": attachment,
+        "message": "Attachment uploaded successfully"
+    }
+
+
+@router.get("/{message_id}/attachments", response_model=List[MessageAttachmentResponse])
+async def get_message_attachments(
+    message_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get all attachments for a message.
+
+    Args:
+        message_id: Message ID
+
+    Returns:
+        List of attachments
+
+    Raises:
+        404: Message not found or no access
+    """
+    # Get message and verify access
+    result = await db.execute(
+        select(Message).where(Message.id == message_id)
+    )
+    message = result.scalar_one_or_none()
+
+    if not message:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Message not found"
+        )
+
+    # Verify user is sender or recipient
+    if message.sender_id != current_user.id and message.recipient_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have access to this message"
+        )
+
+    # Get attachments
+    attachments_result = await db.execute(
+        select(MessageAttachment)
+        .where(MessageAttachment.message_id == message_id)
+        .order_by(MessageAttachment.uploaded_at)
+    )
+    attachments = list(attachments_result.scalars().all())
+
+    return attachments
+
+
+@router.delete("/attachments/{attachment_id}")
+async def delete_message_attachment(
+    attachment_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Delete a message attachment.
+
+    Only the uploader can delete their own attachments.
+
+    Args:
+        attachment_id: Attachment ID
+
+    Returns:
+        Success message
+
+    Raises:
+        404: Attachment not found
+        403: Not authorized to delete
+    """
+    # Get attachment
+    result = await db.execute(
+        select(MessageAttachment).where(MessageAttachment.id == attachment_id)
+    )
+    attachment = result.scalar_one_or_none()
+
+    if not attachment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Attachment not found"
+        )
+
+    # Verify uploader
+    if attachment.uploaded_by != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only delete your own attachments"
+        )
+
+    # Delete from storage
+    try:
+        await storage_service.delete_file(
+            bucket=StorageBucket.MESSAGE_ATTACHMENTS,
+            path=attachment.storage_path
+        )
+    except Exception as e:
+        logger.warning(f"Failed to delete file from storage: {e}")
+        # Continue with database deletion even if storage fails
+
+    # Delete from database
+    await db.delete(attachment)
+    await db.commit()
+
+    logger.info(f"User {current_user.id} deleted attachment {attachment_id}")
+
+    return {"message": "Attachment deleted successfully"}

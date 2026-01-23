@@ -12,6 +12,7 @@ from app.models.base import Base, TimestampMixin, UUIDMixin
 
 if TYPE_CHECKING:
     from app.models.agreement import Agreement
+    from app.models.message_attachment import MessageAttachment
 
 
 class MessageThread(Base, UUIDMixin, TimestampMixin):
@@ -121,6 +122,9 @@ class Message(Base, UUIDMixin, TimestampMixin):
     agreement: Mapped[Optional["Agreement"]] = relationship("Agreement", back_populates="messages")
     flags: Mapped[list["MessageFlag"]] = relationship(
         "MessageFlag", back_populates="message", cascade="all, delete-orphan"
+    )
+    attachments: Mapped[list["MessageAttachment"]] = relationship(
+        "MessageAttachment", back_populates="message", cascade="all, delete-orphan"
     )
 
     def __repr__(self) -> str:

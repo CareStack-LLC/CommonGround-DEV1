@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from app.models.child import Child
     from app.models.agreement import Agreement
     from app.models.message import Message
+    from app.models.message_attachment import MessageAttachment
     from app.models.schedule import ScheduleEvent
     from app.models.custody_exchange import CustodyExchange
     from app.models.payment import Payment
@@ -32,6 +33,7 @@ if TYPE_CHECKING:
     from app.models.activity import Activity
     from app.models.circle import CircleContact
     from app.models.kidcoms import KidComsSettings, KidComsSession, KidComsRoom, ChildUser
+    from app.models.parent_call import ParentCallRoom, ParentCallSession
 
 
 class FamilyFileStatus(str, Enum):
@@ -242,6 +244,21 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
     # My Circle - Child login accounts
     child_users: Mapped[list["ChildUser"]] = relationship(
         "ChildUser", back_populates="family_file", cascade="all, delete-orphan"
+    )
+
+    # Message attachments
+    message_attachments: Mapped[list["MessageAttachment"]] = relationship(
+        "MessageAttachment", back_populates="family_file", cascade="all, delete-orphan"
+    )
+
+    # Parent calls - Permanent call room
+    parent_call_room: Mapped[Optional["ParentCallRoom"]] = relationship(
+        "ParentCallRoom", back_populates="family_file", uselist=False
+    )
+
+    # Parent calls - Call sessions
+    parent_call_sessions: Mapped[list["ParentCallSession"]] = relationship(
+        "ParentCallSession", back_populates="family_file", cascade="all, delete-orphan"
     )
 
     def __repr__(self) -> str:

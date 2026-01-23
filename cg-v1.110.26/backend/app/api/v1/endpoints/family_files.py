@@ -31,7 +31,11 @@ from app.schemas.agreement import AgreementCreateForFamilyFile
 from app.services.family_file import FamilyFileService
 from app.services.agreement import AgreementService
 from app.services.professional import ProfessionalAccessService, CaseAssignmentService
+from app.services.parent_call import parent_call_service
 from app.schemas.professional import CaseAssignmentCreate, AssignmentRole
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -123,6 +127,17 @@ async def create_family_file(
     """
     service = FamilyFileService(db)
     family_file = await service.create_family_file(data, current_user)
+
+    # Auto-create permanent Daily.co room for parent-to-parent calls
+    try:
+        room = await parent_call_service.get_or_create_permanent_room(
+            db=db,
+            family_file_id=family_file.id
+        )
+        logger.info(f"Created permanent call room for family file {family_file.id}: {room.daily_room_name}")
+    except Exception as e:
+        # Log error but don't fail family file creation
+        logger.error(f"Failed to create permanent call room for family file {family_file.id}: {e}")
 
     response = _build_family_file_response(family_file)
     response["message"] = "Family File created successfully"

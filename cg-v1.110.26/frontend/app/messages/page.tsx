@@ -28,6 +28,7 @@ import {
   Users,
   FileText,
   Plus,
+  Music,
 } from 'lucide-react';
 
 interface FamilyFileWithAgreements {
@@ -113,6 +114,59 @@ function MessageBubble({
             {message.content}
           </p>
 
+          {/* Attachments */}
+          {message.attachments && message.attachments.length > 0 && (
+            <div className="mt-2 space-y-2">
+              {message.attachments.map((attachment) => (
+                <div
+                  key={attachment.id}
+                  className={`rounded-lg overflow-hidden ${
+                    isOwn ? 'bg-white/10' : 'bg-slate-50'
+                  }`}
+                >
+                  {attachment.file_category === 'image' ? (
+                    <a
+                      href={attachment.storage_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <img
+                        src={attachment.storage_url}
+                        alt={attachment.file_name}
+                        className="max-w-full h-auto rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                        style={{ maxHeight: '300px' }}
+                      />
+                    </a>
+                  ) : (
+                    <a
+                      href={attachment.storage_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex items-center gap-2 p-2 hover:opacity-80 transition-opacity ${
+                        isOwn ? 'text-white' : 'text-slate-900'
+                      }`}
+                    >
+                      {attachment.file_category === 'video' ? (
+                        <Video className="w-5 h-5 flex-shrink-0" />
+                      ) : attachment.file_category === 'audio' ? (
+                        <Music className="w-5 h-5 flex-shrink-0" />
+                      ) : (
+                        <FileText className="w-5 h-5 flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{attachment.file_name}</p>
+                        <p className={`text-xs ${isOwn ? 'text-white/70' : 'text-slate-600'}`}>
+                          {(attachment.file_size / 1024 / 1024).toFixed(1)} MB
+                        </p>
+                      </div>
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Original Content (if ARIA modified) */}
           {message.original_content && (
             <details className={`mt-2 pt-2 border-t ${
@@ -173,11 +227,17 @@ function EmptyChatState({ onCompose }: { onCompose: () => void }) {
 function ChatHeader({
   familyFileName,
   agreementTitle,
-  onBack
+  familyFileId,
+  parentBJoined,
+  onBack,
+  onInitiateCall
 }: {
   familyFileName: string;
   agreementTitle: string;
+  familyFileId?: string;
+  parentBJoined?: boolean;
   onBack?: () => void;
+  onInitiateCall?: (callType: 'video' | 'audio') => void;
 }) {
   return (
     <div className="bg-white border-b-2 border-slate-200 flex-shrink-0 shadow-md">
@@ -200,6 +260,35 @@ function ChatHeader({
           </div>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Call Buttons */}
+          {familyFileId && onInitiateCall && (
+            <>
+              <button
+                onClick={() => onInitiateCall('audio')}
+                disabled={!parentBJoined}
+                className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${
+                  parentBJoined
+                    ? 'bg-white border-slate-200 hover:border-[#2C5F5D] hover:bg-[#2C5F5D]/5 cursor-pointer'
+                    : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
+                }`}
+                title={parentBJoined ? "Audio call" : "Both parents must join before calling"}
+              >
+                <Phone className={`h-5 w-5 ${parentBJoined ? 'text-[#2C5F5D]' : 'text-slate-400'}`} />
+              </button>
+              <button
+                onClick={() => onInitiateCall('video')}
+                disabled={!parentBJoined}
+                className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${
+                  parentBJoined
+                    ? 'bg-white border-slate-200 hover:border-[#2C5F5D] hover:bg-[#2C5F5D]/5 cursor-pointer'
+                    : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
+                }`}
+                title={parentBJoined ? "Video call" : "Both parents must join before calling"}
+              >
+                <Video className={`h-5 w-5 ${parentBJoined ? 'text-[#2C5F5D]' : 'text-slate-400'}`} />
+              </button>
+            </>
+          )}
           <ARIAGuardianBadge />
         </div>
       </div>
@@ -564,6 +653,28 @@ function MessagesContent() {
     }
   };
 
+  const handleInitiateCall = async (callType: 'video' | 'audio') => {
+    if (!selectedFamilyFile?.id) {
+      alert('Please select a conversation first');
+      return;
+    }
+
+    // Check if both parents have joined
+    const familyFileDetail = selectedFamilyFile as FamilyFileDetail;
+    if (!familyFileDetail.parent_b_id || !familyFileDetail.parent_b_joined_at) {
+      alert('Both parents must join the family file before calling is enabled. Only messaging is available until both parents have joined.');
+      return;
+    }
+
+    try {
+      // Navigate to call page with family file ID and call type
+      router.push(`/messages/call?family_file_id=${selectedFamilyFile.id}&call_type=${callType}`);
+    } catch (error) {
+      console.error('Failed to initiate call:', error);
+      alert('Failed to initiate call. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
       <Navigation />
@@ -648,7 +759,10 @@ function MessagesContent() {
                 <ChatHeader
                   familyFileName={selectedFamilyFile?.title || 'Family'}
                   agreementTitle={selectedAgreement.title}
+                  familyFileId={selectedFamilyFile?.id}
+                  parentBJoined={!!(selectedFamilyFile as FamilyFileDetail)?.parent_b_joined_at}
                   onBack={() => setShowSidebar(true)}
+                  onInitiateCall={handleInitiateCall}
                 />
 
                 {/* Messages Area */}

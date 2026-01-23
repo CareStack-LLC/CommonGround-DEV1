@@ -7,7 +7,7 @@ Handles room creation, token generation, and room management.
 
 import httpx
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import logging
 
 from app.core.config import settings
@@ -295,6 +295,228 @@ class DailyVideoService:
             return existing
 
         return await self.create_room(room_name, **kwargs)
+
+    async def start_recording(
+        self,
+        room_name: str,
+        webhook_url: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Start recording a Daily.co room.
+
+        Args:
+            room_name: The room to record
+            webhook_url: Optional webhook URL for recording events
+
+        Returns:
+            Recording start response
+        """
+        if not self.api_key:
+            logger.warning("Daily.co API key not configured, cannot start recording")
+            return {"mock": True}
+
+        try:
+            payload = {}
+            if webhook_url:
+                payload["webhook_url"] = webhook_url
+
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{DAILY_API_BASE}/rooms/{room_name}/recordings",
+                    json=payload,
+                    headers=self.headers,
+                    timeout=30.0
+                )
+
+                if response.status_code in [200, 201]:
+                    logger.info(f"Started recording for room {room_name}")
+                    return response.json()
+                else:
+                    logger.error(f"Failed to start recording: {response.text}")
+                    raise Exception(f"Failed to start recording (status {response.status_code})")
+
+        except Exception as e:
+            logger.error(f"Error starting recording: {e}")
+            raise
+
+    async def stop_recording(self, room_name: str) -> bool:
+        """
+        Stop recording a Daily.co room.
+
+        Args:
+            room_name: The room to stop recording
+
+        Returns:
+            True if stopped successfully
+        """
+        if not self.api_key:
+            return True
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.delete(
+                    f"{DAILY_API_BASE}/rooms/{room_name}/recordings",
+                    headers=self.headers,
+                    timeout=30.0
+                )
+
+                if response.status_code in [200, 204]:
+                    logger.info(f"Stopped recording for room {room_name}")
+                    return True
+                else:
+                    logger.warning(f"Failed to stop recording: {response.text}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Error stopping recording: {e}")
+            return False
+
+    async def get_recordings(self, room_name: str) -> List[Dict[str, Any]]:
+        """
+        Get all recordings for a room.
+
+        Args:
+            room_name: The room name
+
+        Returns:
+            List of recording data
+        """
+        if not self.api_key:
+            return []
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    f"{DAILY_API_BASE}/recordings",
+                    params={"room_name": room_name},
+                    headers=self.headers,
+                    timeout=30.0
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    return data.get("data", [])
+                else:
+                    logger.error(f"Failed to get recordings: {response.text}")
+                    return []
+
+        except Exception as e:
+            logger.error(f"Error getting recordings: {e}")
+            return []
+
+    async def start_transcription(
+        self,
+        room_name: str,
+        webhook_url: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Start live transcription for a Daily.co room.
+
+        Args:
+            room_name: The room to transcribe
+            webhook_url: Webhook URL to receive transcript chunks
+
+        Returns:
+            Transcription start response
+        """
+        if not self.api_key:
+            logger.warning("Daily.co API key not configured, cannot start transcription")
+            return {"mock": True}
+
+        try:
+            payload = {
+                "properties": {
+                    "enable_transcription": True
+                }
+            }
+
+            if webhook_url:
+                payload["properties"]["transcription_webhook_url"] = webhook_url
+
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{DAILY_API_BASE}/rooms/{room_name}/transcription",
+                    json=payload,
+                    headers=self.headers,
+                    timeout=30.0
+                )
+
+                if response.status_code in [200, 201]:
+                    logger.info(f"Started transcription for room {room_name}")
+                    return response.json()
+                else:
+                    logger.error(f"Failed to start transcription: {response.text}")
+                    raise Exception(f"Failed to start transcription (status {response.status_code})")
+
+        except Exception as e:
+            logger.error(f"Error starting transcription: {e}")
+            raise
+
+    async def stop_transcription(self, room_name: str) -> bool:
+        """
+        Stop live transcription for a Daily.co room.
+
+        Args:
+            room_name: The room to stop transcribing
+
+        Returns:
+            True if stopped successfully
+        """
+        if not self.api_key:
+            return True
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.delete(
+                    f"{DAILY_API_BASE}/rooms/{room_name}/transcription",
+                    headers=self.headers,
+                    timeout=30.0
+                )
+
+                if response.status_code in [200, 204]:
+                    logger.info(f"Stopped transcription for room {room_name}")
+                    return True
+                else:
+                    logger.warning(f"Failed to stop transcription: {response.text}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Error stopping transcription: {e}")
+            return False
+
+    async def end_session(self, room_name: str) -> bool:
+        """
+        End all active sessions in a room (kicks all participants).
+
+        Used for ARIA call termination.
+
+        Args:
+            room_name: The room to end sessions in
+
+        Returns:
+            True if successful
+        """
+        if not self.api_key:
+            return True
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{DAILY_API_BASE}/rooms/{room_name}/eject",
+                    headers=self.headers,
+                    timeout=30.0
+                )
+
+                if response.status_code in [200, 201]:
+                    logger.info(f"Ended all sessions in room {room_name}")
+                    return True
+                else:
+                    logger.error(f"Failed to end sessions: {response.text}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Error ending sessions: {e}")
+            return False
 
 
 # Singleton instance

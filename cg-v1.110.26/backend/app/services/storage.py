@@ -31,6 +31,8 @@ class StorageBucket:
     RECEIPTS = "receipts"
     DOCUMENTS = "documents"
     KIDCOMS = "kidcoms"  # Public bucket for Watch Together videos and books
+    MESSAGE_ATTACHMENTS = "message_attachments"  # Private bucket for parent message attachments
+    CALL_RECORDINGS = "call_recordings"  # Private bucket for parent call recordings
 
 
 class SupabaseStorageService:
@@ -334,6 +336,78 @@ def build_document_path(family_file_id: str, doc_type: str, filename: str) -> st
         filename: File name
     """
     return f"{family_file_id}/{doc_type}/{filename}"
+
+
+def build_attachment_path(family_file_id: str, message_id: str, filename: str) -> str:
+    """
+    Build storage path for message attachment.
+
+    Args:
+        family_file_id: Family file ID
+        message_id: Message ID
+        filename: File name
+    """
+    return f"{family_file_id}/messages/{message_id}/{filename}"
+
+
+def build_recording_path(family_file_id: str, session_id: str, filename: str) -> str:
+    """
+    Build storage path for call recording.
+
+    Args:
+        family_file_id: Family file ID
+        session_id: Call session ID
+        filename: File name
+    """
+    return f"{family_file_id}/calls/{session_id}/{filename}"
+
+
+# File validation constants
+MAX_ATTACHMENT_SIZE = 150 * 1024 * 1024  # 150 MB
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"}
+ALLOWED_DOCUMENT_TYPES = {
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "text/plain",
+    "text/csv",
+}
+ALLOWED_AUDIO_TYPES = {"audio/mpeg", "audio/mp3", "audio/wav", "audio/ogg", "audio/m4a"}
+ALLOWED_VIDEO_TYPES = {"video/mp4", "video/quicktime", "video/x-msvideo", "video/webm"}
+
+
+def validate_attachment(
+    content_type: str,
+    file_size: int
+) -> Tuple[bool, Optional[str], Optional[str]]:
+    """
+    Validate attachment file type and size.
+
+    Args:
+        content_type: MIME type of the file
+        file_size: Size of the file in bytes
+
+    Returns:
+        Tuple of (is_valid, category, error_message)
+        - category: "image", "document", "audio", "video", or None if invalid
+    """
+    # Check file size
+    if file_size > MAX_ATTACHMENT_SIZE:
+        return False, None, f"File size {file_size} bytes exceeds maximum {MAX_ATTACHMENT_SIZE} bytes (50 MB)"
+
+    # Determine category and validate
+    if content_type in ALLOWED_IMAGE_TYPES:
+        return True, "image", None
+    elif content_type in ALLOWED_DOCUMENT_TYPES:
+        return True, "document", None
+    elif content_type in ALLOWED_AUDIO_TYPES:
+        return True, "audio", None
+    elif content_type in ALLOWED_VIDEO_TYPES:
+        return True, "video", None
+    else:
+        return False, None, f"File type {content_type} is not allowed"
 
 
 # Global instance for convenience

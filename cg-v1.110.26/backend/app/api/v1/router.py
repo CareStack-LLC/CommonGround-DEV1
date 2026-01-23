@@ -41,6 +41,7 @@ from app.api.v1.endpoints import (
     parent_reports,
     professional,
     professional_events,
+    parent_calls,
 )
 
 api_router = APIRouter()
@@ -126,3 +127,6 @@ api_router.include_router(professional.router, prefix="/professional", tags=["Pr
 
 # Professional Calendar Events
 api_router.include_router(professional_events.router, prefix="/professional/events", tags=["Professional Events"])
+
+# Parent Communication - Video/Audio Calls
+api_router.include_router(parent_calls.router, prefix="/parent-calls", tags=["Parent Calls"])

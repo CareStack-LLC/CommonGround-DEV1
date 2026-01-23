@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { messagesAPI, ARIAAnalysisResponse } from '@/lib/api';
 import { ARIAIntervention } from './aria-intervention';
 import {
@@ -10,6 +10,13 @@ import {
   AlertCircle,
   CheckCircle,
   Loader2,
+  Paperclip,
+  X,
+  File,
+  Image as ImageIcon,
+  FileText,
+  Music,
+  Video as VideoIcon,
 } from 'lucide-react';
 
 interface MessageComposeProps {
@@ -19,6 +26,15 @@ interface MessageComposeProps {
   recipientId: string;
   onMessageSent: () => void;
   ariaEnabled?: boolean;
+}
+
+interface AttachmentFile {
+  id: string;
+  file: File;
+  preview?: string;
+  uploading: boolean;
+  uploaded: boolean;
+  error?: string;
 }
 
 /**
@@ -42,6 +58,99 @@ export function MessageCompose({
   const [isSending, setIsSending] = useState(false);
   const [analysis, setAnalysis] = useState<ARIAAnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Helper functions for attachments
+  const getFileIcon = (type: string) => {
+    if (type.startsWith('image/')) return ImageIcon;
+    if (type.startsWith('video/')) return VideoIcon;
+    if (type.startsWith('audio/')) return Music;
+    if (type.includes('pdf') || type.includes('document')) return FileText;
+    return File;
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const MAX_SIZE = 150 * 1024 * 1024; // 150MB
+
+    const validFiles = files.filter(file => {
+      if (file.size > MAX_SIZE) {
+        alert(`${file.name} is too large. Maximum file size is 150MB.`);
+        return false;
+      }
+      return true;
+    });
+
+    const newAttachments: AttachmentFile[] = validFiles.map(file => ({
+      id: Math.random().toString(36).substring(7),
+      file,
+      preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+      uploading: false,
+      uploaded: false,
+    }));
+
+    setAttachments(prev => [...prev, ...newAttachments]);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeAttachment = (id: string) => {
+    setAttachments(prev => {
+      const attachment = prev.find(a => a.id === id);
+      if (attachment?.preview) {
+        URL.revokeObjectURL(attachment.preview);
+      }
+      return prev.filter(a => a.id !== id);
+    });
+  };
+
+  const uploadAttachment = async (messageId: string, attachment: AttachmentFile) => {
+    try {
+      setAttachments(prev =>
+        prev.map(a => a.id === attachment.id ? { ...a, uploading: true } : a)
+      );
+
+      const formData = new FormData();
+      formData.append('file', attachment.file);
+
+      const response = await fetch(`/api/v1/messages/${messageId}/attachments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload attachment');
+      }
+
+      setAttachments(prev =>
+        prev.map(a => a.id === attachment.id ? { ...a, uploading: false, uploaded: true } : a)
+      );
+
+      return true;
+    } catch (error) {
+      console.error('Failed to upload attachment:', error);
+      setAttachments(prev =>
+        prev.map(a => a.id === attachment.id ? {
+          ...a,
+          uploading: false,
+          error: 'Upload failed'
+        } : a)
+      );
+      return false;
+    }
+  };
 
   const handleAnalyze = async () => {
     if (!message.trim()) {
@@ -67,17 +176,26 @@ export function MessageCompose({
       setIsSending(true);
       setError(null);
 
-      await messagesAPI.send({
+      const newMessage = await messagesAPI.send({
         case_id: caseId,
         family_file_id: familyFileId,
         agreement_id: agreementId,
         recipient_id: recipientId,
-        content,
+        content: content || '(Attachment)',
         message_type: 'text',
       });
 
+      // Upload attachments if any
+      if (attachments.length > 0 && newMessage.id) {
+        const uploadPromises = attachments.map(attachment =>
+          uploadAttachment(newMessage.id!, attachment)
+        );
+        await Promise.all(uploadPromises);
+      }
+
       setMessage('');
       setAnalysis(null);
+      setAttachments([]);
       onMessageSent();
     } catch (err: any) {
       console.error('Failed to send message:', err);
@@ -109,12 +227,13 @@ export function MessageCompose({
   };
 
   const handleQuickSend = async () => {
-    if (ariaEnabled) {
-      if (!message.trim()) {
-        setError('Please enter a message');
-        return;
-      }
+    // Allow send if there's either a message or attachments
+    if (!message.trim() && attachments.length === 0) {
+      setError('Please enter a message or attach a file');
+      return;
+    }
 
+    if (ariaEnabled && message.trim()) {
       try {
         setIsAnalyzing(true);
         setError(null);
@@ -180,6 +299,64 @@ export function MessageCompose({
             </div>
           )}
 
+          {/* Attachments Preview */}
+          {attachments.length > 0 && (
+            <div className="flex flex-wrap gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+              {attachments.map(attachment => {
+                const FileIconComponent = getFileIcon(attachment.file.type);
+                return (
+                  <div
+                    key={attachment.id}
+                    className="relative group bg-white border-2 border-slate-200 rounded-lg p-2 pr-8 hover:border-[#2C5F5D] transition-colors shadow-sm"
+                  >
+                    <div className="flex items-center gap-2">
+                      {attachment.preview ? (
+                        <img
+                          src={attachment.preview}
+                          alt={attachment.file.name}
+                          className="w-12 h-12 object-cover rounded"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center">
+                          <FileIconComponent className="w-6 h-6 text-slate-600" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-900 truncate max-w-[150px]">
+                          {attachment.file.name}
+                        </p>
+                        <p className="text-xs text-slate-600">
+                          {formatFileSize(attachment.file.size)}
+                        </p>
+                        {attachment.uploading && (
+                          <p className="text-xs text-blue-600 flex items-center gap-1">
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            Uploading...
+                          </p>
+                        )}
+                        {attachment.uploaded && (
+                          <p className="text-xs text-green-600">Uploaded</p>
+                        )}
+                        {attachment.error && (
+                          <p className="text-xs text-red-600">{attachment.error}</p>
+                        )}
+                      </div>
+                    </div>
+                    {!attachment.uploading && !attachment.uploaded && (
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(attachment.id)}
+                        className="absolute top-1 right-1 p-1 bg-white border border-slate-200 rounded-full hover:bg-red-50 hover:border-red-300 transition-colors"
+                      >
+                        <X className="w-3 h-3 text-slate-600 hover:text-red-600" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {/* Text Input */}
           <div className="relative">
             <textarea
@@ -196,10 +373,22 @@ export function MessageCompose({
               {message.length} / 10,000
             </div>
 
-            {/* Send Button */}
+            {/* Attachment & Send Buttons */}
             <div className="absolute bottom-3 right-3 flex gap-2">
+              {/* Attachment Button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isSending || isAnalyzing}
+                className="p-2 rounded-lg text-muted-foreground hover:text-cg-sage hover:bg-cg-sage/10 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Attach file"
+              >
+                <Paperclip className="h-5 w-5" />
+              </button>
+
               {/* Preview Button */}
               <button
+                type="button"
                 onClick={handleAnalyze}
                 disabled={!message.trim() || isAnalyzing || isSending}
                 className="p-2 rounded-lg text-muted-foreground hover:text-cg-amber hover:bg-cg-amber-subtle transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
@@ -214,8 +403,9 @@ export function MessageCompose({
 
               {/* Send Button */}
               <button
+                type="button"
                 onClick={handleQuickSend}
-                disabled={!message.trim() || isAnalyzing || isSending}
+                disabled={(!message.trim() && attachments.length === 0) || isAnalyzing || isSending}
                 className="p-2 rounded-lg bg-cg-sage text-white hover:bg-cg-sage-light transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Send message"
               >
@@ -226,6 +416,16 @@ export function MessageCompose({
                 )}
               </button>
             </div>
+
+            {/* Hidden File Input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
           </div>
 
           {/* Analysis Result (Green - Message OK) */}

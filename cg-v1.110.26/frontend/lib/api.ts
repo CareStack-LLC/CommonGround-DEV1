@@ -682,8 +682,24 @@ export interface SendMessageRequest {
   message_type?: string;
 }
 
-export interface Message {
+export interface MessageAttachment {
   id: string;
+  message_id: string;
+  family_file_id: string;
+  file_name: string;
+  file_type: string;
+  file_size: number;
+  file_category: string;
+  storage_path: string;
+  storage_url: string;
+  sha256_hash: string;
+  virus_scanned: boolean;
+  uploaded_by: string;
+  uploaded_at: string;
+}
+
+export interface Message {
+  id?: string;
   case_id?: string | null;
   agreement_id?: string | null;  // SharedCare Agreement context
   sender_id: string;
@@ -694,6 +710,7 @@ export interface Message {
   was_flagged: boolean;
   original_content?: string;
   thread_id?: string;
+  attachments?: MessageAttachment[];
 }
 
 export interface ARIAAnalysisResponse {
