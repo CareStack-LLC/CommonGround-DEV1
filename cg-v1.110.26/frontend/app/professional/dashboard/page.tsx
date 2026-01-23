@@ -32,7 +32,7 @@ export default function ProfessionalDashboardPage() {
   if (!dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--portal-primary)]" />
       </div>
     );
   }
@@ -49,7 +49,7 @@ export default function ProfessionalDashboardPage() {
             Here's what's happening with your cases today.
           </p>
         </div>
-        <Button asChild className="bg-teal-600 hover:bg-teal-700 text-white shrink-0">
+        <Button asChild className="bg-[var(--portal-primary)] hover:bg-[var(--portal-primary-hover)] text-white shrink-0">
           <Link href="/professional/cases">
             View All Cases
             <ArrowRight className="ml-2 h-4 w-4" />
@@ -119,7 +119,7 @@ export default function ProfessionalDashboardPage() {
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
-                <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-teal-500" />
+                <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-[var(--portal-primary)]" />
                 <p>No active alerts. You're all caught up!</p>
               </div>
             )}
@@ -177,7 +177,7 @@ export default function ProfessionalDashboardPage() {
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-teal-500" />
+            <TrendingUp className="h-5 w-5 text-[var(--portal-primary)]" />
             Recent Activity
           </CardTitle>
           <CardDescription>Latest updates across your cases</CardDescription>
@@ -217,8 +217,8 @@ function StatCard({
 }) {
   const colorClasses = {
     teal: {
-      card: "bg-gradient-to-br from-teal-50 to-white border-teal-200/70 hover:border-teal-300",
-      icon: "bg-teal-100 text-teal-600",
+      card: "bg-gradient-to-br from-[var(--portal-primary)]/5 to-white border-[var(--portal-primary)]/20 hover:border-[var(--portal-primary)]/40",
+      icon: "bg-[var(--portal-primary)]/10 text-[var(--portal-primary)]",
       value: "text-slate-900",
     },
     amber: {
@@ -383,13 +383,13 @@ function EventItem({ event }: { event: any }) {
 // Activity Item Component
 function ActivityItem({ activity }: { activity: any }) {
   const typeIcons: Record<string, React.ReactNode> = {
-    intake_completed: <CheckCircle2 className="h-4 w-4 text-teal-500" />,
+    intake_completed: <CheckCircle2 className="h-4 w-4 text-[var(--portal-primary)]" />,
     intake_updated: <FileText className="h-4 w-4 text-blue-500" />,
     message_received: <MessageSquare className="h-4 w-4 text-purple-500" />,
     agreement_update: <FileText className="h-4 w-4 text-amber-500" />,
-    exchange_completed: <CheckCircle2 className="h-4 w-4 text-teal-500" />,
+    exchange_completed: <CheckCircle2 className="h-4 w-4 text-[var(--portal-primary)]" />,
     exchange_missed: <AlertTriangle className="h-4 w-4 text-red-500" />,
-    compliance_change: <TrendingUp className="h-4 w-4 text-teal-500" />,
+    compliance_change: <TrendingUp className="h-4 w-4 text-[var(--portal-primary)]" />,
     court_event_created: <Calendar className="h-4 w-4 text-purple-500" />,
   };
 

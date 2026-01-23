@@ -225,9 +225,9 @@ function MetricsRow({
       label: 'Active',
       value: metrics?.total_funded || 0,
       icon: ArrowUpRight,
-      gradient: 'from-[#2C5F5D] to-[#1f4644]',
-      bg: 'bg-[#2C5F5D]/5',
-      text: 'text-[#2C5F5D]',
+      gradient: 'from-[var(--portal-primary)] to-[#1f4644]',
+      bg: 'bg-[var(--portal-primary)]/5',
+      text: 'text-[var(--portal-primary)]',
     },
     {
       label: 'Completed',
@@ -452,7 +452,7 @@ function PaymentsContent() {
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center">
-            <div className="w-14 h-14 border-3 border-[#2C5F5D] border-t-transparent rounded-full animate-spin mx-auto" />
+            <div className="w-14 h-14 border-3 border-[var(--portal-primary)] border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="mt-6 text-slate-600 font-medium">Loading ClearFund...</p>
             <p className="mt-2 text-sm text-slate-500">Syncing financial data</p>
           </div>
@@ -468,8 +468,8 @@ function PaymentsContent() {
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center max-w-md px-6">
-            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center mx-auto mb-6 shadow-sm">
-              <Wallet className="h-12 w-12 text-[#2C5F5D]" />
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center mx-auto mb-6 shadow-sm">
+              <Wallet className="h-12 w-12 text-[var(--portal-primary)]" />
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-3">
               Welcome to ClearFund
@@ -481,7 +481,7 @@ function PaymentsContent() {
               href="/family-files"
               className="
                 inline-flex items-center gap-2 px-6 py-3
-                bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+                bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white
                 rounded-xl font-medium shadow-md hover:shadow-lg
                 transition-all duration-200 hover:-translate-y-0.5
               "
@@ -514,7 +514,7 @@ function PaymentsContent() {
                 >
                   <ChevronLeft className="h-5 w-5 text-slate-600" />
                 </button>
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center shadow-md">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center shadow-md">
                   <Wallet className="h-5 w-5 text-white" />
                 </div>
                 <h1 className="text-3xl font-bold text-slate-900">
@@ -544,7 +544,7 @@ function PaymentsContent() {
                     className="
                       appearance-none bg-white border border-slate-200 rounded-xl
                       px-4 py-2.5 pr-10 text-sm font-medium text-slate-900
-                      focus:outline-none focus:ring-2 focus:ring-[#2C5F5D]/20 focus:border-[#2C5F5D]
+                      focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]
                       transition-all cursor-pointer hover:border-slate-300
                       shadow-sm
                     "
@@ -564,7 +564,7 @@ function PaymentsContent() {
                 onClick={() => router.push('/payments/new')}
                 className="
                   group flex items-center gap-2 px-5 py-2.5
-                  bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+                  bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white
                   rounded-xl font-medium shadow-md hover:shadow-lg
                   transition-all duration-200 hover:-translate-y-0.5
                 "
@@ -588,9 +588,9 @@ function PaymentsContent() {
 
         {/* Wallet Banner */}
         {!wallet?.onboarding_completed && (
-          <div className="bg-white rounded-2xl border border-[#2C5F5D]/20 shadow-sm p-4 sm:p-5 bg-gradient-to-r from-[#2C5F5D]/5 to-transparent">
+          <div className="bg-white rounded-2xl border border-[var(--portal-primary)]/20 shadow-sm p-4 sm:p-5 bg-gradient-to-r from-[var(--portal-primary)]/5 to-transparent">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center flex-shrink-0 shadow-md">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center flex-shrink-0 shadow-md">
                 <CreditCard className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
@@ -608,7 +608,7 @@ function PaymentsContent() {
                 onClick={() => router.push('/wallet')}
                 className="
                   inline-flex items-center gap-2 px-5 py-2.5 whitespace-nowrap
-                  bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+                  bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white
                   rounded-xl font-medium shadow-md hover:shadow-lg
                   transition-all duration-200 hover:-translate-y-0.5
                 "
@@ -637,7 +637,7 @@ function PaymentsContent() {
             </div>
             <button
               onClick={() => router.push('/wallet')}
-              className="text-sm text-[#2C5F5D] font-medium hover:underline flex items-center gap-1 transition-colors"
+              className="text-sm text-[var(--portal-primary)] font-medium hover:underline flex items-center gap-1 transition-colors"
             >
               Manage Wallet
               <ArrowUpRight className="h-4 w-4" />
@@ -699,7 +699,7 @@ function PaymentsContent() {
               group flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl
               transition-all duration-200 whitespace-nowrap flex-shrink-0
               ${activeTab === 'active'
-                ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white shadow-sm'
+                ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
               }
             `}
@@ -750,7 +750,7 @@ function PaymentsContent() {
             <div className="space-y-4">
               {isLoading ? (
                 <div className="p-8 text-center">
-                  <div className="w-10 h-10 border-3 border-[#2C5F5D] border-t-transparent rounded-full animate-spin mx-auto" />
+                  <div className="w-10 h-10 border-3 border-[var(--portal-primary)] border-t-transparent rounded-full animate-spin mx-auto" />
                   <p className="mt-4 text-slate-600 font-medium">Loading obligations...</p>
                 </div>
               ) : filteredObligations.length === 0 ? (
@@ -773,7 +773,7 @@ function PaymentsContent() {
                       onClick={() => router.push('/payments/new')}
                       className="
                         inline-flex items-center gap-2 px-6 py-3
-                        bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+                        bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white
                         rounded-xl font-medium shadow-md hover:shadow-lg
                         transition-all duration-200 hover:-translate-y-0.5
                       "

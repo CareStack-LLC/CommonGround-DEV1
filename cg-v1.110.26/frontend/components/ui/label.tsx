@@ -14,8 +14,8 @@ const Label = React.forwardRef<
   <label
     ref={ref}
     className={cn(
-      // Slightly larger text (sm → base), medium weight
-      "text-base font-medium leading-none",
+      // Slightly larger text (sm → base), medium weight, portal-aware text color
+      "text-base font-medium leading-none text-[var(--portal-text)]",
       // Disabled state inherits from peer
       "peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
       className

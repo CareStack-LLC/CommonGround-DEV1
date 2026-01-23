@@ -81,7 +81,7 @@ function MessageBubble({
       {/* Avatar */}
       {showAvatar && (
         <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
-          isOwn ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644]' : 'bg-gradient-to-br from-slate-400 to-slate-500'
+          isOwn ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644]' : 'bg-gradient-to-br from-slate-400 to-slate-500'
         }`}>
           <span className="text-xs font-bold text-white">
             {isOwn ? 'You' : (userName?.charAt(0) || 'P')}
@@ -94,7 +94,7 @@ function MessageBubble({
       <div className={`max-w-[80%] sm:max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
         <div className={`relative group ${
           isOwn
-            ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
+            ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
             : 'bg-white text-slate-900 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg border-2 border-slate-200'
         }`}>
           {/* ARIA Review Badge */}
@@ -191,7 +191,7 @@ function MessageBubble({
           isOwn ? 'justify-end' : 'justify-start'
         }`}>
           <span>{formatTime(message.sent_at)}</span>
-          {isOwn && <CheckCheck className="h-3 w-3 text-[#2C5F5D]" />}
+          {isOwn && <CheckCheck className="h-3 w-3 text-[var(--portal-primary)]" />}
         </div>
       </div>
     </div>
@@ -202,8 +202,8 @@ function MessageBubble({
 function EmptyChatState({ onCompose }: { onCompose: () => void }) {
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8 text-center">
-      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
-        <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-[#2C5F5D]" />
+      <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
+        <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-[var(--portal-primary)]" />
       </div>
       <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
         The Neutral Zone
@@ -246,13 +246,13 @@ function ChatHeader({
           {onBack && (
             <button
               onClick={onBack}
-              className="lg:hidden p-1.5 sm:p-2 -ml-1 sm:-ml-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-all duration-200 flex-shrink-0"
+              className="lg:hidden p-1.5 sm:p-2 -ml-1 sm:-ml-2 rounded-xl hover:bg-[var(--portal-primary)]/10 transition-all duration-200 flex-shrink-0"
             >
               <ChevronLeft className="h-5 w-5 text-slate-600" />
             </button>
           )}
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-md">
-            <Users className="h-5 w-5 text-[#2C5F5D]" />
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-md">
+            <Users className="h-5 w-5 text-[var(--portal-primary)]" />
           </div>
           <div className="min-w-0 flex-1">
             <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFileName}</h2>
@@ -268,24 +268,24 @@ function ChatHeader({
                 disabled={!parentBJoined}
                 className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${
                   parentBJoined
-                    ? 'bg-white border-slate-200 hover:border-[#2C5F5D] hover:bg-[#2C5F5D]/5 cursor-pointer'
+                    ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
                     : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
                 }`}
                 title={parentBJoined ? "Audio call" : "Both parents must join before calling"}
               >
-                <Phone className={`h-5 w-5 ${parentBJoined ? 'text-[#2C5F5D]' : 'text-slate-400'}`} />
+                <Phone className={`h-5 w-5 ${parentBJoined ? 'text-[var(--portal-primary)]' : 'text-slate-400'}`} />
               </button>
               <button
                 onClick={() => onInitiateCall('video')}
                 disabled={!parentBJoined}
                 className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${
                   parentBJoined
-                    ? 'bg-white border-slate-200 hover:border-[#2C5F5D] hover:bg-[#2C5F5D]/5 cursor-pointer'
+                    ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
                     : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
                 }`}
                 title={parentBJoined ? "Video call" : "Both parents must join before calling"}
               >
-                <Video className={`h-5 w-5 ${parentBJoined ? 'text-[#2C5F5D]' : 'text-slate-400'}`} />
+                <Video className={`h-5 w-5 ${parentBJoined ? 'text-[var(--portal-primary)]' : 'text-slate-400'}`} />
               </button>
             </>
           )}
@@ -316,7 +316,7 @@ function ConversationSelector({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin" />
+          <div className="w-10 h-10 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
           <p className="text-sm text-slate-600 font-medium">Loading conversations...</p>
         </div>
       </div>
@@ -326,8 +326,8 @@ function ConversationSelector({
   if (familyFilesWithAgreements.length === 0) {
     return (
       <div className="text-center py-8 px-4">
-        <div className="w-16 h-16 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center mx-auto mb-4">
-          <Users className="h-8 w-8 text-[#2C5F5D]" />
+        <div className="w-16 h-16 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-4">
+          <Users className="h-8 w-8 text-[var(--portal-primary)]" />
         </div>
         <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No Family Files</h3>
         <p className="text-sm text-muted-foreground mb-4">
@@ -349,13 +349,13 @@ function ConversationSelector({
             onClick={() => onSelectFamilyFile(item.familyFile)}
             className={`w-full text-left p-3 rounded-xl transition-all duration-200 ${
               selectedFamilyFile?.id === item.familyFile.id && !selectedAgreement
-                ? 'bg-gradient-to-r from-[#2C5F5D]/10 to-[#2C5F5D]/5 border-2 border-[#2C5F5D]/30 shadow-sm'
+                ? 'bg-gradient-to-r from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 border-2 border-[var(--portal-primary)]/30 shadow-sm'
                 : 'hover:bg-slate-50 border-2 border-transparent'
             }`}
           >
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Users className="h-5 w-5 text-[#2C5F5D]" />
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
+                <Users className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{item.familyFile.title}</p>
@@ -375,8 +375,8 @@ function ConversationSelector({
                   onClick={() => onSelectAgreement(agreement)}
                   className={`w-full text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 shadow-sm ${
                     selectedAgreement?.id === agreement.id
-                      ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white scale-[1.02]'
-                      : 'bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 hover:border-[#2C5F5D]/30'
+                      ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white scale-[1.02]'
+                      : 'bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 hover:border-[var(--portal-primary)]/30'
                   }`}
                 >
                   <FileText className="h-4 w-4 flex-shrink-0" />
@@ -400,7 +400,7 @@ function ConversationSelector({
                 <p className="text-xs text-muted-foreground mb-2">No agreements yet</p>
                 <Link
                   href={`/agreements?familyFileId=${item.familyFile.id}`}
-                  className="text-xs font-medium text-[#2C5F5D] hover:underline"
+                  className="text-xs font-medium text-[var(--portal-primary)] hover:underline"
                 >
                   Create Agreement
                 </Link>
@@ -693,14 +693,14 @@ function MessagesContent() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => router.back()}
-                  className="p-2 -ml-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-all duration-200 flex-shrink-0"
+                  className="p-2 -ml-2 rounded-xl hover:bg-[var(--portal-primary)]/10 transition-all duration-200 flex-shrink-0"
                   aria-label="Go back"
                 >
                   <ArrowLeft className="h-5 w-5 text-slate-600" />
                 </button>
                 <div className="flex items-center gap-2 flex-1">
-                  <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-sm">
-                    <MessageSquare className="h-5 w-5 text-[#2C5F5D]" />
+                  <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-sm">
+                    <MessageSquare className="h-5 w-5 text-[var(--portal-primary)]" />
                   </div>
                   <div>
                     <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
@@ -733,8 +733,8 @@ function MessagesContent() {
             {!selectedAgreement ? (
               /* No Agreement Selected */
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                <div className="w-24 h-24 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center mb-6">
-                  <Shield className="h-12 w-12 text-[#2C5F5D]" />
+                <div className="w-24 h-24 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center mb-6">
+                  <Shield className="h-12 w-12 text-[var(--portal-primary)]" />
                 </div>
                 <h2 className="text-2xl font-semibold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   Welcome to The Neutral Zone
@@ -863,12 +863,12 @@ function MessagesContent() {
                       disabled={!getOtherParentId()}
                       className={`w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-xl border-2 transition-all duration-200 ${
                         getOtherParentId()
-                          ? 'border-slate-200 hover:border-[#2C5F5D] hover:bg-[#2C5F5D]/5 cursor-pointer shadow-md hover:shadow-lg'
+                          ? 'border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer shadow-md hover:shadow-lg'
                           : 'border-slate-200 bg-slate-50 cursor-not-allowed opacity-60'
                       }`}
                     >
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-sm">
-                        <Send className="h-4 w-4 text-[#2C5F5D]" />
+                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-sm">
+                        <Send className="h-4 w-4 text-[var(--portal-primary)]" />
                       </div>
                       <span className="text-sm sm:text-base text-slate-600 font-medium">
                         {getOtherParentId() ? 'Write a message...' : 'Waiting for co-parent to join'}

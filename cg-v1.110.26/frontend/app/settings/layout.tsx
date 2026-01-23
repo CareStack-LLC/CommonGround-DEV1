@@ -104,7 +104,7 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
                     className={cn(
                       'w-full flex items-start gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200',
                       isActive
-                        ? 'bg-[#2C5F5D]/10 text-[#2C5F5D] border-2 border-[#2C5F5D]/20 shadow-md'
+                        ? 'bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] border-2 border-[var(--portal-primary)]/20 shadow-md'
                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-2 border-transparent'
                     )}
                   >

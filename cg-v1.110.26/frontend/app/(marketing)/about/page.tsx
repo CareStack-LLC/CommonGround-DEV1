@@ -15,7 +15,7 @@ export default function AboutPage() {
         {/* Subtle decorative elements */}
         <div className="absolute inset-0 opacity-[0.03]">
           <div className="absolute top-20 left-0 w-full h-px bg-[#D97757]" />
-          <div className="absolute top-40 right-0 w-2/3 h-px bg-[#2C5F5D]" />
+          <div className="absolute top-40 right-0 w-2/3 h-px bg-[var(--portal-primary)]" />
           <div className="absolute bottom-40 left-0 w-1/2 h-px bg-[#D97757]" />
         </div>
 
@@ -33,7 +33,7 @@ export default function AboutPage() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#2C3E50] mb-6 leading-[1.1]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
               When communication breaks down,
               <br />
-              <span className="text-[#2C5F5D]">children still need peace</span>
+              <span className="text-[var(--portal-primary)]">children still need peace</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-8">
@@ -42,7 +42,7 @@ export default function AboutPage() {
             </p>
 
             {/* Mission statement box */}
-            <div className="border-l-4 border-[#2C5F5D] pl-6 py-3 bg-gradient-to-r from-[#F5F9F9] to-transparent">
+            <div className="border-l-4 border-[var(--portal-primary)] pl-6 py-3 bg-gradient-to-r from-[#F5F9F9] to-transparent">
               <p className="text-gray-700 font-medium text-lg">
                 Every child deserves parents who can work together—even when they can't be together.
               </p>
@@ -83,8 +83,8 @@ export default function AboutPage() {
           <div className="relative">
             {/* Statistics cards */}
             <div className="space-y-4">
-              <div className="bg-white rounded-2xl p-6 border-2 border-[#2C5F5D]/10 shadow-sm">
-                <div className="text-4xl font-bold text-[#2C5F5D] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10 shadow-sm">
+                <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   40%
                 </div>
                 <p className="text-sm text-gray-600 font-medium">
@@ -99,8 +99,8 @@ export default function AboutPage() {
                   of divorces involve high conflict that directly harms children's wellbeing
                 </p>
               </div>
-              <div className="bg-white rounded-2xl p-6 border-2 border-[#2C5F5D]/10 shadow-sm">
-                <div className="text-4xl font-bold text-[#2C5F5D] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10 shadow-sm">
+                <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   $50B+
                 </div>
                 <p className="text-sm text-gray-600 font-medium">
@@ -113,7 +113,7 @@ export default function AboutPage() {
       </section>
 
       {/* The Solution - How We're Different */}
-      <section className="bg-gradient-to-br from-[#2C5F5D] to-[#1e4442] text-white py-16 sm:py-20 my-12">
+      <section className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white py-16 sm:py-20 my-12">
         <div className="max-w-5xl mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-4">
@@ -165,20 +165,20 @@ export default function AboutPage() {
       <section className="max-w-5xl mx-auto px-6 py-12 sm:py-16">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-4">
-            <Users className="h-5 w-5 text-[#2C5F5D]" />
-            <span className="text-sm font-semibold text-[#2C5F5D] uppercase tracking-wide">
+            <Users className="h-5 w-5 text-[var(--portal-primary)]" />
+            <span className="text-sm font-semibold text-[var(--portal-primary)] uppercase tracking-wide">
               What We Believe
             </span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            Principles that <span className="text-[#2C5F5D]">guide everything we build</span>
+            Principles that <span className="text-[var(--portal-primary)]">guide everything we build</span>
           </h2>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-8 border-2 border-[#2C5F5D]/10">
+          <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10">
             <div className="flex items-start gap-4">
-              <div className="h-10 w-10 rounded-full bg-[#2C5F5D] flex items-center justify-center flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-[var(--portal-primary)] flex items-center justify-center flex-shrink-0">
                 <Heart className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -210,9 +210,9 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-8 border-2 border-[#2C5F5D]/10">
+          <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10">
             <div className="flex items-start gap-4">
-              <div className="h-10 w-10 rounded-full bg-[#2C5F5D] flex items-center justify-center flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-[var(--portal-primary)] flex items-center justify-center flex-shrink-0">
                 <CheckCircle className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -268,7 +268,7 @@ export default function AboutPage() {
           {/* Impact metrics */}
           <div className="grid sm:grid-cols-3 gap-8 mb-12">
             <div className="text-center">
-              <div className="text-5xl font-bold text-[#2C5F5D] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="text-5xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 10K+
               </div>
               <p className="text-gray-700 font-medium">Families served</p>
@@ -280,7 +280,7 @@ export default function AboutPage() {
               <p className="text-gray-700 font-medium">Report reduced conflict</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-[#2C5F5D] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="text-5xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 500K+
               </div>
               <p className="text-gray-700 font-medium">Messages mediated by ARIA</p>
@@ -289,7 +289,7 @@ export default function AboutPage() {
 
           {/* Testimonial highlights - anonymous */}
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#2C5F5D]/10">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[var(--portal-primary)]/10">
               <p className="text-gray-700 italic mb-4">
                 "For the first time in years, I don't dread opening messages from my ex.
                 ARIA catches the hostile tone before it reaches me. It's like having a buffer."
@@ -322,14 +322,14 @@ export default function AboutPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/register"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[#2C5F5D] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-colors shadow-lg hover:shadow-xl group"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-colors shadow-lg hover:shadow-xl group"
             >
               Start Your Free Trial
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/features"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#2C5F5D] font-semibold rounded-full hover:bg-gray-50 transition-colors border-2 border-[#2C5F5D]"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-[var(--portal-primary)] font-semibold rounded-full hover:bg-gray-50 transition-colors border-2 border-[var(--portal-primary)]"
             >
               See How It Works
             </Link>

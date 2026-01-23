@@ -290,11 +290,11 @@ export default function NotificationSettingsPage() {
             <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
               <div className={`p-2 rounded-xl shadow-md ${
                 pushSubscribed
-                  ? 'bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5'
+                  ? 'bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5'
                   : 'bg-gradient-to-br from-slate-500/10 to-slate-600/5'
               }`}>
                 {pushSubscribed ? (
-                  <Bell className="h-5 w-5 text-[#2C5F5D]" />
+                  <Bell className="h-5 w-5 text-[var(--portal-primary)]" />
                 ) : (
                   <BellOff className="h-5 w-5 text-slate-600" />
                 )}
@@ -394,8 +394,8 @@ export default function NotificationSettingsPage() {
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-md">
-                          <Icon className="h-4 w-4 text-[#2C5F5D]" />
+                        <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
+                          <Icon className="h-4 w-4 text-[var(--portal-primary)]" />
                         </div>
                         <div>
                           <Label className="font-bold text-slate-900">

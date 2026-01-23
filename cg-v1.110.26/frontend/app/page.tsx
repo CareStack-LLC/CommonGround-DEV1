@@ -30,8 +30,8 @@ export default function HomePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="w-12 h-12 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center mx-auto animate-pulse">
-            <div className="w-6 h-6 bg-[#2C5F5D] rounded-full" />
+          <div className="w-12 h-12 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto animate-pulse">
+            <div className="w-6 h-6 bg-[var(--portal-primary)] rounded-full" />
           </div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
@@ -48,7 +48,7 @@ export default function HomePage() {
         {/* Decorative lines */}
         <div className="absolute inset-0 opacity-[0.03]">
           <div className="absolute top-32 left-0 w-full h-px bg-[#D97757]" />
-          <div className="absolute top-64 right-0 w-3/4 h-px bg-[#2C5F5D]" />
+          <div className="absolute top-64 right-0 w-3/4 h-px bg-[var(--portal-primary)]" />
         </div>
 
         <div className="max-w-6xl mx-auto px-6 relative">
@@ -66,21 +66,21 @@ export default function HomePage() {
             <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
               Most apps are built for parents who cooperate.
               <br />
-              <span className="font-medium text-[#2C5F5D]">CommonGround is built for the rest of us.</span>
+              <span className="font-medium text-[var(--portal-primary)]">CommonGround is built for the rest of us.</span>
             </p>
 
             {/* CTA */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center px-8 py-4 bg-[#2C5F5D] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+                className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
               >
                 Start Free
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="/about"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#2C5F5D] font-semibold rounded-full hover:bg-gray-50 transition-all border-2 border-[#2C5F5D]"
+                className="inline-flex items-center justify-center px-8 py-4 bg-white text-[var(--portal-primary)] font-semibold rounded-full hover:bg-gray-50 transition-all border-2 border-[var(--portal-primary)]"
               >
                 Our Story
               </Link>
@@ -89,15 +89,15 @@ export default function HomePage() {
             {/* Trust indicators */}
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
               <span className="flex items-center gap-1.5">
-                <Check className="h-4 w-4 text-[#2C5F5D]" />
+                <Check className="h-4 w-4 text-[var(--portal-primary)]" />
                 Forever free tier
               </span>
               <span className="flex items-center gap-1.5">
-                <Check className="h-4 w-4 text-[#2C5F5D]" />
+                <Check className="h-4 w-4 text-[var(--portal-primary)]" />
                 No credit card
               </span>
               <span className="flex items-center gap-1.5">
-                <Check className="h-4 w-4 text-[#2C5F5D]" />
+                <Check className="h-4 w-4 text-[var(--portal-primary)]" />
                 Court-ready
               </span>
             </div>
@@ -122,15 +122,15 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Benefit 1 */}
-            <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-3xl p-8 border-2 border-[#2C5F5D]/10 hover:border-[#2C5F5D]/30 transition-all hover:shadow-lg group">
-              <div className="h-16 w-16 rounded-2xl bg-[#2C5F5D]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Calendar className="h-8 w-8 text-[#2C5F5D]" />
+            <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-3xl p-8 border-2 border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30 transition-all hover:shadow-lg group">
+              <div className="h-16 w-16 rounded-2xl bg-[var(--portal-primary)]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Calendar className="h-8 w-8 text-[var(--portal-primary)]" />
               </div>
               <h3 className="text-2xl font-semibold text-[#2C3E50] mb-3">Set schedules once</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
                 Automated recurring pickup/dropoff reminders. No more "when do I have them?" texts.
               </p>
-              <p className="text-sm font-medium text-[#2C5F5D]">→ Never argue about schedules again</p>
+              <p className="text-sm font-medium text-[var(--portal-primary)]">→ Never argue about schedules again</p>
             </div>
 
             {/* Benefit 2 */}
@@ -146,22 +146,22 @@ export default function HomePage() {
             </div>
 
             {/* Benefit 3 */}
-            <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-3xl p-8 border-2 border-[#2C5F5D]/10 hover:border-[#2C5F5D]/30 transition-all hover:shadow-lg group">
-              <div className="h-16 w-16 rounded-2xl bg-[#2C5F5D]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Video className="h-8 w-8 text-[#2C5F5D]" />
+            <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-3xl p-8 border-2 border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30 transition-all hover:shadow-lg group">
+              <div className="h-16 w-16 rounded-2xl bg-[var(--portal-primary)]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Video className="h-8 w-8 text-[var(--portal-primary)]" />
               </div>
               <h3 className="text-2xl font-semibold text-[#2C3E50] mb-3">Call your kids</h3>
               <p className="text-gray-600 leading-relaxed mb-4">
                 Video chat directly with your children. No middleman. No permission needed.
               </p>
-              <p className="text-sm font-medium text-[#2C5F5D]">→ Stay connected, always</p>
+              <p className="text-sm font-medium text-[var(--portal-primary)]">→ Stay connected, always</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* AI Messaging - Bonus Feature */}
-      <section className="py-16 sm:py-24 bg-gradient-to-br from-[#2C5F5D] to-[#1e4442] text-white">
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -220,19 +220,19 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
-              <div className="text-4xl font-bold text-[#2C5F5D] mb-2">87%</div>
+              <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2">87%</div>
               <p className="text-sm text-gray-600">Reduction in hostile messages</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-[#2C5F5D] mb-2">10K+</div>
+              <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2">10K+</div>
               <p className="text-sm text-gray-600">Families using CommonGround</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-[#2C5F5D] mb-2">24/7</div>
+              <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2">24/7</div>
               <p className="text-sm text-gray-600">Access from anywhere</p>
             </div>
             <div>
-              <div className="text-4xl font-bold text-[#2C5F5D] mb-2">100%</div>
+              <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2">100%</div>
               <p className="text-sm text-gray-600">Court-ready documentation</p>
             </div>
           </div>
@@ -244,8 +244,8 @@ export default function HomePage() {
                 "Before CommonGround, every interaction was a fight. The schedule, the money, everything. Now it's just... automatic. We barely talk, and honestly? That's perfect for us."
               </p>
               <div className="flex items-center justify-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-[#2C5F5D]" />
+                <div className="h-12 w-12 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-[var(--portal-primary)]" />
                 </div>
                 <div className="text-left">
                   <p className="font-semibold text-gray-900">Marcus R.</p>
@@ -274,8 +274,8 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 text-center">
-              <div className="h-14 w-14 rounded-xl bg-[#2C5F5D]/10 flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-7 w-7 text-[#2C5F5D]" />
+              <div className="h-14 w-14 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-7 w-7 text-[var(--portal-primary)]" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Encrypted & Private</h3>
               <p className="text-sm text-gray-600">Bank-level security for all communications</p>
@@ -292,8 +292,8 @@ export default function HomePage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 text-center">
-              <div className="h-14 w-14 rounded-xl bg-[#2C5F5D]/10 flex items-center justify-center mx-auto mb-4">
-                <svg className="h-7 w-7 text-[#2C5F5D]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="h-14 w-14 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-4">
+                <svg className="h-7 w-7 text-[var(--portal-primary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -305,7 +305,7 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 sm:py-28 bg-gradient-to-br from-[#2C5F5D] to-[#1e4442] text-white">
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6"

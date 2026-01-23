@@ -19,8 +19,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         disabled={disabled}
         onClick={() => !disabled && onCheckedChange?.(!checked)}
         className={cn(
-          'peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-          checked ? 'bg-primary text-primary-foreground' : 'bg-background',
+          'peer h-4 w-4 shrink-0 rounded-[var(--portal-radius-sm)] border border-[var(--portal-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--portal-primary)]/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-smooth',
+          checked ? 'bg-[var(--portal-primary)] text-white' : 'bg-[var(--portal-surface)]',
           className
         )}
       >

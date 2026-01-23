@@ -155,8 +155,8 @@ function ChildCustodyCard({
   const [imageError, setImageError] = useState(false);
   const isWithYou = childStatus.with_current_user;
   const progress = childStatus.progress_percentage || 0;
-  const statusColor = isWithYou ? 'bg-[#2C5F5D]' : 'bg-cg-slate';
-  const statusTextColor = isWithYou ? 'text-[#2C5F5D]' : 'text-cg-slate';
+  const statusColor = isWithYou ? 'bg-[var(--portal-primary)]' : 'bg-cg-slate';
+  const statusTextColor = isWithYou ? 'text-[var(--portal-primary)]' : 'text-cg-slate';
   const hasNextExchange = !!childStatus.next_exchange_time;
   // Always show days data if defined, even if 0
   const hasDaysData = myDays !== undefined;
@@ -191,7 +191,7 @@ function ChildCustodyCard({
 
   return (
     <div
-      className={`bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden ${onClick ? 'cursor-pointer hover:border-[#2C5F5D]/30 hover:scale-[1.01]' : ''}`}
+      className={`bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden ${onClick ? 'cursor-pointer hover:border-[var(--portal-primary)]/30 hover:scale-[1.01]' : ''}`}
       onClick={onClick}
     >
       {/* Top accent bar */}
@@ -200,7 +200,7 @@ function ChildCustodyCard({
       <div className="p-5">
         {/* Child header with "With Me" button */}
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 overflow-hidden ring-2 ring-white shadow-md">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 overflow-hidden ring-2 ring-white shadow-md">
             {childData?.photo_url && !imageError ? (
               <img
                 src={getImageUrl(childData.photo_url) || ''}
@@ -209,7 +209,7 @@ function ChildCustodyCard({
                 onError={() => setImageError(true)}
               />
             ) : (
-              <span className="text-base font-bold text-[#2C5F5D]">
+              <span className="text-base font-bold text-[var(--portal-primary)]">
                 {childStatus.child_first_name.charAt(0)}
               </span>
             )}
@@ -229,7 +229,7 @@ function ChildCustodyCard({
                 e.stopPropagation();
                 onWithMe(childStatus.child_id);
               }}
-              className="px-4 py-2 text-xs font-bold bg-gradient-to-r from-[#2C5F5D] to-[#1f4644] text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0"
+              className="px-4 py-2 text-xs font-bold bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0"
             >
               With Me
             </button>
@@ -261,7 +261,7 @@ function ChildCustodyCard({
             <div className="relative mb-2">
               <div className="cg-progress h-2.5 rounded-full">
                 <div
-                  className={`h-full rounded-full transition-all duration-500 ${isWithYou ? 'bg-gradient-to-r from-[#2C5F5D] to-[#1e4442]' : 'bg-cg-slate/60'}`}
+                  className={`h-full rounded-full transition-all duration-500 ${isWithYou ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1e4442]' : 'bg-cg-slate/60'}`}
                   style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
                 />
               </div>
@@ -289,10 +289,10 @@ function ChildCustodyCard({
         <div className="mt-4 pt-4 border-t-2 border-slate-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#2C5F5D] shadow-sm" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
               <span className="text-sm text-slate-700 font-semibold">Days since agreement active</span>
             </div>
-            <span className="text-2xl font-bold text-[#2C5F5D]">{myDays ?? 0} <span className="text-xs font-medium text-slate-400">days</span></span>
+            <span className="text-2xl font-bold text-[var(--portal-primary)]">{myDays ?? 0} <span className="text-xs font-medium text-slate-400">days</span></span>
           </div>
         </div>
       </div>
@@ -318,7 +318,7 @@ function CustodyStatusCard({
   if (!custodyStatus || children.length === 0) {
     return (
       <div className="cg-card overflow-hidden">
-        <div className="h-2 bg-[#2C5F5D]" />
+        <div className="h-2 bg-[var(--portal-primary)]" />
         <div className="p-5">
           <p className="text-sm text-muted-foreground">
             Set up custody exchanges to see status
@@ -332,8 +332,8 @@ function CustodyStatusCard({
   if (!custodyStatus.children || custodyStatus.children.length === 0) {
     const allWithYou = custodyStatus.all_with_current_user;
     const statusText = allWithYou ? 'Kids are with You' : `Kids are with ${coparentName || 'co-parent'}`;
-    const statusColor = allWithYou ? 'bg-[#2C5F5D]' : 'bg-cg-slate';
-    const statusTextColor = allWithYou ? 'text-[#2C5F5D]' : 'text-cg-slate';
+    const statusColor = allWithYou ? 'bg-[var(--portal-primary)]' : 'bg-cg-slate';
+    const statusTextColor = allWithYou ? 'text-[var(--portal-primary)]' : 'text-cg-slate';
     const progress = custodyStatus.progress_percentage || 0;
     const hasNextExchange = !!custodyStatus.next_exchange_time;
 
@@ -383,7 +383,7 @@ function CustodyStatusCard({
               <div className="relative mb-2">
                 <div className="cg-progress h-2.5 rounded-full">
                   <div
-                    className={`h-full rounded-full transition-all duration-500 ${allWithYou ? 'bg-gradient-to-r from-[#2C5F5D] to-[#1e4442]' : 'bg-cg-slate/60'}`}
+                    className={`h-full rounded-full transition-all duration-500 ${allWithYou ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1e4442]' : 'bg-cg-slate/60'}`}
                     style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
                   />
                 </div>
@@ -449,7 +449,7 @@ function ActionStreamItem({
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
+      className="w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
     >
       <div className={`w-14 h-14 ${iconBg} rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300`}>
         <Icon className={`w-6 h-6 ${iconColor}`} />
@@ -461,7 +461,7 @@ function ActionStreamItem({
       {hasNotification && (
         <div className="w-3 h-3 bg-cg-error rounded-full flex-shrink-0 shadow-md animate-pulse" />
       )}
-      <ChevronRight className="w-5 h-5 text-slate-400 flex-shrink-0 group-hover:text-[#2C5F5D] group-hover:translate-x-1 transition-all duration-300" />
+      <ChevronRight className="w-5 h-5 text-slate-400 flex-shrink-0 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
     </button>
   );
 }
@@ -479,10 +479,10 @@ function QuickActionButton({
   return (
     <button
       onClick={onClick}
-      className="group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border-2 border-slate-200 hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-300 hover:scale-105"
+      className="group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-105"
     >
-      <div className="w-14 h-14 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
-        <Icon className="w-6 h-6 text-[#2C5F5D]" />
+      <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
+        <Icon className="w-6 h-6 text-[var(--portal-primary)]" />
       </div>
       <span className="text-sm font-bold text-foreground">{label}</span>
     </button>
@@ -499,9 +499,9 @@ function getCategoryStyles(category: string) {
     case 'school':
       return { bg: 'bg-cg-amber-subtle', color: 'text-cg-amber', Icon: FileText };
     case 'sports':
-      return { bg: 'bg-[#2C5F5D]/10', color: 'text-[#2C5F5D]', Icon: Users };
+      return { bg: 'bg-[var(--portal-primary)]/10', color: 'text-[var(--portal-primary)]', Icon: Users };
     default:
-      return { bg: 'bg-[#2C5F5D]/10', color: 'text-[#2C5F5D]', Icon: Calendar };
+      return { bg: 'bg-[var(--portal-primary)]/10', color: 'text-[var(--portal-primary)]', Icon: Calendar };
   }
 }
 
@@ -577,7 +577,7 @@ function UpcomingEventItem({ event }: { event: UpcomingEvent }) {
         </p>
       </div>
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-        <span className="text-xs font-bold text-white bg-gradient-to-r from-[#2C5F5D] to-[#1f4644] px-3 py-1 rounded-full shadow-md">
+        <span className="text-xs font-bold text-white bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] px-3 py-1 rounded-full shadow-md">
           {timeRemaining}
         </span>
         <span className="text-xs text-muted-foreground font-semibold">{dayLabel}</span>
@@ -596,8 +596,8 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
     return (
       <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
-            <CheckCircle className="w-6 h-6 text-[#2C5F5D]" />
+          <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+            <CheckCircle className="w-6 h-6 text-[var(--portal-primary)]" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
@@ -619,7 +619,7 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
         <div className="p-3 border-t-2 border-slate-100 bg-slate-50">
           <button
             onClick={() => router.push('/schedule')}
-            className="w-full text-center text-sm text-[#2C5F5D] hover:text-[#1e4442] font-bold py-2 transition-all duration-200 hover:scale-105"
+            className="w-full text-center text-sm text-[var(--portal-primary)] hover:text-[#1e4442] font-bold py-2 transition-all duration-200 hover:scale-105"
           >
             View full schedule →
           </button>
@@ -1063,7 +1063,7 @@ function DashboardContent() {
         <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
             <div className="text-center">
-              <div className="w-14 h-14 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin mx-auto" />
+              <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
               <p className="mt-4 text-slate-600 font-medium">Loading your dashboard...</p>
             </div>
           </div>
@@ -1082,7 +1082,7 @@ function DashboardContent() {
           <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
             {greeting},
           </h1>
-          <h2 className="text-2xl sm:text-3xl font-semibold text-[#2C5F5D]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
             {user?.first_name}
           </h2>
         </div>
@@ -1091,8 +1091,8 @@ function DashboardContent() {
           // Getting Started
           <div className="space-y-6">
             <div className="bg-white rounded-3xl border-2 border-slate-200 p-10 text-center shadow-2xl">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <FolderOpen className="w-10 h-10 text-[#2C5F5D]" />
+              <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <FolderOpen className="w-10 h-10 text-[var(--portal-primary)]" />
               </div>
               <h3 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 Welcome to CommonGround
@@ -1102,7 +1102,7 @@ function DashboardContent() {
               </p>
               <button
                 onClick={() => router.push('/family-files/new')}
-                className="bg-gradient-to-r from-[#2C5F5D] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
               >
                 Create Family File
                 <ArrowRight className="w-5 h-5" />
@@ -1112,8 +1112,8 @@ function DashboardContent() {
             {/* Quick Info Cards */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
-                  <MessageSquare className="w-6 h-6 text-[#2C5F5D]" />
+                <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+                  <MessageSquare className="w-6 h-6 text-[var(--portal-primary)]" />
                 </div>
                 <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>ARIA Messaging</h4>
                 <p className="text-sm text-muted-foreground mt-2 font-medium">
@@ -1121,8 +1121,8 @@ function DashboardContent() {
                 </p>
               </div>
               <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
-                  <Calendar className="w-6 h-6 text-[#2C5F5D]" />
+                <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+                  <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
                 </div>
                 <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Shared Calendar</h4>
                 <p className="text-sm text-muted-foreground mt-2 font-medium">
@@ -1171,7 +1171,7 @@ function DashboardContent() {
             {/* Fallback if no custody data but children exist */}
             {allChildren.length > 0 && allCustodyStatuses.length === 0 && (
               <div className="cg-card overflow-hidden">
-                <div className="h-2 bg-[#2C5F5D]" />
+                <div className="h-2 bg-[var(--portal-primary)]" />
                 <div className="p-5">
                   <p className="text-sm text-muted-foreground">
                     Set up custody exchanges to see status
@@ -1193,8 +1193,8 @@ function DashboardContent() {
                  dashboardSummary.pending_agreements_count === 0 &&
                  dashboardSummary.unread_court_count === 0 && (
                   <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
-                    <div className="w-14 h-14 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center shadow-md">
-                      <CheckCircle className="w-7 h-7 text-[#2C5F5D]" />
+                    <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
+                      <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
                     </div>
                     <div>
                       <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
@@ -1243,8 +1243,8 @@ function DashboardContent() {
                   return (
                     <ActionStreamItem
                       icon={FileText}
-                      iconBg="bg-[#2C5F5D]/10"
-                      iconColor="text-[#2C5F5D]"
+                      iconBg="bg-[var(--portal-primary)]/10"
+                      iconColor="text-[var(--portal-primary)]"
                       title="Agreement Approval"
                       subtitle={
                         count === 1
@@ -1291,8 +1291,8 @@ function DashboardContent() {
                   return (
                     <ActionStreamItem
                       icon={CheckCircle}
-                      iconBg="bg-[#2C5F5D]/10"
-                      iconColor="text-[#2C5F5D]"
+                      iconBg="bg-[var(--portal-primary)]/10"
+                      iconColor="text-[var(--portal-primary)]"
                       title="QuickAccord Active"
                       subtitle={
                         count === 1
@@ -1382,7 +1382,7 @@ function DashboardContent() {
                   </h3>
                   <button
                     onClick={() => router.push('/family-files')}
-                    className="text-sm font-medium text-[#2C5F5D] hover:text-[#1e4442] transition-colors flex items-center gap-1"
+                    className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#1e4442] transition-colors flex items-center gap-1"
                   >
                     View all
                     <ChevronRight className="h-4 w-4" />
@@ -1393,10 +1393,10 @@ function DashboardContent() {
                     <button
                       key={familyFile.id}
                       onClick={() => router.push(`/family-files/${familyFile.id}`)}
-                      className="group w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                      className="group w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
                     >
-                      <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <FolderOpen className="w-6 h-6 text-[#2C5F5D]" />
+                      <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
@@ -1406,7 +1406,7 @@ function DashboardContent() {
                           {familyFile.children?.length || 0} children
                         </p>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[#2C5F5D] group-hover:translate-x-1 transition-all duration-300" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
                     </button>
                   ))}
                 </div>

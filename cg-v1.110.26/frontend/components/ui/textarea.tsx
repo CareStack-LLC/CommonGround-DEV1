@@ -14,21 +14,21 @@ const Textarea = React.forwardRef<
   return (
     <textarea
       className={cn(
-        // Base styles - generous padding
-        "flex min-h-[120px] w-full rounded-lg border border-input bg-background px-4 py-3",
+        // Base styles - generous padding, portal-aware styling
+        "flex min-h-[120px] w-full rounded-[var(--portal-radius-md)] border border-[var(--portal-border)] bg-[var(--portal-surface)] text-[var(--portal-text)] px-4 py-3",
         // Larger, readable text
         "text-base leading-relaxed",
         // Soft shadow for depth
-        "shadow-sm",
+        "shadow-[var(--portal-shadow-sm)]",
         // Smooth transitions
         "transition-smooth",
-        // Placeholder - muted but readable
-        "placeholder:text-muted-foreground",
-        // Focus - primary color ring, visible but not harsh
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary",
+        // Placeholder - portal-aware muted color
+        "placeholder:text-[var(--portal-text-light)]",
+        // Focus - portal-aware primary color ring
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--portal-primary)]/50 focus-visible:border-[var(--portal-primary)]",
         // Disabled state
-        "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted",
-        // Error state (applied via parent)
+        "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-[var(--portal-background)]",
+        // Error state (applied via parent) - semantic red
         "aria-invalid:border-destructive aria-invalid:ring-destructive/50",
         // Resize control
         "resize-y",

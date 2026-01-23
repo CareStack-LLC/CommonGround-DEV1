@@ -145,18 +145,18 @@ export default function CourtPortalLayout({
       value={{ professional, activeGrant, isLoading, token, login, logout, setActiveGrant }}
     >
       <div className="min-h-screen bg-background">
-        {/* Header - Professional indigo for court context */}
-        <header className="bg-indigo-950 text-white shadow-lg">
+        {/* Header - Professional dark for court context */}
+        <header className="bg-[var(--portal-primary-hover)] text-white shadow-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Link href="/court-portal" className="flex items-center gap-3">
-                  <div className="p-1.5 bg-indigo-800 rounded-lg">
+                  <div className="p-1.5 bg-[var(--portal-primary)] rounded-lg">
                     <Scale className="h-5 w-5" />
                   </div>
                   <div>
                     <span className="text-lg font-bold tracking-tight">MediatorMode</span>
-                    <Badge variant="secondary" className="ml-2 text-xs bg-indigo-800 text-indigo-100 border-0">
+                    <Badge variant="secondary" className="ml-2 text-xs bg-[var(--portal-primary)] text-white/90 border-0">
                       by CommonGround
                     </Badge>
                   </div>
@@ -167,7 +167,7 @@ export default function CourtPortalLayout({
                 <div className="flex items-center gap-4">
                   <div className="text-right hidden sm:block">
                     <div className="font-medium text-sm">{professional.full_name}</div>
-                    <div className="flex items-center justify-end gap-1.5 text-xs text-indigo-200">
+                    <div className="flex items-center justify-end gap-1.5 text-xs text-white/70">
                       {roleInfo?.icon}
                       <span>{roleInfo?.label}</span>
                     </div>
@@ -176,7 +176,7 @@ export default function CourtPortalLayout({
                     onClick={logout}
                     variant="ghost"
                     size="sm"
-                    className="text-indigo-200 hover:text-white hover:bg-indigo-800"
+                    className="text-white/70 hover:text-white hover:bg-[var(--portal-primary)]"
                   >
                     <LogOut className="h-4 w-4 sm:mr-2" />
                     <span className="hidden sm:inline">Sign Out</span>
@@ -194,12 +194,12 @@ export default function CourtPortalLayout({
 
         {/* Active Grant Banner - Show directly under header when viewing a case */}
         {activeGrant && !isLoginPage && (
-          <div className="bg-indigo-50 border-b border-indigo-100">
+          <div className="bg-[var(--portal-primary)]/5 border-b border-[var(--portal-primary)]/10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-3">
-                  <FolderOpen className="h-4 w-4 text-indigo-600" />
-                  <span className="font-medium text-indigo-900">
+                  <FolderOpen className="h-4 w-4 text-[var(--portal-primary)]" />
+                  <span className="font-medium text-[var(--portal-text-heading)]">
                     Active Case: {activeGrant.case_name || activeGrant.case_id}
                   </span>
                   {roleInfo && (
@@ -208,7 +208,7 @@ export default function CourtPortalLayout({
                     </Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-1.5 text-indigo-600">
+                <div className="flex items-center gap-1.5 text-[var(--portal-primary)]">
                   <Clock className="h-3.5 w-3.5" />
                   <span>{activeGrant.days_remaining} days remaining</span>
                 </div>
@@ -240,7 +240,7 @@ export default function CourtPortalLayout({
                   All actions logged
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--portal-primary)]" />
                   SHA-256 verified
                 </span>
               </div>
@@ -407,7 +407,7 @@ function CourtNavigation({ pathname, activeGrant }: { pathname: string; activeGr
 
       {/* Case Sub-Navigation (when viewing a case) */}
       {isInCaseContext && activeGrant && (
-        <nav className="bg-indigo-50/50 border-b border-indigo-100 hidden md:block">
+        <nav className="bg-[var(--portal-primary)]/5 border-b border-[var(--portal-primary)]/10 hidden md:block">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <div className="flex gap-1 overflow-x-auto py-1">
               {caseNavItems.map((item) => (
@@ -417,8 +417,8 @@ function CourtNavigation({ pathname, activeGrant }: { pathname: string; activeGr
                   className={`px-3 py-2 text-xs font-medium rounded-md flex items-center gap-1.5 transition-colors whitespace-nowrap ${
                     pathname === item.href ||
                     (item.label !== "Overview" && pathname.startsWith(item.href))
-                      ? "bg-indigo-100 text-indigo-700"
-                      : "text-indigo-600 hover:bg-indigo-100/50"
+                      ? "bg-[var(--portal-primary)]/10 text-[var(--portal-primary)]"
+                      : "text-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5"
                   }`}
                 >
                   {item.icon}
@@ -571,7 +571,7 @@ function NavLink({
       href={href}
       className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-colors whitespace-nowrap ${
         isActive
-          ? "border-indigo-600 text-indigo-600"
+          ? "border-[var(--portal-primary)] text-[var(--portal-primary)]"
           : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
       }`}
     >
@@ -610,7 +610,7 @@ function MobileNavLink({
       onClick={onClick}
       className={`flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
         isActive
-          ? "bg-indigo-100 text-indigo-700"
+          ? "bg-[var(--portal-primary)]/10 text-[var(--portal-primary)]"
           : "text-foreground hover:bg-muted"
       }`}
     >

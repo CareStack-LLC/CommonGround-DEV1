@@ -15,8 +15,8 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      // Using cg-card utility for consistent soft shadow
-      "cg-card text-card-foreground",
+      // Portal-aware card with soft shadows
+      "bg-[var(--portal-surface)] text-[var(--portal-text)] rounded-[var(--portal-radius-lg)] border border-[var(--portal-border)] shadow-[var(--portal-shadow-md)]",
       className
     )}
     {...props}
@@ -24,7 +24,7 @@ const Card = React.forwardRef<
 ))
 Card.displayName = "Card"
 
-// Elevated variant for modals, popovers
+// Elevated variant for modals, popovers - higher elevation
 const CardElevated = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
@@ -32,7 +32,7 @@ const CardElevated = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "cg-card-elevated text-card-foreground",
+      "bg-[var(--portal-surface-elevated)] text-[var(--portal-text)] rounded-[var(--portal-radius-lg)] border border-[var(--portal-border)] shadow-[var(--portal-shadow-lg)]",
       className
     )}
     {...props}
@@ -59,9 +59,9 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    // Larger, clearer titles
+    // Larger, clearer titles with portal-aware heading color
     className={cn(
-      "text-lg font-semibold leading-tight tracking-tight lg:text-xl",
+      "text-lg font-semibold leading-tight tracking-tight lg:text-xl text-[var(--portal-text-heading)]",
       className
     )}
     {...props}
@@ -75,8 +75,8 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    // Slightly larger muted text for readability
-    className={cn("text-sm text-muted-foreground lg:text-base", className)}
+    // Slightly larger muted text with portal-aware color
+    className={cn("text-sm text-[var(--portal-text-light)] lg:text-base", className)}
     {...props}
   />
 ))

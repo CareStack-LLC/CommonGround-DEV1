@@ -4,6 +4,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { NotificationProvider } from "@/contexts/notification-context";
 import { WebSocketProvider } from "@/contexts/websocket-context";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
+import { PortalWrapper } from "@/components/portal-wrapper";
 
 export const metadata: Metadata = {
   title: "CommonGround - Co-parenting without the conflict",
@@ -37,7 +38,9 @@ export default function RootLayout({
         <AuthProvider>
           <NotificationProvider>
             <WebSocketProvider>
-              {children}
+              <PortalWrapper>
+                {children}
+              </PortalWrapper>
             </WebSocketProvider>
           </NotificationProvider>
         </AuthProvider>

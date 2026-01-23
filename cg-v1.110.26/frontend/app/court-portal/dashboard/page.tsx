@@ -187,7 +187,7 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
     exchange: { icon: <MapPin className="h-4 w-4" />, color: 'bg-blue-100 text-blue-600' },
     message: { icon: <MessageSquare className="h-4 w-4" />, color: 'bg-purple-100 text-purple-600' },
     payment: { icon: <DollarSign className="h-4 w-4" />, color: 'bg-emerald-100 text-emerald-600' },
-    event: { icon: <Calendar className="h-4 w-4" />, color: 'bg-indigo-100 text-indigo-600' },
+    event: { icon: <Calendar className="h-4 w-4" />, color: 'bg-[var(--portal-primary)]/10 text-[var(--portal-primary)]' },
     alert: { icon: <AlertTriangle className="h-4 w-4" />, color: 'bg-amber-100 text-amber-600' },
   };
 
@@ -218,7 +218,7 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
         {event.case_name && (
           <Link
             href={`/court-portal/cases/${event.case_id}`}
-            className="text-xs text-indigo-600 hover:underline mt-1 inline-block"
+            className="text-xs text-[var(--portal-primary)] hover:underline mt-1 inline-block"
           >
             {event.case_name} →
           </Link>
@@ -244,7 +244,7 @@ function QuickAction({
   return (
     <Link href={href}>
       <div className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer group">
-        <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg group-hover:bg-indigo-200 transition-colors">
+        <div className="p-2 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] rounded-lg group-hover:bg-[var(--portal-primary)]/20 transition-colors">
           {icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -395,7 +395,7 @@ export default function CourtDashboardPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[var(--portal-primary)] border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -437,7 +437,7 @@ export default function CourtDashboardPage() {
           </button>
           <Link
             href="/court-portal/aria"
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-[var(--portal-primary)] text-white rounded-lg hover:bg-[var(--portal-primary-hover)] transition-colors"
           >
             <Bot className="h-4 w-4" />
             Ask ARIA
@@ -487,12 +487,12 @@ export default function CourtDashboardPage() {
             <div className="p-4 border-b border-border bg-slate-50/50">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-foreground flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4 text-indigo-600" />
+                  <BarChart3 className="h-4 w-4 text-[var(--portal-primary)]" />
                   Case Compliance
                 </h2>
                 <Link
                   href="/court-portal/cases"
-                  className="text-xs text-indigo-600 hover:underline"
+                  className="text-xs text-[var(--portal-primary)] hover:underline"
                 >
                   View All
                 </Link>
@@ -501,7 +501,7 @@ export default function CourtDashboardPage() {
             <div className="divide-y divide-border">
               {isLoadingCases ? (
                 <div className="p-8 text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent mx-auto" />
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-[var(--portal-primary)] border-t-transparent mx-auto" />
                   <p className="mt-3 text-muted-foreground text-sm">Loading cases...</p>
                 </div>
               ) : cases.length === 0 ? (
@@ -565,7 +565,7 @@ export default function CourtDashboardPage() {
             <div className="p-4 border-b border-border bg-slate-50/50">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-foreground flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-indigo-600" />
+                  <Zap className="h-4 w-4 text-[var(--portal-primary)]" />
                   Reality Ledger
                 </h2>
                 <span className="text-xs text-muted-foreground">Live feed</span>
@@ -625,26 +625,26 @@ export default function CourtDashboardPage() {
           <div className="bg-card border border-border rounded-xl overflow-hidden">
             <div className="p-4 border-b border-border bg-slate-50/50">
               <h2 className="font-semibold text-foreground flex items-center gap-2">
-                <Shield className="h-4 w-4 text-indigo-600" />
+                <Shield className="h-4 w-4 text-[var(--portal-primary)]" />
                 Access Guidelines
               </h2>
             </div>
             <div className="p-4">
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
-                  <Lock className="h-4 w-4 text-indigo-500 flex-shrink-0 mt-0.5" />
+                  <Lock className="h-4 w-4 text-[var(--portal-primary)] flex-shrink-0 mt-0.5" />
                   <span>All access is read-only and logged</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Stamp className="h-4 w-4 text-indigo-500 flex-shrink-0 mt-0.5" />
+                  <Stamp className="h-4 w-4 text-[var(--portal-primary)] flex-shrink-0 mt-0.5" />
                   <span>Exports are watermarked with your identity</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Clock className="h-4 w-4 text-indigo-500 flex-shrink-0 mt-0.5" />
+                  <Clock className="h-4 w-4 text-[var(--portal-primary)] flex-shrink-0 mt-0.5" />
                   <span>Access expires based on your role</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <ShieldOff className="h-4 w-4 text-indigo-500 flex-shrink-0 mt-0.5" />
+                  <ShieldOff className="h-4 w-4 text-[var(--portal-primary)] flex-shrink-0 mt-0.5" />
                   <span>Do not share access credentials</span>
                 </li>
               </ul>
@@ -662,15 +662,15 @@ export default function CourtDashboardPage() {
             </div>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="p-2 bg-slate-50 rounded-lg">
-                <Eye className="h-4 w-4 text-indigo-600 mx-auto mb-1" />
+                <Eye className="h-4 w-4 text-[var(--portal-primary)] mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground">Read-only</p>
               </div>
               <div className="p-2 bg-slate-50 rounded-lg">
-                <Activity className="h-4 w-4 text-indigo-600 mx-auto mb-1" />
+                <Activity className="h-4 w-4 text-[var(--portal-primary)] mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground">Logged</p>
               </div>
               <div className="p-2 bg-slate-50 rounded-lg">
-                <Shield className="h-4 w-4 text-indigo-600 mx-auto mb-1" />
+                <Shield className="h-4 w-4 text-[var(--portal-primary)] mx-auto mb-1" />
                 <p className="text-[10px] text-muted-foreground">SHA-256</p>
               </div>
             </div>

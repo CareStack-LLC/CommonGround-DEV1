@@ -41,7 +41,7 @@ export default function FeaturesPage() {
       solution: "Set your custody schedule once, never touch it again",
       detail: "TimeBridge automates recurring pickups, dropoffs, holidays, and special events. Both parents get reminders. No more \"did you forget it's your weekend?\" texts at 6 PM Friday.",
       benefit: "Zero coordination required",
-      color: "#2C5F5D"
+      color: "var(--portal-primary)"
     },
     {
       icon: DollarSign,
@@ -57,7 +57,7 @@ export default function FeaturesPage() {
       solution: "Video call your kids directly, no middleman",
       detail: "KidsCom gives you a direct line to your children. Schedule calls on your parenting time or with approval. High-quality video, recording for safety, and logs for your records.",
       benefit: "Stay connected on your terms",
-      color: "#2C5F5D"
+      color: "var(--portal-primary)"
     },
     {
       icon: MapPin,
@@ -73,7 +73,7 @@ export default function FeaturesPage() {
       solution: "Automatic custody tracking down to the day",
       detail: "Every exchange, every overnight, every hour tracked automatically. Generate reports showing exactly who had the kids when. Court-ready analytics that hold up under scrutiny.",
       benefit: "Accurate time records for court",
-      color: "#2C5F5D"
+      color: "var(--portal-primary)"
     },
     {
       icon: FileCheck,
@@ -96,7 +96,7 @@ export default function FeaturesPage() {
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#2C5F5D] rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
         </div>
 
@@ -107,7 +107,7 @@ export default function FeaturesPage() {
           >
             Built for parents who
             <br />
-            <span className="text-[#2C5F5D]">aren't talking</span>
+            <span className="text-[var(--portal-primary)]">aren't talking</span>
           </h1>
 
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
@@ -130,7 +130,7 @@ export default function FeaturesPage() {
                     opacity: 0
                   }}
                 >
-                  <Icon className="w-4 h-4 text-[#2C5F5D]" />
+                  <Icon className="w-4 h-4 text-[var(--portal-primary)]" />
                   <span>{point.text}</span>
                 </div>
               );
@@ -202,7 +202,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* Philosophy Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-[#2C5F5D] to-[#234846] text-white relative overflow-hidden">
+      <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#234846] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
@@ -248,13 +248,13 @@ export default function FeaturesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => router.push('/signup')}
-              className="px-8 py-4 bg-[#2C5F5D] text-white rounded-xl font-medium text-lg hover:bg-[#234846] transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              className="px-8 py-4 bg-[var(--portal-primary)] text-white rounded-xl font-medium text-lg hover:bg-[#234846] transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               Start Free
             </button>
             <button
               onClick={() => router.push('/pricing')}
-              className="px-8 py-4 bg-white text-[#2C5F5D] rounded-xl font-medium text-lg hover:bg-gray-50 transition-all duration-200 border-2 border-[#2C5F5D]"
+              className="px-8 py-4 bg-white text-[var(--portal-primary)] rounded-xl font-medium text-lg hover:bg-gray-50 transition-all duration-200 border-2 border-[var(--portal-primary)]"
             >
               View Pricing
             </button>

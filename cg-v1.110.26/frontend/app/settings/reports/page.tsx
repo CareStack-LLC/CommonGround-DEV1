@@ -332,8 +332,8 @@ export default function ReportsSettingsPage() {
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-md">
-                <FileCheck className="h-5 w-5 text-[#2C5F5D]" />
+              <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
+                <FileCheck className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
               Select Family File
             </CardTitle>
@@ -342,7 +342,7 @@ export default function ReportsSettingsPage() {
             <select
               value={selectedFamilyFile}
               onChange={(e) => setSelectedFamilyFile(e.target.value)}
-              className="flex h-10 w-full max-w-md rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2C5F5D]"
+              className="flex h-10 w-full max-w-md rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--portal-primary)]"
             >
               {familyFiles.map((ff) => (
                 <option key={ff.id} value={ff.id}>
@@ -386,7 +386,7 @@ export default function ReportsSettingsPage() {
             const isSuccess = showSuccess === report.id;
 
             return (
-              <Card key={report.id} className="relative border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-[#2C5F5D]/30 transition-all duration-300">
+              <Card key={report.id} className="relative border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-[var(--portal-primary)]/30 transition-all duration-300">
                 {isSuccess && (
                   <div className="absolute inset-0 bg-emerald-500/10 rounded-2xl flex items-center justify-center z-10">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-xl flex items-center gap-2">
@@ -643,8 +643,8 @@ export default function ReportsSettingsPage() {
       <Card className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-md">
-              <Shield className="h-5 w-5 text-[#2C5F5D]" />
+            <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
+              <Shield className="h-5 w-5 text-[var(--portal-primary)]" />
             </div>
             About Our Reports
           </CardTitle>
@@ -664,7 +664,7 @@ export default function ReportsSettingsPage() {
             Professional reports can be independently verified using the export number at{' '}
             <a
               href="/verify"
-              className="text-[#2C5F5D] hover:underline font-bold"
+              className="text-[var(--portal-primary)] hover:underline font-bold"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -675,7 +675,7 @@ export default function ReportsSettingsPage() {
             Questions? Contact us at{' '}
             <a
               href="mailto:reports@commonground.app"
-              className="text-[#2C5F5D] hover:underline font-bold"
+              className="text-[var(--portal-primary)] hover:underline font-bold"
             >
               reports@commonground.app
             </a>

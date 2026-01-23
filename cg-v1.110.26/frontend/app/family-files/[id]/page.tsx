@@ -365,7 +365,7 @@ function FamilyFileDetailContent() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-14 h-14 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin" />
+        <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
         <p className="mt-4 text-slate-600 font-medium">Loading family file...</p>
       </div>
     );
@@ -408,8 +408,8 @@ function FamilyFileDetailContent() {
           </CGButton>
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
-                <FolderHeart className="h-5 w-5 text-[#2C5F5D]" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+                <FolderHeart className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
               <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFile.title}</h1>
               {familyFile.has_court_case && (
@@ -432,8 +432,8 @@ function FamilyFileDetailContent() {
           <SheetContent className="w-full sm:max-w-md overflow-y-auto">
             <SheetHeader>
               <SheetTitle className="flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
-                  <Settings className="h-5 w-5 text-[#2C5F5D]" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+                  <Settings className="h-5 w-5 text-[var(--portal-primary)]" />
                 </div>
                 Family File Settings
               </SheetTitle>
@@ -460,7 +460,7 @@ function FamilyFileDetailContent() {
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
                       placeholder="Enter family file name"
-                      className="focus-visible:ring-[#2C5F5D] border-2"
+                      className="focus-visible:ring-[var(--portal-primary)] border-2"
                     />
                     <div className="flex gap-2">
                       <button
@@ -720,7 +720,7 @@ function FamilyFileDetailContent() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <button
                   onClick={() => router.push(`/payments/new?familyFileId=${id}`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left group"
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
                     <DollarSign className="h-5 w-5 text-emerald-600" />
@@ -735,7 +735,7 @@ function FamilyFileDetailContent() {
 
                 <button
                   onClick={() => router.push(`/schedule?familyFileId=${id}&action=new-event`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left group"
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-600/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
                     <CalendarPlus className="h-5 w-5 text-blue-600" />
@@ -750,10 +750,10 @@ function FamilyFileDetailContent() {
 
                 <button
                   onClick={() => router.push(`/messages?familyFileId=${id}`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left group"
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                    <MessageSquare className="h-5 w-5 text-[#2C5F5D]" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                    <MessageSquare className="h-5 w-5 text-[var(--portal-primary)]" />
                   </div>
                   <div>
                     <div className="font-bold text-slate-900">Messages</div>
@@ -765,7 +765,7 @@ function FamilyFileDetailContent() {
 
                 <button
                   onClick={() => router.push(`/family-files/${id}/kidcoms`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left group"
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
                     <Video className="h-5 w-5 text-purple-600" />
@@ -781,9 +781,9 @@ function FamilyFileDetailContent() {
                 {!familyFile.parent_b_id && (
                   <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
                     <DialogTrigger asChild>
-                      <button className="flex items-start gap-4 p-4 rounded-xl border-2 border-[#2C5F5D]/30 bg-[#2C5F5D]/5 hover:bg-[#2C5F5D]/10 hover:border-[#2C5F5D]/50 hover:shadow-md transition-all text-left group">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                          <Mail className="h-5 w-5 text-[#2C5F5D]" />
+                      <button className="flex items-start gap-4 p-4 rounded-xl border-2 border-[var(--portal-primary)]/30 bg-[var(--portal-primary)]/5 hover:bg-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/50 hover:shadow-md transition-all text-left group">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                          <Mail className="h-5 w-5 text-[var(--portal-primary)]" />
                         </div>
                         <div>
                           <div className="font-bold text-slate-900">Invite Co-Parent</div>
@@ -885,7 +885,7 @@ function FamilyFileDetailContent() {
                   {quickAccords.slice(0, 3).map((accord) => (
                     <button
                       key={accord.id}
-                      className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left"
+                      className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left"
                       onClick={() => router.push(`/family-files/${id}/quick-accord/${accord.id}`)}
                     >
                       <div className="flex items-center gap-3">
@@ -956,7 +956,7 @@ function FamilyFileDetailContent() {
                   {agreements.slice(0, 3).map((agreement) => (
                     <button
                       key={agreement.id}
-                      className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left"
+                      className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left"
                       onClick={() => router.push(`/agreements/${agreement.id}`)}
                     >
                       <div className="flex items-center gap-3">
@@ -993,8 +993,8 @@ function FamilyFileDetailContent() {
           {/* Parents */}
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
-                <Users className="h-5 w-5 text-[#2C5F5D]" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+                <Users className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
               <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Parents</h2>
             </div>
@@ -1041,8 +1041,8 @@ function FamilyFileDetailContent() {
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
-                  <Baby className="h-5 w-5 text-[#2C5F5D]" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+                  <Baby className="h-5 w-5 text-[var(--portal-primary)]" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Children</h2>
               </div>

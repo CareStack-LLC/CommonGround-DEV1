@@ -68,7 +68,7 @@ function FamilyFileCard({
       className={`
         w-full text-left p-4 rounded-xl transition-all duration-200
         ${isSelected
-          ? 'bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 border-2 border-[#2C5F5D] shadow-sm'
+          ? 'bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 border-2 border-[var(--portal-primary)] shadow-sm'
           : 'bg-white border-2 border-slate-200 hover:border-slate-300 hover:shadow-sm'
         }
       `}
@@ -78,14 +78,14 @@ function FamilyFileCard({
           <div
             className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-sm ${
               isSelected
-                ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white'
+                ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white'
                 : 'bg-slate-100 text-slate-600'
             }`}
           >
             <FolderOpen className="h-5 w-5" />
           </div>
           <div>
-            <p className={`font-semibold ${isSelected ? 'text-[#2C5F5D]' : 'text-slate-900'}`}>
+            <p className={`font-semibold ${isSelected ? 'text-[var(--portal-primary)]' : 'text-slate-900'}`}>
               {familyFile.title}
             </p>
             <p className="text-xs text-slate-500">{familyFile.family_file_number}</p>
@@ -167,11 +167,11 @@ function AgreementCard({
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
-            <FileSignature className="h-5 w-5 text-[#2C5F5D]" />
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <FileSignature className="h-5 w-5 text-[var(--portal-primary)]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-slate-900 truncate group-hover:text-[#2C5F5D] transition-colors">
+            <h3 className="font-semibold text-slate-900 truncate group-hover:text-[var(--portal-primary)] transition-colors">
               {agreement.title}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5 font-medium">
@@ -236,7 +236,7 @@ function AgreementCard({
       {/* Footer */}
       <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
         <span className="text-xs text-slate-500 font-medium">Click to view details</span>
-        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-[#2C5F5D] group-hover:translate-x-1 transition-all" />
+        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all" />
       </div>
     </button>
   );
@@ -251,8 +251,8 @@ function EmptyAgreementsState({
 }) {
   return (
     <div className="text-center py-16 px-6">
-      <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-sm">
-        <FileSignature className="h-12 w-12 text-[#2C5F5D]" />
+      <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-sm">
+        <FileSignature className="h-12 w-12 text-[var(--portal-primary)]" />
       </div>
       <h3 className="text-xl font-bold text-slate-900 mb-2">
         No Agreements Yet
@@ -265,7 +265,7 @@ function EmptyAgreementsState({
           onClick={onCreate}
           className="
             inline-flex items-center gap-2 px-6 py-3
-            bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+            bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white
             rounded-xl font-medium shadow-md hover:shadow-lg
             transition-all duration-200 hover:-translate-y-0.5
           "
@@ -355,31 +355,31 @@ function BuilderChoiceModal({
             onClick={onSelectWizard}
             disabled={isCreating}
             className="
-              w-full text-left p-5 border-2 border-[#2C5F5D]/30 rounded-xl
-              hover:border-[#2C5F5D] hover:bg-[#2C5F5D]/5
+              w-full text-left p-5 border-2 border-[var(--portal-primary)]/30 rounded-xl
+              hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5
               transition-all disabled:opacity-50 disabled:cursor-not-allowed
               group shadow-sm hover:shadow-md
             "
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center text-white flex-shrink-0 shadow-md">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center text-white flex-shrink-0 shadow-md">
                 <FileText className="h-6 w-6" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-slate-900 group-hover:text-[#2C5F5D] transition-colors mb-1">
+                <h3 className="font-bold text-slate-900 group-hover:text-[var(--portal-primary)] transition-colors mb-1">
                   Step-by-Step Wizard
                 </h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   Fill out structured forms with clear sections for custody schedules, holidays, and more.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <span className="px-2 py-1 bg-[#2C5F5D]/10 text-[#2C5F5D] text-xs font-medium rounded-full">
+                  <span className="px-2 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-medium rounded-full">
                     Structured
                   </span>
-                  <span className="px-2 py-1 bg-[#2C5F5D]/10 text-[#2C5F5D] text-xs font-medium rounded-full">
+                  <span className="px-2 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-medium rounded-full">
                     Traditional
                   </span>
-                  <span className="px-2 py-1 bg-[#2C5F5D]/10 text-[#2C5F5D] text-xs font-medium rounded-full">
+                  <span className="px-2 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-medium rounded-full">
                     Detailed
                   </span>
                 </div>
@@ -524,7 +524,7 @@ function AgreementsListContent() {
             >
               <ChevronLeft className="h-5 w-5 text-slate-600" />
             </button>
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center shadow-md">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center shadow-md">
               <FileSignature className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -545,13 +545,13 @@ function AgreementsListContent() {
           <div className="w-full lg:w-80 lg:flex-shrink-0">
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sticky top-8">
               <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <FolderOpen className="h-4 w-4 text-[#2C5F5D]" />
+                <FolderOpen className="h-4 w-4 text-[var(--portal-primary)]" />
                 Family Files
               </h2>
 
               {isLoadingFamilyFiles ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#2C5F5D]" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[var(--portal-primary)]" />
                 </div>
               ) : familyFiles.length === 0 ? (
                 <div className="text-center py-8">
@@ -559,7 +559,7 @@ function AgreementsListContent() {
                   <Link href="/family-files/new">
                     <button className="
                       inline-flex items-center gap-2 px-4 py-2 text-sm
-                      bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+                      bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white
                       rounded-xl font-medium shadow-md hover:shadow-lg
                       transition-all duration-200 hover:-translate-y-0.5
                     ">
@@ -637,7 +637,7 @@ function AgreementsListContent() {
                         transition-all duration-200
                         ${!canCreateAgreement || isCreatingAgreement
                           ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                          : 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
+                          : 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
                         }
                       `}
                     >
@@ -665,7 +665,7 @@ function AgreementsListContent() {
                 {isLoadingAgreements && (
                   <div className="flex items-center justify-center py-16">
                     <div className="text-center">
-                      <Loader2 className="h-10 w-10 animate-spin text-[#2C5F5D] mx-auto" />
+                      <Loader2 className="h-10 w-10 animate-spin text-[var(--portal-primary)] mx-auto" />
                       <p className="mt-4 text-slate-600 font-medium">Loading agreements...</p>
                     </div>
                   </div>

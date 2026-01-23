@@ -104,7 +104,7 @@ function FamilyFilesContent() {
       );
     }
     return (
-      <CGBadge className="bg-[#2C5F5D]/10 text-[#2C5F5D] border-[#2C5F5D]/20">
+      <CGBadge className="bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] border-[var(--portal-primary)]/20">
         <CheckCircle className="h-3 w-3 mr-1" />
         Active
       </CGBadge>
@@ -133,7 +133,7 @@ function FamilyFilesContent() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-14 h-14 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin" />
+        <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
         <p className="mt-4 text-slate-600 font-medium">Loading your family files...</p>
       </div>
     );
@@ -175,8 +175,8 @@ function FamilyFilesContent() {
       {invitations.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
-              <Mail className="h-5 w-5 text-[#2C5F5D]" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+              <Mail className="h-5 w-5 text-[var(--portal-primary)]" />
             </div>
             <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pending Invitations</h2>
           </div>
@@ -184,12 +184,12 @@ function FamilyFilesContent() {
             {invitations.map((invitation) => (
               <div
                 key={invitation.id}
-                className="bg-white border-2 border-[#2C5F5D]/30 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 p-6"
+                className="bg-white border-2 border-[var(--portal-primary)]/30 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 p-6"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
-                      <FolderHeart className="h-6 w-6 text-[#2C5F5D]" />
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+                      <FolderHeart className="h-6 w-6 text-[var(--portal-primary)]" />
                     </div>
                     <div>
                       <h3 className="font-bold text-slate-900">{invitation.title}</h3>
@@ -246,13 +246,13 @@ function FamilyFilesContent() {
               <div
                 key={file.id}
                 onClick={() => router.push(`/family-files/${file.id}`)}
-                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-[#2C5F5D]/30 hover:scale-[1.02] transition-all duration-300 cursor-pointer p-6"
+                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-[var(--portal-primary)]/30 hover:scale-[1.02] transition-all duration-300 cursor-pointer p-6"
               >
                 <div className="space-y-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-md">
-                        <FolderHeart className="h-6 w-6 text-[#2C5F5D]" />
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <FolderHeart className="h-6 w-6 text-[var(--portal-primary)]" />
                       </div>
                       <div className="min-w-0">
                         <h3 className="text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{file.title}</h3>

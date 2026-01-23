@@ -13,23 +13,23 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
       <input
         type={type}
         className={cn(
-          // Larger height (h-9 → h-11), proper padding
-          "flex h-11 w-full rounded-lg border border-input bg-background px-4 py-2.5",
-          // Larger, readable text
-          "text-base",
+          // Larger height, portal-aware border radius and colors
+          "flex h-11 w-full rounded-[var(--portal-radius-md)] border border-[var(--portal-border)] bg-[var(--portal-surface)] px-4 py-2.5",
+          // Larger, readable text with portal color
+          "text-base text-[var(--portal-text)]",
           // Soft shadow for depth
-          "shadow-sm",
+          "shadow-[var(--portal-shadow-sm)]",
           // Smooth transitions
           "transition-smooth",
           // File inputs
-          "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground",
-          // Placeholder - muted but readable
-          "placeholder:text-muted-foreground",
-          // Focus - primary color ring, visible but not harsh
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:border-primary",
+          "file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-[var(--portal-text)]",
+          // Placeholder - portal-aware muted color
+          "placeholder:text-[var(--portal-text-light)]",
+          // Focus - portal-aware primary color ring
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--portal-primary)]/50 focus-visible:border-[var(--portal-primary)]",
           // Disabled state
-          "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted",
-          // Error state (applied via parent)
+          "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-[var(--portal-background)]",
+          // Error state (applied via parent) - semantic red
           "aria-invalid:border-destructive aria-invalid:ring-destructive/50",
           className
         )}

@@ -28,19 +28,19 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
         disabled={disabled}
         onClick={() => onCheckedChange?.(!checked)}
         className={cn(
-          // Base styles - larger touch target
-          "relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full",
+          // Base styles - larger touch target, portal-aware radius
+          "relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-[var(--portal-radius-full)]",
           "border-2",
           // Smooth transitions
           "transition-smooth",
-          // Focus states
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cg-primary/50 focus-visible:ring-offset-2",
+          // Focus states - portal-aware
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--portal-primary)]/50 focus-visible:ring-offset-2",
           // Disabled state
           "disabled:cursor-not-allowed disabled:opacity-50",
-          // Color states - visible gray when off, primary teal when checked
+          // Color states - portal primary when checked, muted when off
           checked
-            ? "bg-cg-primary border-cg-primary"
-            : "bg-gray-300 border-gray-300",
+            ? "bg-[var(--portal-primary)] border-[var(--portal-primary)]"
+            : "bg-[var(--portal-border)] border-[var(--portal-border)]",
           className
         )}
       >

@@ -24,7 +24,7 @@ export default function PricingPage() {
         'ClearFund tracking (no fees)',
         'Web-only access'
       ],
-      color: '#2C5F5D',
+      color: 'var(--portal-primary)',
       cta: 'Start Free'
     },
     {
@@ -61,7 +61,7 @@ export default function PricingPage() {
         'Court-ready evidence packages',
         'Priority support'
       ],
-      color: '#2C5F5D',
+      color: 'var(--portal-primary)',
       cta: 'Start Trial'
     }
   ];
@@ -93,7 +93,7 @@ export default function PricingPage() {
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#2C5F5D] rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
         </div>
 
@@ -104,7 +104,7 @@ export default function PricingPage() {
           >
             Start free.
             <br />
-            <span className="text-[#2C5F5D]">Upgrade when ready.</span>
+            <span className="text-[var(--portal-primary)]">Upgrade when ready.</span>
           </h1>
 
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
@@ -117,8 +117,8 @@ export default function PricingPage() {
               onClick={() => setBillingPeriod('monthly')}
               className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
                 billingPeriod === 'monthly'
-                  ? 'bg-[#2C5F5D] text-white shadow-md'
-                  : 'text-gray-600 hover:text-[#2C5F5D]'
+                  ? 'bg-[var(--portal-primary)] text-white shadow-md'
+                  : 'text-gray-600 hover:text-[var(--portal-primary)]'
               }`}
             >
               Monthly
@@ -127,8 +127,8 @@ export default function PricingPage() {
               onClick={() => setBillingPeriod('annual')}
               className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
                 billingPeriod === 'annual'
-                  ? 'bg-[#2C5F5D] text-white shadow-md'
-                  : 'text-gray-600 hover:text-[#2C5F5D]'
+                  ? 'bg-[var(--portal-primary)] text-white shadow-md'
+                  : 'text-gray-600 hover:text-[var(--portal-primary)]'
               }`}
             >
               Annual
@@ -328,7 +328,7 @@ export default function PricingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-[#2C5F5D] to-[#234846] text-white relative overflow-hidden">
+      <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#234846] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
@@ -348,7 +348,7 @@ export default function PricingPage() {
 
           <button
             onClick={() => router.push('/signup')}
-            className="px-8 py-4 bg-white text-[#2C5F5D] rounded-xl font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
+            className="px-8 py-4 bg-white text-[var(--portal-primary)] rounded-xl font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
           >
             Start Free Today
           </button>

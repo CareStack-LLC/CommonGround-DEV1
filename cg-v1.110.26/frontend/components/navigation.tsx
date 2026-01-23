@@ -138,8 +138,8 @@ export function Navigation() {
 
   return (
     <>
-      {/* Top Navigation Bar */}
-      <header className="bg-[#2C5F5D] border-b border-white/10 sticky top-0 z-50">
+      {/* Top Navigation Bar - Portal-aware background */}
+      <header className="bg-[var(--portal-primary)] border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -201,30 +201,30 @@ export function Navigation() {
                       />
                     </button>
 
-                    {/* Dropdown Menu */}
+                    {/* Dropdown Menu - Portal-aware styling */}
                     {userMenuOpen && (
-                      <div className="absolute right-0 mt-2 w-64 cg-card-elevated py-2 z-50">
+                      <div className="absolute right-0 mt-2 w-64 bg-[var(--portal-surface)] rounded-[var(--portal-radius-lg)] border border-[var(--portal-border)] shadow-[var(--portal-shadow-lg)] py-2 z-50">
                         {/* User Info */}
-                        <div className="px-4 py-3 border-b border-border">
-                          <p className="font-medium text-foreground">
+                        <div className="px-4 py-3 border-b border-[var(--portal-border)]">
+                          <p className="font-medium text-[var(--portal-text)]">
                             {user?.first_name} {user?.last_name}
                           </p>
-                          <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                          <p className="text-sm text-[var(--portal-text-light)] truncate">{user?.email}</p>
                         </div>
 
                         {/* Menu Items */}
                         <div className="py-1">
                           <button
                             onClick={() => handleNavigation('/dashboard')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-[#2C5F5D]/10 transition-smooth"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-[var(--portal-primary)]/10 transition-smooth"
                           >
-                            <Home className="h-4 w-4 text-muted-foreground" />
+                            <Home className="h-4 w-4 text-[var(--portal-text-light)]" />
                             Dashboard
                           </button>
                           {profile?.is_professional && (
                             <button
                               onClick={() => handleNavigation('/professional')}
-                              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-emerald-50 transition-smooth"
+                              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-emerald-50 transition-smooth"
                             >
                               <Briefcase className="h-4 w-4 text-emerald-600" />
                               Professional Portal
@@ -232,29 +232,29 @@ export function Navigation() {
                           )}
                           <button
                             onClick={() => handleNavigation('/family-files')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-[#2C5F5D]/10 transition-smooth"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-[var(--portal-primary)]/10 transition-smooth"
                           >
-                            <FolderHeart className="h-4 w-4 text-muted-foreground" />
+                            <FolderHeart className="h-4 w-4 text-[var(--portal-text-light)]" />
                             Family Files
                           </button>
                           <button
                             onClick={() => handleNavigation('/settings')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-[#2C5F5D]/10 transition-smooth"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-[var(--portal-primary)]/10 transition-smooth"
                           >
-                            <Settings className="h-4 w-4 text-muted-foreground" />
+                            <Settings className="h-4 w-4 text-[var(--portal-text-light)]" />
                             Settings
                           </button>
                           <button
                             onClick={() => handleNavigation('/help')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-[#2C5F5D]/10 transition-smooth"
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-[var(--portal-primary)]/10 transition-smooth"
                           >
-                            <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                            <HelpCircle className="h-4 w-4 text-[var(--portal-text-light)]" />
                             Help Center
                           </button>
                         </div>
 
                         {/* Logout */}
-                        <div className="border-t border-border pt-1 mt-1">
+                        <div className="border-t border-[var(--portal-border)] pt-1 mt-1">
                           <button
                             onClick={handleLogout}
                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-cg-error hover:bg-cg-error-subtle transition-smooth"
@@ -278,7 +278,7 @@ export function Navigation() {
                   </Link>
                   <Link
                     href="/register"
-                    className="bg-white text-[#2C5F5D] font-medium px-5 py-2 rounded-full text-sm transition-all duration-200 hover:bg-white/90 hover:shadow-lg"
+                    className="bg-white text-[var(--portal-primary)] font-medium px-5 py-2 rounded-full text-sm transition-all duration-200 hover:bg-white/90 hover:shadow-lg"
                   >
                     Get Started Free
                   </Link>
@@ -416,7 +416,7 @@ export function Navigation() {
                   <Link
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-center bg-white text-[#2C5F5D] font-medium py-2.5 rounded-xl hover:bg-white/90 transition-colors"
+                    className="block w-full text-center bg-white text-[var(--portal-primary)] font-medium py-2.5 rounded-xl hover:bg-white/90 transition-colors"
                   >
                     Get Started Free
                   </Link>

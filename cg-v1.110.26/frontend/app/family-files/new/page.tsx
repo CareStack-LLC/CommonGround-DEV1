@@ -110,8 +110,8 @@ function NewFamilyFileContent() {
         </button>
         <div>
           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
-              <FolderHeart className="h-6 w-6 text-[#2C5F5D]" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+              <FolderHeart className="h-6 w-6 text-[var(--portal-primary)]" />
             </div>
             New Family File
           </h1>
@@ -157,7 +157,7 @@ function NewFamilyFileContent() {
               <Label htmlFor="parentARole" className="text-sm font-medium text-slate-900">Your Role</Label>
               <select
                 id="parentARole"
-                className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] focus:border-[#2C5F5D]"
+                className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)] focus:border-[var(--portal-primary)]"
                 value={parentARole}
                 onChange={(e) => setParentARole(e.target.value)}
               >
@@ -174,8 +174,8 @@ function NewFamilyFileContent() {
         <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
-                <Mail className="h-5 w-5 text-[#2C5F5D]" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+                <Mail className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
               Invite Co-Parent (Optional)
             </h2>
@@ -201,7 +201,7 @@ function NewFamilyFileContent() {
                 <Label htmlFor="parentBRole" className="text-sm font-medium text-slate-900">Co-Parent Role</Label>
                 <select
                   id="parentBRole"
-                  className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] focus:border-[#2C5F5D]"
+                  className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)] focus:border-[var(--portal-primary)]"
                   value={parentBRole}
                   onChange={(e) => setParentBRole(e.target.value)}
                 >
@@ -228,7 +228,7 @@ function NewFamilyFileContent() {
               <Label htmlFor="state" className="text-sm font-medium text-slate-900">State</Label>
               <select
                 id="state"
-                className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] focus:border-[#2C5F5D]"
+                className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)] focus:border-[var(--portal-primary)]"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
               >
@@ -255,8 +255,8 @@ function NewFamilyFileContent() {
         <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
           <div className="mb-6">
             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
-                <Baby className="h-5 w-5 text-[#2C5F5D]" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+                <Baby className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
               Children (Optional)
             </h2>
@@ -308,7 +308,7 @@ function NewFamilyFileContent() {
                   <div>
                     <Label className="text-sm font-medium text-slate-900">Gender</Label>
                     <select
-                      className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] focus:border-[#2C5F5D]"
+                      className="w-full mt-1 rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)] focus:border-[var(--portal-primary)]"
                       value={child.gender || ''}
                       onChange={(e) => updateChild(index, 'gender', e.target.value)}
                     >

@@ -10,30 +10,30 @@ import { AlertCircle, CheckCircle, Info, AlertTriangle } from "lucide-react"
  * Philosophy: "Information hierarchy matters for stressed users"
  */
 const alertVariants = cva(
-  // Base styles - rounded, padded, with icon space
-  "relative w-full rounded-lg border p-4 pl-12",
+  // Base styles - portal-aware rounded, padded, with icon space
+  "relative w-full rounded-[var(--portal-radius-md)] border p-4 pl-12",
   {
     variants: {
       variant: {
-        // Default - subtle primary for general info
+        // Default - portal-aware primary for general info
         default:
-          "bg-cg-primary-subtle border-cg-primary/20 text-foreground",
+          "bg-[var(--portal-primary)]/10 border-[var(--portal-primary)]/20 text-[var(--portal-text)]",
 
-        // Success - for positive confirmations
+        // Success - for positive confirmations (semantic)
         success:
-          "bg-cg-success-subtle border-cg-success/20 text-foreground",
+          "bg-cg-success-subtle border-cg-success/20 text-[var(--portal-text)]",
 
-        // Warning - for attention needed
+        // Warning - for attention needed (semantic)
         warning:
-          "bg-cg-warning-subtle border-cg-warning/20 text-foreground",
+          "bg-cg-warning-subtle border-cg-warning/20 text-[var(--portal-text)]",
 
-        // Error/Destructive - for issues
+        // Error/Destructive - for issues (semantic)
         destructive:
-          "bg-cg-error-subtle border-cg-error/20 text-foreground",
+          "bg-cg-error-subtle border-cg-error/20 text-[var(--portal-text)]",
 
-        // ARIA - for AI assistant messages
+        // ARIA - for AI assistant messages (semantic amber)
         aria:
-          "bg-cg-aria-subtle border-cg-aria/20 text-foreground",
+          "bg-cg-amber-subtle border-cg-amber/20 text-[var(--portal-text)]",
       },
     },
     defaultVariants: {
@@ -51,11 +51,11 @@ const iconMap = {
 }
 
 const iconColorMap = {
-  default: "text-cg-primary",
+  default: "text-[var(--portal-primary)]",
   success: "text-cg-success",
   warning: "text-cg-warning",
   destructive: "text-cg-error",
-  aria: "text-cg-aria",
+  aria: "text-cg-amber",
 }
 
 export interface AlertProps

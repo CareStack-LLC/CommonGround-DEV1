@@ -14,7 +14,7 @@ export default function ContactPage() {
       title: 'Support',
       email: 'support@commonground.app',
       description: 'Technical issues, billing questions, or account help',
-      color: '#2C5F5D'
+      color: 'var(--portal-primary)'
     },
     {
       icon: Mail,
@@ -28,7 +28,7 @@ export default function ContactPage() {
       title: 'Professional Partnerships',
       email: 'partnerships@commonground.app',
       description: 'Law firms, courts, mediators, or organizational access',
-      color: '#2C5F5D'
+      color: 'var(--portal-primary)'
     }
   ];
 
@@ -38,7 +38,7 @@ export default function ContactPage() {
       title: 'Help Documentation',
       description: 'Browse guides and tutorials',
       link: '/help',
-      color: '#2C5F5D'
+      color: 'var(--portal-primary)'
     },
     {
       icon: HelpCircle,
@@ -52,7 +52,7 @@ export default function ContactPage() {
       title: 'System Status',
       description: 'Check platform status',
       link: 'https://status.commonground.app',
-      color: '#2C5F5D'
+      color: 'var(--portal-primary)'
     }
   ];
 
@@ -61,7 +61,7 @@ export default function ContactPage() {
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#2C5F5D] rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
         </div>
 
@@ -72,7 +72,7 @@ export default function ContactPage() {
           >
             We're here
             <br />
-            <span className="text-[#2C5F5D]">to help</span>
+            <span className="text-[var(--portal-primary)]">to help</span>
           </h1>
 
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
@@ -87,7 +87,7 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-2xl p-8 shadow-sm flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
             <div className="flex items-center gap-4">
-              <Clock className="w-8 h-8 text-[#2C5F5D]" />
+              <Clock className="w-8 h-8 text-[var(--portal-primary)]" />
               <div>
                 <div className="font-semibold text-[#2C3E50]">Support Hours</div>
                 <div className="text-gray-600">Mon-Fri, 9am-6pm EST</div>
@@ -216,7 +216,7 @@ export default function ContactPage() {
       {/* Emergency Support Note */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-[#2C5F5D]/10 to-[#D97757]/10 rounded-2xl p-8 border-2 border-[#2C5F5D]/20">
+          <div className="bg-gradient-to-br from-[var(--portal-primary)]/10 to-[#D97757]/10 rounded-2xl p-8 border-2 border-[var(--portal-primary)]/20">
             <h3
               className="text-2xl font-serif text-[#2C3E50] mb-4 text-center"
               style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
@@ -228,7 +228,7 @@ export default function ContactPage() {
               critical features, email{' '}
               <a
                 href="mailto:support@commonground.app"
-                className="font-medium text-[#2C5F5D] hover:underline"
+                className="font-medium text-[var(--portal-primary)] hover:underline"
               >
                 support@commonground.app
               </a>{' '}
@@ -239,7 +239,7 @@ export default function ContactPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-[#2C5F5D] to-[#234846] text-white relative overflow-hidden">
+      <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#234846] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
@@ -261,7 +261,7 @@ export default function ContactPage() {
 
           <button
             onClick={() => router.push(user ? '/dashboard' : '/signup')}
-            className="px-8 py-4 bg-white text-[#2C5F5D] rounded-xl font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
+            className="px-8 py-4 bg-white text-[var(--portal-primary)] rounded-xl font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
           >
             {user ? 'Go to Dashboard' : 'Start Free'}
           </button>

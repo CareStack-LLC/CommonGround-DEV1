@@ -321,8 +321,8 @@ export default function SecuritySettingsPage() {
       <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            <div className="p-2 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl shadow-md">
-              <Lock className="h-5 w-5 text-[#2C5F5D]" />
+            <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
+              <Lock className="h-5 w-5 text-[var(--portal-primary)]" />
             </div>
             Change Password
           </CardTitle>

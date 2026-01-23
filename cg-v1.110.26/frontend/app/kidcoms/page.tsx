@@ -202,13 +202,13 @@ function KidComsContent() {
 
   if (!familyFileId) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-[var(--portal-background)] via-[var(--portal-surface)] to-[var(--portal-accent)]/5 pb-20 lg:pb-0">
         <Navigation />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-8">
             {/* Page Header */}
             <header className="text-center">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Video className="h-10 w-10 text-white" />
               </div>
               <h1 className="text-3xl font-bold text-slate-900 mb-2">KidComs</h1>
@@ -224,15 +224,15 @@ function KidComsContent() {
 
             {/* Select Family File */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center max-w-4xl mx-auto">
-              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 flex items-center justify-center mx-auto mb-6">
-                <FolderHeart className="h-12 w-12 text-purple-600" />
+              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 flex items-center justify-center mx-auto mb-6">
+                <FolderHeart className="h-12 w-12 text-[var(--portal-primary)]" />
               </div>
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Select a Family File</h2>
               <p className="text-slate-600 mb-8">Choose a family file to access KidComs features</p>
 
               {isLoading ? (
                 <div className="flex justify-center py-8">
-                  <div className="w-12 h-12 border-3 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-12 h-12 border-3 border-[var(--portal-primary)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : familyFiles.length === 0 ? (
                 <div className="py-4">
@@ -241,7 +241,7 @@ function KidComsContent() {
                     onClick={() => router.push('/family-files/new')}
                     className="
                       inline-flex items-center gap-2 px-6 py-3
-                      bg-gradient-to-br from-purple-500 to-purple-600 text-white
+                      bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-primary-hover)] text-white
                       rounded-xl font-medium shadow-md hover:shadow-lg
                       transition-all duration-200 hover:-translate-y-0.5
                     "
@@ -258,13 +258,13 @@ function KidComsContent() {
                       onClick={() => selectFamilyFile(ff.id)}
                       className="
                         bg-white border border-slate-200 rounded-2xl p-5 text-left
-                        hover:border-purple-300 hover:shadow-lg transition-all
+                        hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all
                         group
                       "
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-purple-600 transition-colors">{ff.title}</h3>
+                          <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-[var(--portal-primary)] transition-colors">{ff.title}</h3>
                           <p className="text-sm text-slate-500 font-medium">{ff.family_file_number}</p>
                         </div>
                         <span className={`px-2.5 py-1 text-xs rounded-full font-semibold ${
@@ -296,11 +296,11 @@ function KidComsContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-[var(--portal-background)] via-[var(--portal-surface)] to-[var(--portal-accent)]/5 pb-20 lg:pb-0">
         <Navigation />
         <div className="flex flex-col items-center justify-center py-20">
           <div className="relative">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center shadow-lg">
               <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
           </div>
@@ -311,22 +311,22 @@ function KidComsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 pb-24 lg:pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--portal-background)] via-[var(--portal-surface)] to-[var(--portal-accent)]/5 pb-24 lg:pb-8">
       <Navigation />
 
       {/* Page Header */}
-      <header className="border-b border-purple-200 bg-white/80 backdrop-blur-sm">
+      <header className="border-b border-[var(--portal-primary)]/20 bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="p-2 -ml-2 rounded-xl hover:bg-purple-100 transition-colors"
+                className="p-2 -ml-2 rounded-xl hover:bg-[var(--portal-primary)]/10 transition-colors"
                 aria-label="Go back"
               >
                 <ChevronLeft className="h-5 w-5 text-slate-600" />
               </button>
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-md">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center shadow-md">
                 <Video className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -360,7 +360,7 @@ function KidComsContent() {
             {children.length > 0 && (
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
                 <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-purple-600" />
+                  <Shield className="h-4 w-4 text-[var(--portal-primary)]" />
                   Select Child
                 </h3>
                 <div className="space-y-2">
@@ -371,12 +371,12 @@ function KidComsContent() {
                       className={`
                         w-full flex items-center gap-3 p-3 rounded-xl transition-all
                         ${selectedChild?.id === child.id
-                          ? 'bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-400 shadow-sm'
+                          ? 'bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 border-2 border-[var(--portal-primary)]/40 shadow-sm'
                           : 'bg-slate-50 hover:bg-slate-100 border-2 border-transparent'
                         }
                       `}
                     >
-                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold shadow-md">
+                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center text-white font-bold shadow-md">
                         {(child.preferred_name || child.first_name)[0]}
                       </div>
                       <span className="font-semibold text-slate-900">
@@ -397,7 +397,7 @@ function KidComsContent() {
                   disabled={!selectedChild || isStartingSession}
                   className="
                     flex flex-col items-center p-4 rounded-xl transition-all
-                    bg-gradient-to-br from-purple-500 to-purple-600 text-white
+                    bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-primary-hover)] text-white
                     hover:shadow-lg hover:-translate-y-0.5
                     disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
                   "
@@ -446,8 +446,8 @@ function KidComsContent() {
                   onClick={() => router.push(`/kidcoms/circle?case=${familyFileId}`)}
                   className="
                     flex items-center gap-1.5 px-3 py-1.5 text-sm
-                    bg-purple-100 text-purple-700 rounded-lg
-                    hover:bg-purple-200 transition-colors font-medium
+                    bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] rounded-lg
+                    hover:bg-[var(--portal-primary)]/20 transition-colors font-medium
                   "
                 >
                   <Plus className="h-4 w-4" />
@@ -457,8 +457,8 @@ function KidComsContent() {
 
               {contacts.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-10 w-10 text-purple-600" />
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-10 w-10 text-[var(--portal-primary)]" />
                   </div>
                   <p className="font-semibold text-slate-900 mb-1">No circle contacts yet</p>
                   <p className="text-sm text-slate-600">
@@ -470,10 +470,10 @@ function KidComsContent() {
                   {contacts.map((contact) => (
                     <div
                       key={contact.id}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-purple-200 transition-colors"
+                      className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-[var(--portal-primary)]/20 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center text-white font-bold shadow-sm">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center text-white font-bold shadow-sm">
                           {contact.contact_name[0]}
                         </div>
                         <div>
@@ -515,8 +515,8 @@ function KidComsContent() {
 
               {sessions.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 flex items-center justify-center mx-auto mb-4">
-                    <Clock className="h-10 w-10 text-purple-600" />
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 flex items-center justify-center mx-auto mb-4">
+                    <Clock className="h-10 w-10 text-[var(--portal-primary)]" />
                   </div>
                   <p className="font-semibold text-slate-900 mb-1">No sessions yet</p>
                   <p className="text-sm text-slate-600">
@@ -536,7 +536,7 @@ function KidComsContent() {
                       className={`
                         w-full flex items-center justify-between p-3 rounded-xl transition-all
                         ${session.status === 'active' || session.status === 'waiting'
-                          ? 'bg-purple-50 hover:bg-purple-100 cursor-pointer border border-purple-200'
+                          ? 'bg-[var(--portal-primary)]/5 hover:bg-[var(--portal-primary)]/10 cursor-pointer border border-[var(--portal-primary)]/20'
                           : 'bg-slate-50 cursor-default border border-slate-100'
                         }
                       `}
@@ -598,10 +598,10 @@ export default function KidComsPage() {
   return (
     <ProtectedRoute>
       <Suspense fallback={
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+        <div className="min-h-screen bg-gradient-to-br from-[var(--portal-background)] via-[var(--portal-surface)] to-[var(--portal-accent)]/5">
           <Navigation />
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center shadow-lg">
               <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
             <p className="mt-6 text-slate-600 font-medium">Loading KidComs...</p>

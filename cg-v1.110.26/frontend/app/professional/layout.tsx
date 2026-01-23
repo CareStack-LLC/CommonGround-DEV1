@@ -219,7 +219,7 @@ export default function ProfessionalPortalLayout({
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--portal-primary)]" />
       </div>
     );
   }
@@ -246,12 +246,12 @@ export default function ProfessionalPortalLayout({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Link href="/professional" className="flex items-center gap-3 group">
-                  <div className="p-2 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl shadow-lg shadow-teal-500/20 group-hover:shadow-teal-500/40 transition-all duration-300">
+                  <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-primary-hover)] rounded-xl shadow-lg shadow-[var(--portal-primary)]/20 group-hover:shadow-[var(--portal-primary)]/40 transition-all duration-300">
                     <Briefcase className="h-5 w-5" />
                   </div>
                   <div>
                     <span className="text-xl font-semibold tracking-tight bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">CommonGround</span>
-                    <Badge className="ml-2.5 text-[10px] font-semibold bg-teal-500/20 text-teal-300 border border-teal-500/30 hover:bg-teal-500/30">
+                    <Badge className="ml-2.5 text-[10px] font-semibold bg-[var(--portal-primary)]/20 text-[var(--portal-accent)] border border-[var(--portal-primary)]/30 hover:bg-[var(--portal-primary)]/30">
                       Professional
                     </Badge>
                   </div>
@@ -317,12 +317,12 @@ export default function ProfessionalPortalLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-slate-500">
               <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-teal-600" />
+                <Shield className="h-4 w-4 text-[var(--portal-primary)]" />
                 <span className="font-medium">CommonGround Professional Portal</span>
               </div>
               <div className="flex items-center gap-4 text-xs">
-                <span className="flex items-center gap-1.5 bg-teal-50 text-teal-700 px-2.5 py-1 rounded-full font-medium">
-                  <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
+                <span className="flex items-center gap-1.5 bg-[var(--portal-primary)]/5 text-[var(--portal-primary)] px-2.5 py-1 rounded-full font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--portal-primary)] animate-pulse" />
                   HIPAA Compliant
                 </span>
                 <span className="flex items-center gap-1.5 bg-slate-200 text-slate-600 px-2.5 py-1 rounded-full font-medium">
@@ -440,7 +440,7 @@ function ProfessionalNavigation({
                 </Link>
               )}
               {dashboardData?.pending_intakes > 0 && (
-                <Badge className="text-xs bg-teal-50 text-teal-700 border border-teal-200 font-medium">
+                <Badge className="text-xs bg-[var(--portal-primary)]/5 text-[var(--portal-primary)] border border-[var(--portal-primary)]/20 font-medium">
                   {dashboardData.pending_intakes} pending intake{dashboardData.pending_intakes !== 1 ? "s" : ""}
                 </Badge>
               )}
@@ -498,7 +498,7 @@ function ProfessionalNavigation({
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   pathname.startsWith(item.href)
-                    ? "bg-teal-50 text-teal-700 border border-teal-200 shadow-sm"
+                    ? "bg-[var(--portal-primary)]/5 text-[var(--portal-primary)] border border-[var(--portal-primary)]/20 shadow-sm"
                     : "text-slate-700 hover:bg-white hover:shadow-sm"
                 }`}
               >
@@ -507,7 +507,7 @@ function ProfessionalNavigation({
                   {item.label}
                 </span>
                 {item.badge && (
-                  <span className="px-2 py-0.5 text-[10px] font-bold bg-teal-500 text-white rounded-full">
+                  <span className="px-2 py-0.5 text-[10px] font-bold bg-[var(--portal-primary)] text-white rounded-full">
                     {item.badge}
                   </span>
                 )}
@@ -541,14 +541,14 @@ function NavLink({
       href={href}
       className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
         isActive
-          ? "border-teal-600 text-teal-700 bg-teal-50/50"
+          ? "border-[var(--portal-primary)] text-[var(--portal-primary)] bg-[var(--portal-primary)]/5"
           : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300"
       }`}
     >
       {icon}
       {children}
       {badge && (
-        <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-teal-500 text-white rounded-full shadow-sm">
+        <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-[var(--portal-primary)] text-white rounded-full shadow-sm">
           {badge}
         </span>
       )}

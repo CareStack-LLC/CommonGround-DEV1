@@ -9,38 +9,42 @@ import { cn } from "@/lib/utils"
  * Philosophy: "Colors are semantic, not decorative"
  */
 const badgeVariants = cva(
-  // Base styles - rounded pill, readable text
-  "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-smooth",
+  // Base styles - portal-aware rounded pill, readable text
+  "inline-flex items-center rounded-[var(--portal-radius-full)] px-3 py-1 text-sm font-medium transition-smooth",
   {
     variants: {
       variant: {
-        // Default - subtle primary background
+        // Default - portal-aware primary background
         default:
-          "bg-cg-primary-subtle text-cg-primary",
+          "bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] border border-[var(--portal-primary)]/20",
 
         // Success - For completed, verified, compliant states
         success:
-          "bg-cg-success-subtle text-cg-success",
+          "bg-cg-success-subtle text-cg-success border border-cg-success/20",
 
         // Warning - For attention needed, pending, upcoming
         warning:
-          "bg-cg-warning-subtle text-cg-warning",
+          "bg-cg-warning-subtle text-cg-warning border border-cg-warning/20",
 
         // Error - Only for confirmed issues (missed, failed, overdue)
         error:
-          "bg-cg-error-subtle text-cg-error",
+          "bg-cg-error-subtle text-cg-error border border-cg-error/20",
 
-        // Secondary - Neutral, de-emphasized
+        // Secondary - Portal-aware secondary color
         secondary:
-          "bg-secondary text-secondary-foreground",
+          "bg-[var(--portal-secondary)]/10 text-[var(--portal-secondary)] border border-[var(--portal-secondary)]/20",
 
-        // Outline - Minimal styling
+        // Accent - Portal-aware accent color
+        accent:
+          "bg-[var(--portal-accent)]/10 text-[var(--portal-accent)] border border-[var(--portal-accent)]/20",
+
+        // Outline - Portal-aware minimal styling
         outline:
-          "border border-border bg-transparent text-foreground",
+          "border border-[var(--portal-border)] bg-transparent text-[var(--portal-text)]",
 
-        // ARIA - For AI assistant indicators
+        // ARIA - For AI assistant indicators (amber)
         aria:
-          "bg-cg-aria-subtle text-cg-aria border border-cg-aria/20",
+          "bg-cg-amber-subtle text-cg-amber border border-cg-amber/20",
       },
       size: {
         default: "px-3 py-1 text-sm",

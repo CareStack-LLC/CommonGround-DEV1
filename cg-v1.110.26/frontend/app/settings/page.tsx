@@ -57,8 +57,8 @@ const settingCards: SettingCard[] = [
     description: 'Generate court documentation, export data, and access compliance reports',
     icon: FileText,
     path: '/settings/reports',
-    iconBgGradient: 'from-[#2C5F5D]/10 to-[#2C5F5D]/5',
-    iconColor: 'text-[#2C5F5D]',
+    iconBgGradient: 'from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5',
+    iconColor: 'text-[var(--portal-primary)]',
   },
 ];
 
@@ -81,7 +81,7 @@ export default function SettingsPage() {
               key={card.path}
               onClick={() => handleCardClick(card.path)}
               className="group text-left bg-white rounded-2xl p-8 border-2 border-slate-200 shadow-lg
-                hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-300
+                hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300
                 hover:scale-[1.02] active:scale-[0.98]"
             >
               <div className="flex items-start justify-between gap-4 mb-5">
@@ -92,11 +92,11 @@ export default function SettingsPage() {
                   <Icon className={`h-7 w-7 ${card.iconColor}`} />
                 </div>
 
-                <ArrowRight className="h-6 w-6 text-slate-400 group-hover:text-[#2C5F5D]
+                <ArrowRight className="h-6 w-6 text-slate-400 group-hover:text-[var(--portal-primary)]
                   group-hover:translate-x-1 transition-all duration-300" />
               </div>
 
-              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-[#2C5F5D]
+              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-[var(--portal-primary)]
                 transition-colors duration-300" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 {card.title}
               </h3>
@@ -112,9 +112,9 @@ export default function SettingsPage() {
       {/* Help Section */}
       <div className="bg-white rounded-2xl p-6 border-2 border-slate-200 shadow-lg">
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl shadow-md">
+          <div className="p-3 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl shadow-md">
             <svg
-              className="h-6 w-6 text-[#2C5F5D]"
+              className="h-6 w-6 text-[var(--portal-primary)]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

@@ -68,7 +68,7 @@ function TabButton({
         rounded-xl transition-all duration-200 flex-shrink-0
         ${
           active
-            ? 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white shadow-sm'
+            ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white shadow-sm'
             : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
         }
       `}
@@ -106,11 +106,11 @@ function QuickActionCard({
 }) {
   const colorClasses = {
     sage: {
-      bg: 'bg-gradient-to-br from-[#2C5F5D]/5 to-[#2C5F5D]/10',
-      icon: 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white',
-      text: 'text-[#2C5F5D]',
-      hover: 'hover:from-[#2C5F5D]/10 hover:to-[#2C5F5D]/15 hover:shadow-md',
-      border: 'border-[#2C5F5D]/10 hover:border-[#2C5F5D]/20',
+      bg: 'bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10',
+      icon: 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white',
+      text: 'text-[var(--portal-primary)]',
+      hover: 'hover:from-[var(--portal-primary)]/10 hover:to-[var(--portal-primary)]/15 hover:shadow-md',
+      border: 'border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/20',
     },
     purple: {
       bg: 'bg-gradient-to-br from-purple-50/80 to-purple-100/50',
@@ -160,7 +160,7 @@ function CustodyLegend() {
     <div className="flex items-center gap-4 text-xs bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-100">
       <span className="text-slate-500 font-medium mr-1">Legend:</span>
       <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] shadow-sm" />
+        <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] shadow-sm" />
         <span className="text-slate-700 font-medium whitespace-nowrap">Your Time</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -195,7 +195,7 @@ function FamilyFileSelector({
         className="
           appearance-none bg-white border border-slate-200 rounded-xl
           px-4 py-2.5 pr-10 text-sm font-medium text-slate-900
-          focus:outline-none focus:ring-2 focus:ring-[#2C5F5D]/20 focus:border-[#2C5F5D]
+          focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]
           transition-all cursor-pointer hover:border-slate-300
           shadow-sm
         "
@@ -375,7 +375,7 @@ function ScheduleContent() {
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center">
-            <div className="w-14 h-14 border-3 border-[#2C5F5D] border-t-transparent rounded-full animate-spin mx-auto" />
+            <div className="w-14 h-14 border-3 border-[var(--portal-primary)] border-t-transparent rounded-full animate-spin mx-auto" />
             <p className="mt-6 text-slate-600 font-medium">Loading TimeBridge...</p>
             <p className="mt-2 text-sm text-slate-500">Syncing your schedule</p>
           </div>
@@ -391,8 +391,8 @@ function ScheduleContent() {
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center max-w-md px-6">
-            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center mx-auto mb-6 shadow-sm">
-              <Calendar className="h-12 w-12 text-[#2C5F5D]" />
+            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center mx-auto mb-6 shadow-sm">
+              <Calendar className="h-12 w-12 text-[var(--portal-primary)]" />
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-3">
               Welcome to TimeBridge
@@ -404,7 +404,7 @@ function ScheduleContent() {
               href="/family-files"
               className="
                 inline-flex items-center gap-2 px-6 py-3
-                bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white
+                bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white
                 rounded-xl font-medium shadow-md hover:shadow-lg
                 transition-all duration-200 hover:-translate-y-0.5
               "
@@ -438,7 +438,7 @@ function ScheduleContent() {
                 >
                   <ChevronLeft className="h-5 w-5 text-slate-600" />
                 </button>
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] flex items-center justify-center shadow-md">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center shadow-md">
                   <Calendar className="h-5 w-5 text-white" />
                 </div>
                 <h1 className="text-3xl font-bold text-slate-900">
@@ -473,7 +473,7 @@ function ScheduleContent() {
                     className="
                       appearance-none bg-white border border-slate-200 rounded-xl
                       px-4 py-2.5 pr-10 text-sm font-medium text-slate-900
-                      focus:outline-none focus:ring-2 focus:ring-[#2C5F5D]/20 focus:border-[#2C5F5D]
+                      focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]
                       transition-all cursor-pointer hover:border-slate-300
                       shadow-sm
                     "

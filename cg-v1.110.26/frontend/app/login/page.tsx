@@ -64,7 +64,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl opacity-[0.04]"
-          style={{ background: 'radial-gradient(circle, #2C5F5D 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, var(--portal-primary) 0%, transparent 70%)' }}
         />
         <div
           className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.03]"
@@ -76,9 +76,9 @@ export default function LoginPage() {
       <header className="relative z-10 p-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-3 text-[#2C3E50] hover:text-[#2C5F5D] transition-colors group"
+          className="inline-flex items-center gap-3 text-[#2C3E50] hover:text-[var(--portal-primary)] transition-colors group"
         >
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#2C5F5D] to-[#1e4442] flex items-center justify-center shadow-sm">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] flex items-center justify-center shadow-sm">
             <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="12" cy="12" r="10"/>
               <path d="M12 6v12M6 12h12"/>
@@ -97,7 +97,7 @@ export default function LoginPage() {
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {/* Welcome Card */}
-          <div className="bg-white rounded-3xl shadow-xl border border-[#2C5F5D]/10 p-8 sm:p-10">
+          <div className="bg-white rounded-3xl shadow-xl border border-[var(--portal-primary)]/10 p-8 sm:p-10">
             {/* Header */}
             <div className="text-center mb-8">
               <h1
@@ -137,7 +137,7 @@ export default function LoginPage() {
                     placeholder="you@example.com"
                     required
                     disabled={isLoading}
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2C5F5D] focus:ring-2 focus:ring-[#2C5F5D]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] focus:ring-2 focus:ring-[var(--portal-primary)]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -150,7 +150,7 @@ export default function LoginPage() {
                   </label>
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-[#2C5F5D] hover:text-[#1e4442] font-medium transition-colors"
+                    className="text-sm text-[var(--portal-primary)] hover:text-[#1e4442] font-medium transition-colors"
                   >
                     Forgot password?
                   </Link>
@@ -167,7 +167,7 @@ export default function LoginPage() {
                     placeholder="••••••••"
                     required
                     disabled={isLoading}
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#2C5F5D] focus:ring-2 focus:ring-[#2C5F5D]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] focus:ring-2 focus:ring-[var(--portal-primary)]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
               </div>
@@ -176,7 +176,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading || oauthLoading !== null}
-                className="w-full py-4 px-6 rounded-xl bg-[#2C5F5D] hover:bg-[#1e4442] text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                className="w-full py-4 px-6 rounded-xl bg-[var(--portal-primary)] hover:bg-[#1e4442] text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
               >
                 {isLoading ? (
                   <>
@@ -271,7 +271,7 @@ export default function LoginPage() {
             {/* Register Link */}
             <Link
               href="/register"
-              className="block w-full py-4 px-6 rounded-xl border-2 border-[#2C5F5D] text-[#2C5F5D] hover:bg-[#2C5F5D] hover:text-white font-semibold transition-all text-center"
+              className="block w-full py-4 px-6 rounded-xl border-2 border-[var(--portal-primary)] text-[var(--portal-primary)] hover:bg-[var(--portal-primary)] hover:text-white font-semibold transition-all text-center"
             >
               Create an Account
             </Link>
@@ -282,7 +282,7 @@ export default function LoginPage() {
             <p className="text-sm text-gray-600 mb-4 font-medium">Trusted by thousands of co-parents</p>
             <div className="flex items-center justify-center gap-6 text-gray-500">
               <div className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-[#2C5F5D]" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="h-5 w-5 text-[var(--portal-primary)]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span className="text-xs font-medium">Secure</span>
@@ -294,7 +294,7 @@ export default function LoginPage() {
                 <span className="text-xs font-medium">Court-Ready</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-[#2C5F5D]" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="h-5 w-5 text-[var(--portal-primary)]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
                 </svg>
                 <span className="text-xs font-medium">Child-Focused</span>
@@ -307,9 +307,9 @@ export default function LoginPage() {
       {/* Footer */}
       <footer className="relative z-10 py-6 text-center">
         <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
-          <Link href="/legal/privacy" className="hover:text-[#2C5F5D] transition-colors font-medium">Privacy</Link>
-          <Link href="/legal/terms" className="hover:text-[#2C5F5D] transition-colors font-medium">Terms</Link>
-          <Link href="/help" className="hover:text-[#2C5F5D] transition-colors font-medium">Help</Link>
+          <Link href="/legal/privacy" className="hover:text-[var(--portal-primary)] transition-colors font-medium">Privacy</Link>
+          <Link href="/legal/terms" className="hover:text-[var(--portal-primary)] transition-colors font-medium">Terms</Link>
+          <Link href="/help" className="hover:text-[var(--portal-primary)] transition-colors font-medium">Help</Link>
         </div>
       </footer>
     </div>

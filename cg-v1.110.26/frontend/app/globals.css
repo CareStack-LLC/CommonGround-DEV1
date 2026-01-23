@@ -264,6 +264,329 @@
 }
 
 /* ============================================================================
+   PORTAL-SPECIFIC THEMING
+   ============================================================================ */
+
+/* Parent Portal - "Warm Haven" (Default) */
+.parent-portal {
+  /* Colors */
+  --portal-primary: #4A6C58;
+  --portal-primary-hover: #3A5646;
+  --portal-primary-light: #6B9B7A;
+  --portal-secondary: #2C5F5D;
+  --portal-secondary-light: #3A7574;
+  --portal-accent: #D97757;
+  --portal-accent-hover: #C76747;
+  --portal-background: #F5F0E8;
+  --portal-surface: #FFFBF5;
+  --portal-surface-elevated: #FFFFFF;
+  --portal-border: #D9D4CC;
+  --portal-border-hover: #C9C4BC;
+  --portal-text: #2D3A35;
+  --portal-text-light: #6B7B74;
+  --portal-text-heading: #2C3E50;
+
+  /* Shadows - Organic, soft */
+  --portal-shadow-sm: 0 2px 8px -2px rgba(74, 108, 88, 0.08);
+  --portal-shadow-md: 0 4px 12px -2px rgba(74, 108, 88, 0.1);
+  --portal-shadow-lg: 0 8px 24px -4px rgba(74, 108, 88, 0.12);
+  --portal-shadow-xl: 0 16px 32px -8px rgba(74, 108, 88, 0.15);
+
+  /* Border Radii - Organic curves */
+  --portal-radius-sm: 0.75rem;
+  --portal-radius-md: 1rem;
+  --portal-radius-lg: 1.5rem;
+  --portal-radius-xl: 2rem;
+  --portal-radius-full: 9999px;
+
+  /* Spacing */
+  --portal-spacing-section: 3rem;
+  --portal-spacing-card: 1.5rem;
+  --portal-spacing-element: 1rem;
+
+  /* Typography */
+  --portal-font-heading: 'Crimson Text', Georgia, serif;
+  --portal-font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+/* Professional Portal - "Corporate Authority" */
+.professional-portal {
+  /* Colors */
+  --portal-primary: #2C5F5D;
+  --portal-primary-hover: #1F4745;
+  --portal-primary-light: #3A7574;
+  --portal-secondary: #475569;
+  --portal-secondary-light: #64748B;
+  --portal-accent: #14B8A6;
+  --portal-accent-hover: #0F9B8E;
+  --portal-background: #F8FAFC;
+  --portal-surface: #FFFFFF;
+  --portal-surface-elevated: #FFFFFF;
+  --portal-border: #E2E8F0;
+  --portal-border-hover: #CBD5E1;
+  --portal-text: #0F172A;
+  --portal-text-light: #64748B;
+  --portal-text-heading: #1E293B;
+
+  /* Shadows - Sharper, defined */
+  --portal-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+  --portal-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+  --portal-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  --portal-shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.12);
+
+  /* Border Radii - Tighter curves */
+  --portal-radius-sm: 0.5rem;
+  --portal-radius-md: 0.75rem;
+  --portal-radius-lg: 1rem;
+  --portal-radius-xl: 1.25rem;
+  --portal-radius-full: 9999px;
+
+  /* Spacing - More efficient */
+  --portal-spacing-section: 2rem;
+  --portal-spacing-card: 1rem;
+  --portal-spacing-element: 0.75rem;
+
+  /* Typography */
+  --portal-font-heading: 'Crimson Text', Georgia, serif;
+  --portal-font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+/* Child Portal - "Playful Sanctuary" */
+.child-portal {
+  /* Colors - Vibrant, playful */
+  --portal-primary: #9333EA;
+  --portal-primary-hover: #7E22CE;
+  --portal-primary-light: #A855F7;
+  --portal-secondary: #C084FC;
+  --portal-secondary-light: #D8B4FE;
+  --portal-accent: #38BDF8;
+  --portal-accent-hover: #0EA5E9;
+  --portal-background: #FFFFFF;
+  --portal-surface: #FEFEFE;
+  --portal-surface-elevated: #FFFFFF;
+  --portal-border: #E9D5FF;
+  --portal-border-hover: #D8B4FE;
+  --portal-text: #581C87;
+  --portal-text-light: #A855F7;
+  --portal-text-heading: #6B21A8;
+
+  /* Shadows - Colorful, playful */
+  --portal-shadow-sm: 0 2px 8px -2px rgba(147, 51, 234, 0.1);
+  --portal-shadow-md: 0 4px 12px -2px rgba(147, 51, 234, 0.15);
+  --portal-shadow-lg: 0 8px 24px -4px rgba(147, 51, 234, 0.2);
+  --portal-shadow-xl: 0 16px 32px -8px rgba(147, 51, 234, 0.25);
+
+  /* Border Radii - Very round, friendly */
+  --portal-radius-sm: 1rem;
+  --portal-radius-md: 1.25rem;
+  --portal-radius-lg: 2rem;
+  --portal-radius-xl: 3rem;
+  --portal-radius-full: 9999px;
+
+  /* Spacing - Extra generous */
+  --portal-spacing-section: 4rem;
+  --portal-spacing-card: 2rem;
+  --portal-spacing-element: 1.25rem;
+
+  /* Typography - Larger, easier to read */
+  --portal-font-heading: 'DM Sans', system-ui, sans-serif;
+  --portal-font-body: 'DM Sans', system-ui, sans-serif;
+  --portal-font-size-base: 1.125rem;
+  --portal-line-height: 1.8;
+}
+
+/* Court Portal - "Legal Authority" */
+.court-portal {
+  /* Colors - Formal, authoritative */
+  --portal-primary: #312E81;
+  --portal-primary-hover: #1E1B4B;
+  --portal-primary-light: #4F46E5;
+  --portal-secondary: #64748B;
+  --portal-secondary-light: #94A3B8;
+  --portal-accent: #4F46E5;
+  --portal-accent-hover: #4338CA;
+  --portal-background: #F1F5F9;
+  --portal-surface: #FFFFFF;
+  --portal-surface-elevated: #FFFFFF;
+  --portal-border: #CBD5E1;
+  --portal-border-hover: #94A3B8;
+  --portal-text: #1E293B;
+  --portal-text-light: #64748B;
+  --portal-text-heading: #0F172A;
+
+  /* Shadows - Precise, crisp */
+  --portal-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --portal-shadow-md: 0 2px 6px rgba(0, 0, 0, 0.06);
+  --portal-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --portal-shadow-xl: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  /* Border Radii - Conservative curves */
+  --portal-radius-sm: 0.375rem;
+  --portal-radius-md: 0.5rem;
+  --portal-radius-lg: 0.75rem;
+  --portal-radius-xl: 1rem;
+  --portal-radius-full: 9999px;
+
+  /* Spacing - Formal, structured */
+  --portal-spacing-section: 1.5rem;
+  --portal-spacing-card: 1rem;
+  --portal-spacing-element: 0.75rem;
+
+  /* Typography */
+  --portal-font-heading: 'Crimson Text', Georgia, serif;
+  --portal-font-body: 'DM Sans', system-ui, sans-serif;
+}
+
+/* ============================================================================
+   CHILD PORTAL ANIMATIONS
+   ============================================================================ */
+
+@keyframes child-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes child-wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes child-scale-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes child-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes child-rainbow-glow {
+  0% {
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+  }
+  33% {
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+  }
+  66% {
+    box-shadow: 0 0 20px rgba(192, 132, 252, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+  }
+}
+
+/* Apply animations only in child portal */
+.child-portal .animate-bounce-fun {
+  animation: child-bounce 1s ease-in-out infinite;
+}
+
+.child-portal .animate-wiggle {
+  animation: child-wiggle 0.5s ease-in-out;
+}
+
+.child-portal .hover-wiggle:hover {
+  animation: child-wiggle 0.5s ease-in-out;
+}
+
+.child-portal .animate-float {
+  animation: child-float 3s ease-in-out infinite;
+}
+
+.child-portal .animate-rainbow-glow {
+  animation: child-rainbow-glow 3s ease-in-out infinite;
+}
+
+.child-portal button:hover,
+.child-portal .interactive-element:hover {
+  animation: child-scale-pulse 0.3s ease-in-out;
+}
+
+/* Larger touch targets for child portal (WCAG AAA) */
+.child-portal button,
+.child-portal a[role="button"],
+.child-portal .interactive-element {
+  min-height: 48px;
+  min-width: 48px;
+  padding: 1rem 1.5rem;
+}
+
+/* Enhanced typography for child portal */
+.child-portal {
+  font-size: var(--portal-font-size-base, 1.125rem);
+  line-height: var(--portal-line-height, 1.8);
+}
+
+.child-portal h1 {
+  font-size: 2.5rem;
+}
+
+.child-portal h2 {
+  font-size: 2rem;
+}
+
+.child-portal h3 {
+  font-size: 1.75rem;
+}
+
+/* ============================================================================
+   SMOOTH PORTAL TRANSITIONS
+   ============================================================================ */
+
+/* Enable smooth transitions when switching portals */
+body.portal-transition {
+  transition: background-color 0.3s ease-in-out;
+}
+
+body.portal-transition * {
+  transition: color 0.2s ease-in-out,
+              background-color 0.2s ease-in-out,
+              border-color 0.2s ease-in-out,
+              box-shadow 0.2s ease-in-out;
+}
+
+/* Disable transitions on child portal (instant is better for kids) */
+body.child-portal.portal-transition,
+body.child-portal.portal-transition * {
+  transition: none;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  body.portal-transition,
+  body.portal-transition *,
+  .child-portal .animate-bounce-fun,
+  .child-portal .animate-wiggle,
+  .child-portal .animate-float,
+  .child-portal .animate-rainbow-glow {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ============================================================================
    BASE STYLES
    ============================================================================ */
 
@@ -765,13 +1088,13 @@
   animation-delay: -4s;
 }
 
-/* Bottom navigation for mobile */
+/* Bottom navigation for mobile - Portal-aware */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #2C5F5D;
+  background-color: var(--portal-primary);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: space-around;
@@ -786,7 +1109,7 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 0.75rem;
+  border-radius: var(--portal-radius-md);
   color: rgba(255, 255, 255, 0.7);
   transition: all 0.2s;
 }

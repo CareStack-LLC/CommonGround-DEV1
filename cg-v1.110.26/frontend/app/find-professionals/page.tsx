@@ -285,7 +285,7 @@ function FindProfessionalsContent() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-14 h-14 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin" />
+        <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
         <p className="mt-4 text-slate-600 font-medium">Loading directory...</p>
       </div>
     );
@@ -392,7 +392,7 @@ function FindProfessionalsContent() {
             <button
               key={firm.id}
               onClick={() => handleViewFirm(firm.slug)}
-              className="group text-left bg-white rounded-xl p-6 border-2 border-slate-200 hover:border-[#2C5F5D]/30 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+              className="group text-left bg-white rounded-xl p-6 border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
             >
               <div className="flex items-start gap-4 mb-4">
                 {firm.logo_url ? (
@@ -404,17 +404,17 @@ function FindProfessionalsContent() {
                 ) : (
                   <div
                     className="w-14 h-14 rounded-xl flex items-center justify-center shadow-sm"
-                    style={{ backgroundColor: firm.primary_color || '#2C5F5D' }}
+                    style={{ backgroundColor: firm.primary_color || 'var(--portal-primary)' }}
                   >
                     <Building2 className="h-7 w-7 text-white" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-slate-900 truncate group-hover:text-[#2C5F5D] transition-colors" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <h3 className="font-bold text-slate-900 truncate group-hover:text-[var(--portal-primary)] transition-colors" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                     {firm.name}
                   </h3>
                   <div className="flex items-center gap-2 mt-1.5">
-                    <span className="text-xs px-2 py-0.5 rounded-lg bg-[#2C5F5D]/10 text-[#2C5F5D] font-medium">
+                    <span className="text-xs px-2 py-0.5 rounded-lg bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] font-medium">
                       {getFirmTypeLabel(firm.firm_type)}
                     </span>
                   </div>
@@ -454,7 +454,7 @@ function FindProfessionalsContent() {
                   <span className="font-medium">{firm.professional_count}</span>
                   <span>professional{firm.professional_count !== 1 ? 's' : ''}</span>
                 </div>
-                <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-[#2C5F5D] group-hover:translate-x-1 transition-all duration-200" />
+                <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-200" />
               </div>
             </button>
           ))}
@@ -467,7 +467,7 @@ function FindProfessionalsContent() {
           {selectedFirm && (
             <>
               {/* Hero Header */}
-              <div className="relative bg-gradient-to-br from-[#2C5F5D] via-[#2C5F5D]/95 to-[#1a4746] p-8 pb-6">
+              <div className="relative bg-gradient-to-br from-[var(--portal-primary)] via-[var(--portal-primary)]/95 to-[#1a4746] p-8 pb-6">
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30" />
                 <div className="relative flex items-start gap-6">
                   {selectedFirm.logo_url ? (
@@ -516,8 +516,8 @@ function FindProfessionalsContent() {
                 {selectedFirm.description && (
                   <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-2xl p-6">
                     <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center">
-                        <FileText className="h-4 w-4 text-[#2C5F5D]" />
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-[var(--portal-primary)]" />
                       </div>
                       About Our Firm
                     </h3>
@@ -540,7 +540,7 @@ function FindProfessionalsContent() {
                           key={area}
                           className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200"
                         >
-                          <div className="w-1.5 h-1.5 rounded-full bg-[#2C5F5D]" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-[var(--portal-primary)]" />
                           <span className="text-sm font-medium text-slate-900">{area}</span>
                         </div>
                       ))}
@@ -562,12 +562,12 @@ function FindProfessionalsContent() {
                         href={`tel:${selectedFirm.phone}`}
                         className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors group"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-[#2C5F5D] transition-colors">
-                          <Phone className="h-4 w-4 text-slate-600 group-hover:text-[#2C5F5D]" />
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-[var(--portal-primary)] transition-colors">
+                          <Phone className="h-4 w-4 text-slate-600 group-hover:text-[var(--portal-primary)]" />
                         </div>
                         <div className="flex-1">
                           <div className="text-xs text-slate-600 font-medium mb-0.5">Phone</div>
-                          <div className="text-sm font-bold text-[#2C5F5D]">{selectedFirm.phone}</div>
+                          <div className="text-sm font-bold text-[var(--portal-primary)]">{selectedFirm.phone}</div>
                         </div>
                       </a>
                     )}
@@ -576,12 +576,12 @@ function FindProfessionalsContent() {
                         href={`mailto:${selectedFirm.email}`}
                         className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors group"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-[#2C5F5D] transition-colors">
-                          <Mail className="h-4 w-4 text-slate-600 group-hover:text-[#2C5F5D]" />
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-[var(--portal-primary)] transition-colors">
+                          <Mail className="h-4 w-4 text-slate-600 group-hover:text-[var(--portal-primary)]" />
                         </div>
                         <div className="flex-1">
                           <div className="text-xs text-slate-600 font-medium mb-0.5">Email</div>
-                          <div className="text-sm font-bold text-[#2C5F5D] truncate">{selectedFirm.email}</div>
+                          <div className="text-sm font-bold text-[var(--portal-primary)] truncate">{selectedFirm.email}</div>
                         </div>
                       </a>
                     )}
@@ -592,12 +592,12 @@ function FindProfessionalsContent() {
                         rel="noopener noreferrer"
                         className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors group"
                       >
-                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-[#2C5F5D] transition-colors">
-                          <Globe className="h-4 w-4 text-slate-600 group-hover:text-[#2C5F5D]" />
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-[var(--portal-primary)] transition-colors">
+                          <Globe className="h-4 w-4 text-slate-600 group-hover:text-[var(--portal-primary)]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="text-xs text-slate-600 font-medium mb-0.5">Website</div>
-                          <div className="text-sm font-bold text-[#2C5F5D] truncate">
+                          <div className="text-sm font-bold text-[var(--portal-primary)] truncate">
                             {selectedFirm.website.replace(/^https?:\/\//, '')}
                           </div>
                         </div>
@@ -646,13 +646,13 @@ function FindProfessionalsContent() {
                           )}
                           className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
                             selectedProfessionalId === prof.id
-                              ? 'border-[#2C5F5D] bg-[#2C5F5D]/5 shadow-md'
+                              ? 'border-[var(--portal-primary)] bg-[var(--portal-primary)]/5 shadow-md'
                               : 'border-slate-200 hover:border-slate-300 hover:shadow-sm'
                           }`}
                         >
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 ${
                             selectedProfessionalId === prof.id
-                              ? 'bg-[#2C5F5D] text-white'
+                              ? 'bg-[var(--portal-primary)] text-white'
                               : 'bg-slate-100 text-slate-600'
                           }`}>
                             {prof.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
@@ -672,7 +672,7 @@ function FindProfessionalsContent() {
                             </div>
                           </div>
                           {selectedProfessionalId === prof.id && (
-                            <CheckCircle className="h-5 w-5 text-[#2C5F5D] flex-shrink-0" />
+                            <CheckCircle className="h-5 w-5 text-[var(--portal-primary)] flex-shrink-0" />
                           )}
                         </button>
                       ))}
@@ -692,11 +692,11 @@ function FindProfessionalsContent() {
                         <button
                           key={file.id}
                           onClick={() => handleFamilyFileChange(file.id)}
-                          className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 hover:border-[#2C5F5D] hover:bg-slate-50 transition-all text-left"
+                          className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)] hover:bg-slate-50 transition-all text-left"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center">
-                              <FileText className="h-5 w-5 text-[#2C5F5D]" />
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center">
+                              <FileText className="h-5 w-5 text-[var(--portal-primary)]" />
                             </div>
                             <div>
                               <div className="font-bold text-slate-900">{file.title || 'Family File'}</div>
@@ -733,7 +733,7 @@ function FindProfessionalsContent() {
                 {!familyFileId && isLoadingFamilyFiles && (
                   <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl p-6">
                     <div className="flex items-center gap-3">
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-slate-300 border-t-[#2C5F5D]" />
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-slate-300 border-t-[var(--portal-primary)]" />
                       <span className="text-sm text-slate-600 font-medium">Loading your family files...</span>
                     </div>
                   </div>
