@@ -3,7 +3,7 @@
 ## Summary
 
 ✅ **Backend**: DEPLOYED & LIVE
-⏳ **Frontend**: DEPLOYING (fixing TypeScript error)
+✅ **Frontend**: DEPLOYING (TypeScript errors fixed)
 
 ---
 
@@ -64,13 +64,13 @@ All required environment variables are configured:
 
 ### Service: common-ground-blue
 - **URL**: https://common-ground-blue.vercel.app
-- **Status**: ⏳ DEPLOYING
-- **Issue**: TypeScript error (user.profile access)
-- **Fix**: Deployed (commit 3d89cad5)
+- **Status**: ✅ DEPLOYING
+- **Last Fix**: UserProfile property access (commit 7e35eeef)
+- **Build Verified**: ✅ TypeScript compilation passed, Next.js build successful
 
-### Build Error (Fixed)
+### Build Errors (Fixed)
 
-**Original Error**:
+**Error #1 - user.profile access**:
 ```
 ./app/messages/call/page.tsx:153:23
 Type error: Property 'profile' does not exist on type 'User'.
@@ -88,8 +88,31 @@ userName: profile?.display_name || user?.email || 'Parent',
 ```
 
 **Fix Commit**: 3d89cad5
-**Deployed**: Jan 23, 2026 @ 13:55:47 UTC
-**Status**: ⏳ Build in progress
+**Status**: ✅ Fixed
+
+---
+
+**Error #2 - display_name property**:
+```
+./app/messages/call/page.tsx:153:26
+Type error: Property 'display_name' does not exist on type 'UserProfile'.
+userName: profile?.display_name || user?.email || 'Parent',
+```
+
+**Root Cause**: UserProfile interface doesn't have `display_name`, it has `preferred_name`, `first_name`, `last_name`
+
+**Fix Applied**:
+```tsx
+// Before
+userName: profile?.display_name || user?.email || 'Parent',
+
+// After
+userName: profile?.preferred_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || user?.email || 'Parent',
+```
+
+**Fix Commit**: 7e35eeef
+**Deployed**: Jan 23, 2026 @ 14:10 UTC
+**Status**: ✅ Fixed - Build passes locally
 
 ### New Frontend Files
 
@@ -109,13 +132,14 @@ userName: profile?.display_name || user?.email || 'Parent',
 - [x] Migration applied (backend started successfully)
 - [x] No errors in deployment logs
 
-### Frontend (Pending Build)
+### Frontend ✅
 
-- [ ] TypeScript compilation passes
-- [ ] Call interface renders
-- [ ] Call buttons appear in messages page
-- [ ] Attachment upload works
-- [ ] Video/audio calls can be initiated
+- [x] TypeScript compilation passes (npx tsc --noEmit)
+- [x] Next.js build succeeds (all 102 pages generated)
+- [ ] Call interface renders (pending Vercel deploy)
+- [ ] Call buttons appear in messages page (pending Vercel deploy)
+- [ ] Attachment upload works (pending Vercel deploy)
+- [ ] Video/audio calls can be initiated (pending Vercel deploy)
 
 ---
 
@@ -190,8 +214,11 @@ render deploys rollback srv-d5e4bd3uibrs73c7sd80
 
 ### Immediate (Today)
 
-- [x] Fix frontend TypeScript error
-- [x] Push fix to main
+- [x] Fix frontend TypeScript error #1 (user.profile)
+- [x] Fix frontend TypeScript error #2 (display_name)
+- [x] Verify TypeScript compilation passes locally
+- [x] Verify Next.js build succeeds locally
+- [x] Push fixes to main (commits 3d89cad5, 7e35eeef)
 - [ ] Wait for Vercel build to complete
 - [ ] Verify frontend deploys successfully
 - [ ] Manual smoke tests
@@ -266,9 +293,11 @@ Please test and report any issues!
 
 ## Status Updates
 
-**Last Updated**: Jan 23, 2026 @ 13:55 UTC
+**Last Updated**: Jan 23, 2026 @ 14:10 UTC
 
 - ✅ Backend deployed and verified
-- ⏳ Frontend fixing TypeScript error
+- ✅ Frontend TypeScript errors fixed (2 errors resolved)
+- ✅ Local build verification passed
+- ✅ Code pushed to main (commit 7e35eeef)
 - ⏳ Awaiting Vercel build completion
 - ⏳ Pending manual smoke tests
