@@ -57,7 +57,6 @@ const settingsNavItems: SettingsNavItem[] = [
 function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const isSettingsHome = pathname === '/settings';
   const isSubpage = pathname !== '/settings';
 
   return (
@@ -65,27 +64,18 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
       <Navigation />
 
       <PageContainer className="pb-32">
-        {/* Back Navigation - Desktop always shows "Back to Dashboard", Mobile shows context-aware */}
+        {/* Back Navigation - Always uses browser back */}
         <button
-          onClick={() => {
-            if (isSubpage) {
-              // On mobile subpages, go back to settings hub
-              router.push('/settings');
-            } else {
-              // On settings home, go to dashboard
-              router.push('/dashboard');
-            }
-          }}
+          onClick={() => router.back()}
           className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors mb-6"
         >
           <ChevronLeft className="h-4 w-4" />
-          <span className="lg:hidden">{isSubpage ? 'Back to Settings' : 'Back to Dashboard'}</span>
-          <span className="hidden lg:inline">Back to Dashboard</span>
+          Back
         </button>
 
-        {/* Settings Header - Only show on settings home on mobile */}
-        {(isSettingsHome || !isSubpage) && (
-          <div className="mb-8 lg:block" style={{ display: isSubpage ? 'none' : 'block' }}>
+        {/* Settings Header - Only show on settings home */}
+        {!isSubpage && (
+          <div className="mb-8">
             <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
               Settings
             </h1>
