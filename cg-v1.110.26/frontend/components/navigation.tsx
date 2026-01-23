@@ -69,7 +69,7 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
       className={`flex items-center gap-2 cursor-pointer ${className}`}
       onClick={onClick}
     >
-      <div className="w-9 h-9 bg-[#2C5F5D] rounded-xl flex items-center justify-center">
+      <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center">
         <svg
           width="20"
           height="20"
@@ -79,21 +79,21 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
         >
           <path
             d="M12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20"
-            stroke="white"
+            stroke="#2C5F5D"
             strokeWidth="2"
             strokeLinecap="round"
           />
           <path
             d="M12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20"
-            stroke="white"
+            stroke="#2C5F5D"
             strokeWidth="2"
             strokeLinecap="round"
             strokeDasharray="4 4"
           />
-          <circle cx="12" cy="12" r="2.5" fill="white" />
+          <circle cx="12" cy="12" r="2.5" fill="#2C5F5D" />
         </svg>
       </div>
-      <span className="text-lg font-semibold text-foreground hidden sm:inline" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+      <span className="text-lg font-semibold text-white hidden sm:inline" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
         CommonGround
       </span>
     </div>
@@ -139,7 +139,7 @@ export function Navigation() {
   return (
     <>
       {/* Top Navigation Bar */}
-      <header className="cg-glass border-b border-border/50 sticky top-0 z-50">
+      <header className="bg-[#2C5F5D] border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -154,7 +154,11 @@ export function Navigation() {
                   <Link
                     key={item.path}
                     href={item.path}
-                    className={`nav-item ${isActive ? 'active' : ''}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : 'text-white/80 hover:text-white hover:bg-white/10'
+                    }`}
                   >
                     {item.name}
                   </Link>
@@ -169,13 +173,13 @@ export function Navigation() {
                   {/* Notifications - Only for signed in users */}
                   <button
                     onClick={() => router.push('/activities')}
-                    className="relative p-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-smooth"
+                    className="relative p-2 rounded-xl hover:bg-white/10 transition-smooth"
                     aria-label={unreadCount > 0 ? `${unreadCount} unread notifications` : 'Notifications'}
                   >
-                    <Bell className="h-5 w-5 text-muted-foreground" />
+                    <Bell className="h-5 w-5 text-white" />
                     {/* Notification badge - only show when there are unread */}
                     {unreadCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-cg-error text-white text-xs font-medium rounded-full flex items-center justify-center px-1">
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center px-1">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
@@ -185,13 +189,13 @@ export function Navigation() {
                   <div className="relative" ref={userMenuRef}>
                     <button
                       onClick={() => setUserMenuOpen(!userMenuOpen)}
-                      className="flex items-center gap-2 p-1.5 pr-3 rounded-full hover:bg-[#2C5F5D]/10 transition-smooth"
+                      className="flex items-center gap-2 p-1.5 pr-3 rounded-full hover:bg-white/10 transition-smooth"
                     >
-                      <div className="w-8 h-8 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center">
-                        <span className="text-sm font-medium text-[#2C5F5D]">{initials}</span>
+                      <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                        <span className="text-sm font-medium text-white">{initials}</span>
                       </div>
                       <ChevronDown
-                        className={`h-4 w-4 text-muted-foreground transition-transform hidden sm:block ${
+                        className={`h-4 w-4 text-white transition-transform hidden sm:block ${
                           userMenuOpen ? 'rotate-180' : ''
                         }`}
                       />
@@ -268,13 +272,13 @@ export function Navigation() {
                 <div className="hidden lg:flex items-center gap-3">
                   <Link
                     href="/login"
-                    className="text-muted-foreground hover:text-foreground font-medium px-4 py-2 text-sm transition-colors"
+                    className="text-white/80 hover:text-white font-medium px-4 py-2 text-sm transition-colors"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/register"
-                    className="bg-[#2C5F5D] text-white font-medium px-5 py-2 rounded-full text-sm transition-all duration-200 hover:bg-[#2C5F5D]/90 hover:shadow-lg"
+                    className="bg-white text-[#2C5F5D] font-medium px-5 py-2 rounded-full text-sm transition-all duration-200 hover:bg-white/90 hover:shadow-lg"
                   >
                     Get Started Free
                   </Link>
@@ -283,14 +287,14 @@ export function Navigation() {
 
               {/* Mobile Menu Toggle */}
               <button
-                className="lg:hidden p-2 rounded-xl hover:bg-[#2C5F5D]/10 transition-smooth"
+                className="lg:hidden p-2 rounded-xl hover:bg-white/10 transition-smooth"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle navigation menu"
               >
                 {mobileMenuOpen ? (
-                  <X className="h-5 w-5 text-foreground" />
+                  <X className="h-5 w-5 text-white" />
                 ) : (
-                  <Menu className="h-5 w-5 text-foreground" />
+                  <Menu className="h-5 w-5 text-white" />
                 )}
               </button>
             </div>
@@ -298,7 +302,7 @@ export function Navigation() {
 
           {/* Mobile Slide-down Menu */}
           {mobileMenuOpen && (
-            <nav className="lg:hidden pb-4 pt-2 border-t border-border animate-in slide-in-from-top-2 duration-200">
+            <nav className="lg:hidden pb-4 pt-2 border-t border-white/10 animate-in slide-in-from-top-2 duration-200">
               {/* Marketing Links */}
               <div className="space-y-1">
                 {marketingLinks.map((item) => {
@@ -309,7 +313,11 @@ export function Navigation() {
                       key={item.path}
                       href={item.path}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`w-full nav-item flex items-center gap-3 ${isActive ? 'active' : ''}`}
+                      className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        isActive
+                          ? 'bg-white/20 text-white'
+                          : 'text-white/80 hover:text-white hover:bg-white/10'
+                      }`}
                     >
                       {Icon && <Icon className="h-5 w-5" />}
                       {item.name}
@@ -320,8 +328,8 @@ export function Navigation() {
 
               {/* User-specific links */}
               {user && (
-                <div className="mt-4 pt-4 border-t border-border space-y-1">
-                  <p className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">My Account</p>
+                <div className="mt-4 pt-4 border-t border-white/10 space-y-1">
+                  <p className="px-4 py-2 text-xs font-semibold text-white/60 uppercase tracking-wider">My Account</p>
                   <button
                     onClick={() => handleNavigation('/dashboard')}
                     className={`w-full nav-item ${
@@ -376,39 +384,39 @@ export function Navigation() {
 
               {/* User info on mobile */}
               {user ? (
-                <div className="mt-4 pt-4 border-t border-border">
+                <div className="mt-4 pt-4 border-t border-white/10">
                   <div className="flex items-center gap-3 px-4">
-                    <div className="w-10 h-10 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center">
-                      <span className="text-sm font-medium text-[#2C5F5D]">{initials}</span>
+                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                      <span className="text-sm font-medium text-white">{initials}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground truncate">
+                      <p className="font-medium text-white truncate">
                         {user?.first_name} {user?.last_name}
                       </p>
-                      <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                      <p className="text-sm text-white/80 truncate">{user?.email}</p>
                     </div>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 text-sm text-cg-error bg-cg-error-subtle rounded-xl transition-smooth hover:bg-cg-error/10"
+                    className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 text-sm text-white bg-white/10 rounded-xl transition-smooth hover:bg-white/20"
                   >
                     <LogOut className="h-4 w-4" />
                     Sign out
                   </button>
                 </div>
               ) : (
-                <div className="mt-4 pt-4 border-t border-border space-y-3">
+                <div className="mt-4 pt-4 border-t border-white/10 space-y-3">
                   <Link
                     href="/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-center text-foreground font-medium py-2.5 rounded-xl border border-border hover:bg-muted transition-colors"
+                    className="block w-full text-center text-white font-medium py-2.5 rounded-xl border border-white/20 hover:bg-white/10 transition-colors"
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/register"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block w-full text-center bg-[#2C5F5D] text-white font-medium py-2.5 rounded-xl hover:bg-[#2C5F5D]/90 transition-colors"
+                    className="block w-full text-center bg-white text-[#2C5F5D] font-medium py-2.5 rounded-xl hover:bg-white/90 transition-colors"
                   >
                     Get Started Free
                   </Link>

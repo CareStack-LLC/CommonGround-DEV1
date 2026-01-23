@@ -771,8 +771,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--card);
-  border-top: 1px solid var(--border);
+  background-color: #2C5F5D;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -787,13 +787,13 @@
   gap: 0.25rem;
   padding: 0.5rem 0.75rem;
   border-radius: 0.75rem;
-  color: var(--muted-foreground);
+  color: rgba(255, 255, 255, 0.7);
   transition: all 0.2s;
 }
 
 .bottom-nav-item.active {
-  color: var(--cg-sage);
-  background-color: var(--cg-sage-subtle);
+  color: white;
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 /* Calendar day cells */
