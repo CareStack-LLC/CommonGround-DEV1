@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidBookCard } from '@/components/kidcoms/kid-book-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
+import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
 import { theaterContent } from '@/lib/theater-content';
 
 interface ChildUserData {
@@ -82,6 +83,7 @@ export default function LibraryPage() {
         {/* Header */}
         <header className="bg-white/90 backdrop-blur-sm border-b-2 border-purple-100">
           <div className="max-w-5xl mx-auto px-6 py-6">
+            <KidComsLogo size="sm" className="mb-3" />
             <h1 className="text-2xl font-black text-gray-800">READ WITH ME LIBRARY</h1>
             <p className="text-gray-600 mt-1">Read amazing stories!</p>
           </div>
@@ -109,6 +111,7 @@ export default function LibraryPage() {
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-sm border-b-2 border-purple-100">
         <div className="max-w-5xl mx-auto px-6 py-6">
+          <KidComsLogo size="sm" className="mb-3" />
           <h1 className="text-2xl font-black text-gray-800">READ WITH ME LIBRARY</h1>
           <p className="text-gray-600 mt-1">Read amazing stories!</p>
         </div>

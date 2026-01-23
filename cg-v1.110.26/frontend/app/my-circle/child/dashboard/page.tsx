@@ -6,6 +6,7 @@ import { Users, BookOpen, Gamepad2, Film, MessageCircle } from 'lucide-react';
 import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidDashboardCard } from '@/components/kidcoms/kid-dashboard-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
+import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
 import { theaterContent } from '@/lib/theater-content';
 
 interface ChildUserData {
@@ -98,6 +99,9 @@ export default function ChildDashboardPage() {
       {/* Header with Greeting */}
       <header className="relative bg-white/90 backdrop-blur-sm border-b-2 border-purple-100">
         <div className="max-w-4xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between mb-3">
+            <KidComsLogo size="md" />
+          </div>
           <h1 className="text-3xl md:text-4xl font-black text-gray-800 tracking-tight">
             HEY {userData?.childName?.toUpperCase() || 'FRIEND'}!
           </h1>
