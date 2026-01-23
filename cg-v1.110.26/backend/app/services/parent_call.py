@@ -20,7 +20,7 @@ from app.models.parent_call import (
     CallStatus,
 )
 from app.models.family_file import FamilyFile
-from app.services.daily_video import DailyVideoService
+from app.services.daily_video import daily_service
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,8 @@ class ParentCallService:
     """Service for managing parent-to-parent video/audio calls."""
 
     def __init__(self):
-        self.daily_service = DailyVideoService()
+        # Use global daily_service singleton (same as KidComs)
+        self.daily_service = daily_service
 
     async def get_or_create_permanent_room(
         self,
