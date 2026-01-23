@@ -6,16 +6,6 @@ import { familyFilesAPI, FirmDirectoryEntry, FirmPublicProfile, ProfessionalAcce
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
-import {
-  CGCard,
-  CGCardHeader,
-  CGCardTitle,
-  CGCardDescription,
-  CGCardContent,
-  CGButton,
-  CGBadge,
-  CGEmptyState,
-} from '@/components/cg';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -305,26 +295,28 @@ function FindProfessionalsContent() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start gap-4">
-        <CGButton variant="ghost" size="sm" onClick={() => router.back()}>
-          <ArrowLeft className="h-5 w-5" />
-        </CGButton>
+        <button
+          onClick={() => router.back()}
+          className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors mt-1"
+        >
+          <ArrowLeft className="h-5 w-5 text-slate-600" />
+        </button>
         <div>
-          <h1 className="text-2xl font-semibold text-foreground flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
-              <Building2 className="h-5 w-5 text-cg-sage" />
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center shadow-md">
+              <Building2 className="h-5 w-5 text-emerald-600" />
             </div>
             Find Professionals
           </h1>
-          <p className="text-muted-foreground mt-1 ml-14">
+          <p className="text-slate-600 font-medium mt-1 ml-14">
             Search for attorneys, mediators, and legal professionals
           </p>
         </div>
       </div>
 
       {/* Search Filters */}
-      <CGCard variant="elevated">
-        <CGCardContent className="py-4">
-          <form onSubmit={handleSearch} className="space-y-4">
+      <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+        <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-4">
               <div className="sm:col-span-2">
                 <Label htmlFor="search" className="sr-only">Search</Label>
@@ -368,35 +360,33 @@ function FindProfessionalsContent() {
             </div>
 
             <div className="flex justify-end">
-              <CGButton type="submit" variant="primary">
-                <Search className="h-4 w-4 mr-2" />
+              <button type="submit" className="cg-btn-primary flex items-center gap-2 shadow-md hover:shadow-lg">
+                <Search className="h-4 w-4" />
                 Search
-              </CGButton>
+              </button>
             </div>
           </form>
-        </CGCardContent>
-      </CGCard>
+        </div>
+      </div>
 
       {/* Results */}
       {error ? (
-        <CGCard variant="default" className="border-cg-error/30 bg-cg-error-subtle">
-          <CGCardContent className="py-6">
-            <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-cg-error" />
-              <p className="text-cg-error font-medium">{error}</p>
+        <div className="bg-white border-2 border-red-200 rounded-2xl shadow-lg p-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/10 to-red-600/5 flex items-center justify-center shadow-md">
+              <AlertCircle className="h-5 w-5 text-red-500" />
             </div>
-          </CGCardContent>
-        </CGCard>
+            <p className="text-red-600 font-bold">{error}</p>
+          </div>
+        </div>
       ) : firms.length === 0 ? (
-        <CGCard variant="elevated">
-          <CGCardContent className="py-12">
-            <CGEmptyState
-              icon={<Building2 className="h-8 w-8" />}
-              title="No firms found"
-              description="Try adjusting your search filters or check back later"
-            />
-          </CGCardContent>
-        </CGCard>
+        <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-12 text-center">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center shadow-md">
+            <Building2 className="h-10 w-10 text-emerald-600" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No firms found</h3>
+          <p className="text-slate-600 font-medium">Try adjusting your search filters or check back later</p>
+        </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {firms.map((firm) => (
@@ -715,39 +705,42 @@ function FindProfessionalsContent() {
               </div>
 
               <DialogFooter>
-                <CGButton variant="ghost" onClick={() => setSelectedFirm(null)}>
+                <button
+                  onClick={() => setSelectedFirm(null)}
+                  className="cg-btn-secondary shadow-md hover:shadow-lg"
+                >
                   Close
-                </CGButton>
+                </button>
                 {familyFileId && hasExistingFirm && (
-                  <CGButton
-                    variant="secondary"
+                  <button
                     onClick={() => {
                       setSelectedFirm(null);
                       router.push(`/family-files/${familyFileId}/settings`);
                     }}
+                    className="cg-btn-secondary flex items-center gap-2 shadow-md hover:shadow-lg"
                   >
-                    <Settings className="h-4 w-4 mr-2" />
+                    <Settings className="h-4 w-4" />
                     Go to Settings to Switch Firm
-                  </CGButton>
+                  </button>
                 )}
                 {familyFileId && !hasExistingFirm && (
-                  <CGButton
-                    variant="primary"
+                  <button
                     onClick={handleInviteFirm}
                     disabled={isInviting || !!inviteSuccess}
+                    className="cg-btn-primary flex items-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isInviting ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                         Sending...
                       </>
                     ) : (
                       <>
-                        <Send className="h-4 w-4 mr-2" />
+                        <Send className="h-4 w-4" />
                         {selectedProfessionalId ? 'Invite Professional' : 'Invite Firm'}
                       </>
                     )}
-                  </CGButton>
+                  </button>
                 )}
               </DialogFooter>
             </>
@@ -763,7 +756,7 @@ export default function FindProfessionalsPage() {
     <ProtectedRoute>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
         <Navigation />
-        <PageContainer>
+        <PageContainer background="transparent">
           <FindProfessionalsContent />
         </PageContainer>
       </div>
