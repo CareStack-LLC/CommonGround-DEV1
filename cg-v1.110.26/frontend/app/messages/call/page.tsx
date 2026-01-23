@@ -76,8 +76,8 @@ function ParentCallContent() {
         setIsInitiating(true);
 
         // Create call session
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-        const response = await fetch(`${apiUrl}/parent-calls/`, {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${apiUrl}/api/v1/parent-calls/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -252,8 +252,8 @@ function ParentCallContent() {
 
     if (session) {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-        await fetch(`${apiUrl}/parent-calls/${session.session_id}/end`, {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        await fetch(`${apiUrl}/api/v1/parent-calls/${session.session_id}/end`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
