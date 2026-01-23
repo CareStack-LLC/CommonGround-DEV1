@@ -695,11 +695,12 @@ function MessagesContent() {
 
   const getOtherParentName = () => {
     if (!selectedFamilyFile || !user) return 'Co-Parent';
-    const familyFileDetail = selectedFamilyFile as FamilyFileDetail;
-    if (familyFileDetail.parent_a_id === user.id) {
-      return familyFileDetail.parent_b_display_name || 'Co-Parent';
+    if (selectedFamilyFile.parent_a_id === user.id) {
+      const info = selectedFamilyFile.parent_b_info;
+      return info?.first_name ? `${info.first_name} ${info.last_name || ''}`.trim() : 'Co-Parent';
     } else {
-      return familyFileDetail.parent_a_display_name || 'Co-Parent';
+      const info = selectedFamilyFile.parent_a_info;
+      return info?.first_name ? `${info.first_name} ${info.last_name || ''}`.trim() : 'Co-Parent';
     }
   };
 
