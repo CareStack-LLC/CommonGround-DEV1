@@ -150,7 +150,7 @@ function ParentCallContent() {
     daily.join({
       url: sessionData.room_url,
       token: sessionData.token,
-      userName: profile?.display_name || user?.email || 'Parent',
+      userName: profile?.preferred_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || user?.email || 'Parent',
     });
 
     // Event listeners
