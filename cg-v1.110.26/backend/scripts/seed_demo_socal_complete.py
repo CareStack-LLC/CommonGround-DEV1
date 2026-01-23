@@ -5,7 +5,7 @@ Creates comprehensive realistic demo data with:
 - 16 user accounts (Supabase Auth)
 - 8 family files
 - 15 children
-- Complete agreements (all 18 sections)
+- Complete agreements (all 7 sections)
 - Quick Accords
 - Schedule events
 - Custody exchanges with check-ins (triggers custody tracking)
@@ -21,11 +21,12 @@ Run with: python -m scripts.seed_demo_socal_complete
 import asyncio
 import os
 import sys
+import hashlib
+import random
 from datetime import datetime, timedelta, date
 from decimal import Decimal
 from uuid import uuid4
 from pathlib import Path
-import random
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -41,7 +42,7 @@ from app.models.child import Child
 from app.models.agreement import Agreement, AgreementSection
 from app.models.schedule import ScheduleEvent
 from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
-from app.models.obligation import Obligation
+from app.models.clearfund import Obligation
 from app.models.message import Message, MessageThread, MessageFlag
 from app.models.professional import ProfessionalProfile, Firm, FirmMembership, CaseAssignment, ProfessionalAccessRequest
 
@@ -186,6 +187,29 @@ PERSONAS = {
 
 
 # ========================================
+# PROFESSIONAL FIRMS DATA
+# ========================================
+
+FIRMS = [
+    {"name": "Harbor Family Law Group", "city": "Long Beach", "state": "CA", "zip": "90802", "phone": "(562) 555-0101", "email": "info@harborfamilylaw.com", "description": "Compassionate family law representation in Long Beach for over 20 years"},
+    {"name": "Pasadena Family Mediation Center", "city": "Pasadena", "state": "CA", "zip": "91101", "phone": "(626) 555-0202", "email": "mediate@pfmc.com", "description": "Mediation-first approach to family disputes"},
+    {"name": "Irvine Custody Solutions", "city": "Irvine", "state": "CA", "zip": "92612", "phone": "(949) 555-0303", "email": "contact@irvinecustody.com", "description": "Child-focused custody arrangements and co-parenting plans"},
+    {"name": "Compton Community Legal Aid", "city": "Compton", "state": "CA", "zip": "90220", "phone": "(310) 555-0404", "email": "help@comptonlegal.org", "description": "Affordable family law services for the Compton community"},
+    {"name": "Carson Family Advocates", "city": "Carson", "state": "CA", "zip": "90745", "phone": "(310) 555-0505", "email": "advocates@carsonfamily.com", "description": "Fierce advocates for parents and children in South Bay"},
+    {"name": "Downtown LA Family Law Partners", "city": "Los Angeles", "state": "CA", "zip": "90012", "phone": "(213) 555-0606", "email": "partners@lafamilylaw.com", "description": "Full-service family law firm in the heart of DTLA"},
+    {"name": "Redlands Family Justice Center", "city": "Redlands", "state": "CA", "zip": "92373", "phone": "(909) 555-0707", "email": "justice@redlandsfamily.org", "description": "Fair and equitable solutions for Inland Empire families"},
+    {"name": "Riverside Co-Parenting Institute", "city": "Riverside", "state": "CA", "zip": "92501", "phone": "(951) 555-0808", "email": "institute@riversidecopi.com", "description": "Specialized co-parenting coordination and education"},
+    {"name": "Culver City Collaborative Law", "city": "Culver City", "state": "CA", "zip": "90232", "phone": "(310) 555-0909", "email": "collab@culvercitylaw.com", "description": "Collaborative divorce and custody solutions"},
+    {"name": "Lakewood Family Mediation Services", "city": "Lakewood", "state": "CA", "zip": "90712", "phone": "(562) 555-1010", "email": "mediate@lakewoodfms.com", "description": "Neutral mediation services for co-parents"},
+    {"name": "South Bay Children's Law Center", "city": "Torrance", "state": "CA", "zip": "90503", "phone": "(310) 555-1111", "email": "children@southbaylaw.org", "description": "Protecting children's best interests in custody matters"},
+    {"name": "Orange County Family Solutions", "city": "Santa Ana", "state": "CA", "zip": "92701", "phone": "(714) 555-1212", "email": "solutions@ocfamily.com", "description": "Comprehensive family law services across Orange County"},
+    {"name": "San Gabriel Valley Legal Group", "city": "El Monte", "state": "CA", "zip": "91731", "phone": "(626) 555-1313", "email": "sgv@legalgroup.com", "description": "Bilingual family law representation"},
+    {"name": "Inglewood Family Advocacy", "city": "Inglewood", "state": "CA", "zip": "90301", "phone": "(310) 555-1414", "email": "advocacy@inglewoodfamily.com", "description": "Community-focused family law and mediation"},
+    {"name": "West LA Co-Parenting Counsel", "city": "Santa Monica", "state": "CA", "zip": "90401", "phone": "(310) 555-1515", "email": "counsel@westlacpc.com", "description": "High-conflict co-parenting specialists"}
+]
+
+
+# ========================================
 # MESSAGE TEMPLATES
 # ========================================
 
@@ -234,86 +258,119 @@ HIGH_CONFLICT_MESSAGES = [
 # ========================================
 
 def generate_agreement_sections(custody_split, schedule_type, child_support, conflict_level):
-    """Generate realistic agreement section content"""
+    """Generate realistic 7-section agreement content (v2_standard format)"""
 
     parent_a_pct, parent_b_pct = custody_split
 
+    # V2 Standard Format: 7 sections (simplified from legacy 18-section format)
     sections = {
         "1": {
+            "title": "Children & Legal Custody",
+            "type": "custody",
+            "content": f"This agreement pertains to the minor child(ren) of the parties. The parents shall share joint legal custody with equal decision-making authority regarding education, healthcare, and general welfare. In the event of a disagreement, the parents agree to first attempt mediation before seeking court intervention."
+        },
+        "2": {
+            "title": "Physical Custody & Parenting Time",
+            "type": "schedule",
+            "content": f"Physical custody shall be shared with Parent A having {parent_a_pct}% of the time and Parent B having {parent_b_pct}% of the time. Regular Schedule: {schedule_type.replace('_', ' ').title()}. The schedule shall be followed consistently unless both parents mutually agree to modifications."
+        },
+        "3": {
+            "title": "Holidays, Vacation & Special Days",
+            "type": "schedule",
+            "content": "Holidays shall alternate annually between parents. Even years: Parent A has Thanksgiving, Parent B has Christmas. Odd years: the schedule reverses. Mother's Day with mother, Father's Day with father. Each parent is entitled to two weeks of uninterrupted vacation time with 30 days advance notice."
+        },
+        "4": {
+            "title": "Transportation & Exchanges",
+            "type": "logistics",
+            "content": f"The parent beginning their parenting time is responsible for pickup. Exchanges shall be prompt and respectful. {'Silent handoff procedures shall be followed.' if conflict_level == 'high' else 'Brief cordial communication is encouraged during exchanges.'}"
+        },
+        "5": {
+            "title": "Communication & Decision-Making",
+            "type": "communication",
+            "content": f"Parents shall communicate regarding the children via {'the CommonGround platform exclusively' if conflict_level == 'high' else 'text, email, or CommonGround platform'}. All communication shall be respectful and child-focused. Response time: within 24 hours for routine matters, immediately for emergencies. Both parents shall have equal access to school and medical records."
+        },
+        "6": {
+            "title": "Financial Responsibilities",
+            "type": "financial",
+            "content": f"{'Child support of $' + str(child_support) + '/month shall be paid by Parent B to Parent A.' if child_support else 'Parents shall share child-related expenses proportionally to their income.'} Major expenses (medical, educational, extracurricular) require mutual consent and shall be shared equally unless otherwise agreed."
+        },
+        "7": {
+            "title": "Dispute Resolution",
+            "type": "dispute",
+            "content": "In the event of a dispute regarding this agreement, the parents agree to first attempt direct communication, then mediation through a qualified family mediator, before seeking court intervention. Both parents commit to resolving disagreements in the best interests of the children."
+        }
+    }
+
+    # Return only sections 1-7 for v2_standard format
+    return {k: v for k, v in list(sections.items())[:7]}
+
+
+# Legacy function kept for reference (18-section format)
+def generate_legacy_18_section_agreement(custody_split, schedule_type, child_support, conflict_level):
+    """Legacy 18-section comprehensive format (v1)"""
+
+    parent_a_pct, parent_b_pct = custody_split
+
+    legacy_sections = {
+        "1": {
             "title": "Children",
+            "type": "general",
             "content": f"This agreement pertains to the minor child(ren) of the parties. Both parents share equal decision-making authority regarding major life decisions including education, healthcare, and religious upbringing. Both parents agree to communicate respectfully and cooperatively for the benefit of the children."
         },
         "2": {
             "title": "Legal Custody",
+            "type": "custody",
             "content": "The parents shall share joint legal custody of the children. Major decisions regarding the children's education, healthcare, and general welfare shall be made jointly by both parents. In the event of a disagreement, the parents agree to first attempt mediation before seeking court intervention."
         },
         "3": {
             "title": "Physical Custody",
+            "type": "custody",
             "content": f"Physical custody shall be shared with Parent A having {parent_a_pct}% of the time and Parent B having {parent_b_pct}% of the time. This arrangement prioritizes the children's stability while maintaining meaningful relationships with both parents."
         },
         "4": {
             "title": "Parenting Time Schedule",
+            "type": "schedule",
             "content": f"Regular Schedule: {schedule_type.replace('_', ' ').title()}. The schedule shall be followed consistently unless both parents mutually agree to modifications. Exchanges shall occur as specified in the Transportation & Exchanges section."
         },
         "5": {
             "title": "Holidays & Special Days",
+            "type": "schedule",
             "content": "Holidays shall alternate annually between parents. Even years: Parent A has Thanksgiving, Parent B has Christmas. Odd years: the schedule reverses. Mother's Day with mother, Father's Day with father. Children's birthdays: split time or alternate years based on mutual agreement."
         },
         "6": {
             "title": "Vacation Time",
+            "type": "schedule",
             "content": "Each parent is entitled to two weeks of uninterrupted vacation time with the children per year, with 30 days advance notice to the other parent. Summer vacation shall be split to allow extended time with each parent."
         },
         "7": {
             "title": "Transportation & Exchanges",
+            "type": "logistics",
             "content": f"Exchanges shall occur at: {PERSONAS[list(PERSONAS.keys())[0]]['exchange_location']}. The parent beginning their parenting time is responsible for pickup. Exchanges shall be prompt and respectful. {'Silent handoff procedures shall be followed.' if conflict_level == 'high' else 'Brief cordial communication is encouraged during exchanges.'}"
         },
         "8": {
             "title": "Communication",
+            "type": "communication",
             "content": f"Parents shall communicate regarding the children via {'the CommonGround platform exclusively' if conflict_level == 'high' else 'text, email, or CommonGround platform'}. All communication shall be respectful and child-focused. Response time: within 24 hours for routine matters, immediately for emergencies."
         },
         "9": {
             "title": "Education",
+            "type": "education",
             "content": "Both parents shall have equal access to school records, teacher conferences, and school events. Major educational decisions (school choice, IEP modifications, tutoring) require mutual consent. Both parents shall be listed as emergency contacts."
         },
         "10": {
             "title": "Healthcare",
+            "type": "healthcare",
             "content": "Both parents shall have access to medical records and may take children to routine appointments. Non-emergency medical decisions require joint consent. In emergencies, the parent with the child shall make immediate decisions and notify the other parent ASAP."
         },
         "11": {
             "title": "Extracurricular Activities",
+            "type": "activities",
             "content": "Children may participate in one activity per season with mutual parental consent. Activities that conflict with the other parent's time require that parent's approval. Costs shall be shared as outlined in Expense Sharing section."
-        },
-        "12": {
-            "title": "Religious Upbringing",
-            "content": "Each parent may expose the children to their own religious beliefs during their parenting time. Neither parent shall disparage the other's religious beliefs or practices."
-        },
-        "13": {
-            "title": "Child Support",
-            "content": f"{'Parent B shall pay $' + str(child_support) + ' per month in child support, due on the 1st of each month.' if child_support else 'No child support is required given the equal incomes and shared custody arrangement.'}"
-        },
-        "14": {
-            "title": "Expense Sharing",
-            "content": f"Routine expenses (food, clothing, entertainment during parenting time) are the responsibility of each parent during their time. Extraordinary expenses (medical, education, extracurriculars) shall be shared {parent_a_pct}/{parent_b_pct} between parents using the CommonGround ClearFund system."
-        },
-        "15": {
-            "title": "Right of First Refusal",
-            "content": "If a parent is unable to care for the children for more than 4 consecutive hours during their scheduled time, they shall first offer that time to the other parent before arranging alternative childcare."
-        },
-        "16": {
-            "title": "Relocation",
-            "content": "Neither parent may relocate with the children more than 50 miles from their current residence without 90 days written notice and consent of the other parent or court approval. Relocation disputes shall be resolved through mediation first."
-        },
-        "17": {
-            "title": "Dispute Resolution",
-            "content": "Any disputes regarding this agreement shall first be addressed through good-faith negotiation. If unresolved, the parties agree to mediation before seeking court intervention. The CommonGround platform's ARIA system may be used for communication assistance."
-        },
-        "18": {
-            "title": "Modifications",
-            "content": "This agreement may be modified only by written consent of both parties or by court order. Minor scheduling adjustments may be made through the Quick Accord feature on CommonGround. All modifications shall prioritize the best interests of the children."
         }
+        # ... other legacy sections 12-18 omitted for brevity
     }
 
-    return sections
+    return legacy_sections
 
 
 # ========================================
@@ -453,7 +510,7 @@ async def seed_complete_demo():
     print("   ✓ 16 user accounts (Supabase Auth)")
     print("   ✓ 8 family files")
     print("   ✓ 15 children")
-    print("   ✓ 8 complete agreements (all 18 sections)")
+    print("   ✓ 8 complete agreements (all 7 sections)")
     print("   ✓ 12+ Quick Accords")
     print("   ✓ 50+ schedule events")
     print("   ✓ 40+ custody exchanges with check-ins")
@@ -479,7 +536,7 @@ async def seed_complete_demo():
         # ========================================
         # STEP 1: Create Users & Profiles
         # ========================================
-        print("👥 Step 1/9: Creating users and profiles...")
+        print("👥 Step 1/10: Creating users and profiles...")
 
         unique_users = {}
         for persona_name, persona_data in PERSONAS.items():
@@ -489,8 +546,36 @@ async def seed_complete_demo():
                     unique_users[email] = parent
 
         for email, parent_data in unique_users.items():
+            # Check if user already exists
+            result = await session.execute(select(User).where(User.email == email))
+            existing_user = result.scalar_one_or_none()
+
+            if existing_user:
+                # User exists, use existing IDs
+                user_map[email] = existing_user.id
+                result = await session.execute(select(UserProfile).where(UserProfile.user_id == existing_user.id))
+                existing_profile = result.scalar_one_or_none()
+                if existing_profile:
+                    profile_map[email] = existing_profile.id
+                print(f"   ⏭️  {parent_data['first_name']} {parent_data['last_name']} (already exists)")
+                continue
+
             # Create Supabase Auth user
-            user_id = await create_supabase_user(email, parent_data["password"])
+            supabase_id = await create_supabase_user(email, parent_data["password"])
+
+            # Create User record in database
+            user_id = str(uuid4())
+            user = User(
+                id=user_id,
+                supabase_id=supabase_id,
+                email=email,
+                first_name=parent_data["first_name"],
+                last_name=parent_data["last_name"],
+                email_verified=True,
+                is_active=True,
+                created_at=datetime.utcnow() - timedelta(days=random.randint(180, 730))
+            )
+            session.add(user)
             user_map[email] = user_id
 
             # Create user profile
@@ -499,8 +584,6 @@ async def seed_complete_demo():
                 user_id=user_id,
                 first_name=parent_data["first_name"],
                 last_name=parent_data["last_name"],
-                email=email,
-                phone=parent_data.get("phone"),
                 address_line1=parent_data.get("address"),
                 city=parent_data.get("city"),
                 state=parent_data.get("state"),
@@ -520,16 +603,28 @@ async def seed_complete_demo():
         # ========================================
         # STEP 2: Create Family Files
         # ========================================
-        print("📁 Step 2/9: Creating family files...")
+        print("📁 Step 2/10: Creating family files...")
 
+        ff_counter = 1
         for persona_name, persona_data in PERSONAS.items():
             parent_a_email = persona_data["parents"][0]["email"]
             parent_b_email = persona_data["parents"][1]["email"]
+            ff_number = f"FF-{ff_counter:03d}-2026"
+
+            # Check if family file already exists
+            result = await session.execute(select(FamilyFile).where(FamilyFile.family_file_number == ff_number))
+            existing_ff = result.scalar_one_or_none()
+
+            if existing_ff:
+                family_file_map[persona_name] = existing_ff.id
+                print(f"   ⏭️  {existing_ff.title} (already exists)")
+                ff_counter += 1
+                continue
 
             family_file = FamilyFile(
                 id=str(uuid4()),
                 title=f"{persona_data['parents'][0]['last_name']} Family",
-                family_file_number=f"FF-{persona_name.upper().replace('_', '-')}-2026",
+                family_file_number=ff_number,
                 parent_a_id=user_map[parent_a_email],
                 parent_b_id=user_map[parent_b_email],
                 parent_b_joined_at=datetime.utcnow() - timedelta(days=random.randint(60, 180)),
@@ -541,6 +636,7 @@ async def seed_complete_demo():
             session.add(family_file)
             family_file_map[persona_name] = family_file.id
             print(f"   ✅ {family_file.title}")
+            ff_counter += 1
 
         await session.commit()
         print(f"   ✓ Created {len(family_file_map)} family files\n")
@@ -548,7 +644,7 @@ async def seed_complete_demo():
         # ========================================
         # STEP 3: Create Children
         # ========================================
-        print("👶 Step 3/9: Creating children...")
+        print("👶 Step 3/10: Creating children...")
 
         child_count = 0
         for persona_name, persona_data in PERSONAS.items():
@@ -563,7 +659,7 @@ async def seed_complete_demo():
                     last_name=child_data["last_name"],
                     date_of_birth=datetime.strptime(child_data["dob"], "%Y-%m-%d").date(),
                     gender=child_data["gender"],
-                    special_needs_note=child_data.get("special_needs"),
+                    special_needs_notes=child_data.get("special_needs"),
                     created_at=datetime.utcnow() - timedelta(days=random.randint(90, 365))
                 )
                 session.add(child)
@@ -577,7 +673,7 @@ async def seed_complete_demo():
         # ========================================
         # STEP 4: Create Agreements
         # ========================================
-        print("📜 Step 4/9: Creating agreements (18 sections each)...")
+        print("📜 Step 4/10: Creating agreements (7 sections each)...")
 
         for persona_name, persona_data in PERSONAS.items():
             family_file_id = family_file_map[persona_name]
@@ -588,8 +684,8 @@ async def seed_complete_demo():
                 title="Shared Care Agreement",
                 agreement_type="shared_care",
                 status="active",
-                parent_a_approved_at=datetime.utcnow() - timedelta(days=random.randint(60, 150)),
-                parent_b_approved_at=datetime.utcnow() - timedelta(days=random.randint(59, 149)),
+                petitioner_approved_at=datetime.utcnow() - timedelta(days=random.randint(60, 150)),
+                respondent_approved_at=datetime.utcnow() - timedelta(days=random.randint(59, 149)),
                 created_at=datetime.utcnow() - timedelta(days=random.randint(180, 365))
             )
             session.add(agreement)
@@ -607,16 +703,16 @@ async def seed_complete_demo():
                     id=str(uuid4()),
                     agreement_id=agreement.id,
                     section_number=section_num,
-                    title=section_data["title"],
+                    section_title=section_data["title"],
+                    section_type=section_data.get("type", "general"),
                     content=section_data["content"],
-                    completed=True,
-                    approved_by_parent_a=True,
-                    approved_by_parent_b=True,
+                    is_completed=True,
+                    display_order=int(section_num) if section_num.isdigit() else 0,
                     created_at=agreement.created_at
                 )
                 session.add(section)
 
-            print(f"   ✅ {persona_data['parents'][0]['last_name']} agreement (18 sections)")
+            print(f"   ✅ {persona_data['parents'][0]['last_name']} agreement (7 sections)")
 
         await session.commit()
         print(f"   ✓ Created {len(family_file_map)} complete agreements\n")
@@ -624,7 +720,7 @@ async def seed_complete_demo():
         # ========================================
         # STEP 5: Create Custody Exchanges
         # ========================================
-        print("🔄 Step 5/9: Creating custody exchanges with check-ins...")
+        print("🔄 Step 5/10: Creating custody exchanges with check-ins...")
 
         exchange_count = 0
         for persona_name, persona_data in PERSONAS.items():
@@ -633,15 +729,24 @@ async def seed_complete_demo():
             parent_b_id = user_map[persona_data["parents"][1]["email"]]
 
             # Create base custody exchange
+            parent_a_id = user_map[parent_a_email]
+            parent_b_id = user_map[parent_b_email]
+
             exchange = CustodyExchange(
                 id=str(uuid4()),
                 family_file_id=family_file_id,
-                exchange_type="regular",
-                location_type="neutral" if persona_data["conflict_level"] == "high" else "parent_home",
-                location_address=persona_data["exchange_location"],
-                is_silent_handoff=(persona_data["conflict_level"] == "high"),
+                created_by=parent_a_id,
+                from_parent_id=parent_b_id,
+                to_parent_id=parent_a_id,
+                exchange_type="pickup",
+                title=f"Weekend Exchange - {persona_data['parents'][0]['last_name']} Family",
+                location=persona_data["exchange_location"],
+                location_notes="Neutral if high conflict" if persona_data["conflict_level"] == "high" else "Parent home",
+                silent_handoff_enabled=(persona_data["conflict_level"] == "high"),
+                scheduled_time=datetime.utcnow() + timedelta(days=7, hours=18),
                 is_recurring=True,
                 recurrence_pattern="weekly",
+                child_ids=[c for c in child_map.get(persona_name, [])],
                 created_at=datetime.utcnow() - timedelta(days=120)
             )
             session.add(exchange)
@@ -654,24 +759,25 @@ async def seed_complete_demo():
 
                 exchange_datetime = datetime.utcnow() + timedelta(days=week_offset*7, hours=18)
 
-                status = "completed" if week_offset < 0 else "pending"
+                status = "completed" if week_offset < 0 else "scheduled"
 
                 instance = CustodyExchangeInstance(
                     id=str(uuid4()),
-                    custody_exchange_id=exchange.id,
-                    scheduled_datetime=exchange_datetime,
-                    status=status,
-                    parent_dropping_off=parent_a_id if week_offset % 2 == 0 else parent_b_id,
-                    parent_picking_up=parent_b_id if week_offset % 2 == 0 else parent_a_id,
-                    created_at=datetime.utcnow() - timedelta(days=max(0, -week_offset*7))
+                    exchange_id=exchange.id,
+                    scheduled_time=exchange_datetime,
+                    status=status
                 )
 
                 # Add check-in data for completed exchanges
                 if status == "completed":
                     variance = random.randint(-10, 15)  # Minutes early/late
-                    instance.actual_datetime = exchange_datetime + timedelta(minutes=variance)
-                    instance.checked_in_by = instance.parent_picking_up
-                    instance.checked_in_at = instance.actual_datetime
+                    completed_time = exchange_datetime + timedelta(minutes=variance)
+                    instance.completed_at = completed_time
+                    instance.from_parent_checked_in = True
+                    instance.from_parent_check_in_time = completed_time - timedelta(minutes=random.randint(2, 10))
+                    instance.to_parent_checked_in = True
+                    instance.to_parent_check_in_time = completed_time - timedelta(minutes=random.randint(1, 5))
+                    instance.handoff_outcome = "completed"
                     instance.location_verified = True
 
                     # Occasionally mark as late
@@ -690,7 +796,7 @@ async def seed_complete_demo():
         # ========================================
         # STEP 6: Create Messages with ARIA Scores
         # ========================================
-        print("💬 Step 6/9: Creating messages with ARIA scores...")
+        print("💬 Step 6/10: Creating messages with ARIA scores...")
 
         message_count = 0
         flag_count = 0
@@ -708,17 +814,23 @@ async def seed_complete_demo():
                 recipient_id = parent_b_id if sender_id == parent_a_id else parent_a_id
 
                 message_text, toxicity_score = random.choice(messages_pool)
+                message_id = str(uuid4())
+                sent_time = datetime.utcnow() - timedelta(days=random.randint(1, 90))
+
+                # Calculate content hash
+                content_hash = hashlib.sha256(message_text.encode()).hexdigest()
 
                 message = Message(
-                    id=str(uuid4()),
+                    id=message_id,
                     family_file_id=family_file_id,
                     sender_id=sender_id,
                     recipient_id=recipient_id,
                     content=message_text,
-                    aria_sentiment_score=toxicity_score,
-                    sent_at=datetime.utcnow() - timedelta(days=random.randint(1, 90)),
-                    read_at=datetime.utcnow() - timedelta(days=random.randint(0, 89)) if random.random() > 0.2 else None,
-                    status="delivered"
+                    content_hash=content_hash,
+                    sent_at=sent_time,
+                    delivered_at=sent_time + timedelta(seconds=random.randint(1, 10)),
+                    read_at=sent_time + timedelta(days=random.randint(0, 2)) if random.random() > 0.2 else None,
+                    was_flagged=(toxicity_score > 0.65)
                 )
                 session.add(message)
                 message_count += 1
@@ -728,14 +840,15 @@ async def seed_complete_demo():
                     flag = MessageFlag(
                         id=str(uuid4()),
                         message_id=message.id,
-                        flag_type="high_toxicity",
                         toxicity_score=toxicity_score,
-                        toxicity_categories=["hostility"] if toxicity_score > 0.8 else ["passive_aggressive"],
+                        categories=["hostility", "conflict"] if toxicity_score > 0.8 else ["passive_aggressive"],
                         severity="severe" if toxicity_score > 0.8 else "high",
-                        intervention_taken=True,
-                        intervention_type="warning" if toxicity_score < 0.8 else "rewrite_suggested",
-                        flagged_at=message.sent_at,
-                        created_at=message.sent_at
+                        original_content_hash=content_hash,
+                        final_content_hash=content_hash,
+                        user_action="modified" if random.random() > 0.5 else "rejected",
+                        intervention_level=4 if toxicity_score > 0.8 else 3,
+                        intervention_message=f"ARIA detected {'severe' if toxicity_score > 0.8 else 'high'} conflict in this message.",
+                        created_at=sent_time
                     )
                     session.add(flag)
                     flag_count += 1
@@ -748,7 +861,7 @@ async def seed_complete_demo():
         # ========================================
         # STEP 7: Create ClearFund Obligations
         # ========================================
-        print("💰 Step 7/9: Creating ClearFund obligations...")
+        print("💰 Step 7/10: Creating ClearFund obligations...")
 
         obligation_count = 0
         for persona_name, persona_data in PERSONAS.items():
@@ -760,18 +873,25 @@ async def seed_complete_demo():
             if persona_data.get("child_support"):
                 for month_offset in range(-2, 2):  # Past 2 months + next 2 months
                     due_date = (datetime.utcnow() + timedelta(days=month_offset*30)).replace(day=1)
+                    amount = Decimal(str(persona_data["child_support"]))
 
                     obligation = Obligation(
                         id=str(uuid4()),
                         family_file_id=family_file_id,
-                        obligation_type="child_support",
-                        description=f"Child Support - {due_date.strftime('%B %Y')}",
-                        amount=Decimal(str(persona_data["child_support"])),
-                        payer_id=parent_b_id,
-                        payee_id=parent_a_id,
+                        created_by=parent_a_id,
+                        source_type="agreement",
+                        purpose_category="child_support",
+                        title=f"Child Support - {due_date.strftime('%B %Y')}",
+                        description=f"Monthly child support payment",
+                        total_amount=amount,
+                        petitioner_share=Decimal("0.00"),
+                        respondent_share=amount,
+                        petitioner_percentage=0,
                         due_date=due_date,
-                        status="paid" if month_offset < 0 else "pending",
-                        paid_at=due_date + timedelta(days=random.randint(0, 5)) if month_offset < 0 else None,
+                        status="verified" if month_offset < 0 else "open",
+                        amount_funded=amount if month_offset < 0 else Decimal("0.00"),
+                        amount_spent=amount if month_offset < 0 else Decimal("0.00"),
+                        amount_verified=amount if month_offset < 0 else Decimal("0.00"),
                         created_at=due_date - timedelta(days=30)
                     )
                     session.add(obligation)
@@ -779,24 +899,34 @@ async def seed_complete_demo():
 
             # Extracurricular expenses
             expenses = [
-                ("Soccer League Registration", Decimal("450.00")),
-                ("Dance Class Tuition", Decimal("200.00")),
-                ("School Supplies", Decimal("85.00")),
-                ("Doctor Visit Copay", Decimal("40.00"))
+                ("Soccer League Registration", Decimal("450.00"), "sports"),
+                ("Dance Class Tuition", Decimal("200.00"), "extracurricular"),
+                ("School Supplies", Decimal("85.00"), "education"),
+                ("Doctor Visit Copay", Decimal("40.00"), "medical")
             ]
 
-            for expense_name, amount in random.sample(expenses, 2):
+            for expense_name, amount, category in random.sample(expenses, 2):
+                # Calculate split based on custody percentages
+                parent_a_pct, parent_b_pct = persona_data["custody_split"]
+                parent_a_share = (amount * Decimal(str(parent_a_pct))) / Decimal("100")
+                parent_b_share = (amount * Decimal(str(parent_b_pct))) / Decimal("100")
+
                 obligation = Obligation(
                     id=str(uuid4()),
                     family_file_id=family_file_id,
-                    obligation_type="extracurricular" if "Soccer" in expense_name or "Dance" in expense_name else "medical",
-                    description=expense_name,
-                    amount=amount,
-                    payer_id=parent_a_id,
-                    split_percentage_a=persona_data["custody_split"][0],
-                    split_percentage_b=persona_data["custody_split"][1],
+                    created_by=parent_a_id,
+                    source_type="request",
+                    purpose_category=category,
+                    title=expense_name,
+                    description=f"Shared expense for child",
+                    total_amount=amount,
+                    petitioner_share=parent_a_share,
+                    respondent_share=parent_b_share,
+                    petitioner_percentage=parent_a_pct,
+                    split_from_agreement=True,
                     due_date=datetime.utcnow() - timedelta(days=random.randint(10, 40)),
-                    status=random.choice(["paid", "pending", "pending_approval"]),
+                    status=random.choice(["verified", "funded", "open"]),
+                    amount_funded=amount if random.random() > 0.3 else Decimal("0.00"),
                     created_at=datetime.utcnow() - timedelta(days=random.randint(15, 60))
                 )
                 session.add(obligation)
@@ -810,7 +940,7 @@ async def seed_complete_demo():
         # ========================================
         # STEP 8: Create Quick Accords
         # ========================================
-        print("📋 Step 8/9: Creating Quick Accords...")
+        print("📋 Step 8/10: Creating Quick Accords...")
 
         accord_count = 0
         accord_templates = [
@@ -827,19 +957,25 @@ async def seed_complete_demo():
             parent_b_id = user_map[persona_data["parents"][1]["email"]]
 
             for title, description, status in random.sample(accord_templates, 2):
+                # Generate unique accord number
+                accord_number = f"QA-{str(uuid4())[:6].upper()}"
+
                 accord = QuickAccord(
                     id=str(uuid4()),
                     family_file_id=family_file_id,
+                    accord_number=accord_number,
                     title=title,
-                    description=description,
-                    proposed_by=parent_a_id,
+                    purpose_category="schedule_swap",
+                    purpose_description=description,
+                    initiated_by=parent_a_id,
                     status=status,
-                    proposed_at=datetime.utcnow() - timedelta(days=random.randint(15, 60)),
+                    parent_a_approved=(status == "approved" or status == "active"),
+                    parent_b_approved=(status == "approved" or status == "active"),
                     created_at=datetime.utcnow() - timedelta(days=random.randint(15, 60))
                 )
 
                 if status == "approved":
-                    accord.approved_at = accord.proposed_at + timedelta(hours=random.randint(2, 48))
+                    accord.approved_at = accord.created_at + timedelta(hours=random.randint(2, 48))
                     accord.approved_by = parent_b_id
 
                 session.add(accord)
@@ -853,11 +989,12 @@ async def seed_complete_demo():
         # ========================================
         # STEP 9: Create Schedule Events
         # ========================================
-        print("📅 Step 9/9: Creating schedule events...")
+        print("📅 Step 9/10: Creating schedule events...")
 
         event_count = 0
         for persona_name, persona_data in PERSONAS.items():
             family_file_id = family_file_map[persona_name]
+            parent_a_id = user_map[persona_data["parents"][0]["email"]]
             children = child_map[persona_name]
 
             # Weekly activities
@@ -868,13 +1005,15 @@ async def seed_complete_demo():
                     event = ScheduleEvent(
                         id=str(uuid4()),
                         family_file_id=family_file_id,
-                        child_id=children[0] if children else None,
+                        child_ids=[children[0]] if children else [],
+                        custodial_parent_id=parent_a_id,
+                        created_by=parent_a_id,
                         title=f"Soccer Practice - {persona_data['children'][0]['first_name']}",
-                        category="activity",
+                        event_type="regular",
+                        event_category="sports",
                         start_time=event_date,
                         end_time=event_date + timedelta(hours=1, minutes=30),
                         location="Local Youth Sports Complex",
-                        is_recurring=True,
                         created_at=datetime.utcnow() - timedelta(days=30)
                     )
                     session.add(event)
@@ -888,13 +1027,16 @@ async def seed_complete_demo():
                     event = ScheduleEvent(
                         id=str(uuid4()),
                         family_file_id=family_file_id,
-                        child_id=children[1] if len(children) > 1 else children[0],
+                        child_ids=[children[1] if len(children) > 1 else children[0]],
+                        custodial_parent_id=parent_a_id,
+                        created_by=parent_a_id,
                         title=f"Therapy Session - {persona_data['children'][-1]['first_name']}",
-                        category="medical",
+                        event_type="regular",
+                        event_category="medical",
                         start_time=event_date,
                         end_time=event_date + timedelta(hours=2),
                         location="Therapy Center",
-                        notes="Bring communication book",
+                        description="Bring communication book",
                         created_at=datetime.utcnow() - timedelta(days=60)
                     )
                     session.add(event)
@@ -904,6 +1046,41 @@ async def seed_complete_demo():
 
         await session.commit()
         print(f"   ✓ Created {event_count} schedule events\n")
+
+        # ========================================
+        # STEP 10: Create Professional Firms
+        # ========================================
+        print("🏢 Step 10/10: Creating professional firms...")
+
+        firm_count = 0
+        # Use first user as creator for firms
+        first_user_id = list(user_map.values())[0]
+
+        for firm_data in FIRMS:
+            # Generate slug from firm name
+            slug = firm_data["name"].lower().replace(" ", "-").replace("&", "and")
+
+            firm = Firm(
+                id=str(uuid4()),
+                name=firm_data["name"],
+                slug=slug,
+                firm_type="law_firm",
+                city=firm_data["city"],
+                state=firm_data["state"],
+                zip_code=firm_data["zip"],
+                phone=firm_data["phone"],
+                email=firm_data["email"],
+                description=firm_data["description"],
+                is_public=True,
+                created_by=first_user_id,
+                created_at=datetime.utcnow() - timedelta(days=random.randint(365, 1825))
+            )
+            session.add(firm)
+            firm_count += 1
+            print(f"   ✅ {firm.name}")
+
+        await session.commit()
+        print(f"   ✓ Created {firm_count} professional firms\n")
 
         # ========================================
         # SUMMARY
@@ -916,7 +1093,7 @@ async def seed_complete_demo():
         print(f"   • {len(unique_users)} user accounts created")
         print(f"   • {len(family_file_map)} family files")
         print(f"   • {child_count} children")
-        print(f"   • {len(family_file_map)} complete agreements (18 sections each)")
+        print(f"   • {len(family_file_map)} complete agreements (7 sections each)")
         print(f"   • {exchange_count} custody exchange instances")
         print(f"   • {message_count} messages ({flag_count} flagged by ARIA)")
         print(f"   • {obligation_count} financial obligations")
@@ -928,7 +1105,7 @@ async def seed_complete_demo():
         print("   ✓ Message Reports (ARIA sentiment analysis)")
         print("   ✓ Financial Tracking (child support + expenses)")
         print("   ✓ Schedule Coordination (events + exchanges)")
-        print("   ✓ Agreement Management (complete 18-section agreements)")
+        print("   ✓ Agreement Management (complete 7-section agreements)")
         print("   ✓ Quick Accord System (flexible schedule changes)")
 
         print("\n🎉 Ready to demo CommonGround with realistic SoCal data!")
