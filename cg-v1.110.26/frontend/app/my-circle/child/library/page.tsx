@@ -57,9 +57,7 @@ export default function LibraryPage() {
 
   function handleBookSelect(book: typeof theaterContent.storybooks[0]) {
     console.log('Selected book:', book);
-    alert(`Coming soon: ${book.title}! 📚`);
-    // Future: Navigate to PDF reader or theater reading mode
-    // router.push(`/my-circle/child/library/${book.id}`);
+    router.push(`/my-circle/child/library/${book.id}`);
   }
 
   const books = theaterContent.storybooks;

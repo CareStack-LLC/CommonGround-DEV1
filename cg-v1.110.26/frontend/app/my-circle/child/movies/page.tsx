@@ -57,9 +57,7 @@ export default function MoviesPage() {
 
   function handleVideoSelect(video: typeof theaterContent.videos[0]) {
     console.log('Selected video:', video);
-    alert(`Coming soon: ${video.title}! 🎬`);
-    // Future: Navigate to video player or theater mode
-    // router.push(`/my-circle/child/movies/${video.id}`);
+    router.push(`/my-circle/child/movies/${video.id}`);
   }
 
   const videos = theaterContent.videos;
