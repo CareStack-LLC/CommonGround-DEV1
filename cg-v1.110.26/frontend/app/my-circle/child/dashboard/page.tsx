@@ -133,50 +133,50 @@ export default function ChildDashboardPage() {
 
         {/* Dashboard Cards */}
         <main className="w-full mx-auto px-6 pb-8">
-          <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-2 gap-6 max-w-3xl mx-auto">
             {/* MY CIRCLE Card */}
-            <div className="group transform hover:scale-[1.02] transition-all duration-200">
+            <div className="group transform hover:scale-[1.02] transition-all duration-200 w-full">
               <KidDashboardCard
                 title="MY CIRCLE"
                 icon={<Users className="w-full h-full" />}
                 color="purple"
                 badge={contacts.length > 0 ? contacts.length : undefined}
                 onClick={() => router.push('/my-circle/child/my-circle-page')}
-                className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
+                className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all w-full h-[220px]"
               />
             </div>
 
             {/* READ WITH ME LIBRARY Card */}
-            <div className="group transform hover:scale-[1.02] transition-all duration-200">
+            <div className="group transform hover:scale-[1.02] transition-all duration-200 w-full">
               <KidDashboardCard
                 title="READ WITH ME LIBRARY"
                 icon={<BookOpen className="w-full h-full" />}
                 color="blue"
                 onClick={() => router.push('/my-circle/child/library')}
-                className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
+                className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all w-full h-[220px]"
               />
             </div>
 
             {/* ARCADE Card */}
-            <div className="group transform hover:scale-[1.02] transition-all duration-200">
+            <div className="group transform hover:scale-[1.02] transition-all duration-200 w-full">
               <KidDashboardCard
                 title="ARCADE"
                 icon={<Gamepad2 className="w-full h-full" />}
                 color="pink"
                 onClick={() => router.push('/my-circle/child/arcade')}
-                className="border border-[#D97757]/20 hover:border-[#D97757]/40 hover:shadow-lg transition-all"
+                className="border border-[#D97757]/20 hover:border-[#D97757]/40 hover:shadow-lg transition-all w-full h-[220px]"
               />
             </div>
 
             {/* NEW MOVIE Card */}
-            <div className="group transform hover:scale-[1.02] transition-all duration-200">
+            <div className="group transform hover:scale-[1.02] transition-all duration-200 w-full">
               <KidDashboardCard
                 title="NEW MOVIE"
                 subtitle={featuredMovie?.title || 'Watch something fun!'}
                 icon={<Film className="w-full h-full" />}
                 color="green"
                 onClick={() => router.push('/my-circle/child/movies')}
-                className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
+                className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all w-full h-[220px]"
               />
             </div>
           </div>
