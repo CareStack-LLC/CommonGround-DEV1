@@ -1202,8 +1202,8 @@ function FamilyFileDetailContent() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-            </CGCardHeader>
-            <CGCardContent>
+            </div>
+            <div>
               {/* Pending Access Requests */}
               {pendingRequests.length > 0 && (
                 <div className="mb-4 space-y-2">
@@ -1229,24 +1229,20 @@ function FamilyFileDetailContent() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        <CGButton
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50"
+                        <button
+                          className="h-7 w-7 p-0 text-emerald-600 hover:bg-emerald-50 rounded transition-colors disabled:opacity-50"
                           onClick={() => handleApproveRequest(request.id)}
                           disabled={isProcessingRequest === request.id}
                         >
                           <CheckCircle2 className="h-4 w-4" />
-                        </CGButton>
-                        <CGButton
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 w-7 p-0 text-red-500 hover:bg-red-50"
+                        </button>
+                        <button
+                          className="h-7 w-7 p-0 text-red-500 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
                           onClick={() => handleDeclineRequest(request.id)}
                           disabled={isProcessingRequest === request.id}
                         >
                           <XCircle className="h-4 w-4" />
-                        </CGButton>
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -1282,15 +1278,13 @@ function FamilyFileDetailContent() {
                           </div>
                         </div>
                       </div>
-                      <CGButton
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 w-7 p-0 text-muted-foreground hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      <button
+                        className="h-7 w-7 p-0 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all rounded disabled:opacity-50"
                         onClick={() => handleRevokeProfessionalAccess(prof.assignment_id)}
                         disabled={isRevokingAccess === prof.assignment_id}
                       >
                         <XCircle className="h-4 w-4" />
-                      </CGButton>
+                      </button>
                     </div>
                   ))}
                 </div>
