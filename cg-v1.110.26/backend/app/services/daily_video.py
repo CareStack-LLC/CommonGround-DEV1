@@ -377,11 +377,14 @@ class DailyVideoService:
         """
         Stop recording a Daily.co room.
 
+        Note: Server-side recording requires a paid Daily.co plan.
+        This method will gracefully handle "not found" errors on free tier.
+
         Args:
             room_name: The room to stop recording
 
         Returns:
-            True if stopped successfully
+            True if stopped successfully or if recording not supported
         """
         if not self.api_key:
             return True
@@ -396,6 +399,10 @@ class DailyVideoService:
 
                 if response.status_code in [200, 204]:
                     logger.info(f"Stopped recording for room {room_name}")
+                    return True
+                elif response.status_code == 404 or "not-found" in response.text:
+                    # Recording not available on free tier - this is expected
+                    logger.debug(f"Recording not available for room {room_name} (free tier)")
                     return True
                 else:
                     logger.warning(f"Failed to stop recording: {response.text}")
@@ -490,11 +497,14 @@ class DailyVideoService:
         """
         Stop live transcription for a Daily.co room.
 
+        Note: Server-side transcription requires a paid Daily.co plan.
+        For ARIA monitoring, we use Daily.co's client-side transcription events instead.
+
         Args:
             room_name: The room to stop transcribing
 
         Returns:
-            True if stopped successfully
+            True if stopped successfully or if transcription not supported
         """
         if not self.api_key:
             return True
@@ -509,6 +519,10 @@ class DailyVideoService:
 
                 if response.status_code in [200, 204]:
                     logger.info(f"Stopped transcription for room {room_name}")
+                    return True
+                elif response.status_code == 404 or "not-found" in response.text:
+                    # Transcription not available on free tier - this is expected
+                    logger.debug(f"Server-side transcription not available for room {room_name} (free tier)")
                     return True
                 else:
                     logger.warning(f"Failed to stop transcription: {response.text}")

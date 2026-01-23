@@ -95,11 +95,13 @@ class ParentCallService:
             )
 
             # Create database record
+            # Note: recording_enabled=False because Daily.co free tier doesn't support server-side recording
+            # ARIA monitoring uses client-side transcription via Daily.co's built-in transcription events
             room = ParentCallRoom(
                 family_file_id=family_file_id,
                 daily_room_name=room_name,
                 daily_room_url=daily_room["url"],
-                recording_enabled=True,
+                recording_enabled=False,  # Server-side recording not supported on free tier
                 aria_monitoring_enabled=True,
                 max_duration_minutes=120,
                 is_active=True,
