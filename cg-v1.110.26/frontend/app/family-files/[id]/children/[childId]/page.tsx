@@ -174,14 +174,14 @@ function SectionCard({
   isSaving?: boolean;
 }) {
   return (
-    <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+    <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
       {/* Header */}
       <div className="px-5 sm:px-6 py-4 border-b border-border bg-gradient-to-r from-cg-sage/5 to-transparent flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-cg-sage/10 flex items-center justify-center">
             {icon}
           </div>
-          <h3 className="font-semibold text-foreground">{title}</h3>
+          <h3 className="font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{title}</h3>
         </div>
 
         {editMode ? (
@@ -700,13 +700,13 @@ function ChildProfileContent() {
 
       {/* Pending Approval Banner */}
       {child.status === 'pending_approval' && (
-        <div className="bg-card border border-yellow-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+        <div className="bg-white border-2 border-yellow-200 rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-100 flex items-center justify-center flex-shrink-0">
               <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-foreground">Pending Approval</h3>
+              <h3 className="font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pending Approval</h3>
               <p className="text-sm text-muted-foreground mt-1">
                 Both parents need to approve before this profile becomes active.
               </p>
@@ -761,7 +761,7 @@ function ChildProfileContent() {
       )}
 
       {/* Profile Header */}
-      <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-md">
+      <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
         {/* Decorative Header */}
         <div className="h-20 sm:h-24 bg-gradient-to-br from-[#2C5F5D] via-[#2C5F5D]/90 to-[#1f4644] relative">
           {/* Subtle pattern overlay */}
@@ -818,7 +818,7 @@ function ChildProfileContent() {
             <div className="flex-1 pt-1 sm:pt-2">
               <div className="flex items-start justify-between gap-3 sm:gap-4">
                 <div className="min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
+                  <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                     {child.preferred_name || child.first_name} {child.last_name}
                   </h1>
                   <p className="text-sm sm:text-base text-muted-foreground mt-0.5 sm:mt-1">
@@ -1065,7 +1065,7 @@ function ChildProfileContent() {
               />
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   <Stethoscope className="h-4 w-4 text-cg-sage" />
                   Healthcare Providers
                 </h4>
@@ -1094,7 +1094,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4">Insurance</h4>
+                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Insurance</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <FormInput
                     label="Provider"
@@ -1119,7 +1119,7 @@ function ChildProfileContent() {
               <InfoField label="Medical Conditions" value={child.medical_conditions} emptyText="None reported" />
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   <Stethoscope className="h-4 w-4 text-cg-sage" />
                   Healthcare Providers
                 </h4>
@@ -1140,7 +1140,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4">Insurance</h4>
+                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Insurance</h4>
                 <div className="grid grid-cols-2 gap-6">
                   <InfoField label="Provider" value={child.insurance_provider} />
                   <InfoField label="Policy Number" value={child.insurance_policy_number} />
@@ -1271,7 +1271,7 @@ function ChildProfileContent() {
           {editMode ? (
             <div className="space-y-6">
               <div>
-                <h4 className="font-medium text-foreground mb-4">Food</h4>
+                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Food</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <FormTextarea
                     label="Favorite Foods"
@@ -1289,7 +1289,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   <Activity className="h-4 w-4 text-cg-sage" />
                   Activities & Comfort
                 </h4>
@@ -1314,7 +1314,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   <Shirt className="h-4 w-4 text-cg-sage" />
                   Sizes
                 </h4>
@@ -1333,7 +1333,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   <Moon className="h-4 w-4 text-cg-sage" />
                   Temperament & Emotional Needs
                 </h4>
@@ -1361,7 +1361,7 @@ function ChildProfileContent() {
           ) : (
             <div className="space-y-6">
               <div>
-                <h4 className="font-medium text-foreground mb-4">Food</h4>
+                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Food</h4>
                 <div className="grid grid-cols-2 gap-6">
                   <InfoField label="Favorites" value={child.favorite_foods} />
                   <InfoField label="Dislikes" value={child.food_dislikes} />
@@ -1369,7 +1369,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   <Activity className="h-4 w-4 text-cg-sage" />
                   Activities & Comfort
                 </h4>
@@ -1381,7 +1381,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   <Shirt className="h-4 w-4 text-cg-sage" />
                   Sizes
                 </h4>
@@ -1392,7 +1392,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   <Moon className="h-4 w-4 text-cg-sage" />
                   Temperament & Emotional Needs
                 </h4>
@@ -1508,7 +1508,7 @@ function ChildProfileContent() {
       )}
 
       {/* Both Parents Can Add Indicator */}
-      <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+      <div className="bg-white border-2 border-slate-200 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-cg-sage/10 flex items-center justify-center flex-shrink-0">
             <Users className="h-4 w-4 text-cg-sage" />
@@ -1525,9 +1525,9 @@ function ChildProfileContent() {
 export default function ChildProfilePage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         <Navigation />
-        <PageContainer className="pb-32">
+        <PageContainer background="transparent" className="pb-32">
           <ChildProfileContent />
         </PageContainer>
       </div>
