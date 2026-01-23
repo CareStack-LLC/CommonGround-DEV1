@@ -405,10 +405,10 @@ function FamilyFileDetailContent() {
           </CGButton>
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
-                <FolderHeart className="h-5 w-5 text-cg-sage" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
+                <FolderHeart className="h-5 w-5 text-[#2C5F5D]" />
               </div>
-              <h1 className="text-2xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFile.title}</h1>
+              <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFile.title}</h1>
               {familyFile.has_court_case && (
                 <CGBadge variant="slate">
                   <Scale className="h-3 w-3 mr-1" />
@@ -690,42 +690,42 @@ function FamilyFileDetailContent() {
 
       {/* Status Alert */}
       {!familyFile.is_complete && (
-        <CGCard variant="default" className="border-cg-amber/30 bg-cg-amber-subtle/50">
-          <CGCardContent className="py-4">
-            <div className="flex items-center gap-3">
-              <Clock className="h-5 w-5 text-cg-amber" />
-              <p className="text-foreground">
-                {familyFile.parent_b_email ? (
-                  <>Waiting for <span className="font-medium">{familyFile.parent_b_email}</span> to accept the invitation.</>
-                ) : (
-                  <>Invite your co-parent to complete this Family File.</>
-                )}
-              </p>
+        <div className="bg-white border-2 border-[#F59E0B]/30 rounded-2xl shadow-lg p-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F59E0B]/10 to-[#F59E0B]/5 flex items-center justify-center shadow-md">
+              <Clock className="h-5 w-5 text-[#F59E0B]" />
             </div>
-          </CGCardContent>
-        </CGCard>
+            <p className="text-slate-900 font-medium">
+              {familyFile.parent_b_email ? (
+                <>Waiting for <span className="font-bold">{familyFile.parent_b_email}</span> to accept the invitation.</>
+              ) : (
+                <>Invite your co-parent to complete this Family File.</>
+              )}
+            </p>
+          </div>
+        </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Left Column - Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Quick Actions */}
-          <CGCard variant="elevated">
-            <CGCardHeader>
-              <CGCardTitle>Quick Actions</CGCardTitle>
-            </CGCardHeader>
-            <CGCardContent>
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+            <div className="mb-6">
+              <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Quick Actions</h2>
+            </div>
+            <div className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <button
                   onClick={() => router.push(`/payments/new?familyFileId=${id}`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-border transition-all text-left group"
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
                     <DollarSign className="h-5 w-5 text-emerald-600" />
                   </div>
                   <div>
-                    <div className="font-medium text-foreground">ClearFund Request</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-bold text-slate-900">ClearFund Request</div>
+                    <div className="text-sm text-slate-600 font-medium">
                       Request expense reimbursement
                     </div>
                   </div>
@@ -733,14 +733,14 @@ function FamilyFileDetailContent() {
 
                 <button
                   onClick={() => router.push(`/schedule?familyFileId=${id}&action=new-event`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-border transition-all text-left group"
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-600/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
                     <CalendarPlus className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <div className="font-medium text-foreground">New Event</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-bold text-slate-900">New Event</div>
+                    <div className="text-sm text-slate-600 font-medium">
                       Add to shared calendar
                     </div>
                   </div>
@@ -748,14 +748,14 @@ function FamilyFileDetailContent() {
 
                 <button
                   onClick={() => router.push(`/messages?familyFileId=${id}`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-border transition-all text-left group"
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                    <MessageSquare className="h-5 w-5 text-cg-sage" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                    <MessageSquare className="h-5 w-5 text-[#2C5F5D]" />
                   </div>
                   <div>
-                    <div className="font-medium text-foreground">Messages</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-bold text-slate-900">Messages</div>
+                    <div className="text-sm text-slate-600 font-medium">
                       Chat with your co-parent
                     </div>
                   </div>
@@ -763,14 +763,14 @@ function FamilyFileDetailContent() {
 
                 <button
                   onClick={() => router.push(`/family-files/${id}/kidcoms`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border border-border/50 bg-card hover:bg-muted/50 hover:border-border transition-all text-left group"
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
                     <Video className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <div className="font-medium text-foreground">KidComs</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-bold text-slate-900">KidComs</div>
+                    <div className="text-sm text-slate-600 font-medium">
                       Video calls for kids
                     </div>
                   </div>
@@ -779,13 +779,13 @@ function FamilyFileDetailContent() {
                 {!familyFile.parent_b_id && (
                   <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
                     <DialogTrigger asChild>
-                      <button className="flex items-start gap-4 p-4 rounded-xl border border-cg-sage/30 bg-cg-sage-subtle/30 hover:bg-cg-sage-subtle/50 hover:border-cg-sage/50 transition-all text-left group">
-                        <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                          <Mail className="h-5 w-5 text-cg-sage" />
+                      <button className="flex items-start gap-4 p-4 rounded-xl border-2 border-[#2C5F5D]/30 bg-[#2C5F5D]/5 hover:bg-[#2C5F5D]/10 hover:border-[#2C5F5D]/50 hover:shadow-md transition-all text-left group">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                          <Mail className="h-5 w-5 text-[#2C5F5D]" />
                         </div>
                         <div>
-                          <div className="font-medium text-foreground">Invite Co-Parent</div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="font-bold text-slate-900">Invite Co-Parent</div>
+                          <div className="text-sm text-slate-600 font-medium">
                             Send invitation email
                           </div>
                         </div>
@@ -845,29 +845,32 @@ function FamilyFileDetailContent() {
                   </Dialog>
                 )}
               </div>
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
 
           {/* QuickAccords */}
-          <CGCard variant="elevated">
-            <CGCardHeader className="flex flex-row items-center justify-between">
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <CGCardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-cg-amber" />
-                  QuickAccords
-                </CGCardTitle>
-                <CGCardDescription>Situational agreements</CGCardDescription>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F59E0B]/10 to-[#F59E0B]/5 flex items-center justify-center shadow-md">
+                    <Zap className="h-5 w-5 text-[#F59E0B]" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>QuickAccords</h2>
+                    <p className="text-sm text-slate-600 font-medium">Situational agreements</p>
+                  </div>
+                </div>
               </div>
-              <CGButton
-                size="sm"
-                variant="primary"
+              <button
                 onClick={() => router.push(`/family-files/${id}/quick-accord/new`)}
+                className="cg-btn-primary flex items-center gap-2 shadow-md hover:shadow-lg"
               >
-                <Plus className="h-4 w-4 mr-1" />
+                <Plus className="h-4 w-4" />
                 New
-              </CGButton>
-            </CGCardHeader>
-            <CGCardContent>
+              </button>
+            </div>
+            <div>
               {quickAccords.length === 0 ? (
                 <CGEmptyState
                   icon={<Zap className="h-6 w-6" />}
@@ -880,7 +883,7 @@ function FamilyFileDetailContent() {
                   {quickAccords.slice(0, 3).map((accord) => (
                     <button
                       key={accord.id}
-                      className="w-full flex items-center justify-between p-4 rounded-xl border border-border/50 hover:bg-muted/50 hover:border-border transition-all text-left"
+                      className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left"
                       onClick={() => router.push(`/family-files/${id}/quick-accord/${accord.id}`)}
                     >
                       <div className="flex items-center gap-3">
@@ -899,40 +902,42 @@ function FamilyFileDetailContent() {
                       </div>
                     </button>
                   ))}
-                  <CGButton
-                    variant="ghost"
-                    className="w-full text-muted-foreground hover:text-foreground"
+                  <button
+                    className="w-full text-slate-600 hover:text-slate-900 font-medium py-2 transition-colors"
                     onClick={() => router.push(`/family-files/${id}/quick-accords`)}
                   >
                     View All QuickAccords ({quickAccords.length})
-                  </CGButton>
+                  </button>
                 </div>
               )}
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
 
           {/* SharedCare Agreements */}
-          <CGCard variant="elevated">
-            <CGCardHeader className="flex flex-row items-center justify-between">
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <CGCardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-cg-slate" />
-                  SharedCare Agreements
-                </CGCardTitle>
-                <CGCardDescription>Comprehensive co-parenting agreements</CGCardDescription>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-500/10 to-slate-600/5 flex items-center justify-center shadow-md">
+                    <FileText className="h-5 w-5 text-slate-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>SharedCare Agreements</h2>
+                    <p className="text-sm text-slate-600 font-medium">Comprehensive co-parenting agreements</p>
+                  </div>
+                </div>
               </div>
               {familyFile.can_create_shared_care_agreement && (
-                <CGButton
-                  size="sm"
-                  variant="secondary"
+                <button
                   onClick={() => router.push(`/agreements/new?familyFileId=${id}`)}
+                  className="cg-btn-secondary flex items-center gap-2 shadow-md hover:shadow-lg"
                 >
-                  <Plus className="h-4 w-4 mr-1" />
+                  <Plus className="h-4 w-4" />
                   New
-                </CGButton>
+                </button>
               )}
-            </CGCardHeader>
-            <CGCardContent>
+            </div>
+            <div>
               {agreements.length === 0 ? (
                 <CGEmptyState
                   icon={<FileText className="h-6 w-6" />}
@@ -949,12 +954,12 @@ function FamilyFileDetailContent() {
                   {agreements.slice(0, 3).map((agreement) => (
                     <button
                       key={agreement.id}
-                      className="w-full flex items-center justify-between p-4 rounded-xl border border-border/50 hover:bg-muted/50 hover:border-border transition-all text-left"
+                      className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[#2C5F5D]/30 hover:shadow-md transition-all text-left"
                       onClick={() => router.push(`/agreements/${agreement.id}`)}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-cg-slate-subtle flex items-center justify-center">
-                          <FileText className="h-5 w-5 text-cg-slate" />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-500/10 to-slate-600/5 flex items-center justify-center shadow-md">
+                          <FileText className="h-5 w-5 text-slate-600" />
                         </div>
                         <div>
                           <div className="font-medium text-foreground">{agreement.title}</div>
@@ -969,30 +974,29 @@ function FamilyFileDetailContent() {
                       </div>
                     </button>
                   ))}
-                  <CGButton
-                    variant="ghost"
-                    className="w-full text-muted-foreground hover:text-foreground"
+                  <button
+                    className="w-full text-slate-600 hover:text-slate-900 font-medium py-2 transition-colors"
                     onClick={() => router.push(`/agreements?familyFileId=${id}`)}
                   >
                     View All Agreements ({agreements.length})
-                  </CGButton>
+                  </button>
                 </div>
               )}
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
         </div>
 
         {/* Right Column - Sidebar */}
         <div className="space-y-6">
           {/* Parents */}
-          <CGCard variant="elevated">
-            <CGCardHeader>
-              <CGCardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-cg-sage" />
-                Parents
-              </CGCardTitle>
-            </CGCardHeader>
-            <CGCardContent className="space-y-4">
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
+                <Users className="h-5 w-5 text-[#2C5F5D]" />
+              </div>
+              <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Parents</h2>
+            </div>
+            <div className="space-y-4">
               {/* Parent A */}
               <div className="flex items-center gap-3">
                 <CGAvatar name={getRoleName(familyFile.parent_a_role)} size="md" color="sage" />
@@ -1028,21 +1032,23 @@ function FamilyFileDetailContent() {
                   <CGBadge variant="slate">You</CGBadge>
                 )}
               </div>
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
 
           {/* Children */}
-          <CGCard variant="elevated">
-            <CGCardHeader className="flex flex-row items-center justify-between">
-              <CGCardTitle className="flex items-center gap-2">
-                <Baby className="h-5 w-5 text-cg-sage" />
-                Children
-              </CGCardTitle>
-              <CGButton variant="ghost" size="sm">
-                <Plus className="h-4 w-4" />
-              </CGButton>
-            </CGCardHeader>
-            <CGCardContent>
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
+                  <Baby className="h-5 w-5 text-[#2C5F5D]" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Children</h2>
+              </div>
+              <button className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors">
+                <Plus className="h-4 w-4 text-slate-600" />
+              </button>
+            </div>
+            <div>
               {familyFile.children.length === 0 ? (
                 <CGEmptyState
                   icon={<Baby className="h-6 w-6" />}
@@ -1081,15 +1087,13 @@ function FamilyFileDetailContent() {
                   ))}
                 </div>
               )}
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
 
           {/* Info */}
-          <CGCard variant="default">
-            <CGCardHeader>
-              <CGCardTitle>Details</CGCardTitle>
-            </CGCardHeader>
-            <CGCardContent className="space-y-3 text-sm">
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+            <h2 className="text-xl font-bold text-slate-900 mb-6" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Details</h2>
+            <div className="space-y-3 text-sm">
               {familyFile.state && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Location</span>
@@ -1110,21 +1114,23 @@ function FamilyFileDetailContent() {
                   {new Date(familyFile.created_at).toLocaleDateString()}
                 </span>
               </div>
-            </CGCardContent>
-          </CGCard>
+            </div>
+          </div>
 
           {/* Professional Access */}
-          <CGCard variant="elevated">
-            <CGCardHeader className="flex flex-row items-center justify-between">
-              <CGCardTitle className="flex items-center gap-2">
-                <Briefcase className="h-5 w-5 text-emerald-600" />
-                Legal Team
-              </CGCardTitle>
+          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center shadow-md">
+                  <Briefcase className="h-5 w-5 text-emerald-600" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Legal Team</h2>
+              </div>
               <Dialog open={isInviteProfOpen} onOpenChange={setIsInviteProfOpen}>
                 <DialogTrigger asChild>
-                  <CGButton variant="ghost" size="sm">
-                    <Plus className="h-4 w-4" />
-                  </CGButton>
+                  <button className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors">
+                    <Plus className="h-4 w-4 text-slate-600" />
+                  </button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
@@ -1148,18 +1154,16 @@ function FamilyFileDetailContent() {
                         className="focus-visible:ring-emerald-600"
                       />
                     </div>
-                    <CGButton
-                      variant="ghost"
-                      size="sm"
-                      className="w-full text-muted-foreground hover:text-foreground"
+                    <button
+                      className="w-full text-slate-600 hover:text-slate-900 font-medium py-2 flex items-center justify-center gap-2 transition-colors"
                       onClick={() => {
                         setIsInviteProfOpen(false);
                         router.push(`/find-professionals?familyFileId=${id}`);
                       }}
                     >
-                      <Building2 className="h-4 w-4 mr-2" />
+                      <Building2 className="h-4 w-4" />
                       Browse Firm Directory Instead
-                    </CGButton>
+                    </button>
                     {profInviteError && (
                       <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
@@ -1293,17 +1297,15 @@ function FamilyFileDetailContent() {
               ) : null}
 
               {/* Find Professionals Link */}
-              <CGButton
-                variant="ghost"
-                size="sm"
-                className="w-full mt-3 text-muted-foreground hover:text-foreground"
+              <button
+                className="w-full mt-3 text-slate-600 hover:text-slate-900 font-medium py-2 flex items-center justify-center gap-2 transition-colors"
                 onClick={() => router.push(`/find-professionals?familyFileId=${id}`)}
               >
-                <ExternalLink className="h-4 w-4 mr-2" />
+                <ExternalLink className="h-4 w-4" />
                 Browse Firm Directory
-              </CGButton>
-            </CGCardContent>
-          </CGCard>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

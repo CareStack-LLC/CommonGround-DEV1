@@ -144,16 +144,19 @@ function FamilyFilesContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <p className="text-sm text-muted-foreground mb-1">{getGreeting()}</p>
-          <h1 className="text-2xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Family Files</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-sm text-slate-600 font-medium mb-1">{getGreeting()}</p>
+          <h1 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Family Files</h1>
+          <p className="text-slate-600 font-medium mt-1">
             Manage your co-parenting arrangements
           </p>
         </div>
-        <CGButton variant="primary" onClick={() => router.push('/family-files/new')}>
-          <Plus className="h-4 w-4 mr-2" />
+        <button
+          onClick={() => router.push('/family-files/new')}
+          className="cg-btn-primary flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200"
+        >
+          <Plus className="h-4 w-4" />
           New Family File
-        </CGButton>
+        </button>
       </div>
 
       {/* Error */}
@@ -171,49 +174,46 @@ function FamilyFilesContent() {
       {/* Pending Invitations */}
       {invitations.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#2C5F5D]/10 flex items-center justify-center">
-              <Mail className="h-4 w-4 text-[#2C5F5D]" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
+              <Mail className="h-5 w-5 text-[#2C5F5D]" />
             </div>
-            <h2 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pending Invitations</h2>
+            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pending Invitations</h2>
           </div>
           <div className="space-y-3">
             {invitations.map((invitation) => (
-              <CGCard
+              <div
                 key={invitation.id}
-                variant="default"
-                className="border-[#2C5F5D]/30 bg-[#2C5F5D]/5"
+                className="bg-white border-2 border-[#2C5F5D]/30 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 p-6"
               >
-                <CGCardContent className="py-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-[#2C5F5D]/10 flex items-center justify-center">
-                        <FolderHeart className="h-6 w-6 text-[#2C5F5D]" />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-foreground">{invitation.title}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {invitation.family_file_number} - Invited as {getRoleName(invitation.your_role)}
-                        </p>
-                      </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center shadow-md">
+                      <FolderHeart className="h-6 w-6 text-[#2C5F5D]" />
                     </div>
-                    <CGButton
-                      variant="primary"
+                    <div>
+                      <h3 className="font-bold text-slate-900">{invitation.title}</h3>
+                      <p className="text-sm text-slate-600 font-medium">
+                        {invitation.family_file_number} - Invited as {getRoleName(invitation.your_role)}
+                      </p>
+                    </div>
+                  </div>
+                    <button
                       onClick={() => handleAcceptInvitation(invitation.id)}
                       disabled={isAccepting === invitation.id}
+                      className="cg-btn-primary flex items-center gap-2 shadow-md hover:shadow-lg"
                     >
                       {isAccepting === invitation.id ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                           Joining...
                         </>
                       ) : (
                         'Accept & Join'
                       )}
-                    </CGButton>
+                    </button>
                   </div>
-                </CGCardContent>
-              </CGCard>
+              </div>
             ))}
           </div>
         </div>
@@ -235,37 +235,34 @@ function FamilyFilesContent() {
         </CGCard>
       ) : familyFiles.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-cg-slate-subtle flex items-center justify-center">
-              <FolderHeart className="h-4 w-4 text-cg-slate" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-500/10 to-slate-600/5 flex items-center justify-center shadow-md">
+              <FolderHeart className="h-5 w-5 text-slate-600" />
             </div>
-            <h2 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Your Family Files</h2>
+            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Your Family Files</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {familyFiles.map((file) => (
-              <CGCard
+              <div
                 key={file.id}
-                variant="interactive"
-                className="cursor-pointer"
                 onClick={() => router.push(`/family-files/${file.id}`)}
+                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-[#2C5F5D]/30 hover:scale-[1.02] transition-all duration-300 cursor-pointer p-6"
               >
-                <CGCardHeader className="pb-3">
+                <div className="space-y-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-[#2C5F5D]/10 flex items-center justify-center flex-shrink-0">
-                        <FolderHeart className="h-5 w-5 text-[#2C5F5D]" />
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <FolderHeart className="h-6 w-6 text-[#2C5F5D]" />
                       </div>
                       <div className="min-w-0">
-                        <CGCardTitle className="text-base truncate">{file.title}</CGCardTitle>
-                        <CGCardDescription className="text-xs">
+                        <h3 className="text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{file.title}</h3>
+                        <p className="text-xs text-slate-600 font-medium">
                           {file.family_file_number}
-                        </CGCardDescription>
+                        </p>
                       </div>
                     </div>
                     {getStatusBadge(file.status, file.is_complete)}
                   </div>
-                </CGCardHeader>
-                <CGCardContent className="pt-0">
                   <div className="space-y-3">
                     {/* Parents */}
                     <div className="flex items-center gap-2 text-sm">
@@ -311,8 +308,8 @@ function FamilyFilesContent() {
                       </div>
                     </div>
                   </div>
-                </CGCardContent>
-              </CGCard>
+                </div>
+              </div>
             ))}
           </div>
         </div>
