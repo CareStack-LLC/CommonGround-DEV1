@@ -1,7 +1,7 @@
 # KidComs - Child Communication System
 
-**Last Updated:** January 17, 2026
-**Version:** 1.5.0
+**Last Updated:** January 22, 2026
+**Version:** 1.6.0
 **Status:** Production Ready
 
 ---
@@ -9,18 +9,19 @@
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Architecture](#architecture)
-3. [Daily.co Integration](#dailyco-integration)
-4. [Session Management](#session-management)
-5. [Participant Types](#participant-types)
-6. [Call Flows](#call-flows)
-7. [Permission System](#permission-system)
-8. [Family Settings](#family-settings)
-9. [ARIA Chat Monitoring](#aria-chat-monitoring)
-10. [API Reference](#api-reference)
-11. [Frontend Integration](#frontend-integration)
-12. [Theater Mode](#theater-mode)
-13. [Brand Theming](#brand-theming-v130)
+2. [Kids' Side UI (v1.6.0)](#kids-side-ui-v160)
+3. [Architecture](#architecture)
+4. [Daily.co Integration](#dailyco-integration)
+5. [Session Management](#session-management)
+6. [Participant Types](#participant-types)
+7. [Call Flows](#call-flows)
+8. [Permission System](#permission-system)
+9. [Family Settings](#family-settings)
+10. [ARIA Chat Monitoring](#aria-chat-monitoring)
+11. [API Reference](#api-reference)
+12. [Frontend Integration](#frontend-integration)
+13. [Theater Mode](#theater-mode)
+14. [Brand Theming](#brand-theming-v130)
 
 ---
 
@@ -46,6 +47,447 @@ KidComs is CommonGround's child communication platform that enables children to 
 3. **Age-Appropriate**: Kid-friendly UI and PIN-based login
 4. **Transparent**: Complete communication logs for parental review
 5. **Flexible**: Works with both parents' custody schedules
+
+---
+
+## Kids' Side UI (v1.6.0)
+
+**Released:** January 22, 2026
+
+Complete redesign of the children's interface with a modern, card-based layout centered around the ARIA mascot. This update transforms KidComs from a call-only interface into a comprehensive kids' portal with entertainment, education, and communication features.
+
+### Design Philosophy
+
+The new kids' interface follows these principles:
+- **Fun & Engaging**: Colorful, animated interface that delights children
+- **Large Touch Targets**: All buttons and cards are minimum 48px for easy tapping
+- **Clear Navigation**: Simple 5-icon bottom navigation visible on all pages
+- **Consistent Patterns**: Same authentication and layout across all pages
+- **Family Context**: All features tied to the child's family file for proper scoping
+
+### ARIA Mascot
+
+The centerpiece of the new UI is ARIA, the AI companion that appears throughout the kids' experience:
+
+**Component:** `/components/kidcoms/aria-mascot.tsx`
+
+```typescript
+interface ARIAMascotProps {
+  greeting?: string;
+  state?: 'idle' | 'greeting' | 'loading' | 'success';
+  className?: string;
+}
+```
+
+**Features:**
+- Floating animation (gentle up/down movement)
+- Greeting speech bubble with customizable messages
+- Multiple states for different contexts
+- Orbital decoration with animated dots
+- Uses `/public/images/Aria.png` asset
+
+**States:**
+- `idle`: Calm floating with welcoming message
+- `greeting`: Bouncy animation with friendly greeting
+- `loading`: Pulsing animation with loading message
+- `success`: Celebration animation with success message
+
+### Page Structure
+
+All kids' pages follow a consistent structure:
+
+1. **Header** - White background with title and subtitle
+2. **Main Content** - Featured section + grid layout
+3. **Bottom Navigation** - Fixed 5-icon nav bar
+4. **Authentication** - Family file validation on mount
+
+**Routes:**
+- `/my-circle/child/dashboard` - Main hub
+- `/my-circle/child/my-circle-page` - Contacts list
+- `/my-circle/child/movies` - Video library
+- `/my-circle/child/library` - Storybook collection
+- `/my-circle/child/arcade` - Games selection
+
+### Dashboard
+
+**Path:** `/app/my-circle/child/dashboard/page.tsx`
+
+The new dashboard greets children by name and presents five main activity cards:
+
+**Layout:**
+```
+┌────────────────────────────────────┐
+│  HEY [CHILD NAME]!                 │
+├────────────────────────────────────┤
+│         ARIA Mascot                │
+│  "What do you want to do today?"   │
+├────────────────────────────────────┤
+│  ┌────────┐ ┌────────┐ ┌────────┐ │
+│  │   MY   │ │  READ  │ │ ARCADE │ │
+│  │ CIRCLE │ │  WITH  │ │        │ │
+│  │   (3)  │ │   ME   │ │        │ │
+│  └────────┘ └────────┘ └────────┘ │
+│  ┌────────┐ ┌────────┐            │
+│  │  NEW   │ │MESSAGE │            │
+│  │ MOVIE  │ │   S    │            │
+│  │        │ │(Coming)│            │
+│  └────────┘ └────────┘            │
+└────────────────────────────────────┘
+```
+
+**Card Component:** `kid-dashboard-card.tsx`
+
+```typescript
+interface KidDashboardCardProps {
+  title: string;
+  subtitle?: string;
+  icon?: React.ReactNode;
+  color?: 'purple' | 'green' | 'blue' | 'pink' | 'amber';
+  badge?: number;  // Show notification count
+  onClick: () => void;
+  disabled?: boolean;
+}
+```
+
+### My Circle (Contacts)
+
+**Path:** `/app/my-circle/child/my-circle-page/page.tsx`
+
+Contact list for calling family and friends.
+
+**Features:**
+- Horizontal contact cards with emoji avatars
+- Large call (green) and video (purple) buttons
+- Disabled states for restricted contacts
+- Empty state with ARIA guidance
+
+**Contact Card:** `kid-contact-card.tsx`
+
+```typescript
+interface KidContactCardProps {
+  contact: {
+    contact_id: string;
+    display_name: string;
+    contact_type: string;    // Maps to emoji
+    relationship?: string;
+    can_video_call: boolean;
+    can_voice_call: boolean;
+  };
+  onCall: () => void;
+  onVideo: () => void;
+}
+```
+
+**Contact Type Emojis:**
+- parent_a: 👩, parent_b: 👨
+- grandparent: 👴, grandma: 👵
+- aunt: 👩‍🦰, uncle: 👨‍🦱
+- sibling: 👦, cousin: 🧒
+- therapist: 🧠, coach: ⚽
+- other: 💜
+
+### Movies (Theater)
+
+**Path:** `/app/my-circle/child/movies/page.tsx`
+
+Video library browser with featured movie section.
+
+**Features:**
+- Featured movie spotlight
+- Grid of all available videos
+- Thumbnail/poster images
+- Duration badges
+- Integrates with `theaterContent.videos`
+
+**Movie Card:** `kid-movie-card.tsx`
+
+```typescript
+interface KidMovieCardProps {
+  video: {
+    id: string;
+    title: string;
+    url: string;
+    thumbnail?: string;
+    duration?: string;
+    description?: string;
+  };
+  onClick: () => void;
+}
+```
+
+**Design:**
+- Large play button overlay (green, 64px)
+- Video thumbnail or film icon fallback
+- Dark overlay for better contrast
+- Hover animation (scale + lift)
+
+### Library (Read With Me)
+
+**Path:** `/app/my-circle/child/library/page.tsx`
+
+Storybook collection browser with featured story section.
+
+**Features:**
+- Featured story spotlight
+- Grid of all available books
+- Cover images with fallback designs
+- Page count indicators
+- Integrates with `theaterContent.storybooks`
+
+**Book Card:** `kid-book-card.tsx`
+
+```typescript
+interface KidBookCardProps {
+  book: {
+    id: string;
+    title: string;
+    url: string;        // PDF path
+    cover?: string;     // Cover image
+    pages?: number;
+    description?: string;
+  };
+  onClick: () => void;
+}
+```
+
+**Design:**
+- Whimsical storybook aesthetic
+- Decorative book spine (colorful gradient)
+- Sparkle animations on hover
+- Shimmer sweep effect
+- Fallback cover with decorative patterns
+
+### Arcade (Games)
+
+**Path:** `/app/my-circle/child/arcade/page.tsx`
+
+Game selection hub with three playable games.
+
+**Features:**
+- Featured game spotlight
+- Grid of all games
+- Difficulty indicators
+- Retro-arcade aesthetic
+
+**Game Card:** `kid-game-card.tsx`
+
+```typescript
+interface KidGameCardProps {
+  game: {
+    id: string;
+    title: string;
+    emoji: string;      // Game icon
+    color: 'purple' | 'green' | 'blue' | 'pink' | 'amber' | 'red';
+    difficulty?: 'easy' | 'medium' | 'hard';
+    description?: string;
+  };
+  onClick: () => void;
+}
+```
+
+**Design:**
+- Large emoji display (text-7xl)
+- Geometric decorative patterns
+- Diagonal stripes and shapes
+- Shimmer effect on hover
+- Difficulty dots (easy: 1 green, medium: 2 yellow, hard: 3 red)
+
+#### Game 1: Memory Match
+
+**Path:** `/components/kidcoms/arcade/memory-game.tsx`
+
+Classic card matching game with 16 cards (8 pairs).
+
+**Features:**
+- 4×4 grid of cards
+- Emoji pairs: 🎮 🎨 🎭 🎪 🎸 🎺 🎹 🎬
+- Flip animation
+- Match detection
+- Move counter
+- Win celebration modal
+- Reset button
+
+**Game Logic:**
+- Click to flip card
+- Match check after 2 cards flipped
+- Auto flip-back after 1s if no match
+- Win when all 8 pairs matched
+
+#### Game 2: Tic-Tac-Toe
+
+**Path:** `/components/kidcoms/arcade/tic-tac-toe.tsx`
+
+Classic 3×3 grid game with AI opponent.
+
+**Features:**
+- Player (X) vs AI (O)
+- 3×3 grid
+- Win detection (rows, columns, diagonals)
+- Winning line highlight (yellow gradient)
+- Player/AI scoreboard
+- Win/lose/draw modal
+- New game button
+
+**AI Logic:**
+1. Try to win (find completing move)
+2. Block player from winning
+3. Take center if available
+4. Take random available spot
+
+#### Game 3: Drawing Pad
+
+**Path:** `/components/kidcoms/arcade/drawing-pad.tsx`
+
+HTML5 canvas-based creative drawing tool.
+
+**Features:**
+- Freehand drawing with mouse/touch
+- 9 color options
+- 4 brush sizes (small: 2px, medium: 5px, large: 10px, XL: 20px)
+- Clear canvas button
+- Save as PNG button
+- White canvas background
+- Smooth line rendering (rounded caps/joins)
+
+**Colors:**
+- Red (#EF4444), Orange (#F97316), Yellow (#EAB308)
+- Green (#22C55E), Blue (#3B82F6), Purple (#A855F7)
+- Pink (#EC4899), Black (#000000), White (#FFFFFF)
+
+### Bottom Navigation
+
+**Component:** `kid-bottom-nav.tsx`
+
+Fixed navigation bar visible on all kids' pages.
+
+**Icons & Routes:**
+- 🏠 Home → `/my-circle/child/dashboard`
+- 🎬 Movies → `/my-circle/child/movies`
+- 📚 Books → `/my-circle/child/library`
+- 🎮 Games → `/my-circle/child/arcade`
+- 👥 People → `/my-circle/child/my-circle-page`
+
+**Design:**
+- Fixed bottom position with safe area padding
+- Active state: purple accent with icon animation
+- Inactive state: gray with hover effect
+- Large touch targets (56px height)
+- Backdrop blur for glassmorphism
+
+### Authentication Pattern
+
+All kids' pages use this critical authentication flow:
+
+```typescript
+function validateAndLoadUser() {
+  try {
+    const token = localStorage.getItem('child_token');
+    const userStr = localStorage.getItem('child_user');
+
+    if (!token || !userStr) {
+      router.push('/my-circle/child');
+      return;
+    }
+
+    const user = JSON.parse(userStr) as ChildUserData;
+
+    // CRITICAL: Validate family file ID
+    if (!user.familyFileId) {
+      console.error('Missing family file ID');
+      localStorage.clear();
+      router.push('/my-circle/child');
+      return;
+    }
+
+    setUserData(user);
+    setIsLoading(false);
+  } catch (error) {
+    console.error('Failed to load user:', error);
+    localStorage.clear();
+    router.push('/my-circle/child');
+  }
+}
+```
+
+**Why This Matters:**
+- All KidComs features must be scoped to a family file
+- Prevents orphaned child sessions
+- Ensures contacts, content, and settings are properly loaded
+- Maintains security and data isolation
+
+### Design System
+
+**Color Palette:**
+```css
+/* Primary */
+--kid-purple: #A78BFA      /* ARIA accent, buttons */
+--kid-green: #10B981       /* Primary actions (call, play) */
+--kid-blue: #3B82F6        /* Video buttons, accents */
+--kid-pink: #EC4899        /* Fun accents, highlights */
+
+/* Backgrounds */
+--kid-bg: #F9FAFB          /* Soft gray */
+--kid-card: #FFFFFF        /* Card backgrounds */
+```
+
+**Typography:**
+- Font: DM Sans (existing CommonGround font)
+- Headings: font-black (900 weight)
+- Body: font-semibold (600 weight)
+- Large sizes for readability
+
+**Touch Targets:**
+- Minimum: 48×48px
+- Preferred: 56×56px or larger
+- Cards: min-height 200px
+
+**Borders:**
+- Cards: rounded-3xl (24px)
+- Buttons: rounded-2xl (16px) or rounded-full
+- Consistent 2-4px borders
+
+**Animations:**
+- Hover: scale-105, -translate-y-1, shadow-xl
+- Active: scale-100, translate-y-0
+- Transitions: duration-200 to duration-300
+- Keyframes for ARIA floating, sparkles, pulsing
+
+### Component Files
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| `aria-mascot.tsx` | `/components/kidcoms/` | AI companion with animations |
+| `kid-dashboard-card.tsx` | `/components/kidcoms/` | Navigation cards |
+| `kid-bottom-nav.tsx` | `/components/kidcoms/` | Bottom navigation bar |
+| `kid-contact-card.tsx` | `/components/kidcoms/` | Contact display with call buttons |
+| `kid-movie-card.tsx` | `/components/kidcoms/` | Video display with play button |
+| `kid-book-card.tsx` | `/components/kidcoms/` | Book display with read indicator |
+| `kid-game-card.tsx` | `/components/kidcoms/` | Game display with difficulty |
+| `memory-game.tsx` | `/components/kidcoms/arcade/` | Memory matching game |
+| `tic-tac-toe.tsx` | `/components/kidcoms/arcade/` | Tic-tac-toe game |
+| `drawing-pad.tsx` | `/components/kidcoms/arcade/` | Canvas drawing tool |
+
+### Page Files
+
+| Page | Path | Purpose |
+|------|------|---------|
+| Dashboard | `/app/my-circle/child/dashboard/page.tsx` | Main hub |
+| My Circle | `/app/my-circle/child/my-circle-page/page.tsx` | Contacts |
+| Movies | `/app/my-circle/child/movies/page.tsx` | Video library |
+| Library | `/app/my-circle/child/library/page.tsx` | Storybooks |
+| Arcade | `/app/my-circle/child/arcade/page.tsx` | Games |
+
+### Future Enhancements
+
+**Planned Features:**
+1. **Game Routes**: Individual game pages at `/arcade/{game-id}`
+2. **Theater Integration**: Direct navigation to theater mode from movies/library
+3. **Achievement System**: Badges and rewards for game completion
+4. **Customization**: Avatar selection, theme colors, name preferences
+5. **More Games**: Simon Says, Matching pairs, Coloring book
+6. **Multiplayer**: Play games with contacts during calls
+7. **Read-Along**: Synchronized PDF page turning in theater mode
+8. **Voice Messages**: Record and send audio messages to contacts
 
 ---
 
