@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Users, BookOpen, Gamepad2, Film, MessageCircle } from 'lucide-react';
+import { Users, BookOpen, Gamepad2, Film } from 'lucide-react';
 import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidDashboardCard } from '@/components/kidcoms/kid-dashboard-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
@@ -177,21 +177,6 @@ export default function ChildDashboardPage() {
                 color="green"
                 onClick={() => router.push('/my-circle/child/movies')}
                 className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
-              />
-            </div>
-
-            {/* MESSAGES Card (Future Feature - Disabled) */}
-            <div className="group opacity-60">
-              <KidDashboardCard
-                title="MESSAGES"
-                subtitle="Coming Soon!"
-                icon={<MessageCircle className="w-full h-full" />}
-                color="amber"
-                onClick={() => {
-                  // Future feature
-                }}
-                disabled
-                className="border border-gray-300"
               />
             </div>
           </div>
