@@ -295,12 +295,8 @@ function FindProfessionalsContent() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="relative">
-          <div className="w-16 h-16 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-            <Sparkles className="h-8 w-8 text-cg-sage animate-pulse" />
-          </div>
-        </div>
-        <p className="mt-4 text-muted-foreground font-medium">Loading directory...</p>
+        <div className="w-14 h-14 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin" />
+        <p className="mt-4 text-slate-600 font-medium">Loading directory...</p>
       </div>
     );
   }
@@ -313,7 +309,7 @@ function FindProfessionalsContent() {
           <ArrowLeft className="h-5 w-5" />
         </CGButton>
         <div>
-          <h1 className="text-2xl font-semibold text-foreground flex items-center gap-3">
+          <h1 className="text-2xl font-semibold text-foreground flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
             <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
               <Building2 className="h-5 w-5 text-cg-sage" />
             </div>
@@ -425,7 +421,7 @@ function FindProfessionalsContent() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-slate-900 truncate group-hover:text-[#2C5F5D] transition-colors">
+                  <h3 className="font-bold text-slate-900 truncate group-hover:text-[#2C5F5D] transition-colors" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                     {firm.name}
                   </h3>
                   <div className="flex items-center gap-2 mt-1.5">
@@ -499,7 +495,7 @@ function FindProfessionalsContent() {
                       </div>
                     )}
                     <div className="flex-1">
-                      <DialogTitle className="text-xl font-bold text-slate-900">{selectedFirm.name}</DialogTitle>
+                      <DialogTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{selectedFirm.name}</DialogTitle>
                       <div className="flex items-center gap-2 mt-2">
                         <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#2C5F5D]/10 text-[#2C5F5D]">
                           {getFirmTypeLabel(selectedFirm.firm_type)}
@@ -572,7 +568,7 @@ function FindProfessionalsContent() {
                 {/* Practice Areas */}
                 {selectedFirm.practice_areas && selectedFirm.practice_areas.length > 0 && (
                   <div>
-                    <Label className="text-sm font-medium">Practice Areas</Label>
+                    <Label className="text-sm font-semibold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Practice Areas</Label>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {selectedFirm.practice_areas.map((area) => (
                         <span
@@ -589,7 +585,7 @@ function FindProfessionalsContent() {
                 {/* Team Members */}
                 {selectedFirm.professionals && selectedFirm.professionals.length > 0 && (
                   <div>
-                    <Label className="text-sm font-medium">Team Members</Label>
+                    <Label className="text-sm font-semibold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Team Members</Label>
                     <div className="space-y-2 mt-2">
                       {selectedFirm.professionals.map((prof) => (
                         <button
@@ -650,7 +646,7 @@ function FindProfessionalsContent() {
                 {/* Family File Selection - show when no familyFileId but user has family files */}
                 {!familyFileId && familyFiles.length > 1 && (
                   <div className="space-y-3">
-                    <Label className="text-sm font-medium">Select Family File</Label>
+                    <Label className="text-sm font-semibold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Select Family File</Label>
                     <p className="text-xs text-muted-foreground">
                       Choose which family file to invite this firm to:
                     </p>
@@ -765,7 +761,7 @@ function FindProfessionalsContent() {
 export default function FindProfessionalsPage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
         <Navigation />
         <PageContainer>
           <FindProfessionalsContent />

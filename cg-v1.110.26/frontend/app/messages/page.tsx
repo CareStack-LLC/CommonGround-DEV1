@@ -150,7 +150,7 @@ function EmptyChatState({ onCompose }: { onCompose: () => void }) {
       <div className="w-20 h-20 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center mb-6">
         <Shield className="h-10 w-10 text-[#2C5F5D]" />
       </div>
-      <h3 className="text-xl font-semibold text-foreground mb-2">
+      <h3 className="text-xl font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
         The Neutral Zone
       </h3>
       <p className="text-muted-foreground max-w-sm mb-6">
@@ -194,7 +194,7 @@ function ChatHeader({
             <Users className="h-5 w-5 text-[#2C5F5D]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="font-bold text-slate-900 truncate">{familyFileName}</h2>
+            <h2 className="font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFileName}</h2>
             <p className="text-xs text-slate-600 truncate">{agreementTitle}</p>
           </div>
         </div>
@@ -225,7 +225,10 @@ function ConversationSelector({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-[#2C5F5D] border-t-transparent rounded-full animate-spin" />
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin" />
+          <p className="text-sm text-slate-600 font-medium">Loading conversations...</p>
+        </div>
       </div>
     );
   }
@@ -236,7 +239,7 @@ function ConversationSelector({
         <div className="w-16 h-16 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center mx-auto mb-4">
           <Users className="h-8 w-8 text-[#2C5F5D]" />
         </div>
-        <h3 className="font-medium text-foreground mb-2">No Family Files</h3>
+        <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No Family Files</h3>
         <p className="text-sm text-muted-foreground mb-4">
           Create a family file to start messaging
         </p>
@@ -265,8 +268,8 @@ function ConversationSelector({
                 <Users className="h-5 w-5 text-[#2C5F5D]" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-slate-900 truncate">{item.familyFile.title}</p>
-                <p className="text-xs text-slate-600">
+                <p className="font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{item.familyFile.title}</p>
+                <p className="text-xs text-slate-600 font-medium">
                   {item.agreements.length} agreement{item.agreements.length !== 1 ? 's' : ''}
                 </p>
               </div>
@@ -561,7 +564,7 @@ function MessagesContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
       <Navigation />
 
       <div className="flex-1 max-w-7xl mx-auto w-full">
@@ -570,14 +573,14 @@ function MessagesContent() {
           {/* Sidebar - Conversations */}
           <aside className={`
             ${showSidebar ? 'flex' : 'hidden lg:flex'}
-            w-full lg:w-80 flex-col border-r border-border bg-card
+            w-full lg:w-80 flex-col border-r-2 border-slate-200 bg-white shadow-sm
             absolute lg:relative inset-0 lg:inset-auto z-20 lg:z-auto
           `}>
             {/* Sidebar Header */}
             <div className="p-4 border-b border-border">
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => router.push('/dashboard')}
+                  onClick={() => router.back()}
                   className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
                   aria-label="Go back"
                 >
@@ -607,7 +610,7 @@ function MessagesContent() {
           {/* Main Chat Area */}
           <main className={`
             ${!showSidebar || selectedAgreement ? 'flex' : 'hidden lg:flex'}
-            flex-1 flex flex-col bg-background overflow-hidden
+            flex-1 flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-50 overflow-hidden
           `}>
             {!selectedAgreement ? (
               /* No Agreement Selected */

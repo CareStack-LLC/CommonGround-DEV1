@@ -133,12 +133,8 @@ function FamilyFilesContent() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="relative">
-          <div className="w-16 h-16 rounded-full bg-[#2C5F5D]/10 flex items-center justify-center">
-            <Sparkles className="h-8 w-8 text-[#2C5F5D] animate-pulse" />
-          </div>
-        </div>
-        <p className="mt-4 text-muted-foreground font-medium">Loading your family files...</p>
+        <div className="w-14 h-14 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin" />
+        <p className="mt-4 text-slate-600 font-medium">Loading your family files...</p>
       </div>
     );
   }
@@ -328,7 +324,7 @@ function FamilyFilesContent() {
 export default function FamilyFilesPage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
         <Navigation />
         <PageContainer>
           <FamilyFilesContent />

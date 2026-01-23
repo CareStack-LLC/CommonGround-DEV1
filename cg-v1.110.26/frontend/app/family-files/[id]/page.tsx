@@ -365,12 +365,8 @@ function FamilyFileDetailContent() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="relative">
-          <div className="w-16 h-16 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-            <Sparkles className="h-8 w-8 text-cg-sage animate-pulse" />
-          </div>
-        </div>
-        <p className="mt-4 text-muted-foreground font-medium">Loading family file...</p>
+        <div className="w-14 h-14 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin" />
+        <p className="mt-4 text-slate-600 font-medium">Loading family file...</p>
       </div>
     );
   }
@@ -412,7 +408,7 @@ function FamilyFileDetailContent() {
               <div className="w-10 h-10 rounded-xl bg-cg-sage-subtle flex items-center justify-center">
                 <FolderHeart className="h-5 w-5 text-cg-sage" />
               </div>
-              <h1 className="text-2xl font-semibold text-foreground">{familyFile.title}</h1>
+              <h1 className="text-2xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFile.title}</h1>
               {familyFile.has_court_case && (
                 <CGBadge variant="slate">
                   <Scale className="h-3 w-3 mr-1" />
@@ -432,7 +428,7 @@ function FamilyFileDetailContent() {
           </SheetTrigger>
           <SheetContent className="w-full sm:max-w-md overflow-y-auto">
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
+              <SheetTitle className="flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 <Settings className="h-5 w-5 text-cg-sage" />
                 Family File Settings
               </SheetTitle>
@@ -1317,7 +1313,7 @@ function FamilyFileDetailContent() {
 export default function FamilyFileDetailPage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-cg-background pb-20 lg:pb-0">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
         <Navigation />
         <PageContainer>
           <FamilyFileDetailContent />

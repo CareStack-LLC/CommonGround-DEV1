@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MFA Factor Enrolled</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f8faf9;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background-color: #4a5d53;
+            /* cg-sage-dark */
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .content p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #4a5d53;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #3b4a42;
+        }
+
+        .btn-alert {
+            background-color: #c53030 !important;
+        }
+
+        .btn-alert:hover {
+            background-color: #9b2c2c !important;
+        }
+
+        .info-box {
+            background-color: #f8faf9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .info-row {
+            margin-bottom: 10px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #4a5d53;
+            display: inline-block;
+            width: 100px;
+        }
+
+        .footer {
+            background-color: #f1f3f2;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .footer a {
+            color: #4a5d53;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CommonGround</h1>
+        </div>
+
+        <div class="content">
+            <h2 style="color: #4a5d53; margin-top: 0;">New MFA Enrolled</h2>
+            <p>
+                A new Multi-Factor Authentication (MFA) method has been enrolled for your CommonGround account.
+            </p>
+
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="label">Type:</span> <strong>{{ .FactorType }}</strong>
+                </div>
+                <div class="info-row">
+                    <span class="label">Account:</span> {{ .Email }}
+                </div>
+            </div>
+
+            <p style="margin-top: 10px;">
+                <strong>Did you NOT make this change?</strong><br>
+                If you did not enroll this new authentication factor, please contact support immediately to secure your
+                account.
+            </p>
+
+            <!-- Support Link (Placeholder) -->
+            <a href="mailto:support@commonground.com" class="btn btn-alert">Contact Support</a>
+
+        </div>
+
+        <div class="footer">
+            &copy; 2026 CommonGround. All rights reserved.<br>
+            Building peace for co-parents everywhere.
+        </div>
+    </div>
+</body>
+
+</html>

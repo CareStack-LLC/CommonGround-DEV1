@@ -1058,15 +1058,13 @@ function DashboardContent() {
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         <Navigation />
         <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
             <div className="text-center">
-              <div className="w-12 h-12 bg-[#2C5F5D]/20 rounded-full flex items-center justify-center mx-auto animate-pulse">
-                <div className="w-6 h-6 bg-[#2C5F5D] rounded-full" />
-              </div>
-              <p className="mt-4 text-muted-foreground">Loading your dashboard...</p>
+              <div className="w-14 h-14 border-3 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin mx-auto" />
+              <p className="mt-4 text-slate-600 font-medium">Loading your dashboard...</p>
             </div>
           </div>
         </main>
@@ -1075,7 +1073,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation />
 
       <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
@@ -1184,7 +1182,7 @@ function DashboardContent() {
 
             {/* Action Stream */}
             <section>
-              <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide mb-3">
+              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 Action Stream
               </h3>
               <div className="space-y-3">
@@ -1340,7 +1338,7 @@ function DashboardContent() {
 
             {/* Upcoming Events */}
             <section>
-              <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide mb-3">
+              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 Coming Up
               </h3>
               <UpcomingEventsList events={dashboardSummary?.upcoming_events} />
@@ -1348,7 +1346,7 @@ function DashboardContent() {
 
             {/* Quick Actions */}
             <section>
-              <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide mb-3">
+              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 Quick Actions
               </h3>
               <div className="grid grid-cols-4 gap-3">
@@ -1378,15 +1376,16 @@ function DashboardContent() {
             {/* Family Files Summary */}
             {familyFilesWithData.length > 0 && (
               <section>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                     Family Files
                   </h3>
                   <button
                     onClick={() => router.push('/family-files')}
-                    className="text-sm text-[#2C5F5D] hover:text-[#1e4442] transition-colors"
+                    className="text-sm font-medium text-[#2C5F5D] hover:text-[#1e4442] transition-colors flex items-center gap-1"
                   >
                     View all
+                    <ChevronRight className="h-4 w-4" />
                   </button>
                 </div>
                 <div className="space-y-3">
@@ -1416,7 +1415,7 @@ function DashboardContent() {
 
             {/* Recent Activity */}
             <section>
-              <h3 className="text-sm font-medium text-[#2C5F5D] uppercase tracking-wide mb-3">
+              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 Recent Activity
               </h3>
               <div className="cg-card">

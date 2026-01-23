@@ -5,6 +5,208 @@ All notable changes to CommonGround will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-01-22
+
+### Added
+
+#### Design System Unification - Phase 7 Final Polish
+Complete design system refinement across all parent-facing pages with consistent typography, colors, and visual hierarchy.
+
+**Typography Enhancements:**
+- Applied **Crimson Text** serif font to all major page headers and titles
+- Consistent font hierarchy across Dashboard, Messages, Family Files, and Find Professionals
+- Improved visual distinction between headers (serif) and body text (sans-serif)
+- Enhanced section labels from uppercase small text to larger, more prominent titles
+
+**Page-Specific Improvements:**
+
+*Dashboard (`app/dashboard/page.tsx`):*
+- Updated all section headers: "Action Stream", "Coming Up", "Quick Actions", "Family Files", "Recent Activity"
+- Added chevron icon to "View all" links for better visual affordance
+- Improved spacing and visual consistency across sections
+- Enhanced greeting header with Crimson Text
+
+*Messages (`app/messages/page.tsx`):*
+- Applied Crimson Text to "The Neutral Zone" welcome message
+- Enhanced chat header with family file name styling
+- Improved conversation selector typography
+- Updated empty states with better font hierarchy
+
+*Family Files (`app/family-files/page.tsx`, `app/family-files/[id]/page.tsx`):*
+- Enhanced main family file titles with serif typography
+- Updated settings modal headers
+- Improved visual consistency with other pages
+
+*Find Professionals (`app/find-professionals/page.tsx`):*
+- Updated page header "Find Professionals" with Crimson Text
+- Enhanced firm card titles with serif font
+- Applied consistent typography to:
+  - Firm detail modal titles
+  - "Practice Areas" section label
+  - "Team Members" section label
+  - "Select Family File" section label
+- Upgraded section labels to semibold for better hierarchy
+
+**Loading Screen Modernization:**
+- Replaced old spinner designs with modern border-spin animation
+- Updated background gradients from tan/beige to white gradient
+- Consistent loading pattern: `bg-gradient-to-br from-slate-50 via-white to-slate-50`
+- Applied modern loading states to:
+  - Dashboard
+  - Messages
+  - Family Files (list and detail)
+  - Find Professionals
+
+**Navigation Improvements:**
+- Fixed Messages back arrow to use `router.back()` for proper navigation history
+- Improved back button behavior across all pages
+
+#### KidComs Theater Content Library
+Expanded watch-together content for parent-child video calls.
+
+**New Video Content (available locally, pending Git LFS setup):**
+- `Crunch.mp4` - Animated short about an alien who loves cereal (79.70 MB)
+- `Johnny Express.mp4` - Space delivery adventure
+- `The Bread.mp4` - Charming story about bread
+
+**Note:** Video files exceed GitHub's 50MB limit and will be added using Git LFS in a future commit.
+
+**New Storybook Content:**
+- `Luna_And_Midnight_.pdf` - Luna and Midnight adventure story
+
+**Documentation:**
+- Created comprehensive `/frontend/public/kidsComms/README.md` guide
+- Instructions for adding new videos and PDFs
+- Copyright and licensing guidelines
+- Content recommendations and sources
+- Technical limits and troubleshooting
+
+**Content Guidelines:**
+- Family-friendly (G or PG rated)
+- Educational or entertaining focus
+- Safe for co-parent viewing
+- Legally licensed or copyright-free
+
+#### Custody Tracker Verification (Workstream 7)
+Complete verification and documentation of custody time tracking system.
+
+**Deliverables:**
+- Comprehensive test suite (`backend/tests/test_custody_tracker_verification.py`)
+- Full system documentation (`docs/features/CUSTODY_TRACKER.md`)
+- Verified date counting logic (inclusive date range calculation)
+- Verified backfill accuracy (one record per day)
+- Verified exchange integration
+
+**Key Findings:**
+- Backend logic already correct: `total_days = (end_date - start_date).days + 1`
+- Backfill loop properly creates one custody record per day
+- Exchange records create exactly one record per child
+- Dashboard displays total custody days accurately
+- No code changes needed - documentation and tests added for verification
+
+#### Subscription System Implementation Plan (Workstream 1)
+Detailed implementation documentation for subscription tier overhaul.
+
+**Document:** `/docs/WS1_SUBSCRIPTION_IMPLEMENTATION.md`
+
+**Subscription Tiers:**
+- **Starter** (Free) - Basic co-parenting tools, 1 family file
+- **Essential** ($9.99/month) - Full features, 3 family files, priority support
+- **Professional** ($49.99/month) - Legal practice management, unlimited cases
+
+**Features:**
+- Stripe integration with subscription lifecycle management
+- Entitlements system for feature gating
+- Usage tracking and limits enforcement
+- Billing portal integration
+- Trial periods and promotional pricing
+- Backend sync script (`backend/scripts/sync_stripe_products.py`)
+
+#### Marketing & Client Documentation
+
+**Marketing Campaign:** (`docs/marketing/campaign_dv_safety_2026.md`)
+- Domestic violence awareness campaign
+- Social media content strategy
+- Visual assets for toxic message blocking
+- Flyer designs for family courts
+
+**Email Templates:** (`docs/client_docs/`)
+- Complete Supabase email template collection (13 templates)
+- Change email notification
+- Email confirmation
+- Magic link authentication
+- MFA enrollment/unenrollment
+- Password reset and change
+- Phone number change
+- Reauth email
+- Identity linking/unlinking
+
+#### Project Planning & Documentation
+
+**Project Roadmap:** (`docs/PROJECT_ROADMAP_v1.120.md`)
+- Comprehensive 4-6 week roadmap
+- 9 major workstreams with detailed tasks
+- Timeline and deployment strategy
+- Risk mitigation plans
+- Success metrics and testing strategy
+
+**Progress Update:** (`docs/PROGRESS_UPDATE_2026-01-22.md`)
+- Session summary for January 22, 2026
+- Completed workstreams documentation
+- Test results and verification reports
+
+### Changed
+
+**Design Consistency:**
+- Unified color palette: #2C5F5D (primary teal) across all pages
+- Consistent card styling with proper shadows and transitions
+- Standardized badge variants and sizing
+- Unified spacing patterns (mb-4 for section headers, consistent gaps)
+
+**Typography System:**
+- Headers: Crimson Text (Georgia fallback)
+- Body: System font stack
+- Consistent font weights and sizes
+- Improved visual hierarchy
+
+**Loading States:**
+- Modern spinning border indicator
+- Consistent background gradients
+- Better loading messages
+
+### Fixed
+
+**Navigation:**
+- Messages back arrow now properly returns to previous screen (`router.back()`)
+- Improved navigation history handling
+
+**Settings Page:**
+- Added Shield icon back to imports (was causing build error)
+- Fixed TypeScript errors in settings components
+
+**Dashboard:**
+- Custody tracking cards now consistently show total days
+- Fixed days display to always show count (even when 0)
+- Improved "With Me" button visibility
+
+**Child Profile:**
+- Updated header gradient and button styling
+- Improved profile page consistency
+
+**Find Professionals:**
+- Enhanced firm card design
+- Improved firm detail modal styling
+- Better professional directory layout
+
+### Security
+- No security changes in this release
+
+### Performance
+- Optimized loading screen rendering
+- Improved component re-render performance with consistent patterns
+
+---
+
 ## [1.6.0] - 2026-01-18
 
 ### Added
