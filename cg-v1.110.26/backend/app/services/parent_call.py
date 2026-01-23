@@ -49,7 +49,7 @@ class ParentCallService:
         Returns:
             ParentCallRoom instance
         """
-        # Check if room already exists
+        # Check if room already exists in database
         result = await db.execute(
             select(ParentCallRoom).where(ParentCallRoom.family_file_id == family_file_id)
         )
@@ -57,6 +57,20 @@ class ParentCallService:
 
         if room:
             logger.info(f"Found existing permanent room for family file {family_file_id}")
+            # IMPORTANT: Verify the room exists in Daily.co and create if not
+            # This handles cases where the DB record exists but Daily.co room
+            # was never created or expired
+            try:
+                await self.daily_service.create_room_if_not_exists(
+                    room_name=room.daily_room_name,
+                    privacy="private",
+                    exp_minutes=525600,  # 1 year
+                    max_participants=4,
+                    enable_recording=True,
+                )
+                logger.info(f"Verified Daily.co room exists: {room.daily_room_name}")
+            except Exception as e:
+                logger.warning(f"Could not verify Daily.co room: {e}")
             return room
 
         # Get family file to construct room name
