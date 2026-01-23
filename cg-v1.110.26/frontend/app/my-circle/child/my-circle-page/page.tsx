@@ -85,7 +85,7 @@ export default function MyCirclePage() {
       const sessionData = {
         contact_type: contact.contact_type,
         contact_id: contact.contact_id,
-        session_type: type === 'video' ? 'video_call' : 'voice_call',
+        session_type: (type === 'video' ? 'video_call' : 'voice_call') as 'video_call' | 'voice_call',
       };
 
       const response = await kidcomsAPI.createChildSession(sessionData);
