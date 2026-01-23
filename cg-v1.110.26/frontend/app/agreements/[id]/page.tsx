@@ -361,7 +361,7 @@ function AgreementSectionCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="font-serif text-lg font-semibold text-foreground">
+                <h3 className="font-serif text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   {section.section_title}
                 </h3>
                 {section.is_required && (
@@ -634,7 +634,7 @@ function AgreementDetailsContent() {
   const completionPercent = Math.round((completedSections / totalSections) * 100);
 
   return (
-    <div className="min-h-screen bg-cg-sand">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation />
 
       {/* Back Button */}
@@ -681,7 +681,7 @@ function AgreementDetailsContent() {
         {!isLoading && agreement && (
           <div className="space-y-8">
             {/* Document Header - Paper Texture Background */}
-            <div className="cg-card overflow-hidden">
+            <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
               {/* Decorative Header Bar */}
               <div className="h-2 bg-gradient-to-r from-cg-sage via-cg-amber to-cg-sage" />
 
@@ -700,7 +700,7 @@ function AgreementDetailsContent() {
                         </span>
                       )}
                     </div>
-                    <h1 className="font-serif text-3xl font-bold text-foreground">
+                    <h1 className="font-serif text-3xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                       {agreement.title}
                     </h1>
                   </div>
@@ -794,8 +794,8 @@ function AgreementDetailsContent() {
             )}
 
             {/* Actions Card */}
-            <div className="cg-card p-6">
-              <h3 className="font-semibold text-foreground mb-4">Actions</h3>
+            <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+              <h3 className="font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Actions</h3>
               <div className="space-y-3">
                 {/* Draft Actions */}
                 {agreement.status === 'draft' && (
@@ -917,11 +917,11 @@ function AgreementDetailsContent() {
             </div>
 
             {/* Sections - The Living Document */}
-            <div className="cg-card overflow-hidden">
-              <div className="p-6 border-b border-border">
+            <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-6 border-b border-slate-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-serif text-xl font-semibold text-foreground">
+                    <h3 className="font-serif text-xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                       Agreement Sections
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
