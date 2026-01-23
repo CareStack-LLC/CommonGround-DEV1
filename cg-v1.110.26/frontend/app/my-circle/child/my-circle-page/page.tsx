@@ -18,7 +18,7 @@ interface ChildUserData {
 interface ChildContact {
   contact_id: string;
   display_name: string;
-  contact_type: string;
+  contact_type: 'parent_a' | 'parent_b' | 'circle';
   relationship?: string;
   can_video_call: boolean;
   can_voice_call: boolean;
