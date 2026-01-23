@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd cg-v1.110.26/frontend && npm run build",
+  "outputDirectory": "cg-v1.110.26/frontend/.next",
+  "installCommand": "cd cg-v1.110.26/frontend && npm install",
+  "framework": "nextjs",
+  "regions": ["pdx1"]
+}
