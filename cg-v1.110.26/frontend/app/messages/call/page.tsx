@@ -40,7 +40,7 @@ interface ARIAWarning {
 }
 
 function ParentCallContent() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const familyFileId = searchParams.get('family_file_id');
@@ -150,7 +150,7 @@ function ParentCallContent() {
     daily.join({
       url: sessionData.room_url,
       token: sessionData.token,
-      userName: user?.profile?.display_name || user?.email || 'Parent',
+      userName: profile?.display_name || user?.email || 'Parent',
     });
 
     // Event listeners
