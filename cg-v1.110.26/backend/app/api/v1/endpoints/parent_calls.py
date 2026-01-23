@@ -65,6 +65,46 @@ async def debug_daily_config():
     }
 
 
+@router.get("/debug-token-test")
+async def debug_token_test():
+    """Test Daily.co token creation directly (remove in production)."""
+    import httpx
+    from datetime import datetime, timedelta
+
+    if not daily_service.api_key:
+        return {"error": "No API key configured"}
+
+    exp_time = datetime.utcnow() + timedelta(minutes=60)
+    token_config = {
+        "properties": {
+            "room_name": "cg-parent-FF-001-2026",
+            "user_name": "Test User",
+            "user_id": "test-123",
+            "is_owner": True,
+            "exp": int(exp_time.timestamp()),
+        }
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.daily.co/v1/meeting-tokens",
+                json=token_config,
+                headers={
+                    "Authorization": f"Bearer {daily_service.api_key}",
+                    "Content-Type": "application/json"
+                },
+                timeout=30.0
+            )
+            return {
+                "status_code": response.status_code,
+                "response": response.json() if response.status_code in [200, 201] else response.text,
+                "token_received": response.status_code in [200, 201],
+            }
+    except Exception as e:
+        return {"error": str(e), "error_type": type(e).__name__}
+
+
 @router.post("/", response_model=CallSessionJoinResponse)
 async def initiate_call(
     call_create: CallSessionCreate,
