@@ -259,9 +259,9 @@ class DailyVideoService:
                     logger.info(f"Created meeting token for {user_name} in {room_name}")
                     return data.get("token")
                 else:
-                    logger.error(f"Failed to create token (status {response.status_code}): {response.text}")
+                    logger.error(f"Daily.co token creation failed (status {response.status_code}): {response.text}")
+                    logger.error(f"Token request was for room: {room_name}, user: {user_name}")
                     # Fall back to mock token on API error
-                    logger.warning(f"Falling back to mock token for {user_name}")
                     import secrets
                     return f"mock_{secrets.token_urlsafe(32)}"
 
