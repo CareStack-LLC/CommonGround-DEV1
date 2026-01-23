@@ -117,22 +117,26 @@ interface PageContainerProps {
   children: React.ReactNode;
   className?: string;
   narrow?: boolean; // For forms, focused content
+  background?: 'sand' | 'white' | 'transparent';
 }
 
 export function PageContainer({
   children,
   className = '',
   narrow = false,
+  background = 'sand',
 }: PageContainerProps) {
+  const bgClasses = {
+    sand: 'bg-cg-sand min-h-screen',
+    white: 'bg-card min-h-screen',
+    transparent: '',
+  };
+
   return (
-    <main
-      className={`
-        mx-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8
-        ${narrow ? 'max-w-3xl' : 'max-w-7xl'}
-        ${className}
-      `}
-    >
-      {children}
+    <main className={`${bgClasses[background]} ${className}`}>
+      <div className={`mx-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8 ${narrow ? 'max-w-3xl' : 'max-w-7xl'}`}>
+        {children}
+      </div>
     </main>
   );
 }
