@@ -132,8 +132,8 @@ export default function ChildDashboardPage() {
         </div>
 
         {/* Dashboard Cards */}
-        <main className="max-w-5xl mx-auto px-6 pb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <main className="max-w-4xl mx-auto px-6 pb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {/* MY CIRCLE Card */}
             <div className="group transform hover:scale-[1.02] transition-all duration-200">
               <KidDashboardCard
