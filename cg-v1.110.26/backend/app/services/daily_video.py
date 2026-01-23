@@ -232,6 +232,8 @@ class DailyVideoService:
 
         exp_time = datetime.utcnow() + timedelta(minutes=exp_minutes)
 
+        # Note: enable_recording on tokens requires specific Daily.co plan/config
+        # Only include essential properties to avoid API errors
         token_config = {
             "properties": {
                 "room_name": room_name,
@@ -239,11 +241,14 @@ class DailyVideoService:
                 "user_id": user_id,
                 "is_owner": is_owner,
                 "exp": int(exp_time.timestamp()),
-                "start_video_off": start_video_off,
-                "start_audio_off": start_audio_off,
-                "enable_recording": enable_recording,
             }
         }
+
+        # Only add optional properties if they differ from defaults
+        if start_video_off:
+            token_config["properties"]["start_video_off"] = True
+        if start_audio_off:
+            token_config["properties"]["start_audio_off"] = True
 
         try:
             async with httpx.AsyncClient() as client:
