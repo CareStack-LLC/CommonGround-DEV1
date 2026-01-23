@@ -371,11 +371,11 @@ export function TheaterMode({
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="fixed inset-0 z-40 bg-slate-900 flex flex-col">
+    <div className="fixed inset-0 z-40 bg-[#2C3E50] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-800/80 backdrop-blur-sm border-b border-slate-700/50">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#2C5F5D]/20 backdrop-blur-sm border-b border-[#2C5F5D]/30">
         <div className="flex items-center space-x-3">
-          <span className="text-cg-sage text-sm font-medium px-3 py-1 bg-cg-sage/10 rounded-lg border border-cg-sage/20">
+          <span className="text-[#2C5F5D] text-sm font-medium px-3 py-1 bg-[#2C5F5D]/10 rounded-lg border border-[#2C5F5D]/20">
             Theater Mode
           </span>
           {content && (
@@ -385,7 +385,7 @@ export function TheaterMode({
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowLibrary(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+            className="flex items-center space-x-2 px-3 py-1.5 bg-[#2C5F5D] hover:bg-[#2C5F5D]/90 text-white rounded-lg transition-colors"
           >
             <Library className="h-4 w-4" />
             <span className="text-sm hidden sm:inline">Library</span>
@@ -407,7 +407,7 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-cg-sage/40 bg-slate-800"
+              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D]/40 bg-[#2C3E50]"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -420,7 +420,7 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-cg-sage/40 bg-slate-800"
+              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D]/40 bg-[#2C3E50]"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -428,7 +428,7 @@ export function TheaterMode({
 
           {/* Local participant PiP */}
           {localParticipant && (
-            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-slate-600/50 bg-slate-800">
+            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D]/30 bg-[#2C3E50]">
               <PiPVideoTile participant={localParticipant} />
             </div>
           )}
@@ -441,18 +441,18 @@ export function TheaterMode({
             <div className="flex-1 flex flex-col items-center justify-center">
               <div className="text-center px-4">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-cg-sage rounded-full blur-2xl opacity-20" />
-                  <Library className="relative h-16 w-16 md:h-20 md:w-20 text-slate-500 mx-auto" />
+                  <div className="absolute inset-0 bg-[#2C5F5D] rounded-full blur-2xl opacity-20" />
+                  <Library className="relative h-16 w-16 md:h-20 md:w-20 text-gray-400 mx-auto" />
                 </div>
                 <h2 className="text-lg md:text-xl text-white mb-2 font-semibold">
                   Choose something to watch together
                 </h2>
-                <p className="text-slate-400 mb-6 text-sm md:text-base">
+                <p className="text-gray-400 mb-6 text-sm md:text-base">
                   Select a video or storybook from the library
                 </p>
                 <button
                   onClick={() => setShowLibrary(true)}
-                  className="px-6 py-3 bg-cg-sage hover:bg-cg-sage-light text-white rounded-xl font-medium transition-all shadow-lg shadow-cg-sage/20 hover:shadow-cg-sage/30"
+                  className="px-6 py-3 bg-[#2C5F5D] hover:bg-[#2C5F5D]/90 text-white rounded-xl font-medium transition-all shadow-lg shadow-[#2C5F5D]/20 hover:shadow-[#2C5F5D]/30"
                 >
                   Open Library
                 </button>
@@ -502,13 +502,13 @@ export function TheaterMode({
       </div>
 
       {/* Bottom Controls */}
-      <div className="px-4 py-3 bg-slate-800/90 backdrop-blur-sm safe-area-bottom border-t border-slate-700/50">
+      <div className="px-4 py-3 bg-[#2C5F5D]/20 backdrop-blur-sm safe-area-bottom border-t border-[#2C5F5D]/30">
         <div className="flex items-center justify-center space-x-3">
           <button
             onClick={onToggleAudio}
             className={`p-3 rounded-full transition-all duration-200 ${
               isAudioOn
-                ? 'bg-slate-700 hover:bg-slate-600 text-white hover:scale-105'
+                ? 'bg-[#2C5F5D] hover:bg-[#2C5F5D]/90 text-white hover:scale-105'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
@@ -518,7 +518,7 @@ export function TheaterMode({
             onClick={onToggleVideo}
             className={`p-3 rounded-full transition-all duration-200 ${
               isVideoOn
-                ? 'bg-slate-700 hover:bg-slate-600 text-white hover:scale-105'
+                ? 'bg-[#2C5F5D] hover:bg-[#2C5F5D]/90 text-white hover:scale-105'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
@@ -583,8 +583,8 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-800">
-          <div className="w-10 h-10 rounded-full bg-cg-sage flex items-center justify-center text-white text-lg font-semibold shadow-lg shadow-cg-sage/20">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-semibold shadow-lg shadow-[#2C5F5D]/20">
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
         </div>
@@ -597,7 +597,7 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1">
         <span className="text-white text-xs truncate block drop-shadow-lg">
           {participant.odName}
-          {participant.isLocal && <span className="text-cg-sage"> (You)</span>}
+          {participant.isLocal && <span className="text-[#D97757]"> (You)</span>}
         </span>
       </div>
 

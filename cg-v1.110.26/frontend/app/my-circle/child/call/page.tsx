@@ -331,11 +331,11 @@ function ChildCallContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center">
-        <div className="text-center text-white">
-          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4" />
-          <p className="text-xl font-bold">Connecting your call...</p>
-          <p className="text-white/80 mt-2">Getting everything ready! 🎉</p>
+      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-[#2C5F5D]" />
+          <p className="text-xl font-bold text-[#2C3E50]">Connecting your call...</p>
+          <p className="text-gray-600 mt-2">Getting everything ready! 🎉</p>
         </div>
       </div>
     );
@@ -343,14 +343,14 @@ function ChildCallContent() {
 
   if (error || !callSession) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4">
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">😕</div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Oops!</h1>
+          <h1 className="text-2xl font-bold text-[#2C5F5D] mb-2">Oops!</h1>
           <p className="text-gray-600 mb-6">{error || 'Something went wrong'}</p>
           <button
             onClick={handleGoBack}
-            className="px-6 py-3 bg-purple-500 text-white rounded-full font-semibold hover:bg-purple-600 transition-colors"
+            className="px-6 py-3 bg-[#2C5F5D] text-white rounded-full font-semibold hover:bg-[#2C5F5D]/90 transition-all hover:scale-105"
           >
             Go Back
           </button>
@@ -361,10 +361,10 @@ function ChildCallContent() {
 
   if (callEnded) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4">
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">👋</div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Call Ended</h1>
+          <h1 className="text-2xl font-bold text-[#2C5F5D] mb-2">Call Ended</h1>
           <p className="text-gray-600 mb-4">
             You talked with {callSession.contactName}!
           </p>
@@ -383,7 +383,7 @@ function ChildCallContent() {
       {/* Main Video Area */}
       <div className="flex-1 flex flex-col">
         {/* Header - Desktop */}
-        <header className="hidden md:flex bg-gradient-to-r from-purple-600/50 to-pink-600/50 px-4 py-2 items-center justify-between">
+        <header className="hidden md:flex bg-gradient-to-r from-[#2C5F5D]/50 to-[#D97757]/50 px-4 py-2 items-center justify-between">
           <div className="flex items-center space-x-3">
             <button
               onClick={handleGoBack}
@@ -409,13 +409,13 @@ function ChildCallContent() {
         {/* Video Area */}
         <div className="flex-1 relative overflow-hidden">
           {!isCallJoined ? (
-            <div className="h-full bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center">
+            <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#D97757]/80 flex items-center justify-center">
               <div className="text-center">
                 <Loader2 className="h-16 w-16 animate-spin text-white mx-auto mb-4" />
                 <p className="text-white text-xl font-bold">
                   {isJoiningCall ? 'Joining...' : 'Connecting...'}
                 </p>
-                <p className="text-white/60 mt-2">Almost there! 🚀</p>
+                <p className="text-white/80 mt-2">Almost there! 🚀</p>
               </div>
             </div>
           ) : (
@@ -425,7 +425,7 @@ function ChildCallContent() {
                 {remoteParticipants.length > 0 ? (
                   <VideoTile participant={remoteParticipants[0]} isFullScreen />
                 ) : (
-                  <div className="h-full bg-gradient-to-br from-purple-800 to-pink-800 flex items-center justify-center">
+                  <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#D97757]/80 flex items-center justify-center">
                     <div className="text-center">
                       <div className="text-6xl mb-4">⏳</div>
                       <p className="text-white text-lg font-bold">Waiting for {callSession.contactName}...</p>
@@ -435,7 +435,7 @@ function ChildCallContent() {
 
                 {/* Local participant PiP */}
                 {localParticipant && (
-                  <div className="absolute top-4 right-4 w-28 h-40 rounded-2xl overflow-hidden shadow-2xl border-2 border-purple-400 z-10">
+                  <div className="absolute top-4 right-4 w-28 h-40 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D] z-10">
                     <VideoTile participant={localParticipant} isCompact />
                   </div>
                 )}
@@ -516,7 +516,7 @@ function ChildCallContent() {
             <button
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
               className={`hidden md:flex p-3 rounded-full transition-all ${activePanel === 'chat'
-                ? 'bg-purple-600 text-white'
+                ? 'bg-[#2C5F5D] text-white'
                 : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                 }`}
               title="Chat"
@@ -528,7 +528,7 @@ function ChildCallContent() {
             <button
               onClick={() => setActivePanel(activePanel === 'participants' ? null : 'participants')}
               className={`hidden md:flex p-3 rounded-full transition-all ${activePanel === 'participants'
-                ? 'bg-purple-600 text-white'
+                ? 'bg-[#2C5F5D] text-white'
                 : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                 }`}
               title="Participants"
@@ -542,7 +542,7 @@ function ChildCallContent() {
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-all transform hover:scale-105 ${!isCallJoined
                 ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
-                : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white'
+                : 'bg-gradient-to-r from-[#2C5F5D] to-[#D97757] hover:from-[#2C5F5D]/90 hover:to-[#D97757]/90 text-white'
                 }`}
               title="Watch Together! 🎬"
             >
@@ -597,7 +597,7 @@ function ChildCallContent() {
                     messages.map((msg) => (
                       <div key={msg.id} className="p-3 bg-gray-700 rounded-xl">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-bold text-purple-400">{msg.sender}</span>
+                          <span className="text-sm font-bold text-[#2C5F5D]">{msg.sender}</span>
                           <span className="text-xs text-gray-500">
                             {msg.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
@@ -616,12 +616,12 @@ function ChildCallContent() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
-                      className="flex-1 bg-gray-700 text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="flex-1 bg-gray-700 text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C5F5D]"
                     />
                     <button
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim()}
-                      className="p-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl disabled:opacity-50"
+                      className="p-2 bg-[#2C5F5D] hover:bg-[#2C5F5D]/90 text-white rounded-xl disabled:opacity-50"
                     >
                       <Send className="h-5 w-5" />
                     </button>
@@ -637,7 +637,7 @@ function ChildCallContent() {
                     key={participant.odId}
                     className="flex items-center space-x-3 p-3 bg-gray-700 rounded-xl"
                   >
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-lg font-bold">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2C5F5D] to-[#D97757] flex items-center justify-center text-white text-lg font-bold">
                       {participant.odName[0]?.toUpperCase() || '?'}
                     </div>
                     <div className="flex-1">
@@ -743,7 +743,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-700 to-pink-700">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]">
             <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold">
               {participant.odName[0]?.toUpperCase() || '?'}
             </div>
@@ -772,7 +772,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-800 to-pink-800">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]/80">
             <div className="w-32 h-32 rounded-full bg-white/20 flex items-center justify-center text-white text-5xl font-bold">
               {participant.odName[0]?.toUpperCase() || '?'}
             </div>
@@ -814,7 +814,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-700 to-pink-700">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]">
           <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center text-white text-4xl font-bold">
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
@@ -844,10 +844,10 @@ export default function ChildCallPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center">
-          <div className="text-center text-white">
-            <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4" />
-            <p className="text-xl font-bold">Loading...</p>
+        <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-[#2C5F5D]" />
+            <p className="text-xl font-bold text-[#2C3E50]">Loading...</p>
           </div>
         </div>
       }
