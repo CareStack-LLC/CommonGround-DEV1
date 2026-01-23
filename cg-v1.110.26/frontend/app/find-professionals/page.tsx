@@ -367,7 +367,6 @@ function FindProfessionalsContent() {
             </div>
           </form>
         </div>
-      </div>
 
       {/* Results */}
       {error ? (
