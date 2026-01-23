@@ -463,180 +463,228 @@ function FindProfessionalsContent() {
 
       {/* Firm Detail Modal */}
       <Dialog open={!!selectedFirm} onOpenChange={() => setSelectedFirm(null)}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto p-0">
           {selectedFirm && (
             <>
-              <DialogHeader>
-                <div className="bg-gradient-to-br from-[#2C5F5D]/5 via-white to-[#2C5F5D]/5 rounded-xl p-4 border border-[#2C5F5D]/10">
-                  <div className="flex items-start gap-4">
-                    {selectedFirm.logo_url ? (
-                      <img
-                        src={selectedFirm.logo_url}
-                        alt={selectedFirm.name}
-                        className="w-16 h-16 rounded-xl object-contain bg-white p-2 shadow-sm"
-                      />
-                    ) : (
-                      <div
-                        className="w-16 h-16 rounded-xl flex items-center justify-center shadow-sm"
-                        style={{ backgroundColor: selectedFirm.primary_color || '#2C5F5D' }}
-                      >
-                        <Building2 className="h-8 w-8 text-white" />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <DialogTitle className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{selectedFirm.name}</DialogTitle>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[#2C5F5D]/10 text-[#2C5F5D]">
-                          {getFirmTypeLabel(selectedFirm.firm_type)}
-                        </span>
-                        {selectedFirm.city && (
-                          <span className="inline-flex items-center gap-1 text-sm text-slate-600">
-                            <MapPin className="h-3.5 w-3.5" />
-                            {selectedFirm.city}, {selectedFirm.state}
-                          </span>
-                        )}
-                      </div>
+              {/* Hero Header */}
+              <div className="relative bg-gradient-to-br from-[#2C5F5D] via-[#2C5F5D]/95 to-[#1a4746] p-8 pb-6">
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30" />
+                <div className="relative flex items-start gap-6">
+                  {selectedFirm.logo_url ? (
+                    <img
+                      src={selectedFirm.logo_url}
+                      alt={selectedFirm.name}
+                      className="w-20 h-20 rounded-xl object-contain bg-white p-3 shadow-lg flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-lg bg-white/10 backdrop-blur-sm border border-white/20 flex-shrink-0">
+                      <Building2 className="h-10 w-10 text-white" />
                     </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <DialogTitle className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                      {selectedFirm.name}
+                    </DialogTitle>
+                    <div className="flex flex-wrap items-center gap-3 mb-3">
+                      <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-white/20 backdrop-blur-sm text-white border border-white/30">
+                        {getFirmTypeLabel(selectedFirm.firm_type)}
+                      </span>
+                      {selectedFirm.city && (
+                        <span className="inline-flex items-center gap-1.5 text-white/90">
+                          <MapPin className="h-4 w-4" />
+                          <span className="font-medium">{selectedFirm.city}, {selectedFirm.state}</span>
+                        </span>
+                      )}
+                      {selectedFirm.professionals && selectedFirm.professionals.length > 0 && (
+                        <span className="inline-flex items-center gap-1.5 text-white/90">
+                          <Users className="h-4 w-4" />
+                          <span className="font-medium">{selectedFirm.professionals.length} {selectedFirm.professionals.length === 1 ? 'Professional' : 'Professionals'}</span>
+                        </span>
+                      )}
+                    </div>
+                    {selectedFirm.description && (
+                      <p className="text-white/90 text-sm leading-relaxed line-clamp-2">
+                        {selectedFirm.description}
+                      </p>
+                    )}
                   </div>
                 </div>
-              </DialogHeader>
+              </div>
 
-              <div className="space-y-4 py-4">
-                {/* Description */}
+              <div className="p-6 space-y-6">
+                {/* About Section */}
                 {selectedFirm.description && (
-                  <p className="text-sm text-muted-foreground">{selectedFirm.description}</p>
-                )}
-
-                {/* Contact Info */}
-                <div className="space-y-2">
-                  {selectedFirm.phone && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <a href={`tel:${selectedFirm.phone}`} className="text-cg-sage hover:underline">
-                        {selectedFirm.phone}
-                      </a>
-                    </div>
-                  )}
-                  {selectedFirm.email && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <a href={`mailto:${selectedFirm.email}`} className="text-cg-sage hover:underline">
-                        {selectedFirm.email}
-                      </a>
-                    </div>
-                  )}
-                  {selectedFirm.website && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <a
-                        href={selectedFirm.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-cg-sage hover:underline"
-                      >
-                        {selectedFirm.website.replace(/^https?:\/\//, '')}
-                      </a>
-                    </div>
-                  )}
-                  {(selectedFirm.address_line1 || selectedFirm.city) && (
-                    <div className="flex items-start gap-2 text-sm">
-                      <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-                      <div className="text-foreground">
-                        {selectedFirm.address_line1 && <div>{selectedFirm.address_line1}</div>}
-                        {selectedFirm.address_line2 && <div>{selectedFirm.address_line2}</div>}
-                        {selectedFirm.city && (
-                          <div>
-                            {selectedFirm.city}, {selectedFirm.state} {selectedFirm.zip_code}
-                          </div>
-                        )}
+                  <div className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-2xl p-6">
+                    <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-[#2C5F5D]" />
                       </div>
-                    </div>
-                  )}
-                </div>
+                      About Our Firm
+                    </h3>
+                    <p className="text-slate-700 leading-relaxed">{selectedFirm.description}</p>
+                  </div>
+                )}
 
                 {/* Practice Areas */}
                 {selectedFirm.practice_areas && selectedFirm.practice_areas.length > 0 && (
-                  <div>
-                    <Label className="text-sm font-semibold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Practice Areas</Label>
-                    <div className="flex flex-wrap gap-1 mt-2">
+                  <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
+                    <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center">
+                        <Sparkles className="h-4 w-4 text-purple-600" />
+                      </div>
+                      Areas of Expertise
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
                       {selectedFirm.practice_areas.map((area) => (
-                        <span
+                        <div
                           key={area}
-                          className="text-xs px-2 py-1 rounded-full bg-cg-sage-subtle text-cg-sage"
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200"
                         >
-                          {area}
-                        </span>
+                          <div className="w-1.5 h-1.5 rounded-full bg-[#2C5F5D]" />
+                          <span className="text-sm font-medium text-slate-900">{area}</span>
+                        </div>
                       ))}
                     </div>
                   </div>
                 )}
 
+                {/* Contact Information */}
+                <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/5 flex items-center justify-center">
+                      <Mail className="h-4 w-4 text-blue-600" />
+                    </div>
+                    Get in Touch
+                  </h3>
+                  <div className="grid gap-3">
+                    {selectedFirm.phone && (
+                      <a
+                        href={`tel:${selectedFirm.phone}`}
+                        className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors group"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-[#2C5F5D] transition-colors">
+                          <Phone className="h-4 w-4 text-slate-600 group-hover:text-[#2C5F5D]" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-xs text-slate-600 font-medium mb-0.5">Phone</div>
+                          <div className="text-sm font-bold text-[#2C5F5D]">{selectedFirm.phone}</div>
+                        </div>
+                      </a>
+                    )}
+                    {selectedFirm.email && (
+                      <a
+                        href={`mailto:${selectedFirm.email}`}
+                        className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors group"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-[#2C5F5D] transition-colors">
+                          <Mail className="h-4 w-4 text-slate-600 group-hover:text-[#2C5F5D]" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-xs text-slate-600 font-medium mb-0.5">Email</div>
+                          <div className="text-sm font-bold text-[#2C5F5D] truncate">{selectedFirm.email}</div>
+                        </div>
+                      </a>
+                    )}
+                    {selectedFirm.website && (
+                      <a
+                        href={selectedFirm.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors group"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-[#2C5F5D] transition-colors">
+                          <Globe className="h-4 w-4 text-slate-600 group-hover:text-[#2C5F5D]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-xs text-slate-600 font-medium mb-0.5">Website</div>
+                          <div className="text-sm font-bold text-[#2C5F5D] truncate">
+                            {selectedFirm.website.replace(/^https?:\/\//, '')}
+                          </div>
+                        </div>
+                      </a>
+                    )}
+                    {(selectedFirm.address_line1 || selectedFirm.city) && (
+                      <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-50">
+                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center flex-shrink-0">
+                          <MapPin className="h-4 w-4 text-slate-600" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-xs text-slate-600 font-medium mb-0.5">Office Location</div>
+                          <div className="text-sm font-medium text-slate-900">
+                            {selectedFirm.address_line1 && <div>{selectedFirm.address_line1}</div>}
+                            {selectedFirm.address_line2 && <div>{selectedFirm.address_line2}</div>}
+                            {selectedFirm.city && (
+                              <div>
+                                {selectedFirm.city}, {selectedFirm.state} {selectedFirm.zip_code}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* Team Members */}
                 {selectedFirm.professionals && selectedFirm.professionals.length > 0 && (
-                  <div>
-                    <Label className="text-sm font-semibold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Team Members</Label>
-                    <div className="space-y-2 mt-2">
+                  <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center">
+                        <Users className="h-4 w-4 text-emerald-600" />
+                      </div>
+                      Our Team
+                    </h3>
+                    <p className="text-sm text-slate-600 mb-4">
+                      Select a specific attorney or invite the entire firm to your case
+                    </p>
+                    <div className="space-y-3">
                       {selectedFirm.professionals.map((prof) => (
                         <button
                           key={prof.id}
                           onClick={() => setSelectedProfessionalId(
                             selectedProfessionalId === prof.id ? null : prof.id
                           )}
-                          className={`w-full flex items-center justify-between p-3 rounded-xl border transition-colors text-left ${
+                          className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
                             selectedProfessionalId === prof.id
-                              ? 'border-cg-sage bg-cg-sage-subtle/50'
-                              : 'border-border hover:bg-muted/50'
+                              ? 'border-[#2C5F5D] bg-[#2C5F5D]/5 shadow-md'
+                              : 'border-slate-200 hover:border-slate-300 hover:shadow-sm'
                           }`}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-                              <Briefcase className="h-4 w-4 text-cg-sage" />
-                            </div>
-                            <div>
-                              <div className="font-medium text-foreground text-sm">{prof.name}</div>
-                              <div className="text-xs text-muted-foreground">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0 ${
+                            selectedProfessionalId === prof.id
+                              ? 'bg-[#2C5F5D] text-white'
+                              : 'bg-slate-100 text-slate-600'
+                          }`}>
+                            {prof.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-slate-900 mb-1">{prof.name}</div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium">
                                 {getProfessionalTypeLabel(prof.professional_type)}
-                              </div>
+                              </span>
+                              {prof.license_verified && (
+                                <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 font-medium">
+                                  <Shield className="h-3 w-3" />
+                                  Licensed
+                                </span>
+                              )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            {prof.license_verified && (
-                              <span title="License Verified">
-                                <Shield className="h-4 w-4 text-cg-sage" />
-                              </span>
-                            )}
-                            {selectedProfessionalId === prof.id && (
-                              <CheckCircle className="h-4 w-4 text-cg-sage" />
-                            )}
-                          </div>
+                          {selectedProfessionalId === prof.id && (
+                            <CheckCircle className="h-5 w-5 text-[#2C5F5D] flex-shrink-0" />
+                          )}
                         </button>
                       ))}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Select a specific professional or invite the entire firm
-                    </p>
                   </div>
-                )}
-
-                {/* Invite Feedback */}
-                {inviteError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{inviteError}</AlertDescription>
-                  </Alert>
-                )}
-                {inviteSuccess && (
-                  <Alert className="bg-cg-sage-subtle text-cg-sage border-cg-sage/30">
-                    <CheckCircle className="h-4 w-4 text-cg-sage" />
-                    <AlertDescription>{inviteSuccess}</AlertDescription>
-                  </Alert>
                 )}
 
                 {/* Family File Selection - show when no familyFileId but user has family files */}
                 {!familyFileId && familyFiles.length > 1 && (
-                  <div className="space-y-3">
-                    <Label className="text-sm font-semibold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Select Family File</Label>
-                    <p className="text-xs text-muted-foreground">
+                  <div className="bg-white border-2 border-slate-200 rounded-2xl p-6">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Select Family File</h3>
+                    <p className="text-sm text-slate-600 mb-4">
                       Choose which family file to invite this firm to:
                     </p>
                     <div className="space-y-2">
@@ -644,20 +692,20 @@ function FindProfessionalsContent() {
                         <button
                           key={file.id}
                           onClick={() => handleFamilyFileChange(file.id)}
-                          className="w-full flex items-center justify-between p-3 rounded-xl border border-border hover:bg-muted/50 transition-colors text-left"
+                          className="w-full flex items-center justify-between p-4 rounded-xl border-2 border-slate-200 hover:border-[#2C5F5D] hover:bg-slate-50 transition-all text-left"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-                              <FileText className="h-4 w-4 text-cg-sage" />
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 flex items-center justify-center">
+                              <FileText className="h-5 w-5 text-[#2C5F5D]" />
                             </div>
                             <div>
-                              <div className="font-medium text-foreground text-sm">{file.title || 'Family File'}</div>
-                              <div className="text-xs text-muted-foreground">
+                              <div className="font-bold text-slate-900">{file.title || 'Family File'}</div>
+                              <div className="text-xs text-slate-600 font-medium">
                                 {file.family_file_number}
                               </div>
                             </div>
                           </div>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          <ChevronRight className="h-5 w-5 text-slate-400" />
                         </button>
                       ))}
                     </div>
@@ -666,82 +714,127 @@ function FindProfessionalsContent() {
 
                 {/* No Family File Warning - show when user has no family files */}
                 {!familyFileId && familyFiles.length === 0 && !isLoadingFamilyFiles && (
-                  <Alert className="bg-cg-amber-subtle text-cg-amber border-cg-amber/30">
-                    <AlertCircle className="h-4 w-4 text-cg-amber" />
-                    <AlertDescription>
-                      To invite this firm, please create a Family File first or go to your existing Family File and click "Invite Professional".
-                    </AlertDescription>
-                  </Alert>
+                  <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                        <AlertCircle className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-amber-900 mb-1">Family File Required</h4>
+                        <p className="text-sm text-amber-700">
+                          To invite this firm, please create a Family File first or go to your existing Family File and click "Invite Professional".
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
                 {/* Loading family files indicator */}
                 {!familyFileId && isLoadingFamilyFiles && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cg-sage" />
-                    Loading your family files...
+                  <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-slate-300 border-t-[#2C5F5D]" />
+                      <span className="text-sm text-slate-600 font-medium">Loading your family files...</span>
+                    </div>
                   </div>
                 )}
 
                 {/* Existing Firm Warning */}
                 {familyFileId && hasExistingFirm && (
-                  <Alert className="bg-cg-amber-subtle text-cg-amber border-cg-amber/30">
-                    <RefreshCw className="h-4 w-4 text-cg-amber" />
-                    <AlertDescription>
-                      You already have a legal professional on your case. To switch firms, you'll need to remove the current professional from your{' '}
-                      <button
-                        onClick={() => {
-                          setSelectedFirm(null);
-                          router.push(`/family-files/${familyFileId}/settings`);
-                        }}
-                        className="underline font-medium hover:no-underline"
-                      >
-                        Family File Settings
-                      </button>
-                      .
-                    </AlertDescription>
-                  </Alert>
+                  <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                        <RefreshCw className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-amber-900 mb-1">Professional Already Assigned</h4>
+                        <p className="text-sm text-amber-700 mb-3">
+                          You already have a legal professional on your case. To switch firms, you'll need to remove the current professional from your Family File Settings.
+                        </p>
+                        <button
+                          onClick={() => {
+                            setSelectedFirm(null);
+                            router.push(`/family-files/${familyFileId}/settings`);
+                          }}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 font-medium text-sm transition-colors"
+                        >
+                          <Settings className="h-4 w-4" />
+                          Go to Settings
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Invite Feedback */}
+                {inviteError && (
+                  <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <AlertCircle className="h-5 w-5 text-red-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-red-900 mb-1">Invitation Failed</h4>
+                        <p className="text-sm text-red-700">{inviteError}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {inviteSuccess && (
+                  <div className="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-emerald-900 mb-1">Success!</h4>
+                        <p className="text-sm text-emerald-700">{inviteSuccess}</p>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 
-              <DialogFooter>
-                <button
-                  onClick={() => setSelectedFirm(null)}
-                  className="cg-btn-secondary shadow-md hover:shadow-lg"
-                >
-                  Close
-                </button>
-                {familyFileId && hasExistingFirm && (
+              {/* Footer Actions */}
+              <div className="border-t-2 border-slate-200 bg-slate-50 p-6">
+                <div className="flex flex-col sm:flex-row gap-3 justify-end">
                   <button
-                    onClick={() => {
-                      setSelectedFirm(null);
-                      router.push(`/family-files/${familyFileId}/settings`);
-                    }}
-                    className="cg-btn-secondary flex items-center gap-2 shadow-md hover:shadow-lg"
+                    onClick={() => setSelectedFirm(null)}
+                    className="cg-btn-secondary shadow-md hover:shadow-lg order-2 sm:order-1"
                   >
-                    <Settings className="h-4 w-4" />
-                    Go to Settings to Switch Firm
+                    Close
                   </button>
+                  {familyFileId && !hasExistingFirm && (
+                    <button
+                      onClick={handleInviteFirm}
+                      disabled={isInviting || !!inviteSuccess}
+                      className="cg-btn-primary flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
+                    >
+                      {isInviting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white" />
+                          Sending Invitation...
+                        </>
+                      ) : inviteSuccess ? (
+                        <>
+                          <CheckCircle className="h-4 w-4" />
+                          Invitation Sent!
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4" />
+                          {selectedProfessionalId ? 'Invite This Attorney' : 'Invite This Firm'}
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+                {familyFileId && !hasExistingFirm && !selectedProfessionalId && (
+                  <p className="text-xs text-center text-slate-600 mt-3">
+                    💡 Inviting the entire firm allows any team member to work on your case
+                  </p>
                 )}
-                {familyFileId && !hasExistingFirm && (
-                  <button
-                    onClick={handleInviteFirm}
-                    disabled={isInviting || !!inviteSuccess}
-                    className="cg-btn-primary flex items-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isInviting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="h-4 w-4" />
-                        {selectedProfessionalId ? 'Invite Professional' : 'Invite Firm'}
-                      </>
-                    )}
-                  </button>
-                )}
-              </DialogFooter>
+              </div>
             </>
           )}
         </DialogContent>
