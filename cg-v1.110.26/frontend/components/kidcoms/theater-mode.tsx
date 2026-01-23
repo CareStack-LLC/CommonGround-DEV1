@@ -371,15 +371,15 @@ export function TheaterMode({
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#2C3E50] flex flex-col">
+    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#2C5F5D]/20 backdrop-blur-sm border-b border-[#2C5F5D]/30">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-white/90 backdrop-blur-sm border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <span className="text-[#2C5F5D] text-sm font-medium px-3 py-1 bg-[#2C5F5D]/10 rounded-lg border border-[#2C5F5D]/20">
             Theater Mode
           </span>
           {content && (
-            <span className="text-white font-medium hidden sm:inline">{content.title}</span>
+            <span className="text-[#2C3E50] font-medium hidden sm:inline">{content.title}</span>
           )}
         </div>
         <div className="flex items-center space-x-2">
@@ -407,7 +407,7 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D]/40 bg-[#2C3E50]"
+              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D] bg-white"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -420,7 +420,7 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D]/40 bg-[#2C3E50]"
+              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D] bg-white"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -428,7 +428,7 @@ export function TheaterMode({
 
           {/* Local participant PiP */}
           {localParticipant && (
-            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D]/30 bg-[#2C3E50]">
+            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D] bg-white">
               <PiPVideoTile participant={localParticipant} />
             </div>
           )}
@@ -441,13 +441,13 @@ export function TheaterMode({
             <div className="flex-1 flex flex-col items-center justify-center">
               <div className="text-center px-4">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-[#2C5F5D] rounded-full blur-2xl opacity-20" />
-                  <Library className="relative h-16 w-16 md:h-20 md:w-20 text-gray-400 mx-auto" />
+                  <div className="absolute inset-0 bg-[#2C5F5D] rounded-full blur-2xl opacity-10" />
+                  <Library className="relative h-16 w-16 md:h-20 md:w-20 text-[#2C5F5D] mx-auto" />
                 </div>
-                <h2 className="text-lg md:text-xl text-white mb-2 font-semibold">
+                <h2 className="text-lg md:text-xl text-[#2C3E50] mb-2 font-semibold">
                   Choose something to watch together
                 </h2>
-                <p className="text-gray-400 mb-6 text-sm md:text-base">
+                <p className="text-gray-600 mb-6 text-sm md:text-base">
                   Select a video or storybook from the library
                 </p>
                 <button
@@ -502,13 +502,13 @@ export function TheaterMode({
       </div>
 
       {/* Bottom Controls */}
-      <div className="px-4 py-3 bg-[#2C5F5D]/20 backdrop-blur-sm safe-area-bottom border-t border-[#2C5F5D]/30">
+      <div className="px-4 py-3 bg-[#2C5F5D] safe-area-bottom border-t border-[#2C5F5D]/50 shadow-lg">
         <div className="flex items-center justify-center space-x-3">
           <button
             onClick={onToggleAudio}
             className={`p-3 rounded-full transition-all duration-200 ${
               isAudioOn
-                ? 'bg-[#2C5F5D] hover:bg-[#2C5F5D]/90 text-white hover:scale-105'
+                ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-105'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
@@ -518,7 +518,7 @@ export function TheaterMode({
             onClick={onToggleVideo}
             className={`p-3 rounded-full transition-all duration-200 ${
               isVideoOn
-                ? 'bg-[#2C5F5D] hover:bg-[#2C5F5D]/90 text-white hover:scale-105'
+                ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-105'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
@@ -594,7 +594,7 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
       {!participant.isLocal && <audio ref={audioRef} />}
 
       {/* Name label */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#2C3E50]/90 to-transparent px-2 py-1">
         <span className="text-white text-xs truncate block drop-shadow-lg">
           {participant.odName}
           {participant.isLocal && <span className="text-[#D97757]"> (You)</span>}

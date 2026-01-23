@@ -379,28 +379,28 @@ function ChildCallContent() {
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="flex h-screen bg-gray-900">
+    <div className="flex h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
       {/* Main Video Area */}
       <div className="flex-1 flex flex-col">
         {/* Header - Desktop */}
-        <header className="hidden md:flex bg-gradient-to-r from-[#2C5F5D]/50 to-[#D97757]/50 px-4 py-2 items-center justify-between">
+        <header className="hidden md:flex bg-white/90 backdrop-blur-sm border-b border-gray-200 px-4 py-2 items-center justify-between">
           <div className="flex items-center space-x-3">
             <button
               onClick={handleGoBack}
-              className="p-1.5 text-white/80 hover:text-white hover:bg-white/10 rounded-lg"
+              className="p-1.5 text-gray-600 hover:text-[#2C5F5D] hover:bg-gray-100 rounded-lg"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div>
-              <h1 className="text-white font-bold">
+              <h1 className="text-[#2C3E50] font-bold">
                 {isCallJoined ? `Talking with ${callSession.contactName}` : 'Connecting...'}
               </h1>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-gray-600">
                 {callSession.callType === 'video' ? '📹 Video Call' : '📞 Voice Call'}
               </p>
             </div>
           </div>
-          <span className={`px-3 py-1 rounded-full text-xs font-bold ${isCallJoined ? 'bg-green-500/30 text-green-300' : 'bg-yellow-500/30 text-yellow-300'
+          <span className={`px-3 py-1 rounded-full text-xs font-bold ${isCallJoined ? 'bg-green-500/20 text-green-700' : 'bg-yellow-500/20 text-yellow-700'
             }`}>
             {participantList.length} {participantList.length === 1 ? 'person' : 'people'} 👥
           </span>
@@ -443,7 +443,7 @@ function ChildCallContent() {
                 {/* Mobile back button */}
                 <button
                   onClick={handleGoBack}
-                  className="absolute top-4 left-4 z-10 p-2 bg-black/40 backdrop-blur-sm text-white rounded-full"
+                  className="absolute top-4 left-4 z-10 p-2 bg-white/90 backdrop-blur-sm text-[#2C5F5D] rounded-full shadow-lg"
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </button>
@@ -472,14 +472,14 @@ function ChildCallContent() {
         </div>
 
         {/* Controls Bar */}
-        <div className="bg-gray-800/90 md:bg-gray-800 px-4 py-4 absolute md:relative bottom-0 left-0 right-0 backdrop-blur-sm md:backdrop-blur-none safe-area-bottom">
+        <div className="bg-[#2C5F5D] px-4 py-4 absolute md:relative bottom-0 left-0 right-0 safe-area-bottom shadow-lg">
           <div className="flex items-center justify-center space-x-3 md:space-x-4">
             {/* Audio Toggle */}
             <button
               onClick={toggleAudio}
               disabled={!isCallJoined}
               className={`p-4 rounded-full transition-all transform hover:scale-105 ${isAudioOn
-                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                ? 'bg-white/20 hover:bg-white/30 text-white'
                 : 'bg-red-500 hover:bg-red-600 text-white'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
@@ -492,7 +492,7 @@ function ChildCallContent() {
               onClick={toggleVideo}
               disabled={!isCallJoined}
               className={`p-4 rounded-full transition-all transform hover:scale-105 ${isVideoOn
-                ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                ? 'bg-white/20 hover:bg-white/30 text-white'
                 : 'bg-red-500 hover:bg-red-600 text-white'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
@@ -510,14 +510,14 @@ function ChildCallContent() {
             </button>
 
             {/* Divider */}
-            <div className="hidden md:block w-px h-10 bg-gray-600" />
+            <div className="hidden md:block w-px h-10 bg-white/20" />
 
             {/* Chat Toggle - Desktop only */}
             <button
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
               className={`hidden md:flex p-3 rounded-full transition-all ${activePanel === 'chat'
-                ? 'bg-[#2C5F5D] text-white'
-                : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                ? 'bg-white text-[#2C5F5D]'
+                : 'bg-white/20 hover:bg-white/30 text-white'
                 }`}
               title="Chat"
             >
@@ -528,8 +528,8 @@ function ChildCallContent() {
             <button
               onClick={() => setActivePanel(activePanel === 'participants' ? null : 'participants')}
               className={`hidden md:flex p-3 rounded-full transition-all ${activePanel === 'participants'
-                ? 'bg-[#2C5F5D] text-white'
-                : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                ? 'bg-white text-[#2C5F5D]'
+                : 'bg-white/20 hover:bg-white/30 text-white'
                 }`}
               title="Participants"
             >
@@ -541,8 +541,8 @@ function ChildCallContent() {
               onClick={() => setIsTheaterMode(true)}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-all transform hover:scale-105 ${!isCallJoined
-                ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
-                : 'bg-gradient-to-r from-[#2C5F5D] to-[#D97757] hover:from-[#2C5F5D]/90 hover:to-[#D97757]/90 text-white'
+                ? 'bg-white/10 text-white/30 opacity-50 cursor-not-allowed'
+                : 'bg-[#D97757] hover:bg-[#D97757]/90 text-white'
                 }`}
               title="Watch Together! 🎬"
             >
@@ -554,8 +554,8 @@ function ChildCallContent() {
               onClick={() => setIsArcadeMode(true)}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 flex rounded-full transition-all ${!isCallJoined
-                ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
-                : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
+                ? 'bg-white/10 text-white/30 opacity-50 cursor-not-allowed'
+                : 'bg-white/20 hover:bg-white/30 text-white'
                 }`}
               title="Arcade (Mini & Mega)"
             >
@@ -565,7 +565,7 @@ function ChildCallContent() {
             {/* Whiteboard - Coming Soon */}
             <button
               disabled
-              className="hidden md:flex p-3 rounded-full bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed"
+              className="hidden md:flex p-3 rounded-full bg-white/10 text-white/30 opacity-50 cursor-not-allowed"
               title="Draw Together (Coming Soon!)"
             >
               <PenTool className="h-5 w-5" />
@@ -576,39 +576,39 @@ function ChildCallContent() {
 
       {/* Side Panel */}
       {activePanel && (
-        <div className="w-80 bg-gray-800 border-l border-gray-700 flex flex-col">
-          <div className="p-4 border-b border-gray-700">
-            <h3 className="text-white font-bold text-lg capitalize flex items-center gap-2">
+        <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="text-[#2C3E50] font-bold text-lg capitalize flex items-center gap-2">
               {activePanel === 'chat' ? '💬' : '👥'} {activePanel}
             </h3>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto bg-gray-50">
             {activePanel === 'chat' && (
               <div className="flex flex-col h-full">
                 <div className="flex-1 p-4 space-y-3 overflow-y-auto">
                   {messages.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="text-4xl mb-2">💬</div>
-                      <p className="text-gray-400 text-sm">No messages yet</p>
+                      <p className="text-gray-600 text-sm">No messages yet</p>
                       <p className="text-gray-500 text-xs">Say hi!</p>
                     </div>
                   ) : (
                     messages.map((msg) => (
-                      <div key={msg.id} className="p-3 bg-gray-700 rounded-xl">
+                      <div key={msg.id} className="p-3 bg-white rounded-xl shadow-sm border border-gray-200">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-bold text-[#2C5F5D]">{msg.sender}</span>
                           <span className="text-xs text-gray-500">
                             {msg.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
-                        <p className="text-white text-sm">{msg.content}</p>
+                        <p className="text-[#2C3E50] text-sm">{msg.content}</p>
                       </div>
                     ))
                   )}
                 </div>
 
-                <div className="p-4 border-t border-gray-700">
+                <div className="p-4 border-t border-gray-200 bg-white">
                   <div className="flex space-x-2">
                     <input
                       type="text"
@@ -616,7 +616,7 @@ function ChildCallContent() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
-                      className="flex-1 bg-gray-700 text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C5F5D]"
+                      className="flex-1 bg-gray-100 text-[#2C3E50] rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] border border-gray-200"
                     />
                     <button
                       onClick={handleSendMessage}
@@ -635,17 +635,17 @@ function ChildCallContent() {
                 {participantList.map((participant) => (
                   <div
                     key={participant.odId}
-                    className="flex items-center space-x-3 p-3 bg-gray-700 rounded-xl"
+                    className="flex items-center space-x-3 p-3 bg-white rounded-xl shadow-sm border border-gray-200"
                   >
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2C5F5D] to-[#D97757] flex items-center justify-center text-white text-lg font-bold">
                       {participant.odName[0]?.toUpperCase() || '?'}
                     </div>
                     <div className="flex-1">
-                      <p className="text-white font-bold">
+                      <p className="text-[#2C3E50] font-bold">
                         {participant.odName}
                         {participant.isLocal && ' (You)'}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-600">
                         {participant.isLocal ? '🎤 Speaking' : '👂 Listening'}
                       </p>
                     </div>
@@ -780,7 +780,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
         )}
         {/* Name overlay */}
         <div className="absolute bottom-24 left-0 right-0 text-center">
-          <span className="text-white text-xl font-bold bg-black/40 px-6 py-2 rounded-full backdrop-blur-sm">
+          <span className="text-white text-xl font-bold bg-[#2C3E50]/80 px-6 py-2 rounded-full backdrop-blur-sm">
             {participant.odName}
           </span>
         </div>
@@ -804,7 +804,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
 
   // Default grid tile mode for desktop
   return (
-    <div className="relative bg-gray-800 rounded-2xl overflow-hidden h-full">
+    <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden h-full shadow-lg border border-gray-200">
       {participant.videoOn && participant.videoTrack ? (
         <video
           ref={videoRef}
@@ -822,7 +822,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
       )}
 
       {/* Name and status overlay */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#2C3E50]/90 to-transparent p-4">
         <div className="flex items-center justify-between">
           <span className="text-white font-bold">
             {participant.odName}
