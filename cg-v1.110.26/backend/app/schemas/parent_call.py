@@ -10,12 +10,18 @@ class CallSessionCreate(BaseModel):
 
     family_file_id: str = Field(..., min_length=1, max_length=100)
     call_type: str = Field(default="video", max_length=20)
+    aria_sensitivity_level: str = Field(
+        default="moderate",
+        pattern="^(strict|moderate|relaxed|off)$",
+        description="ARIA sensitivity level: strict, moderate, relaxed, or off"
+    )
 
     class Config:
         json_schema_extra = {
             "example": {
                 "family_file_id": "ff-123456",
-                "call_type": "video"
+                "call_type": "video",
+                "aria_sensitivity_level": "moderate"
             }
         }
 
@@ -54,6 +60,23 @@ class TranscriptChunkCreate(BaseModel):
     end_time: float
 
 
+class ARIASettingsUpdate(BaseModel):
+    """Update ARIA sensitivity settings for a call session."""
+
+    sensitivity_level: str = Field(
+        ...,
+        pattern="^(strict|moderate|relaxed|off)$",
+        description="ARIA sensitivity level: strict, moderate, relaxed, or off"
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "sensitivity_level": "moderate"
+            }
+        }
+
+
 class CallSessionResponse(BaseModel):
     """Response model for call session."""
 
@@ -77,6 +100,8 @@ class CallSessionResponse(BaseModel):
     aria_active: bool
     aria_intervention_count: int
     aria_terminated_call: bool
+    aria_sensitivity_level: str = "moderate"
+    aria_sensitivity_threshold: float = 0.5
     max_duration_minutes: Optional[int]
 
     class Config:
@@ -97,6 +122,9 @@ class CallFlagResponse(BaseModel):
     intervention_type: Optional[str]
     intervention_message: str
     flagged_at: datetime
+    call_time_seconds: Optional[float] = None
+    offending_speaker_id: Optional[str] = None
+    mute_duration_seconds: Optional[float] = None
 
     class Config:
         from_attributes = True

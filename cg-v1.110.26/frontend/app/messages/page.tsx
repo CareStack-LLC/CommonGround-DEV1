@@ -11,6 +11,8 @@ import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
 import { MessageCompose } from '@/components/messages/message-compose';
+import { PreCallSettingsDialog } from '@/components/calls/pre-call-settings-dialog';
+import { SensitivityLevel } from '@/components/calls/aria-sensitivity-slider';
 import {
   MessageSquare,
   Shield,
@@ -432,6 +434,9 @@ function MessagesContent() {
   const [showSidebar, setShowSidebar] = useState(true);
   const [isOtherTyping, setIsOtherTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [showPreCallDialog, setShowPreCallDialog] = useState(false);
+  const [pendingCallType, setPendingCallType] = useState<'video' | 'audio'>('video');
+  const [isStartingCall, setIsStartingCall] = useState(false);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -666,12 +671,35 @@ function MessagesContent() {
       return;
     }
 
+    // Show pre-call settings dialog
+    setPendingCallType(callType);
+    setShowPreCallDialog(true);
+  };
+
+  const handleStartCallWithSettings = (settings: { callType: 'video' | 'audio'; ariaSensitivity: SensitivityLevel }) => {
+    if (!selectedFamilyFile?.id) return;
+
+    setIsStartingCall(true);
+
     try {
-      // Navigate to call page with family file ID and call type
-      router.push(`/messages/call?family_file_id=${selectedFamilyFile.id}&call_type=${callType}`);
+      // Navigate to call page with family file ID, call type, and ARIA sensitivity
+      router.push(
+        `/messages/call?family_file_id=${selectedFamilyFile.id}&call_type=${settings.callType}&aria_sensitivity=${settings.ariaSensitivity}`
+      );
     } catch (error) {
       console.error('Failed to initiate call:', error);
       alert('Failed to initiate call. Please try again.');
+      setIsStartingCall(false);
+    }
+  };
+
+  const getOtherParentName = () => {
+    if (!selectedFamilyFile || !user) return 'Co-Parent';
+    const familyFileDetail = selectedFamilyFile as FamilyFileDetail;
+    if (familyFileDetail.parent_a_id === user.id) {
+      return familyFileDetail.parent_b_display_name || 'Co-Parent';
+    } else {
+      return familyFileDetail.parent_a_display_name || 'Co-Parent';
     }
   };
 
@@ -881,6 +909,16 @@ function MessagesContent() {
           </main>
         </div>
       </div>
+
+      {/* Pre-Call Settings Dialog */}
+      <PreCallSettingsDialog
+        open={showPreCallDialog}
+        onOpenChange={setShowPreCallDialog}
+        onStartCall={handleStartCallWithSettings}
+        recipientName={getOtherParentName()}
+        defaultCallType={pendingCallType}
+        isLoading={isStartingCall}
+      />
     </div>
   );
 }

@@ -38,6 +38,10 @@ interface ARIAWarning {
   warning_message: string;
   should_terminate: boolean;
   termination_delay?: number;
+  intervention_type?: string;
+  should_mute?: boolean;
+  mute_speaker_id?: string;
+  mute_duration_seconds?: number;
 }
 
 interface Participant {
@@ -59,6 +63,8 @@ function ParentCallContent() {
   const searchParams = useSearchParams();
   const familyFileId = searchParams.get('family_file_id');
   const callType = searchParams.get('call_type') || 'video';
+  const existingSessionId = searchParams.get('session_id'); // For joining existing calls
+  const ariaSensitivity = searchParams.get('aria_sensitivity') || 'moderate';
 
   const [callObject, setCallObject] = useState<any>(null);
   const [session, setSession] = useState<CallSession | null>(null);
@@ -70,6 +76,7 @@ function ParentCallContent() {
   const [error, setError] = useState<string | null>(null);
   const [isInitiating, setIsInitiating] = useState(true);
   const [isJoined, setIsJoined] = useState(false);
+  const [isMutedByARIA, setIsMutedByARIA] = useState(false);
 
   const callStartTime = useRef<number>(0);
   const durationInterval = useRef<NodeJS.Timeout | null>(null);
@@ -77,6 +84,7 @@ function ParentCallContent() {
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
+  const mutedByARIATimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Format duration
   const formatDuration = (seconds: number) => {
@@ -163,27 +171,55 @@ function ParentCallContent() {
     const initiateCall = async () => {
       try {
         setIsInitiating(true);
-
-        // Create call session
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-        const response = await fetch(`${apiUrl}/api/v1/parent-calls/`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-          },
-          body: JSON.stringify({
-            family_file_id: familyFileId,
-            call_type: callType,
-          }),
-        });
+        let sessionData: CallSession;
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.detail || 'Failed to create call session');
+        if (existingSessionId) {
+          // Join existing call session (from incoming call notification)
+          const userName = profile?.preferred_name ||
+            `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() ||
+            user?.email || 'Parent';
+
+          const response = await fetch(`${apiUrl}/api/v1/parent-calls/${existingSessionId}/join`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            },
+            body: JSON.stringify({
+              user_name: userName,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || 'Failed to join call session');
+          }
+
+          sessionData = await response.json();
+        } else {
+          // Create new call session with ARIA sensitivity
+          const response = await fetch(`${apiUrl}/api/v1/parent-calls/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            },
+            body: JSON.stringify({
+              family_file_id: familyFileId,
+              call_type: callType,
+              aria_sensitivity_level: ariaSensitivity,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || 'Failed to create call session');
+          }
+
+          sessionData = await response.json();
         }
 
-        const sessionData: CallSession = await response.json();
         setSession(sessionData);
 
         // Load Daily.co script
@@ -221,8 +257,11 @@ function ParentCallContent() {
       if (durationInterval.current) {
         clearInterval(durationInterval.current);
       }
+      if (mutedByARIATimeoutRef.current) {
+        clearTimeout(mutedByARIATimeoutRef.current);
+      }
     };
-  }, [familyFileId, callType, user]);
+  }, [familyFileId, callType, user, existingSessionId, profile]);
 
   // Join Daily.co call using call object (custom UI)
   const joinDailyCall = async (sessionData: CallSession) => {
@@ -298,18 +337,36 @@ function ParentCallContent() {
     }
   };
 
-  // Setup WebSocket for ARIA warnings
+  // Setup WebSocket for ARIA warnings and call notifications
   const setupWebSocket = (sessionId: string) => {
     // Build WebSocket URL from API URL
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    // Convert http(s) to ws(s) and use /ws path (not /api/v1/ws)
-    const wsUrl = apiUrl.replace(/^http/, 'ws').replace(/\/api\/v1$/, '');
+    // Convert http(s) to ws(s) - keep /api/v1 if present since WS endpoint is at /api/v1/ws
+    let wsUrl = apiUrl.replace(/^http/, 'ws');
+    // Ensure we have /api/v1/ws path
+    if (!wsUrl.includes('/api/v1')) {
+      wsUrl = wsUrl + '/api/v1';
+    }
+
+    // Get auth token for WebSocket authentication
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.error('No auth token for WebSocket');
+      return;
+    }
 
     try {
-      const wsConnection = new WebSocket(`${wsUrl}/ws`);
+      const wsConnection = new WebSocket(`${wsUrl}/ws?token=${encodeURIComponent(token)}`);
 
       wsConnection.onopen = () => {
-        console.log('WebSocket connected for ARIA monitoring');
+        console.log('[WebSocket] Connected for ARIA monitoring');
+        // Subscribe to the family file for call-related notifications
+        if (familyFileId) {
+          wsConnection.send(JSON.stringify({
+            type: 'subscribe',
+            case_id: familyFileId,
+          }));
+        }
       };
 
       wsConnection.onmessage = (event) => {
@@ -342,10 +399,35 @@ function ParentCallContent() {
   const handleARIAWarning = (warning: ARIAWarning) => {
     setAriaWarning(warning);
 
+    // Handle MUTE intervention - mute the offending speaker
+    if (warning.should_mute && warning.mute_speaker_id === user?.id) {
+      if (callObject) {
+        callObject.setLocalAudio(false);
+        setIsAudioOn(false);
+        setIsMutedByARIA(true);
+      }
+
+      // Auto-unmute after duration
+      if (mutedByARIATimeoutRef.current) {
+        clearTimeout(mutedByARIATimeoutRef.current);
+      }
+      mutedByARIATimeoutRef.current = setTimeout(() => {
+        if (callObject) {
+          callObject.setLocalAudio(true);
+          setIsAudioOn(true);
+          setIsMutedByARIA(false);
+        }
+      }, (warning.mute_duration_seconds || 2) * 1000);
+    }
+
     if (!warning.should_terminate) {
+      // Clear warning after display time (longer for mute)
+      const displayDuration = warning.should_mute ?
+        Math.max((warning.mute_duration_seconds || 2) * 1000 + 2000, 10000) :
+        10000;
       setTimeout(() => {
         setAriaWarning(null);
-      }, 10000);
+      }, displayDuration);
     } else {
       setTimeout(() => {
         if (callObject) {
@@ -518,15 +600,22 @@ function ParentCallContent() {
           <div className={`rounded-2xl p-5 shadow-2xl backdrop-blur-sm ${
             ariaWarning.severity === 'severe'
               ? 'bg-gradient-to-r from-red-500/95 to-orange-500/95'
+              : ariaWarning.should_mute
+              ? 'bg-gradient-to-r from-purple-500/95 to-indigo-500/95'
               : 'bg-gradient-to-r from-amber-500/95 to-orange-500/95'
           } text-white`}>
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                <AlertTriangle className="h-5 w-5" />
+                {ariaWarning.should_mute ? (
+                  <MicOff className="h-5 w-5" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5" />
+                )}
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-lg mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                  {ariaWarning.should_terminate ? 'Severe Violation' : 'ARIA Warning'}
+                  {ariaWarning.should_terminate ? 'Severe Violation' :
+                   ariaWarning.should_mute ? 'Microphone Muted' : 'ARIA Warning'}
                 </h3>
                 <p className="text-sm opacity-95 mb-2">{ariaWarning.warning_message}</p>
                 {ariaWarning.should_terminate && (
@@ -534,8 +623,23 @@ function ParentCallContent() {
                     Call will be terminated in {ariaWarning.termination_delay || 10} seconds.
                   </p>
                 )}
+                {ariaWarning.should_mute && ariaWarning.mute_speaker_id === user?.id && (
+                  <p className="text-xs font-semibold bg-white/20 rounded-lg px-3 py-2">
+                    Your microphone will be unmuted in {ariaWarning.mute_duration_seconds || 2} seconds.
+                  </p>
+                )}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ARIA Muted Indicator - Persistent overlay when muted by ARIA */}
+      {isMutedByARIA && (
+        <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-40">
+          <div className="bg-purple-600/90 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 animate-pulse">
+            <MicOff className="h-4 w-4" />
+            <span className="text-sm font-medium">Muted by ARIA</span>
           </div>
         </div>
       )}

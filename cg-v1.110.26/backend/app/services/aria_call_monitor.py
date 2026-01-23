@@ -51,6 +51,8 @@ class RealtimeFlag:
     intervention_needed: bool
     intervention_type: Optional[InterventionType]
     warning_message: str
+    speaker_id: Optional[str] = None  # Speaker who triggered the violation
+    mute_duration_seconds: Optional[float] = None  # Duration to mute if MUTE intervention
 
 
 @dataclass
@@ -99,10 +101,26 @@ class ARIACallMonitor:
         ],
     }
 
-    # Intervention thresholds
+    # Default intervention thresholds (overridden by sensitivity level)
     SEVERE_THRESHOLD = 0.7  # Score >= 0.7 triggers intervention
     TERMINATION_THRESHOLD = 0.85  # Score >= 0.85 triggers immediate termination
     WARNING_DURATION = 10  # Seconds before termination
+    MUTE_DURATION = 2.0  # Seconds to mute offending speaker
+
+    # Sensitivity level thresholds - configurable per call
+    SENSITIVITY_THRESHOLDS = {
+        "strict": {"warning": 0.3, "mute": 0.5, "terminate": 0.7},
+        "moderate": {"warning": 0.5, "mute": 0.65, "terminate": 0.85},
+        "relaxed": {"warning": 0.7, "mute": 0.8, "terminate": 0.9},
+        "off": {"warning": 1.1, "mute": 1.1, "terminate": 1.1},  # Never trigger
+    }
+
+    def get_thresholds(self, sensitivity_level: str = "moderate") -> Dict[str, float]:
+        """Get thresholds for given sensitivity level"""
+        return self.SENSITIVITY_THRESHOLDS.get(
+            sensitivity_level.lower(),
+            self.SENSITIVITY_THRESHOLDS["moderate"]
+        )
 
     def __init__(self):
         """Initialize ARIA call monitor"""
@@ -124,7 +142,8 @@ class ARIACallMonitor:
     async def analyze_transcript_chunk_realtime(
         self,
         db: AsyncSession,
-        chunk: CallTranscriptChunk
+        chunk: CallTranscriptChunk,
+        sensitivity_level: str = "moderate"
     ) -> Optional[RealtimeFlag]:
         """
         Real-time analysis of transcript chunk.
@@ -135,10 +154,15 @@ class ARIACallMonitor:
         Args:
             db: Database session
             chunk: Transcript chunk to analyze
+            sensitivity_level: ARIA sensitivity level (strict/moderate/relaxed/off)
 
         Returns:
             RealtimeFlag if severe violation detected, None otherwise
         """
+        # If ARIA is off, no analysis
+        if sensitivity_level.lower() == "off":
+            return None
+
         content = chunk.content.lower()
 
         # Step 1: Quick regex check for severe patterns
@@ -161,34 +185,44 @@ class ARIACallMonitor:
             # Fallback: Use regex match count as proxy
             toxicity_score = min(len(detected_categories) * 0.3, 1.0)
 
-        # Step 3: Determine intervention
-        is_severe = toxicity_score >= self.SEVERE_THRESHOLD
+        # Step 3: Get dynamic thresholds based on sensitivity
+        thresholds = self.get_thresholds(sensitivity_level)
 
-        if not is_severe:
-            return None
-
-        # Determine intervention type
+        # Step 4: Determine intervention
         intervention_type = None
         intervention_needed = False
         warning_message = ""
+        mute_duration = None
+        is_flagged = toxicity_score >= thresholds["warning"]
 
-        if toxicity_score >= self.TERMINATION_THRESHOLD:
+        if not is_flagged:
+            return None
+
+        # Determine intervention type based on thresholds
+        if toxicity_score >= thresholds["terminate"]:
             intervention_type = InterventionType.TERMINATE
             intervention_needed = True
             warning_message = "SEVERE VIOLATION DETECTED: This call will be terminated in 10 seconds. Please change your communication immediately."
-        elif toxicity_score >= self.SEVERE_THRESHOLD:
+        elif toxicity_score >= thresholds["mute"]:
+            intervention_type = InterventionType.MUTE
+            intervention_needed = True
+            mute_duration = self.MUTE_DURATION
+            warning_message = "Your microphone has been temporarily muted due to inappropriate language. Please take a moment to calm down."
+        elif toxicity_score >= thresholds["warning"]:
             intervention_type = InterventionType.WARNING
             intervention_needed = True
             warning_message = "WARNING: Your language is inappropriate and violates communication standards. Please remain respectful."
 
         return RealtimeFlag(
             chunk_id=chunk.id,
-            is_severe=is_severe,
+            is_severe=toxicity_score >= thresholds["mute"],  # Severe if at mute threshold or higher
             toxicity_score=toxicity_score,
             categories=[cat.value for cat in detected_categories],
             intervention_needed=intervention_needed,
             intervention_type=intervention_type,
-            warning_message=warning_message
+            warning_message=warning_message,
+            speaker_id=chunk.speaker_id,
+            mute_duration_seconds=mute_duration,
         )
 
     async def _quick_claude_analysis(self, content: str) -> float:
@@ -246,7 +280,8 @@ Score:"""
         Flow:
         1. Create CallFlag record
         2. Send warning via WebSocket (handled by endpoint)
-        3. If TERMINATE level: Wait 10s, then end call
+        3. If MUTE level: Mute speaker for configured duration
+        4. If TERMINATE level: Wait 10s, then end call
 
         Args:
             db: Database session
@@ -257,18 +292,33 @@ Score:"""
         Returns:
             Action details for WebSocket broadcast
         """
-        # Create flag record
+        # Get thresholds for severity assessment
+        thresholds = self.get_thresholds(session.aria_sensitivity_level)
+
+        # Determine severity based on configured thresholds
+        if flag.toxicity_score >= thresholds["terminate"]:
+            severity = CallSeverity.SEVERE.value
+        elif flag.toxicity_score >= thresholds["mute"]:
+            severity = CallSeverity.HIGH.value
+        else:
+            severity = CallSeverity.MEDIUM.value
+
+        # Create flag record with speaker and mute tracking
         call_flag = CallFlag(
             session_id=session.id,
             transcript_chunk_id=chunk.id,
             flag_type="real_time",
             toxicity_score=flag.toxicity_score,
-            severity=CallSeverity.SEVERE.value if flag.toxicity_score >= self.SEVERE_THRESHOLD else CallSeverity.HIGH.value,
+            severity=severity,
             categories=flag.categories,
+            triggers=[],  # TODO: Extract specific trigger phrases
             intervention_taken=flag.intervention_needed,
             intervention_type=flag.intervention_type.value if flag.intervention_type else None,
             intervention_message=flag.warning_message,
             flagged_at=datetime.utcnow(),
+            call_time_seconds=chunk.start_time,  # Exact timestamp in call
+            offending_speaker_id=flag.speaker_id,
+            mute_duration_seconds=flag.mute_duration_seconds,
         )
 
         db.add(call_flag)
@@ -278,6 +328,7 @@ Score:"""
 
         # Check if termination needed
         should_terminate = flag.intervention_type == InterventionType.TERMINATE
+        should_mute = flag.intervention_type == InterventionType.MUTE
 
         if should_terminate:
             session.aria_terminated_call = True
@@ -288,7 +339,8 @@ Score:"""
         logger.warning(
             f"ARIA intervention in session {session.id}: "
             f"score={flag.toxicity_score:.2f}, "
-            f"action={flag.intervention_type.value if flag.intervention_type else 'none'}"
+            f"action={flag.intervention_type.value if flag.intervention_type else 'none'}, "
+            f"speaker={flag.speaker_id}"
         )
 
         return {
@@ -299,6 +351,10 @@ Score:"""
             "warning_message": flag.warning_message,
             "should_terminate": should_terminate,
             "termination_delay": self.WARNING_DURATION if should_terminate else None,
+            "should_mute": should_mute,
+            "mute_speaker_id": flag.speaker_id if should_mute else None,
+            "mute_duration_seconds": flag.mute_duration_seconds if should_mute else None,
+            "call_time_seconds": chunk.start_time,
             "timestamp": datetime.utcnow().isoformat(),
         }
 
@@ -492,10 +548,69 @@ Score:"""
 
         return recommendations
 
+    async def get_speaker_violation_summary(
+        self,
+        db: AsyncSession,
+        session_id: str
+    ) -> Dict[str, Dict[str, Any]]:
+        """
+        Get violation stats grouped by speaker for court reporting.
+
+        Args:
+            db: Database session
+            session_id: Call session ID
+
+        Returns:
+            Dict mapping speaker_id to their violation stats
+        """
+        flags_result = await db.execute(
+            select(CallFlag)
+            .where(CallFlag.session_id == session_id)
+            .order_by(CallFlag.flagged_at)
+        )
+        flags = list(flags_result.scalars().all())
+
+        speaker_stats: Dict[str, Dict[str, Any]] = {}
+
+        for flag in flags:
+            speaker_id = flag.offending_speaker_id or "unknown"
+
+            if speaker_id not in speaker_stats:
+                speaker_stats[speaker_id] = {
+                    "total_violations": 0,
+                    "warnings": 0,
+                    "mutes": 0,
+                    "terminates": 0,
+                    "categories": {},
+                    "total_mute_duration": 0.0,
+                    "highest_score": 0.0,
+                }
+
+            stats = speaker_stats[speaker_id]
+            stats["total_violations"] += 1
+
+            if flag.intervention_type == "warning":
+                stats["warnings"] += 1
+            elif flag.intervention_type == "mute":
+                stats["mutes"] += 1
+                if flag.mute_duration_seconds:
+                    stats["total_mute_duration"] += flag.mute_duration_seconds
+            elif flag.intervention_type == "terminate":
+                stats["terminates"] += 1
+
+            if flag.toxicity_score > stats["highest_score"]:
+                stats["highest_score"] = flag.toxicity_score
+
+            for cat in (flag.categories or []):
+                stats["categories"][cat] = stats["categories"].get(cat, 0) + 1
+
+        return speaker_stats
+
     async def generate_call_report_text(
         self,
         report: CallReport,
-        session: ParentCallSession
+        session: ParentCallSession,
+        speaker_summary: Optional[Dict[str, Dict[str, Any]]] = None
     ) -> str:
         """
         Generate formatted text report for court export.
@@ -503,6 +618,7 @@ Score:"""
         Args:
             report: CallReport dataclass
             session: ParentCallSession model
+            speaker_summary: Optional speaker violation breakdown
 
         Returns:
             Formatted markdown report
@@ -517,6 +633,18 @@ Score:"""
         lines.append(f"**Participants:** Parent A (ID: {session.parent_a_id}), Parent B (ID: {session.parent_b_id or 'N/A'})")
         lines.append("")
 
+        # ARIA Settings used
+        lines.append("## ARIA Monitoring Settings")
+        sensitivity_descriptions = {
+            "strict": "Strict (Most sensitive - flags minor issues)",
+            "moderate": "Moderate (Balanced detection)",
+            "relaxed": "Relaxed (Only severe violations)",
+            "off": "Off (Monitoring disabled)"
+        }
+        lines.append(f"- **Sensitivity Level:** {sensitivity_descriptions.get(session.aria_sensitivity_level, session.aria_sensitivity_level)}")
+        lines.append(f"- **Base Threshold:** {session.aria_sensitivity_threshold:.2f}")
+        lines.append("")
+
         lines.append("## Overall Assessment")
         lines.append(f"- **Toxicity Score:** {report.overall_toxicity_score:.2f}/1.0")
         lines.append(f"- **Transcript Chunks:** {report.total_chunks}")
@@ -526,7 +654,40 @@ Score:"""
 
         if session.aria_terminated_call:
             lines.append("⚠️ **CALL TERMINATED BY ARIA** ⚠️")
+            lines.append(f"- **Termination Reason:** {session.aria_termination_reason or 'Severe violation threshold exceeded'}")
             lines.append("")
+
+        # Intervention breakdown
+        lines.append("## Intervention Summary")
+        lines.append(f"- **Warnings Issued:** {report.intervention_summary.get('warnings', 0)}")
+        lines.append(f"- **Mute Interventions:** {report.intervention_summary.get('mutes', 0)}")
+        lines.append(f"- **Termination Actions:** {report.intervention_summary.get('terminations', 0)}")
+        lines.append("")
+
+        # Speaker-specific breakdown
+        if speaker_summary:
+            lines.append("## Violations by Speaker")
+            for speaker_id, stats in speaker_summary.items():
+                if speaker_id == "unknown":
+                    speaker_label = "Unknown Speaker"
+                elif speaker_id == session.parent_a_id:
+                    speaker_label = f"Parent A (ID: {speaker_id[:8]}...)"
+                elif speaker_id == session.parent_b_id:
+                    speaker_label = f"Parent B (ID: {speaker_id[:8]}...)"
+                else:
+                    speaker_label = f"Speaker (ID: {speaker_id[:8]}...)"
+
+                lines.append(f"### {speaker_label}")
+                lines.append(f"- **Total Violations:** {stats['total_violations']}")
+                lines.append(f"- **Warnings:** {stats['warnings']}")
+                lines.append(f"- **Times Muted:** {stats['mutes']}")
+                if stats['total_mute_duration'] > 0:
+                    lines.append(f"- **Total Mute Duration:** {stats['total_mute_duration']:.1f} seconds")
+                lines.append(f"- **Highest Toxicity Score:** {stats['highest_score']:.2f}")
+                if stats['categories']:
+                    cats = ", ".join([f"{k.replace('_', ' ').title()} ({v})" for k, v in stats['categories'].items()])
+                    lines.append(f"- **Categories:** {cats}")
+                lines.append("")
 
         lines.append("## Category Breakdown")
         if report.category_breakdown:

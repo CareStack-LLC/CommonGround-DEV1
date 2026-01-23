@@ -174,6 +174,14 @@ class ParentCallSession(Base, UUIDMixin, TimestampMixin):
     aria_terminated_call: Mapped[bool] = mapped_column(Boolean, default=False)
     aria_termination_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    # ARIA sensitivity settings (configurable per call)
+    aria_sensitivity_level: Mapped[str] = mapped_column(
+        String(20), default="moderate"
+    )  # strict, moderate, relaxed, off
+    aria_sensitivity_threshold: Mapped[float] = mapped_column(
+        Float, default=0.5
+    )  # Base threshold (adjusted by level)
+
     # Overall ARIA metrics (calculated post-call)
     overall_toxicity_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     compliance_rating: Mapped[Optional[str]] = mapped_column(
@@ -344,12 +352,23 @@ class CallFlag(Base, UUIDMixin, TimestampMixin):
         Float, nullable=True
     )  # Time in call when flagged
 
+    # Speaker tracking for mute interventions
+    offending_speaker_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    mute_duration_seconds: Mapped[Optional[float]] = mapped_column(
+        Float, nullable=True
+    )  # Duration speaker was muted (if applicable)
+
     # Relationships
     session: Mapped["ParentCallSession"] = relationship(
         "ParentCallSession", back_populates="flags"
     )
     transcript_chunk: Mapped[Optional["CallTranscriptChunk"]] = relationship(
         "CallTranscriptChunk"
+    )
+    offending_speaker: Mapped[Optional["User"]] = relationship(
+        "User", foreign_keys=[offending_speaker_id]
     )
 
     # Indexes

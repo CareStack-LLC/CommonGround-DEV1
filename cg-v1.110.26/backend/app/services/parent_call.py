@@ -122,7 +122,8 @@ class ParentCallService:
         db: AsyncSession,
         family_file_id: str,
         initiator_id: str,
-        call_type: str = "video"
+        call_type: str = "video",
+        aria_sensitivity_level: str = "moderate"
     ) -> ParentCallSession:
         """
         Create a new call session.
@@ -132,6 +133,7 @@ class ParentCallService:
             family_file_id: Family file ID
             initiator_id: User ID of the parent initiating the call
             call_type: "video" or "audio"
+            aria_sensitivity_level: ARIA sensitivity (strict/moderate/relaxed/off)
 
         Returns:
             ParentCallSession instance
@@ -158,7 +160,15 @@ class ParentCallService:
         # Get or create permanent room
         room = await self.get_or_create_permanent_room(db, family_file_id)
 
-        # Create session
+        # Map sensitivity level to threshold
+        threshold_map = {
+            "strict": 0.3,
+            "moderate": 0.5,
+            "relaxed": 0.7,
+            "off": 1.0,
+        }
+
+        # Create session with ARIA sensitivity settings
         session = ParentCallSession(
             family_file_id=family_file_id,
             room_id=room.id,
@@ -170,7 +180,9 @@ class ParentCallService:
             initiated_by=initiator_id,
             initiated_at=datetime.utcnow(),
             recording_enabled=room.recording_enabled,
-            aria_active=room.aria_monitoring_enabled,
+            aria_active=room.aria_monitoring_enabled and aria_sensitivity_level != "off",
+            aria_sensitivity_level=aria_sensitivity_level,
+            aria_sensitivity_threshold=threshold_map.get(aria_sensitivity_level, 0.5),
         )
 
         db.add(session)

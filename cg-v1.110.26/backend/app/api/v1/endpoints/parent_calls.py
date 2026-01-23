@@ -35,6 +35,7 @@ from app.schemas.parent_call import (
     CallReportResponse,
     CallARIAAnalysisResponse,
     CallFlagResponse,
+    ARIASettingsUpdate,
 )
 from app.services.parent_call import parent_call_service
 from app.services.aria_call_monitor import aria_call_monitor
@@ -103,13 +104,14 @@ async def initiate_call(
             detail="Call type must be 'video' or 'audio'"
         )
 
-    # Create call session
+    # Create call session with ARIA sensitivity settings
     try:
         session = await parent_call_service.create_call_session(
             db=db,
             family_file_id=call_create.family_file_id,
             initiator_id=current_user.id,
-            call_type=call_create.call_type
+            call_type=call_create.call_type,
+            aria_sensitivity_level=call_create.aria_sensitivity_level
         )
     except Exception as e:
         logger.error(f"Failed to create call session: {e}")
@@ -255,6 +257,86 @@ async def join_call(
     return join_response
 
 
+@router.patch("/{session_id}/aria-settings")
+async def update_aria_settings(
+    session_id: str,
+    settings: ARIASettingsUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Update ARIA sensitivity settings for a call session.
+
+    Allows parents to adjust ARIA sensitivity during or before a call.
+
+    Args:
+        session_id: Call session ID
+        settings: New ARIA sensitivity settings
+
+    Returns:
+        Updated session info
+
+    Raises:
+        404: Session not found
+        403: User not authorized
+    """
+    # Get session
+    result = await db.execute(
+        select(ParentCallSession).where(ParentCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Call session not found"
+        )
+
+    # Verify user is a participant
+    if current_user.id not in [session.parent_a_id, session.parent_b_id]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a participant in this call"
+        )
+
+    # Update sensitivity settings
+    session.aria_sensitivity_level = settings.sensitivity_level
+
+    # Update threshold based on level
+    threshold_map = {
+        "strict": 0.3,
+        "moderate": 0.5,
+        "relaxed": 0.7,
+        "off": 1.0,
+    }
+    session.aria_sensitivity_threshold = threshold_map.get(settings.sensitivity_level, 0.5)
+
+    await db.commit()
+    await db.refresh(session)
+
+    logger.info(f"ARIA settings updated for session {session_id}: level={settings.sensitivity_level}")
+
+    # Notify both parents of the settings change
+    for parent_id in [session.parent_a_id, session.parent_b_id]:
+        if parent_id:
+            await manager.send_personal_message(
+                message={
+                    "type": "aria_settings_updated",
+                    "session_id": session_id,
+                    "sensitivity_level": session.aria_sensitivity_level,
+                    "updated_by": current_user.id,
+                },
+                user_id=parent_id
+            )
+
+    return {
+        "message": "ARIA settings updated successfully",
+        "session_id": session_id,
+        "aria_sensitivity_level": session.aria_sensitivity_level,
+        "aria_sensitivity_threshold": session.aria_sensitivity_threshold,
+    }
+
+
 @router.post("/{session_id}/end")
 async def end_call(
     session_id: str,
@@ -390,15 +472,16 @@ async def process_transcript_chunk(
             detail="Failed to process transcript chunk"
         )
 
-    # Real-time ARIA analysis (if enabled)
-    if session.aria_active:
+    # Real-time ARIA analysis (if enabled and not set to 'off')
+    if session.aria_active and session.aria_sensitivity_level != "off":
         try:
             flag = await aria_call_monitor.analyze_transcript_chunk_realtime(
                 db=db,
-                chunk=chunk
+                chunk=chunk,
+                sensitivity_level=session.aria_sensitivity_level
             )
 
-            # If severe violation detected, handle intervention
+            # If violation detected, handle intervention
             if flag and flag.intervention_needed:
                 intervention_data = await aria_call_monitor.handle_severe_violation(
                     db=db,
@@ -415,7 +498,12 @@ async def process_transcript_chunk(
                             user_id=parent_id
                         )
 
-                logger.warning(f"ARIA intervention in session {session_id}: {flag.intervention_type.value if flag.intervention_type else 'none'}")
+                logger.warning(
+                    f"ARIA intervention in session {session_id}: "
+                    f"type={flag.intervention_type.value if flag.intervention_type else 'none'}, "
+                    f"speaker={flag.speaker_id}, "
+                    f"mute={flag.mute_duration_seconds}s"
+                )
 
                 return {
                     "message": "Transcript chunk processed with intervention",
