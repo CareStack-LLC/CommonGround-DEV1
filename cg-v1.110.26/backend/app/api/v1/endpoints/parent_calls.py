@@ -641,6 +641,7 @@ async def process_audio_chunk(
     logger.info(f"Whisper transcribed: '{transcription.get('content', '')[:50]}...'")
 
     # Store transcript chunk
+    chunk = None
     try:
         # Estimate end time based on typical speech rate
         content = transcription.get("content", "")
@@ -661,9 +662,9 @@ async def process_audio_chunk(
         logger.error(f"Failed to store transcript chunk: {e}")
         # Continue even if storage fails - we still want to analyze
 
-    # Real-time ARIA analysis (if enabled)
+    # Real-time ARIA analysis (if enabled and chunk was stored)
     intervention_data = None
-    if session.aria_active and session.aria_sensitivity_level != "off":
+    if session.aria_active and session.aria_sensitivity_level != "off" and chunk:
         try:
             flag = await aria_call_monitor.analyze_transcript_chunk_realtime(
                 db=db,

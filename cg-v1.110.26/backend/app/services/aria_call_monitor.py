@@ -18,7 +18,7 @@ from enum import Enum
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 import anthropic
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 from app.core.config import settings
 from app.models.parent_call import (
@@ -136,9 +136,9 @@ class ARIACallMonitor:
         self.daily_service = DailyVideoService()
         self.compiled_severe_patterns = self._compile_severe_patterns()
 
-        # Initialize AI clients
-        self.claude_client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-        self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
+        # Initialize AI clients (async versions for use in async functions)
+        self.claude_client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+        self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
 
     def _compile_severe_patterns(self) -> Dict[ToxicityCategory, List[re.Pattern]]:
         """Compile severe violation patterns for real-time detection"""
@@ -260,7 +260,7 @@ Respond with ONLY a number from 0.0 to 1.0:
 Score:"""
 
         try:
-            message = self.claude_client.messages.create(
+            message = await self.claude_client.messages.create(
                 model="claude-3-haiku-20240307",  # Fast model
                 max_tokens=10,
                 temperature=0,
