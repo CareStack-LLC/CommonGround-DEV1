@@ -701,12 +701,15 @@ export interface MessageAttachment {
 export interface Message {
   id?: string;
   case_id?: string | null;
+  family_file_id?: string | null;
   agreement_id?: string | null;  // SharedCare Agreement context
   sender_id: string;
   recipient_id: string;
   content: string;
   message_type: string;
   sent_at: string;
+  read_at?: string | null;
+  acknowledged_at?: string | null;  // When recipient acknowledged the message
   was_flagged: boolean;
   original_content?: string;
   thread_id?: string;
@@ -784,6 +787,19 @@ export const messagesAPI = {
   async markAsRead(familyFileId: string): Promise<{ marked_read: number }> {
     return fetchAPI<{ marked_read: number }>(
       `/messages/family-file/${familyFileId}/mark-read`,
+      {
+        method: 'POST',
+      }
+    );
+  },
+
+  /**
+   * Acknowledge a message without sending a response
+   * Allows recipients to indicate they've seen and acknowledged a message
+   */
+  async acknowledge(messageId: string): Promise<Message> {
+    return fetchAPI<Message>(
+      `/messages/${messageId}/acknowledge`,
       {
         method: 'POST',
       }

@@ -139,6 +139,7 @@ class MessageResponse(BaseModel):
     sent_at: datetime
     delivered_at: Optional[datetime] = None
     read_at: Optional[datetime] = None
+    acknowledged_at: Optional[datetime] = None  # When recipient acknowledged the message
     was_flagged: bool
     original_content: Optional[str] = None  # If ARIA intervention occurred
 

@@ -31,6 +31,7 @@ import {
   FileText,
   Plus,
   Music,
+  ThumbsUp,
 } from 'lucide-react';
 
 interface FamilyFileWithAgreements {
@@ -66,17 +67,23 @@ function MessageBubble({
   message,
   isOwn,
   showAvatar = true,
-  userName
+  userName,
+  onAcknowledge,
+  isAcknowledging
 }: {
   message: Message;
   isOwn: boolean;
   showAvatar?: boolean;
   userName?: string;
+  onAcknowledge?: (messageId: string) => void;
+  isAcknowledging?: boolean;
 }) {
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   };
+
+  const canAcknowledge = !isOwn && !message.acknowledged_at && message.id && onAcknowledge;
 
   return (
     <div className={`flex gap-2 sm:gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}>
@@ -186,6 +193,20 @@ function MessageBubble({
               </p>
             </details>
           )}
+
+          {/* Acknowledge Button - Only for received messages that haven't been acknowledged */}
+          {canAcknowledge && (
+            <div className="mt-2 pt-2 border-t border-slate-100">
+              <button
+                onClick={() => onAcknowledge(message.id!)}
+                disabled={isAcknowledging}
+                className="flex items-center gap-1.5 text-xs font-medium text-[var(--portal-primary)] hover:text-[var(--portal-primary)]/80 transition-colors disabled:opacity-50"
+              >
+                <ThumbsUp className="h-3.5 w-3.5" />
+                {isAcknowledging ? 'Acknowledging...' : 'Acknowledge'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Timestamp and Status */}
@@ -193,7 +214,19 @@ function MessageBubble({
           isOwn ? 'justify-end' : 'justify-start'
         }`}>
           <span>{formatTime(message.sent_at)}</span>
-          {isOwn && <CheckCheck className="h-3 w-3 text-[var(--portal-primary)]" />}
+          {isOwn && message.acknowledged_at && (
+            <div className="flex items-center gap-1 text-emerald-600">
+              <ThumbsUp className="h-3 w-3" />
+              <span className="text-xs font-medium">Acknowledged</span>
+            </div>
+          )}
+          {isOwn && !message.acknowledged_at && <CheckCheck className="h-3 w-3 text-[var(--portal-primary)]" />}
+          {!isOwn && message.acknowledged_at && (
+            <div className="flex items-center gap-1 text-emerald-600">
+              <ThumbsUp className="h-3 w-3" />
+              <span className="text-xs font-medium">Acknowledged</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -437,6 +470,7 @@ function MessagesContent() {
   const [showPreCallDialog, setShowPreCallDialog] = useState(false);
   const [pendingCallType, setPendingCallType] = useState<'video' | 'audio'>('video');
   const [isStartingCall, setIsStartingCall] = useState(false);
+  const [acknowledgingMessageId, setAcknowledgingMessageId] = useState<string | null>(null);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -462,6 +496,19 @@ function MessagesContent() {
     if (!selectedAgreement) return;
 
     const unsubscribeMessage = onNewMessage((data: NewMessageEvent) => {
+      // Handle acknowledgment updates
+      if ((data as any).type === 'message_acknowledged') {
+        const ackData = data as any;
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === ackData.message_id
+              ? { ...msg, acknowledged_at: ackData.acknowledged_at }
+              : msg
+          )
+        );
+        return;
+      }
+
       // Only add if it's for the current agreement (via case_id match)
       // and not already in messages
       if (data.sender_id !== user?.id) {
@@ -704,6 +751,27 @@ function MessagesContent() {
     }
   };
 
+  const handleAcknowledgeMessage = async (messageId: string) => {
+    try {
+      setAcknowledgingMessageId(messageId);
+      const updatedMessage = await messagesAPI.acknowledge(messageId);
+
+      // Update the message in state
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? { ...msg, acknowledged_at: updatedMessage.acknowledged_at }
+            : msg
+        )
+      );
+    } catch (err: any) {
+      console.error('Failed to acknowledge message:', err);
+      setError(err.message || 'Failed to acknowledge message');
+    } finally {
+      setAcknowledgingMessageId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
       <Navigation />
@@ -798,7 +866,7 @@ function MessagesContent() {
                 <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
                   {isLoadingMessages ? (
                     <div className="flex items-center justify-center h-full">
-                      <div className="w-8 h-8 border-2 border-cg-sage border-t-transparent rounded-full animate-spin" />
+                      <div className="w-10 h-10 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
                     </div>
                   ) : messages.length === 0 ? (
                     <EmptyChatState onCompose={() => setShowCompose(true)} />
@@ -829,6 +897,8 @@ function MessagesContent() {
                             isOwn={isOwn}
                             showAvatar={showAvatar}
                             userName={isOwn ? undefined : 'Co-Parent'}
+                            onAcknowledge={handleAcknowledgeMessage}
+                            isAcknowledging={acknowledgingMessageId === message.id}
                           />
                         );
                       })}

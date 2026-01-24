@@ -38,16 +38,10 @@ export default function WalletBalanceCard({
 }: WalletBalanceCardProps) {
   if (isLoading) {
     return (
-      <div className="cg-card-elevated p-6">
-        <div className="animate-pulse">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-muted rounded-xl" />
-            <div className="flex-1">
-              <div className="h-4 w-24 bg-muted rounded mb-2" />
-              <div className="h-3 w-32 bg-muted rounded" />
-            </div>
-          </div>
-          <div className="h-10 w-40 bg-muted rounded mt-4" />
+      <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-6">
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
+          <p className="mt-4 text-muted-foreground font-medium">Loading wallet...</p>
         </div>
       </div>
     );
@@ -56,21 +50,21 @@ export default function WalletBalanceCard({
   // No wallet yet - show setup prompt
   if (!wallet) {
     return (
-      <div className="cg-card-elevated overflow-hidden">
+      <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-cg-sage-subtle flex items-center justify-center flex-shrink-0">
-              <Wallet className="h-6 w-6 text-cg-sage" />
+            <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+              <Wallet className="h-6 w-6 text-[var(--portal-primary)]" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-foreground mb-1">Set Up Your Wallet</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <h3 className="font-semibold text-foreground mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Set Up Your Wallet</h3>
+              <p className="text-sm text-muted-foreground mb-4 font-medium">
                 Connect your bank account to send and receive payments through ClearFund.
               </p>
               {onSetupWallet && (
                 <button
                   onClick={onSetupWallet}
-                  className="cg-btn-primary inline-flex items-center gap-2"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                 >
                   <CreditCard className="h-4 w-4" />
                   Connect Bank Account
@@ -86,21 +80,21 @@ export default function WalletBalanceCard({
   // Wallet exists but onboarding not complete
   if (!wallet.onboarding_completed) {
     return (
-      <div className="cg-card-elevated overflow-hidden">
+      <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-cg-warning-subtle flex items-center justify-center flex-shrink-0">
-              <Clock className="h-6 w-6 text-cg-warning" />
+            <div className="w-14 h-14 bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+              <Clock className="h-6 w-6 text-amber-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-foreground mb-1">Complete Wallet Setup</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <h3 className="font-semibold text-foreground mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Complete Wallet Setup</h3>
+              <p className="text-sm text-muted-foreground mb-4 font-medium">
                 Finish connecting your bank account to start using ClearFund payments.
               </p>
               {onSetupWallet && (
                 <button
                   onClick={onSetupWallet}
-                  className="cg-btn-primary inline-flex items-center gap-2"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                 >
                   <ExternalLink className="h-4 w-4" />
                   Continue Setup
@@ -109,8 +103,8 @@ export default function WalletBalanceCard({
             </div>
           </div>
         </div>
-        <div className="border-t border-border bg-cg-warning-subtle/30 px-6 py-3">
-          <p className="text-xs text-cg-warning flex items-center gap-2">
+        <div className="border-t-2 border-amber-200 bg-amber-50 px-6 py-3">
+          <p className="text-xs text-amber-700 flex items-center gap-2 font-bold">
             <AlertCircle className="h-4 w-4" />
             Bank verification pending
           </p>
@@ -125,24 +119,24 @@ export default function WalletBalanceCard({
   const pendingBalance = currentBalance - availableBalance;
 
   return (
-    <div className="cg-card-elevated overflow-hidden">
+    <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
       {/* Main Balance Section */}
       <div className="p-6">
         <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-cg-success-subtle flex items-center justify-center">
-              <Wallet className="h-6 w-6 text-cg-success" />
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-md">
+              <Wallet className="h-6 w-6 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Available Balance</p>
-              <p className="text-3xl font-bold text-foreground font-mono tabular-nums">
+              <p className="text-sm text-muted-foreground font-medium">Available Balance</p>
+              <p className="text-3xl font-bold text-foreground font-mono tabular-nums" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 {formatCurrency(availableBalance)}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {wallet.charges_enabled && wallet.payouts_enabled && (
-              <span className="flex items-center gap-1 text-xs text-cg-success bg-cg-success-subtle px-2 py-1 rounded-full">
+              <span className="flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 border-2 border-emerald-200 px-2.5 py-1 rounded-full font-bold">
                 <CheckCircle className="h-3 w-3" />
                 Active
               </span>
@@ -155,7 +149,7 @@ export default function WalletBalanceCard({
           {onAddFunds && (
             <button
               onClick={onAddFunds}
-              className="cg-btn-primary flex-1 inline-flex items-center justify-center gap-2"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               <TrendingUp className="h-4 w-4" />
               Add Funds
@@ -164,7 +158,7 @@ export default function WalletBalanceCard({
           {onViewTransactions && (
             <button
               onClick={onViewTransactions}
-              className="cg-btn-secondary flex-1 inline-flex items-center justify-center gap-2"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-slate-200 text-foreground rounded-xl font-bold hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
             >
               View History
             </button>
@@ -173,19 +167,19 @@ export default function WalletBalanceCard({
       </div>
 
       {/* Balance Breakdown */}
-      <div className="border-t border-border bg-muted/30 px-6 py-4">
+      <div className="border-t-2 border-slate-200 bg-slate-50 px-6 py-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Pending</p>
-            <p className="font-mono text-sm tabular-nums">
+            <p className="text-xs text-muted-foreground mb-1 font-medium">Pending</p>
+            <p className="font-mono text-sm tabular-nums font-bold">
               {formatCurrency(pendingBalance)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Bank Account</p>
+            <p className="text-xs text-muted-foreground mb-1 font-medium">Bank Account</p>
             <div className="flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">
+              <Building2 className="h-4 w-4 text-slate-500" />
+              <span className="text-sm font-medium">
                 {wallet.bank_name ? `${wallet.bank_name} ` : ''}
                 {wallet.bank_last_four ? `****${wallet.bank_last_four}` : 'Connected'}
               </span>

@@ -58,7 +58,6 @@ const marketingLinks: TopNavLink[] = [
   { name: 'Home', path: '/', icon: Home },
   { name: 'Features', path: '/features', icon: Sparkles },
   { name: 'Pricing', path: '/pricing', icon: DollarSign },
-  { name: 'For Professionals', path: '/professionals', icon: Users },
   { name: 'About', path: '/about', icon: Info },
 ];
 
@@ -326,85 +325,8 @@ export function Navigation() {
                 })}
               </div>
 
-              {/* User-specific links */}
-              {user && (
-                <div className="mt-4 pt-4 border-t border-white/10 space-y-1">
-                  <p className="px-4 py-2 text-xs font-semibold text-white/60 uppercase tracking-wider">My Account</p>
-                  <button
-                    onClick={() => handleNavigation('/dashboard')}
-                    className={`w-full nav-item ${
-                      pathname === '/dashboard'
-                        ? 'active'
-                        : ''
-                    }`}
-                  >
-                    <Home className="h-5 w-5" />
-                    Dashboard
-                  </button>
-                  {profile?.is_professional && (
-                    <button
-                      onClick={() => handleNavigation('/professional')}
-                      className={`w-full nav-item ${
-                        pathname?.startsWith('/professional')
-                          ? 'active'
-                          : ''
-                      }`}
-                    >
-                      <Briefcase className="h-5 w-5 text-emerald-600" />
-                      Professional Portal
-                    </button>
-                  )}
-                  <button
-                    onClick={() => handleNavigation('/family-files')}
-                    className={`w-full nav-item ${
-                      pathname === '/family-files' || pathname?.startsWith('/family-files/')
-                        ? 'active'
-                        : ''
-                    }`}
-                  >
-                    <FolderHeart className="h-5 w-5" />
-                    Family Files
-                  </button>
-                  <button
-                    onClick={() => handleNavigation('/settings')}
-                    className="w-full nav-item"
-                  >
-                    <Settings className="h-5 w-5" />
-                    Settings
-                  </button>
-                  <button
-                    onClick={() => handleNavigation('/help')}
-                    className="w-full nav-item"
-                  >
-                    <HelpCircle className="h-5 w-5" />
-                    Help Center
-                  </button>
-                </div>
-              )}
-
-              {/* User info on mobile */}
-              {user ? (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <div className="flex items-center gap-3 px-4">
-                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                      <span className="text-sm font-medium text-white">{initials}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-white truncate">
-                        {user?.first_name} {user?.last_name}
-                      </p>
-                      <p className="text-sm text-white/80 truncate">{user?.email}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 text-sm text-white bg-white/10 rounded-xl transition-smooth hover:bg-white/20"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Sign out
-                  </button>
-                </div>
-              ) : (
+              {/* Sign in / Register for non-authenticated users */}
+              {!user && (
                 <div className="mt-4 pt-4 border-t border-white/10 space-y-3">
                   <Link
                     href="/login"

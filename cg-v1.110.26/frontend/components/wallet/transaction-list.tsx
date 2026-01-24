@@ -112,19 +112,9 @@ export default function TransactionList({
 }: TransactionListProps) {
   if (isLoading) {
     return (
-      <div className="space-y-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="p-4 bg-card rounded-xl border border-border animate-pulse">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-muted rounded-lg" />
-              <div className="flex-1">
-                <div className="h-4 w-32 bg-muted rounded mb-2" />
-                <div className="h-3 w-24 bg-muted rounded" />
-              </div>
-              <div className="h-5 w-20 bg-muted rounded" />
-            </div>
-          </div>
-        ))}
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
+        <p className="mt-4 text-muted-foreground font-medium">Loading transactions...</p>
       </div>
     );
   }
@@ -132,10 +122,10 @@ export default function TransactionList({
   if (transactions.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-          <Receipt className="h-8 w-8 text-muted-foreground" />
+        <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+          <Receipt className="h-7 w-7 text-slate-500" />
         </div>
-        <p className="text-muted-foreground">{emptyMessage}</p>
+        <p className="text-muted-foreground font-medium">{emptyMessage}</p>
       </div>
     );
   }
@@ -154,7 +144,7 @@ export default function TransactionList({
     <div className="space-y-6">
       {Object.entries(groupedTransactions).map(([date, txs]) => (
         <div key={date}>
-          <h4 className="text-sm font-medium text-muted-foreground mb-3">{date}</h4>
+          <h4 className="text-sm font-bold text-muted-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{date}</h4>
           <div className="space-y-2">
             {txs.map((tx) => {
               const Icon = getTransactionIcon(tx.transaction_type);
@@ -166,23 +156,23 @@ export default function TransactionList({
               return (
                 <div
                   key={tx.id}
-                  className="p-4 bg-card rounded-xl border border-border hover:border-border/80 transition-colors"
+                  className="p-4 bg-white rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
                 >
                   <div className="flex items-center gap-4">
                     {/* Icon */}
-                    <div className={`w-10 h-10 rounded-lg ${colors.bg} flex items-center justify-center flex-shrink-0`}>
+                    <div className={`w-12 h-12 rounded-xl ${colors.bg} flex items-center justify-center flex-shrink-0 shadow-sm`}>
                       <Icon className={`h-5 w-5 ${colors.text}`} />
                     </div>
 
                     {/* Details */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-foreground truncate">
+                        <p className="font-bold text-foreground truncate">
                           {tx.description}
                         </p>
                         <StatusIcon className={`h-4 w-4 ${statusInfo.color} flex-shrink-0`} />
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground font-medium">
                         {formatTime(tx.created_at)}
                         {tx.fee_amount && parseFloat(tx.fee_amount) > 0 && (
                           <span className="ml-2">
@@ -194,13 +184,13 @@ export default function TransactionList({
 
                     {/* Amount */}
                     <div className="text-right flex-shrink-0">
-                      <p className={`font-mono text-lg tabular-nums font-medium ${
-                        credit ? 'text-cg-success' : 'text-foreground'
+                      <p className={`font-mono text-lg tabular-nums font-bold ${
+                        credit ? 'text-emerald-600' : 'text-foreground'
                       }`}>
                         {credit ? '+' : '-'}{formatCurrency(tx.amount)}
                       </p>
                       {tx.balance_after && (
-                        <p className="text-xs text-muted-foreground font-mono">
+                        <p className="text-xs text-muted-foreground font-mono font-medium">
                           Bal: {formatCurrency(tx.balance_after)}
                         </p>
                       )}

@@ -102,6 +102,7 @@ class Message(Base, UUIDMixin, TimestampMixin):
     sent_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     delivered_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     read_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    acknowledged_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     # User actions
     is_hidden_by_sender: Mapped[bool] = mapped_column(Boolean, default=False)

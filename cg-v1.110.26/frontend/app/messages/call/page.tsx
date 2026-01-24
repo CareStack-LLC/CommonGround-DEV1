@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useWebSocket } from '@/contexts/websocket-context';
 import { ProtectedRoute } from '@/components/protected-route';
 import { useWhisperARIAShield, type SensitivityLevel, type ARIAIntervention } from '@/hooks/use-whisper-aria-shield';
+import { useCallRecording } from '@/hooks/use-call-recording';
 import type { ARIAInterventionEvent } from '@/lib/websocket';
 import {
   Phone,
@@ -127,6 +128,19 @@ function ParentCallContent() {
     onIntervention: handleARIAIntervention,
     onTranscript: (text) => console.log('[ARIA Whisper] Transcribed:', text),
     onError: (err) => console.error('[ARIA Shield] Error:', err),
+  });
+
+  // Call recording hook - records mixed audio and uploads when call ends
+  const {
+    isRecording: isCallRecording,
+    startRecording: startCallRecording,
+    stopRecording: stopCallRecording,
+  } = useCallRecording({
+    callRef,
+    sessionId: session?.session_id || '',
+    familyFileId: familyFileId || '',
+    onRecordingComplete: (url) => console.log('[Recording] Uploaded:', url),
+    onError: (err) => console.error('[Recording] Error:', err),
   });
 
   // Track when ARIA recording starts
@@ -332,6 +346,18 @@ function ParentCallContent() {
       return () => clearTimeout(timeoutId);
     }
   }, [isJoined, ariaSensitivity, isMonitoring, startMonitoring]);
+
+  // Start call recording when call joins
+  useEffect(() => {
+    if (isJoined && callRef.current && session?.session_id && !isCallRecording) {
+      // Start recording shortly after join to capture all audio
+      const timeoutId = setTimeout(() => {
+        console.log('[Recording] Starting call recording...');
+        startCallRecording();
+      }, 1500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isJoined, session?.session_id, isCallRecording, startCallRecording]);
 
   // Stop monitoring when call ends
   useEffect(() => {
@@ -565,6 +591,12 @@ function ParentCallContent() {
   const handleEndCall = async () => {
     if (durationInterval.current) {
       clearInterval(durationInterval.current);
+    }
+
+    // Stop call recording and upload (do this before ending session)
+    if (isCallRecording) {
+      console.log('[Recording] Stopping and uploading recording...');
+      await stopCallRecording();
     }
 
     if (session) {

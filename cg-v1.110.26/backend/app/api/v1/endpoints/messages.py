@@ -603,6 +603,7 @@ async def send_message(
         sent_at=new_message.sent_at,
         delivered_at=new_message.delivered_at,
         read_at=new_message.read_at,
+        acknowledged_at=new_message.acknowledged_at,
         was_flagged=new_message.was_flagged,
         original_content=None
     )
@@ -723,6 +724,7 @@ async def handle_intervention_response(
         sent_at=message.sent_at,
         delivered_at=message.delivered_at,
         read_at=message.read_at,
+        acknowledged_at=message.acknowledged_at,
         was_flagged=message.was_flagged,
         original_content=message.original_content
     )
@@ -789,6 +791,7 @@ async def list_messages(
             sent_at=msg.sent_at,
             delivered_at=msg.delivered_at,
             read_at=msg.read_at,
+            acknowledged_at=msg.acknowledged_at,
             was_flagged=msg.was_flagged,
             original_content=msg.original_content
         )
@@ -848,6 +851,7 @@ async def list_messages_by_agreement(
             sent_at=msg.sent_at,
             delivered_at=msg.delivered_at,
             read_at=msg.read_at,
+            acknowledged_at=msg.acknowledged_at,
             was_flagged=msg.was_flagged,
             original_content=msg.original_content
         )
@@ -908,6 +912,101 @@ async def mark_messages_as_read(
     await db.commit()
 
     return {"marked_read": result.rowcount}
+
+
+@router.post("/{message_id}/acknowledge", response_model=MessageResponse)
+async def acknowledge_message(
+    message_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Acknowledge a message without sending a response.
+
+    This allows recipients to indicate they've seen and acknowledged
+    a message without needing to write a reply.
+
+    Args:
+        message_id: Message ID to acknowledge
+
+    Returns:
+        Updated message with acknowledged_at timestamp
+
+    Raises:
+        404: Message not found
+        403: Not authorized (only recipient can acknowledge)
+        400: Already acknowledged
+    """
+    # Get message
+    result = await db.execute(
+        select(Message).where(Message.id == message_id)
+    )
+    message = result.scalar_one_or_none()
+
+    if not message:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Message not found"
+        )
+
+    # Verify user is the recipient
+    if message.recipient_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the recipient can acknowledge a message"
+        )
+
+    # Check if already acknowledged
+    if message.acknowledged_at:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Message already acknowledged"
+        )
+
+    # Set acknowledged timestamp
+    message.acknowledged_at = datetime.utcnow()
+
+    # Also mark as read if not already
+    if not message.read_at:
+        message.read_at = datetime.utcnow()
+
+    await db.commit()
+    await db.refresh(message)
+
+    # Broadcast acknowledgment via WebSocket
+    context_id = message.family_file_id or message.case_id
+    if context_id:
+        try:
+            await manager.broadcast_to_case(
+                message={
+                    "type": "message_acknowledged",
+                    "message_id": str(message.id),
+                    "acknowledged_by": str(current_user.id),
+                    "acknowledged_at": message.acknowledged_at.isoformat()
+                },
+                case_id=context_id,
+                exclude_user=None
+            )
+        except Exception as e:
+            logger.warning(f"WebSocket broadcast failed: {e}")
+
+    return MessageResponse(
+        id=message.id,
+        case_id=message.case_id,
+        family_file_id=message.family_file_id,
+        thread_id=message.thread_id,
+        agreement_id=message.agreement_id,
+        sender_id=message.sender_id,
+        recipient_id=message.recipient_id,
+        content=message.content,
+        message_type=message.message_type,
+        sent_at=message.sent_at,
+        delivered_at=message.delivered_at,
+        read_at=message.read_at,
+        acknowledged_at=message.acknowledged_at,
+        was_flagged=message.was_flagged,
+        original_content=message.original_content
+    )
 
 
 @router.get("/analytics/{case_id}/user", response_model=AnalyticsResponse)

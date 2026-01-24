@@ -42,12 +42,12 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 // Map categories to colors
-const categoryColors: Record<string, { bg: string; text: string }> = {
-  communication: { bg: 'bg-cg-slate-subtle', text: 'text-cg-slate' },
-  custody: { bg: 'bg-cg-sage-subtle', text: 'text-cg-sage' },
-  schedule: { bg: 'bg-cg-amber-subtle', text: 'text-cg-amber' },
-  financial: { bg: 'bg-cg-error-subtle', text: 'text-cg-error' },
-  system: { bg: 'bg-muted', text: 'text-muted-foreground' },
+const categoryColors: Record<string, { bg: string; text: string; gradient: string }> = {
+  communication: { bg: 'bg-blue-100', text: 'text-blue-600', gradient: 'from-blue-100 to-blue-50' },
+  custody: { bg: 'bg-emerald-100', text: 'text-emerald-600', gradient: 'from-emerald-100 to-emerald-50' },
+  schedule: { bg: 'bg-amber-100', text: 'text-amber-600', gradient: 'from-amber-100 to-amber-50' },
+  financial: { bg: 'bg-purple-100', text: 'text-purple-600', gradient: 'from-purple-100 to-purple-50' },
+  system: { bg: 'bg-slate-100', text: 'text-slate-500', gradient: 'from-slate-100 to-slate-50' },
 };
 
 interface GroupedActivities {
@@ -94,32 +94,32 @@ function ActivityItem({
   return (
     <button
       onClick={() => onNavigate(activity)}
-      className={`w-full p-4 flex items-start gap-4 text-left transition-colors hover:bg-muted/50 ${
-        !activity.is_read ? 'bg-cg-sage-subtle/30 border-l-4 border-l-cg-sage' : ''
+      className={`w-full p-4 flex items-start gap-4 text-left transition-all duration-300 hover:bg-slate-50 ${
+        !activity.is_read ? 'bg-[var(--portal-primary)]/5 border-l-4 border-l-[var(--portal-primary)]' : ''
       }`}
     >
       <div
-        className={`w-10 h-10 ${colors.bg} rounded-lg flex items-center justify-center flex-shrink-0`}
+        className={`w-12 h-12 bg-gradient-to-br ${colors.gradient} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}
       >
         <Icon className={`w-5 h-5 ${colors.text}`} />
       </div>
       <div className="flex-1 min-w-0">
         <p
           className={`text-sm ${
-            !activity.is_read ? 'font-semibold text-foreground' : 'font-medium text-foreground'
+            !activity.is_read ? 'font-bold text-foreground' : 'font-medium text-foreground'
           }`}
         >
           {activity.title}
         </p>
         {activity.description && (
-          <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
+          <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2 font-medium">
             {activity.description}
           </p>
         )}
-        <p className="text-xs text-muted-foreground mt-1">{timeAgo}</p>
+        <p className="text-xs text-muted-foreground mt-1 font-medium">{timeAgo}</p>
       </div>
       {!activity.is_read && (
-        <div className="w-2 h-2 bg-cg-sage rounded-full flex-shrink-0 mt-2" />
+        <div className="w-2.5 h-2.5 bg-[var(--portal-primary)] rounded-full flex-shrink-0 mt-2" />
       )}
     </button>
   );
@@ -138,10 +138,10 @@ function ActivitySection({
 
   return (
     <div className="mb-6">
-      <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-4">
+      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3 px-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
         {title}
       </h3>
-      <div className="cg-card divide-y divide-border/50">
+      <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg divide-y divide-slate-100 overflow-hidden">
         {activities.map((activity) => (
           <ActivityItem
             key={activity.id}
@@ -272,15 +272,13 @@ function ActivitiesContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         <Navigation />
         <main className="max-w-3xl mx-auto px-4 py-8 pb-24 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
             <div className="text-center">
-              <div className="w-12 h-12 bg-cg-sage/20 rounded-full flex items-center justify-center mx-auto animate-pulse">
-                <Bell className="w-6 h-6 text-cg-sage" />
-              </div>
-              <p className="mt-4 text-muted-foreground">Loading activities...</p>
+              <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
+              <p className="mt-4 text-muted-foreground font-medium">Loading activities...</p>
             </div>
           </div>
         </main>
@@ -289,26 +287,31 @@ function ActivitiesContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation />
 
       <main className="max-w-3xl mx-auto px-4 py-6 pb-24 lg:pb-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="p-2 rounded-lg hover:bg-muted transition-colors"
+              className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
             >
               <ArrowLeft className="w-5 h-5 text-muted-foreground" />
             </button>
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">Activity</h1>
-              {unreadCount > 0 && (
-                <p className="text-sm text-muted-foreground">
-                  {unreadCount} unread
-                </p>
-              )}
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
+                <Bell className="w-5 h-5 text-[var(--portal-primary)]" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Activity</h1>
+                {unreadCount > 0 && (
+                  <p className="text-sm text-muted-foreground font-medium">
+                    {unreadCount} unread
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -316,7 +319,7 @@ function ActivitiesContent() {
             <button
               onClick={handleMarkAllRead}
               disabled={isMarkingRead}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-cg-sage hover:bg-cg-sage-subtle rounded-lg transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-[var(--portal-primary)] bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg rounded-xl transition-all duration-300 disabled:opacity-50"
             >
               <CheckCheck className="w-4 h-4" />
               {isMarkingRead ? 'Marking...' : 'Mark all read'}
@@ -326,14 +329,14 @@ function ActivitiesContent() {
 
         {/* Activities */}
         {activities.length === 0 ? (
-          <div className="cg-card p-8 text-center">
-            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-              <Bell className="w-8 h-8 text-muted-foreground" />
+          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-8 text-center">
+            <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+              <Bell className="w-7 h-7 text-slate-500" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">
+            <h3 className="text-lg font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
               No activity yet
             </h3>
-            <p className="text-muted-foreground max-w-sm mx-auto">
+            <p className="text-muted-foreground max-w-sm mx-auto font-medium">
               When you or your co-parent send messages, update profiles, or
               complete exchanges, you&apos;ll see the activity here.
             </p>

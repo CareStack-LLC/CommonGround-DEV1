@@ -89,13 +89,13 @@ function TabButton({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
-        ? 'bg-cg-sage text-white shadow-sm'
-        : 'bg-card text-muted-foreground hover:bg-cg-sage/10 hover:text-cg-sage border border-transparent hover:border-cg-sage/20'
+      className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${isActive
+        ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md'
+        : 'bg-white border-2 border-slate-200 text-muted-foreground hover:text-foreground hover:border-[var(--portal-primary)]/30 hover:shadow-lg'
         }`}
     >
-      <Icon className="h-4 w-4" />
-      <span className="hidden sm:inline">{tab.label}</span>
+      <Icon className={`h-4 w-4 transition-transform duration-200 ${isActive ? '' : 'group-hover:scale-110'}`} />
+      <span className="hidden sm:inline" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{tab.label}</span>
     </button>
   );
 }
@@ -104,17 +104,17 @@ function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { icon: React.ReactNode; className: string; label: string }> = {
     active: {
       icon: <CheckCircle className="h-3.5 w-3.5" />,
-      className: 'bg-cg-sage/10 text-cg-sage border-cg-sage/20',
+      className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
       label: 'Active',
     },
     pending_approval: {
       icon: <Clock className="h-3.5 w-3.5" />,
-      className: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+      className: 'bg-amber-100 text-amber-700 border-amber-200',
       label: 'Pending',
     },
     archived: {
       icon: <X className="h-3.5 w-3.5" />,
-      className: 'bg-gray-100 text-gray-600 border-gray-200',
+      className: 'bg-slate-100 text-slate-600 border-slate-200',
       label: 'Archived',
     },
   };
@@ -122,7 +122,7 @@ function StatusBadge({ status }: { status: string }) {
   const { icon, className, label } = config[status] || config.active;
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-xl border ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border-2 ${className}`}>
       {icon}
       {label}
     </span>
@@ -638,10 +638,10 @@ function ChildProfileContent() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center h-[60vh]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-cg-sage mx-auto" />
-          <p className="mt-4 text-muted-foreground">Loading profile...</p>
+          <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
+          <p className="mt-4 text-muted-foreground font-medium">Loading profile...</p>
         </div>
       </div>
     );
@@ -650,17 +650,19 @@ function ChildProfileContent() {
   if (error && !child) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+        <div className="bg-white border-2 border-red-200 rounded-2xl p-6 shadow-lg">
           <div className="flex items-start gap-4">
-            <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0" />
+            <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+              <AlertCircle className="h-6 w-6 text-red-600" />
+            </div>
             <div>
-              <p className="font-semibold text-red-600">Error Loading Profile</p>
-              <p className="text-sm text-red-600/80 mt-1">{error}</p>
+              <p className="font-bold text-red-700" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Error Loading Profile</p>
+              <p className="text-sm text-red-600 mt-1 font-medium">{error}</p>
             </div>
           </div>
           <button
             onClick={() => router.push(`/family-files/${familyFileId}`)}
-            className="mt-4 px-4 py-2 bg-white border border-red-200 rounded-lg text-red-600 hover:bg-red-50"
+            className="mt-4 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-6 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
           >
             Back to Family File
           </button>
@@ -676,7 +678,7 @@ function ChildProfileContent() {
       {/* Back Link */}
       <Link
         href={`/family-files/${familyFileId}`}
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-cg-sage transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-[var(--portal-primary)] transition-colors font-medium"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Family File
@@ -684,17 +686,21 @@ function ChildProfileContent() {
 
       {/* Success Message */}
       {success && (
-        <div className="p-4 bg-cg-sage/10 border border-cg-sage/20 rounded-2xl flex items-center gap-3 shadow-sm">
-          <CheckCircle className="h-5 w-5 text-cg-sage flex-shrink-0" />
-          <p className="text-sm text-cg-sage font-medium">{success}</p>
+        <div className="p-4 bg-white border-2 border-emerald-200 rounded-2xl flex items-center gap-4 shadow-lg">
+          <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <CheckCircle className="h-5 w-5 text-emerald-600" />
+          </div>
+          <p className="text-sm text-emerald-700 font-semibold">{success}</p>
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 shadow-sm">
-          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-          <p className="text-sm text-red-600 font-medium">{error}</p>
+        <div className="p-4 bg-white border-2 border-red-200 rounded-2xl flex items-center gap-4 shadow-lg">
+          <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <AlertCircle className="h-5 w-5 text-red-600" />
+          </div>
+          <p className="text-sm text-red-700 font-semibold">{error}</p>
         </div>
       )}
 

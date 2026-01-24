@@ -710,6 +710,184 @@ async def process_audio_chunk(
     }
 
 
+@router.post("/{session_id}/upload-recording")
+async def upload_recording(
+    session_id: str,
+    recording: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Upload a client-side recorded call.
+
+    Stores the recording in Supabase storage and updates the session with the URL.
+
+    Args:
+        session_id: Call session ID
+        recording: Audio/video recording file
+
+    Returns:
+        Recording URL
+    """
+    # Get session
+    result = await db.execute(
+        select(ParentCallSession).where(ParentCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Call session not found"
+        )
+
+    # Verify user is a participant
+    if current_user.id not in [session.parent_a_id, session.parent_b_id]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a participant in this call"
+        )
+
+    # Read recording data
+    try:
+        recording_data = await recording.read()
+        logger.info(f"Received recording: {len(recording_data)} bytes")
+    except Exception as e:
+        logger.error(f"Failed to read recording: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid recording data"
+        )
+
+    # Determine content type
+    content_type = recording.content_type or "audio/webm"
+
+    # Build storage path
+    storage_path = build_recording_path(
+        family_file_id=str(session.family_file_id),
+        session_id=session_id,
+        filename=f"recording-{session_id}.webm"
+    )
+
+    # Upload to Supabase storage
+    try:
+        recording_url = await storage_service.upload_file(
+            bucket=StorageBucket.CALL_RECORDINGS,
+            path=storage_path,
+            file_content=recording_data,
+            content_type=content_type,
+            upsert=True
+        )
+
+        # Update session with recording URL
+        session.recording_url = recording_url
+        session.recording_storage_path = storage_path
+        await db.commit()
+
+        logger.info(f"Recording uploaded for session {session_id}: {recording_url}")
+
+        return {
+            "message": "Recording uploaded successfully",
+            "session_id": session_id,
+            "recording_url": recording_url
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to upload recording: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload recording"
+        )
+
+
+@router.get("/{session_id}/transcript")
+async def get_full_transcript(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get the full transcript for a call session.
+
+    Combines all transcript chunks into a single formatted transcript.
+
+    Args:
+        session_id: Call session ID
+
+    Returns:
+        Full transcript with speaker names and timestamps
+    """
+    # Get session
+    result = await db.execute(
+        select(ParentCallSession).where(ParentCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Call session not found"
+        )
+
+    # Verify family file access
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+
+    if not family_file:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Family file not found"
+        )
+
+    # Verify user is a parent
+    if current_user.id not in [family_file.parent_a_id, family_file.parent_b_id]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have access to this transcript"
+        )
+
+    # Get all transcript chunks ordered by time
+    chunks_result = await db.execute(
+        select(CallTranscriptChunk)
+        .where(CallTranscriptChunk.session_id == session_id)
+        .order_by(CallTranscriptChunk.start_time)
+    )
+    chunks = list(chunks_result.scalars().all())
+
+    # Format transcript
+    transcript_lines = []
+    for chunk in chunks:
+        timestamp = f"{int(chunk.start_time // 60):02d}:{int(chunk.start_time % 60):02d}"
+        transcript_lines.append({
+            "timestamp": timestamp,
+            "start_time": chunk.start_time,
+            "speaker_name": chunk.speaker_name,
+            "content": chunk.content,
+            "confidence": chunk.confidence,
+            "flagged": chunk.flagged,
+        })
+
+    # Build full text transcript
+    full_text = "\n".join([
+        f"[{line['timestamp']}] {line['speaker_name']}: {line['content']}"
+        for line in transcript_lines
+    ])
+
+    return {
+        "session_id": session_id,
+        "family_file_id": str(session.family_file_id),
+        "call_started": session.started_at.isoformat() if session.started_at else None,
+        "call_ended": session.ended_at.isoformat() if session.ended_at else None,
+        "duration_seconds": session.duration_seconds,
+        "chunk_count": len(chunks),
+        "transcript_lines": transcript_lines,
+        "full_text": full_text,
+        "recording_url": session.recording_url,
+    }
+
+
 @router.get("/family-file/{family_file_id}/history", response_model=List[CallSessionResponse])
 async def get_call_history(
     family_file_id: str,
