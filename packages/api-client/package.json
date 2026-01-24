@@ -1,0 +1,47 @@
+{
+  "name": "@commonground/api-client",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./adapters/web": {
+      "types": "./dist/adapters/web-storage.d.ts",
+      "import": "./dist/adapters/web-storage.mjs",
+      "require": "./dist/adapters/web-storage.js"
+    },
+    "./adapters/native": {
+      "types": "./dist/adapters/native-storage.d.ts",
+      "import": "./dist/adapters/native-storage.mjs",
+      "require": "./dist/adapters/native-storage.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/adapters/web-storage.ts src/adapters/native-storage.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts src/adapters/web-storage.ts src/adapters/native-storage.ts --format cjs,esm --dts --watch",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@commonground/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@commonground/tsconfig": "workspace:*",
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0"
+  },
+  "peerDependencies": {
+    "expo-secure-store": ">=13.0.0"
+  },
+  "peerDependenciesMeta": {
+    "expo-secure-store": {
+      "optional": true
+    }
+  }
+}

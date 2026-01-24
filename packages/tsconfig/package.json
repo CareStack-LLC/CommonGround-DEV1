@@ -1,0 +1,12 @@
+{
+  "name": "@commonground/tsconfig",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared TypeScript configurations for CommonGround",
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react-native.json",
+    "library.json"
+  ]
+}
