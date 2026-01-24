@@ -120,7 +120,7 @@ function ParentCallContent() {
     userId: user?.id || '',
     userName: profile?.preferred_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Parent',
     sensitivityLevel: ariaSensitivity as SensitivityLevel,
-    chunkIntervalMs: 5000, // Send audio every 5 seconds for transcription
+    chunkIntervalMs: 2500, // Send audio every 2.5 seconds for faster response
     onIntervention: handleARIAIntervention,
     onTranscript: (text) => console.log('[ARIA Whisper] Transcribed:', text),
     onError: (err) => console.error('[ARIA Shield] Error:', err),
