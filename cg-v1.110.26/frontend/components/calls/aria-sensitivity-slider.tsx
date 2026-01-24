@@ -94,13 +94,18 @@ export function ARIASensitivitySlider({
       <div className="relative">
         {/* Background track */}
         <div className="h-2 bg-gray-100 rounded-full">
-          {/* Colored fill */}
+          {/* Colored fill - extends to the selected option position */}
+          {/* Calculate fill width: each option at 0, 33, 66, 100% with 8% minimum */}
           <div
             className={cn(
               "h-full rounded-full transition-all duration-200",
               selectedOption.color.replace("text-", "bg-")
             )}
-            style={{ width: `${((3 - selectedIndex) / 3) * 100}%` }}
+            style={{
+              width: selectedIndex === 0
+                ? '8%'
+                : `${(selectedIndex / (sensitivityOptions.length - 1)) * 100}%`
+            }}
           />
         </div>
 
