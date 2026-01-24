@@ -5,7 +5,7 @@ import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
 import { cn } from '@/lib/utils';
-import { User, Bell, Shield, CreditCard, ChevronLeft, FileText } from 'lucide-react';
+import { User, Bell, Shield, CreditCard, ArrowLeft, FileText, Settings } from 'lucide-react';
 
 /**
  * CommonGround Settings Layout
@@ -64,26 +64,28 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
       <Navigation />
 
       <PageContainer className="pb-32">
-        {/* Back Navigation - Always uses browser back */}
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors mb-6"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back
-        </button>
-
-        {/* Settings Header - Only show on settings home */}
-        {!isSubpage && (
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-              Settings
-            </h1>
-            <p className="mt-1 text-slate-600 font-medium">
-              Manage your account preferences and security
-            </p>
+        {/* Header with back button - matches Quick Accord styling */}
+        <div className="flex items-center gap-4 mb-8">
+          <button
+            onClick={() => router.back()}
+            className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+          >
+            <ArrowLeft className="w-5 h-5 text-slate-500" />
+          </button>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
+              <Settings className="w-6 h-6 text-[var(--portal-primary)]" />
+            </div>
+            <div>
+              <h1 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                Settings
+              </h1>
+              <p className="text-sm text-slate-500 font-medium">
+                Manage your account preferences
+              </p>
+            </div>
           </div>
-        )}
+        </div>
 
         {/* Settings Layout: Sidebar + Content */}
         <div className="flex flex-col lg:flex-row gap-8">
