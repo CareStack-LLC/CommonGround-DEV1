@@ -356,7 +356,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
             )}
 
             {/* Contact Limit Banner */}
-            {!contactLimitGate.canAdd && contactLimitGate.limit > 0 && (
+            {!contactLimitGate.canAddMore && contactLimitGate.limit > 0 && (
               <UpgradeBanner
                 variant="slim"
                 feature="circle_contacts_limit"
@@ -366,7 +366,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {contactLimitGate.canAdd ? (
+              {contactLimitGate.canAddMore ? (
                 <button
                   onClick={() => setShowInviteModal(true)}
                   className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-teal-300 transition-all p-6 flex items-center gap-4 group"
@@ -449,7 +449,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No contacts yet</h3>
                   <p className="text-slate-600 mb-6">Invite trusted people to your circle</p>
-                  {contactLimitGate.canAdd ? (
+                  {contactLimitGate.canAddMore ? (
                     <button
                       onClick={() => setShowInviteModal(true)}
                       className="cg-btn-primary flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl"
