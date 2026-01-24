@@ -63,7 +63,7 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation />
 
-      <PageContainer className="pb-32">
+      <PageContainer className="pb-32" background="transparent">
         {/* Header with back button - matches Quick Accord styling */}
         <div className="flex items-center gap-4 mb-8">
           <button
