@@ -253,14 +253,19 @@ export default function NotificationSettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Title */}
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-          Notification Settings
-        </h2>
-        <p className="text-slate-600 font-medium">
-          Choose how you want to be notified about important updates
-        </p>
+      {/* Page Header - matches app design system */}
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-2xl flex items-center justify-center shadow-md">
+          <Bell className="w-6 h-6 text-amber-600" />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            Notification Settings
+          </h2>
+          <p className="text-sm text-slate-500 font-medium">
+            Choose how you want to be notified about important updates
+          </p>
+        </div>
       </div>
 
       {/* Error Alert */}

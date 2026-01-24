@@ -289,14 +289,19 @@ export default function SecuritySettingsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Page Title */}
-      <div>
-        <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-          Security Settings
-        </h2>
-        <p className="text-muted-foreground font-medium mt-1">
-          Manage your password and account security
-        </p>
+      {/* Page Header - matches app design system */}
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-2xl flex items-center justify-center shadow-md">
+          <Shield className="w-6 h-6 text-red-600" />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            Security Settings
+          </h2>
+          <p className="text-sm text-slate-500 font-medium">
+            Manage your password and account security
+          </p>
+        </div>
       </div>
 
       {/* Success Alert */}
