@@ -188,26 +188,44 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-              <div className="space-y-4">
-                <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                  <p className="text-sm text-white/60 mb-1">Original message:</p>
-                  <p className="text-white">
-                    "You're always late. This is ridiculous."
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 px-4">
-                  <div className="h-px flex-1 bg-[#D97757]/30" />
-                  <span className="text-xs text-[#D97757] font-medium uppercase tracking-wide">
-                    ARIA Alert
-                  </span>
-                  <div className="h-px flex-1 bg-[#D97757]/30" />
-                </div>
-                <div className="bg-[#D97757]/20 rounded-2xl p-4 border border-[#D97757]/30">
-                  <p className="text-sm text-[#D97757] mb-2 font-medium">⚠️ Could escalate conflict</p>
-                  <p className="text-white/80 text-sm">
-                    This phrasing may be taken as an attack. Consider focusing on the schedule issue.
-                  </p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20">
+              {/* Chat container - mimics a phone screen */}
+              <div className="bg-[#0b141a] rounded-2xl p-4 shadow-2xl">
+                <div className="space-y-3">
+                  {/* Outgoing message bubble - like iMessage/WhatsApp */}
+                  <div className="flex justify-end">
+                    <div className="relative max-w-[85%]">
+                      <div className="bg-[#005c4b] text-white px-4 py-2.5 rounded-2xl rounded-br-md shadow-lg">
+                        <p className="text-[15px] leading-relaxed">
+                          You're always late. This is ridiculous.
+                        </p>
+                        <p className="text-[11px] text-white/50 text-right mt-1">Draft</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ARIA Alert - system notification style */}
+                  <div className="flex justify-center my-2">
+                    <div className="bg-[#D97757] text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
+                      ⚠️ ARIA ALERT
+                    </div>
+                  </div>
+
+                  {/* ARIA suggestion card */}
+                  <div className="bg-gradient-to-br from-[#D97757]/30 to-[#D97757]/10 rounded-2xl p-4 border border-[#D97757]/40 shadow-lg mx-2">
+                    <p className="text-[#D97757] font-semibold text-sm mb-2">Could escalate conflict</p>
+                    <p className="text-white/90 text-sm leading-relaxed">
+                      This phrasing may be taken as an attack. Consider focusing on the schedule issue.
+                    </p>
+                    <div className="flex gap-2 mt-3">
+                      <button className="bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors">
+                        Rewrite
+                      </button>
+                      <button className="bg-white/10 hover:bg-white/20 text-white/70 text-xs font-medium px-3 py-1.5 rounded-full transition-colors">
+                        Send Anyway
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
