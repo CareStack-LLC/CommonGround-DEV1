@@ -2,7 +2,7 @@
 Recording Service - Manages video call recordings and transcriptions.
 
 Handles:
-- AWS S3 storage configuration for Daily.co recordings
+- Supabase Storage for recording files
 - Recording lifecycle management
 - Transcription processing
 - Signed URL generation for playback
@@ -13,10 +13,7 @@ import hmac
 import logging
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any, List
-from enum import Enum
 
-import boto3
-from botocore.exceptions import ClientError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,56 +26,24 @@ from app.models.recording import (
     RecordingType,
     TranscriptionStatus,
 )
+from app.services.storage import (
+    storage_service,
+    StorageBucket,
+    build_recording_path,
+)
 
 logger = logging.getLogger(__name__)
 
 
 class RecordingService:
-    """Service for managing recordings and their S3 storage."""
+    """Service for managing recordings with Supabase Storage."""
 
     def __init__(self):
-        """Initialize the recording service with S3 client."""
-        self._s3_client = None
-        self.bucket = settings.AWS_S3_RECORDING_BUCKET
-        self.prefix = settings.AWS_S3_RECORDING_PREFIX
-        self.region = settings.AWS_REGION
+        """Initialize the recording service."""
+        self.bucket = StorageBucket.CALL_RECORDINGS
+        self.storage = storage_service
 
-    @property
-    def s3_client(self):
-        """Lazy-load S3 client."""
-        if self._s3_client is None:
-            if settings.AWS_ACCESS_KEY_ID and settings.AWS_SECRET_ACCESS_KEY:
-                self._s3_client = boto3.client(
-                    's3',
-                    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                    region_name=settings.AWS_REGION
-                )
-            else:
-                logger.warning("AWS credentials not configured - S3 operations will fail")
-                self._s3_client = boto3.client('s3', region_name=settings.AWS_REGION)
-        return self._s3_client
-
-    def get_s3_config_for_daily(self) -> Dict[str, Any]:
-        """
-        Get S3 configuration for Daily.co recording destination.
-
-        Returns configuration that can be passed to Daily.co API
-        for cloud recording to your own S3 bucket.
-        """
-        return {
-            "s3": {
-                "bucket": self.bucket,
-                "prefix": self.prefix,
-                "region": self.region,
-                "credentials": {
-                    "access_key_id": settings.AWS_ACCESS_KEY_ID,
-                    "secret_access_key": settings.AWS_SECRET_ACCESS_KEY,
-                }
-            }
-        }
-
-    def build_recording_key(
+    def build_recording_path(
         self,
         family_file_id: str,
         session_id: str,
@@ -86,12 +51,49 @@ class RecordingService:
         filename: str = "recording.mp4"
     ) -> str:
         """
-        Build S3 key for a recording.
+        Build storage path for a recording.
 
-        Format: {prefix}/{type}/{family_id}/{session_id}/{filename}
+        Format: {family_file_id}/{type}/{session_id}/{filename}
         """
         type_folder = recording_type.value  # "kidcoms" or "parent_call"
-        return f"{self.prefix}/{type_folder}/{family_file_id}/{session_id}/{filename}"
+        return f"{family_file_id}/{type_folder}/{session_id}/{filename}"
+
+    async def upload_recording(
+        self,
+        family_file_id: str,
+        session_id: str,
+        recording_type: RecordingType,
+        file_content: bytes,
+        content_type: str = "video/mp4",
+        filename: str = "recording.mp4"
+    ) -> str:
+        """
+        Upload a recording file to Supabase Storage.
+
+        Args:
+            family_file_id: Family file ID
+            session_id: Session ID
+            recording_type: Type of recording
+            file_content: Raw file bytes
+            content_type: MIME type
+            filename: Filename
+
+        Returns:
+            Signed URL for the uploaded file
+        """
+        path = self.build_recording_path(
+            family_file_id, session_id, recording_type, filename
+        )
+
+        url = await self.storage.upload_file(
+            bucket=self.bucket,
+            path=path,
+            file_content=file_content,
+            content_type=content_type,
+        )
+
+        logger.info(f"Uploaded recording to {self.bucket}/{path}")
+        return url
 
     async def create_recording(
         self,
@@ -204,19 +206,20 @@ class RecordingService:
         self,
         db: AsyncSession,
         recording_id: str,
-        s3_key: str,
+        storage_path: str,
         duration_seconds: Optional[int] = None,
         file_size_bytes: Optional[int] = None,
     ) -> Recording:
-        """Mark recording as completed with S3 location."""
+        """Mark recording as completed with Supabase Storage location."""
         recording = await self.get_recording(db, recording_id)
         if not recording:
             raise ValueError(f"Recording {recording_id} not found")
 
+        # Store Supabase bucket/path instead of S3
         recording.mark_completed(
-            s3_bucket=self.bucket,
-            s3_key=s3_key,
-            s3_region=self.region,
+            s3_bucket=self.bucket,  # Using s3_bucket field for Supabase bucket
+            s3_key=storage_path,    # Using s3_key field for storage path
+            s3_region="supabase",   # Marker to indicate Supabase storage
             duration_seconds=duration_seconds,
             file_size_bytes=file_size_bytes,
         )
@@ -228,7 +231,7 @@ class RecordingService:
         await db.refresh(recording)
 
         logger.info(
-            f"Recording {recording_id} completed: s3://{self.bucket}/{s3_key}"
+            f"Recording {recording_id} completed: supabase://{self.bucket}/{storage_path}"
         )
         return recording
 
@@ -258,7 +261,7 @@ class RecordingService:
         expires_in: int = 3600
     ) -> Optional[str]:
         """
-        Generate a signed URL for recording playback.
+        Generate a signed URL for recording playback using Supabase Storage.
 
         Args:
             db: Database session
@@ -276,25 +279,60 @@ class RecordingService:
             return None
 
         try:
-            url = self.s3_client.generate_presigned_url(
-                'get_object',
-                Params={
-                    'Bucket': recording.s3_bucket,
-                    'Key': recording.s3_key,
-                },
-                ExpiresIn=expires_in
+            # Use Supabase Storage signed URL
+            url = await self.storage.get_signed_url(
+                bucket=recording.s3_bucket,
+                path=recording.s3_key,
+                expires_in=expires_in
             )
 
-            # Cache the URL
-            recording.download_url = url
-            recording.download_url_expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
-            await db.commit()
+            if url:
+                # Cache the URL
+                recording.download_url = url
+                recording.download_url_expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+                await db.commit()
 
             return url
 
-        except ClientError as e:
+        except Exception as e:
             logger.error(f"Failed to generate signed URL for {recording_id}: {e}")
             return None
+
+    async def delete_recording_file(
+        self,
+        db: AsyncSession,
+        recording_id: str
+    ) -> bool:
+        """
+        Delete recording file from Supabase Storage.
+
+        Args:
+            db: Database session
+            recording_id: Recording ID
+
+        Returns:
+            True if deleted successfully
+        """
+        recording = await self.get_recording(db, recording_id)
+        if not recording or not recording.s3_key:
+            return False
+
+        try:
+            success = await self.storage.delete_file(
+                bucket=recording.s3_bucket,
+                path=recording.s3_key
+            )
+
+            if success:
+                recording.status = RecordingStatus.DELETED.value
+                await db.commit()
+                logger.info(f"Deleted recording file for {recording_id}")
+
+            return success
+
+        except Exception as e:
+            logger.error(f"Failed to delete recording file for {recording_id}: {e}")
+            return False
 
     async def get_family_recordings(
         self,
@@ -398,6 +436,39 @@ class RecordingService:
         await db.refresh(transcription)
 
         return transcription
+
+    async def upload_transcription_file(
+        self,
+        family_file_id: str,
+        session_id: str,
+        recording_type: RecordingType,
+        content: str,
+    ) -> str:
+        """
+        Upload transcription text file to Supabase Storage.
+
+        Args:
+            family_file_id: Family file ID
+            session_id: Session ID
+            recording_type: Type of recording
+            content: Transcription text content
+
+        Returns:
+            Signed URL for the uploaded file
+        """
+        path = self.build_recording_path(
+            family_file_id, session_id, recording_type, "transcription.txt"
+        )
+
+        url = await self.storage.upload_file(
+            bucket=self.bucket,
+            path=path,
+            file_content=content.encode('utf-8'),
+            content_type="text/plain",
+        )
+
+        logger.info(f"Uploaded transcription to {self.bucket}/{path}")
+        return url
 
     # =========================================================================
     # Webhook Signature Verification

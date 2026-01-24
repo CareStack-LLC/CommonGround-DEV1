@@ -328,17 +328,16 @@ class DailyVideoService:
         self,
         room_name: str,
         webhook_url: Optional[str] = None,
-        s3_config: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Start recording a Daily.co room.
 
+        Recording files are stored temporarily by Daily.co and then
+        downloaded via webhook and stored in Supabase Storage.
+
         Args:
             room_name: The room to record
             webhook_url: Optional webhook URL for recording events
-            s3_config: Optional S3 configuration for custom storage destination
-                       Format: {"bucket": "...", "prefix": "...", "region": "...",
-                               "credentials": {"access_key_id": "...", "secret_access_key": "..."}}
 
         Returns:
             Recording start response
@@ -351,17 +350,6 @@ class DailyVideoService:
             payload: Dict[str, Any] = {}
             if webhook_url:
                 payload["webhook_url"] = webhook_url
-
-            # Add S3 destination configuration for cloud recording
-            if s3_config:
-                payload["output_storage"] = {
-                    "type": "s3",
-                    "s3_bucket_region": s3_config.get("region", "us-east-1"),
-                    "s3_bucket_name": s3_config.get("bucket"),
-                    "s3_key_prefix": s3_config.get("prefix", "recordings"),
-                    "s3_access_key": s3_config.get("credentials", {}).get("access_key_id"),
-                    "s3_secret_key": s3_config.get("credentials", {}).get("secret_access_key"),
-                }
 
             async with httpx.AsyncClient() as client:
                 response = await client.post(
@@ -382,49 +370,29 @@ class DailyVideoService:
             logger.error(f"Error starting recording: {e}")
             raise
 
-    async def start_cloud_recording(
+    async def start_session_recording(
         self,
         room_name: str,
-        family_file_id: str,
-        session_id: str,
-        recording_type: str = "kidcoms",
+        backend_url: str,
     ) -> Dict[str, Any]:
         """
-        Start cloud recording with automatic S3 storage.
+        Start recording with webhook for Supabase Storage.
 
-        This is the preferred method for production recording.
-        Recordings are automatically saved to the configured S3 bucket.
+        Recordings are stored by Daily.co temporarily, then downloaded
+        and saved to Supabase Storage via webhook handler.
 
         Args:
             room_name: The room to record
-            family_file_id: Family file ID for organizing recordings
-            session_id: Session ID (kidcoms_session_id or parent_call_session_id)
-            recording_type: Type of recording ("kidcoms" or "parent_call")
+            backend_url: Backend URL for webhook (e.g., "https://api.yourapp.com")
 
         Returns:
             Recording start response including recording_id
         """
-        from app.core.config import settings
-        from app.services.recording import recording_service
-
-        # Get S3 configuration
-        s3_config = recording_service.get_s3_config_for_daily()
-
-        # Customize prefix for this recording
-        s3_config["s3"]["prefix"] = recording_service.build_recording_key(
-            family_file_id=family_file_id,
-            session_id=session_id,
-            recording_type=recording_type,
-            filename=""  # Daily.co will add the filename
-        ).rstrip("/")
-
-        # Build webhook URL for recording events
-        webhook_url = f"{settings.FRONTEND_URL.replace('vercel.app', 'your-backend.com')}/api/v1/webhooks/daily/recording"
+        webhook_url = f"{backend_url}/api/v1/webhooks/daily/recording"
 
         return await self.start_recording(
             room_name=room_name,
             webhook_url=webhook_url,
-            s3_config=s3_config["s3"],
         )
 
     async def stop_recording(self, room_name: str) -> bool:

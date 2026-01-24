@@ -82,14 +82,7 @@ class Settings(BaseSettings):
     DAILY_DOMAIN: str = "cg-mvp.daily.co"
     DAILY_WEBHOOK_SECRET: Optional[str] = None  # For verifying webhook signatures
 
-    # AWS S3 (for recording storage)
-    AWS_ACCESS_KEY_ID: Optional[str] = None
-    AWS_SECRET_ACCESS_KEY: Optional[str] = None
-    AWS_REGION: str = "us-east-1"
-    AWS_S3_RECORDING_BUCKET: str = "commonground-recordings"
-    AWS_S3_RECORDING_PREFIX: str = "recordings"
-
-    # Recording settings
+    # Recording settings (recordings stored in Supabase Storage - call_recordings bucket)
     RECORDING_ENABLED: bool = True
     TRANSCRIPTION_ENABLED: bool = True
 
