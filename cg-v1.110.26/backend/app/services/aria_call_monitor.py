@@ -99,6 +99,14 @@ class ARIACallMonitor:
             r'\bwanna\s+fuck\b', r'\blet\'?s\s+fuck\b',
             r'\bmolest\b', r'\brape\b', r'\brapist\b',
         ],
+        ToxicityCategory.PROFANITY: [
+            # Strong profanity - triggers warnings in calls
+            r'\bfuck(ing|ed|er|ers|s)?\b', r'\bshit(ty|s|ting|ted)?\b',
+            r'\bass\s*hole\w*\b', r'\bbitch(es|y|ing)?\b',
+            r'\bdamn(ed|it)?\b', r'\bhell\b',
+            r'\bbastard\w*\b', r'\bprick\b', r'\bdick(head)?\b',
+            r'\bwh[o0]re\b', r'\bslut\b',
+        ],
     }
 
     # Default intervention thresholds (overridden by sensitivity level)
