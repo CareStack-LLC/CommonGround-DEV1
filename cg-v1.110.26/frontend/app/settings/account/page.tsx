@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { usersAPI } from '@/lib/api';
 import { TIMEZONE_OPTIONS } from '@/lib/timezone';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -139,14 +138,19 @@ export default function AccountSettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Title */}
-      <div>
-        <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-          Account Settings
-        </h2>
-        <p className="text-slate-600 font-medium">
-          Manage your profile and contact information
-        </p>
+      {/* Page Header - matches app design system */}
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-2xl flex items-center justify-center shadow-md">
+          <User className="w-6 h-6 text-blue-600" />
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            Account Settings
+          </h2>
+          <p className="text-sm text-slate-500 font-medium">
+            Manage your profile and contact information
+          </p>
+        </div>
       </div>
 
       {/* Success Alert */}
@@ -285,7 +289,7 @@ export default function AccountSettingsPage() {
                 name="timezone"
                 value={formData.timezone}
                 onChange={handleChange}
-                className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-sm font-medium focus:border-[var(--portal-primary)] focus:outline-none focus:ring-0 transition-colors"
               >
                 {TIMEZONE_OPTIONS.map((tz) => (
                   <option key={tz.value} value={tz.value}>
@@ -380,9 +384,8 @@ export default function AccountSettingsPage() {
 
         {/* Save Button */}
         <div className="flex justify-end gap-3">
-          <Button
+          <button
             type="button"
-            variant="outline"
             onClick={() => {
               // Reset to profile data
               if (profile) {
@@ -415,19 +418,24 @@ export default function AccountSettingsPage() {
               setError(null);
               setShowSuccess(false);
             }}
+            className="px-6 py-2.5 bg-white border-2 border-slate-200 text-slate-700 rounded-xl font-bold hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
           >
             Cancel
-          </Button>
-          <Button type="submit" disabled={isSaving}>
+          </button>
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="px-6 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+          >
             {isSaving ? (
-              <>
-                <span className="mr-2">Saving</span>
-                <span className="animate-spin">...</span>
-              </>
+              <span className="flex items-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Saving...
+              </span>
             ) : (
               'Save Changes'
             )}
-          </Button>
+          </button>
         </div>
       </form>
     </div>
