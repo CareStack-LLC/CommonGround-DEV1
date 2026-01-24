@@ -442,6 +442,7 @@ function ConversationSelector({
   onSelectFamilyFile,
   onSelectAgreement,
   isLoading,
+  currentUserId,
 }: {
   familyFilesWithAgreements: FamilyFileWithAgreements[];
   selectedFamilyFile: FamilyFile | FamilyFileDetail | null;
@@ -449,7 +450,22 @@ function ConversationSelector({
   onSelectFamilyFile: (ff: FamilyFile | FamilyFileDetail) => void;
   onSelectAgreement: (agreement: Agreement, ff?: FamilyFile | FamilyFileDetail) => void;
   isLoading: boolean;
+  currentUserId?: string;
 }) {
+  // Helper to get co-parent info
+  const getCoParentInfo = (ff: FamilyFile | FamilyFileDetail) => {
+    const isParentA = ff.parent_a_id === currentUserId;
+    const coParentInfo = isParentA ? ff.parent_b_info : ff.parent_a_info;
+    const coParentName = coParentInfo?.first_name || (isParentA ? 'Co-Parent' : 'Co-Parent');
+    const coParentInitial = coParentName.charAt(0).toUpperCase();
+    return { coParentName, coParentInitial, coParentInfo };
+  };
+
+  // Get active agreement for a family file
+  const getActiveAgreement = (agreements: Agreement[]) => {
+    return agreements.find(a => a.status === 'approved' || a.status === 'active') || agreements[0];
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -479,74 +495,120 @@ function ConversationSelector({
   }
 
   return (
-    <div className="space-y-2 p-4">
-      {familyFilesWithAgreements.map((item) => (
-        <div key={item.familyFile.id}>
-          {/* Family File Header */}
-          <button
-            onClick={() => onSelectFamilyFile(item.familyFile)}
-            className={`w-full text-left p-3 rounded-xl transition-all duration-200 ${
-              selectedFamilyFile?.id === item.familyFile.id && !selectedAgreement
-                ? 'bg-gradient-to-r from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 border-2 border-[var(--portal-primary)]/30 shadow-sm'
-                : 'hover:bg-slate-50 border-2 border-transparent'
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Users className="h-5 w-5 text-[var(--portal-primary)]" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{item.familyFile.title}</p>
-                <p className="text-xs text-slate-600 font-medium">
-                  {item.agreements.length} agreement{item.agreements.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-            </div>
-          </button>
+    <div className="divide-y divide-slate-100">
+      {familyFilesWithAgreements.map((item) => {
+        const { coParentName, coParentInitial } = getCoParentInfo(item.familyFile);
+        const activeAgreement = getActiveAgreement(item.agreements);
+        const isSelected = selectedFamilyFile?.id === item.familyFile.id;
+        const hasAgreements = item.agreements.length > 0;
 
-          {/* Agreements under this family file */}
-          {selectedFamilyFile?.id === item.familyFile.id && item.agreements.length > 0 && (
-            <div className="ml-6 mt-2 space-y-1 border-l-2 border-border pl-3">
-              {item.agreements.map((agreement) => (
-                <button
-                  key={agreement.id}
-                  onClick={() => onSelectAgreement(agreement)}
-                  className={`w-full text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 shadow-sm ${
-                    selectedAgreement?.id === agreement.id
-                      ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white scale-[1.02]'
-                      : 'bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 hover:border-[var(--portal-primary)]/30'
-                  }`}
-                >
-                  <FileText className="h-4 w-4 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold truncate">{agreement.title}</p>
-                    <span className={`text-xs font-medium ${
-                      selectedAgreement?.id === agreement.id ? 'text-white/80' : 'text-slate-600'
-                    }`}>
-                      {agreement.status === 'approved' || agreement.status === 'active' ? 'Active' : agreement.status}
+        return (
+          <div key={item.familyFile.id}>
+            {/* Main conversation thread item - looks like phone messages */}
+            <button
+              onClick={() => {
+                if (hasAgreements && activeAgreement) {
+                  onSelectAgreement(activeAgreement, item.familyFile);
+                } else {
+                  onSelectFamilyFile(item.familyFile);
+                }
+              }}
+              className={`w-full text-left p-4 transition-all duration-200 ${
+                isSelected
+                  ? 'bg-[var(--portal-primary)]/5'
+                  : 'hover:bg-slate-50 active:bg-slate-100'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                {/* Avatar with initial */}
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-lg font-bold ${
+                  isSelected
+                    ? 'bg-[var(--portal-primary)] text-white'
+                    : 'bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600'
+                }`}>
+                  {coParentInitial}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className={`font-semibold truncate ${isSelected ? 'text-[var(--portal-primary)]' : 'text-slate-900'}`}>
+                      {coParentName}
+                    </p>
+                    {/* Timestamp placeholder - would show last message time */}
+                    <span className="text-xs text-slate-500 flex-shrink-0">
+                      {item.agreements.length > 0 ? (
+                        <span className="flex items-center gap-1">
+                          <FileText className="w-3 h-3" />
+                          {item.agreements.length}
+                        </span>
+                      ) : null}
                     </span>
                   </div>
-                </button>
-              ))}
-            </div>
-          )}
+                  <p className="text-sm text-slate-600 truncate font-medium">
+                    {item.familyFile.title}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate mt-0.5">
+                    {hasAgreements
+                      ? `${activeAgreement?.title || 'Agreement'} • ${activeAgreement?.status === 'approved' || activeAgreement?.status === 'active' ? 'Active' : activeAgreement?.status}`
+                      : 'No agreements yet - tap to create'
+                    }
+                  </p>
+                </div>
 
-          {/* No agreements message */}
-          {selectedFamilyFile?.id === item.familyFile.id && item.agreements.length === 0 && (
-            <div className="ml-6 mt-2 border-l-2 border-border pl-3">
-              <div className="p-3 text-center">
-                <p className="text-xs text-muted-foreground mb-2">No agreements yet</p>
-                <Link
-                  href={`/agreements?familyFileId=${item.familyFile.id}`}
-                  className="text-xs font-medium text-[var(--portal-primary)] hover:underline"
-                >
-                  Create Agreement
-                </Link>
+                {/* Chevron */}
+                <ChevronLeft className="w-5 h-5 text-slate-400 flex-shrink-0 rotate-180" />
               </div>
-            </div>
-          )}
-        </div>
-      ))}
+            </button>
+
+            {/* Expanded agreements list when selected and multiple agreements */}
+            {isSelected && item.agreements.length > 1 && (
+              <div className="bg-slate-50 border-t border-slate-100 py-2 px-4">
+                <p className="text-xs text-slate-500 font-medium mb-2 px-2">Select Agreement</p>
+                <div className="space-y-1">
+                  {item.agreements.map((agreement) => (
+                    <button
+                      key={agreement.id}
+                      onClick={() => onSelectAgreement(agreement, item.familyFile)}
+                      className={`w-full text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${
+                        selectedAgreement?.id === agreement.id
+                          ? 'bg-[var(--portal-primary)] text-white shadow-md'
+                          : 'bg-white hover:bg-slate-100 text-slate-900 border border-slate-200'
+                      }`}
+                    >
+                      <FileText className="h-4 w-4 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold truncate">{agreement.title}</p>
+                        <span className={`text-xs ${
+                          selectedAgreement?.id === agreement.id ? 'text-white/80' : 'text-slate-500'
+                        }`}>
+                          {agreement.status === 'approved' || agreement.status === 'active' ? 'Active' : agreement.status}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* No agreements - show create link */}
+            {isSelected && !hasAgreements && (
+              <div className="bg-slate-50 border-t border-slate-100 p-4">
+                <div className="text-center">
+                  <p className="text-sm text-slate-600 mb-2">Create an agreement to start messaging</p>
+                  <Link
+                    href={`/agreements?familyFileId=${item.familyFile.id}`}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--portal-primary)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--portal-primary)]/90 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Create Agreement
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -899,6 +961,7 @@ function MessagesContent() {
                 onSelectFamilyFile={handleSelectFamilyFile}
                 onSelectAgreement={handleSelectAgreement}
                 isLoading={isLoadingFamilyFiles}
+                currentUserId={user?.id}
               />
             </div>
           </aside>
