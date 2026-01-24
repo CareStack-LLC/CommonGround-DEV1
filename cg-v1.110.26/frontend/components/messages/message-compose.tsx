@@ -130,13 +130,14 @@ export function MessageCompose({
       );
 
       return true;
-    } catch (error) {
-      console.error('Failed to upload attachment:', error);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Upload failed';
+      console.error('Failed to upload attachment:', attachment.file.name, errorMessage, error);
       setAttachments(prev =>
         prev.map(a => a.id === attachment.id ? {
           ...a,
           uploading: false,
-          error: 'Upload failed'
+          error: errorMessage
         } : a)
       );
       return false;
@@ -167,26 +168,44 @@ export function MessageCompose({
       setIsSending(true);
       setError(null);
 
+      // Determine content - use placeholder only if there are pending attachments
+      const messageContent = content.trim() || (attachments.length > 0 ? '' : '');
+
       const newMessage = await messagesAPI.send({
         case_id: caseId,
         family_file_id: familyFileId,
         agreement_id: agreementId,
         recipient_id: recipientId,
-        content: content || '(Attachment)',
+        content: messageContent || '(Attachment)',
         message_type: 'text',
       });
 
       // Upload attachments if any
+      let uploadErrors: string[] = [];
       if (attachments.length > 0 && newMessage.id) {
-        const uploadPromises = attachments.map(attachment =>
-          uploadAttachment(newMessage.id!, attachment)
+        const uploadResults = await Promise.all(
+          attachments.map(async (attachment) => {
+            const success = await uploadAttachment(newMessage.id!, attachment);
+            return { name: attachment.file.name, success };
+          })
         );
-        await Promise.all(uploadPromises);
+
+        // Collect any failed uploads
+        uploadErrors = uploadResults
+          .filter(r => !r.success)
+          .map(r => r.name);
       }
 
+      // Clear form state
       setMessage('');
       setAnalysis(null);
       setAttachments([]);
+
+      // Show warning if some uploads failed
+      if (uploadErrors.length > 0) {
+        setError(`Message sent, but ${uploadErrors.length} attachment(s) failed to upload: ${uploadErrors.join(', ')}`);
+      }
+
       onMessageSent();
     } catch (err: any) {
       console.error('Failed to send message:', err);
