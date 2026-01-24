@@ -926,7 +926,7 @@ function MessagesContent() {
           <aside className={`
             ${showSidebar ? 'flex' : 'hidden lg:flex'}
             w-full lg:w-80 flex-col border-r-2 border-slate-200 bg-white shadow-sm
-            absolute lg:relative inset-0 lg:inset-auto z-20 lg:z-auto
+            absolute lg:relative top-0 left-0 right-0 bottom-[5rem] lg:bottom-0 lg:inset-auto z-20 lg:z-auto
           `}>
             {/* Sidebar Header */}
             <div className="p-4 border-b-2 border-slate-200 bg-white">
