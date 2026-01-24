@@ -8,6 +8,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, desc
+from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -740,14 +741,14 @@ async def list_messages(
 ):
     """
     Get messages for a case.
-    
+
     Args:
         case_id: Case ID
         limit: Number of messages to return
         offset: Offset for pagination
-        
+
     Returns:
-        List of messages (most recent first)
+        List of messages (most recent first) with attachments
     """
     # Verify access
     result = await db.execute(
@@ -760,23 +761,24 @@ async def list_messages(
         )
     )
     participant = result.scalar_one_or_none()
-    
+
     if not participant:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have access to this case"
         )
-    
-    # Get messages
+
+    # Get messages with attachments
     messages_result = await db.execute(
         select(Message)
+        .options(selectinload(Message.attachments))
         .where(Message.case_id == case_id)
         .order_by(desc(Message.sent_at))
         .limit(limit)
         .offset(offset)
     )
     messages = messages_result.scalars().all()
-    
+
     return [
         MessageResponse(
             id=msg.id,
@@ -793,7 +795,25 @@ async def list_messages(
             read_at=msg.read_at,
             acknowledged_at=msg.acknowledged_at,
             was_flagged=msg.was_flagged,
-            original_content=msg.original_content
+            original_content=msg.original_content,
+            attachments=[
+                MessageAttachmentResponse(
+                    id=att.id,
+                    message_id=att.message_id,
+                    family_file_id=att.family_file_id,
+                    file_name=att.file_name,
+                    file_type=att.file_type,
+                    file_size=att.file_size,
+                    file_category=att.file_category,
+                    storage_path=att.storage_path,
+                    storage_url=att.storage_url,
+                    sha256_hash=att.sha256_hash,
+                    virus_scanned=att.virus_scanned,
+                    uploaded_by=att.uploaded_by,
+                    uploaded_at=att.uploaded_at,
+                )
+                for att in (msg.attachments or [])
+            ]
         )
         for msg in messages
     ]
@@ -818,7 +838,7 @@ async def list_messages_by_agreement(
         offset: Offset for pagination
 
     Returns:
-        List of messages (most recent first)
+        List of messages (most recent first) with attachments
     """
     from app.models.agreement import Agreement
     from app.services.agreement import AgreementService
@@ -827,9 +847,10 @@ async def list_messages_by_agreement(
     agreement_service = AgreementService(db)
     agreement = await agreement_service.get_agreement(agreement_id, current_user)
 
-    # Get messages for this agreement
+    # Get messages for this agreement with attachments eagerly loaded
     messages_result = await db.execute(
         select(Message)
+        .options(selectinload(Message.attachments))
         .where(Message.agreement_id == agreement_id)
         .order_by(desc(Message.sent_at))
         .limit(limit)
@@ -853,7 +874,25 @@ async def list_messages_by_agreement(
             read_at=msg.read_at,
             acknowledged_at=msg.acknowledged_at,
             was_flagged=msg.was_flagged,
-            original_content=msg.original_content
+            original_content=msg.original_content,
+            attachments=[
+                MessageAttachmentResponse(
+                    id=att.id,
+                    message_id=att.message_id,
+                    family_file_id=att.family_file_id,
+                    file_name=att.file_name,
+                    file_type=att.file_type,
+                    file_size=att.file_size,
+                    file_category=att.file_category,
+                    storage_path=att.storage_path,
+                    storage_url=att.storage_url,
+                    sha256_hash=att.sha256_hash,
+                    virus_scanned=att.virus_scanned,
+                    uploaded_by=att.uploaded_by,
+                    uploaded_at=att.uploaded_at,
+                )
+                for att in (msg.attachments or [])
+            ]
         )
         for msg in messages
     ]

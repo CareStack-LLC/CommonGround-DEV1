@@ -1,7 +1,8 @@
 """Message schemas for request/response validation."""
 
+from __future__ import annotations
 from datetime import datetime
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, TYPE_CHECKING
 from pydantic import BaseModel, Field, field_validator
 from app.utils.sanitize import sanitize_text
 
@@ -142,6 +143,7 @@ class MessageResponse(BaseModel):
     acknowledged_at: Optional[datetime] = None  # When recipient acknowledged the message
     was_flagged: bool
     original_content: Optional[str] = None  # If ARIA intervention occurred
+    attachments: List[MessageAttachmentResponse] = []  # File attachments
 
     class Config:
         from_attributes = True
