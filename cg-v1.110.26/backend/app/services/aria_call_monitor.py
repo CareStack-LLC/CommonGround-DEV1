@@ -191,7 +191,12 @@ class ARIACallMonitor:
         except Exception as e:
             logger.error(f"Claude analysis failed: {e}")
             # Fallback: Use regex match count as proxy
-            toxicity_score = min(len(detected_categories) * 0.3, 1.0)
+            # Base score of 0.5 ensures profanity triggers at least a warning
+            # Add 0.15 per additional category detected
+            base_score = 0.5  # Minimum score to trigger warning on "moderate"
+            additional_score = max(0, len(detected_categories) - 1) * 0.15
+            toxicity_score = min(base_score + additional_score, 1.0)
+            logger.info(f"Using fallback score {toxicity_score} for {len(detected_categories)} detected categories")
 
         # Step 3: Get dynamic thresholds based on sensitivity
         thresholds = self.get_thresholds(sensitivity_level)
