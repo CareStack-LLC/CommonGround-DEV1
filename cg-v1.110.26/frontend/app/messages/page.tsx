@@ -34,7 +34,86 @@ import {
   Plus,
   Music,
   ThumbsUp,
+  Lock,
+  Scale,
+  Eye,
+  X,
 } from 'lucide-react';
+
+// Welcome Disclaimer Modal
+function WelcomeDisclaimer({ onAccept }: { onAccept: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-300">
+        {/* Header */}
+        <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] p-6 text-center">
+          <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            Welcome to The Neutral Zone
+          </h2>
+          <p className="text-white/80 mt-1 text-sm font-medium">
+            A safe space for co-parenting communication
+          </p>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-4">
+          <p className="text-slate-700 text-center font-medium">
+            This secure messaging platform is designed for conversations about your children and custody matters.
+          </p>
+
+          {/* Key Points */}
+          <div className="space-y-3">
+            <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+              <div className="w-10 h-10 bg-[var(--portal-primary)]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Lock className="w-5 h-5 text-[var(--portal-primary)]" />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900 text-sm">Secure & Documented</p>
+                <p className="text-xs text-slate-600">All messages and calls are encrypted, timestamped, and digitally signed for your protection.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+              <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Eye className="w-5 h-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900 text-sm">ARIA Guardian Active</p>
+                <p className="text-xs text-slate-600">Our AI assistant monitors conversations and gently guides toward constructive communication.</p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+              <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Scale className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-900 text-sm">Court-Ready Records</p>
+                <p className="text-xs text-slate-600">Communication records may be used as documentation in legal proceedings if needed.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="pt-4 border-t border-slate-100">
+            <button
+              onClick={onAccept}
+              className="w-full py-3 px-6 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300"
+            >
+              I Understand, Continue
+            </button>
+            <p className="text-xs text-slate-500 text-center mt-3">
+              By continuing, you acknowledge these terms for using CommonGround messaging.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface FamilyFileWithAgreements {
   familyFile: FamilyFile | FamilyFileDetail;
@@ -461,6 +540,8 @@ function ConversationSelector({
   );
 }
 
+const DISCLAIMER_ACCEPTED_KEY = 'cg_messages_disclaimer_accepted';
+
 function MessagesContent() {
   const { user } = useAuth();
   const router = useRouter();
@@ -481,6 +562,20 @@ function MessagesContent() {
   const [pendingCallType, setPendingCallType] = useState<'video' | 'audio'>('video');
   const [isStartingCall, setIsStartingCall] = useState(false);
   const [acknowledgingMessageId, setAcknowledgingMessageId] = useState<string | null>(null);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  // Check if user has accepted disclaimer
+  useEffect(() => {
+    const accepted = localStorage.getItem(DISCLAIMER_ACCEPTED_KEY);
+    if (!accepted) {
+      setShowDisclaimer(true);
+    }
+  }, []);
+
+  const handleAcceptDisclaimer = () => {
+    localStorage.setItem(DISCLAIMER_ACCEPTED_KEY, 'true');
+    setShowDisclaimer(false);
+  };
 
   // Handle new message from Supabase Realtime
   const handleNewMessage = useCallback((message: Message) => {
@@ -968,6 +1063,11 @@ function MessagesContent() {
         defaultCallType={pendingCallType}
         isLoading={isStartingCall}
       />
+
+      {/* Welcome Disclaimer Modal */}
+      {showDisclaimer && (
+        <WelcomeDisclaimer onAccept={handleAcceptDisclaimer} />
+      )}
     </div>
   );
 }
