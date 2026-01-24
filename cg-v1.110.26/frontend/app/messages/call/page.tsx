@@ -6,6 +6,9 @@ import { useAuth } from '@/lib/auth-context';
 import { useWebSocket } from '@/contexts/websocket-context';
 import type { CallDeclinedEvent } from '@/lib/websocket';
 import { ProtectedRoute } from '@/components/protected-route';
+import { Navigation } from '@/components/navigation';
+import { PageContainer } from '@/components/layout';
+import { Card, CardContent } from '@/components/ui/card';
 import { useWhisperARIAShield, type SensitivityLevel, type ARIAIntervention } from '@/hooks/use-whisper-aria-shield';
 import { useCallRecording } from '@/hooks/use-call-recording';
 import type { ARIAInterventionEvent } from '@/lib/websocket';
@@ -21,6 +24,7 @@ import {
   Clock,
   User,
   X,
+  ArrowLeft,
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -701,20 +705,50 @@ function ParentCallContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
-        <div className="bg-white rounded-2xl p-8 max-w-md text-center shadow-2xl mx-4">
-          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-            <AlertTriangle className="h-8 w-8 text-red-500" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        <Navigation />
+        <PageContainer className="pb-32">
+          <div className="max-w-lg mx-auto pt-8">
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-8">
+              <button
+                onClick={() => router.push('/messages')}
+                className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[#2C5F5D]/30 hover:shadow-lg transition-all duration-300"
+              >
+                <ArrowLeft className="w-5 h-5 text-slate-500" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-2xl flex items-center justify-center shadow-md">
+                  <Phone className="w-6 h-6 text-red-500" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    Call Failed
+                  </h1>
+                  <p className="text-sm text-slate-500 font-medium">Unable to connect</p>
+                </div>
+              </div>
+            </div>
+
+            <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+              <CardContent className="pt-8 pb-8 text-center">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-500/10 to-red-600/5 flex items-center justify-center mx-auto mb-6 shadow-md">
+                  <AlertTriangle className="h-10 w-10 text-red-500" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  Something Went Wrong
+                </h2>
+                <p className="text-slate-600 mb-8 max-w-sm mx-auto">{error}</p>
+                <button
+                  onClick={() => router.push('/messages')}
+                  className="px-8 py-3.5 bg-gradient-to-r from-[#2C5F5D] to-[#1f4644] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300"
+                >
+                  Back to Messages
+                </button>
+              </CardContent>
+            </Card>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Call Failed</h2>
-          <p className="text-slate-600 mb-6">{error}</p>
-          <button
-            onClick={() => router.push('/messages')}
-            className="px-6 py-3 bg-[#2C5F5D] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg"
-          >
-            Back to Messages
-          </button>
-        </div>
+        </PageContainer>
       </div>
     );
   }
@@ -722,20 +756,60 @@ function ParentCallContent() {
   // Call was declined by the other parent
   if (callDeclined) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
-        <div className="bg-white rounded-2xl p-8 max-w-md text-center shadow-2xl mx-4">
-          <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
-            <PhoneOff className="h-8 w-8 text-orange-500" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        <Navigation />
+        <PageContainer className="pb-32">
+          <div className="max-w-lg mx-auto pt-8">
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-8">
+              <button
+                onClick={() => router.push('/messages')}
+                className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[#2C5F5D]/30 hover:shadow-lg transition-all duration-300"
+              >
+                <ArrowLeft className="w-5 h-5 text-slate-500" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-orange-500/10 to-orange-600/5 rounded-2xl flex items-center justify-center shadow-md">
+                  <PhoneOff className="w-6 h-6 text-orange-500" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    Call Declined
+                  </h1>
+                  <p className="text-sm text-slate-500 font-medium">Not available right now</p>
+                </div>
+              </div>
+            </div>
+
+            <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+              <CardContent className="pt-8 pb-8 text-center">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-500/10 to-orange-600/5 flex items-center justify-center mx-auto mb-6 shadow-md">
+                  <PhoneOff className="h-10 w-10 text-orange-500" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  Call Not Accepted
+                </h2>
+                <p className="text-slate-600 mb-8 max-w-sm mx-auto">
+                  The other parent declined your call. You can try again later or send a message instead.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button
+                    onClick={() => router.push('/messages')}
+                    className="px-8 py-3.5 bg-gradient-to-r from-[#2C5F5D] to-[#1f4644] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300"
+                  >
+                    Send a Message
+                  </button>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="px-8 py-3.5 bg-white border-2 border-slate-200 text-slate-700 rounded-xl font-bold hover:border-[#2C5F5D]/30 hover:shadow-lg transition-all duration-300"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Call Declined</h2>
-          <p className="text-slate-600 mb-6">The other parent declined your call. You can try again later or send a message instead.</p>
-          <button
-            onClick={() => router.push('/messages')}
-            className="px-6 py-3 bg-[#2C5F5D] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg"
-          >
-            Back to Messages
-          </button>
-        </div>
+        </PageContainer>
       </div>
     );
   }
@@ -743,34 +817,106 @@ function ParentCallContent() {
   // Call timed out - no answer after 30 seconds
   if (callTimedOut) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
-        <div className="bg-white rounded-2xl p-8 max-w-md text-center shadow-2xl mx-4">
-          <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-            <Clock className="h-8 w-8 text-slate-500" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        <Navigation />
+        <PageContainer className="pb-32">
+          <div className="max-w-lg mx-auto pt-8">
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-8">
+              <button
+                onClick={() => router.push('/messages')}
+                className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[#2C5F5D]/30 hover:shadow-lg transition-all duration-300"
+              >
+                <ArrowLeft className="w-5 h-5 text-slate-500" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-slate-500/10 to-slate-600/5 rounded-2xl flex items-center justify-center shadow-md">
+                  <Clock className="w-6 h-6 text-slate-500" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    No Answer
+                  </h1>
+                  <p className="text-sm text-slate-500 font-medium">Call timed out</p>
+                </div>
+              </div>
+            </div>
+
+            <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+              <CardContent className="pt-8 pb-8 text-center">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-slate-500/10 to-slate-600/5 flex items-center justify-center mx-auto mb-6 shadow-md">
+                  <Clock className="h-10 w-10 text-slate-500" />
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  No Answer
+                </h2>
+                <p className="text-slate-600 mb-8 max-w-sm mx-auto">
+                  The other parent didn&apos;t answer. They may be busy or away. Try again later or send a message.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <button
+                    onClick={() => router.push('/messages')}
+                    className="px-8 py-3.5 bg-gradient-to-r from-[#2C5F5D] to-[#1f4644] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300"
+                  >
+                    Send a Message
+                  </button>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="px-8 py-3.5 bg-white border-2 border-slate-200 text-slate-700 rounded-xl font-bold hover:border-[#2C5F5D]/30 hover:shadow-lg transition-all duration-300"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No Answer</h2>
-          <p className="text-slate-600 mb-6">The other parent didn&apos;t answer. They may be busy or away. Try again later or send a message.</p>
-          <button
-            onClick={() => router.push('/messages')}
-            className="px-6 py-3 bg-[#2C5F5D] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg"
-          >
-            Back to Messages
-          </button>
-        </div>
+        </PageContainer>
       </div>
     );
   }
 
   if (isInitiating) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
-        <div className="text-center">
-          <div className="w-20 h-20 border-4 border-[#2C5F5D]/30 border-t-[#2C5F5D] rounded-full animate-spin mx-auto mb-6"></div>
-          <h2 className="text-white text-xl font-semibold mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            {callType === 'audio' ? 'Starting Audio Call...' : 'Starting Video Call...'}
-          </h2>
-          <p className="text-slate-400 text-sm">Connecting you securely</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        <Navigation />
+        <PageContainer className="pb-32">
+          <div className="max-w-lg mx-auto pt-8">
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-8">
+              <button
+                onClick={() => router.push('/messages')}
+                className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[#2C5F5D]/30 hover:shadow-lg transition-all duration-300"
+              >
+                <ArrowLeft className="w-5 h-5 text-slate-500" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center shadow-md">
+                  {callType === 'video' ? (
+                    <Video className="w-6 h-6 text-[#2C5F5D]" />
+                  ) : (
+                    <Phone className="w-6 h-6 text-[#2C5F5D]" />
+                  )}
+                </div>
+                <div>
+                  <h1 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    {callType === 'video' ? 'Video Call' : 'Audio Call'}
+                  </h1>
+                  <p className="text-sm text-slate-500 font-medium">Connecting...</p>
+                </div>
+              </div>
+            </div>
+
+            <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+              <CardContent className="pt-12 pb-12 text-center">
+                <div className="w-20 h-20 border-4 border-[#2C5F5D]/20 border-t-[#2C5F5D] rounded-full animate-spin mx-auto mb-8"></div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  {callType === 'audio' ? 'Starting Audio Call...' : 'Starting Video Call...'}
+                </h2>
+                <p className="text-slate-500 font-medium">Connecting you securely</p>
+              </CardContent>
+            </Card>
+          </div>
+        </PageContainer>
       </div>
     );
   }
@@ -778,57 +924,77 @@ function ParentCallContent() {
   // ARIA initialization splash screen - show while waiting for ARIA to start recording
   if (isJoined && ariaSensitivity !== 'off' && !isARIAReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
-        <div className="text-center max-w-sm mx-4">
-          {/* ARIA Mascot */}
-          <div className="relative w-32 h-32 mx-auto mb-6">
-            <Image
-              src="/images/Aria.png"
-              alt="ARIA Guardian"
-              fill
-              className="object-contain animate-pulse"
-              priority
-            />
-          </div>
-
-          {/* Loading indicator */}
-          <div className="flex justify-center mb-4">
-            <div className="flex gap-1">
-              <div className="w-2 h-2 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-2 h-2 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-2 h-2 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-            </div>
-          </div>
-
-          <h2 className="text-white text-xl font-semibold mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            ARIA Guardian Activating
-          </h2>
-          <p className="text-slate-400 text-sm mb-4">
-            Setting up communication monitoring to keep your conversation constructive
-          </p>
-
-          {/* Status indicators */}
-          <div className="bg-white/5 rounded-xl p-4 text-left space-y-2">
-            <div className="flex items-center gap-3 text-sm">
-              <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        <Navigation />
+        <PageContainer className="pb-32">
+          <div className="max-w-lg mx-auto pt-8">
+            {/* Header */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-2xl flex items-center justify-center shadow-md">
+                <Shield className="w-6 h-6 text-[#2C5F5D]" />
               </div>
-              <span className="text-emerald-400">Call connected</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
+              <div>
+                <h1 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  ARIA Guardian
+                </h1>
+                <p className="text-sm text-slate-500 font-medium">Initializing protection</p>
               </div>
-              <span className="text-amber-400">Initializing ARIA monitoring...</span>
             </div>
-            <div className="flex items-center gap-3 text-sm opacity-50">
-              <div className="w-5 h-5 rounded-full bg-slate-500/20 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-slate-500"></div>
-              </div>
-              <span className="text-slate-500">Ready to communicate</span>
-            </div>
+
+            <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+              <CardContent className="pt-8 pb-8 text-center">
+                {/* ARIA Mascot */}
+                <div className="relative w-28 h-28 mx-auto mb-6">
+                  <Image
+                    src="/images/Aria.png"
+                    alt="ARIA Guardian"
+                    fill
+                    className="object-contain animate-pulse"
+                    priority
+                  />
+                </div>
+
+                {/* Loading indicator */}
+                <div className="flex justify-center mb-4">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  ARIA Guardian Activating
+                </h2>
+                <p className="text-slate-500 text-sm mb-6 max-w-xs mx-auto">
+                  Setting up communication monitoring to keep your conversation constructive
+                </p>
+
+                {/* Status indicators */}
+                <div className="bg-slate-50 rounded-xl p-4 text-left space-y-3 border-2 border-slate-100">
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                    </div>
+                    <span className="text-emerald-700 font-medium">Call connected</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
+                      <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></div>
+                    </div>
+                    <span className="text-amber-700 font-medium">Initializing ARIA monitoring...</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm opacity-50">
+                    <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-400"></div>
+                    </div>
+                    <span className="text-slate-500 font-medium">Ready to communicate</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </div>
+        </PageContainer>
       </div>
     );
   }
