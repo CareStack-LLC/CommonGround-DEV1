@@ -138,26 +138,28 @@ async def initiate_call(
     # Broadcast call notification to other parent via WebSocket
     other_parent_id = family_file.parent_b_id if current_user.id == family_file.parent_a_id else family_file.parent_a_id
     if other_parent_id:
+        # Convert UUID to string for WebSocket manager lookup
+        other_parent_id_str = str(other_parent_id)
         caller_name = current_user.profile.display_name if current_user.profile else current_user.email
         notification_payload = {
             "type": "incoming_call",
-            "session_id": session.id,
-            "caller_id": current_user.id,
+            "session_id": str(session.id),
+            "caller_id": str(current_user.id),
             "caller_name": caller_name,
             "call_type": call_create.call_type,
-            "family_file_id": call_create.family_file_id,
+            "family_file_id": str(call_create.family_file_id),
         }
-        logger.info(f"Sending incoming_call notification to {other_parent_id}: {notification_payload}")
+        logger.info(f"Sending incoming_call notification to {other_parent_id_str}: {notification_payload}")
 
         # Check if user is connected
-        is_connected = other_parent_id in manager.active_connections
-        logger.info(f"Other parent {other_parent_id} connected: {is_connected}, connections: {len(manager.active_connections.get(other_parent_id, set()))}")
+        is_connected = other_parent_id_str in manager.active_connections
+        logger.info(f"Other parent {other_parent_id_str} connected: {is_connected}, connections: {len(manager.active_connections.get(other_parent_id_str, set()))}")
 
         await manager.send_personal_message(
             message=notification_payload,
-            user_id=other_parent_id
+            user_id=other_parent_id_str
         )
-        logger.info(f"Incoming call notification sent to {other_parent_id}")
+        logger.info(f"Incoming call notification sent to {other_parent_id_str}")
     else:
         logger.warning(f"No other parent found to notify for family file {family_file.id}")
 

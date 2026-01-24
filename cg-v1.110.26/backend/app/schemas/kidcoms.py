@@ -462,6 +462,36 @@ class ARIAChatAnalyzeResponse(BaseModel):
 
 
 # ============================================================
+# ARIA Sentiment Shield - Transcript Chunk Schemas
+# ============================================================
+
+class KidComsTranscriptChunkCreate(BaseModel):
+    """Transcript chunk for ARIA Sentiment Shield analysis."""
+
+    speaker_id: str = Field(..., description="ID of the speaker (child, parent, or contact)")
+    speaker_name: str = Field(..., description="Display name of the speaker")
+    content: str = Field(..., description="Transcribed text content")
+    confidence: float = Field(0.9, ge=0.0, le=1.0, description="Transcription confidence")
+    start_time: float = Field(..., description="Start time in seconds from session start")
+    end_time: float = Field(..., description="End time in seconds from session start")
+    sensitivity_level: Optional[str] = Field(
+        default="moderate",
+        description="ARIA sensitivity level: strict, moderate, relaxed, off"
+    )
+
+
+class KidComsTranscriptChunkResponse(BaseModel):
+    """Response after processing transcript chunk."""
+
+    message: str
+    chunk_id: Optional[str] = None
+    intervention: Optional[dict] = Field(
+        default=None,
+        description="ARIA intervention if flagged (warning, mute, terminate)"
+    )
+
+
+# ============================================================
 # KidComs Dashboard/Summary Schemas
 # ============================================================
 

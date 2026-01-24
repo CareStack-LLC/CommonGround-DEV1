@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import type { DailyCall, DailyParticipant } from '@daily-co/daily-js';
+import { useARIASentimentShield, type ARIAIntervention } from '@/hooks/use-aria-sentiment-shield';
 import {
   PhoneOff,
   Video,
@@ -18,6 +19,8 @@ import {
   Loader2,
   ArrowLeft,
   Send,
+  Shield,
+  AlertTriangle,
 } from 'lucide-react';
 // Dynamically import TheaterMode to avoid SSR issues with Daily.co
 const TheaterMode = dynamic(
@@ -84,6 +87,47 @@ function ChildCallContent() {
   const [childUserId, setChildUserId] = useState<string>('');
   const [childUserName, setChildUserName] = useState<string>('');
 
+  // ARIA Sentiment Shield state
+  const [ariaWarning, setAriaWarning] = useState<{
+    type: string;
+    message: string;
+    severity: string;
+  } | null>(null);
+  const callStartTime = useRef<number>(0);
+
+  // Handle ARIA interventions
+  const handleARIAIntervention = useCallback((intervention: ARIAIntervention) => {
+    console.log('[ARIA Shield] Child call intervention:', intervention);
+    setAriaWarning({
+      type: intervention.type,
+      message: intervention.message,
+      severity: intervention.severity,
+    });
+
+    // Auto-clear warning after 10 seconds for non-terminate interventions
+    if (intervention.type !== 'terminate') {
+      setTimeout(() => setAriaWarning(null), 10000);
+    }
+  }, []);
+
+  // ARIA Sentiment Shield hook - for child safety monitoring
+  const {
+    isMonitoring: isARIAMonitoring,
+    isTranscribing,
+    startMonitoring: startARIAMonitoring,
+    stopMonitoring: stopARIAMonitoring,
+  } = useARIASentimentShield({
+    callRef,
+    sessionId: callSession?.sessionId || '',
+    sessionType: 'my_circle',
+    userId: childUserId,
+    userName: childUserName,
+    sensitivityLevel: 'moderate', // Default moderate for child calls
+    callStartTime: callStartTime.current,
+    onIntervention: handleARIAIntervention,
+    onError: (err) => console.error('[ARIA Shield] Error:', err),
+  });
+
   useEffect(() => {
     loadCallSession();
   }, [sessionId]);
@@ -102,6 +146,26 @@ function ChildCallContent() {
       }
     };
   }, [callSession]);
+
+  // Start ARIA Sentiment Shield when call joins
+  useEffect(() => {
+    if (isCallJoined && callRef.current && !isARIAMonitoring) {
+      // Set call start time
+      callStartTime.current = Date.now();
+      // Delay to ensure audio is ready
+      const timeoutId = setTimeout(() => {
+        startARIAMonitoring();
+      }, 1500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isCallJoined, isARIAMonitoring, startARIAMonitoring]);
+
+  // Stop ARIA monitoring when call ends
+  useEffect(() => {
+    if (!isCallJoined && isARIAMonitoring) {
+      stopARIAMonitoring();
+    }
+  }, [isCallJoined, isARIAMonitoring, stopARIAMonitoring]);
 
   // Listen for theater mode messages at session level (to auto-enter theater mode)
   useEffect(() => {
@@ -380,6 +444,29 @@ function ChildCallContent() {
 
   return (
     <div className="flex h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+      {/* ARIA Warning Overlay */}
+      {ariaWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-3xl p-8 mx-4 max-w-md text-center shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="h-8 w-8 text-amber-600" />
+            </div>
+            <h2 className="text-xl font-bold text-[#2C3E50] mb-2">
+              {ariaWarning.type === 'terminate' ? 'Call Ending' : 'Friendly Reminder'}
+            </h2>
+            <p className="text-gray-600 mb-4">{ariaWarning.message}</p>
+            {ariaWarning.type !== 'terminate' && (
+              <button
+                onClick={() => setAriaWarning(null)}
+                className="px-6 py-2 bg-[#2C5F5D] text-white rounded-full font-semibold hover:bg-[#2C5F5D]/90"
+              >
+                I Understand
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Main Video Area */}
       <div className="flex-1 flex flex-col">
         {/* Header - Desktop */}
@@ -395,8 +482,13 @@ function ChildCallContent() {
               <h1 className="text-[#2C3E50] font-bold">
                 {isCallJoined ? `Talking with ${callSession.contactName}` : 'Connecting...'}
               </h1>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-gray-600 flex items-center gap-1">
                 {callSession.callType === 'video' ? '📹 Video Call' : '📞 Voice Call'}
+                {isARIAMonitoring && (
+                  <span className="inline-flex items-center gap-1 ml-2 text-[#2C5F5D]">
+                    <Shield className="h-3 w-3" /> Protected
+                  </span>
+                )}
               </p>
             </div>
           </div>

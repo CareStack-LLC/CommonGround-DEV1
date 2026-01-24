@@ -208,6 +208,7 @@ class DailyVideoService:
         start_video_off: bool = False,
         start_audio_off: bool = False,
         enable_recording: bool = False,
+        enable_transcription: bool = True,
     ) -> str:
         """
         Create a meeting token for a participant.
@@ -221,6 +222,7 @@ class DailyVideoService:
             start_video_off: Start with video disabled
             start_audio_off: Start with audio disabled
             enable_recording: Whether user can record
+            enable_transcription: Whether user can start/access transcription (for ARIA)
 
         Returns:
             Meeting token string
@@ -249,6 +251,12 @@ class DailyVideoService:
             token_config["properties"]["start_video_off"] = True
         if start_audio_off:
             token_config["properties"]["start_audio_off"] = True
+
+        # Enable transcription permission for ARIA Sentiment Shield
+        if enable_transcription:
+            token_config["properties"]["enable_transcription"] = True
+            # Grant transcription admin permission to start/stop transcription
+            token_config["properties"]["canAdmin"] = ["transcription"]
 
         try:
             async with httpx.AsyncClient() as client:

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { ProtectedRoute } from '@/components/protected-route';
+import { useARIASentimentShield, type SensitivityLevel, type ARIAIntervention } from '@/hooks/use-aria-sentiment-shield';
 import {
   Phone,
   PhoneOff,
@@ -77,7 +78,6 @@ function ParentCallContent() {
   const [isInitiating, setIsInitiating] = useState(true);
   const [isJoined, setIsJoined] = useState(false);
   const [isMutedByARIA, setIsMutedByARIA] = useState(false);
-  const [isTranscribing, setIsTranscribing] = useState(false);
 
   const callStartTime = useRef<number>(0);
   const durationInterval = useRef<NodeJS.Timeout | null>(null);
@@ -86,8 +86,41 @@ function ParentCallContent() {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const mutedByARIATimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const speechRecognitionRef = useRef<any>(null);
-  const transcriptStartTimeRef = useRef<number>(0);
+  const callRef = useRef<any>(null);
+
+  // Handle ARIA interventions from the Sentiment Shield
+  const handleARIAIntervention = useCallback((intervention: ARIAIntervention) => {
+    console.log('[ARIA Shield] Intervention received:', intervention);
+    setAriaWarning({
+      type: 'aria_intervention',
+      severity: intervention.severity,
+      warning_message: intervention.message,
+      should_terminate: intervention.type === 'terminate',
+      intervention_type: intervention.type,
+      should_mute: intervention.type === 'mute',
+      mute_speaker_id: intervention.speakerId,
+      mute_duration_seconds: intervention.muteDurationSeconds,
+    });
+  }, []);
+
+  // ARIA Sentiment Shield hook - uses Daily.co transcription
+  const {
+    isMonitoring,
+    isTranscribing,
+    startMonitoring,
+    stopMonitoring,
+    interventions,
+  } = useARIASentimentShield({
+    callRef,
+    sessionId: session?.session_id || '',
+    sessionType: 'parent_call',
+    userId: user?.id || '',
+    userName: profile?.preferred_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Parent',
+    sensitivityLevel: ariaSensitivity as SensitivityLevel,
+    callStartTime: callStartTime.current,
+    onIntervention: handleARIAIntervention,
+    onError: (err) => console.error('[ARIA Shield] Error:', err),
+  });
 
   // Format duration
   const formatDuration = (seconds: number) => {
@@ -95,125 +128,6 @@ function ParentCallContent() {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  // Send transcript chunk to backend for ARIA analysis
-  const sendTranscriptChunk = useCallback(async (content: string, confidence: number = 0.9) => {
-    if (!session?.session_id || !user?.id || ariaSensitivity === 'off') return;
-
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    const now = Date.now();
-    const startTime = (now - (callStartTime.current || now)) / 1000;
-
-    try {
-      const response = await fetch(`${apiUrl}/api/v1/parent-calls/${session.session_id}/transcript-chunk`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify({
-          speaker_id: user.id,
-          speaker_name: profile?.preferred_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Parent',
-          content: content,
-          confidence: confidence,
-          start_time: startTime,
-          end_time: startTime + (content.length * 0.06), // Rough estimate
-        }),
-      });
-
-      if (!response.ok) {
-        console.warn('[Transcription] Failed to send chunk:', await response.text());
-      }
-    } catch (err) {
-      console.error('[Transcription] Error sending chunk:', err);
-    }
-  }, [session?.session_id, user?.id, profile, ariaSensitivity]);
-
-  // Start speech recognition for ARIA monitoring
-  const startTranscription = useCallback(() => {
-    // Check if ARIA monitoring is disabled
-    if (ariaSensitivity === 'off') {
-      console.log('[Transcription] ARIA monitoring is off, skipping transcription');
-      return;
-    }
-
-    // Check for Web Speech API support
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.warn('[Transcription] Web Speech API not supported in this browser');
-      return;
-    }
-
-    try {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = false; // Only final results for analysis
-      recognition.lang = 'en-US';
-
-      recognition.onstart = () => {
-        console.log('[Transcription] Speech recognition started');
-        setIsTranscribing(true);
-      };
-
-      recognition.onresult = (event: any) => {
-        const last = event.results.length - 1;
-        const transcript = event.results[last][0].transcript;
-        const confidence = event.results[last][0].confidence;
-
-        console.log('[Transcription]', transcript, `(confidence: ${confidence})`);
-
-        // Send to backend for ARIA analysis
-        if (transcript.trim()) {
-          sendTranscriptChunk(transcript.trim(), confidence);
-        }
-      };
-
-      recognition.onerror = (event: any) => {
-        console.warn('[Transcription] Error:', event.error);
-        // Auto-restart on non-fatal errors
-        if (event.error === 'no-speech' || event.error === 'aborted') {
-          // These are recoverable, will auto-restart
-        } else {
-          setIsTranscribing(false);
-        }
-      };
-
-      recognition.onend = () => {
-        console.log('[Transcription] Recognition ended');
-        // Auto-restart if still in call and not muted
-        if (isJoined && isAudioOn && ariaSensitivity !== 'off') {
-          console.log('[Transcription] Restarting...');
-          setTimeout(() => {
-            try {
-              recognition.start();
-            } catch (err) {
-              console.warn('[Transcription] Could not restart:', err);
-            }
-          }, 100);
-        } else {
-          setIsTranscribing(false);
-        }
-      };
-
-      recognition.start();
-      speechRecognitionRef.current = recognition;
-    } catch (err) {
-      console.error('[Transcription] Failed to start:', err);
-    }
-  }, [ariaSensitivity, isJoined, isAudioOn, sendTranscriptChunk]);
-
-  // Stop speech recognition
-  const stopTranscription = useCallback(() => {
-    if (speechRecognitionRef.current) {
-      try {
-        speechRecognitionRef.current.stop();
-        speechRecognitionRef.current = null;
-      } catch (err) {
-        console.warn('[Transcription] Error stopping:', err);
-      }
-      setIsTranscribing(false);
-    }
-  }, []);
 
   // Update video/audio elements when participants change
   const updateVideoElements = useCallback((daily: any) => {
@@ -382,41 +296,28 @@ function ParentCallContent() {
       if (mutedByARIATimeoutRef.current) {
         clearTimeout(mutedByARIATimeoutRef.current);
       }
-      // Clean up speech recognition
-      if (speechRecognitionRef.current) {
-        try {
-          speechRecognitionRef.current.stop();
-          speechRecognitionRef.current = null;
-        } catch (err) {
-          // Ignore cleanup errors
-        }
-      }
+      // ARIA Sentiment Shield cleanup is handled by the hook
+      callRef.current = null;
     };
   }, [familyFileId, callType, user, existingSessionId, profile]);
 
-  // Start transcription for ARIA monitoring when call joins
+  // Start ARIA Sentiment Shield monitoring when call joins
   useEffect(() => {
-    if (isJoined && isAudioOn && ariaSensitivity !== 'off' && !speechRecognitionRef.current) {
+    if (isJoined && callRef.current && ariaSensitivity !== 'off' && !isMonitoring) {
       // Small delay to ensure audio stream is ready
       const timeoutId = setTimeout(() => {
-        startTranscription();
+        startMonitoring();
       }, 1000);
       return () => clearTimeout(timeoutId);
     }
-  }, [isJoined, isAudioOn, ariaSensitivity, startTranscription]);
+  }, [isJoined, ariaSensitivity, isMonitoring, startMonitoring]);
 
-  // Stop/restart transcription when audio is toggled
+  // Stop monitoring when call ends
   useEffect(() => {
-    if (!isJoined) return;
-
-    if (!isAudioOn && speechRecognitionRef.current) {
-      // Mic muted - stop transcription
-      stopTranscription();
-    } else if (isAudioOn && !speechRecognitionRef.current && ariaSensitivity !== 'off') {
-      // Mic unmuted - restart transcription
-      startTranscription();
+    if (!isJoined && isMonitoring) {
+      stopMonitoring();
     }
-  }, [isAudioOn, isJoined, ariaSensitivity, startTranscription, stopTranscription]);
+  }, [isJoined, isMonitoring, stopMonitoring]);
 
   // Join Daily.co call using call object (custom UI)
   const joinDailyCall = async (sessionData: CallSession) => {
@@ -430,6 +331,7 @@ function ParentCallContent() {
       });
 
       setCallObject(daily);
+      callRef.current = daily; // Store ref for ARIA Sentiment Shield
 
       // Event listeners
       daily.on('joined-meeting', () => {
@@ -628,9 +530,13 @@ function ParentCallContent() {
       }
     }
 
+    // Stop ARIA monitoring
+    stopMonitoring();
+
     if (callObject) {
       await callObject.destroy();
     }
+    callRef.current = null;
 
     if (ws.current) {
       ws.current.close();

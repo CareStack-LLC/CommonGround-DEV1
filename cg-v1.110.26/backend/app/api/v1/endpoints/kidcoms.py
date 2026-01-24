@@ -63,7 +63,10 @@ from app.schemas.kidcoms import (
     CircleContactSessionCreate,
     IncomingCallResponse,
     IncomingCallListResponse,
+    KidComsTranscriptChunkCreate,
+    KidComsTranscriptChunkResponse,
 )
+from app.services.aria_call_monitor import aria_call_monitor
 
 router = APIRouter()
 
@@ -1829,6 +1832,183 @@ async def analyze_chat_message(
         should_hide=False,
         should_notify_parents=False,
     )
+
+
+# ============================================================
+# ARIA Sentiment Shield - Transcript Chunk Processing
+# ============================================================
+
+@router.post(
+    "/sessions/{session_id}/transcript-chunk",
+    response_model=KidComsTranscriptChunkResponse,
+    summary="Process transcript chunk",
+    description="Process a transcript chunk from Daily.co for ARIA Sentiment Shield analysis."
+)
+async def process_transcript_chunk(
+    session_id: str,
+    chunk_data: KidComsTranscriptChunkCreate,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Process a transcript chunk from Daily.co transcription.
+
+    This endpoint receives real-time transcription from Daily.co and runs
+    ARIA Sentiment Shield analysis to detect harmful content in calls.
+
+    For child safety, this monitors:
+    - Inappropriate language
+    - Concerning topics
+    - Signs of manipulation or grooming
+    - Hostile or threatening content
+
+    Args:
+        session_id: KidComs session ID
+        chunk_data: Transcript chunk with speaker info and content
+
+    Returns:
+        Processing result, optionally with ARIA intervention
+
+    Note:
+        This endpoint can be called from the frontend (with auth) or from
+        Daily.co webhook (without auth for real-time processing).
+    """
+    # Get session
+    result = await db.execute(
+        select(KidComsSession).where(KidComsSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Session not found"
+        )
+
+    # Check if ARIA monitoring is enabled (default to moderate for child safety)
+    sensitivity_level = chunk_data.sensitivity_level or "moderate"
+
+    if sensitivity_level == "off":
+        return KidComsTranscriptChunkResponse(
+            message="ARIA monitoring disabled",
+            chunk_id=None
+        )
+
+    # Store the transcript chunk as a KidComs message for audit trail
+    message = KidComsMessage(
+        session_id=session_id,
+        sender_id=chunk_data.speaker_id,
+        sender_type=_determine_participant_type(session, chunk_data.speaker_id),
+        sender_name=chunk_data.speaker_name,
+        content=chunk_data.content,
+        aria_analyzed=True,
+    )
+    db.add(message)
+    await db.flush()  # Get the message ID
+
+    # Run ARIA analysis using the call monitor
+    try:
+        # Create a mock chunk object for the ARIA call monitor
+        from types import SimpleNamespace
+        chunk_obj = SimpleNamespace(
+            id=message.id,
+            session_id=session_id,
+            speaker_id=chunk_data.speaker_id,
+            speaker_name=chunk_data.speaker_name,
+            content=chunk_data.content,
+            confidence=chunk_data.confidence,
+            start_time=chunk_data.start_time,
+            end_time=chunk_data.end_time,
+        )
+
+        flag = await aria_call_monitor.analyze_transcript_chunk_realtime(
+            db=db,
+            chunk=chunk_obj,
+            sensitivity_level=sensitivity_level
+        )
+
+        # If flagged, handle intervention
+        if flag and flag.intervention_needed:
+            # Update message with flag info
+            message.aria_flagged = True
+            message.aria_category = flag.categories[0] if flag.categories else "unknown"
+            message.aria_reason = flag.flagged_content
+            message.aria_score = flag.toxicity_score
+
+            # Get family file for parent notifications
+            family_file_result = await db.execute(
+                select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+            )
+            family_file = family_file_result.scalar_one_or_none()
+
+            # Build intervention data
+            intervention_data = {
+                "type": "aria_intervention",
+                "session_id": session_id,
+                "intervention_type": flag.intervention_type.value if flag.intervention_type else "warning",
+                "warning_message": _get_child_safe_warning(flag),
+                "severity": flag.severity.value if flag.severity else "low",
+                "mute_speaker_id": chunk_data.speaker_id if flag.intervention_type and flag.intervention_type.value == "mute" else None,
+                "mute_duration_seconds": flag.mute_duration_seconds,
+                "flag_id": str(message.id),
+            }
+
+            # Broadcast to parents via WebSocket
+            if family_file:
+                for parent_id in [family_file.parent_a_id, family_file.parent_b_id]:
+                    if parent_id:
+                        await manager.send_personal_message(
+                            message=intervention_data,
+                            user_id=str(parent_id)
+                        )
+
+            # Update session flag count
+            session.flagged_messages += 1
+
+            await db.commit()
+
+            logger.warning(
+                f"ARIA intervention in KidComs session {session_id}: "
+                f"type={flag.intervention_type.value if flag.intervention_type else 'warning'}, "
+                f"speaker={chunk_data.speaker_id}"
+            )
+
+            return KidComsTranscriptChunkResponse(
+                message="Transcript chunk processed with intervention",
+                chunk_id=str(message.id),
+                intervention=intervention_data
+            )
+
+    except Exception as e:
+        logger.error(f"ARIA analysis failed for KidComs session {session_id}: {e}")
+        # Continue even if ARIA fails - don't block the call
+
+    # Update session message count
+    session.total_messages += 1
+    await db.commit()
+
+    return KidComsTranscriptChunkResponse(
+        message="Transcript chunk processed successfully",
+        chunk_id=str(message.id)
+    )
+
+
+def _determine_participant_type(session: KidComsSession, speaker_id: str) -> str:
+    """Determine participant type from session participants."""
+    if session.participants:
+        for participant in session.participants:
+            if participant.get("id") == speaker_id:
+                return participant.get("type", ParticipantType.PARENT.value)
+    return ParticipantType.PARENT.value
+
+
+def _get_child_safe_warning(flag) -> str:
+    """Get a child-appropriate warning message."""
+    if flag.intervention_type and flag.intervention_type.value == "terminate":
+        return "This call is being ended because of something that was said. A parent will be notified."
+    elif flag.intervention_type and flag.intervention_type.value == "mute":
+        return "Please be kind and respectful to each other."
+    else:
+        return "Remember to be kind and respectful in your conversation."
 
 
 # ============================================================
