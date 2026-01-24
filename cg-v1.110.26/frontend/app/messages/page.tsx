@@ -361,30 +361,41 @@ function ChatHeader({
     <div className="bg-white border-b-2 border-slate-200 flex-shrink-0 shadow-md">
       <div className="flex items-center justify-between p-3 sm:p-4 gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          {/* Mobile back button - more prominent */}
           {onBack && (
             <button
               onClick={onBack}
-              className="lg:hidden p-1.5 sm:p-2 -ml-1 sm:-ml-2 rounded-xl hover:bg-[var(--portal-primary)]/10 transition-all duration-200 flex-shrink-0"
+              className="lg:hidden p-2 -ml-1 rounded-xl bg-slate-100 hover:bg-[var(--portal-primary)]/10 border border-slate-200 transition-all duration-200 flex-shrink-0"
+              aria-label="Back to conversations"
             >
-              <ChevronLeft className="h-5 w-5 text-slate-600" />
+              <ChevronLeft className="h-5 w-5 text-[var(--portal-primary)]" />
             </button>
           )}
-          <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-md">
-            <Users className="h-5 w-5 text-[var(--portal-primary)]" />
-            {/* Online status indicator */}
-            <div className="absolute -bottom-0.5 -right-0.5">
-              <OnlineDot isOnline={isCoParentOnline || false} size="sm" />
+          {/* Tappable header area on mobile to go back */}
+          <button
+            onClick={onBack}
+            className="lg:pointer-events-none flex items-center gap-2 sm:gap-3 min-w-0 flex-1 text-left"
+          >
+            <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-md">
+              <Users className="h-5 w-5 text-[var(--portal-primary)]" />
+              {/* Online status indicator */}
+              <div className="absolute -bottom-0.5 -right-0.5">
+                <OnlineDot isOnline={isCoParentOnline || false} size="sm" />
+              </div>
             </div>
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFileName}</h2>
-              {isCoParentOnline && (
-                <span className="text-xs text-emerald-600 font-medium hidden sm:inline">Online</span>
-              )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFileName}</h2>
+                {isCoParentOnline && (
+                  <span className="text-xs text-emerald-600 font-medium hidden sm:inline">Online</span>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                <p className="text-xs text-slate-600 truncate font-medium">{agreementTitle}</p>
+                <ChevronLeft className="h-3 w-3 text-slate-400 lg:hidden rotate-180" />
+              </div>
             </div>
-            <p className="text-xs text-slate-600 truncate font-medium">{agreementTitle}</p>
-          </div>
+          </button>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Call Buttons */}
