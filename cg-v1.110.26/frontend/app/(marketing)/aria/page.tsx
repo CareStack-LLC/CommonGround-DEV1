@@ -11,7 +11,6 @@ import {
   Heart,
   ArrowRight,
   Check,
-  Zap,
   RefreshCw,
 } from 'lucide-react';
 
@@ -271,39 +270,21 @@ export default function ARIAPage() {
                 {/* Decorative background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#D97757]/20 to-[var(--portal-primary)]/20 rounded-full blur-3xl scale-110" />
 
-                {/* Mascot placeholder - friendly robot character */}
+                {/* Mascot with actual image */}
                 <div className="relative bg-white rounded-3xl p-8 shadow-2xl border-4 border-[#D97757]/20">
                   <div className="w-48 h-48 mx-auto relative">
-                    {/* Simple friendly ARIA mascot illustration */}
-                    <svg viewBox="0 0 200 200" className="w-full h-full">
-                      {/* Body */}
-                      <ellipse cx="100" cy="130" rx="60" ry="50" fill="#E8F5F3" stroke="#2A5854" strokeWidth="3"/>
-                      {/* Head */}
-                      <circle cx="100" cy="70" r="50" fill="#E8F5F3" stroke="#2A5854" strokeWidth="3"/>
-                      {/* Eyes */}
-                      <circle cx="80" cy="65" r="12" fill="#2A5854"/>
-                      <circle cx="120" cy="65" r="12" fill="#2A5854"/>
-                      <circle cx="83" cy="62" r="4" fill="white"/>
-                      <circle cx="123" cy="62" r="4" fill="white"/>
-                      {/* Smile */}
-                      <path d="M 75 85 Q 100 105 125 85" fill="none" stroke="#2A5854" strokeWidth="3" strokeLinecap="round"/>
-                      {/* Antenna */}
-                      <line x1="100" y1="20" x2="100" y2="35" stroke="#D97757" strokeWidth="3" strokeLinecap="round"/>
-                      <circle cx="100" cy="15" r="8" fill="#D97757"/>
-                      {/* Sparkles */}
-                      <circle cx="45" cy="50" r="3" fill="#D97757" opacity="0.6"/>
-                      <circle cx="155" cy="45" r="4" fill="#D97757" opacity="0.8"/>
-                      <circle cx="160" cy="90" r="2" fill="#D97757" opacity="0.5"/>
-                      {/* Arms waving */}
-                      <ellipse cx="35" cy="120" rx="15" ry="8" fill="#E8F5F3" stroke="#2A5854" strokeWidth="2" transform="rotate(-30 35 120)"/>
-                      <ellipse cx="165" cy="120" rx="15" ry="8" fill="#E8F5F3" stroke="#2A5854" strokeWidth="2" transform="rotate(30 165 120)"/>
-                    </svg>
+                    <Image
+                      src="/images/Aria.png"
+                      alt="ARIA - AI Relationship Intelligence Assistant"
+                      fill
+                      className="object-contain"
+                    />
                   </div>
                   <p
                     className="text-center text-[#2C3E50] font-semibold mt-4"
                     style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
                   >
-                    Hi! I'm ARIA 👋
+                    Hi! I'm ARIA
                   </p>
                   <p className="text-center text-gray-500 text-sm mt-1">
                     I help families communicate better

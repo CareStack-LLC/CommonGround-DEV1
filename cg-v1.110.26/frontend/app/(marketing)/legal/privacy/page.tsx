@@ -1,237 +1,448 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { Shield, ArrowLeft } from 'lucide-react';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy | CommonGround',
-  description: 'Learn how CommonGround collects, uses, and protects your personal information.',
-};
+import Link from 'next/link';
+import { Shield, Lock, Eye, Server, Check, ArrowRight } from 'lucide-react';
 
 /**
  * Privacy Policy Page
  *
- * Comprehensive privacy policy for CommonGround.
+ * Comprehensive privacy policy matching the design system.
  */
 
+const dataCategories = [
+  {
+    title: 'Account Information',
+    items: ['Name, email, phone number', 'Password (encrypted)', 'Profile preferences'],
+  },
+  {
+    title: 'Case Information',
+    items: ['Children\'s details', 'Co-parent information', 'Custody arrangements'],
+  },
+  {
+    title: 'Communications',
+    items: ['Messages between parents', 'ARIA suggestions (not stored separately)', 'Professional correspondence'],
+  },
+  {
+    title: 'Financial Data',
+    items: ['Expense records', 'Payment information (via Stripe)', 'Reimbursement history'],
+  },
+  {
+    title: 'Usage Data',
+    items: ['Features used', 'Login times', 'Device information'],
+  },
+  {
+    title: 'Location Data',
+    items: ['Exchange check-in GPS (optional)', 'Only when you explicitly enable'],
+  },
+];
+
+const securityMeasures = [
+  { label: 'Encryption at Rest', value: 'AES-256' },
+  { label: 'Encryption in Transit', value: 'TLS 1.3' },
+  { label: 'Authentication', value: 'Multi-factor available' },
+  { label: 'Access Controls', value: 'Role-based permissions' },
+  { label: 'Audit Logging', value: 'All actions logged' },
+  { label: 'Data Backups', value: 'Daily, encrypted' },
+];
+
+const neverDo = [
+  'We NEVER sell your personal information',
+  'We NEVER share data for advertising purposes',
+  'We NEVER use your communications to train AI models',
+  'We NEVER provide data to third parties without consent',
+  'We NEVER access your account without your permission',
+];
+
 export default function PrivacyPolicyPage() {
-  const lastUpdated = 'January 1, 2025';
+  const lastUpdated = 'January 24, 2026';
 
   return (
-    <div className="bg-background">
-      {/* Header */}
-      <section className="py-16 bg-card border-b border-border">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/legal/terms"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+      {/* Hero */}
+      <section className="pt-24 pb-16 sm:pt-32 sm:pb-20">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl mb-6">
+            <Shield className="w-8 h-8 text-[var(--portal-primary)]" />
+          </div>
+          <h1
+            className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#2C3E50] mb-4 leading-[1.1]"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Legal
-          </Link>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-cg-sage-subtle rounded-xl flex items-center justify-center">
-              <Shield className="w-6 h-6 text-cg-sage" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-semibold text-foreground">Privacy Policy</h1>
-              <p className="text-muted-foreground">Last updated: {lastUpdated}</p>
+            Privacy <span className="text-[#D97757]">Policy</span>
+          </h1>
+          <p className="text-lg text-gray-600 mb-2">
+            Your family's data is sacred. Here's how we protect it.
+          </p>
+          <p className="text-sm text-gray-400">Last updated: {lastUpdated}</p>
+        </div>
+      </section>
+
+      {/* Our Commitment */}
+      <section className="py-12 -mt-8">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] rounded-3xl p-8 text-white">
+            <h2
+              className="text-2xl font-serif mb-4"
+              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            >
+              Our Commitment to You
+            </h2>
+            <p className="text-white/80 mb-6">
+              CommonGround was built by parents who understand the sensitivity of family information.
+              We collect only what's necessary, protect it with bank-level security, and give you
+              complete control over your data.
+            </p>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {[
+                { icon: Lock, text: 'Bank-level encryption' },
+                { icon: Eye, text: 'You control access' },
+                { icon: Server, text: 'Never sold or shared' },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.text} className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-[#D97757]" />
+                    </div>
+                    <span className="text-sm text-white/90">{item.text}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Content */}
-      <section className="py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="prose prose-gray dark:prose-invert max-w-none">
+      {/* What We Collect */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2
+            className="text-3xl font-serif text-[#2C3E50] mb-4 text-center"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            Information We <span className="text-[#D97757]">Collect</span>
+          </h2>
+          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+            We collect only what's necessary to provide our services. Here's exactly what we gather:
+          </p>
 
-            <div className="bg-cg-sage-subtle rounded-xl p-6 mb-8 not-prose">
-              <h2 className="text-lg font-semibold text-foreground mb-2">Our Commitment</h2>
-              <p className="text-muted-foreground">
-                At CommonGround, we believe your family's data is sacred. We collect only what's necessary
-                to provide our services, we never sell your information, and we give you control over your data.
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {dataCategories.map((category) => (
+              <div
+                key={category.title}
+                className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10"
+              >
+                <h3
+                  className="font-semibold text-[#2C3E50] mb-3"
+                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                >
+                  {category.title}
+                </h3>
+                <ul className="space-y-2">
+                  {category.items.map((item) => (
+                    <li key={item} className="text-sm text-gray-600 flex items-start gap-2">
+                      <span className="text-[var(--portal-primary)] mt-1">•</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How We Use It */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2
+            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            How We <span className="text-[#D97757]">Use</span> Your Information
+          </h2>
+
+          <div className="space-y-4">
+            {[
+              { title: 'Provide Services', desc: 'Enable messaging, scheduling, agreements, and expense tracking between co-parents.' },
+              { title: 'Power ARIA', desc: 'Analyze messages in real-time to suggest calmer alternatives. Content is processed but not stored separately.' },
+              { title: 'Generate Court Documents', desc: 'Create verified exports when you request them for legal proceedings.' },
+              { title: 'Send Notifications', desc: 'Alert you about messages, schedule changes, and important updates you\'ve enabled.' },
+              { title: 'Improve Security', desc: 'Detect and prevent fraud, abuse, and unauthorized access to protect all users.' },
+              { title: 'Comply with Law', desc: 'Respond to valid legal requests and protect our rights when required.' },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30 transition-colors"
+              >
+                <h3 className="font-semibold text-[#2C3E50] mb-1">{item.title}</h3>
+                <p className="text-gray-600 text-sm">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What We NEVER Do */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2
+            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            What We <span className="text-[#D97757]">Never</span> Do
+          </h2>
+
+          <div className="bg-gradient-to-br from-red-50 to-white rounded-3xl p-8 border-2 border-red-100">
+            <ul className="space-y-4">
+              {neverDo.map((item) => (
+                <li key={item} className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <span className="text-red-500 font-bold text-sm">✕</span>
+                  </div>
+                  <span className="text-[#2C3E50] font-medium">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Data Sharing */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2
+            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            Who Can <span className="text-[#D97757]">Access</span> Your Data
+          </h2>
+
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
+              <h3 className="font-semibold text-[#2C3E50] mb-2">Your Co-Parent</h3>
+              <p className="text-gray-600 text-sm">
+                Messages, shared calendars, agreements, and expense records are visible to both parents.
+                This is core to how CommonGround works.
               </p>
             </div>
 
-            <h2>1. Information We Collect</h2>
+            <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
+              <h3 className="font-semibold text-[#2C3E50] mb-2">Authorized Professionals</h3>
+              <p className="text-gray-600 text-sm">
+                Attorneys, GALs, and mediators you invite can view case information according to
+                permissions you set. All access is logged and can be revoked anytime.
+              </p>
+            </div>
 
-            <h3>1.1 Information You Provide</h3>
-            <p>When you use CommonGround, you may provide us with:</p>
-            <ul>
-              <li><strong>Account Information:</strong> Name, email address, phone number, and password when you register</li>
-              <li><strong>Profile Information:</strong> Address, timezone, and notification preferences</li>
-              <li><strong>Case Information:</strong> Details about your custody case, children's information, and co-parent details</li>
-              <li><strong>Communication Content:</strong> Messages you send through the platform</li>
-              <li><strong>Agreement Content:</strong> Information you enter when creating custody agreements</li>
-              <li><strong>Financial Information:</strong> Expense records, payment information for subscriptions</li>
-              <li><strong>Schedule Information:</strong> Custody schedules, events, and exchange check-ins</li>
-            </ul>
+            <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
+              <h3 className="font-semibold text-[#2C3E50] mb-2">Service Providers</h3>
+              <p className="text-gray-600 text-sm mb-3">
+                Trusted partners who help us operate, all bound by strict confidentiality:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {['Supabase (Database)', 'Anthropic (AI)', 'Stripe (Payments)', 'Vercel (Hosting)'].map((p) => (
+                  <span key={p} className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                    {p}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-            <h3>1.2 Information We Collect Automatically</h3>
-            <p>When you use our platform, we automatically collect:</p>
-            <ul>
-              <li><strong>Usage Data:</strong> Features you use, pages you visit, actions you take</li>
-              <li><strong>Device Information:</strong> Browser type, operating system, device identifiers</li>
-              <li><strong>Log Data:</strong> IP address, access times, referring URLs</li>
-              <li><strong>Location Data:</strong> GPS coordinates when you use exchange check-in features (with your permission)</li>
-            </ul>
-
-            <h3>1.3 Information from Third Parties</h3>
-            <p>We may receive information from:</p>
-            <ul>
-              <li><strong>Authentication Providers:</strong> When you sign in with Google or other providers</li>
-              <li><strong>Payment Processors:</strong> Transaction confirmation from Stripe</li>
-              <li><strong>Professional Verifiers:</strong> Bar association verification for legal professionals</li>
-            </ul>
-
-            <h2>2. How We Use Your Information</h2>
-            <p>We use your information to:</p>
-            <ul>
-              <li><strong>Provide Services:</strong> Enable messaging, scheduling, agreement building, and expense tracking</li>
-              <li><strong>Improve Communication:</strong> Power ARIA's sentiment analysis and suggestions (processed in real-time, not stored separately)</li>
-              <li><strong>Generate Reports:</strong> Create court export packages when you request them</li>
-              <li><strong>Send Notifications:</strong> Alert you about messages, schedule changes, and important updates</li>
-              <li><strong>Provide Support:</strong> Respond to your questions and help resolve issues</li>
-              <li><strong>Improve the Platform:</strong> Analyze usage patterns to improve features (using aggregated, anonymized data)</li>
-              <li><strong>Ensure Security:</strong> Detect and prevent fraud, abuse, and security incidents</li>
-              <li><strong>Comply with Law:</strong> Respond to legal requests and protect our rights</li>
-            </ul>
-
-            <h2>3. How We Share Your Information</h2>
-
-            <h3>3.1 With Your Co-Parent</h3>
-            <p>
-              Messages, shared calendars, agreements, and expense records are visible to both parents
-              in your case. This is core to how CommonGround works.
-            </p>
-
-            <h3>3.2 With Authorized Professionals</h3>
-            <p>
-              When you grant access to attorneys, GALs, mediators, or other professionals, they can
-              view case information according to the permissions you set. All access is logged.
-            </p>
-
-            <h3>3.3 With Service Providers</h3>
-            <p>We share information with trusted service providers who help us operate:</p>
-            <ul>
-              <li><strong>Supabase:</strong> Database hosting and authentication</li>
-              <li><strong>Anthropic:</strong> AI processing for ARIA (message content is processed but not stored by Anthropic)</li>
-              <li><strong>Stripe:</strong> Payment processing</li>
-              <li><strong>SendGrid:</strong> Email delivery</li>
-              <li><strong>Vercel/Railway:</strong> Application hosting</li>
-            </ul>
-
-            <h3>3.4 For Legal Reasons</h3>
-            <p>We may disclose information when required by law, court order, or to protect rights and safety.</p>
-
-            <h3>3.5 What We Never Do</h3>
-            <ul>
-              <li>We <strong>never sell</strong> your personal information</li>
-              <li>We <strong>never share</strong> your data for advertising purposes</li>
-              <li>We <strong>never use</strong> your communications to train AI models</li>
-            </ul>
-
-            <h2>4. Data Security</h2>
-            <p>We protect your data with:</p>
-            <ul>
-              <li><strong>Encryption:</strong> AES-256 encryption at rest, TLS 1.3 in transit</li>
-              <li><strong>Access Controls:</strong> Role-based permissions and authentication</li>
-              <li><strong>Audit Logging:</strong> All access and modifications are logged</li>
-              <li><strong>Regular Audits:</strong> Security assessments and penetration testing</li>
-              <li><strong>Employee Training:</strong> Security awareness for all team members</li>
-            </ul>
-
-            <h2>5. Data Retention</h2>
-            <p>We retain your data as follows:</p>
-            <ul>
-              <li><strong>Active Accounts:</strong> Data is retained while your account is active</li>
-              <li><strong>Deleted Accounts:</strong> Data is deleted within 90 days of account deletion request</li>
-              <li><strong>Legal Requirements:</strong> Some data may be retained longer if required by law</li>
-              <li><strong>Court Records:</strong> Data that has been exported for court proceedings may be retained per court requirements</li>
-            </ul>
-
-            <h2>6. Your Rights</h2>
-            <p>You have the right to:</p>
-            <ul>
-              <li><strong>Access:</strong> Request a copy of your personal data</li>
-              <li><strong>Correction:</strong> Update inaccurate information</li>
-              <li><strong>Deletion:</strong> Request deletion of your data (subject to legal requirements)</li>
-              <li><strong>Export:</strong> Download your data in a portable format</li>
-              <li><strong>Opt-Out:</strong> Disable certain data collection (like location services)</li>
-              <li><strong>Withdraw Consent:</strong> Revoke consent for optional data processing</li>
-            </ul>
-            <p>
-              To exercise these rights, contact us at{' '}
-              <a href="mailto:privacy@commonground.app">privacy@commonground.app</a>.
-            </p>
-
-            <h2>7. Children's Privacy</h2>
-            <p>
-              CommonGround is designed for parents and legal professionals, not children. While we
-              collect information about children as part of custody cases, this information is provided
-              by parents and is protected with the same security as all other data.
-            </p>
-            <p>
-              We do not knowingly collect information directly from children under 13. If you believe
-              a child has provided us with personal information, please contact us.
-            </p>
-
-            <h2>8. International Users</h2>
-            <p>
-              CommonGround is based in the United States. If you access our services from outside the
-              US, your information will be transferred to and processed in the US. We comply with
-              applicable data protection laws and provide appropriate safeguards for international transfers.
-            </p>
-
-            <h2>9. California Privacy Rights (CCPA)</h2>
-            <p>California residents have additional rights:</p>
-            <ul>
-              <li>Right to know what personal information we collect</li>
-              <li>Right to delete personal information</li>
-              <li>Right to opt-out of sale (we don't sell your data)</li>
-              <li>Right to non-discrimination for exercising privacy rights</li>
-            </ul>
-
-            <h2>10. Changes to This Policy</h2>
-            <p>
-              We may update this policy from time to time. We'll notify you of significant changes
-              via email or through the platform. Continued use after changes constitutes acceptance.
-            </p>
-
-            <h2>11. Contact Us</h2>
-            <p>For privacy-related questions or to exercise your rights:</p>
-            <ul>
-              <li><strong>Email:</strong> <a href="mailto:privacy@commonground.app">privacy@commonground.app</a></li>
-              <li><strong>Mail:</strong> CommonGround Privacy, [Address]</li>
-              <li><strong>Contact Form:</strong> <Link href="/help/contact">Contact Us</Link></li>
-            </ul>
-
+            <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
+              <h3 className="font-semibold text-[#2C3E50] mb-2">Legal Requirements</h3>
+              <p className="text-gray-600 text-sm">
+                We may disclose information when required by law, court order, or to protect the
+                safety of users. We will notify you when legally permitted.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Related Links */}
-      <section className="py-12 bg-card border-t border-border">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Related Documents</h2>
-          <div className="flex flex-wrap gap-4">
+      {/* Security */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2
+            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            How We <span className="text-[#D97757]">Protect</span> Your Data
+          </h2>
+
+          <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] rounded-3xl p-8 text-white">
+            <div className="grid sm:grid-cols-2 gap-4">
+              {securityMeasures.map((measure) => (
+                <div key={measure.label} className="flex items-center justify-between border-b border-white/20 pb-3">
+                  <span className="text-white/70">{measure.label}</span>
+                  <span className="font-semibold">{measure.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Your Rights */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2
+            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            Your <span className="text-[#D97757]">Rights</span>
+          </h2>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[
+              { title: 'Access', desc: 'Request a copy of all your personal data' },
+              { title: 'Correction', desc: 'Update inaccurate or incomplete information' },
+              { title: 'Deletion', desc: 'Request deletion of your data (subject to legal requirements)' },
+              { title: 'Export', desc: 'Download your data in a portable format' },
+              { title: 'Opt-Out', desc: 'Disable optional data collection like location services' },
+              { title: 'Withdraw Consent', desc: 'Revoke consent for optional data processing' },
+            ].map((right) => (
+              <div
+                key={right.title}
+                className="bg-white rounded-2xl p-5 border-2 border-[var(--portal-primary)]/10"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <Check className="w-5 h-5 text-[var(--portal-primary)]" />
+                  <h3 className="font-semibold text-[#2C3E50]">{right.title}</h3>
+                </div>
+                <p className="text-gray-600 text-sm pl-7">{right.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-gray-600 mt-8">
+            To exercise these rights, email{' '}
+            <a href="mailto:privacy@commonground.app" className="text-[var(--portal-primary)] font-medium hover:underline">
+              privacy@commonground.app
+            </a>
+          </p>
+        </div>
+      </section>
+
+      {/* Data Retention */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2
+            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            Data <span className="text-[#D97757]">Retention</span>
+          </h2>
+
+          <div className="space-y-4">
+            <div className="flex items-start gap-4 p-5 bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl border-2 border-[var(--portal-primary)]/10">
+              <div className="w-12 h-12 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-[var(--portal-primary)] font-bold">∞</span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-[#2C3E50]">Active Accounts</h3>
+                <p className="text-gray-600 text-sm">Data retained while your account is active</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 p-5 bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl border-2 border-[var(--portal-primary)]/10">
+              <div className="w-12 h-12 rounded-xl bg-[#D97757]/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-[#D97757] font-bold">90</span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-[#2C3E50]">After Deletion Request</h3>
+                <p className="text-gray-600 text-sm">Data deleted within 90 days of account deletion request</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4 p-5 bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl border-2 border-[var(--portal-primary)]/10">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-gray-500 font-bold">⚖</span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-[#2C3E50]">Legal Requirements</h3>
+                <p className="text-gray-600 text-sm">Some data may be retained longer if required by law or court proceedings</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Special Provisions */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2
+            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            Special <span className="text-[#D97757]">Provisions</span>
+          </h2>
+
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
+              <h3 className="font-semibold text-[#2C3E50] mb-2">Children's Privacy</h3>
+              <p className="text-gray-600 text-sm">
+                CommonGround is designed for parents, not children. Information about children is
+                provided by parents and protected with the same security as all data. We do not
+                knowingly collect information directly from children under 13.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
+              <h3 className="font-semibold text-[#2C3E50] mb-2">California Residents (CCPA)</h3>
+              <p className="text-gray-600 text-sm mb-3">
+                California residents have additional rights under the CCPA:
+              </p>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Right to know what personal information we collect</li>
+                <li>• Right to delete personal information</li>
+                <li>• Right to opt-out of sale (we don't sell your data)</li>
+                <li>• Right to non-discrimination for exercising privacy rights</li>
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
+              <h3 className="font-semibold text-[#2C3E50] mb-2">International Users</h3>
+              <p className="text-gray-600 text-sm">
+                CommonGround is based in the United States. If you access our services from outside
+                the US, your information will be transferred to and processed in the US. We comply
+                with applicable data protection laws.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
+              <h3 className="font-semibold text-[#2C3E50] mb-2">Policy Changes</h3>
+              <p className="text-gray-600 text-sm">
+                We may update this policy from time to time. We'll notify you of significant changes
+                via email or through the platform. Continued use after changes constitutes acceptance.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2
+            className="text-3xl sm:text-4xl font-serif mb-4"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            Questions about privacy?
+          </h2>
+          <p className="text-white/80 mb-8 max-w-xl mx-auto">
+            We're here to help. Reach out to our privacy team.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:privacy@commonground.app"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[#D97757] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all"
+            >
+              privacy@commonground.app
+            </a>
             <Link
               href="/legal/terms"
-              className="px-4 py-2 bg-background rounded-lg border border-border hover:border-cg-sage/30 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white/10 text-white font-semibold rounded-full hover:bg-white/20 transition-all border-2 border-white/30"
             >
               Terms of Service
-            </Link>
-            <Link
-              href="/security"
-              className="px-4 py-2 bg-background rounded-lg border border-border hover:border-cg-sage/30 transition-colors"
-            >
-              Security
-            </Link>
-            <Link
-              href="/help/contact"
-              className="px-4 py-2 bg-background rounded-lg border border-border hover:border-cg-sage/30 transition-colors"
-            >
-              Contact Us
             </Link>
           </div>
         </div>
