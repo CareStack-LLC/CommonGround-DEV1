@@ -113,6 +113,13 @@ async def initiate_call(
             call_type=call_create.call_type,
             aria_sensitivity_level=call_create.aria_sensitivity_level
         )
+    except ValueError as e:
+        # ValueError indicates configuration issue (e.g., missing API key)
+        logger.error(f"Failed to create call session: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(e)
+        )
     except Exception as e:
         logger.error(f"Failed to create call session: {e}")
         raise HTTPException(
@@ -127,6 +134,13 @@ async def initiate_call(
             session_id=session.id,
             user_id=current_user.id,
             user_name=current_user.profile.display_name if current_user.profile else current_user.email
+        )
+    except ValueError as e:
+        # ValueError indicates configuration issue (e.g., missing API key)
+        logger.error(f"Failed to join call: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(e)
         )
     except Exception as e:
         logger.error(f"Failed to join call: {e}")
@@ -229,6 +243,13 @@ async def join_call(
             session_id=session_id,
             user_id=current_user.id,
             user_name=join_data.user_name
+        )
+    except ValueError as e:
+        # ValueError indicates configuration issue (e.g., missing API key)
+        logger.error(f"Failed to join call: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=str(e)
         )
     except Exception as e:
         logger.error(f"Failed to join call: {e}")

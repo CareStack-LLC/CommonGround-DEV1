@@ -68,13 +68,8 @@ class DailyVideoService:
             Room data including name and URL
         """
         if not self.api_key:
-            logger.warning("Daily.co API key not configured, using mock room")
-            return {
-                "name": room_name,
-                "url": f"https://{self.domain}/{room_name}",
-                "privacy": privacy,
-                "created_at": datetime.utcnow().isoformat(),
-            }
+            logger.error("DAILY_API_KEY not configured - cannot create room")
+            raise ValueError("Video calling is not available. Please configure DAILY_API_KEY.")
 
         exp_time = datetime.utcnow() + timedelta(minutes=exp_minutes)
 
@@ -107,31 +102,16 @@ class DailyVideoService:
                     }
                 else:
                     logger.error(f"Failed to create room (status {response.status_code}): {response.text}")
-                    # Fall back to mock room on API error
-                    logger.warning(f"Falling back to mock room for {room_name}")
-                    return {
-                        "name": room_name,
-                        "url": f"https://{self.domain}/{room_name}",
-                        "privacy": privacy,
-                        "created_at": datetime.utcnow().isoformat(),
-                    }
+                    raise ValueError(f"Failed to create video room: {response.text}")
 
         except httpx.TimeoutException:
-            logger.error("Daily.co API timeout, falling back to mock room")
-            return {
-                "name": room_name,
-                "url": f"https://{self.domain}/{room_name}",
-                "privacy": privacy,
-                "created_at": datetime.utcnow().isoformat(),
-            }
+            logger.error("Daily.co API timeout")
+            raise ValueError("Video service is temporarily unavailable. Please try again.")
+        except ValueError:
+            raise
         except Exception as e:
-            logger.error(f"Daily.co API error: {e}, falling back to mock room")
-            return {
-                "name": room_name,
-                "url": f"https://{self.domain}/{room_name}",
-                "privacy": privacy,
-                "created_at": datetime.utcnow().isoformat(),
-            }
+            logger.error(f"Daily.co API error: {e}")
+            raise ValueError(f"Failed to create video room: {str(e)}")
 
     async def get_room(self, room_name: str) -> Optional[Dict[str, Any]]:
         """
@@ -226,11 +206,13 @@ class DailyVideoService:
 
         Returns:
             Meeting token string
+
+        Raises:
+            ValueError: If DAILY_API_KEY is not configured
         """
         if not self.api_key:
-            # Return mock token when no API key
-            import secrets
-            return f"mock_{secrets.token_urlsafe(32)}"
+            logger.error("DAILY_API_KEY not configured - video calls unavailable")
+            raise ValueError("Video calling is not available. Please configure DAILY_API_KEY.")
 
         exp_time = datetime.utcnow() + timedelta(minutes=exp_minutes)
 
@@ -269,23 +251,25 @@ class DailyVideoService:
 
                 if response.status_code in [200, 201]:
                     data = response.json()
+                    token = data.get("token")
+                    if not token:
+                        logger.error(f"Daily.co returned no token: {data}")
+                        raise ValueError("Failed to generate meeting token")
                     logger.info(f"Created meeting token for {user_name} in {room_name}")
-                    return data.get("token")
+                    return token
                 else:
                     logger.error(f"Daily.co token creation failed (status {response.status_code}): {response.text}")
                     logger.error(f"Token request was for room: {room_name}, user: {user_name}")
-                    # Fall back to mock token on API error
-                    import secrets
-                    return f"mock_{secrets.token_urlsafe(32)}"
+                    raise ValueError(f"Failed to generate meeting token: {response.text}")
 
         except httpx.TimeoutException:
-            logger.error("Daily.co API timeout, falling back to mock token")
-            import secrets
-            return f"mock_{secrets.token_urlsafe(32)}"
+            logger.error("Daily.co API timeout")
+            raise ValueError("Video service is temporarily unavailable. Please try again.")
+        except ValueError:
+            raise
         except Exception as e:
-            logger.error(f"Daily.co API error: {e}, falling back to mock token")
-            import secrets
-            return f"mock_{secrets.token_urlsafe(32)}"
+            logger.error(f"Daily.co API error: {e}")
+            raise ValueError(f"Failed to generate meeting token: {str(e)}")
 
     async def get_room_presence(self, room_name: str) -> Dict[str, Any]:
         """
