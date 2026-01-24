@@ -202,6 +202,14 @@ from app.models.parent_call import (
     CallStatus,
     CallSeverity,
 )
+from app.models.recording import (
+    Recording,
+    Transcription,
+    TranscriptionChunk,
+    RecordingStatus,
+    RecordingType,
+    TranscriptionStatus,
+)
 
 __all__ = [
     "Base",
@@ -401,4 +409,11 @@ __all__ = [
     "CallType",
     "CallStatus",
     "CallSeverity",
+    # Recording System
+    "Recording",
+    "Transcription",
+    "TranscriptionChunk",
+    "RecordingStatus",
+    "RecordingType",
+    "TranscriptionStatus",
 ]

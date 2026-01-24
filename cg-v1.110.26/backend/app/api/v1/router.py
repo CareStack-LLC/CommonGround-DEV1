@@ -42,6 +42,8 @@ from app.api.v1.endpoints import (
     professional,
     professional_events,
     parent_calls,
+    recording_webhooks,
+    recordings,
 )
 
 api_router = APIRouter()
@@ -130,3 +132,9 @@ api_router.include_router(professional_events.router, prefix="/professional/even
 
 # Parent Communication - Video/Audio Calls
 api_router.include_router(parent_calls.router, prefix="/parent-calls", tags=["Parent Calls"])
+
+# Recording Webhooks - Daily.co recording/transcription events
+api_router.include_router(recording_webhooks.router, prefix="/webhooks", tags=["Recording Webhooks"])
+
+# Recordings - Call recordings and transcriptions
+api_router.include_router(recordings.router, prefix="/recordings", tags=["Recordings"])

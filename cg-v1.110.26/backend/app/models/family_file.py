@@ -261,6 +261,11 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
         "ParentCallSession", back_populates="family_file", cascade="all, delete-orphan"
     )
 
+    # Recordings (video/audio from KidComs and parent calls)
+    recordings: Mapped[list["Recording"]] = relationship(
+        "Recording", back_populates="family_file", cascade="all, delete-orphan"
+    )
+
     def __repr__(self) -> str:
         return f"<FamilyFile {self.family_file_number}: {self.title}>"
 

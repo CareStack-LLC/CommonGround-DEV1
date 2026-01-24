@@ -204,6 +204,9 @@ class ParentCallSession(Base, UUIDMixin, TimestampMixin):
     flags: Mapped[list["CallFlag"]] = relationship(
         "CallFlag", back_populates="session", cascade="all, delete-orphan"
     )
+    recording: Mapped[Optional["Recording"]] = relationship(
+        "Recording", back_populates="parent_call_session", uselist=False
+    )
 
     # Indexes
     __table_args__ = (

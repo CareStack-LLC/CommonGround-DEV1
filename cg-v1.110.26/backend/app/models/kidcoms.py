@@ -196,6 +196,7 @@ class KidComsSession(Base, UUIDMixin, TimestampMixin):
     child = relationship("Child", back_populates="kidcoms_sessions")
     circle_contact = relationship("CircleContact")
     messages = relationship("KidComsMessage", back_populates="session", cascade="all, delete-orphan")
+    recording = relationship("Recording", back_populates="kidcoms_session", uselist=False)
 
     # Indexes
     __table_args__ = (

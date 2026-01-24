@@ -80,6 +80,18 @@ class Settings(BaseSettings):
     # Daily.co (for KidComs video calls)
     DAILY_API_KEY: Optional[str] = None
     DAILY_DOMAIN: str = "cg-mvp.daily.co"
+    DAILY_WEBHOOK_SECRET: Optional[str] = None  # For verifying webhook signatures
+
+    # AWS S3 (for recording storage)
+    AWS_ACCESS_KEY_ID: Optional[str] = None
+    AWS_SECRET_ACCESS_KEY: Optional[str] = None
+    AWS_REGION: str = "us-east-1"
+    AWS_S3_RECORDING_BUCKET: str = "commonground-recordings"
+    AWS_S3_RECORDING_PREFIX: str = "recordings"
+
+    # Recording settings
+    RECORDING_ENABLED: bool = True
+    TRANSCRIPTION_ENABLED: bool = True
 
     # File Upload
     MAX_UPLOAD_SIZE: int = 10485760  # 10MB
