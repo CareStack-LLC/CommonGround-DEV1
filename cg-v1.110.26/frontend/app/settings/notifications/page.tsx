@@ -245,8 +245,11 @@ export default function NotificationSettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-cg-primary" />
+      <div className="flex items-center justify-center h-[60vh]">
+        <div className="text-center">
+          <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
+          <p className="mt-4 text-slate-600 font-medium">Loading notification preferences...</p>
+        </div>
       </div>
     );
   }
