@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { useWebSocket } from '@/contexts/websocket-context';
 import { familyFilesAPI, agreementsAPI, messagesAPI, FamilyFile, FamilyFileDetail, Agreement, Message } from '@/lib/api';
-import { NewMessageEvent, TypingEvent } from '@/lib/websocket';
+import { useRealtimeMessages } from '@/hooks/use-realtime-messages';
+import { useRealtimeTyping } from '@/hooks/use-realtime-typing';
+import { useRealtimePresence } from '@/hooks/use-realtime-presence';
+import { OnlineDot } from '@/components/presence-indicator';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
@@ -264,6 +266,7 @@ function ChatHeader({
   agreementTitle,
   familyFileId,
   parentBJoined,
+  isCoParentOnline,
   onBack,
   onInitiateCall
 }: {
@@ -271,6 +274,7 @@ function ChatHeader({
   agreementTitle: string;
   familyFileId?: string;
   parentBJoined?: boolean;
+  isCoParentOnline?: boolean;
   onBack?: () => void;
   onInitiateCall?: (callType: 'video' | 'audio') => void;
 }) {
@@ -286,11 +290,20 @@ function ChatHeader({
               <ChevronLeft className="h-5 w-5 text-slate-600" />
             </button>
           )}
-          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-md">
+          <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-md">
             <Users className="h-5 w-5 text-[var(--portal-primary)]" />
+            {/* Online status indicator */}
+            <div className="absolute -bottom-0.5 -right-0.5">
+              <OnlineDot isOnline={isCoParentOnline || false} size="sm" />
+            </div>
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFileName}</h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFileName}</h2>
+              {isCoParentOnline && (
+                <span className="text-xs text-emerald-600 font-medium hidden sm:inline">Online</span>
+              )}
+            </div>
             <p className="text-xs text-slate-600 truncate font-medium">{agreementTitle}</p>
           </div>
         </div>
@@ -452,7 +465,6 @@ function MessagesContent() {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { subscribe, unsubscribe, onNewMessage, onTyping, isConnected } = useWebSocket();
   const agreementIdParam = searchParams.get('agreement');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -465,12 +477,59 @@ function MessagesContent() {
   const [error, setError] = useState<string | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
-  const [isOtherTyping, setIsOtherTyping] = useState(false);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [showPreCallDialog, setShowPreCallDialog] = useState(false);
   const [pendingCallType, setPendingCallType] = useState<'video' | 'audio'>('video');
   const [isStartingCall, setIsStartingCall] = useState(false);
   const [acknowledgingMessageId, setAcknowledgingMessageId] = useState<string | null>(null);
+
+  // Handle new message from Supabase Realtime
+  const handleNewMessage = useCallback((message: Message) => {
+    // Only add if not already in messages and not from current user
+    if (message.sender_id !== user?.id) {
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === message.id)) {
+          return prev;
+        }
+        return [...prev, message];
+      });
+    }
+  }, [user?.id]);
+
+  // Handle message read receipt updates
+  const handleMessageRead = useCallback((messageId: string, readAt: string) => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId ? { ...msg, read_at: readAt } : msg
+      )
+    );
+  }, []);
+
+  // Handle message acknowledgment updates
+  const handleMessageAcknowledged = useCallback((messageId: string, acknowledgedAt: string) => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId ? { ...msg, acknowledged_at: acknowledgedAt } : msg
+      )
+    );
+  }, []);
+
+  // Supabase Realtime hooks
+  useRealtimeMessages({
+    familyFileId: selectedFamilyFile?.id || null,
+    agreementId: selectedAgreement?.id || null,
+    onNewMessage: handleNewMessage,
+    onMessageRead: handleMessageRead,
+    onMessageAcknowledged: handleMessageAcknowledged,
+  });
+
+  const { isPartnerTyping, handleTyping, stopTyping } = useRealtimeTyping({
+    familyFileId: selectedFamilyFile?.id || null,
+    agreementId: selectedAgreement?.id || null,
+  });
+
+  const { isUserOnline } = useRealtimePresence({
+    familyFileId: selectedFamilyFile?.id || null,
+  });
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -478,90 +537,6 @@ function MessagesContent() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
-
-  // Subscribe to case for real-time updates
-  useEffect(() => {
-    const caseId = selectedAgreement?.case_id;
-    if (!caseId || !isConnected) return;
-
-    subscribe(caseId);
-
-    return () => {
-      unsubscribe(caseId);
-    };
-  }, [selectedAgreement?.case_id, isConnected, subscribe, unsubscribe]);
-
-  // Handle incoming new messages via WebSocket
-  useEffect(() => {
-    if (!selectedAgreement) return;
-
-    const unsubscribeMessage = onNewMessage((data: NewMessageEvent) => {
-      // Handle acknowledgment updates
-      if ((data as any).type === 'message_acknowledged') {
-        const ackData = data as any;
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === ackData.message_id
-              ? { ...msg, acknowledged_at: ackData.acknowledged_at }
-              : msg
-          )
-        );
-        return;
-      }
-
-      // Only add if it's for the current agreement (via case_id match)
-      // and not already in messages
-      if (data.sender_id !== user?.id) {
-        const newMessage: Message = {
-          id: data.message_id,
-          sender_id: data.sender_id,
-          content: data.content,
-          sent_at: data.sent_at,
-          was_flagged: data.was_flagged,
-          message_type: 'text',
-        } as Message;
-
-        setMessages((prev) => {
-          // Check if message already exists
-          if (prev.some((m) => m.id === data.message_id)) {
-            return prev;
-          }
-          return [...prev, newMessage];
-        });
-      }
-    });
-
-    return unsubscribeMessage;
-  }, [selectedAgreement, user?.id, onNewMessage]);
-
-  // Handle typing indicator
-  useEffect(() => {
-    if (!selectedAgreement) return;
-
-    const unsubscribeTyping = onTyping((data: TypingEvent) => {
-      // Only show typing for other users
-      if (data.user_id !== user?.id) {
-        setIsOtherTyping(data.is_typing);
-
-        // Auto-clear typing after 3 seconds of inactivity
-        if (typingTimeoutRef.current) {
-          clearTimeout(typingTimeoutRef.current);
-        }
-        if (data.is_typing) {
-          typingTimeoutRef.current = setTimeout(() => {
-            setIsOtherTyping(false);
-          }, 3000);
-        }
-      }
-    });
-
-    return () => {
-      unsubscribeTyping();
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
-    };
-  }, [selectedAgreement, user?.id, onTyping]);
 
   useEffect(() => {
     loadFamilyFilesAndAgreements();
@@ -858,6 +833,7 @@ function MessagesContent() {
                   agreementTitle={selectedAgreement.title}
                   familyFileId={selectedFamilyFile?.id}
                   parentBJoined={!!(selectedFamilyFile as FamilyFileDetail)?.parent_b_joined_at}
+                  isCoParentOnline={isUserOnline(getOtherParentId())}
                   onBack={() => setShowSidebar(true)}
                   onInitiateCall={handleInitiateCall}
                 />
@@ -904,7 +880,7 @@ function MessagesContent() {
                       })}
 
                       {/* Typing Indicator */}
-                      {isOtherTyping && (
+                      {isPartnerTyping && (
                         <div className="flex gap-3">
                           <div className="w-8 h-8 rounded-full bg-cg-slate flex items-center justify-center flex-shrink-0">
                             <span className="text-xs font-medium text-white">P</span>
@@ -935,6 +911,8 @@ function MessagesContent() {
                         recipientId={getOtherParentId()}
                         onMessageSent={handleMessageSent}
                         ariaEnabled={true}
+                        onTyping={handleTyping}
+                        onStopTyping={stopTyping}
                       />
                     ) : (
                       <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 sm:p-4 flex items-center gap-2 sm:gap-3 shadow-md">

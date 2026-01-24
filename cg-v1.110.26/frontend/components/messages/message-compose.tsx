@@ -26,6 +26,8 @@ interface MessageComposeProps {
   recipientId: string;
   onMessageSent: () => void;
   ariaEnabled?: boolean;
+  onTyping?: () => void;
+  onStopTyping?: () => void;
 }
 
 interface AttachmentFile {
@@ -52,6 +54,8 @@ export function MessageCompose({
   recipientId,
   onMessageSent,
   ariaEnabled = true,
+  onTyping,
+  onStopTyping,
 }: MessageComposeProps) {
   const [message, setMessage] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -348,7 +352,11 @@ export function MessageCompose({
           <div className="relative">
             <textarea
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => {
+                setMessage(e.target.value);
+                onTyping?.();
+              }}
+              onBlur={onStopTyping}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
               className="w-full cg-input min-h-[100px] pr-24 resize-none"

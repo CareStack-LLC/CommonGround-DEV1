@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { familyFilesAPI, activitiesAPI, FamilyFile } from '@/lib/api';
+import { useRealtime } from '@/contexts/realtime-context';
 
 interface NotificationContextType {
   unreadCount: number;
@@ -11,14 +12,14 @@ interface NotificationContextType {
   refreshUnreadCount: () => Promise<void>;
   markAllRead: () => Promise<void>;
   decrementUnread: () => void;
+  incrementUnread: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
-const REFRESH_INTERVAL = 30000; // 30 seconds
-
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const { user, isAuthenticated } = useAuth();
+  const { subscribeToFamilyFile, onActivityInsert } = useRealtime();
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [familyFileId, setFamilyFileId] = useState<string | null>(null);
@@ -78,12 +79,32 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
   }, [familyFileId]);
 
+  // Increment unread count (used when new activity arrives via realtime)
+  const incrementUnread = useCallback(() => {
+    setUnreadCount((prev) => prev + 1);
+  }, []);
+
   // Decrement unread count (used when marking individual items as read)
   const decrementUnread = useCallback(() => {
     setUnreadCount((prev) => Math.max(0, prev - 1));
   }, []);
 
-  // Initial fetch and setup polling
+  // Subscribe to real-time activity updates
+  useEffect(() => {
+    if (!familyFileId) return;
+
+    // Subscribe to family file for real-time updates
+    subscribeToFamilyFile(familyFileId);
+
+    // Listen for new activities and increment unread count
+    const unsubscribe = onActivityInsert(() => {
+      incrementUnread();
+    });
+
+    return unsubscribe;
+  }, [familyFileId, subscribeToFamilyFile, onActivityInsert, incrementUnread]);
+
+  // Initial fetch (no more polling!)
   useEffect(() => {
     if (!isAuthenticated) {
       setUnreadCount(0);
@@ -92,13 +113,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Initial fetch
+    // Initial fetch only - realtime handles updates
     refreshUnreadCount();
-
-    // Set up polling interval
-    const intervalId = setInterval(refreshUnreadCount, REFRESH_INTERVAL);
-
-    return () => clearInterval(intervalId);
   }, [isAuthenticated, refreshUnreadCount]);
 
   // Reset when user logs out
@@ -116,6 +132,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     refreshUnreadCount,
     markAllRead,
     decrementUnread,
+    incrementUnread,
   };
 
   return (

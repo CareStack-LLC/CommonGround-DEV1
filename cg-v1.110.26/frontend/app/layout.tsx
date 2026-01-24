@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { NotificationProvider } from "@/contexts/notification-context";
 import { WebSocketProvider } from "@/contexts/websocket-context";
+import { RealtimeProvider } from "@/contexts/realtime-context";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { PortalWrapper } from "@/components/portal-wrapper";
 import { IncomingCallNotification } from "@/components/incoming-call-notification";
@@ -37,14 +38,16 @@ export default function RootLayout({
       <body className="antialiased">
         <ServiceWorkerRegister />
         <AuthProvider>
-          <NotificationProvider>
-            <WebSocketProvider>
-              <IncomingCallNotification />
-              <PortalWrapper>
-                {children}
-              </PortalWrapper>
-            </WebSocketProvider>
-          </NotificationProvider>
+          <WebSocketProvider>
+            <RealtimeProvider>
+              <NotificationProvider>
+                <IncomingCallNotification />
+                <PortalWrapper>
+                  {children}
+                </PortalWrapper>
+              </NotificationProvider>
+            </RealtimeProvider>
+          </WebSocketProvider>
         </AuthProvider>
       </body>
     </html>
