@@ -916,17 +916,17 @@ function MessagesContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col">
+    <div className="h-[100dvh] bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col overflow-hidden">
       <Navigation />
 
-      <div className="flex-1 max-w-7xl mx-auto w-full">
-        {/* Height: viewport - top nav (4rem) - bottom nav (~5rem on mobile, 0 on desktop) */}
-        <div className="flex h-[calc(100dvh-4rem-5rem)] lg:h-[calc(100dvh-4rem)]">
+      <div className="flex-1 max-w-7xl mx-auto w-full overflow-hidden">
+        {/* Height: fills remaining space after nav, minus bottom nav on mobile */}
+        <div className="flex h-full pb-[5rem] lg:pb-0">
           {/* Sidebar - Conversations */}
           <aside className={`
             ${showSidebar ? 'flex' : 'hidden lg:flex'}
             w-full lg:w-80 flex-col border-r-2 border-slate-200 bg-white shadow-sm
-            absolute lg:relative top-0 left-0 right-0 bottom-[5rem] lg:bottom-0 lg:inset-auto z-20 lg:z-auto
+            absolute lg:relative inset-0 lg:inset-auto z-20 lg:z-auto
           `}>
             {/* Sidebar Header */}
             <div className="p-4 border-b-2 border-slate-200 bg-white">
