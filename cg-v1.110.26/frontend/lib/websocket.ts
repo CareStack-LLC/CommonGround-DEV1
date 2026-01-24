@@ -261,6 +261,23 @@ export interface IncomingCallEvent {
   family_file_id: string;
 }
 
+// ARIA Real-time Intervention Events
+export interface ARIAInterventionEvent {
+  type: 'aria_intervention';
+  session_id: string;
+  flag_id: string;
+  severity: 'high' | 'severe';
+  intervention_type: 'warning' | 'mute' | 'terminate';
+  warning_message: string;
+  should_terminate: boolean;
+  termination_delay?: number;
+  should_mute: boolean;
+  mute_speaker_id?: string;
+  mute_duration_seconds?: number;
+  call_time_seconds: number;
+  timestamp: string;
+}
+
 export type WebSocketEventType =
   | 'new_message'
   | 'typing'
@@ -282,6 +299,7 @@ export type WebSocketEventType =
   | 'agreement_approved'
   | 'kidcoms_call_incoming'
   | 'incoming_call'
+  | 'aria_intervention'
   | 'status'
   | 'error'
   | 'pong';

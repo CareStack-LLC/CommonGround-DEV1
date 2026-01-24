@@ -25,6 +25,7 @@ import {
   AgreementApprovedEvent,
   KidComsCallIncomingEvent,
   IncomingCallEvent,
+  ARIAInterventionEvent,
 } from '@/lib/websocket';
 import { authAPI } from '@/lib/api';
 
@@ -59,6 +60,8 @@ interface WebSocketContextType {
   onKidComsCallIncoming: (handler: (data: KidComsCallIncomingEvent) => void) => () => void;
   // Parent-to-Parent Call Notifications
   onIncomingCall: (handler: (data: IncomingCallEvent) => void) => () => void;
+  // ARIA Real-time Intervention Notifications
+  onARIAIntervention: (handler: (data: ARIAInterventionEvent) => void) => () => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -294,6 +297,15 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     return () => wsClient.off('incoming_call', typedHandler);
   }, []);
 
+  // ARIA Real-time Intervention handler
+  const onARIAIntervention = useCallback((handler: (data: ARIAInterventionEvent) => void) => {
+    const typedHandler = (data: WebSocketMessage) => {
+      handler(data as unknown as ARIAInterventionEvent);
+    };
+    wsClient.on('aria_intervention', typedHandler);
+    return () => wsClient.off('aria_intervention', typedHandler);
+  }, []);
+
   const value: WebSocketContextType = {
     isConnected,
     subscribe,
@@ -319,6 +331,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     onAgreementApproved,
     onKidComsCallIncoming,
     onIncomingCall,
+    onARIAIntervention,
   };
 
   return (

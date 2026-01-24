@@ -3,8 +3,10 @@
 import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
+import { useWebSocket } from '@/contexts/websocket-context';
 import { ProtectedRoute } from '@/components/protected-route';
 import { useARIASentimentShield, type SensitivityLevel, type ARIAIntervention } from '@/hooks/use-aria-sentiment-shield';
+import type { ARIAInterventionEvent } from '@/lib/websocket';
 import {
   Phone,
   PhoneOff,
@@ -62,6 +64,7 @@ function ParentCallContent() {
   const { user, profile } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { onARIAIntervention, isConnected: wsConnected } = useWebSocket();
   const familyFileId = searchParams.get('family_file_id');
   const callType = searchParams.get('call_type') || 'video';
   const existingSessionId = searchParams.get('session_id'); // For joining existing calls
@@ -319,6 +322,31 @@ function ParentCallContent() {
     }
   }, [isJoined, isMonitoring, stopMonitoring]);
 
+  // Listen for ARIA intervention events via global WebSocket
+  useEffect(() => {
+    if (!session?.session_id || !wsConnected) return;
+
+    const unsubscribe = onARIAIntervention((event: ARIAInterventionEvent) => {
+      // Only handle interventions for this call session
+      if (event.session_id !== session.session_id) return;
+
+      console.log('[ARIA] WebSocket intervention received:', event);
+      handleARIAWarning({
+        type: event.type,
+        severity: event.severity,
+        warning_message: event.warning_message,
+        should_terminate: event.should_terminate,
+        termination_delay: event.termination_delay,
+        intervention_type: event.intervention_type,
+        should_mute: event.should_mute,
+        mute_speaker_id: event.mute_speaker_id,
+        mute_duration_seconds: event.mute_duration_seconds,
+      });
+    });
+
+    return () => unsubscribe();
+  }, [session?.session_id, wsConnected, onARIAIntervention, handleARIAWarning]);
+
   // Join Daily.co call using call object (custom UI)
   const joinDailyCall = async (sessionData: CallSession) => {
     if (!window.Daily) return;
@@ -452,13 +480,15 @@ function ParentCallContent() {
     }
   };
 
-  // Handle ARIA warning
-  const handleARIAWarning = (warning: ARIAWarning) => {
+  // Handle ARIA warning - memoized to avoid stale closures
+  const handleARIAWarning = useCallback((warning: ARIAWarning) => {
+    console.log('[ARIA] Processing warning:', warning);
     setAriaWarning(warning);
 
     // Handle MUTE intervention - mute the offending speaker
     if (warning.should_mute && warning.mute_speaker_id === user?.id) {
       if (callObject) {
+        console.log('[ARIA] Muting local audio');
         callObject.setLocalAudio(false);
         setIsAudioOn(false);
         setIsMutedByARIA(true);
@@ -470,6 +500,7 @@ function ParentCallContent() {
       }
       mutedByARIATimeoutRef.current = setTimeout(() => {
         if (callObject) {
+          console.log('[ARIA] Unmuting local audio');
           callObject.setLocalAudio(true);
           setIsAudioOn(true);
           setIsMutedByARIA(false);
@@ -486,13 +517,14 @@ function ParentCallContent() {
         setAriaWarning(null);
       }, displayDuration);
     } else {
+      console.log('[ARIA] Call will be terminated in', warning.termination_delay || 10, 'seconds');
       setTimeout(() => {
         if (callObject) {
           callObject.leave();
         }
       }, (warning.termination_delay || 10) * 1000);
     }
-  };
+  }, [user?.id, callObject]);
 
   // Toggle audio
   const toggleAudio = () => {
