@@ -24,6 +24,7 @@ import {
   AgreementUpdatedEvent,
   AgreementApprovedEvent,
   KidComsCallIncomingEvent,
+  IncomingCallEvent,
 } from '@/lib/websocket';
 import { authAPI } from '@/lib/api';
 
@@ -56,6 +57,8 @@ interface WebSocketContextType {
   onAgreementApproved: (handler: (data: AgreementApprovedEvent) => void) => () => void;
   // KidComs Call Notifications
   onKidComsCallIncoming: (handler: (data: KidComsCallIncomingEvent) => void) => () => void;
+  // Parent-to-Parent Call Notifications
+  onIncomingCall: (handler: (data: IncomingCallEvent) => void) => () => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -282,6 +285,15 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     return () => wsClient.off('kidcoms_call_incoming', typedHandler);
   }, []);
 
+  // Parent-to-Parent Call Notification handler
+  const onIncomingCall = useCallback((handler: (data: IncomingCallEvent) => void) => {
+    const typedHandler = (data: WebSocketMessage) => {
+      handler(data as unknown as IncomingCallEvent);
+    };
+    wsClient.on('incoming_call', typedHandler);
+    return () => wsClient.off('incoming_call', typedHandler);
+  }, []);
+
   const value: WebSocketContextType = {
     isConnected,
     subscribe,
@@ -306,6 +318,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     onAgreementUpdated,
     onAgreementApproved,
     onKidComsCallIncoming,
+    onIncomingCall,
   };
 
   return (

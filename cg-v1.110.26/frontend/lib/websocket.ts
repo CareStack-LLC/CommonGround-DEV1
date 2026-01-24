@@ -251,6 +251,16 @@ export interface KidComsCallIncomingEvent {
   timestamp: string;
 }
 
+// Parent-to-Parent Call Notifications
+export interface IncomingCallEvent {
+  type: 'incoming_call';
+  session_id: string;
+  caller_id: string;
+  caller_name: string;
+  call_type: 'video' | 'audio';
+  family_file_id: string;
+}
+
 export type WebSocketEventType =
   | 'new_message'
   | 'typing'
@@ -271,6 +281,7 @@ export type WebSocketEventType =
   | 'agreement_updated'
   | 'agreement_approved'
   | 'kidcoms_call_incoming'
+  | 'incoming_call'
   | 'status'
   | 'error'
   | 'pong';

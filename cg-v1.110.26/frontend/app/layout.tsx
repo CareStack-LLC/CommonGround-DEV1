@@ -5,6 +5,7 @@ import { NotificationProvider } from "@/contexts/notification-context";
 import { WebSocketProvider } from "@/contexts/websocket-context";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
 import { PortalWrapper } from "@/components/portal-wrapper";
+import { IncomingCallNotification } from "@/components/incoming-call-notification";
 
 export const metadata: Metadata = {
   title: "CommonGround - Co-parenting without the conflict",
@@ -38,6 +39,7 @@ export default function RootLayout({
         <AuthProvider>
           <NotificationProvider>
             <WebSocketProvider>
+              <IncomingCallNotification />
               <PortalWrapper>
                 {children}
               </PortalWrapper>
