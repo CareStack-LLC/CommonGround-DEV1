@@ -10,8 +10,12 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  Wand2,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useFeatureGate } from '@/hooks/use-feature-gate';
+import { TierBadge } from '@/components/tier-badge';
+import { useRouter } from 'next/navigation';
 
 interface ARIAInterventionProps {
   analysis: ARIAAnalysisResponse;

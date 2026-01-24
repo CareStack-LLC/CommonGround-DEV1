@@ -41,6 +41,8 @@ import {
   CheckCircle,
   Zap,
 } from 'lucide-react';
+import { UpgradeBanner } from '@/components/upgrade-banner';
+import { useSubscription } from '@/contexts/subscription-context';
 
 /**
  * CommonGround Dashboard - "The Morning Brief"
@@ -634,6 +636,7 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
 function DashboardContent() {
   const { user } = useAuth();
   const router = useRouter();
+  const { isFree } = useSubscription();
   const {
     subscribe,
     unsubscribe,
@@ -1086,6 +1089,13 @@ function DashboardContent() {
             {user?.first_name}
           </h2>
         </div>
+
+        {/* Upgrade Banner for Free Users */}
+        {isFree() && !needsSetup && (
+          <div className="mb-6">
+            <UpgradeBanner variant="card" dismissible />
+          </div>
+        )}
 
         {needsSetup ? (
           // Getting Started

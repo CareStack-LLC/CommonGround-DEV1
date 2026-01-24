@@ -27,7 +27,10 @@ import {
   Quote,
   Edit3,
   Calendar,
+  Lock,
 } from 'lucide-react';
+import { useFeatureGate } from '@/hooks/use-feature-gate';
+import { TierBadge } from '@/components/tier-badge';
 
 /* =============================================================================
    HELPER FUNCTIONS
@@ -467,6 +470,9 @@ function AgreementDetailsContent() {
   const router = useRouter();
   const agreementId = params.id as string;
 
+  // Feature gate for PDF exports
+  const { hasAccess: hasPdfAccess } = useFeatureGate('pdf_summaries');
+
   const [agreement, setAgreement] = useState<Agreement | null>(null);
   const [sections, setSections] = useState<AgreementSection[]>([]);
   const [summary, setSummary] = useState<AgreementQuickSummary | null>(null);
@@ -865,15 +871,26 @@ function AgreementDetailsContent() {
                     >
                       Activate Agreement
                     </ActionButton>
-                    <ActionButton
-                      onClick={handleGeneratePDF}
-                      isLoading={isGeneratingPDF}
-                      variant="secondary"
-                      icon={<Download className="h-4 w-4" />}
-                      loadingText="Generating..."
-                    >
-                      Download PDF
-                    </ActionButton>
+                    {hasPdfAccess ? (
+                      <ActionButton
+                        onClick={handleGeneratePDF}
+                        isLoading={isGeneratingPDF}
+                        variant="secondary"
+                        icon={<Download className="h-4 w-4" />}
+                        loadingText="Generating..."
+                      >
+                        Download PDF
+                      </ActionButton>
+                    ) : (
+                      <button
+                        onClick={() => router.push('/settings/billing')}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-200 transition-colors"
+                      >
+                        <Lock className="h-4 w-4" />
+                        Download PDF
+                        <TierBadge tier="plus" size="sm" />
+                      </button>
+                    )}
                   </>
                 )}
 
@@ -893,15 +910,26 @@ function AgreementDetailsContent() {
                         </div>
                       </div>
                     </div>
-                    <ActionButton
-                      onClick={handleGeneratePDF}
-                      isLoading={isGeneratingPDF}
-                      variant="secondary"
-                      icon={<Download className="h-4 w-4" />}
-                      loadingText="Generating..."
-                    >
-                      Download PDF
-                    </ActionButton>
+                    {hasPdfAccess ? (
+                      <ActionButton
+                        onClick={handleGeneratePDF}
+                        isLoading={isGeneratingPDF}
+                        variant="secondary"
+                        icon={<Download className="h-4 w-4" />}
+                        loadingText="Generating..."
+                      >
+                        Download PDF
+                      </ActionButton>
+                    ) : (
+                      <button
+                        onClick={() => router.push('/settings/billing')}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-200 transition-colors"
+                      >
+                        <Lock className="h-4 w-4" />
+                        Download PDF
+                        <TierBadge tier="plus" size="sm" />
+                      </button>
+                    )}
                     <ActionButton
                       onClick={handleDeactivate}
                       isLoading={isActivating}

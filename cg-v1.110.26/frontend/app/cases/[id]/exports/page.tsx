@@ -9,11 +9,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExportList } from '@/components/case-export';
 import { casesAPI, Case } from '@/lib/api';
+import { useFeatureGate } from '@/hooks/use-feature-gate';
+import { LockedFeatureCard } from '@/components/locked-feature-card';
+import { FileText } from 'lucide-react';
 
 function ExportsPageContent() {
   const params = useParams();
   const router = useRouter();
   const caseId = params.id as string;
+
+  // Feature gate for court reporting
+  const { hasAccess: hasCourtAccess, isLoading: featureLoading } = useFeatureGate('court_reporting');
 
   const [caseData, setCaseData] = useState<Case | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +60,28 @@ function ExportsPageContent() {
             </Button>
           </CardContent>
         </Card>
+      </div>
+    );
+  }
+
+  // Feature gate - Court exports require Complete tier
+  if (!featureLoading && !hasCourtAccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-6">
+            <Link href={`/cases/${caseId}`} className="text-sm text-gray-500 hover:text-blue-600">
+              ← Back to {caseData.case_name}
+            </Link>
+          </div>
+          <LockedFeatureCard
+            feature="court_reporting"
+            title="Court-Ready Evidence Exports"
+            description="Generate comprehensive court documentation packages with SHA-256 integrity verification, chain of custody certificates, and professionally formatted evidence bundles. Essential for legal proceedings."
+            icon={FileText}
+            requiredTier="complete"
+          />
+        </div>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { SubscriptionProvider } from "@/contexts/subscription-context";
 import { NotificationProvider } from "@/contexts/notification-context";
 import { WebSocketProvider } from "@/contexts/websocket-context";
 import { RealtimeProvider } from "@/contexts/realtime-context";
@@ -38,16 +39,18 @@ export default function RootLayout({
       <body className="antialiased">
         <ServiceWorkerRegister />
         <AuthProvider>
-          <WebSocketProvider>
-            <RealtimeProvider>
-              <NotificationProvider>
-                <IncomingCallNotification />
-                <PortalWrapper>
-                  {children}
-                </PortalWrapper>
-              </NotificationProvider>
-            </RealtimeProvider>
-          </WebSocketProvider>
+          <SubscriptionProvider>
+            <WebSocketProvider>
+              <RealtimeProvider>
+                <NotificationProvider>
+                  <IncomingCallNotification />
+                  <PortalWrapper>
+                    {children}
+                  </PortalWrapper>
+                </NotificationProvider>
+              </RealtimeProvider>
+            </WebSocketProvider>
+          </SubscriptionProvider>
         </AuthProvider>
       </body>
     </html>

@@ -32,7 +32,11 @@ import {
   FileCheck,
   Gavel,
   ClipboardList,
+  Lock,
 } from 'lucide-react';
+import { useFeatureGate } from '@/hooks/use-feature-gate';
+import { LockedFeatureCard } from '@/components/locked-feature-card';
+import { TierBadge } from '@/components/tier-badge';
 
 /**
  * Parent Reports Settings Page
@@ -141,6 +145,7 @@ const professionalReports = [
 
 export default function ReportsSettingsPage() {
   const { user } = useAuth();
+  const { hasAccess: hasPdfAccess, isLoading: featureLoading } = useFeatureGate('pdf_summaries');
   const [familyFiles, setFamilyFiles] = useState<FamilyFile[]>([]);
   const [selectedFamilyFile, setSelectedFamilyFile] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
@@ -306,6 +311,32 @@ export default function ReportsSettingsPage() {
           <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
           <p className="mt-4 text-slate-600 font-medium">Loading reports...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Feature gate - PDF reports require Plus tier
+  if (!featureLoading && !hasPdfAccess) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center shadow-md">
+            <FileText className="w-6 h-6 text-slate-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-slate-500" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              Reports & Documentation
+            </h2>
+            <p className="text-sm text-slate-400">Download PDF reports and documentation</p>
+          </div>
+        </div>
+        <LockedFeatureCard
+          feature="pdf_summaries"
+          title="PDF Reports"
+          description="Download professional PDF reports including custody time summaries, communication logs, expense records, and schedule history. Generate court-ready documentation with SHA-256 verification."
+          icon={FileText}
+          requiredTier="plus"
+        />
       </div>
     );
   }

@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, RefreshCw, MapPin, Clock, Package, FileText, Repeat, Box, CheckCircle, Navigation, QrCode, Loader2 } from 'lucide-react';
+import { X, RefreshCw, MapPin, Clock, Package, FileText, Repeat, Box, CheckCircle, Navigation, QrCode, Loader2, Lock } from 'lucide-react';
+import { useFeatureGate } from '@/hooks/use-feature-gate';
+import { TierBadge } from '@/components/tier-badge';
 import {
   exchangesAPI,
   casesAPI,
@@ -52,6 +54,9 @@ export default function ExchangeForm({
   onSuccess,
   initialDate,
 }: ExchangeFormProps) {
+  // Feature gate for auto-scheduling
+  const { hasAccess: hasAutoScheduling } = useFeatureGate('auto_scheduling');
+
   const [children, setChildren] = useState<Child[]>([]);
   const [cubbieItems, setCubbieItems] = useState<{ children: CubbieItemListResponse[] }>({ children: [] });
   const [isLoading, setIsLoading] = useState(false);
@@ -635,21 +640,41 @@ export default function ExchangeForm({
 
             {/* Recurring */}
             <div className="p-4 bg-secondary/50 rounded-lg border border-border">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="is_recurring"
-                  checked={formData.is_recurring}
-                  onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
-                  className="rounded border-input"
-                />
-                <Label htmlFor="is_recurring" className="cursor-pointer flex items-center gap-1 text-foreground">
-                  <Repeat className="h-4 w-4" />
-                  Make this a recurring exchange
-                </Label>
-              </div>
+              {hasAutoScheduling ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="is_recurring"
+                    checked={formData.is_recurring}
+                    onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
+                    className="rounded border-input"
+                  />
+                  <Label htmlFor="is_recurring" className="cursor-pointer flex items-center gap-1 text-foreground">
+                    <Repeat className="h-4 w-4" />
+                    Make this a recurring exchange
+                  </Label>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 opacity-60">
+                    <input
+                      type="checkbox"
+                      disabled
+                      className="rounded border-input"
+                    />
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <Repeat className="h-4 w-4" />
+                      Make this a recurring exchange
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-slate-400" />
+                    <TierBadge tier="plus" size="sm" />
+                  </div>
+                </div>
+              )}
 
-              {formData.is_recurring && (
+              {hasAutoScheduling && formData.is_recurring && (
                 <div className="mt-4 space-y-4 pl-6 border-l-2 border-cg-primary/30">
                   {/* Recurrence Pattern */}
                   <div>

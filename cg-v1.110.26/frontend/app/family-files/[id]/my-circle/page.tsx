@@ -29,6 +29,10 @@ import { myCircleAPI, familyFilesAPI, circleAPI, KidComsRoom, CirclePermission, 
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
 import { PageContainer } from '@/components/layout';
+import { useLimitGate } from '@/hooks/use-feature-gate';
+import { TierBadge } from '@/components/tier-badge';
+import { UpgradeBanner } from '@/components/upgrade-banner';
+import { Lock } from 'lucide-react';
 
 interface PageParams {
   params: Promise<{ id: string }>;
@@ -70,6 +74,9 @@ export default function MyCircleManagementPage({ params }: PageParams) {
   const [isLoading, setIsLoading] = useState(true);
   const [rooms, setRooms] = useState<KidComsRoom[]>([]);
   const [contacts, setContacts] = useState<CircleContact[]>([]);
+
+  // Contact limit gate - Free: 0, Plus: 1, Complete: 5
+  const contactLimitGate = useLimitGate('circle_contacts_limit', contacts.length);
   const [selectedRoom, setSelectedRoom] = useState<KidComsRoom | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
@@ -348,20 +355,55 @@ export default function MyCircleManagementPage({ params }: PageParams) {
               </div>
             )}
 
+            {/* Contact Limit Banner */}
+            {!contactLimitGate.canAdd && contactLimitGate.limit > 0 && (
+              <UpgradeBanner
+                variant="slim"
+                feature="circle_contacts_limit"
+                dismissible
+              />
+            )}
+
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button
-                onClick={() => setShowInviteModal(true)}
-                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-teal-300 transition-all p-6 flex items-center gap-4 group"
-              >
-                <div className="p-3 bg-gradient-to-br from-teal-500/10 to-teal-600/5 rounded-xl group-hover:from-teal-500/20 group-hover:to-teal-600/10 transition-all">
-                  <UserPlus className="h-6 w-6 text-teal-600" />
-                </div>
-                <div className="text-left">
-                  <h3 className="font-bold text-slate-900">Invite Contact</h3>
-                  <p className="text-sm text-slate-600">Add someone to your circle</p>
-                </div>
-              </button>
+              {contactLimitGate.canAdd ? (
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-teal-300 transition-all p-6 flex items-center gap-4 group"
+                >
+                  <div className="p-3 bg-gradient-to-br from-teal-500/10 to-teal-600/5 rounded-xl group-hover:from-teal-500/20 group-hover:to-teal-600/10 transition-all">
+                    <UserPlus className="h-6 w-6 text-teal-600" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-slate-900">Invite Contact</h3>
+                    <p className="text-sm text-slate-600">
+                      {contactLimitGate.limit > 0
+                        ? `${contacts.length}/${contactLimitGate.limit} contacts`
+                        : 'Add someone to your circle'}
+                    </p>
+                  </div>
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push('/settings/billing')}
+                  className="bg-slate-50 border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl transition-all p-6 flex items-center gap-4 group opacity-75"
+                >
+                  <div className="p-3 bg-gradient-to-br from-slate-200/50 to-slate-300/30 rounded-xl">
+                    <Lock className="h-6 w-6 text-slate-400" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-slate-500">Invite Contact</h3>
+                      <TierBadge tier={contactLimitGate.limit === 0 ? 'plus' : 'complete'} size="sm" />
+                    </div>
+                    <p className="text-sm text-slate-500">
+                      {contactLimitGate.limit === 0
+                        ? 'Upgrade to add contacts'
+                        : `Limit reached (${contacts.length}/${contactLimitGate.limit})`}
+                    </p>
+                  </div>
+                </button>
+              )}
 
               <button
                 onClick={() => setShowChildSetupModal(true)}
@@ -407,13 +449,24 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No contacts yet</h3>
                   <p className="text-slate-600 mb-6">Invite trusted people to your circle</p>
-                  <button
-                    onClick={() => setShowInviteModal(true)}
-                    className="cg-btn-primary flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl"
-                  >
-                    <UserPlus className="h-4 w-4" />
-                    Invite Contact
-                  </button>
+                  {contactLimitGate.canAdd ? (
+                    <button
+                      onClick={() => setShowInviteModal(true)}
+                      className="cg-btn-primary flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                      Invite Contact
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => router.push('/settings/billing')}
+                      className="flex items-center gap-2 mx-auto px-4 py-2 rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-200 transition-colors"
+                    >
+                      <Lock className="h-4 w-4" />
+                      Invite Contact
+                      <TierBadge tier="plus" size="sm" />
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3">

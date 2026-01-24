@@ -77,6 +77,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { IncomingCallBanner } from "@/components/kidcoms/incoming-call-banner";
 import { cn } from '@/lib/utils';
+import { useFeatureGate } from '@/hooks/use-feature-gate';
+import { TierBadge } from '@/components/tier-badge';
+import { Lock } from 'lucide-react';
 import { Trash2, UserMinus, Pencil, Gavel, Briefcase, Building2, XCircle, CheckCircle2, ExternalLink } from 'lucide-react';
 
 /* =============================================================================
@@ -89,6 +92,10 @@ function FamilyFileDetailContent() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+
+  // Feature gates
+  const kidcomsGate = useFeatureGate('kidcoms_access');
+  const quickAccordsGate = useFeatureGate('quick_accords');
 
   const [familyFile, setFamilyFile] = useState<FamilyFileDetail | null>(null);
   const [quickAccords, setQuickAccords] = useState<QuickAccord[]>([]);
@@ -763,20 +770,41 @@ function FamilyFileDetailContent() {
                   </div>
                 </button>
 
-                <button
-                  onClick={() => router.push(`/family-files/${id}/kidcoms`)}
-                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                    <Video className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-900">KidComs</div>
-                    <div className="text-sm text-slate-600 font-medium">
-                      Video calls for kids
+                {kidcomsGate.hasAccess ? (
+                  <button
+                    onClick={() => router.push(`/family-files/${id}/kidcoms`)}
+                    className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                      <Video className="h-5 w-5 text-purple-600" />
                     </div>
-                  </div>
-                </button>
+                    <div>
+                      <div className="font-bold text-slate-900">KidComs</div>
+                      <div className="text-sm text-slate-600 font-medium">
+                        Video calls for kids
+                      </div>
+                    </div>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => router.push('/settings/billing')}
+                    className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all text-left group opacity-75"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-200/50 to-slate-300/30 flex items-center justify-center flex-shrink-0 shadow-md">
+                      <Video className="h-5 w-5 text-slate-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-500">KidComs</span>
+                        <Lock className="h-3.5 w-3.5 text-slate-400" />
+                        <TierBadge tier="complete" size="sm" />
+                      </div>
+                      <div className="text-sm text-slate-500 font-medium">
+                        Video calls for kids
+                      </div>
+                    </div>
+                  </button>
+                )}
 
                 {!familyFile.parent_b_id && (
                   <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
@@ -864,13 +892,24 @@ function FamilyFileDetailContent() {
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => router.push(`/family-files/${id}/quick-accord/new`)}
-                className="cg-btn-primary flex items-center gap-2 shadow-md hover:shadow-lg"
-              >
-                <Plus className="h-4 w-4" />
-                New
-              </button>
+              {quickAccordsGate.hasAccess ? (
+                <button
+                  onClick={() => router.push(`/family-files/${id}/quick-accord/new`)}
+                  className="cg-btn-primary flex items-center gap-2 shadow-md hover:shadow-lg"
+                >
+                  <Plus className="h-4 w-4" />
+                  New
+                </button>
+              ) : (
+                <button
+                  onClick={() => router.push('/settings/billing')}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-200 transition-colors"
+                >
+                  <Lock className="h-4 w-4" />
+                  New
+                  <TierBadge tier="plus" size="sm" />
+                </button>
+              )}
             </div>
             <div>
               {quickAccords.length === 0 ? (

@@ -31,6 +31,8 @@ import {
 } from '@/lib/api';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
+import { LockedFeatureCard } from '@/components/locked-feature-card';
+import { useFeatureGate } from '@/hooks/use-feature-gate';
 
 interface Child {
   id: string;
@@ -62,6 +64,9 @@ function KidComsContent() {
   const searchParams = useSearchParams();
   const familyFileId = searchParams.get('case');
 
+  // Feature gate check
+  const { hasAccess, isLoading: featureLoading } = useFeatureGate('kidcoms_access');
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [familyFiles, setFamilyFiles] = useState<FamilyFile[]>([]);
@@ -74,12 +79,41 @@ function KidComsContent() {
 
   // Load family files if none selected, otherwise load family file data
   useEffect(() => {
+    // Only load data if user has access
+    if (!hasAccess) return;
+
     if (familyFileId) {
       loadData();
     } else {
       loadFamilyFiles();
     }
-  }, [familyFileId]);
+  }, [familyFileId, hasAccess]);
+
+  // Load child-specific data when child is selected
+  useEffect(() => {
+    if (!hasAccess) return;
+    if (selectedChild && familyFileId) {
+      loadChildData();
+    }
+  }, [selectedChild?.id, hasAccess]);
+
+  // Feature gate - show locked card if user doesn't have access
+  if (!featureLoading && !hasAccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[var(--portal-background)] via-[var(--portal-surface)] to-[var(--portal-accent)]/5 pb-20 lg:pb-0">
+        <Navigation />
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <LockedFeatureCard
+            feature="kidcoms_access"
+            title="KidComs Video Calls"
+            description="Connect with your children through secure video calls with ARIA monitoring, circle management, and theater mode. Available with Complete subscription."
+            icon={Video}
+            requiredTier="complete"
+          />
+        </div>
+      </div>
+    );
+  }
 
   async function loadFamilyFiles() {
     try {
@@ -98,13 +132,6 @@ function KidComsContent() {
   function selectFamilyFile(id: string) {
     router.push(`/kidcoms?case=${id}`);
   }
-
-  // Load child-specific data when child is selected
-  useEffect(() => {
-    if (selectedChild && familyFileId) {
-      loadChildData();
-    }
-  }, [selectedChild?.id]);
 
   async function loadData() {
     try {

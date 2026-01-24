@@ -10,6 +10,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
+import { useFeatureGate } from '@/hooks/use-feature-gate';
+import { LockedFeatureCard } from '@/components/locked-feature-card';
 import {
   ArrowLeft,
   Zap,
@@ -35,6 +37,9 @@ function NewQuickAccordContent() {
   const router = useRouter();
   const params = useParams();
   const familyFileId = params.id as string;
+
+  // Feature gate check
+  const { hasAccess, isLoading: featureLoading } = useFeatureGate('quick_accords');
 
   const [familyFile, setFamilyFile] = useState<FamilyFileDetail | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -140,6 +145,30 @@ function NewQuickAccordContent() {
       }
     }
   };
+
+  // Feature gate - QuickAccords require Plus tier
+  if (!featureLoading && !hasAccess) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-6">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+        </div>
+        <LockedFeatureCard
+          feature="quick_accords"
+          title="QuickAccords"
+          description="Create one-time agreements quickly with ARIA's help. Perfect for schedule swaps, travel arrangements, special events, and shared expenses. Available with Plus subscription."
+          icon={Zap}
+          requiredTier="plus"
+        />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

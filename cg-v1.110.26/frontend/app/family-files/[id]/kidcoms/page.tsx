@@ -34,6 +34,7 @@ import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
 import { PageContainer } from '@/components/layout';
 import { cn } from '@/lib/utils';
+import { FeatureGate } from '@/components/feature-gate';
 
 /* =============================================================================
    KidComs Page - Video Communication Hub for Children
@@ -204,12 +205,19 @@ export default function KidComsPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
         <Navigation />
 
-        {/* Incoming Call Banner */}
-        <IncomingCallBanner familyFileId={familyFileId} />
-
         <PageContainer background="transparent">
-          {/* Page Header */}
-          <div className="flex items-start gap-4 mb-8">
+          {/* Feature Gate - Complete tier only */}
+          <FeatureGate
+            feature="kidcoms_access"
+            title="KidComs Video Calls"
+            description="Connect with your children through secure video calls with ARIA monitoring, circle management, and theater mode. Available with Complete subscription."
+            icon={Video}
+          >
+            {/* Incoming Call Banner */}
+            <IncomingCallBanner familyFileId={familyFileId} />
+
+            {/* Page Header */}
+            <div className="flex items-start gap-4 mb-8">
             <button
               onClick={() => router.push(`/family-files/${familyFileId}`)}
               className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors mt-1"
@@ -509,7 +517,8 @@ export default function KidComsPage() {
               </div>
             )}
           </div>
-        </div>
+          </div>
+          </FeatureGate>
         </PageContainer>
       </div>
     </ProtectedRoute>
