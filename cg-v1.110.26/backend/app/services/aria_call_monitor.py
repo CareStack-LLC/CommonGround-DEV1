@@ -185,11 +185,11 @@ class ARIACallMonitor:
         if not detected_categories:
             return None
 
-        # Step 2: Fast Claude analysis for context
+        # Step 2: Fast AI analysis for context (using OpenAI)
         try:
-            toxicity_score = await self._quick_claude_analysis(chunk.content)
+            toxicity_score = await self._quick_toxicity_analysis(chunk.content)
         except Exception as e:
-            logger.error(f"Claude analysis failed: {e}")
+            logger.error(f"AI toxicity analysis failed: {e}")
             # Fallback: Use regex match count as proxy
             # Base score of 0.5 ensures profanity triggers at least a warning
             # Add 0.15 per additional category detected
@@ -238,9 +238,9 @@ class ARIACallMonitor:
             mute_duration_seconds=mute_duration,
         )
 
-    async def _quick_claude_analysis(self, content: str) -> float:
+    async def _quick_toxicity_analysis(self, content: str) -> float:
         """
-        Quick Claude analysis for severe violation scoring.
+        Quick AI analysis for severe violation scoring using OpenAI.
 
         Args:
             content: Text to analyze
@@ -248,36 +248,43 @@ class ARIACallMonitor:
         Returns:
             Toxicity score from 0.0 to 1.0
         """
-        prompt = f"""Analyze this co-parenting communication for SEVERE violations only.
+        if not self.openai_client:
+            logger.error("OpenAI client not available for toxicity analysis")
+            raise ValueError("OpenAI client not configured")
+
+        prompt = f"""Analyze this co-parenting communication for violations.
 
 Categories to check:
+- Profanity and swearing
 - Direct threats of violence or harm
 - Hate speech (racial, homophobic, misogynistic slurs)
 - Sexual harassment
+- Hostile or aggressive language
 
 Text: "{content}"
 
 Respond with ONLY a number from 0.0 to 1.0:
-- 0.0-0.6: Not severe
+- 0.0-0.3: Clean/appropriate
+- 0.4-0.6: Mild issues (profanity, slight hostility)
 - 0.7-0.84: Severe (warning needed)
 - 0.85-1.0: Extremely severe (terminate call)
 
 Score:"""
 
         try:
-            message = await self.claude_client.messages.create(
-                model="claude-3-haiku-20240307",  # Fast model
+            response = await self.openai_client.chat.completions.create(
+                model="gpt-4o-mini",  # Fast and cheap model
                 max_tokens=10,
                 temperature=0,
                 messages=[{"role": "user", "content": prompt}]
             )
 
-            score_text = message.content[0].text.strip()
+            score_text = response.choices[0].message.content.strip()
             score = float(score_text)
             return max(0.0, min(1.0, score))  # Clamp to 0-1
 
         except Exception as e:
-            logger.error(f"Claude quick analysis error: {e}")
+            logger.error(f"OpenAI toxicity analysis error: {e}")
             raise
 
     async def handle_severe_violation(
