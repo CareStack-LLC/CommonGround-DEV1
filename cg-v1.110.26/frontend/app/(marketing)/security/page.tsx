@@ -1,4 +1,5 @@
-import { Metadata } from 'next';
+'use client';
+
 import Link from 'next/link';
 import {
   Shield,
@@ -7,119 +8,92 @@ import {
   Server,
   FileCheck,
   Users,
-  Clock,
   ArrowRight,
   Check,
-  AlertTriangle,
 } from 'lucide-react';
-
-export const metadata: Metadata = {
-  title: 'Security | CommonGround',
-  description: 'Learn how CommonGround protects your family\'s data with bank-level encryption, access controls, and comprehensive audit logging.',
-};
 
 /**
  * Security Page
  *
- * Details about data protection, encryption, and compliance.
+ * Matches homepage design: Crimson Text serif, warm colors, compelling copy
  */
 
 const securityFeatures = [
   {
     icon: Lock,
-    title: 'End-to-End Encryption',
-    description: 'All data is encrypted at rest using AES-256 and in transit using TLS 1.3. Your information is protected by the same standards used by banks.',
+    title: 'AES-256 Encryption',
+    description: 'Same encryption banks use. Your data is unreadable to everyone—including us.',
   },
   {
     icon: Eye,
-    title: 'Access Control',
-    description: 'Strict role-based access ensures only authorized users can view your information. Each parent controls their own access and permissions.',
+    title: 'You Control Access',
+    description: 'Decide who sees what. Grant time-limited access to attorneys when needed.',
   },
   {
     icon: Server,
-    title: 'Secure Infrastructure',
-    description: 'Hosted on enterprise-grade cloud infrastructure with redundancy, regular backups, and 99.9% uptime guarantee.',
+    title: '99.9% Uptime',
+    description: 'Enterprise cloud. Daily backups. Your data is always there when you need it.',
   },
   {
     icon: FileCheck,
-    title: 'Audit Logging',
-    description: 'Every access and modification is logged with timestamps. Complete audit trails are available for court proceedings if needed.',
+    title: 'Complete Audit Trail',
+    description: 'Every action timestamped. Perfect for court if things get ugly.',
   },
   {
     icon: Users,
     title: 'Professional Access',
-    description: 'Time-limited, verified access for attorneys and GALs. All professional access is logged and can be revoked at any time.',
+    description: 'Attorneys and GALs get verified, time-limited access. Revoke anytime.',
   },
   {
-    icon: Clock,
-    title: 'Session Management',
-    description: 'Automatic session timeouts, secure token handling, and optional multi-factor authentication for enhanced security.',
+    icon: Shield,
+    title: 'Court-Ready Exports',
+    description: 'SHA-256 verified documents. Tamper-proof evidence that holds up.',
   },
 ];
 
-const dataProtection = [
-  'Your data is never sold or shared with third parties',
-  'We only access your data to provide our services',
-  'You can export all your data at any time',
-  'You can request complete data deletion',
-  'We comply with applicable privacy laws',
-  'Regular security audits and penetration testing',
-];
-
-const courtReadiness = [
-  {
-    title: 'Verified Exports',
-    description: 'All court exports include SHA-256 hash verification to prove documents haven\'t been altered.',
-  },
-  {
-    title: 'Timestamped Records',
-    description: 'Every message, change, and action is timestamped with UTC time for accurate record-keeping.',
-  },
-  {
-    title: 'Chain of Custody',
-    description: 'Immutable event logs maintain a complete chain of custody for all important actions.',
-  },
-  {
-    title: 'Professional Formatting',
-    description: 'Exports are formatted for legal proceedings with clear organization and proper citations.',
-  },
+const commitments = [
+  'We never sell your data',
+  'We never share with third parties',
+  'You can export everything anytime',
+  'You can delete everything anytime',
 ];
 
 export default function SecurityPage() {
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="relative py-20 lg:py-28 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-cg-sage/5 blur-3xl" />
-          <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-slate/5 blur-3xl" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="w-20 h-20 bg-cg-sage-subtle rounded-2xl flex items-center justify-center mx-auto mb-8">
-              <Shield className="w-10 h-10 text-cg-sage" />
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6">
-              Your family's data is <span className="text-cg-sage">sacred</span>
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              We take security seriously. CommonGround is built from the ground up
-              with privacy and protection as core principles.
-            </p>
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+      {/* Hero */}
+      <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl mb-8 shadow-lg">
+            <Shield className="w-10 h-10 text-[var(--portal-primary)]" />
           </div>
+          <h1
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            Your family's data
+            <br />
+            <span className="text-[#D97757]">is sacred</span>
+          </h1>
+          <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            We built CommonGround knowing your most sensitive information would live here.
+            <span className="font-medium text-[var(--portal-primary)]"> That trust is everything to us.</span>
+          </p>
         </div>
       </section>
 
-      {/* Security Features Grid */}
-      <section className="py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Security Features */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Enterprise-Grade Security
+            <h2
+              className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4"
+              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            >
+              Enterprise-grade protection
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Built with the same security standards used by banks and healthcare providers.
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              The same security standards used by banks and hospitals.
             </p>
           </div>
 
@@ -129,17 +103,18 @@ export default function SecurityPage() {
               return (
                 <div
                   key={feature.title}
-                  className="bg-background rounded-2xl p-6 border border-border/50"
+                  className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-3xl p-8 border-2 border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30 transition-all hover:shadow-lg group"
                 >
-                  <div className="w-12 h-12 bg-cg-sage-subtle rounded-xl flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-cg-sage" />
+                  <div className="h-14 w-14 rounded-2xl bg-[var(--portal-primary)]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <Icon className="h-7 w-7 text-[var(--portal-primary)]" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                  <h3
+                    className="text-xl font-semibold text-[#2C3E50] mb-3"
+                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  >
                     {feature.title}
                   </h3>
-                  <p className="text-muted-foreground">
-                    {feature.description}
-                  </p>
+                  <p className="text-gray-600">{feature.description}</p>
                 </div>
               );
             })}
@@ -147,54 +122,59 @@ export default function SecurityPage() {
         </div>
       </section>
 
-      {/* Data Protection */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Our Commitment */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
-                Your Data, Your Control
+              <h2
+                className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-6"
+                style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              >
+                Your data. <span className="text-[#D97757]">Your control.</span>
               </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                We believe you should always maintain control over your family's information.
-                Here's our commitment to you:
+              <p className="text-lg text-gray-600 mb-8">
+                We don't monetize your information. We don't analyze it for ads.
+                We don't share it with anyone unless you explicitly ask us to.
               </p>
               <ul className="space-y-4">
-                {dataProtection.map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-cg-sage-subtle flex items-center justify-center mt-0.5">
-                      <Check className="w-3 h-3 text-cg-sage" />
+                {commitments.map((item) => (
+                  <li key={item} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center">
+                      <Check className="w-4 h-4 text-[var(--portal-primary)]" />
                     </div>
-                    <span className="text-foreground">{item}</span>
+                    <span className="text-[#2C3E50] font-medium">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle rounded-3xl p-8 lg:p-12">
-                <div className="bg-card rounded-2xl p-6 border border-border/50">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Lock className="w-6 h-6 text-cg-sage" />
-                    <span className="font-semibold text-foreground">Data Protection</span>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Encryption</span>
-                      <span className="text-cg-sage font-medium">AES-256</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Transit Security</span>
-                      <span className="text-cg-sage font-medium">TLS 1.3</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Backups</span>
-                      <span className="text-cg-sage font-medium">Daily</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Uptime SLA</span>
-                      <span className="text-cg-sage font-medium">99.9%</span>
-                    </div>
-                  </div>
+
+            <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] rounded-3xl p-8 text-white">
+              <div className="flex items-center gap-3 mb-6">
+                <Lock className="w-8 h-8" />
+                <span
+                  className="text-2xl font-semibold"
+                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                >
+                  Security Specs
+                </span>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-white/20 pb-3">
+                  <span className="text-white/70">Encryption at Rest</span>
+                  <span className="font-semibold">AES-256</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-white/20 pb-3">
+                  <span className="text-white/70">Encryption in Transit</span>
+                  <span className="font-semibold">TLS 1.3</span>
+                </div>
+                <div className="flex items-center justify-between border-b border-white/20 pb-3">
+                  <span className="text-white/70">Data Backups</span>
+                  <span className="font-semibold">Daily</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-white/70">Uptime SLA</span>
+                  <span className="font-semibold">99.9%</span>
                 </div>
               </div>
             </div>
@@ -202,90 +182,31 @@ export default function SecurityPage() {
         </div>
       </section>
 
-      {/* Court Readiness */}
-      <section className="py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Court-Ready Documentation
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              When you need evidence for legal proceedings, CommonGround delivers
-              verified, admissible documentation.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {courtReadiness.map((item) => (
-              <div
-                key={item.title}
-                className="bg-background rounded-xl p-6 border border-border/50"
-              >
-                <h3 className="font-semibold text-foreground mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Report Vulnerability */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-cg-amber-subtle rounded-2xl p-8 border border-cg-amber/20">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-cg-amber/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle className="w-6 h-6 text-cg-amber" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Report a Security Vulnerability
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    If you discover a security vulnerability, please report it responsibly.
-                    We take all reports seriously and will respond promptly.
-                  </p>
-                  <Link
-                    href="/help/contact"
-                    className="inline-flex items-center gap-2 text-cg-amber font-medium hover:gap-3 transition-all"
-                  >
-                    Contact Security Team
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
+      {/* CTA */}
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2
+            className="text-4xl sm:text-5xl font-serif mb-6"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
             Ready to get started?
           </h2>
-          <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            Join families who trust CommonGround with their most important information.
+          <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+            Join thousands of families who trust CommonGround with their most important information.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/register"
-              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
+              className="inline-flex items-center justify-center px-10 py-5 bg-[#D97757] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
             >
-              Start Free Trial
-              <ArrowRight className="w-5 h-5" />
+              Start Free Today
+              <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />
             </Link>
             <Link
               href="/legal/privacy"
-              className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage hover:text-white"
+              className="inline-flex items-center justify-center px-10 py-5 bg-white/10 text-white font-bold text-lg rounded-full hover:bg-white/20 transition-all border-2 border-white/30"
             >
-              Read Privacy Policy
+              Privacy Policy
             </Link>
           </div>
         </div>

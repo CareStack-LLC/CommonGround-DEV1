@@ -1,4 +1,5 @@
-import { Metadata } from 'next';
+'use client';
+
 import Link from 'next/link';
 import {
   Scale,
@@ -6,347 +7,161 @@ import {
   Building2,
   FileText,
   Shield,
-  Clock,
   Eye,
   ArrowRight,
   Check,
   BarChart3,
-  MessageSquare,
-  Calendar,
   Download,
-  UserCheck,
-  AlertCircle,
+  Search,
+  Zap,
+  Globe,
 } from 'lucide-react';
-
-export const metadata: Metadata = {
-  title: 'For Professionals | CommonGround',
-  description: 'CommonGround for family law professionals. Help your clients co-parent better with verified documentation and reduced conflict.',
-};
 
 /**
  * Professionals Landing Page
  *
- * Use case and feature page for attorneys, GALs, mediators, and other family law professionals.
+ * Focus on Firm Directory visibility and Contact Sales CTA
  */
 
-const professionalRoles = [
+const benefits = [
   {
-    icon: Scale,
-    title: 'Family Law Attorneys',
-    subtitle: 'Represent clients with better documentation',
-    description: 'Your clients arrive with organized communication records, verified compliance data, and court-ready documentation instead of boxes of screenshots.',
-    benefits: [
-      'Court-admissible evidence packages',
-      'Real-time case monitoring',
-      'Automated parenting plan generation',
-      'Reduced discovery disputes',
-    ],
+    icon: Globe,
+    title: 'Get discovered by clients',
+    description: 'Your firm appears in our directory when parents are ready to file. Be there at the moment they need you most.',
+    highlight: true,
   },
-  {
-    icon: Users,
-    title: 'Guardians ad Litem',
-    subtitle: 'Advocate with complete information',
-    description: 'Access verified communication history, compliance metrics, and behavioral patterns to make informed recommendations for children.',
-    benefits: [
-      'Read-only case access',
-      'Communication pattern analysis',
-      'Compliance tracking dashboards',
-      'Objective behavioral data',
-    ],
-  },
-  {
-    icon: Building2,
-    title: 'Mediators',
-    subtitle: 'Facilitate more productive sessions',
-    description: 'Review shared agreement drafts, understand communication dynamics, and help parents build on existing progress.',
-    benefits: [
-      'Draft agreement access',
-      'Communication history review',
-      'Real-time collaborative editing',
-      'Session note integration',
-    ],
-  },
-  {
-    icon: FileText,
-    title: 'Custody Evaluators',
-    subtitle: 'Evaluate with verified data',
-    description: 'Base recommendations on objective data: actual communication records, schedule compliance, and documented interactions.',
-    benefits: [
-      'Verified communication logs',
-      'GPS-verified exchanges',
-      'Good faith metrics',
-      'Trend analysis over time',
-    ],
-  },
-];
-
-const features = [
   {
     icon: Eye,
-    title: 'Case Access Portal',
-    description: 'Secure, time-limited access to client cases. See messages, agreements, schedules, and compliance data in one dashboard.',
+    title: 'See the full picture',
+    description: 'Access verified communication records, compliance data, and behavioral patterns—not just "he said, she said."',
   },
   {
     icon: Download,
-    title: 'Court Export Packages',
-    description: 'Generate verified evidence packages with SHA-256 integrity hashes. Select date ranges, apply redactions, and export court-ready PDFs.',
+    title: 'Court-ready exports',
+    description: 'SHA-256 verified documents. Timestamped. Tamper-proof. No more discovery disputes.',
   },
   {
     icon: BarChart3,
-    title: 'Compliance Analytics',
-    description: 'Track schedule adherence, communication quality, and agreement compliance over time with visual dashboards.',
-  },
-  {
-    icon: UserCheck,
-    title: 'Voucher System',
-    description: 'Provide clients with premium access vouchers. Both parents get upgraded features, and you get case visibility.',
-  },
-  {
-    icon: Shield,
-    title: 'Audit Trail',
-    description: 'Every access is logged with timestamps. Full transparency for you, your clients, and the court.',
-  },
-  {
-    icon: AlertCircle,
-    title: 'Alert Notifications',
-    description: 'Get notified of concerning patterns: missed exchanges, escalating communication, or agreement violations.',
+    title: 'Track compliance',
+    description: 'Real-time dashboards show schedule adherence, communication quality, and agreement compliance.',
   },
 ];
 
-const workflow = [
-  {
-    step: 1,
-    title: 'Invite Your Client',
-    description: 'Generate a voucher code from your professional dashboard and share it with your client.',
-  },
-  {
-    step: 2,
-    title: 'Client Onboards',
-    description: 'Your client registers with the voucher code, getting premium access and inviting their co-parent.',
-  },
-  {
-    step: 3,
-    title: 'Request Access',
-    description: 'Once both parents are on the platform, request case access through the professional portal.',
-  },
-  {
-    step: 4,
-    title: 'Monitor & Export',
-    description: 'Review case activity, track compliance, and generate court-ready documentation as needed.',
-  },
+const whoItsFor = [
+  { role: 'Family Law Attorneys', icon: Scale },
+  { role: 'Guardians ad Litem', icon: Users },
+  { role: 'Mediators', icon: Building2 },
+  { role: 'Custody Evaluators', icon: FileText },
+  { role: 'Parenting Coordinators', icon: Users },
 ];
 
-const testimonials = [
-  {
-    quote: "CommonGround has transformed how I handle custody cases. My clients come to hearings with verified documentation instead of he-said-she-said disputes.",
-    author: "Sarah M.",
-    role: "Family Law Attorney",
-    location: "Los Angeles, CA",
-  },
-  {
-    quote: "The compliance tracking is invaluable. I can show the court objective data about schedule adherence rather than relying on conflicting parental accounts.",
-    author: "Michael R.",
-    role: "Guardian ad Litem",
-    location: "Chicago, IL",
-  },
-  {
-    quote: "Mediation sessions are so much more productive when I can review the communication history beforehand. I understand the dynamics before we even start.",
-    author: "Jennifer L.",
-    role: "Family Mediator",
-    location: "Seattle, WA",
-  },
-];
-
-const faqs = [
-  {
-    question: 'How do I get access to my client\'s case?',
-    answer: 'After your client joins CommonGround (using your voucher or on their own), they can grant you access from their settings. You\'ll receive an email to verify your credentials and accept the access grant.',
-  },
-  {
-    question: 'What information can I see?',
-    answer: 'With case access, you can view: all messages between parents, agreement drafts and history, schedule events and compliance data, expense records, and activity logs. You cannot modify anything—access is read-only.',
-  },
-  {
-    question: 'Is the data court-admissible?',
-    answer: 'Yes. All exports include SHA-256 integrity verification, timestamps, and chain of custody documentation. The platform is designed specifically for court-admissible evidence.',
-  },
-  {
-    question: 'How long does access last?',
-    answer: 'Access duration is set by your client when granting access. Typical periods are 90 days for attorneys and 120 days for GALs. Clients can extend or revoke access at any time.',
-  },
-  {
-    question: 'Can I access cases from multiple clients?',
-    answer: 'Absolutely. Your professional dashboard shows all cases where you\'ve been granted access. You can switch between cases and manage them all from one interface.',
-  },
-  {
-    question: 'What if my client\'s co-parent won\'t join?',
-    answer: 'CommonGround works best with both parents, but single-parent functionality is available. Your client can still document their communications, track their schedule compliance, and build agreements.',
-  },
+const directoryFeatures = [
+  'Appear in searches by location and specialty',
+  'Profile includes credentials, reviews, and availability',
+  'Parents can request consultations directly',
+  'One click to accept new clients',
 ];
 
 export default function ProfessionalsPage() {
   return (
-    <div className="bg-background">
-      {/* Hero Section */}
-      <section className="relative py-20 lg:py-28 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-cg-sage/5 blur-3xl" />
-          <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-amber/5 blur-3xl" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage-subtle rounded-full mb-6">
-              <Scale className="w-4 h-4 text-cg-sage" />
-              <span className="text-sm font-medium text-cg-sage">For Family Law Professionals</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6">
-              Better outcomes for your <span className="text-cg-sage">clients and their children</span>
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              CommonGround gives you verified documentation, objective compliance data,
-              and tools to help your clients communicate better.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/pricing/professionals"
-                className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
-              >
-                View Professional Plans
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/help/contact?type=professional"
-                className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage hover:text-white"
-              >
-                Schedule Demo
-              </Link>
-            </div>
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+      {/* Hero */}
+      <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--portal-primary)]/10 rounded-full mb-6">
+            <Scale className="w-4 h-4 text-[var(--portal-primary)]" />
+            <span className="text-sm font-medium text-[var(--portal-primary)]">For Family Law Professionals</span>
+          </div>
+          <h1
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            Clients find you when they
+            <br />
+            <span className="text-[#D97757]">need you most</span>
+          </h1>
+          <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            CommonGround puts your firm in front of parents at the moment they're ready to file—
+            <span className="font-medium text-[var(--portal-primary)]"> not when they're searching Google.</span>
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/contact?type=professional"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+            >
+              Contact Sales
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <Link
+              href="/contact?type=demo"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-[var(--portal-primary)] font-semibold rounded-full border-2 border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 transition-all"
+            >
+              Schedule Demo
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Role-Specific Sections */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Built for how you work
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Every family law professional has unique needs. Here's how CommonGround helps.
-            </p>
-          </div>
+      {/* Firm Directory Highlight */}
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full mb-6">
+                <Zap className="w-4 h-4" />
+                <span className="text-sm font-medium">Firm Directory</span>
+              </div>
+              <h2
+                className="text-3xl sm:text-4xl font-serif mb-6"
+                style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              >
+                Be one click away from your next client
+              </h2>
+              <p className="text-lg text-white/80 mb-8">
+                When parents on CommonGround are ready to hire representation, they search our directory first.
+                Your firm shows up based on location, specialty, and availability—right when they need you.
+              </p>
+              <ul className="space-y-3">
+                {directoryFeatures.map((item) => (
+                  <li key={item} className="flex items-center gap-3">
+                    <div className="w-5 h-5 rounded-full bg-[#D97757] flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-white/90">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div className="space-y-16">
-            {professionalRoles.map((role, index) => {
-              const Icon = role.icon;
-              const isEven = index % 2 === 0;
-
-              return (
+            {/* Directory Preview */}
+            <div className="bg-white rounded-3xl p-6 shadow-2xl">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                <Search className="w-5 h-5 text-gray-400" />
+                <span className="text-gray-500">Find a professional near Los Angeles, CA...</span>
+              </div>
+              {[
+                { name: 'Morrison Family Law', specialty: 'High-Conflict Custody', rating: '4.9' },
+                { name: 'Chen & Associates', specialty: 'Mediation, Collaborative', rating: '4.8' },
+                { name: 'Your Firm Here', specialty: 'Your Specialty', rating: '★', highlight: true },
+              ].map((firm, i) => (
                 <div
-                  key={role.title}
-                  className={`grid lg:grid-cols-2 gap-12 items-center ${
-                    isEven ? '' : 'lg:flex-row-reverse'
+                  key={i}
+                  className={`p-4 rounded-xl mb-3 transition-all ${
+                    firm.highlight
+                      ? 'bg-[#D97757]/10 border-2 border-[#D97757]/30'
+                      : 'bg-gray-50 border border-gray-100'
                   }`}
                 >
-                  <div className={isEven ? '' : 'lg:order-2'}>
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage-subtle rounded-full mb-4">
-                      <Icon className="w-4 h-4 text-cg-sage" />
-                      <span className="text-sm font-medium text-cg-sage">{role.subtitle}</span>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className={`font-semibold ${firm.highlight ? 'text-[#D97757]' : 'text-[#2C3E50]'}`}>
+                        {firm.name}
+                      </p>
+                      <p className="text-sm text-gray-500">{firm.specialty}</p>
                     </div>
-                    <h3 className="text-2xl sm:text-3xl font-semibold text-foreground mb-4">
-                      {role.title}
-                    </h3>
-                    <p className="text-lg text-muted-foreground mb-6">
-                      {role.description}
-                    </p>
-                    <ul className="space-y-3">
-                      {role.benefits.map((benefit) => (
-                        <li key={benefit} className="flex items-center gap-3">
-                          <div className="w-5 h-5 rounded-full bg-cg-sage-subtle flex items-center justify-center">
-                            <Check className="w-3 h-3 text-cg-sage" />
-                          </div>
-                          <span className="text-foreground">{benefit}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className={isEven ? '' : 'lg:order-1'}>
-                    <div className="bg-gradient-to-br from-cg-sage-subtle to-background rounded-3xl p-8 aspect-video flex items-center justify-center border border-border/50">
-                      <Icon className="w-24 h-24 text-cg-sage/30" />
+                    <div className={`text-sm font-medium ${firm.highlight ? 'text-[#D97757]' : 'text-[var(--portal-primary)]'}`}>
+                      {firm.rating}
                     </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Professional Tools
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to support your clients and build stronger cases.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={feature.title}
-                  className="bg-background rounded-xl p-6 border border-border/50"
-                >
-                  <div className="w-12 h-12 bg-cg-sage-subtle rounded-xl flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-cg-sage" />
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Workflow Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Simple Workflow
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Get your clients on CommonGround and start seeing better outcomes.
-            </p>
-          </div>
-
-          <div className="max-w-3xl mx-auto">
-            <div className="space-y-8">
-              {workflow.map((item, index) => (
-                <div key={item.step} className="flex gap-6">
-                  <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 bg-cg-sage rounded-full flex items-center justify-center text-white font-semibold">
-                      {item.step}
-                    </div>
-                    {index < workflow.length - 1 && (
-                      <div className="w-0.5 h-full bg-border mt-4" />
-                    )}
-                  </div>
-                  <div className="flex-1 pb-8">
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-muted-foreground">
-                      {item.description}
-                    </p>
                   </div>
                 </div>
               ))}
@@ -355,27 +170,103 @@ export default function ProfessionalsPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Who It's For */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Trusted by Professionals
+            <h2
+              className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4"
+              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            >
+              Built for family law <span className="text-[#D97757]">professionals</span>
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="bg-background rounded-xl p-6 border border-border/50"
-              >
-                <div className="text-cg-sage text-4xl font-serif mb-4">"</div>
-                <p className="text-foreground mb-6">{testimonial.quote}</p>
-                <div>
-                  <div className="font-semibold text-foreground">{testimonial.author}</div>
-                  <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                  <div className="text-sm text-muted-foreground">{testimonial.location}</div>
+          <div className="flex flex-wrap justify-center gap-4">
+            {whoItsFor.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.role}
+                  className="flex items-center gap-3 bg-gradient-to-br from-[#F5F9F9] to-white rounded-full px-6 py-3 border-2 border-[var(--portal-primary)]/10"
+                >
+                  <Icon className="w-5 h-5 text-[var(--portal-primary)]" />
+                  <span className="font-medium text-[#2C3E50]">{item.role}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid sm:grid-cols-2 gap-8">
+            {benefits.map((benefit) => {
+              const Icon = benefit.icon;
+              return (
+                <div
+                  key={benefit.title}
+                  className={`rounded-3xl p-8 border-2 transition-all hover:shadow-lg group ${
+                    benefit.highlight
+                      ? 'bg-gradient-to-br from-[#D97757]/10 to-[#D97757]/5 border-[#D97757]/20 hover:border-[#D97757]/40'
+                      : 'bg-gradient-to-br from-[#F5F9F9] to-white border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30'
+                  }`}
+                >
+                  <div className={`h-14 w-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${
+                    benefit.highlight ? 'bg-[#D97757]/20' : 'bg-[var(--portal-primary)]/10'
+                  }`}>
+                    <Icon className={`h-7 w-7 ${benefit.highlight ? 'text-[#D97757]' : 'text-[var(--portal-primary)]'}`} />
+                  </div>
+                  <h3
+                    className="text-xl font-semibold text-[#2C3E50] mb-3"
+                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  >
+                    {benefit.title}
+                  </h3>
+                  <p className="text-gray-600">{benefit.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2
+              className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4"
+              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            >
+              Simple to <span className="text-[#D97757]">get started</span>
+            </h2>
+          </div>
+
+          <div className="space-y-8">
+            {[
+              { step: '01', title: 'Contact our sales team', description: 'We\'ll learn about your practice and show you the platform.' },
+              { step: '02', title: 'Set up your firm profile', description: 'Add your credentials, specialties, and service areas.' },
+              { step: '03', title: 'Appear in the directory', description: 'Parents searching in your area will find you immediately.' },
+              { step: '04', title: 'Accept clients one click', description: 'When a parent requests you, you\'re instantly connected.' },
+            ].map((item, index) => (
+              <div key={item.step} className="flex gap-6 items-start">
+                <span
+                  className="text-5xl font-serif text-gray-100"
+                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                >
+                  {item.step}
+                </span>
+                <div className="flex-1 pt-2">
+                  <h3
+                    className="text-xl font-semibold text-[#2C3E50] mb-2"
+                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-600">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -383,59 +274,32 @@ export default function ProfessionalsPage() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold text-foreground mb-4">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="max-w-3xl mx-auto space-y-4">
-            {faqs.map((faq, index) => (
-              <details
-                key={index}
-                className="group bg-card rounded-xl border border-border/50 overflow-hidden"
-              >
-                <summary className="flex items-center justify-between p-6 cursor-pointer list-none">
-                  <span className="font-medium text-foreground">{faq.question}</span>
-                  <span className="text-muted-foreground group-open:rotate-180 transition-transform">
-                    ▼
-                  </span>
-                </summary>
-                <div className="px-6 pb-6 text-muted-foreground">
-                  {faq.answer}
-                </div>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
-            Ready to transform your practice?
+      {/* CTA */}
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2
+            className="text-4xl sm:text-5xl font-serif mb-6"
+            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+          >
+            Ready to grow your practice?
           </h2>
-          <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            Join hundreds of family law professionals who use CommonGround
-            to help their clients co-parent better.
+          <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+            Get in front of parents who are ready to take action.
+            No advertising. No cold leads. Just clients who need you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/pricing/professionals"
-              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
+              href="/contact?type=professional"
+              className="inline-flex items-center justify-center px-10 py-5 bg-[#D97757] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
             >
-              View Plans & Pricing
-              <ArrowRight className="w-5 h-5" />
+              Contact Sales
+              <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />
             </Link>
             <Link
-              href="/register?plan=pro-practice"
-              className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage hover:text-white"
+              href="/contact?type=demo"
+              className="inline-flex items-center justify-center px-10 py-5 bg-white/10 text-white font-bold text-lg rounded-full hover:bg-white/20 transition-all border-2 border-white/30"
             >
-              Start Free Trial
+              Schedule Demo
             </Link>
           </div>
         </div>
