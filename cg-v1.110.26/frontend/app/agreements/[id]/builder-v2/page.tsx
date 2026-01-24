@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
-import { CheckCircle2, Circle, ChevronRight, ChevronLeft, Info, Lightbulb } from 'lucide-react';
+import { CheckCircle2, Circle, ChevronRight, ChevronLeft, Info, Lightbulb, ArrowLeft, FileText } from 'lucide-react';
 
 // V2 Section Types - 7 sections for standard, 5 for lite
 type SectionKeyV2 =
@@ -259,12 +259,12 @@ function BuilderV2Content() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cg-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading agreement builder...</p>
+            <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
+            <p className="mt-4 text-muted-foreground font-medium">Loading agreement builder...</p>
           </div>
         </div>
       </div>
@@ -273,16 +273,19 @@ function BuilderV2Content() {
 
   if (error && !agreement) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-          <Card className="max-w-md">
+          <Card className="max-w-md border-2 border-slate-200 rounded-2xl shadow-lg">
             <CardHeader>
-              <CardTitle className="text-destructive">Error</CardTitle>
+              <CardTitle className="text-destructive" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Error</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-foreground mb-4">{error}</p>
-              <Button onClick={() => router.push('/agreements')}>
+              <p className="text-foreground mb-4 font-medium">{error}</p>
+              <Button
+                onClick={() => router.push('/agreements')}
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] hover:opacity-90"
+              >
                 Back to Agreements
               </Button>
             </CardContent>
@@ -297,20 +300,32 @@ function BuilderV2Content() {
   const suggestions = QUICK_ACCORD_SUGGESTIONS[currentSection.key] || [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation />
 
       {/* Header */}
-      <header className="bg-card border-b sticky top-16 z-10">
+      <header className="bg-white/80 backdrop-blur-sm border-b-2 border-slate-200 sticky top-16 z-10">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div>
-              <h1 className="text-xl font-bold text-foreground">SharedCare Agreement</h1>
-              <p className="text-sm text-muted-foreground">Simple 7-Section Builder</p>
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => router.push(`/agreements/${agreementId}`)}
+                className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+              >
+                <ArrowLeft className="w-5 h-5 text-muted-foreground" />
+              </button>
+              <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
+                <FileText className="w-5 h-5 text-[var(--portal-primary)]" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>SharedCare Agreement</h1>
+                <p className="text-sm text-muted-foreground font-medium">Simple 7-Section Builder</p>
+              </div>
             </div>
             <Button
               variant="outline"
               onClick={() => router.push(`/agreements/${agreementId}`)}
+              className="border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300 font-bold"
             >
               Save & Exit
             </Button>
@@ -319,19 +334,19 @@ function BuilderV2Content() {
       </header>
 
       {/* Progress Bar */}
-      <div className="bg-card border-b">
+      <div className="bg-white border-b-2 border-slate-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-foreground">
+            <span className="text-sm font-bold text-foreground">
               Section {currentSection.number} of {sections.length}
             </span>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm font-medium text-muted-foreground">
               {getProgressPercentage()}% Complete
             </span>
           </div>
-          <div className="w-full bg-secondary rounded-full h-2">
+          <div className="w-full bg-slate-200 rounded-full h-2.5 shadow-inner">
             <div
-              className="bg-cg-primary h-2 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] h-2.5 rounded-full transition-all duration-300"
               style={{ width: `${getProgressPercentage()}%` }}
             />
           </div>
@@ -339,19 +354,19 @@ function BuilderV2Content() {
       </div>
 
       {/* Section Navigation */}
-      <div className="bg-card border-b">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center gap-4 overflow-x-auto">
+      <div className="bg-white border-b-2 border-slate-200">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center gap-3 overflow-x-auto pb-1">
             {sections.map((section, index) => (
               <button
                 key={section.key}
                 onClick={() => setCurrentSectionIndex(index)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-colors whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap border-2 ${
                   index === currentSectionIndex
-                    ? 'bg-cg-primary text-white'
+                    ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white border-transparent shadow-lg'
                     : completedSections.has(section.key)
-                    ? 'bg-cg-success/10 text-cg-success'
-                    : 'text-muted-foreground hover:bg-secondary'
+                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:shadow-md'
+                    : 'text-muted-foreground border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-md bg-white'
                 }`}
               >
                 {completedSections.has(section.key) ? (
@@ -371,25 +386,29 @@ function BuilderV2Content() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Quick Accord Suggestions Modal */}
         {showQuickAccordSuggestions && suggestions.length > 0 && (
-          <Card className="mb-6 border-cg-primary/30 bg-cg-primary/5">
+          <Card className="mb-6 border-2 border-amber-200 rounded-2xl shadow-lg bg-gradient-to-br from-amber-50 to-white">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-5 w-5 text-cg-primary" />
-                <CardTitle className="text-lg">Would you like to add more detail?</CardTitle>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-md">
+                  <Lightbulb className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Would you like to add more detail?</CardTitle>
+                  <CardDescription className="font-medium">
+                    These Quick Accords can be added now or later to supplement your main agreement.
+                  </CardDescription>
+                </div>
               </div>
-              <CardDescription>
-                These Quick Accords can be added now or later to supplement your main agreement.
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {suggestions.map((suggestion) => (
                   <button
                     key={suggestion.id}
-                    className="w-full text-left p-4 rounded-lg border bg-card hover:border-cg-primary/50 transition-colors"
+                    className="w-full text-left p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
                   >
-                    <h4 className="font-medium text-foreground">{suggestion.title}</h4>
-                    <p className="text-sm text-muted-foreground">{suggestion.description}</p>
+                    <h4 className="font-bold text-foreground">{suggestion.title}</h4>
+                    <p className="text-sm text-muted-foreground font-medium">{suggestion.description}</p>
                   </button>
                 ))}
               </div>
@@ -397,13 +416,13 @@ function BuilderV2Content() {
                 <Button
                   variant="outline"
                   onClick={handleContinueAfterSuggestions}
-                  className="flex-1"
+                  className="flex-1 border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg font-bold transition-all duration-300"
                 >
                   Skip for now
                 </Button>
                 <Button
                   onClick={handleContinueAfterSuggestions}
-                  className="flex-1 bg-cg-primary hover:bg-cg-primary/90"
+                  className="flex-1 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] hover:opacity-90 font-bold transition-all duration-300"
                 >
                   Continue
                 </Button>
@@ -414,15 +433,15 @@ function BuilderV2Content() {
 
         {/* Section Content */}
         {!showQuickAccordSuggestions && (
-          <Card>
+          <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
             <CardHeader>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-cg-primary text-white font-bold text-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white font-bold text-lg shadow-md">
                   {currentSection.number}
                 </div>
                 <div>
-                  <CardTitle>{currentSection.title}</CardTitle>
-                  <CardDescription>{currentSection.description}</CardDescription>
+                  <CardTitle style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{currentSection.title}</CardTitle>
+                  <CardDescription className="font-medium">{currentSection.description}</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -446,6 +465,7 @@ function BuilderV2Content() {
               variant="outline"
               onClick={handlePrevious}
               disabled={currentSectionIndex === 0}
+              className="border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg font-bold transition-all duration-300 disabled:opacity-50"
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
               Previous
@@ -454,7 +474,7 @@ function BuilderV2Content() {
             {currentSectionIndex < sections.length - 1 ? (
               <Button
                 onClick={handleNext}
-                className="bg-cg-primary hover:bg-cg-primary/90"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] hover:opacity-90 font-bold transition-all duration-300 shadow-lg"
               >
                 Save & Continue
                 <ChevronRight className="h-4 w-4 ml-2" />
@@ -462,7 +482,7 @@ function BuilderV2Content() {
             ) : (
               <Button
                 onClick={() => router.push(`/agreements/${agreementId}`)}
-                className="bg-cg-success hover:bg-cg-success/90"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 font-bold transition-all duration-300 shadow-lg"
               >
                 Finish Agreement
                 <CheckCircle2 className="h-4 w-4 ml-2" />
@@ -571,32 +591,32 @@ function PartiesChildrenForm({
       {/* Parent Information */}
       {familyFile ? (
         <div className="space-y-4">
-          <div className="p-4 rounded-lg bg-cg-primary/5 border border-cg-primary/20">
-            <h3 className="font-medium text-foreground mb-3 flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-cg-success" />
+          <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10 border-2 border-[var(--portal-primary)]/20">
+            <h3 className="font-bold text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
               Parent Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Parent A */}
-              <div className="p-3 rounded-lg bg-card border">
-                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+              <div className="p-4 rounded-xl bg-white border-2 border-slate-200 shadow-sm">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1 font-bold">
                   {formatRole(familyFile.parent_a_role) || 'Parent A'}
                 </div>
-                <div className="font-medium text-foreground">
+                <div className="font-bold text-foreground">
                   {formatParentName(familyFile.parent_a_info)}
                 </div>
                 {familyFile.parent_a_info?.email && (
-                  <div className="text-sm text-muted-foreground mt-0.5">
+                  <div className="text-sm text-muted-foreground mt-0.5 font-medium">
                     {familyFile.parent_a_info.email}
                   </div>
                 )}
               </div>
               {/* Parent B */}
-              <div className="p-3 rounded-lg bg-card border">
-                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+              <div className="p-4 rounded-xl bg-white border-2 border-slate-200 shadow-sm">
+                <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1 font-bold">
                   {formatRole(familyFile.parent_b_role) || 'Parent B'}
                 </div>
-                <div className="font-medium text-foreground">
+                <div className="font-bold text-foreground">
                   {familyFile.parent_b_info
                     ? formatParentName(familyFile.parent_b_info)
                     : familyFile.parent_b_email
@@ -604,7 +624,7 @@ function PartiesChildrenForm({
                       : 'Not yet invited'}
                 </div>
                 {familyFile.parent_b_info?.email && (
-                  <div className="text-sm text-muted-foreground mt-0.5">
+                  <div className="text-sm text-muted-foreground mt-0.5 font-medium">
                     {familyFile.parent_b_info.email}
                   </div>
                 )}
@@ -614,24 +634,24 @@ function PartiesChildrenForm({
 
           {/* Children Information */}
           {familyFile.children && familyFile.children.length > 0 && (
-            <div className="p-4 rounded-lg bg-cg-primary/5 border border-cg-primary/20">
-              <h3 className="font-medium text-foreground mb-3 flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-cg-success" />
+            <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10 border-2 border-[var(--portal-primary)]/20">
+              <h3 className="font-bold text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                 Children ({familyFile.children.length})
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {familyFile.children.map((child) => (
-                  <div key={child.id} className="p-3 rounded-lg bg-card border flex items-center justify-between">
+                  <div key={child.id} className="p-4 rounded-xl bg-white border-2 border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
-                      <div className="font-medium text-foreground">
+                      <div className="font-bold text-foreground">
                         {child.first_name} {child.last_name}
                         {child.preferred_name && (
-                          <span className="text-muted-foreground ml-1">
+                          <span className="text-muted-foreground ml-1 font-medium">
                             ("{child.preferred_name}")
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-muted-foreground font-medium">
                         {calculateAge(child.date_of_birth)} years old
                         {child.gender && ` • ${child.gender}`}
                       </div>
@@ -642,17 +662,17 @@ function PartiesChildrenForm({
             </div>
           )}
 
-          <div className="p-4 rounded-lg bg-muted/50 border">
-            <p className="text-sm text-muted-foreground flex items-center gap-2">
-              <Info className="h-4 w-4" />
+          <div className="p-4 rounded-xl bg-slate-50 border-2 border-slate-200">
+            <p className="text-sm text-muted-foreground flex items-center gap-2 font-medium">
+              <Info className="h-4 w-4 text-[var(--portal-primary)]" />
               This information is pulled from your Family File. To update parent or child details, visit your Family File settings.
             </p>
           </div>
         </div>
       ) : (
-        <div className="p-4 rounded-lg bg-muted/50 border">
-          <p className="text-sm text-muted-foreground flex items-center gap-2">
-            <Info className="h-4 w-4" />
+        <div className="p-4 rounded-xl bg-slate-50 border-2 border-slate-200">
+          <p className="text-sm text-muted-foreground flex items-center gap-2 font-medium">
+            <Info className="h-4 w-4 text-[var(--portal-primary)]" />
             Loading family information...
           </p>
         </div>
@@ -660,13 +680,13 @@ function PartiesChildrenForm({
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="current_arrangements">Current Living Arrangements</Label>
+          <Label htmlFor="current_arrangements" className="font-bold">Current Living Arrangements</Label>
           <Textarea
             id="current_arrangements"
             placeholder="Describe the current custody situation..."
             value={data.current_arrangements || ''}
             onChange={(e) => onChange('current_arrangements', e.target.value)}
-            className="mt-1.5"
+            className="mt-2 border-2 border-slate-200 rounded-xl focus:border-[var(--portal-primary)] focus:ring-[var(--portal-primary)]"
           />
         </div>
       </div>
@@ -678,56 +698,56 @@ function ScopeDurationForm({ data, onChange }: { data: any; onChange: (field: st
   return (
     <div className="space-y-6">
       <div>
-        <Label htmlFor="effective_date">When should this agreement start?</Label>
+        <Label htmlFor="effective_date" className="font-bold">When should this agreement start?</Label>
         <Input
           id="effective_date"
           type="date"
           value={data.effective_date || ''}
           onChange={(e) => onChange('effective_date', e.target.value)}
-          className="mt-1.5 max-w-xs"
+          className="mt-2 max-w-xs border-2 border-slate-200 rounded-xl focus:border-[var(--portal-primary)] focus:ring-[var(--portal-primary)]"
         />
       </div>
 
       <div>
-        <Label>How long should this agreement last?</Label>
+        <Label className="font-bold">How long should this agreement last?</Label>
         <RadioGroup
           value={data.duration_type || 'indefinite'}
           onValueChange={(value) => onChange('duration_type', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="indefinite" id="indefinite" />
-            <Label htmlFor="indefinite" className="font-normal">Until modified by both parents</Label>
+            <Label htmlFor="indefinite" className="font-medium cursor-pointer">Until modified by both parents</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="until_child_18" id="until_child_18" />
-            <Label htmlFor="until_child_18" className="font-normal">Until child(ren) turn 18</Label>
+            <Label htmlFor="until_child_18" className="font-medium cursor-pointer">Until child(ren) turn 18</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="fixed_term" id="fixed_term" />
-            <Label htmlFor="fixed_term" className="font-normal">For a specific period</Label>
+            <Label htmlFor="fixed_term" className="font-medium cursor-pointer">For a specific period</Label>
           </div>
         </RadioGroup>
       </div>
 
       <div>
-        <Label>How often should you review this agreement?</Label>
+        <Label className="font-bold">How often should you review this agreement?</Label>
         <RadioGroup
           value={data.review_schedule || 'annual'}
           onValueChange={(value) => onChange('review_schedule', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="annual" id="annual" />
-            <Label htmlFor="annual" className="font-normal">Annually</Label>
+            <Label htmlFor="annual" className="font-medium cursor-pointer">Annually</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="every_6_months" id="every_6_months" />
-            <Label htmlFor="every_6_months" className="font-normal">Every 6 months</Label>
+            <Label htmlFor="every_6_months" className="font-medium cursor-pointer">Every 6 months</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="as_needed" id="as_needed" />
-            <Label htmlFor="as_needed" className="font-normal">As needed</Label>
+            <Label htmlFor="as_needed" className="font-medium cursor-pointer">As needed</Label>
           </div>
         </RadioGroup>
       </div>
@@ -739,61 +759,61 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
   return (
     <div className="space-y-6">
       <div>
-        <Label>Where will the child(ren) primarily live?</Label>
+        <Label className="font-bold">Where will the child(ren) primarily live?</Label>
         <RadioGroup
           value={data.primary_residence || ''}
           onValueChange={(value) => onChange('primary_residence', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="equal" id="equal" />
-            <Label htmlFor="equal" className="font-normal">Equal time with both parents (50/50)</Label>
+            <Label htmlFor="equal" className="font-medium cursor-pointer">Equal time with both parents (50/50)</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="parent_a" id="parent_a" />
-            <Label htmlFor="parent_a" className="font-normal">Primarily with me</Label>
+            <Label htmlFor="parent_a" className="font-medium cursor-pointer">Primarily with me</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="parent_b" id="parent_b" />
-            <Label htmlFor="parent_b" className="font-normal">Primarily with other parent</Label>
+            <Label htmlFor="parent_b" className="font-medium cursor-pointer">Primarily with other parent</Label>
           </div>
         </RadioGroup>
       </div>
 
       <div>
-        <Label>What schedule pattern works best?</Label>
+        <Label className="font-bold">What schedule pattern works best?</Label>
         <RadioGroup
           value={data.schedule_pattern || ''}
           onValueChange={(value) => onChange('schedule_pattern', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="week_on_week_off" id="week_on_week_off" />
-            <Label htmlFor="week_on_week_off" className="font-normal">Week-on, week-off</Label>
+            <Label htmlFor="week_on_week_off" className="font-medium cursor-pointer">Week-on, week-off</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="2-2-3" id="2-2-3" />
-            <Label htmlFor="2-2-3" className="font-normal">2-2-3 rotation</Label>
+            <Label htmlFor="2-2-3" className="font-medium cursor-pointer">2-2-3 rotation</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="every_other_weekend" id="every_other_weekend" />
-            <Label htmlFor="every_other_weekend" className="font-normal">Every other weekend + one weeknight</Label>
+            <Label htmlFor="every_other_weekend" className="font-medium cursor-pointer">Every other weekend + one weeknight</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="custom" id="custom" />
-            <Label htmlFor="custom" className="font-normal">Custom arrangement</Label>
+            <Label htmlFor="custom" className="font-medium cursor-pointer">Custom arrangement</Label>
           </div>
         </RadioGroup>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="transition_day">Transition day</Label>
+          <Label htmlFor="transition_day" className="font-bold">Transition day</Label>
           <select
             id="transition_day"
             value={data.transition_day || ''}
             onChange={(e) => onChange('transition_day', e.target.value)}
-            className="mt-1.5 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="mt-2 w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-2.5 text-sm font-medium focus:border-[var(--portal-primary)] focus:ring-[var(--portal-primary)] focus:outline-none transition-colors"
           >
             <option value="">Select day...</option>
             <option value="Sunday">Sunday</option>
@@ -806,13 +826,13 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
           </select>
         </div>
         <div>
-          <Label htmlFor="transition_time">Transition time</Label>
+          <Label htmlFor="transition_time" className="font-bold">Transition time</Label>
           <Input
             id="transition_time"
             type="time"
             value={data.transition_time || ''}
             onChange={(e) => onChange('transition_time', e.target.value)}
-            className="mt-1.5"
+            className="mt-2 border-2 border-slate-200 rounded-xl focus:border-[var(--portal-primary)] focus:ring-[var(--portal-primary)]"
           />
         </div>
       </div>
@@ -824,84 +844,84 @@ function LogisticsForm({ data, onChange }: { data: any; onChange: (field: string
   return (
     <div className="space-y-6">
       <div>
-        <Label>Where will exchanges happen?</Label>
+        <Label className="font-bold">Where will exchanges happen?</Label>
         <RadioGroup
           value={data.exchange_location || ''}
           onValueChange={(value) => onChange('exchange_location', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="school" id="school" />
-            <Label htmlFor="school" className="font-normal">At school (pickup/dropoff)</Label>
+            <Label htmlFor="school" className="font-medium cursor-pointer">At school (pickup/dropoff)</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="parent_a_home" id="parent_a_home" />
-            <Label htmlFor="parent_a_home" className="font-normal">At my home</Label>
+            <Label htmlFor="parent_a_home" className="font-medium cursor-pointer">At my home</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="parent_b_home" id="parent_b_home" />
-            <Label htmlFor="parent_b_home" className="font-normal">At other parent's home</Label>
+            <Label htmlFor="parent_b_home" className="font-medium cursor-pointer">At other parent's home</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="neutral_location" id="neutral_location" />
-            <Label htmlFor="neutral_location" className="font-normal">Neutral location</Label>
+            <Label htmlFor="neutral_location" className="font-medium cursor-pointer">Neutral location</Label>
           </div>
         </RadioGroup>
       </div>
 
       {data.exchange_location === 'neutral_location' && (
         <div>
-          <Label htmlFor="exchange_address">Exchange location address</Label>
+          <Label htmlFor="exchange_address" className="font-bold">Exchange location address</Label>
           <Input
             id="exchange_address"
             placeholder="Address of neutral location..."
             value={data.exchange_location_address || ''}
             onChange={(e) => onChange('exchange_location_address', e.target.value)}
-            className="mt-1.5"
+            className="mt-2 border-2 border-slate-200 rounded-xl focus:border-[var(--portal-primary)] focus:ring-[var(--portal-primary)]"
           />
         </div>
       )}
 
       <div>
-        <Label>Who handles transportation?</Label>
+        <Label className="font-bold">Who handles transportation?</Label>
         <RadioGroup
           value={data.transportation_responsibility || ''}
           onValueChange={(value) => onChange('transportation_responsibility', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="picking_up_parent" id="picking_up_parent" />
-            <Label htmlFor="picking_up_parent" className="font-normal">Parent picking up handles transportation</Label>
+            <Label htmlFor="picking_up_parent" className="font-medium cursor-pointer">Parent picking up handles transportation</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="dropping_off_parent" id="dropping_off_parent" />
-            <Label htmlFor="dropping_off_parent" className="font-normal">Parent dropping off handles transportation</Label>
+            <Label htmlFor="dropping_off_parent" className="font-medium cursor-pointer">Parent dropping off handles transportation</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="shared" id="shared" />
-            <Label htmlFor="shared" className="font-normal">Meet in the middle</Label>
+            <Label htmlFor="shared" className="font-medium cursor-pointer">Meet in the middle</Label>
           </div>
         </RadioGroup>
       </div>
 
       <div>
-        <Label>Preferred communication method</Label>
+        <Label className="font-bold">Preferred communication method</Label>
         <RadioGroup
           value={data.transition_communication || 'commonground'}
           onValueChange={(value) => onChange('transition_communication', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="commonground" id="commonground" />
-            <Label htmlFor="commonground" className="font-normal">CommonGround app</Label>
+            <Label htmlFor="commonground" className="font-medium cursor-pointer">CommonGround app</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="text" id="text" />
-            <Label htmlFor="text" className="font-normal">Text messages</Label>
+            <Label htmlFor="text" className="font-medium cursor-pointer">Text messages</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="email" id="email" />
-            <Label htmlFor="email" className="font-normal">Email</Label>
+            <Label htmlFor="email" className="font-medium cursor-pointer">Email</Label>
           </div>
         </RadioGroup>
       </div>
@@ -913,49 +933,49 @@ function DecisionMakingForm({ data, onChange }: { data: any; onChange: (field: s
   return (
     <div className="space-y-6">
       <div>
-        <Label>How will major decisions be made?</Label>
+        <Label className="font-bold">How will major decisions be made?</Label>
         <RadioGroup
           value={data.major_decision_authority || 'joint'}
           onValueChange={(value) => onChange('major_decision_authority', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="joint" id="joint" />
-            <Label htmlFor="joint" className="font-normal">Together (both parents must agree)</Label>
+            <Label htmlFor="joint" className="font-medium cursor-pointer">Together (both parents must agree)</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="parent_a" id="decision_parent_a" />
-            <Label htmlFor="decision_parent_a" className="font-normal">I make final decisions</Label>
+            <Label htmlFor="decision_parent_a" className="font-medium cursor-pointer">I make final decisions</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="parent_b" id="decision_parent_b" />
-            <Label htmlFor="decision_parent_b" className="font-normal">Other parent makes final decisions</Label>
+            <Label htmlFor="decision_parent_b" className="font-medium cursor-pointer">Other parent makes final decisions</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="divided" id="divided" />
-            <Label htmlFor="divided" className="font-normal">Divided by category (specify below)</Label>
+            <Label htmlFor="divided" className="font-medium cursor-pointer">Divided by category (specify below)</Label>
           </div>
         </RadioGroup>
       </div>
 
       <div>
-        <Label>How quickly should you respond to messages?</Label>
+        <Label className="font-bold">How quickly should you respond to messages?</Label>
         <RadioGroup
           value={data.response_timeframe || '24_hours'}
           onValueChange={(value) => onChange('response_timeframe', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="same_day_urgent" id="same_day" />
-            <Label htmlFor="same_day" className="font-normal">Same day for urgent, 24 hours for routine</Label>
+            <Label htmlFor="same_day" className="font-medium cursor-pointer">Same day for urgent, 24 hours for routine</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="24_hours" id="24_hours" />
-            <Label htmlFor="24_hours" className="font-normal">Within 24 hours</Label>
+            <Label htmlFor="24_hours" className="font-medium cursor-pointer">Within 24 hours</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="48_hours" id="48_hours" />
-            <Label htmlFor="48_hours" className="font-normal">Within 48 hours</Label>
+            <Label htmlFor="48_hours" className="font-medium cursor-pointer">Within 48 hours</Label>
           </div>
         </RadioGroup>
       </div>
@@ -966,49 +986,49 @@ function DecisionMakingForm({ data, onChange }: { data: any; onChange: (field: s
 function ExpensesForm({ data, onChange }: { data: any; onChange: (field: string, value: any) => void }) {
   return (
     <div className="space-y-6">
-      <div className="p-4 rounded-lg bg-muted/50 border">
-        <p className="text-sm text-muted-foreground flex items-center gap-2">
-          <Info className="h-4 w-4" />
+      <div className="p-4 rounded-xl bg-slate-50 border-2 border-slate-200">
+        <p className="text-sm text-muted-foreground flex items-center gap-2 font-medium">
+          <Info className="h-4 w-4 text-[var(--portal-primary)]" />
           This section covers shared expenses beyond any court-ordered child support. Use CommonGround's ClearFund to track and split expenses.
         </p>
       </div>
 
       <div>
-        <Label>How will you split shared expenses?</Label>
+        <Label className="font-bold">How will you split shared expenses?</Label>
         <RadioGroup
           value={data.split_ratio || '50/50'}
           onValueChange={(value) => onChange('split_ratio', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="50/50" id="50_50" />
-            <Label htmlFor="50_50" className="font-normal">50/50 split</Label>
+            <Label htmlFor="50_50" className="font-medium cursor-pointer">50/50 split</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="60/40" id="60_40" />
-            <Label htmlFor="60_40" className="font-normal">60/40 split</Label>
+            <Label htmlFor="60_40" className="font-medium cursor-pointer">60/40 split</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="income_based" id="income_based" />
-            <Label htmlFor="income_based" className="font-normal">Based on income proportions</Label>
+            <Label htmlFor="income_based" className="font-medium cursor-pointer">Based on income proportions</Label>
           </div>
         </RadioGroup>
       </div>
 
       <div>
-        <Label>How quickly should reimbursements happen?</Label>
+        <Label className="font-bold">How quickly should reimbursements happen?</Label>
         <RadioGroup
           value={data.reimbursement_window || '30_days'}
           onValueChange={(value) => onChange('reimbursement_window', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="14_days" id="14_days" />
-            <Label htmlFor="14_days" className="font-normal">Within 14 days</Label>
+            <Label htmlFor="14_days" className="font-medium cursor-pointer">Within 14 days</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="30_days" id="30_days" />
-            <Label htmlFor="30_days" className="font-normal">Within 30 days</Label>
+            <Label htmlFor="30_days" className="font-medium cursor-pointer">Within 30 days</Label>
           </div>
         </RadioGroup>
       </div>
@@ -1019,63 +1039,63 @@ function ExpensesForm({ data, onChange }: { data: any; onChange: (field: string,
 function AcknowledgmentForm({ data, onChange }: { data: any; onChange: (field: string, value: any) => void }) {
   return (
     <div className="space-y-6">
-      <div className="p-4 rounded-lg border bg-cg-primary/5">
-        <h3 className="font-medium text-foreground mb-2">Review Your Agreement</h3>
-        <p className="text-sm text-muted-foreground">
+      <div className="p-5 rounded-xl border-2 border-[var(--portal-primary)]/20 bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10">
+        <h3 className="font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Review Your Agreement</h3>
+        <p className="text-sm text-muted-foreground font-medium">
           Please review all sections. Once both parents acknowledge, this agreement becomes active.
         </p>
       </div>
 
       <div>
-        <Label>How will you resolve disagreements?</Label>
-        <div className="mt-2 space-y-2">
-          <div className="p-3 rounded border bg-muted/30">
-            <div className="font-medium text-sm">Step 1: Direct Discussion</div>
-            <div className="text-xs text-muted-foreground">Try to work it out through CommonGround messaging</div>
+        <Label className="font-bold">How will you resolve disagreements?</Label>
+        <div className="mt-3 space-y-3">
+          <div className="p-4 rounded-xl border-2 border-slate-200 bg-white shadow-sm">
+            <div className="font-bold text-sm text-foreground">Step 1: Direct Discussion</div>
+            <div className="text-sm text-muted-foreground font-medium mt-1">Try to work it out through CommonGround messaging</div>
           </div>
-          <div className="p-3 rounded border bg-muted/30">
-            <div className="font-medium text-sm">Step 2: Mediation</div>
-            <div className="text-xs text-muted-foreground">Use a neutral third party if needed</div>
+          <div className="p-4 rounded-xl border-2 border-slate-200 bg-white shadow-sm">
+            <div className="font-bold text-sm text-foreground">Step 2: Mediation</div>
+            <div className="text-sm text-muted-foreground font-medium mt-1">Use a neutral third party if needed</div>
           </div>
-          <div className="p-3 rounded border bg-muted/30">
-            <div className="font-medium text-sm">Step 3: Legal Action</div>
-            <div className="text-xs text-muted-foreground">Court as last resort</div>
+          <div className="p-4 rounded-xl border-2 border-slate-200 bg-white shadow-sm">
+            <div className="font-bold text-sm text-foreground">Step 3: Legal Action</div>
+            <div className="text-sm text-muted-foreground font-medium mt-1">Court as last resort</div>
           </div>
         </div>
       </div>
 
       <div>
-        <Label htmlFor="escalation_timeframe">How long to try each step before escalating?</Label>
+        <Label htmlFor="escalation_timeframe" className="font-bold">How long to try each step before escalating?</Label>
         <RadioGroup
           value={data.escalation_timeframe || '14_days'}
           onValueChange={(value) => onChange('escalation_timeframe', value)}
-          className="mt-2 space-y-2"
+          className="mt-3 space-y-3"
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="7_days" id="7_days" />
-            <Label htmlFor="7_days" className="font-normal">7 days</Label>
+            <Label htmlFor="7_days" className="font-medium cursor-pointer">7 days</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="14_days" id="escalation_14_days" />
-            <Label htmlFor="escalation_14_days" className="font-normal">14 days</Label>
+            <Label htmlFor="escalation_14_days" className="font-medium cursor-pointer">14 days</Label>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-3 p-3 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-colors">
             <RadioGroupItem value="30_days" id="escalation_30_days" />
-            <Label htmlFor="escalation_30_days" className="font-normal">30 days</Label>
+            <Label htmlFor="escalation_30_days" className="font-medium cursor-pointer">30 days</Label>
           </div>
         </RadioGroup>
       </div>
 
-      <div className="border-t pt-6">
-        <div className="flex items-start gap-3">
+      <div className="border-t-2 border-slate-200 pt-6">
+        <div className="flex items-start gap-4 p-4 rounded-xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
           <input
             type="checkbox"
             id="acknowledgment"
             checked={data.parent_a_acknowledgment || false}
             onChange={(e) => onChange('parent_a_acknowledgment', e.target.checked)}
-            className="mt-1 h-4 w-4 rounded border-gray-300"
+            className="mt-1 h-5 w-5 rounded-lg border-2 border-slate-300 text-[var(--portal-primary)] focus:ring-[var(--portal-primary)]"
           />
-          <Label htmlFor="acknowledgment" className="font-normal text-sm">
+          <Label htmlFor="acknowledgment" className="font-medium text-sm cursor-pointer">
             I have reviewed this SharedCare Agreement and acknowledge its contents.
             I understand this is a starting point that both parents must accept,
             and that it can be modified by mutual written consent.
