@@ -239,9 +239,9 @@ class DailyVideoService:
             token_config["properties"]["start_audio_off"] = True
 
         # Enable transcription permission for ARIA Sentiment Shield
+        # Note: enable_transcription is NOT a valid token property - it's set at room level
+        # Only canAdmin permission is needed on the token to allow starting transcription
         if enable_transcription:
-            token_config["properties"]["enable_transcription"] = True
-            # Grant transcription admin permission to start/stop transcription
             token_config["properties"]["canAdmin"] = ["transcription"]
 
         try:
