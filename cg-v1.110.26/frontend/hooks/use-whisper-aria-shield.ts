@@ -153,32 +153,58 @@ export function useWhisperARIAShield({
     }
 
     try {
-      // Get local audio track from Daily.co
+      // Get participants from Daily.co
       const participants = call.participants();
       const local = participants.local;
-
-      if (!local?.tracks?.audio?.track) {
-        console.warn('[Whisper ARIA] No local audio track available');
-        return;
-      }
 
       // Create AudioContext to mix tracks
       audioContextRef.current = new AudioContext();
       destinationRef.current = audioContextRef.current.createMediaStreamDestination();
 
-      // Add local audio
-      const localStream = new MediaStream([local.tracks.audio.track]);
-      const localSource = audioContextRef.current.createMediaStreamSource(localStream);
-      localSource.connect(destinationRef.current);
+      let hasAnyAudio = false;
 
-      // Optionally add remote audio for full conversation capture
+      // Try to add local audio (use persistentTrack for reliability)
+      const localAudioTrack = local?.tracks?.audio?.persistentTrack || local?.tracks?.audio?.track;
+      if (localAudioTrack) {
+        try {
+          const localStream = new MediaStream([localAudioTrack]);
+          const localSource = audioContextRef.current.createMediaStreamSource(localStream);
+          localSource.connect(destinationRef.current);
+          hasAnyAudio = true;
+          console.log('[Whisper ARIA] Local audio track added');
+        } catch (e) {
+          console.warn('[Whisper ARIA] Failed to add local audio:', e);
+        }
+      } else {
+        console.warn('[Whisper ARIA] No local audio track available (no mic or permission denied)');
+      }
+
+      // Add remote audio for full conversation capture
       Object.values(participants).forEach((participant: any) => {
-        if (!participant.local && participant.tracks?.audio?.track) {
-          const remoteStream = new MediaStream([participant.tracks.audio.track]);
-          const remoteSource = audioContextRef.current!.createMediaStreamSource(remoteStream);
-          remoteSource.connect(destinationRef.current!);
+        if (participant.local) return;
+
+        const remoteAudioTrack = participant.tracks?.audio?.persistentTrack || participant.tracks?.audio?.track;
+        if (remoteAudioTrack) {
+          try {
+            const remoteStream = new MediaStream([remoteAudioTrack]);
+            const remoteSource = audioContextRef.current!.createMediaStreamSource(remoteStream);
+            remoteSource.connect(destinationRef.current!);
+            hasAnyAudio = true;
+            console.log('[Whisper ARIA] Remote audio track added:', participant.user_name);
+          } catch (e) {
+            console.warn('[Whisper ARIA] Failed to add remote audio:', e);
+          }
         }
       });
+
+      // If no audio tracks available at all, clean up and return
+      if (!hasAnyAudio) {
+        console.warn('[Whisper ARIA] No audio tracks available - will retry when tracks become available');
+        audioContextRef.current?.close();
+        audioContextRef.current = null;
+        destinationRef.current = null;
+        return;
+      }
 
       // Create MediaRecorder
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
@@ -258,6 +284,18 @@ export function useWhisperARIAShield({
     console.log('[Whisper ARIA] Recording stopped');
   }, []);
 
+  // Retry recording when tracks become available
+  const retryRecordingIfNeeded = useCallback(() => {
+    // Only retry if monitoring is active but not recording
+    if (!isMonitoring || isRecording) return;
+
+    const call = callRef.current;
+    if (!call) return;
+
+    console.log('[Whisper ARIA] Retrying recording - checking for available tracks...');
+    startRecording();
+  }, [isMonitoring, isRecording, callRef, startRecording]);
+
   // Start ARIA monitoring
   const startMonitoring = useCallback(async () => {
     if (sensitivityLevel === 'off') {
@@ -283,6 +321,34 @@ export function useWhisperARIAShield({
 
     console.log('[Whisper ARIA] Monitoring started');
   }, [sensitivityLevel, isMonitoring, startRecording]);
+
+  // Listen for Daily.co track events to retry recording when tracks become available
+  useEffect(() => {
+    const call = callRef.current;
+    if (!call || !isMonitoring) return;
+
+    const handleTrackStarted = () => {
+      // When a track starts, retry recording if we're not already recording
+      setTimeout(() => {
+        retryRecordingIfNeeded();
+      }, 500);
+    };
+
+    const handleParticipantJoined = () => {
+      // When a participant joins, wait for their tracks and retry
+      setTimeout(() => {
+        retryRecordingIfNeeded();
+      }, 1000);
+    };
+
+    call.on('track-started', handleTrackStarted);
+    call.on('participant-joined', handleParticipantJoined);
+
+    return () => {
+      call.off('track-started', handleTrackStarted);
+      call.off('participant-joined', handleParticipantJoined);
+    };
+  }, [callRef, isMonitoring, retryRecordingIfNeeded]);
 
   // Stop ARIA monitoring
   const stopMonitoring = useCallback(() => {
