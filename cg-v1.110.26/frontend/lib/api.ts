@@ -805,6 +805,34 @@ export const messagesAPI = {
       }
     );
   },
+
+  /**
+   * Upload an attachment to a message
+   */
+  async uploadAttachment(messageId: string, file: File): Promise<MessageAttachment> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = localStorage.getItem('access_token');
+    const response = await fetch(
+      `${API_URL}/messages/${messageId}/attachments`,
+      {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(error.detail || 'Failed to upload attachment');
+    }
+
+    const result = await response.json();
+    return result.attachment;
+  },
 };
 
 // ============================================================================

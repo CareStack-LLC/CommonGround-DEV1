@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { messagesAPI, ARIAAnalysisResponse } from '@/lib/api';
+import { messagesAPI, ARIAAnalysisResponse, MessageAttachment } from '@/lib/api';
 import { ARIAIntervention } from './aria-intervention';
 import {
   Send,
@@ -119,20 +119,7 @@ export function MessageCompose({
         prev.map(a => a.id === attachment.id ? { ...a, uploading: true } : a)
       );
 
-      const formData = new FormData();
-      formData.append('file', attachment.file);
-
-      const response = await fetch(`/api/v1/messages/${messageId}/attachments`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload attachment');
-      }
+      await messagesAPI.uploadAttachment(messageId, attachment.file);
 
       setAttachments(prev =>
         prev.map(a => a.id === attachment.id ? { ...a, uploading: false, uploaded: true } : a)
