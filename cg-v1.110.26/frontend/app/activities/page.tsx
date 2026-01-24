@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useNotification } from '@/contexts/notification-context';
+import { useRealtimeActivities } from '@/hooks/use-realtime-activities';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { formatDistanceToNow, isToday, isYesterday, format } from 'date-fns';
@@ -163,6 +164,26 @@ function ActivitiesContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [familyFileId, setFamilyFileId] = useState<string | null>(null);
   const [isMarkingRead, setIsMarkingRead] = useState(false);
+
+  // Handle new activity from Supabase Realtime
+  const handleNewActivity = useCallback((activity: RecentActivity) => {
+    // Add new activity at the beginning of the list (most recent first)
+    setActivities((prev) => {
+      // Check if activity already exists
+      if (prev.some((a) => a.id === activity.id)) {
+        return prev;
+      }
+      return [activity, ...prev];
+    });
+    // Increment unread count
+    setUnreadCount((prev) => prev + 1);
+  }, []);
+
+  // Subscribe to realtime activity updates
+  useRealtimeActivities({
+    familyFileId,
+    onNewActivity: handleNewActivity,
+  });
 
   useEffect(() => {
     loadActivities();

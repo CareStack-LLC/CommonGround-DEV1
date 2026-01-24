@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { kidcomsAPI, KidComsSession, KidComsMessage } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { useRealtimeKidcoms } from '@/hooks/use-realtime-kidcoms';
 import { TheaterMode } from '@/components/kidcoms/theater-mode';
 import { ArcadeMode } from '@/components/kidcoms/arcade-mode';
 
@@ -69,27 +70,27 @@ function SessionContent() {
   // Arcade mode
   const [isArcadeMode, setIsArcadeMode] = useState(false);
 
+  // Handle new message from Supabase Realtime
+  const handleNewMessage = useCallback((message: KidComsMessage) => {
+    setMessages((prev) => {
+      // Check if message already exists
+      if (prev.some((m) => m.id === message.id)) {
+        return prev;
+      }
+      return [...prev, message];
+    });
+  }, []);
+
+  // Subscribe to realtime messages (replaces 3-second polling)
+  useRealtimeKidcoms({
+    sessionId: session?.id || null,
+    onNewMessage: handleNewMessage,
+  });
+
   // Load session data
   useEffect(() => {
     loadSession();
   }, [sessionId]);
-
-  // Poll for new messages every 3 seconds
-  useEffect(() => {
-    if (!session) return;
-
-    const pollData = async () => {
-      try {
-        const messagesData = await kidcomsAPI.getMessages(sessionId);
-        setMessages(messagesData.items);
-      } catch (err) {
-        console.error('Error polling messages:', err);
-      }
-    };
-
-    const interval = setInterval(pollData, 3000);
-    return () => clearInterval(interval);
-  }, [sessionId, session?.id]);
 
   // Initialize Daily.co call when token and roomUrl are available
   useEffect(() => {
