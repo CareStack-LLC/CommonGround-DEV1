@@ -159,19 +159,19 @@ function AgreementCard({
     <button
       onClick={onClick}
       className="
-        w-full text-left bg-white border border-slate-200 rounded-2xl p-5
-        hover:shadow-lg hover:border-slate-300 transition-all duration-200
+        w-full text-left bg-white border-2 border-slate-200 rounded-2xl p-5 shadow-lg
+        hover:shadow-xl hover:border-[var(--portal-primary)]/30 transition-all duration-300
         group
       "
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 shadow-md">
             <FileSignature className="h-5 w-5 text-[var(--portal-primary)]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-slate-900 truncate group-hover:text-[var(--portal-primary)] transition-colors">
+            <h3 className="font-bold text-slate-900 truncate group-hover:text-[var(--portal-primary)] transition-colors" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
               {agreement.title}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5 font-medium">
@@ -183,7 +183,7 @@ function AgreementCard({
       </div>
 
       {/* Details */}
-      <div className="pl-[52px]">
+      <div className="pl-[56px]">
         <p className="text-sm text-slate-600 font-medium">
           Created {new Date(agreement.created_at).toLocaleDateString('en-US', {
             month: 'short',
@@ -194,8 +194,8 @@ function AgreementCard({
 
         {/* Pending Approval Status */}
         {agreement.status === 'pending_approval' && (
-          <div className="mt-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
-            <p className="text-xs font-semibold text-amber-800 mb-2">Awaiting Approvals</p>
+          <div className="mt-3 p-3 bg-amber-50 rounded-xl border-2 border-amber-200">
+            <p className="text-xs font-bold text-amber-800 mb-2">Awaiting Approvals</p>
             <div className="flex gap-4 text-xs text-amber-700">
               <span className="flex items-center gap-1.5 font-medium">
                 {agreement.petitioner_approved ? (
@@ -220,9 +220,9 @@ function AgreementCard({
         {/* Active/Approved Status */}
         {(agreement.status === 'approved' || agreement.status === 'active') &&
           agreement.effective_date && (
-            <div className="mt-3 p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+            <div className="mt-3 p-3 bg-emerald-50 rounded-xl border-2 border-emerald-200">
               <p className="text-xs text-emerald-700">
-                <span className="font-semibold">Effective:</span>{' '}
+                <span className="font-bold">Effective:</span>{' '}
                 {new Date(agreement.effective_date).toLocaleDateString('en-US', {
                   month: 'long',
                   day: 'numeric',
@@ -234,9 +234,9 @@ function AgreementCard({
       </div>
 
       {/* Footer */}
-      <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
+      <div className="mt-4 pt-3 border-t-2 border-slate-100 flex items-center justify-between">
         <span className="text-xs text-slate-500 font-medium">Click to view details</span>
-        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all" />
+        <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
       </div>
     </button>
   );
@@ -251,13 +251,13 @@ function EmptyAgreementsState({
 }) {
   return (
     <div className="text-center py-16 px-6">
-      <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-sm">
-        <FileSignature className="h-12 w-12 text-[var(--portal-primary)]" />
+      <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+        <FileSignature className="h-10 w-10 text-[var(--portal-primary)]" />
       </div>
-      <h3 className="text-xl font-bold text-slate-900 mb-2">
+      <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
         No Agreements Yet
       </h3>
-      <p className="text-slate-600 mb-8 max-w-sm mx-auto leading-relaxed">
+      <p className="text-slate-600 font-medium mb-8 max-w-sm mx-auto leading-relaxed">
         Create your first SharedCare Agreement to establish clear guidelines for your co-parenting arrangement.
       </p>
       {canCreate && (
@@ -265,9 +265,9 @@ function EmptyAgreementsState({
           onClick={onCreate}
           className="
             inline-flex items-center gap-2 px-6 py-3
-            bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white
-            rounded-xl font-medium shadow-md hover:shadow-lg
-            transition-all duration-200 hover:-translate-y-0.5
+            bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white
+            rounded-xl font-bold shadow-md hover:shadow-lg
+            transition-all duration-300
           "
         >
           <Plus className="h-4 w-4" />
@@ -295,13 +295,13 @@ function BuilderChoiceModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300 border-2 border-slate-200">
         {/* Header */}
-        <div className="p-6 border-b border-slate-200">
-          <h2 className="text-2xl font-bold text-slate-900">
+        <div className="p-6 border-b-2 border-slate-100">
+          <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
             Create Your Agreement
           </h2>
-          <p className="text-slate-600 mt-1">
+          <p className="text-slate-600 font-medium mt-1">
             Choose how you'd like to build your parenting agreement
           </p>
         </div>
@@ -313,36 +313,36 @@ function BuilderChoiceModal({
             onClick={onSelectAria}
             disabled={isCreating}
             className="
-              w-full text-left p-5 border-2 border-amber-200 rounded-xl
+              w-full text-left p-5 border-2 border-amber-200 rounded-2xl
               hover:border-amber-400 hover:bg-amber-50
-              transition-all disabled:opacity-50 disabled:cursor-not-allowed
-              group shadow-sm hover:shadow-md
+              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
+              group shadow-lg hover:shadow-xl
             "
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white flex-shrink-0 shadow-md aria-glow">
-                <Sparkles className="h-6 w-6" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
+                <Sparkles className="h-7 w-7" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-bold text-slate-900 group-hover:text-amber-700 transition-colors">
+                  <h3 className="font-bold text-slate-900 group-hover:text-amber-700 transition-colors" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                     Talk to ARIA
                   </h3>
-                  <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full">
+                  <span className="px-2.5 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full shadow-sm">
                     Recommended
                   </span>
                 </div>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">
                   Have a natural conversation about your custody arrangement. ARIA will ask questions and create your agreement.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                  <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
                     Conversational
                   </span>
-                  <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                  <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
                     Faster
                   </span>
-                  <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                  <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
                     AI-Powered
                   </span>
                 </div>
@@ -355,31 +355,31 @@ function BuilderChoiceModal({
             onClick={onSelectWizard}
             disabled={isCreating}
             className="
-              w-full text-left p-5 border-2 border-[var(--portal-primary)]/30 rounded-xl
-              hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5
-              transition-all disabled:opacity-50 disabled:cursor-not-allowed
-              group shadow-sm hover:shadow-md
+              w-full text-left p-5 border-2 border-slate-200 rounded-2xl
+              hover:border-[var(--portal-primary)]/50 hover:bg-[var(--portal-primary)]/5
+              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
+              group shadow-lg hover:shadow-xl
             "
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center text-white flex-shrink-0 shadow-md">
-                <FileText className="h-6 w-6" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
+                <FileText className="h-7 w-7" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-slate-900 group-hover:text-[var(--portal-primary)] transition-colors mb-1">
+                <h3 className="font-bold text-slate-900 group-hover:text-[var(--portal-primary)] transition-colors mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   Step-by-Step Wizard
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">
                   Fill out structured forms with clear sections for custody schedules, holidays, and more.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <span className="px-2 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-medium rounded-full">
+                  <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
                     Structured
                   </span>
-                  <span className="px-2 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-medium rounded-full">
+                  <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
                     Traditional
                   </span>
-                  <span className="px-2 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-medium rounded-full">
+                  <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
                     Detailed
                   </span>
                 </div>
@@ -389,14 +389,14 @@ function BuilderChoiceModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-slate-200 bg-slate-50 rounded-b-2xl">
+        <div className="p-6 border-t-2 border-slate-100 bg-gradient-to-b from-slate-50 to-white rounded-b-2xl">
           <button
             onClick={onClose}
             disabled={isCreating}
             className="
-              w-full px-4 py-2.5 bg-white border border-slate-300
-              text-slate-700 rounded-xl font-medium
-              hover:bg-slate-50 transition-colors
+              w-full px-4 py-3 bg-white border-2 border-slate-200
+              text-slate-700 rounded-xl font-bold
+              hover:bg-slate-50 hover:border-slate-300 transition-all duration-300
               disabled:opacity-50 disabled:cursor-not-allowed
             "
           >
@@ -510,28 +510,28 @@ function AgreementsListContent() {
   const canCreateAgreement = selectedFamilyFile && !selectedFamilyFile.has_court_case;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100/50 pb-20 lg:pb-0">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
       <Navigation />
 
       {/* Page Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm">
+      <header className="border-b-2 border-slate-200 bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => router.push('/dashboard')}
-              className="p-2 -ml-2 rounded-xl hover:bg-slate-100 transition-colors"
+              className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
               aria-label="Go back"
             >
-              <ChevronLeft className="h-5 w-5 text-slate-600" />
+              <ChevronLeft className="h-5 w-5 text-muted-foreground" />
             </button>
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center shadow-md">
-              <FileSignature className="h-6 w-6 text-white" />
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
+              <FileSignature className="h-6 w-6 text-[var(--portal-primary)]" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">
+              <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 Agreements
               </h1>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 font-medium">
                 Living documents that guide your co-parenting
               </p>
             </div>
@@ -543,25 +543,25 @@ function AgreementsListContent() {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar - Family File Selection */}
           <div className="w-full lg:w-80 lg:flex-shrink-0">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sticky top-8">
-              <h2 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-5 sticky top-8">
+              <h2 className="font-bold text-slate-900 mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                 <FolderOpen className="h-4 w-4 text-[var(--portal-primary)]" />
                 Family Files
               </h2>
 
               {isLoadingFamilyFiles ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-[var(--portal-primary)]" />
+                  <div className="w-10 h-10 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
                 </div>
               ) : familyFiles.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-sm text-slate-600 mb-4">No family files</p>
+                  <p className="text-sm text-slate-600 font-medium mb-4">No family files</p>
                   <Link href="/family-files/new">
                     <button className="
                       inline-flex items-center gap-2 px-4 py-2 text-sm
-                      bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white
-                      rounded-xl font-medium shadow-md hover:shadow-lg
-                      transition-all duration-200 hover:-translate-y-0.5
+                      bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white
+                      rounded-xl font-bold shadow-md hover:shadow-lg
+                      transition-all duration-300
                     ">
                       <Plus className="h-4 w-4" />
                       Create Family File
@@ -586,15 +586,15 @@ function AgreementsListContent() {
           {/* Main Area - Agreements */}
           <div className="flex-1 min-w-0">
             {!selectedFamilyFile ? (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+              <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg">
                 <div className="text-center py-16 px-6">
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-slate-100 flex items-center justify-center">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center shadow-md">
                     <FileText className="h-10 w-10 text-slate-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                     Select a Family File
                   </h3>
-                  <p className="text-slate-600">
+                  <p className="text-slate-600 font-medium">
                     Choose a family file from the sidebar to view and manage agreements
                   </p>
                 </div>
@@ -603,14 +603,14 @@ function AgreementsListContent() {
               <div className="space-y-6">
                 {/* Court Case Notice */}
                 {selectedFamilyFile.has_court_case && (
-                  <div className="bg-white rounded-2xl border border-amber-200 shadow-sm p-5 bg-gradient-to-r from-amber-50 to-transparent">
+                  <div className="bg-white rounded-2xl border-2 border-amber-200 shadow-lg p-5 bg-gradient-to-r from-amber-50 to-transparent">
                     <div className="flex items-start gap-4">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-md">
                         <Scale className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-900">Court Custody Case Active</h3>
-                        <p className="text-sm text-slate-600 mt-1 leading-relaxed">
+                        <h3 className="font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Court Custody Case Active</h3>
+                        <p className="text-sm text-slate-600 font-medium mt-1 leading-relaxed">
                           This family file has an active Court Custody Case. New SharedCare Agreements cannot be created. Use QuickAccords for situational agreements.
                         </p>
                       </div>
@@ -619,13 +619,13 @@ function AgreementsListContent() {
                 )}
 
                 {/* Family File Header */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-5">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
-                      <h2 className="text-xl font-bold text-slate-900">
+                      <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                         {selectedFamilyFile.title}
                       </h2>
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-slate-600 font-medium">
                         SharedCare Agreements
                       </p>
                     </div>
@@ -633,11 +633,11 @@ function AgreementsListContent() {
                       onClick={() => setShowBuilderChoice(true)}
                       disabled={isCreatingAgreement || !canCreateAgreement}
                       className={`
-                        inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium
-                        transition-all duration-200
+                        inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold
+                        transition-all duration-300
                         ${!canCreateAgreement || isCreatingAgreement
                           ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                          : 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md hover:shadow-lg hover:-translate-y-0.5'
+                          : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md hover:shadow-lg'
                         }
                       `}
                     >
@@ -665,7 +665,7 @@ function AgreementsListContent() {
                 {isLoadingAgreements && (
                   <div className="flex items-center justify-center py-16">
                     <div className="text-center">
-                      <Loader2 className="h-10 w-10 animate-spin text-[var(--portal-primary)] mx-auto" />
+                      <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
                       <p className="mt-4 text-slate-600 font-medium">Loading agreements...</p>
                     </div>
                   </div>
@@ -673,15 +673,17 @@ function AgreementsListContent() {
 
                 {/* Error State */}
                 {error && (
-                  <div className="bg-white rounded-2xl border border-red-200 shadow-sm p-5 bg-gradient-to-r from-red-50 to-transparent">
+                  <div className="bg-white rounded-2xl border-2 border-red-200 shadow-lg p-5 bg-gradient-to-r from-red-50 to-transparent">
                     <div className="flex items-start gap-3">
-                      <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div className="p-2 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-xl shadow-md">
+                        <AlertCircle className="h-5 w-5 text-red-600" />
+                      </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-red-900">Failed to load agreements</p>
-                        <p className="text-sm text-red-700 mt-1">{error}</p>
+                        <p className="font-bold text-red-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Failed to load agreements</p>
+                        <p className="text-sm text-red-700 font-medium mt-1">{error}</p>
                         <button
                           onClick={() => loadAgreements(selectedFamilyFile.id)}
-                          className="mt-3 px-4 py-2 bg-white border border-red-300 text-red-700 rounded-xl text-sm font-medium hover:bg-red-50 transition-colors"
+                          className="mt-3 px-4 py-2 bg-white border-2 border-red-300 text-red-700 rounded-xl text-sm font-bold hover:bg-red-50 transition-all duration-300"
                         >
                           Try Again
                         </button>
@@ -694,7 +696,7 @@ function AgreementsListContent() {
                 {!isLoadingAgreements &&
                   !error &&
                   (!selectedFamilyFile.agreements || selectedFamilyFile.agreements.length === 0) && (
-                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+                    <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg">
                       <EmptyAgreementsState
                         canCreate={canCreateAgreement || false}
                         onCreate={() => setShowBuilderChoice(true)}
