@@ -61,17 +61,27 @@ class ParentCallService:
             # This handles cases where the DB record exists but Daily.co room
             # was never created or expired
             try:
-                await self.daily_service.create_room_if_not_exists(
+                daily_room = await self.daily_service.create_room_if_not_exists(
                     room_name=room.daily_room_name,
                     privacy="private",
                     exp_minutes=525600,  # 1 year
                     max_participants=4,
                     enable_recording=True,
                 )
+                # Update URL in case it was a mock URL before
+                if daily_room and daily_room.get("url"):
+                    room.daily_room_url = daily_room["url"]
+                    await db.commit()
+                    await db.refresh(room)
                 logger.info(f"Verified Daily.co room exists: {room.daily_room_name}")
+                return room
+            except ValueError as e:
+                # ValueError means API key not configured - must fail
+                logger.error(f"Cannot verify Daily.co room: {e}")
+                raise
             except Exception as e:
-                logger.warning(f"Could not verify Daily.co room: {e}")
-            return room
+                logger.error(f"Could not verify Daily.co room: {e}")
+                raise ValueError(f"Failed to verify video room: {str(e)}")
 
         # Get family file to construct room name
         ff_result = await db.execute(

@@ -122,9 +122,13 @@ class DailyVideoService:
 
         Returns:
             Room data or None if not found
+
+        Raises:
+            ValueError: If DAILY_API_KEY is not configured
         """
         if not self.api_key:
-            return None
+            logger.error("DAILY_API_KEY not configured - cannot get room")
+            raise ValueError("Video calling is not available. Please configure DAILY_API_KEY.")
 
         try:
             async with httpx.AsyncClient() as client:
