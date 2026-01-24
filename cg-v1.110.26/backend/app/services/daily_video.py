@@ -238,11 +238,9 @@ class DailyVideoService:
         if start_audio_off:
             token_config["properties"]["start_audio_off"] = True
 
-        # Enable transcription permission for ARIA Sentiment Shield
-        # Note: enable_transcription is NOT a valid token property - it's set at room level
-        # Only canAdmin permission is needed on the token to allow starting transcription
-        if enable_transcription:
-            token_config["properties"]["canAdmin"] = ["transcription"]
+        # Note: Transcription permissions for ARIA are granted via is_owner=True
+        # Daily.co owners can start/stop transcription automatically
+        # No additional token properties needed for transcription
 
         try:
             async with httpx.AsyncClient() as client:
