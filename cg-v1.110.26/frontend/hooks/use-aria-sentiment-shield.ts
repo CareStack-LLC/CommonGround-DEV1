@@ -1,7 +1,13 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import type { DailyCall } from '@daily-co/daily-js';
+import type {
+  DailyCall,
+  DailyEventObjectTranscriptionMessage,
+  DailyEventObjectTranscriptionStarted,
+  DailyEventObjectTranscriptionStopped,
+  DailyEventObjectTranscriptionError,
+} from '@daily-co/daily-js';
 
 /**
  * ARIA Sentiment Shield - Real-time call monitoring using Daily.co transcription
@@ -151,32 +157,21 @@ export function useARIASentimentShield({
   }, [sessionId, sessionType, sensitivityLevel, onIntervention, onError]);
 
   // Handle transcription message from Daily.co
-  const handleTranscriptionMessage = useCallback((event: {
-    fromId?: string;
-    data?: {
-      text?: string;
-      session_id?: string;
-      user_name?: string;
-      is_final?: boolean;
-      timestamp?: number;
-    };
-  }) => {
-    // Only process transcription messages
-    if (event.fromId !== 'transcription') return;
+  const handleTranscriptionMessage = useCallback((event: DailyEventObjectTranscriptionMessage) => {
+    // DailyEventObjectTranscriptionMessage has: participantId, text, timestamp, rawResponse
+    const { participantId, text } = event;
 
-    const { text, session_id, user_name, is_final } = event.data || {};
+    if (!text) return;
 
-    if (!text || !is_final) return; // Only process final transcripts
-
-    console.log('[ARIA Shield] Transcript:', text, `(speaker: ${user_name || session_id})`);
+    console.log('[ARIA Shield] Transcript:', text, `(speaker: ${participantId})`);
 
     setLatestTranscript(text);
 
     // Build transcript chunk
     const chunk: TranscriptChunk = {
       sessionId,
-      speakerId: session_id || userId,
-      speakerName: user_name || userName,
+      speakerId: participantId || userId,
+      speakerName: userName, // Daily doesn't provide user_name in this event
       text,
       timestamp: new Date(),
       isFinal: true,
@@ -191,19 +186,19 @@ export function useARIASentimentShield({
   }, [sessionId, userId, userName, sendTranscriptChunk, onTranscript]);
 
   // Handle transcription started event
-  const handleTranscriptionStarted = useCallback(() => {
-    console.log('[ARIA Shield] Transcription started');
+  const handleTranscriptionStarted = useCallback((event: DailyEventObjectTranscriptionStarted) => {
+    console.log('[ARIA Shield] Transcription started', event.language);
     setIsTranscribing(true);
   }, []);
 
   // Handle transcription stopped event
-  const handleTranscriptionStopped = useCallback(() => {
-    console.log('[ARIA Shield] Transcription stopped');
+  const handleTranscriptionStopped = useCallback((event: DailyEventObjectTranscriptionStopped) => {
+    console.log('[ARIA Shield] Transcription stopped', event.updatedBy);
     setIsTranscribing(false);
   }, []);
 
   // Handle transcription error
-  const handleTranscriptionError = useCallback((event: { errorMsg?: string }) => {
+  const handleTranscriptionError = useCallback((event: DailyEventObjectTranscriptionError) => {
     console.error('[ARIA Shield] Transcription error:', event.errorMsg);
     setIsTranscribing(false);
     onError?.(new Error(event.errorMsg || 'Transcription error'));
