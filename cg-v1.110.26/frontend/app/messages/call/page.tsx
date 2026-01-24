@@ -18,7 +18,9 @@ import {
   Shield,
   Clock,
   User,
+  X,
 } from 'lucide-react';
+import Image from 'next/image';
 
 // Daily.co types
 declare global {
@@ -81,6 +83,7 @@ function ParentCallContent() {
   const [isInitiating, setIsInitiating] = useState(true);
   const [isJoined, setIsJoined] = useState(false);
   const [isMutedByARIA, setIsMutedByARIA] = useState(false);
+  const [isARIAReady, setIsARIAReady] = useState(false);
 
   const callStartTime = useRef<number>(0);
   const durationInterval = useRef<NodeJS.Timeout | null>(null);
@@ -125,6 +128,20 @@ function ParentCallContent() {
     onTranscript: (text) => console.log('[ARIA Whisper] Transcribed:', text),
     onError: (err) => console.error('[ARIA Shield] Error:', err),
   });
+
+  // Track when ARIA recording starts
+  useEffect(() => {
+    if (isRecording && !isARIAReady) {
+      setIsARIAReady(true);
+    }
+  }, [isRecording, isARIAReady]);
+
+  // If ARIA is off, mark as ready immediately when joined
+  useEffect(() => {
+    if (isJoined && ariaSensitivity === 'off' && !isARIAReady) {
+      setIsARIAReady(true);
+    }
+  }, [isJoined, ariaSensitivity, isARIAReady]);
 
   // Format duration
   const formatDuration = (seconds: number) => {
@@ -622,6 +639,64 @@ function ParentCallContent() {
     );
   }
 
+  // ARIA initialization splash screen - show while waiting for ARIA to start recording
+  if (isJoined && ariaSensitivity !== 'off' && !isARIAReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
+        <div className="text-center max-w-sm mx-4">
+          {/* ARIA Mascot */}
+          <div className="relative w-32 h-32 mx-auto mb-6">
+            <Image
+              src="/images/Aria.png"
+              alt="ARIA Guardian"
+              fill
+              className="object-contain animate-pulse"
+              priority
+            />
+          </div>
+
+          {/* Loading indicator */}
+          <div className="flex justify-center mb-4">
+            <div className="flex gap-1">
+              <div className="w-2 h-2 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          </div>
+
+          <h2 className="text-white text-xl font-semibold mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            ARIA Guardian Activating
+          </h2>
+          <p className="text-slate-400 text-sm mb-4">
+            Setting up communication monitoring to keep your conversation constructive
+          </p>
+
+          {/* Status indicators */}
+          <div className="bg-white/5 rounded-xl p-4 text-left space-y-2">
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
+              </div>
+              <span className="text-emerald-400">Call connected</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
+              </div>
+              <span className="text-amber-400">Initializing ARIA monitoring...</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm opacity-50">
+              <div className="w-5 h-5 rounded-full bg-slate-500/20 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-slate-500"></div>
+              </div>
+              <span className="text-slate-500">Ready to communicate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 flex flex-col">
       {/* Hidden audio element for remote participant audio - CRITICAL for sound! */}
@@ -698,8 +773,18 @@ function ParentCallContent() {
               : ariaWarning.should_mute
               ? 'bg-gradient-to-r from-purple-500/95 to-indigo-500/95'
               : 'bg-gradient-to-r from-amber-500/95 to-orange-500/95'
-          } text-white`}>
-            <div className="flex items-start gap-4">
+          } text-white relative`}>
+            {/* Close button - only show for non-terminating warnings */}
+            {!ariaWarning.should_terminate && (
+              <button
+                onClick={() => setAriaWarning(null)}
+                className="absolute top-3 right-3 p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                aria-label="Dismiss warning"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+            <div className="flex items-start gap-4 pr-8">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                 {ariaWarning.should_mute ? (
                   <MicOff className="h-5 w-5" />
