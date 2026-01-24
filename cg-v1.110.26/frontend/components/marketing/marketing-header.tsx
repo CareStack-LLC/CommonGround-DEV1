@@ -20,27 +20,11 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  {
-    label: 'Solutions',
-    href: '/features',
-    children: [
-      { label: 'All Features', href: '/features', description: 'Complete platform overview' },
-      { label: 'Safe Handoff', href: '/safe-handoff', description: 'For DV survivors - zero contact custody' },
-      { label: 'High-Conflict', href: '/high-conflict', description: 'Documentation & court evidence' },
-      { label: 'ARIA Messaging', href: '/aria', description: 'AI-powered communication' },
-    ]
-  },
-  {
-    label: 'Pricing',
-    href: '/pricing',
-    children: [
-      { label: 'For Parents', href: '/pricing', description: 'Individual subscription plans' },
-      { label: 'For Professionals', href: '/pricing/professionals', description: 'Bulk voucher packs' },
-      { label: 'For Courts', href: '/pricing/courts', description: 'Per-form processing' },
-    ]
-  },
-  { label: 'For Professionals', href: '/professionals' },
+  { label: 'Home', href: '/' },
+  { label: 'Features', href: '/features' },
+  { label: 'Pricing', href: '/pricing' },
   { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 function Logo() {
