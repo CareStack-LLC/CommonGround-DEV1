@@ -11,7 +11,7 @@ Provides:
 
 import logging
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, File, UploadFile, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 
@@ -40,6 +40,7 @@ from app.schemas.parent_call import (
 from app.services.parent_call import parent_call_service
 from app.services.aria_call_monitor import aria_call_monitor
 from app.services.daily_video import daily_service
+from app.services.whisper_transcription import whisper_service
 from app.services.storage import storage_service, StorageBucket, build_recording_path
 from app.core.config import settings
 from app.core.websocket import manager
@@ -552,6 +553,159 @@ async def process_transcript_chunk(
     return {
         "message": "Transcript chunk processed successfully",
         "chunk_id": chunk.id
+    }
+
+
+@router.post("/{session_id}/audio-chunk")
+async def process_audio_chunk(
+    session_id: str,
+    audio: UploadFile = File(...),
+    speaker_id: str = Form(...),
+    speaker_name: str = Form(...),
+    chunk_index: int = Form(0),
+    start_time: float = Form(0.0),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Process audio chunk using OpenAI Whisper for transcription.
+
+    This endpoint:
+    1. Receives audio data from the frontend
+    2. Transcribes it using OpenAI Whisper
+    3. Runs ARIA analysis on the transcription
+    4. Returns/broadcasts interventions if needed
+
+    Args:
+        session_id: Call session ID
+        audio: Audio file (webm, mp3, wav, etc.)
+        speaker_id: ID of the speaker
+        speaker_name: Name of the speaker
+        chunk_index: Index of this chunk in the stream
+        start_time: Start time in seconds from call start
+
+    Returns:
+        Transcription result and any ARIA interventions
+    """
+    # Get session
+    result = await db.execute(
+        select(ParentCallSession).where(ParentCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Call session not found"
+        )
+
+    # Read audio data
+    try:
+        audio_data = await audio.read()
+        logger.info(f"Received audio chunk: {len(audio_data)} bytes, format: {audio.content_type}")
+    except Exception as e:
+        logger.error(f"Failed to read audio data: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid audio data"
+        )
+
+    # Determine audio format from content type
+    content_type = audio.content_type or "audio/webm"
+    format_map = {
+        "audio/webm": "webm",
+        "audio/mp4": "mp4",
+        "audio/mpeg": "mp3",
+        "audio/mp3": "mp3",
+        "audio/wav": "wav",
+        "audio/ogg": "ogg",
+    }
+    audio_format = format_map.get(content_type, "webm")
+
+    # Transcribe with Whisper
+    transcription = await whisper_service.transcribe_audio_stream(
+        audio_data=audio_data,
+        session_id=session_id,
+        speaker_id=speaker_id,
+        chunk_index=chunk_index,
+        audio_format=audio_format
+    )
+
+    # If no speech detected, return early
+    if not transcription.get("has_speech"):
+        return {
+            "message": "No speech detected",
+            "transcription": None,
+            "intervention": None
+        }
+
+    logger.info(f"Whisper transcribed: '{transcription.get('content', '')[:50]}...'")
+
+    # Store transcript chunk
+    try:
+        # Estimate end time based on typical speech rate
+        content = transcription.get("content", "")
+        estimated_duration = len(content.split()) * 0.4  # ~0.4s per word average
+        end_time = start_time + estimated_duration
+
+        chunk = await parent_call_service.process_transcript_chunk(
+            db=db,
+            session_id=session_id,
+            speaker_id=speaker_id,
+            speaker_name=speaker_name,
+            content=content,
+            confidence=transcription.get("confidence", 0.9),
+            start_time=start_time,
+            end_time=end_time
+        )
+    except Exception as e:
+        logger.error(f"Failed to store transcript chunk: {e}")
+        # Continue even if storage fails - we still want to analyze
+
+    # Real-time ARIA analysis (if enabled)
+    intervention_data = None
+    if session.aria_active and session.aria_sensitivity_level != "off":
+        try:
+            flag = await aria_call_monitor.analyze_transcript_chunk_realtime(
+                db=db,
+                chunk=chunk,
+                sensitivity_level=session.aria_sensitivity_level
+            )
+
+            # If violation detected, handle intervention
+            if flag and flag.intervention_needed:
+                intervention_data = await aria_call_monitor.handle_severe_violation(
+                    db=db,
+                    session=session,
+                    flag=flag,
+                    chunk=chunk
+                )
+
+                # Broadcast intervention via WebSocket to both parents
+                for parent_id in [session.parent_a_id, session.parent_b_id]:
+                    if parent_id:
+                        await manager.send_personal_message(
+                            message=intervention_data,
+                            user_id=parent_id
+                        )
+
+                logger.warning(
+                    f"ARIA intervention in session {session_id}: "
+                    f"type={flag.intervention_type.value if flag.intervention_type else 'none'}, "
+                    f"speaker={flag.speaker_id}"
+                )
+
+        except Exception as e:
+            logger.error(f"ARIA analysis failed: {e}")
+            # Continue even if ARIA fails
+
+    return {
+        "message": "Audio chunk processed successfully",
+        "transcription": {
+            "text": transcription.get("content", ""),
+            "confidence": transcription.get("confidence", 0.0),
+            "chunk_index": chunk_index,
+        },
+        "intervention": intervention_data
     }
 
 

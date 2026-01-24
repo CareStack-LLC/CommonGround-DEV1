@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useWebSocket } from '@/contexts/websocket-context';
 import { ProtectedRoute } from '@/components/protected-route';
-import { useARIASentimentShield, type SensitivityLevel, type ARIAIntervention } from '@/hooks/use-aria-sentiment-shield';
+import { useWhisperARIAShield, type SensitivityLevel, type ARIAIntervention } from '@/hooks/use-whisper-aria-shield';
 import type { ARIAInterventionEvent } from '@/lib/websocket';
 import {
   Phone,
@@ -106,22 +106,23 @@ function ParentCallContent() {
     });
   }, []);
 
-  // ARIA Sentiment Shield hook - uses Daily.co transcription
+  // ARIA Sentiment Shield hook - uses OpenAI Whisper transcription
   const {
     isMonitoring,
-    isTranscribing,
+    isRecording,
     startMonitoring,
     stopMonitoring,
     interventions,
-  } = useARIASentimentShield({
+    latestTranscript,
+  } = useWhisperARIAShield({
     callRef,
     sessionId: session?.session_id || '',
-    sessionType: 'parent_call',
     userId: user?.id || '',
     userName: profile?.preferred_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Parent',
     sensitivityLevel: ariaSensitivity as SensitivityLevel,
-    callStartTime: callStartTime.current,
+    chunkIntervalMs: 5000, // Send audio every 5 seconds for transcription
     onIntervention: handleARIAIntervention,
+    onTranscript: (text) => console.log('[ARIA Whisper] Transcribed:', text),
     onError: (err) => console.error('[ARIA Shield] Error:', err),
   });
 
@@ -322,6 +323,53 @@ function ParentCallContent() {
     }
   }, [isJoined, isMonitoring, stopMonitoring]);
 
+  // Handle ARIA warning - memoized to avoid stale closures
+  // (Defined before WebSocket effect that uses it)
+  const handleARIAWarning = useCallback((warning: ARIAWarning) => {
+    console.log('[ARIA] Processing warning:', warning);
+    setAriaWarning(warning);
+
+    // Handle MUTE intervention - mute the offending speaker
+    if (warning.should_mute && warning.mute_speaker_id === user?.id) {
+      if (callObject) {
+        console.log('[ARIA] Muting local audio');
+        callObject.setLocalAudio(false);
+        setIsAudioOn(false);
+        setIsMutedByARIA(true);
+      }
+
+      // Auto-unmute after duration
+      if (mutedByARIATimeoutRef.current) {
+        clearTimeout(mutedByARIATimeoutRef.current);
+      }
+      mutedByARIATimeoutRef.current = setTimeout(() => {
+        if (callObject) {
+          console.log('[ARIA] Unmuting local audio');
+          callObject.setLocalAudio(true);
+          setIsAudioOn(true);
+          setIsMutedByARIA(false);
+        }
+      }, (warning.mute_duration_seconds || 2) * 1000);
+    }
+
+    if (!warning.should_terminate) {
+      // Clear warning after display time (longer for mute)
+      const displayDuration = warning.should_mute ?
+        Math.max((warning.mute_duration_seconds || 2) * 1000 + 2000, 10000) :
+        10000;
+      setTimeout(() => {
+        setAriaWarning(null);
+      }, displayDuration);
+    } else {
+      console.log('[ARIA] Call will be terminated in', warning.termination_delay || 10, 'seconds');
+      setTimeout(() => {
+        if (callObject) {
+          callObject.leave();
+        }
+      }, (warning.termination_delay || 10) * 1000);
+    }
+  }, [user?.id, callObject]);
+
   // Listen for ARIA intervention events via global WebSocket
   useEffect(() => {
     if (!session?.session_id || !wsConnected) return;
@@ -479,52 +527,6 @@ function ParentCallContent() {
       console.error('Failed to setup WebSocket:', err);
     }
   };
-
-  // Handle ARIA warning - memoized to avoid stale closures
-  const handleARIAWarning = useCallback((warning: ARIAWarning) => {
-    console.log('[ARIA] Processing warning:', warning);
-    setAriaWarning(warning);
-
-    // Handle MUTE intervention - mute the offending speaker
-    if (warning.should_mute && warning.mute_speaker_id === user?.id) {
-      if (callObject) {
-        console.log('[ARIA] Muting local audio');
-        callObject.setLocalAudio(false);
-        setIsAudioOn(false);
-        setIsMutedByARIA(true);
-      }
-
-      // Auto-unmute after duration
-      if (mutedByARIATimeoutRef.current) {
-        clearTimeout(mutedByARIATimeoutRef.current);
-      }
-      mutedByARIATimeoutRef.current = setTimeout(() => {
-        if (callObject) {
-          console.log('[ARIA] Unmuting local audio');
-          callObject.setLocalAudio(true);
-          setIsAudioOn(true);
-          setIsMutedByARIA(false);
-        }
-      }, (warning.mute_duration_seconds || 2) * 1000);
-    }
-
-    if (!warning.should_terminate) {
-      // Clear warning after display time (longer for mute)
-      const displayDuration = warning.should_mute ?
-        Math.max((warning.mute_duration_seconds || 2) * 1000 + 2000, 10000) :
-        10000;
-      setTimeout(() => {
-        setAriaWarning(null);
-      }, displayDuration);
-    } else {
-      console.log('[ARIA] Call will be terminated in', warning.termination_delay || 10, 'seconds');
-      setTimeout(() => {
-        if (callObject) {
-          callObject.leave();
-        }
-      }, (warning.termination_delay || 10) * 1000);
-    }
-  }, [user?.id, callObject]);
 
   // Toggle audio
   const toggleAudio = () => {
