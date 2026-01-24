@@ -292,6 +292,91 @@ async def join_call(
     return join_response
 
 
+@router.post("/{session_id}/decline")
+async def decline_call(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Decline an incoming call.
+
+    Notifies the caller via WebSocket that the call was declined and
+    updates the session status.
+
+    Args:
+        session_id: Call session ID
+
+    Returns:
+        Success message
+
+    Raises:
+        404: Session not found
+        403: User not authorized
+    """
+    # Get session
+    result = await db.execute(
+        select(ParentCallSession).where(ParentCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Call session not found"
+        )
+
+    # Verify user is the call recipient (not the initiator)
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+
+    if not family_file:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Family file not found"
+        )
+
+    # Verify user is a parent in this family file
+    if current_user.id not in [family_file.parent_a_id, family_file.parent_b_id]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a participant in this family file"
+        )
+
+    # Update session status
+    from datetime import datetime, timezone
+    session.status = CallStatus.ENDED.value
+    session.ended_at = datetime.now(timezone.utc)
+    await db.commit()
+
+    # Notify the caller that the call was declined via WebSocket
+    caller_id = str(session.parent_a_id)  # parent_a is always the initiator
+    user_name = current_user.profile.display_name if current_user.profile else current_user.email
+
+    decline_notification = {
+        "type": "call_declined",
+        "session_id": session_id,
+        "declined_by_id": str(current_user.id),
+        "declined_by_name": user_name,
+    }
+
+    logger.info(f"Sending call_declined notification to {caller_id}: {decline_notification}")
+
+    await manager.send_personal_message(
+        message=decline_notification,
+        user_id=caller_id
+    )
+
+    logger.info(f"Call session {session_id} declined by {current_user.id}")
+
+    return {
+        "message": "Call declined successfully",
+        "session_id": session_id
+    }
+
+
 @router.patch("/{session_id}/aria-settings")
 async def update_aria_settings(
     session_id: str,

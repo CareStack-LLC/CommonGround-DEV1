@@ -25,6 +25,8 @@ import {
   AgreementApprovedEvent,
   KidComsCallIncomingEvent,
   IncomingCallEvent,
+  CallDeclinedEvent,
+  CallTimeoutEvent,
   ARIAInterventionEvent,
 } from '@/lib/websocket';
 import { authAPI } from '@/lib/api';
@@ -60,6 +62,8 @@ interface WebSocketContextType {
   onKidComsCallIncoming: (handler: (data: KidComsCallIncomingEvent) => void) => () => void;
   // Parent-to-Parent Call Notifications
   onIncomingCall: (handler: (data: IncomingCallEvent) => void) => () => void;
+  onCallDeclined: (handler: (data: CallDeclinedEvent) => void) => () => void;
+  onCallTimeout: (handler: (data: CallTimeoutEvent) => void) => () => void;
   // ARIA Real-time Intervention Notifications
   onARIAIntervention: (handler: (data: ARIAInterventionEvent) => void) => () => void;
 }
@@ -297,6 +301,24 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     return () => wsClient.off('incoming_call', typedHandler);
   }, []);
 
+  // Call Declined handler
+  const onCallDeclined = useCallback((handler: (data: CallDeclinedEvent) => void) => {
+    const typedHandler = (data: WebSocketMessage) => {
+      handler(data as unknown as CallDeclinedEvent);
+    };
+    wsClient.on('call_declined', typedHandler);
+    return () => wsClient.off('call_declined', typedHandler);
+  }, []);
+
+  // Call Timeout handler
+  const onCallTimeout = useCallback((handler: (data: CallTimeoutEvent) => void) => {
+    const typedHandler = (data: WebSocketMessage) => {
+      handler(data as unknown as CallTimeoutEvent);
+    };
+    wsClient.on('call_timeout', typedHandler);
+    return () => wsClient.off('call_timeout', typedHandler);
+  }, []);
+
   // ARIA Real-time Intervention handler
   const onARIAIntervention = useCallback((handler: (data: ARIAInterventionEvent) => void) => {
     const typedHandler = (data: WebSocketMessage) => {
@@ -331,6 +353,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     onAgreementApproved,
     onKidComsCallIncoming,
     onIncomingCall,
+    onCallDeclined,
+    onCallTimeout,
     onARIAIntervention,
   };
 

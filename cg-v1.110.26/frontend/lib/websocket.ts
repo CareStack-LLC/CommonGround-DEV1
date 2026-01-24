@@ -261,6 +261,18 @@ export interface IncomingCallEvent {
   family_file_id: string;
 }
 
+export interface CallDeclinedEvent {
+  type: 'call_declined';
+  session_id: string;
+  declined_by_id: string;
+  declined_by_name: string;
+}
+
+export interface CallTimeoutEvent {
+  type: 'call_timeout';
+  session_id: string;
+}
+
 // ARIA Real-time Intervention Events
 export interface ARIAInterventionEvent {
   type: 'aria_intervention';
@@ -299,6 +311,8 @@ export type WebSocketEventType =
   | 'agreement_approved'
   | 'kidcoms_call_incoming'
   | 'incoming_call'
+  | 'call_declined'
+  | 'call_timeout'
   | 'aria_intervention'
   | 'status'
   | 'error'

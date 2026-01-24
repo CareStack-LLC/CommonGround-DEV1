@@ -110,13 +110,27 @@ export function IncomingCallNotification() {
     setIsRinging(false);
   };
 
-  const handleDecline = () => {
+  const handleDecline = async () => {
     // Clear timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    // TODO: Optionally notify the caller that the call was declined
+    // Notify the caller that the call was declined
+    if (incomingCall) {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        await fetch(`${apiUrl}/api/v1/parent-calls/${incomingCall.session_id}/decline`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          },
+        });
+      } catch (err) {
+        console.error('Failed to notify caller of decline:', err);
+      }
+    }
+
     setIncomingCall(null);
     setIsRinging(false);
   };

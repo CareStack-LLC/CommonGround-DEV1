@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useWebSocket } from '@/contexts/websocket-context';
+import type { CallDeclinedEvent } from '@/lib/websocket';
 import { ProtectedRoute } from '@/components/protected-route';
 import { useWhisperARIAShield, type SensitivityLevel, type ARIAIntervention } from '@/hooks/use-whisper-aria-shield';
 import { useCallRecording } from '@/hooks/use-call-recording';
@@ -67,7 +68,7 @@ function ParentCallContent() {
   const { user, profile } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { onARIAIntervention, isConnected: wsConnected } = useWebSocket();
+  const { onARIAIntervention, onCallDeclined, isConnected: wsConnected } = useWebSocket();
   const familyFileId = searchParams.get('family_file_id');
   const callType = searchParams.get('call_type') || 'video';
   const existingSessionId = searchParams.get('session_id'); // For joining existing calls
@@ -85,6 +86,9 @@ function ParentCallContent() {
   const [isJoined, setIsJoined] = useState(false);
   const [isMutedByARIA, setIsMutedByARIA] = useState(false);
   const [isARIAReady, setIsARIAReady] = useState(false);
+  const [isRinging, setIsRinging] = useState(false);
+  const [callDeclined, setCallDeclined] = useState(false);
+  const [callTimedOut, setCallTimedOut] = useState(false);
 
   const callStartTime = useRef<number>(0);
   const durationInterval = useRef<NodeJS.Timeout | null>(null);
@@ -94,6 +98,7 @@ function ParentCallContent() {
   const remoteAudioRef = useRef<HTMLAudioElement>(null);
   const mutedByARIATimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const callRef = useRef<any>(null);
+  const ringingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Handle ARIA interventions from the Sentiment Shield
   const handleARIAIntervention = useCallback((intervention: ARIAIntervention) => {
@@ -438,6 +443,63 @@ function ParentCallContent() {
     return () => unsubscribe();
   }, [session?.session_id, wsConnected, onARIAIntervention, handleARIAWarning]);
 
+  // Listen for call declined events
+  useEffect(() => {
+    if (!session?.session_id || !wsConnected) return;
+
+    const unsubscribe = onCallDeclined((event: CallDeclinedEvent) => {
+      if (event.session_id !== session.session_id) return;
+
+      console.log('[Call] Call was declined by:', event.declined_by_name);
+      setCallDeclined(true);
+      setIsRinging(false);
+
+      // Clear ringing timeout
+      if (ringingTimeoutRef.current) {
+        clearTimeout(ringingTimeoutRef.current);
+        ringingTimeoutRef.current = null;
+      }
+    });
+
+    return () => unsubscribe();
+  }, [session?.session_id, wsConnected, onCallDeclined]);
+
+  // Set ringing state and timeout when call is initiated (not joining existing)
+  useEffect(() => {
+    // Only for outgoing calls (not joining an existing session)
+    if (!existingSessionId && session && isJoined && !callDeclined && !callTimedOut) {
+      const remoteCount = Array.from(participants.values()).filter(p => !p.local).length;
+
+      // If no remote participant yet, we're "ringing"
+      if (remoteCount === 0) {
+        setIsRinging(true);
+
+        // Set 30-second timeout
+        if (!ringingTimeoutRef.current) {
+          ringingTimeoutRef.current = setTimeout(() => {
+            console.log('[Call] Ringing timeout - no answer');
+            setCallTimedOut(true);
+            setIsRinging(false);
+          }, 30000);
+        }
+      } else {
+        // Remote participant joined, stop ringing
+        setIsRinging(false);
+        if (ringingTimeoutRef.current) {
+          clearTimeout(ringingTimeoutRef.current);
+          ringingTimeoutRef.current = null;
+        }
+      }
+    }
+
+    return () => {
+      if (ringingTimeoutRef.current) {
+        clearTimeout(ringingTimeoutRef.current);
+        ringingTimeoutRef.current = null;
+      }
+    };
+  }, [existingSessionId, session, isJoined, participants, callDeclined, callTimedOut]);
+
   // Join Daily.co call using call object (custom UI)
   const joinDailyCall = async (sessionData: CallSession) => {
     if (!window.Daily) return;
@@ -646,6 +708,48 @@ function ParentCallContent() {
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Call Failed</h2>
           <p className="text-slate-600 mb-6">{error}</p>
+          <button
+            onClick={() => router.push('/messages')}
+            className="px-6 py-3 bg-[#2C5F5D] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg"
+          >
+            Back to Messages
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Call was declined by the other parent
+  if (callDeclined) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
+        <div className="bg-white rounded-2xl p-8 max-w-md text-center shadow-2xl mx-4">
+          <div className="w-16 h-16 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-4">
+            <PhoneOff className="h-8 w-8 text-orange-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Call Declined</h2>
+          <p className="text-slate-600 mb-6">The other parent declined your call. You can try again later or send a message instead.</p>
+          <button
+            onClick={() => router.push('/messages')}
+            className="px-6 py-3 bg-[#2C5F5D] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg"
+          >
+            Back to Messages
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Call timed out - no answer after 30 seconds
+  if (callTimedOut) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
+        <div className="bg-white rounded-2xl p-8 max-w-md text-center shadow-2xl mx-4">
+          <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+            <Clock className="h-8 w-8 text-slate-500" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No Answer</h2>
+          <p className="text-slate-600 mb-6">The other parent didn&apos;t answer. They may be busy or away. Try again later or send a message.</p>
           <button
             onClick={() => router.push('/messages')}
             className="px-6 py-3 bg-[#2C5F5D] text-white rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg"
