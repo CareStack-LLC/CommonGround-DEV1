@@ -171,17 +171,43 @@ function ChildCard({
     id: string;
     name: string;
     avatar_url?: string;
-    age: number;
+    age?: number;
     is_online: boolean;
+    can_video_call?: boolean;
+    can_voice_call?: boolean;
+    can_chat?: boolean;
+    is_within_allowed_time?: boolean;
+    require_parent_present?: boolean;
   };
   onCall: () => void;
 }) {
+  // Check parent-set permissions
+  const canVideoCall = child.can_video_call !== false;
+  const isWithinTime = child.is_within_allowed_time !== false;
+  const requiresParent = child.require_parent_present === true;
+
+  // Can only call if online, has permission, and within allowed time
+  const canCall = child.is_online && canVideoCall && isWithinTime;
+
+  // Determine status message
+  const getStatusMessage = () => {
+    if (!canVideoCall) return { text: "Video calls not allowed", color: "text-red-500" };
+    if (!isWithinTime) return { text: "Outside allowed hours", color: "text-orange-500" };
+    if (child.is_online) {
+      if (requiresParent) return { text: "Parent must be present", color: "text-orange-500" };
+      return { text: "Available to chat", color: "text-green-500" };
+    }
+    return { text: "Currently offline", color: "text-gray-500" };
+  };
+
+  const status = getStatusMessage();
+
   return (
-    <View className="bg-white rounded-2xl p-4 mb-3 shadow-sm">
+    <View className={`bg-white rounded-2xl p-4 mb-3 shadow-sm ${!canCall ? 'opacity-75' : ''}`}>
       <View className="flex-row items-center">
         {/* Avatar */}
         <View className="relative">
-          <View className="w-16 h-16 bg-primary-100 rounded-full items-center justify-center">
+          <View className={`w-16 h-16 rounded-full items-center justify-center ${canVideoCall ? 'bg-primary-100' : 'bg-gray-200'}`}>
             {child.avatar_url ? (
               <Image
                 source={{ uri: child.avatar_url }}
@@ -189,47 +215,54 @@ function ChildCard({
               />
             ) : (
               <Text className="text-3xl">
-                {child.age < 10 ? "👧" : "🧑"}
+                {child.age && child.age < 10 ? "👧" : "🧑"}
               </Text>
             )}
           </View>
-          {child.is_online && (
+          {child.is_online && canVideoCall && isWithinTime && (
             <View className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+          )}
+          {/* Requires parent indicator */}
+          {requiresParent && canCall && (
+            <View className="absolute top-0 right-0 w-5 h-5 bg-orange-500 rounded-full border-2 border-white items-center justify-center">
+              <Text className="text-[8px]">👨‍👩‍👧</Text>
+            </View>
           )}
         </View>
 
         {/* Info */}
         <View className="flex-1 ml-4">
-          <Text className="text-lg font-bold text-gray-800">{child.name}</Text>
-          <Text className="text-gray-500">
-            {child.is_online ? (
-              <Text className="text-green-500">Available to chat</Text>
-            ) : (
-              "Currently offline"
+          <View className="flex-row items-center">
+            <Text className="text-lg font-bold text-gray-800">{child.name}</Text>
+            {!canVideoCall && (
+              <View className="ml-2 bg-red-100 px-2 py-0.5 rounded-full">
+                <Text className="text-red-600 text-xs">Restricted</Text>
+              </View>
             )}
-          </Text>
+          </View>
+          <Text className={status.color}>{status.text}</Text>
         </View>
 
         {/* Call Button */}
         <TouchableOpacity
           className={`px-5 py-3 rounded-xl ${
-            child.is_online ? "bg-green-500" : "bg-gray-200"
+            canCall ? "bg-green-500" : "bg-gray-200"
           }`}
           onPress={onCall}
-          disabled={!child.is_online}
+          disabled={!canCall}
         >
           <View className="flex-row items-center">
             <Ionicons
-              name="videocam"
+              name={canVideoCall ? "videocam" : "lock-closed"}
               size={20}
-              color={child.is_online ? "white" : "#9ca3af"}
+              color={canCall ? "white" : "#9ca3af"}
             />
             <Text
               className={`ml-2 font-bold ${
-                child.is_online ? "text-white" : "text-gray-400"
+                canCall ? "text-white" : "text-gray-400"
               }`}
             >
-              Call
+              {canVideoCall ? "Call" : "Locked"}
             </Text>
           </View>
         </TouchableOpacity>

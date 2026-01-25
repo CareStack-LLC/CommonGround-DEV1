@@ -1712,24 +1712,45 @@ async def send_message(
             detail="Can only send messages in active sessions"
         )
 
-    # Create message
+    # Run ARIA analysis on the message
+    from app.services.aria_child_chat import aria_child_chat_monitor
+
+    aria_result = aria_child_chat_monitor.analyze_message(
+        content=message_data.content,
+        sender_type="parent",  # Messages from parent app
+        sender_name=f"{current_user.first_name} {current_user.last_name}",
+    )
+
+    # Create message with ARIA analysis results
     message = KidComsMessage(
         session_id=session_id,
         sender_id=current_user.id,
         sender_type=ParticipantType.PARENT.value,
         sender_name=f"{current_user.first_name} {current_user.last_name}",
-        content=message_data.content,
+        content=message_data.content if not aria_result.should_hide else "[Message hidden by safety filter]",
+        aria_analyzed=True,
+        aria_flagged=aria_result.should_flag,
+        aria_reason=aria_result.reason if aria_result.should_flag else None,
+        aria_category=aria_result.category.value if aria_result.category else None,
+        aria_score=aria_result.confidence_score,
     )
 
-    # TODO: Call ARIA for analysis
-    # For now, mark as analyzed and safe
-    message.aria_analyzed = True
-    message.aria_flagged = False
+    # If message should be hidden, store original content separately for parent review
+    if aria_result.should_hide:
+        message.original_content = message_data.content
 
     db.add(message)
 
     # Update session stats
     session.total_messages += 1
+    if aria_result.should_flag:
+        session.flagged_messages += 1
+
+        # Log for parent notification
+        logger.warning(
+            f"ARIA flagged message in session {session_id}: "
+            f"category={aria_result.category}, reason={aria_result.reason}"
+        )
 
     await db.commit()
     await db.refresh(message)
@@ -1815,22 +1836,45 @@ async def analyze_chat_message(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Analyze a chat message with ARIA.
+    Analyze a chat message with ARIA for child safety.
 
-    Returns safety assessment and optional suggested rewrite.
+    Returns safety assessment, flags concerning content, and optionally
+    suggests rewrites or hides inappropriate messages.
+
+    Categories monitored:
+    - Inappropriate language
+    - Personal information sharing
+    - Stranger danger signals
+    - Bullying
+    - Mature content references
+    - Emotional distress signals
     """
-    # TODO: Integrate with OpenAI or Claude for actual analysis
-    # For now, return mock safe response
+    from app.services.aria_child_chat import aria_child_chat_monitor
+
+    # Run ARIA analysis
+    result = aria_child_chat_monitor.analyze_message(
+        content=analyze_data.content,
+        sender_type=analyze_data.sender_type,
+        sender_name=analyze_data.sender_name,
+        context=analyze_data.context,
+    )
+
+    # Log flagged messages for parent review
+    if result.should_flag:
+        logger.info(
+            f"ARIA flagged message: category={result.category}, "
+            f"severity={result.severity}, sender={analyze_data.sender_name}"
+        )
 
     return ARIAChatAnalyzeResponse(
-        is_safe=True,
-        should_flag=False,
-        category=None,
-        reason=None,
-        confidence_score=0.95,
-        suggested_rewrite=None,
-        should_hide=False,
-        should_notify_parents=False,
+        is_safe=result.is_safe,
+        should_flag=result.should_flag,
+        category=result.category.value if result.category else None,
+        reason=result.reason,
+        confidence_score=result.confidence_score,
+        suggested_rewrite=result.suggested_rewrite,
+        should_hide=result.should_hide,
+        should_notify_parents=result.should_notify_parents,
     )
 
 

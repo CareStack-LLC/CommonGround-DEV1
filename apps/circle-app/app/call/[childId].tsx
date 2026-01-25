@@ -40,15 +40,31 @@ export default function CallScreen() {
   } = useDailyCall();
 
   const [showControls, setShowControls] = useState(true);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
 
   const child = connectedChildren.find((c) => c.id === childId);
 
-  // Initialize call
+  // Check parent-controlled permissions
+  const canVideoCall = child?.can_video_call !== false;
+  const isWithinTime = child?.is_within_allowed_time !== false;
+  const requiresParent = child?.require_parent_present === true;
+
+  // Initialize call only if permissions allow
   useEffect(() => {
     if (childId && child?.family_file_id) {
+      // Check permissions first
+      if (!canVideoCall) {
+        setPermissionError("Video calls with this child are not allowed by the parent.");
+        return;
+      }
+      if (!isWithinTime) {
+        setPermissionError("Video calls are not allowed at this time. Please try during the allowed hours.");
+        return;
+      }
+      // Permission granted - proceed with call
       initiateCall(childId, "child", child.family_file_id);
     }
-  }, [childId, child]);
+  }, [childId, child, canVideoCall, isWithinTime]);
 
   // Handle call end
   useEffect(() => {
@@ -101,6 +117,26 @@ export default function CallScreen() {
         <SafeAreaView style={styles.centerContent}>
           <ActivityIndicator size="large" color="white" />
           <Text style={styles.statusText}>Connecting...</Text>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
+
+  // Permission error state
+  if (permissionError) {
+    return (
+      <LinearGradient colors={["#f97316", "#ea580c"]} style={styles.container}>
+        <SafeAreaView style={styles.centerContent}>
+          <Ionicons name="lock-closed" size={64} color="white" />
+          <Text style={styles.statusText}>{permissionError}</Text>
+          {requiresParent && (
+            <Text style={[styles.statusText, { fontSize: 14, marginTop: 8 }]}>
+              A parent must be present during calls with {child?.name}.
+            </Text>
+          )}
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Text style={styles.backButtonText}>Go Back</Text>
+          </TouchableOpacity>
         </SafeAreaView>
       </LinearGradient>
     );

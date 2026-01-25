@@ -9,6 +9,13 @@ export interface CircleContact {
   avatar_url?: string;
   is_online?: boolean;
   family_file_id?: string;
+  // Parent-controlled permissions
+  can_video_call?: boolean;
+  can_voice_call?: boolean;
+  can_chat?: boolean;
+  can_theater?: boolean;
+  is_within_allowed_time?: boolean;
+  require_parent_present?: boolean;
 }
 
 interface UseCircleContactsReturn {
@@ -47,10 +54,11 @@ export function useCircleContacts(): UseCircleContactsReturn {
       }
 
       const data = await response.json();
+      // API returns contacts with permission info from parent settings
       setContacts(data.contacts || []);
     } catch (err: any) {
       setError(err.message || "Failed to load contacts");
-      // Use demo data for development
+      // Use demo data for development - includes permission flags
       setContacts([
         {
           id: "1",
@@ -59,6 +67,12 @@ export function useCircleContacts(): UseCircleContactsReturn {
           relationship: "grandparent",
           is_online: true,
           family_file_id: "demo-family-file",
+          can_video_call: true,
+          can_voice_call: true,
+          can_chat: true,
+          can_theater: true,
+          is_within_allowed_time: true,
+          require_parent_present: false,
         },
         {
           id: "2",
@@ -67,6 +81,12 @@ export function useCircleContacts(): UseCircleContactsReturn {
           relationship: "grandparent",
           is_online: false,
           family_file_id: "demo-family-file",
+          can_video_call: true,
+          can_voice_call: true,
+          can_chat: false, // Chat disabled by parent
+          can_theater: true,
+          is_within_allowed_time: true,
+          require_parent_present: false,
         },
         {
           id: "3",
@@ -75,6 +95,12 @@ export function useCircleContacts(): UseCircleContactsReturn {
           relationship: "aunt",
           is_online: true,
           family_file_id: "demo-family-file",
+          can_video_call: true,
+          can_voice_call: true,
+          can_chat: true,
+          can_theater: true,
+          is_within_allowed_time: false, // Outside allowed hours
+          require_parent_present: true, // Requires parent
         },
       ]);
     } finally {

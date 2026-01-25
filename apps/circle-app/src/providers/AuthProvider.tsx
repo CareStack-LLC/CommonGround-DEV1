@@ -31,9 +31,13 @@ interface ConnectedChild {
   age?: number;
   is_online: boolean;
   family_file_id: string;
+  // Parent-controlled permissions
   can_video_call?: boolean;
   can_voice_call?: boolean;
   can_chat?: boolean;
+  can_theater?: boolean;
+  is_within_allowed_time?: boolean;
+  require_parent_present?: boolean;
 }
 
 interface AuthContextType {
@@ -118,6 +122,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           can_video_call: child.can_video_call,
           can_voice_call: child.can_voice_call,
           can_chat: child.can_chat,
+          can_theater: child.can_theater,
+          is_within_allowed_time: child.is_within_allowed_time,
+          require_parent_present: child.require_parent_present,
         }))
       );
     } catch (error) {
@@ -131,6 +138,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           age: 8,
           is_online: true,
           family_file_id: "ff-1",
+          can_video_call: true,
+          can_voice_call: true,
+          can_chat: true,
+          can_theater: true,
+          is_within_allowed_time: true,
+          require_parent_present: false,
         },
         {
           id: "child-2",
@@ -139,6 +152,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           age: 6,
           is_online: false,
           family_file_id: "ff-1",
+          can_video_call: true,
+          can_voice_call: true,
+          can_chat: false, // Chat disabled by parent
+          can_theater: true,
+          is_within_allowed_time: true,
+          require_parent_present: true, // Requires parent present
         },
       ]);
     }

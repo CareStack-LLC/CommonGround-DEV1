@@ -71,7 +71,16 @@ export default function CircleScreen() {
 }
 
 function ContactCard({ contact }: { contact: CircleContact }) {
+  // Check parent-set permissions
+  const canCall = contact.can_video_call !== false;
+  const isWithinTime = contact.is_within_allowed_time !== false;
+  const requiresParent = contact.require_parent_present === true;
+
+  // Contact is available if they can call AND it's within allowed time
+  const isAvailable = canCall && isWithinTime;
+
   const handleCall = () => {
+    if (!isAvailable) return;
     router.push(`/call/${contact.id}`);
   };
 
@@ -79,12 +88,13 @@ function ContactCard({ contact }: { contact: CircleContact }) {
     <TouchableOpacity
       className="w-40 m-2"
       onPress={handleCall}
-      activeOpacity={0.8}
+      activeOpacity={isAvailable ? 0.8 : 1}
+      disabled={!isAvailable}
     >
-      <View className="bg-white rounded-3xl p-4 items-center shadow-xl">
+      <View className={`bg-white rounded-3xl p-4 items-center shadow-xl ${!isAvailable ? 'opacity-60' : ''}`}>
         {/* Avatar */}
         <View className="relative">
-          <View className="w-24 h-24 rounded-full bg-pink-100 items-center justify-center mb-3">
+          <View className={`w-24 h-24 rounded-full items-center justify-center mb-3 ${isAvailable ? 'bg-pink-100' : 'bg-gray-200'}`}>
             {contact.avatar_url ? (
               <Image
                 source={{ uri: contact.avatar_url }}
@@ -94,9 +104,15 @@ function ContactCard({ contact }: { contact: CircleContact }) {
               <Text className="text-5xl">{getContactEmoji(contact.relationship)}</Text>
             )}
           </View>
-          {/* Online indicator */}
-          {contact.is_online && (
+          {/* Online indicator - only show if contact is available */}
+          {contact.is_online && isAvailable && (
             <View className="absolute bottom-3 right-0 w-6 h-6 bg-green-500 rounded-full border-4 border-white" />
+          )}
+          {/* Requires parent indicator */}
+          {requiresParent && isAvailable && (
+            <View className="absolute top-0 right-0 w-7 h-7 bg-orange-500 rounded-full border-2 border-white items-center justify-center">
+              <Text className="text-xs">👨‍👩‍👧</Text>
+            </View>
           )}
         </View>
 
@@ -112,12 +128,32 @@ function ContactCard({ contact }: { contact: CircleContact }) {
           </Text>
         )}
 
+        {/* Status Messages */}
+        {!canCall && (
+          <Text className="text-xs text-gray-400 text-center mt-1">
+            🚫 Calling not allowed
+          </Text>
+        )}
+        {canCall && !isWithinTime && (
+          <Text className="text-xs text-orange-500 text-center mt-1">
+            ⏰ Not available now
+          </Text>
+        )}
+        {requiresParent && isAvailable && (
+          <Text className="text-xs text-orange-500 text-center mt-1">
+            👨‍👩‍👧 Parent needed
+          </Text>
+        )}
+
         {/* Call Button */}
         <TouchableOpacity
-          className="mt-3 bg-green-500 px-6 py-2 rounded-full"
+          className={`mt-3 px-6 py-2 rounded-full ${isAvailable ? 'bg-green-500' : 'bg-gray-300'}`}
           onPress={handleCall}
+          disabled={!isAvailable}
         >
-          <Text className="text-white font-bold">📞 Call</Text>
+          <Text className={`font-bold ${isAvailable ? 'text-white' : 'text-gray-500'}`}>
+            {isAvailable ? '📞 Call' : '🔒 Locked'}
+          </Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
