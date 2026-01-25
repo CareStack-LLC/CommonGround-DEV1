@@ -84,10 +84,22 @@ export default function DashboardScreen() {
               color={AMBER}
             />
             <QuickActionButton
+              icon="flash"
+              label="Quick Accords"
+              onPress={() => router.push("/accords")}
+              color={AMBER}
+            />
+            <QuickActionButton
               icon="document-text"
               label="Agreements"
-              onPress={() => {}}
+              onPress={() => router.push("/agreements")}
               color={SLATE}
+            />
+            <QuickActionButton
+              icon="folder-open"
+              label="Family Files"
+              onPress={() => router.push("/family")}
+              color={SAGE}
             />
           </View>
         </View>

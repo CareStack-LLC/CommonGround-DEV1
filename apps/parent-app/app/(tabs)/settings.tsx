@@ -71,6 +71,26 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* Agreements Section */}
+        <View className="px-6 mb-4">
+          <Text className="text-sm font-medium text-secondary-500 dark:text-secondary-400 mb-2 uppercase tracking-wide">
+            Agreements
+          </Text>
+          <View className="card space-y-0">
+            <SettingsRow
+              icon="document-text-outline"
+              label="Custody Agreements"
+              onPress={() => router.push("/agreements")}
+            />
+            <SettingsRow
+              icon="flash-outline"
+              label="Quick Accords"
+              onPress={() => router.push("/accords")}
+              isLast
+            />
+          </View>
+        </View>
+
         {/* Account Settings */}
         <View className="px-6 mb-4">
           <Text className="text-sm font-medium text-secondary-500 dark:text-secondary-400 mb-2 uppercase tracking-wide">
