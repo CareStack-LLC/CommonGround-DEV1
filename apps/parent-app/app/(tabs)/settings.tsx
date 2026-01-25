@@ -51,6 +51,26 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* Family Section */}
+        <View className="px-6 mb-4">
+          <Text className="text-sm font-medium text-secondary-500 dark:text-secondary-400 mb-2 uppercase tracking-wide">
+            Family
+          </Text>
+          <View className="card space-y-0">
+            <SettingsRow
+              icon="folder-open-outline"
+              label="Family Files"
+              onPress={() => router.push("/family")}
+            />
+            <SettingsRow
+              icon="person-add-outline"
+              label="Invite Co-Parent"
+              onPress={() => router.push("/family")}
+              isLast
+            />
+          </View>
+        </View>
+
         {/* Account Settings */}
         <View className="px-6 mb-4">
           <Text className="text-sm font-medium text-secondary-500 dark:text-secondary-400 mb-2 uppercase tracking-wide">
