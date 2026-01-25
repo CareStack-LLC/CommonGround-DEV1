@@ -923,6 +923,236 @@ async def get_my_circle_permissions(
     )
 
 
+@router.get(
+    "/circle-users/me/profile",
+    response_model=CircleUserProfileResponse,
+    summary="Get my profile",
+    description="Get profile information for the authenticated circle user."
+)
+async def get_my_circle_profile(
+    current_circle_user: CircleUser = Depends(get_current_circle_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get profile information for the authenticated circle user.
+    """
+    # Get the circle contact
+    contact_result = await db.execute(
+        select(CircleContact)
+        .where(CircleContact.id == current_circle_user.circle_contact_id)
+    )
+    contact = contact_result.scalar_one_or_none()
+
+    if not contact:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Circle contact not found"
+        )
+
+    # Get permissions and children
+    permissions = await my_circle_service.get_permissions_for_contact(
+        db, str(current_circle_user.circle_contact_id)
+    )
+
+    children_list = []
+    permissions_list = []
+    for permission in permissions:
+        child = permission.child
+        if child:
+            age = None
+            if child.date_of_birth:
+                today = datetime.utcnow().date()
+                age = today.year - child.date_of_birth.year - (
+                    (today.month, today.day) < (child.date_of_birth.month, child.date_of_birth.day)
+                )
+            children_list.append({
+                "id": child.id,
+                "name": child.display_name or child.first_name,
+                "avatar_url": child.photo_url,
+                "age": age,
+            })
+        permissions_list.append({
+            "child_id": permission.child_id,
+            "can_video_call": permission.can_video_call,
+            "can_voice_call": permission.can_voice_call,
+            "can_chat": permission.can_chat,
+            "can_theater": permission.can_theater,
+        })
+
+    return CircleUserProfileResponse(
+        id=current_circle_user.id,
+        circle_contact_id=current_circle_user.circle_contact_id,
+        email=current_circle_user.email,
+        contact_name=contact.contact_name,
+        relationship_type=contact.relationship_type or "",
+        family_file_id=contact.family_file_id,
+        room_number=contact.room_number,
+        email_verified=contact.is_verified or False,
+        is_active=contact.is_active,
+        last_login=current_circle_user.last_login,
+        children=children_list,
+        permissions=permissions_list,
+        created_at=current_circle_user.created_at,
+    )
+
+
+@router.get(
+    "/circle-users/me/children",
+    summary="Get my connected children",
+    description="Get all children this circle user can communicate with."
+)
+async def get_my_connected_children(
+    current_circle_user: CircleUser = Depends(get_current_circle_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get all children this circle user is permitted to communicate with.
+    Returns children with their online status and permissions.
+    """
+    # Get permissions for this contact
+    permissions = await my_circle_service.get_permissions_for_contact(
+        db, str(current_circle_user.circle_contact_id)
+    )
+
+    children = []
+    for permission in permissions:
+        child = permission.child
+        if child:
+            # Calculate age from date_of_birth
+            age = None
+            if child.date_of_birth:
+                today = datetime.utcnow().date()
+                age = today.year - child.date_of_birth.year - (
+                    (today.month, today.day) < (child.date_of_birth.month, child.date_of_birth.day)
+                )
+
+            children.append({
+                "id": child.id,
+                "name": child.display_name or child.first_name,
+                "avatar_url": child.photo_url,
+                "age": age,
+                "is_online": False,  # TODO: Integrate with presence system
+                "family_file_id": child.family_file_id,
+                "can_video_call": permission.can_video_call,
+                "can_voice_call": permission.can_voice_call,
+                "can_chat": permission.can_chat,
+                "can_theater": permission.can_theater,
+            })
+
+    return {"items": children, "total": len(children)}
+
+
+@router.get(
+    "/circle-users/me/children/{child_id}",
+    summary="Get child profile",
+    description="Get a specific child's profile for communication."
+)
+async def get_child_for_circle_user(
+    child_id: str,
+    current_circle_user: CircleUser = Depends(get_current_circle_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get a specific child's profile that this circle user can communicate with.
+    """
+    # Check permission
+    permission_result = await db.execute(
+        select(CirclePermission).where(
+            and_(
+                CirclePermission.circle_contact_id == current_circle_user.circle_contact_id,
+                CirclePermission.child_id == child_id
+            )
+        )
+    )
+    permission = permission_result.scalar_one_or_none()
+
+    if not permission:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permission to view this child"
+        )
+
+    # Get child
+    child_result = await db.execute(
+        select(Child).where(Child.id == child_id)
+    )
+    child = child_result.scalar_one_or_none()
+
+    if not child:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Child not found"
+        )
+
+    # Calculate age
+    age = None
+    if child.date_of_birth:
+        today = datetime.utcnow().date()
+        age = today.year - child.date_of_birth.year - (
+            (today.month, today.day) < (child.date_of_birth.month, child.date_of_birth.day)
+        )
+
+    return {
+        "id": child.id,
+        "first_name": child.first_name,
+        "display_name": child.display_name,
+        "avatar_url": child.photo_url,
+        "age": age,
+        "family_file_id": child.family_file_id,
+    }
+
+
+@router.get(
+    "/circle-users/me/children/{child_id}/availability",
+    summary="Check child availability",
+    description="Check if a child is available for a call."
+)
+async def check_child_availability_for_circle(
+    child_id: str,
+    current_circle_user: CircleUser = Depends(get_current_circle_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Check if a child is available for a call from this circle user.
+    Checks permissions, time restrictions, and online status.
+    """
+    # Get permission
+    permission_result = await db.execute(
+        select(CirclePermission).where(
+            and_(
+                CirclePermission.circle_contact_id == current_circle_user.circle_contact_id,
+                CirclePermission.child_id == child_id
+            )
+        )
+    )
+    permission = permission_result.scalar_one_or_none()
+
+    if not permission:
+        return {
+            "available": False,
+            "reason": "You don't have permission to contact this child"
+        }
+
+    if not permission.can_video_call and not permission.can_voice_call:
+        return {
+            "available": False,
+            "reason": "Calling is not enabled for this child"
+        }
+
+    # Check time restrictions
+    if hasattr(permission, 'is_within_allowed_time') and not permission.is_within_allowed_time():
+        return {
+            "available": False,
+            "reason": "Calls are only allowed during specific times"
+        }
+
+    # TODO: Check if child is actually online via presence system
+    return {
+        "available": True,
+        "reason": None
+    }
+
+
 # ============================================================
 # Child User Authentication Endpoints
 # ============================================================

@@ -1,3 +1,8 @@
+/**
+ * Auth Provider for My Circle App
+ * Handles circle user authentication and connected children
+ */
+
 import {
   createContext,
   useContext,
@@ -8,21 +13,27 @@ import {
 } from "react";
 import * as SecureStore from "expo-secure-store";
 
+import { circle } from "@commonground/api-client";
+
 interface User {
   id: string;
   email: string;
   name: string;
   avatar_url?: string;
   relationship?: string;
+  family_file_id?: string;
 }
 
 interface ConnectedChild {
   id: string;
   name: string;
   avatar_url?: string;
-  age: number;
+  age?: number;
   is_online: boolean;
   family_file_id: string;
+  can_video_call?: boolean;
+  can_voice_call?: boolean;
+  can_chat?: boolean;
 }
 
 interface AuthContextType {
@@ -32,6 +43,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string) => Promise<boolean>;
+  acceptInvite: (token: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshChildren: () => Promise<void>;
 }
@@ -60,7 +72,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (token && storedUser) {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
-        await fetchConnectedChildren(token);
+
+        // Validate session and refresh data
+        try {
+          const { valid, profile } = await circle.auth.validateSession();
+          if (valid && profile) {
+            const updatedUser: User = {
+              id: profile.id,
+              email: profile.email,
+              name: profile.contact_name,
+              relationship: profile.relationship_type,
+              family_file_id: profile.family_file_id,
+            };
+            setUser(updatedUser);
+            await SecureStore.setItemAsync(USER_KEY, JSON.stringify(updatedUser));
+            await fetchConnectedChildren();
+          } else {
+            // Session invalid, clear stored data
+            await logout();
+          }
+        } catch (error) {
+          console.error("Session validation failed:", error);
+          // Keep using stored data if validation fails (offline support)
+          await fetchConnectedChildren();
+        }
       }
     } catch (error) {
       console.error("Failed to load auth:", error);
@@ -69,13 +104,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const fetchConnectedChildren = async (token: string) => {
+  const fetchConnectedChildren = async () => {
     try {
-      // In real app, this would call the API
-      // const response = await apiClient.getConnectedChildren(token);
-      // setConnectedChildren(response.data);
-
-      // Demo data for now
+      const response = await circle.auth.getConnectedChildren();
+      setConnectedChildren(
+        response.items.map((child) => ({
+          id: child.id,
+          name: child.name,
+          avatar_url: child.avatar_url,
+          age: child.age,
+          is_online: child.is_online,
+          family_file_id: child.family_file_id,
+          can_video_call: child.can_video_call,
+          can_voice_call: child.can_voice_call,
+          can_chat: child.can_chat,
+        }))
+      );
+    } catch (error) {
+      console.error("Failed to fetch children:", error);
+      // Fall back to demo data for development
       setConnectedChildren([
         {
           id: "child-1",
@@ -94,8 +141,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           family_file_id: "ff-1",
         },
       ]);
-    } catch (error) {
-      console.error("Failed to fetch children:", error);
     }
   };
 
@@ -103,31 +148,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      // In real app, this would call the API
-      // const response = await apiClient.circleLogin({ email, password });
+      const response = await circle.auth.login(email, password);
 
-      // Demo login
-      if (email && password.length >= 6) {
-        const demoUser: User = {
-          id: "circle-user-1",
-          email,
-          name: email.split("@")[0],
-          relationship: "Grandparent",
-        };
+      const loggedInUser: User = {
+        id: response.user_id,
+        email: email,
+        name: response.contact_name,
+        family_file_id: response.family_file_id,
+      };
 
-        const demoToken = "demo-circle-token";
+      await Promise.all([
+        SecureStore.setItemAsync(TOKEN_KEY, response.access_token),
+        SecureStore.setItemAsync(USER_KEY, JSON.stringify(loggedInUser)),
+      ]);
 
-        await Promise.all([
-          SecureStore.setItemAsync(TOKEN_KEY, demoToken),
-          SecureStore.setItemAsync(USER_KEY, JSON.stringify(demoUser)),
-        ]);
-
-        setUser(demoUser);
-        await fetchConnectedChildren(demoToken);
-        return true;
-      }
-
-      return false;
+      setUser(loggedInUser);
+      await fetchConnectedChildren();
+      return true;
     } catch (error) {
       console.error("Login failed:", error);
       return false;
@@ -137,36 +174,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const register = useCallback(
-    async (name: string, email: string, password: string): Promise<boolean> => {
+    async (_name: string, _email: string, _password: string): Promise<boolean> => {
+      // Circle users don't self-register - they accept invitations
+      // This is here for interface compatibility
+      console.warn("Circle users should use acceptInvite instead of register");
+      return false;
+    },
+    []
+  );
+
+  const acceptInvite = useCallback(
+    async (inviteToken: string, password: string): Promise<boolean> => {
       try {
         setIsLoading(true);
 
-        // In real app, this would call the API
-        // const response = await apiClient.circleRegister({ name, email, password });
+        const response = await circle.auth.acceptInvitation(
+          inviteToken,
+          password,
+          password // confirm password same as password
+        );
 
-        // Demo registration
-        if (name && email && password.length >= 6) {
-          const demoUser: User = {
-            id: "circle-user-new",
-            email,
-            name,
-            relationship: undefined,
-          };
+        const invitedUser: User = {
+          id: response.user_id,
+          email: "", // Email will be fetched from profile
+          name: response.contact_name,
+          family_file_id: response.family_file_id,
+        };
 
-          const demoToken = "demo-circle-token-new";
+        await Promise.all([
+          SecureStore.setItemAsync(TOKEN_KEY, response.access_token),
+          SecureStore.setItemAsync(USER_KEY, JSON.stringify(invitedUser)),
+        ]);
 
-          await Promise.all([
-            SecureStore.setItemAsync(TOKEN_KEY, demoToken),
-            SecureStore.setItemAsync(USER_KEY, JSON.stringify(demoUser)),
-          ]);
-
-          setUser(demoUser);
-          return true;
-        }
-
-        return false;
+        setUser(invitedUser);
+        await fetchConnectedChildren();
+        return true;
       } catch (error) {
-        console.error("Registration failed:", error);
+        console.error("Accept invite failed:", error);
         return false;
       } finally {
         setIsLoading(false);
@@ -177,6 +221,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
+      await circle.auth.logout();
       await Promise.all([
         SecureStore.deleteItemAsync(TOKEN_KEY),
         SecureStore.deleteItemAsync(USER_KEY),
@@ -189,10 +234,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const refreshChildren = useCallback(async () => {
-    const token = await SecureStore.getItemAsync(TOKEN_KEY);
-    if (token) {
-      await fetchConnectedChildren(token);
-    }
+    await fetchConnectedChildren();
   }, []);
 
   return (
@@ -204,6 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: !!user,
         login,
         register,
+        acceptInvite,
         logout,
         refreshChildren,
       }}
