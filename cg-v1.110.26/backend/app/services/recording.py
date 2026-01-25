@@ -66,9 +66,12 @@ class RecordingService:
         file_content: bytes,
         content_type: str = "video/mp4",
         filename: str = "recording.mp4"
-    ) -> str:
+    ) -> Dict[str, Any]:
         """
-        Upload a recording file to Supabase Storage.
+        Upload a recording file to Supabase Storage with integrity hash.
+
+        Computes SHA-256 hash of file content for court-admissible
+        chain of custody verification.
 
         Args:
             family_file_id: Family file ID
@@ -79,8 +82,12 @@ class RecordingService:
             filename: Filename
 
         Returns:
-            Signed URL for the uploaded file
+            Dict with url, path, file_hash, and file_size
         """
+        # Compute SHA-256 hash for integrity verification
+        file_hash = hashlib.sha256(file_content).hexdigest()
+        file_size = len(file_content)
+
         path = self.build_recording_path(
             family_file_id, session_id, recording_type, filename
         )
@@ -92,8 +99,17 @@ class RecordingService:
             content_type=content_type,
         )
 
-        logger.info(f"Uploaded recording to {self.bucket}/{path}")
-        return url
+        logger.info(
+            f"Uploaded recording to {self.bucket}/{path} "
+            f"(hash: {file_hash[:16]}..., size: {file_size})"
+        )
+
+        return {
+            "url": url,
+            "path": path,
+            "file_hash": file_hash,
+            "file_size": file_size,
+        }
 
     async def create_recording(
         self,
@@ -209,8 +225,19 @@ class RecordingService:
         storage_path: str,
         duration_seconds: Optional[int] = None,
         file_size_bytes: Optional[int] = None,
+        file_hash: Optional[str] = None,
     ) -> Recording:
-        """Mark recording as completed with Supabase Storage location."""
+        """
+        Mark recording as completed with Supabase Storage location.
+
+        Args:
+            db: Database session
+            recording_id: Recording ID
+            storage_path: Path in Supabase Storage
+            duration_seconds: Duration of recording
+            file_size_bytes: Size of recording file
+            file_hash: SHA-256 hash for integrity verification
+        """
         recording = await self.get_recording(db, recording_id)
         if not recording:
             raise ValueError(f"Recording {recording_id} not found")
@@ -222,6 +249,7 @@ class RecordingService:
             s3_region="supabase",   # Marker to indicate Supabase storage
             duration_seconds=duration_seconds,
             file_size_bytes=file_size_bytes,
+            file_hash=file_hash,    # Store integrity hash
         )
 
         # Set retention (default 7 years for legal records)
@@ -231,7 +259,8 @@ class RecordingService:
         await db.refresh(recording)
 
         logger.info(
-            f"Recording {recording_id} completed: supabase://{self.bucket}/{storage_path}"
+            f"Recording {recording_id} completed: supabase://{self.bucket}/{storage_path} "
+            f"(hash: {file_hash[:16] if file_hash else 'none'}...)"
         )
         return recording
 
@@ -469,6 +498,78 @@ class RecordingService:
 
         logger.info(f"Uploaded transcription to {self.bucket}/{path}")
         return url
+
+    # =========================================================================
+    # Integrity Verification
+    # =========================================================================
+
+    async def download_and_verify(
+        self,
+        db: AsyncSession,
+        recording_id: str
+    ) -> Dict[str, Any]:
+        """
+        Download a recording and verify its integrity.
+
+        Used to verify that the stored file has not been modified.
+
+        Args:
+            db: Database session
+            recording_id: Recording ID
+
+        Returns:
+            Dict with verification status and details
+        """
+        recording = await self.get_recording(db, recording_id)
+        if not recording or not recording.is_available:
+            return {
+                "verified": False,
+                "status": "unavailable",
+                "message": "Recording not available",
+            }
+
+        if not recording.file_hash:
+            return {
+                "verified": False,
+                "status": "no_hash",
+                "message": "Recording was created before integrity tracking",
+            }
+
+        try:
+            # Download file content
+            file_content = await self.storage.download_file(
+                bucket=recording.s3_bucket,
+                path=recording.s3_key
+            )
+
+            # Compute hash
+            computed_hash = hashlib.sha256(file_content).hexdigest()
+
+            # Verify
+            is_valid = recording.verify_integrity(computed_hash)
+            await db.commit()
+
+            return {
+                "verified": is_valid,
+                "status": "verified" if is_valid else "failed",
+                "stored_hash": recording.file_hash,
+                "computed_hash": computed_hash,
+                "file_size": len(file_content),
+                "expected_size": recording.file_size_bytes,
+                "message": "File integrity verified" if is_valid else "Hash mismatch - file may be corrupted",
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to verify recording {recording_id}: {e}")
+            return {
+                "verified": False,
+                "status": "error",
+                "message": str(e),
+            }
+
+    def compute_file_hash(self, file_content: bytes) -> str:
+        """Compute SHA-256 hash of file content."""
+        return hashlib.sha256(file_content).hexdigest()
 
     # =========================================================================
     # Webhook Signature Verification

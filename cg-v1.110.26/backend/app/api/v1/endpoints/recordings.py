@@ -2,26 +2,36 @@
 Recording Access API Endpoints.
 
 Provides access to call recordings and transcriptions for parents.
+All access is logged for court-admissible chain of custody.
 """
 
 import logging
 from typing import Optional, List
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.models.recording import RecordingType, RecordingStatus, TranscriptionStatus
+from app.models.recording import RecordingType, RecordingStatus, TranscriptionStatus, RecordingAccessAction
 from app.services.recording import recording_service
+from app.services.recording_audit import recording_audit_service
 from app.services.family_file import get_user_family_file
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+def get_client_ip(request: Request) -> Optional[str]:
+    """Extract client IP from request."""
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else None
 
 
 # =============================================================================
@@ -163,13 +173,15 @@ async def get_family_recordings(
 @router.get("/{recording_id}", response_model=RecordingDetailResponse)
 async def get_recording(
     recording_id: str,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """
     Get a specific recording with download URL.
 
-    The download URL is a signed S3 URL valid for 1 hour.
+    The download URL is a signed URL valid for 1 hour.
+    Access is logged for chain of custody.
     """
     recording = await recording_service.get_recording(db, recording_id)
     if not recording:
@@ -183,11 +195,26 @@ async def get_recording(
     # Generate signed URL if recording is available
     download_url = None
     download_url_expires_at = None
+    action = RecordingAccessAction.VIEW_METADATA
 
     if recording.is_available:
         download_url = await recording_service.generate_signed_url(db, recording_id)
         if download_url and recording.download_url_expires_at:
             download_url_expires_at = recording.download_url_expires_at
+            action = RecordingAccessAction.GENERATE_URL
+
+    # Log access for chain of custody
+    await recording_audit_service.log_access(
+        db=db,
+        recording_id=recording_id,
+        user_id=current_user.id,
+        action=action,
+        user_email=current_user.email,
+        user_role="parent",
+        action_detail=f"Viewed recording details, URL generated: {download_url is not None}",
+        ip_address=get_client_ip(request),
+        user_agent=request.headers.get("User-Agent"),
+    )
 
     return RecordingDetailResponse(
         id=recording.id,
@@ -209,6 +236,7 @@ async def get_recording(
 @router.get("/{recording_id}/transcription", response_model=TranscriptionResponse)
 async def get_recording_transcription(
     recording_id: str,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -216,6 +244,7 @@ async def get_recording_transcription(
     Get the transcription for a recording.
 
     Returns the full transcription with speaker-diarized chunks.
+    Access is logged for chain of custody.
     """
     recording = await recording_service.get_recording(db, recording_id)
     if not recording:
@@ -231,6 +260,19 @@ async def get_recording_transcription(
         raise HTTPException(status_code=404, detail="Transcription not available")
 
     transcription = recording.transcription
+
+    # Log transcription access
+    await recording_audit_service.log_access(
+        db=db,
+        recording_id=recording_id,
+        user_id=current_user.id,
+        action=RecordingAccessAction.TRANSCRIPTION_VIEW,
+        user_email=current_user.email,
+        user_role="parent",
+        action_detail=f"Viewed transcription ({transcription.word_count or 0} words)",
+        ip_address=get_client_ip(request),
+        user_agent=request.headers.get("User-Agent"),
+    )
 
     # Build chunks response
     chunks = []
@@ -261,6 +303,7 @@ async def get_recording_transcription(
 @router.post("/{recording_id}/refresh-url")
 async def refresh_download_url(
     recording_id: str,
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
@@ -268,6 +311,7 @@ async def refresh_download_url(
     Refresh the download URL for a recording.
 
     Use this if the previous URL has expired.
+    Access is logged for chain of custody.
     """
     recording = await recording_service.get_recording(db, recording_id)
     if not recording:
@@ -288,6 +332,19 @@ async def refresh_download_url(
     download_url = await recording_service.generate_signed_url(db, recording_id)
     if not download_url:
         raise HTTPException(status_code=500, detail="Failed to generate download URL")
+
+    # Log URL generation
+    await recording_audit_service.log_access(
+        db=db,
+        recording_id=recording_id,
+        user_id=current_user.id,
+        action=RecordingAccessAction.GENERATE_URL,
+        user_email=current_user.email,
+        user_role="parent",
+        action_detail="Refreshed download URL",
+        ip_address=get_client_ip(request),
+        user_agent=request.headers.get("User-Agent"),
+    )
 
     return {
         "download_url": download_url,
