@@ -1,0 +1,115 @@
+import { Tabs } from "expo-router";
+import { View, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
+type TabIconProps = {
+  name: keyof typeof Ionicons.glyphMap;
+  color: string;
+  focused: boolean;
+  label: string;
+  emoji: string;
+};
+
+function TabIcon({ emoji, color, focused, label }: TabIconProps) {
+  return (
+    <View className="items-center justify-center pt-2">
+      <Text className={`text-2xl ${focused ? "scale-110" : ""}`}>{emoji}</Text>
+      <Text
+        className={`text-xs mt-1 font-bold ${
+          focused ? "text-purple-600" : "text-gray-400"
+        }`}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+export default function MainTabLayout() {
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: "#9333ea",
+        tabBarInactiveTintColor: "#9ca3af",
+        tabBarStyle: {
+          backgroundColor: "#ffffff",
+          borderTopWidth: 0,
+          height: 80,
+          paddingBottom: 8,
+          paddingTop: 8,
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 12,
+          elevation: 20,
+          position: "absolute",
+        },
+        tabBarShowLabel: false,
+        headerShown: false,
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              name="home"
+              emoji="🏠"
+              color={color}
+              focused={focused}
+              label="Home"
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="circle"
+        options={{
+          title: "My Circle",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              name="people"
+              emoji="👨‍👩‍👧‍👦"
+              color={color}
+              focused={focused}
+              label="Circle"
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="theater"
+        options={{
+          title: "Theater",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              name="tv"
+              emoji="🎬"
+              color={color}
+              focused={focused}
+              label="Theater"
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="arcade"
+        options={{
+          title: "Arcade",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              name="game-controller"
+              emoji="🎮"
+              color={color}
+              focused={focused}
+              label="Arcade"
+            />
+          ),
+        }}
+      />
+    </Tabs>
+  );
+}

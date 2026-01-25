@@ -1,0 +1,91 @@
+{
+  "expo": {
+    "name": "Kidscom",
+    "slug": "commonground-kidscom",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "kidscom",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#8b5cf6"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.commonground.kidscom",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Kidscom needs camera access for video calls with your family",
+        "NSMicrophoneUsageDescription": "Kidscom needs microphone access for calls with your family",
+        "UIBackgroundModes": [
+          "audio",
+          "voip",
+          "remote-notification"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#8b5cf6"
+      },
+      "package": "com.commonground.kidscom",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#8b5cf6"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Kidscom needs your camera for video calls"
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Kidscom needs your microphone for calls"
+        }
+      ],
+      [
+        "@daily-co/react-native-daily-js",
+        {
+          "enableScreenShare": false
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "tsconfigPaths": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "your-project-id"
+      }
+    }
+  }
+}
