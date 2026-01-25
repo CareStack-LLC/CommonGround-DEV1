@@ -453,7 +453,7 @@ export default function ScheduleScreen() {
       <TouchableOpacity
         className="absolute bottom-6 right-6 w-14 h-14 rounded-full items-center justify-center shadow-elevated"
         style={{ backgroundColor: SAGE }}
-        onPress={() => Alert.alert("Coming Soon", "Add exchange scheduling coming soon!")}
+        onPress={() => router.push("/exchange/create")}
       >
         <Ionicons name="add" size={28} color="white" />
       </TouchableOpacity>
