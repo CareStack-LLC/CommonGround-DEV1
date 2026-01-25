@@ -209,6 +209,9 @@ from app.models.recording import (
     RecordingStatus,
     RecordingType,
     TranscriptionStatus,
+    RecordingAccessLog,
+    RecordingExportLog,
+    RecordingAccessAction,
 )
 
 __all__ = [
@@ -416,4 +419,8 @@ __all__ = [
     "RecordingStatus",
     "RecordingType",
     "TranscriptionStatus",
+    # Recording Audit (Chain of Custody)
+    "RecordingAccessLog",
+    "RecordingExportLog",
+    "RecordingAccessAction",
 ]

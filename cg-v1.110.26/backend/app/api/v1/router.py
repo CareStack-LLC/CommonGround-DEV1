@@ -44,6 +44,7 @@ from app.api.v1.endpoints import (
     parent_calls,
     recording_webhooks,
     recordings,
+    recording_audit,
 )
 
 api_router = APIRouter()
@@ -138,3 +139,6 @@ api_router.include_router(recording_webhooks.router, prefix="/webhooks", tags=["
 
 # Recordings - Call recordings and transcriptions
 api_router.include_router(recordings.router, prefix="/recordings", tags=["Recordings"])
+
+# Recording Audit - Chain of custody, legal hold, evidence export
+api_router.include_router(recording_audit.router, prefix="/recordings", tags=["Recording Audit"])
