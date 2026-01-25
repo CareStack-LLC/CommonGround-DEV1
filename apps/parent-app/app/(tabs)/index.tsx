@@ -47,23 +47,39 @@ export default function DashboardScreen() {
           <View className="flex-row flex-wrap gap-3">
             <QuickActionButton
               icon="chatbubble"
-              label="New Message"
+              label="Messages"
               onPress={() => router.push("/(tabs)/messages")}
+              color="#2563eb"
             />
             <QuickActionButton
-              icon="calendar"
-              label="Add Event"
+              icon="wallet"
+              label="ClearFund"
+              onPress={() => router.push("/expenses")}
+              color="#22c55e"
+            />
+            <QuickActionButton
+              icon="swap-horizontal"
+              label="Time Bridge"
               onPress={() => router.push("/(tabs)/schedule")}
+              color="#f97316"
+            />
+            <QuickActionButton
+              icon="people"
+              label="My Circle"
+              onPress={() => router.push("/circle")}
+              color="#9333ea"
             />
             <QuickActionButton
               icon="videocam"
               label="Recordings"
               onPress={() => router.push("/recordings")}
+              color="#ef4444"
             />
             <QuickActionButton
               icon="document-text"
               label="Agreements"
               onPress={() => {}}
+              color="#64748b"
             />
           </View>
         </View>
@@ -130,10 +146,12 @@ function QuickActionButton({
   icon,
   label,
   onPress,
+  color = "#2563eb",
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   onPress: () => void;
+  color?: string;
 }) {
   return (
     <TouchableOpacity
@@ -141,8 +159,11 @@ function QuickActionButton({
       style={{ width: "47%" }}
       onPress={onPress}
     >
-      <View className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full items-center justify-center mb-2">
-        <Ionicons name={icon} size={24} color="#2563eb" />
+      <View
+        className="w-12 h-12 rounded-full items-center justify-center mb-2"
+        style={{ backgroundColor: `${color}20` }}
+      >
+        <Ionicons name={icon} size={24} color={color} />
       </View>
       <Text className="text-secondary-700 dark:text-secondary-300 text-sm font-medium">
         {label}
