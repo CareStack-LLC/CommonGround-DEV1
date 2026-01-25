@@ -60,22 +60,22 @@ export default function SettingsScreen() {
             <SettingsRow
               icon="person-outline"
               label="Edit Profile"
-              onPress={() => {}}
+              onPress={() => router.push("/settings/edit-profile")}
             />
             <SettingsRow
               icon="lock-closed-outline"
               label="Change Password"
-              onPress={() => {}}
+              onPress={() => router.push("/settings/change-password")}
             />
             <SettingsRow
               icon="notifications-outline"
               label="Notification Preferences"
-              onPress={() => {}}
+              onPress={() => router.push("/settings/notifications")}
             />
             <SettingsRow
               icon="shield-checkmark-outline"
               label="Privacy Settings"
-              onPress={() => {}}
+              onPress={() => router.push("/settings/privacy")}
               isLast
             />
           </View>

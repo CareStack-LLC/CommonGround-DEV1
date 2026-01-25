@@ -57,8 +57,8 @@ export default function DashboardScreen() {
             />
             <QuickActionButton
               icon="videocam"
-              label="Start Call"
-              onPress={() => {}}
+              label="Recordings"
+              onPress={() => router.push("/recordings")}
             />
             <QuickActionButton
               icon="document-text"

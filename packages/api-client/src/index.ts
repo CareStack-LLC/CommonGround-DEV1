@@ -100,7 +100,7 @@ export {
 } from './core';
 
 // API modules
-export { parent, child, circle } from './api';
+export { parent, child, circle, video } from './api';
 
 // Re-export adapters for convenience
 export { createWebStorage, WebStorage } from './adapters/web-storage';

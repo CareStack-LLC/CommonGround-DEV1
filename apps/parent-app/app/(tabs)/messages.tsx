@@ -75,7 +75,7 @@ export default function MessagesScreen() {
       {/* Compose Button */}
       <TouchableOpacity
         className="absolute bottom-6 right-6 w-14 h-14 bg-primary-600 rounded-full items-center justify-center shadow-lg"
-        onPress={() => {}}
+        onPress={() => router.push("/messages/compose")}
       >
         <Ionicons name="create" size={24} color="white" />
       </TouchableOpacity>
