@@ -7,6 +7,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
 
+// CommonGround Design System Colors - Matching Web
+const SAGE = "#4A6C58";       // Primary - Trust, success
+const SAGE_LIGHT = "#6B9B7A";
+const SLATE = "#475569";      // Secondary - Stability
+const AMBER = "#D4A574";      // Accent - Warmth, attention
+const SAND = "#F5F0E8";       // Background
+const CREAM = "#FFFBF5";      // Card surfaces
+
 export default function DashboardScreen() {
   const { user } = useAuth();
   const { familyFile, children, isLoading, refresh } = useFamilyFile();
@@ -21,7 +29,7 @@ export default function DashboardScreen() {
   const firstName = user?.first_name || "Parent";
 
   return (
-    <SafeAreaView className="flex-1 bg-secondary-50 dark:bg-secondary-900" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-sand-200 dark:bg-secondary-900" edges={["top"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -30,18 +38,18 @@ export default function DashboardScreen() {
         }
       >
         {/* Header */}
-        <View className="px-6 pt-4 pb-6 bg-white dark:bg-secondary-800">
-          <Text className="text-2xl font-bold text-secondary-900 dark:text-white">
+        <View className="px-6 pt-4 pb-6" style={{ backgroundColor: CREAM }}>
+          <Text className="text-2xl font-bold" style={{ color: SAGE }}>
             Welcome, {firstName}
           </Text>
-          <Text className="text-secondary-500 dark:text-secondary-400 mt-1">
+          <Text className="mt-1" style={{ color: SLATE }}>
             {familyFile?.title || "Your family dashboard"}
           </Text>
         </View>
 
         {/* Quick Actions */}
         <View className="px-6 py-4">
-          <Text className="text-lg font-semibold text-secondary-900 dark:text-white mb-3">
+          <Text className="text-lg font-semibold mb-3" style={{ color: SLATE }}>
             Quick Actions
           </Text>
           <View className="flex-row flex-wrap gap-3">
@@ -49,37 +57,37 @@ export default function DashboardScreen() {
               icon="chatbubble"
               label="Messages"
               onPress={() => router.push("/(tabs)/messages")}
-              color="#2563eb"
+              color={SAGE}
             />
             <QuickActionButton
               icon="wallet"
               label="ClearFund"
               onPress={() => router.push("/expenses")}
-              color="#22c55e"
+              color={SAGE_LIGHT}
             />
             <QuickActionButton
               icon="swap-horizontal"
               label="Time Bridge"
               onPress={() => router.push("/(tabs)/schedule")}
-              color="#f97316"
+              color={AMBER}
             />
             <QuickActionButton
               icon="people"
               label="My Circle"
               onPress={() => router.push("/circle")}
-              color="#9333ea"
+              color={SLATE}
             />
             <QuickActionButton
               icon="videocam"
               label="Recordings"
               onPress={() => router.push("/recordings")}
-              color="#ef4444"
+              color={AMBER}
             />
             <QuickActionButton
               icon="document-text"
               label="Agreements"
               onPress={() => {}}
-              color="#64748b"
+              color={SLATE}
             />
           </View>
         </View>
@@ -87,7 +95,7 @@ export default function DashboardScreen() {
         {/* Children Section */}
         {children && children.length > 0 && (
           <View className="px-6 py-4">
-            <Text className="text-lg font-semibold text-secondary-900 dark:text-white mb-3">
+            <Text className="text-lg font-semibold mb-3" style={{ color: SLATE }}>
               Children
             </Text>
             <View className="space-y-3">
@@ -101,17 +109,17 @@ export default function DashboardScreen() {
         {/* Recent Activity */}
         <View className="px-6 py-4">
           <View className="flex-row justify-between items-center mb-3">
-            <Text className="text-lg font-semibold text-secondary-900 dark:text-white">
+            <Text className="text-lg font-semibold" style={{ color: SLATE }}>
               Recent Activity
             </Text>
             <TouchableOpacity>
-              <Text className="text-primary-600 text-sm">View All</Text>
+              <Text className="text-sm" style={{ color: SAGE }}>View All</Text>
             </TouchableOpacity>
           </View>
-          <View className="card">
+          <View className="rounded-3xl p-4" style={{ backgroundColor: CREAM }}>
             <View className="items-center py-8">
-              <Ionicons name="time-outline" size={48} color="#94a3b8" />
-              <Text className="text-secondary-500 dark:text-secondary-400 mt-3">
+              <Ionicons name="time-outline" size={48} color={SLATE} />
+              <Text className="mt-3" style={{ color: SLATE }}>
                 No recent activity
               </Text>
             </View>
@@ -121,17 +129,17 @@ export default function DashboardScreen() {
         {/* Upcoming Events */}
         <View className="px-6 py-4">
           <View className="flex-row justify-between items-center mb-3">
-            <Text className="text-lg font-semibold text-secondary-900 dark:text-white">
+            <Text className="text-lg font-semibold" style={{ color: SLATE }}>
               Upcoming Events
             </Text>
             <TouchableOpacity onPress={() => router.push("/(tabs)/schedule")}>
-              <Text className="text-primary-600 text-sm">View Calendar</Text>
+              <Text className="text-sm" style={{ color: SAGE }}>View Calendar</Text>
             </TouchableOpacity>
           </View>
-          <View className="card">
+          <View className="rounded-3xl p-4" style={{ backgroundColor: CREAM }}>
             <View className="items-center py-8">
-              <Ionicons name="calendar-outline" size={48} color="#94a3b8" />
-              <Text className="text-secondary-500 dark:text-secondary-400 mt-3">
+              <Ionicons name="calendar-outline" size={48} color={AMBER} />
+              <Text className="mt-3" style={{ color: SLATE }}>
                 No upcoming events
               </Text>
             </View>
@@ -146,7 +154,7 @@ function QuickActionButton({
   icon,
   label,
   onPress,
-  color = "#2563eb",
+  color = SAGE,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
@@ -155,8 +163,8 @@ function QuickActionButton({
 }) {
   return (
     <TouchableOpacity
-      className="bg-white dark:bg-secondary-800 rounded-xl p-4 items-center justify-center shadow-sm border border-secondary-100 dark:border-secondary-700"
-      style={{ width: "47%" }}
+      className="rounded-3xl p-4 items-center justify-center shadow-sm"
+      style={{ width: "47%", backgroundColor: CREAM }}
       onPress={onPress}
     >
       <View
@@ -165,7 +173,7 @@ function QuickActionButton({
       >
         <Ionicons name={icon} size={24} color={color} />
       </View>
-      <Text className="text-secondary-700 dark:text-secondary-300 text-sm font-medium">
+      <Text className="text-sm font-medium" style={{ color: SLATE }}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -181,23 +189,29 @@ function ChildCard({ child }: { child: { id: string; first_name: string; date_of
     : null;
 
   return (
-    <TouchableOpacity className="card flex-row items-center">
-      <View className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full items-center justify-center">
-        <Text className="text-primary-600 font-bold text-lg">
+    <TouchableOpacity
+      className="flex-row items-center rounded-3xl p-4"
+      style={{ backgroundColor: CREAM }}
+    >
+      <View
+        className="w-12 h-12 rounded-full items-center justify-center"
+        style={{ backgroundColor: `${SAGE}20` }}
+      >
+        <Text className="font-bold text-lg" style={{ color: SAGE }}>
           {child.first_name.charAt(0)}
         </Text>
       </View>
       <View className="ml-4 flex-1">
-        <Text className="text-secondary-900 dark:text-white font-semibold">
+        <Text className="font-semibold" style={{ color: SLATE }}>
           {child.first_name}
         </Text>
         {age !== null && (
-          <Text className="text-secondary-500 dark:text-secondary-400 text-sm">
+          <Text className="text-sm" style={{ color: `${SLATE}99` }}>
             {age} years old
           </Text>
         )}
       </View>
-      <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
+      <Ionicons name="chevron-forward" size={20} color={SLATE} />
     </TouchableOpacity>
   );
 }

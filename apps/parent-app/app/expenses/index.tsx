@@ -183,17 +183,18 @@ export default function ExpensesScreen() {
   };
 
   const getStatusBadge = (status: string) => {
+    // Using web design system colors: Sage for success, Amber for pending, Slate for neutral
     const badges: Record<string, { bg: string; text: string; label: string }> = {
-      pending_funding: { bg: "bg-yellow-100", text: "text-yellow-700", label: "Needs Funding" },
-      partially_funded: { bg: "bg-blue-100", text: "text-blue-700", label: "Partial" },
-      fully_funded: { bg: "bg-green-100", text: "text-green-700", label: "Funded" },
-      in_progress: { bg: "bg-purple-100", text: "text-purple-700", label: "In Progress" },
-      pending_verification: { bg: "bg-orange-100", text: "text-orange-700", label: "Verify" },
-      completed: { bg: "bg-gray-100", text: "text-gray-700", label: "Complete" },
-      cancelled: { bg: "bg-red-100", text: "text-red-700", label: "Cancelled" },
-      disputed: { bg: "bg-red-100", text: "text-red-700", label: "Disputed" },
+      pending_funding: { bg: "bg-amber-50", text: "text-amber-600", label: "Needs Funding" },
+      partially_funded: { bg: "bg-slate-100", text: "text-slate-600", label: "Partial" },
+      fully_funded: { bg: "bg-sage-50", text: "text-sage-600", label: "Funded" },
+      in_progress: { bg: "bg-slate-100", text: "text-slate-600", label: "In Progress" },
+      pending_verification: { bg: "bg-amber-50", text: "text-amber-600", label: "Verify" },
+      completed: { bg: "bg-sage-50", text: "text-sage-600", label: "Complete" },
+      cancelled: { bg: "bg-danger-50", text: "text-danger-600", label: "Cancelled" },
+      disputed: { bg: "bg-danger-50", text: "text-danger-600", label: "Disputed" },
     };
-    return badges[status] || { bg: "bg-gray-100", text: "text-gray-700", label: status };
+    return badges[status] || { bg: "bg-slate-100", text: "text-slate-600", label: status };
   };
 
   const formatCurrency = (amount: number) => {
@@ -203,33 +204,43 @@ export default function ExpensesScreen() {
     }).format(amount);
   };
 
+  // Web design system colors
+  const SAGE = "#4A6C58";
+  const SAGE_LIGHT = "#6B9B7A";
+  const SAGE_SUBTLE = "#E8F0EC";
+  const AMBER = "#D4A574";
+  const AMBER_SUBTLE = "#FEF7ED";
+
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-secondary-50 dark:bg-secondary-900 items-center justify-center">
-        <ActivityIndicator size="large" color="#2563eb" />
+      <SafeAreaView className="flex-1 bg-sand-200 dark:bg-slate-900 items-center justify-center">
+        <ActivityIndicator size="large" color={SAGE} />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-secondary-50 dark:bg-secondary-900" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-sand-200 dark:bg-slate-900" edges={["top"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={SAGE} />
         }
       >
-        {/* Balance Summary Card */}
+        {/* Balance Summary Card - Sage Green Gradient */}
         {balance && (
-          <View className="mx-4 mt-4 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-5 shadow-lg">
+          <View
+            className="mx-4 mt-4 rounded-3xl p-5"
+            style={{ backgroundColor: SAGE }}
+          >
             <View className="flex-row items-center justify-between">
               <View>
-                <Text className="text-primary-100 text-sm">Net Balance</Text>
+                <Text className="text-sage-200 text-sm">Net Balance</Text>
                 <Text className="text-white text-3xl font-bold mt-1">
                   {formatCurrency(Math.abs(balance.net_balance))}
                 </Text>
-                <Text className="text-primary-200 text-sm mt-1">
+                <Text className="text-sage-200 text-sm mt-1">
                   {balance.net_balance > 0
                     ? "You owe co-parent"
                     : balance.net_balance < 0
@@ -237,21 +248,21 @@ export default function ExpensesScreen() {
                     : "All settled up!"}
                 </Text>
               </View>
-              <View className="bg-white/20 rounded-xl p-3">
+              <View className="bg-white/20 rounded-2xl p-4">
                 <Ionicons name="wallet" size={32} color="white" />
               </View>
             </View>
 
             <View className="flex-row mt-4 pt-4 border-t border-white/20">
               <View className="flex-1">
-                <Text className="text-primary-200 text-xs">You've funded</Text>
-                <Text className="text-white font-semibold">
+                <Text className="text-sage-300 text-xs">You've funded</Text>
+                <Text className="text-white font-semibold text-lg">
                   {formatCurrency(balance.parent_a_total_funded)}
                 </Text>
               </View>
               <View className="flex-1">
-                <Text className="text-primary-200 text-xs">Pending total</Text>
-                <Text className="text-white font-semibold">
+                <Text className="text-sage-300 text-xs">Pending total</Text>
+                <Text className="text-white font-semibold text-lg">
                   {formatCurrency(balance.total_obligations_amount - balance.parent_a_total_funded - balance.parent_b_total_funded)}
                 </Text>
               </View>
@@ -259,37 +270,43 @@ export default function ExpensesScreen() {
           </View>
         )}
 
-        {/* Quick Stats */}
+        {/* Quick Stats - Matching Web Design */}
         <View className="flex-row mx-4 mt-4 gap-3">
-          <View className="flex-1 bg-white dark:bg-secondary-800 rounded-xl p-4 shadow-sm">
+          <View className="flex-1 bg-cream dark:bg-slate-800 rounded-2xl p-4 shadow-card">
             <View className="flex-row items-center">
-              <View className="w-10 h-10 bg-yellow-100 rounded-full items-center justify-center">
-                <Ionicons name="hourglass" size={20} color="#eab308" />
+              <View
+                className="w-11 h-11 rounded-full items-center justify-center"
+                style={{ backgroundColor: AMBER_SUBTLE }}
+              >
+                <Ionicons name="hourglass" size={20} color={AMBER} />
               </View>
               <View className="ml-3">
-                <Text className="text-2xl font-bold text-secondary-900 dark:text-white">
+                <Text className="text-2xl font-bold text-slate-800 dark:text-white">
                   {obligations.filter((o) => o.status === "pending_funding" || o.status === "partially_funded").length}
                 </Text>
-                <Text className="text-secondary-500 text-xs">Pending</Text>
+                <Text className="text-slate-500 text-xs">Open</Text>
               </View>
             </View>
           </View>
-          <View className="flex-1 bg-white dark:bg-secondary-800 rounded-xl p-4 shadow-sm">
+          <View className="flex-1 bg-cream dark:bg-slate-800 rounded-2xl p-4 shadow-card">
             <View className="flex-row items-center">
-              <View className="w-10 h-10 bg-green-100 rounded-full items-center justify-center">
-                <Ionicons name="checkmark-circle" size={20} color="#22c55e" />
+              <View
+                className="w-11 h-11 rounded-full items-center justify-center"
+                style={{ backgroundColor: SAGE_SUBTLE }}
+              >
+                <Ionicons name="checkmark-circle" size={20} color={SAGE} />
               </View>
               <View className="ml-3">
-                <Text className="text-2xl font-bold text-secondary-900 dark:text-white">
-                  {obligations.filter((o) => o.status === "completed").length}
+                <Text className="text-2xl font-bold text-slate-800 dark:text-white">
+                  {obligations.filter((o) => o.status === "completed" || o.status === "fully_funded").length}
                 </Text>
-                <Text className="text-secondary-500 text-xs">Completed</Text>
+                <Text className="text-slate-500 text-xs">Funded</Text>
               </View>
             </View>
           </View>
         </View>
 
-        {/* Filter Tabs */}
+        {/* Filter Tabs - Pill Style Matching Web */}
         <View className="px-4 mt-4">
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {[
@@ -300,19 +317,17 @@ export default function ExpensesScreen() {
             ].map((tab) => (
               <TouchableOpacity
                 key={tab.id}
-                className={`mr-2 px-4 py-2 rounded-full ${
-                  filter === tab.id
-                    ? "bg-primary-600"
-                    : "bg-white dark:bg-secondary-800"
-                }`}
+                className="mr-2 px-5 py-2.5 rounded-full"
+                style={{
+                  backgroundColor: filter === tab.id ? SAGE : "#FFFBF5",
+                }}
                 onPress={() => setFilter(tab.id as FilterType)}
               >
                 <Text
-                  className={`font-medium ${
-                    filter === tab.id
-                      ? "text-white"
-                      : "text-secondary-700 dark:text-secondary-300"
-                  }`}
+                  className="font-medium"
+                  style={{
+                    color: filter === tab.id ? "white" : "#475569",
+                  }}
                 >
                   {tab.label}
                 </Text>
@@ -323,14 +338,14 @@ export default function ExpensesScreen() {
 
         {/* Obligations List */}
         <View className="px-4 mt-4">
-          <Text className="text-lg font-semibold text-secondary-900 dark:text-white mb-3">
+          <Text className="text-lg font-semibold text-slate-800 dark:text-white mb-3">
             Shared Expenses
           </Text>
 
           {filteredObligations.length === 0 ? (
-            <View className="bg-white dark:bg-secondary-800 rounded-xl p-8 items-center">
-              <Ionicons name="receipt-outline" size={48} color="#9ca3af" />
-              <Text className="text-secondary-500 mt-4 text-center">
+            <View className="bg-cream dark:bg-slate-800 rounded-2xl p-8 items-center shadow-card">
+              <Ionicons name="receipt-outline" size={48} color="#94a3b8" />
+              <Text className="text-slate-500 mt-4 text-center">
                 No expenses found
               </Text>
             </View>
@@ -346,13 +361,13 @@ export default function ExpensesScreen() {
                 return (
                   <TouchableOpacity
                     key={obligation.id}
-                    className="bg-white dark:bg-secondary-800 rounded-xl p-4 shadow-sm"
+                    className="bg-cream dark:bg-slate-800 rounded-2xl p-4 shadow-card"
                     onPress={() => router.push(`/expenses/${obligation.id}`)}
                   >
                     <View className="flex-row items-start">
                       <View
-                        className="w-12 h-12 rounded-full items-center justify-center"
-                        style={{ backgroundColor: `${getPurposeColor(obligation.purpose)}20` }}
+                        className="w-12 h-12 rounded-2xl items-center justify-center"
+                        style={{ backgroundColor: `${getPurposeColor(obligation.purpose)}15` }}
                       >
                         <Ionicons
                           name={getPurposeIcon(obligation.purpose) as any}
@@ -363,10 +378,10 @@ export default function ExpensesScreen() {
 
                       <View className="flex-1 ml-3">
                         <View className="flex-row items-center justify-between">
-                          <Text className="text-secondary-900 dark:text-white font-semibold flex-1">
+                          <Text className="text-slate-800 dark:text-white font-semibold flex-1">
                             {obligation.description}
                           </Text>
-                          <View className={`${badge.bg} px-2 py-1 rounded-full ml-2`}>
+                          <View className={`${badge.bg} px-2.5 py-1 rounded-full ml-2`}>
                             <Text className={`${badge.text} text-xs font-medium`}>
                               {badge.label}
                             </Text>
@@ -376,39 +391,42 @@ export default function ExpensesScreen() {
                         <View className="flex-row items-center mt-1">
                           {obligation.child_name && (
                             <>
-                              <Text className="text-secondary-500 text-sm">
+                              <Text className="text-slate-500 text-sm">
                                 {obligation.child_name}
                               </Text>
-                              <Text className="text-secondary-300 mx-2">|</Text>
+                              <Text className="text-slate-300 mx-2">|</Text>
                             </>
                           )}
-                          <Text className="text-secondary-500 text-sm capitalize">
+                          <Text className="text-slate-500 text-sm capitalize">
                             {obligation.purpose.replace("_", " ")}
                           </Text>
                         </View>
 
-                        {/* Progress Bar */}
+                        {/* Progress Bar - Sage Green */}
                         <View className="mt-3">
                           <View className="flex-row justify-between mb-1">
-                            <Text className="text-secondary-500 text-xs">
+                            <Text className="text-slate-500 text-xs">
                               {formatCurrency(obligation.parent_a_funded + obligation.parent_b_funded)} of {formatCurrency(obligation.total_amount)}
                             </Text>
-                            <Text className="text-secondary-500 text-xs">
+                            <Text className="text-slate-500 text-xs">
                               {Math.round(fundedPercent)}%
                             </Text>
                           </View>
-                          <View className="h-2 bg-secondary-200 dark:bg-secondary-700 rounded-full overflow-hidden">
+                          <View className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                             <View
-                              className="h-full bg-green-500 rounded-full"
-                              style={{ width: `${fundedPercent}%` }}
+                              className="h-full rounded-full"
+                              style={{ width: `${fundedPercent}%`, backgroundColor: SAGE }}
                             />
                           </View>
                         </View>
 
                         {obligation.due_date && (
-                          <Text className="text-secondary-400 text-xs mt-2">
-                            Due {new Date(obligation.due_date).toLocaleDateString()}
-                          </Text>
+                          <View className="flex-row items-center mt-2">
+                            <Ionicons name="calendar-outline" size={12} color={AMBER} />
+                            <Text className="text-amber-500 text-xs ml-1">
+                              Due {new Date(obligation.due_date).toLocaleDateString()}
+                            </Text>
+                          </View>
                         )}
                       </View>
                     </View>
@@ -420,9 +438,10 @@ export default function ExpensesScreen() {
         </View>
       </ScrollView>
 
-      {/* FAB */}
+      {/* FAB - Sage Green Matching Web */}
       <TouchableOpacity
-        className="absolute bottom-6 right-6 w-14 h-14 bg-primary-600 rounded-full items-center justify-center shadow-lg"
+        className="absolute bottom-6 right-6 w-14 h-14 rounded-full items-center justify-center shadow-elevated"
+        style={{ backgroundColor: SAGE }}
         onPress={() => router.push("/expenses/create")}
       >
         <Ionicons name="add" size={28} color="white" />

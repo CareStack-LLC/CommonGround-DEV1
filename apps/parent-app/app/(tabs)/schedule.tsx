@@ -208,83 +208,105 @@ export default function ScheduleScreen() {
 
   const days = getDaysInMonth(currentMonth);
 
+  // Web design system colors - matching custody color coding
+  const SAGE = "#4A6C58"; // Mom's custody / Your time
+  const SLATE = "#475569"; // Dad's custody / Co-parent time
+  const AMBER = "#D4A574"; // Attention/exchanges
+
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-white dark:bg-secondary-900 items-center justify-center">
-        <ActivityIndicator size="large" color="#2563eb" />
+      <SafeAreaView className="flex-1 bg-sand-200 dark:bg-slate-900 items-center justify-center">
+        <ActivityIndicator size="large" color={SAGE} />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-secondary-900" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-sand-200 dark:bg-slate-900" edges={["top"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={SAGE} />
         }
       >
-        {/* Custody Status Banner */}
+        {/* Custody Status Banner - Sage Green (Your Time) or Slate (Their Time) */}
         {custodySummary && (
-          <View className="mx-4 mt-4 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-4 shadow-lg">
+          <View
+            className="mx-4 mt-4 rounded-3xl p-5 shadow-card"
+            style={{
+              backgroundColor: custodySummary.current_custody_parent === "parent_a" ? SAGE : SLATE,
+            }}
+          >
             <View className="flex-row items-center justify-between">
               <View className="flex-1">
-                <Text className="text-green-100 text-sm">Current Custody</Text>
-                <Text className="text-white text-xl font-bold mt-1">
+                <Text className="text-white/70 text-sm">Current Custody</Text>
+                <Text className="text-white text-2xl font-bold mt-1">
                   {custodySummary.current_custody_parent === "parent_a" ? "With You" : "With Co-Parent"}
                 </Text>
-                <View className="flex-row items-center mt-2">
+                <View className="flex-row items-center mt-3">
                   {custodySummary.children.map((child, index) => (
                     <View key={child.id} className="flex-row items-center">
-                      <View className="w-6 h-6 bg-white/30 rounded-full items-center justify-center">
-                        <Text className="text-white text-xs">{child.name.charAt(0)}</Text>
+                      <View className="w-7 h-7 bg-white/25 rounded-full items-center justify-center">
+                        <Text className="text-white text-xs font-medium">{child.name.charAt(0)}</Text>
                       </View>
                       {index < custodySummary.children.length - 1 && (
-                        <Text className="text-white/50 mx-1">+</Text>
+                        <Text className="text-white/40 mx-1">+</Text>
                       )}
                     </View>
                   ))}
-                  <Text className="text-green-100 text-sm ml-2">
+                  <Text className="text-white/80 text-sm ml-2">
                     {custodySummary.children.map(c => c.name).join(", ")}
                   </Text>
                 </View>
               </View>
-              <View className="bg-white/20 rounded-xl p-3">
+              <View className="bg-white/20 rounded-2xl p-4">
                 <Ionicons name="home" size={28} color="white" />
               </View>
             </View>
 
-            {/* Time Stats */}
-            <View className="flex-row mt-4 pt-3 border-t border-white/20">
+            {/* Time Stats - Custody Legend */}
+            <View className="flex-row mt-4 pt-4 border-t border-white/20">
               <View className="flex-1">
-                <Text className="text-green-100 text-xs">This Week</Text>
-                <Text className="text-white font-semibold">
-                  {custodySummary.this_week_days.parent_a} / 7 days
+                <View className="flex-row items-center mb-1">
+                  <View className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: SAGE }} />
+                  <Text className="text-white/60 text-xs">Your Time</Text>
+                </View>
+                <Text className="text-white font-semibold text-lg">
+                  {custodySummary.this_week_days.parent_a} days this week
                 </Text>
               </View>
               <View className="flex-1">
-                <Text className="text-green-100 text-xs">This Month</Text>
-                <Text className="text-white font-semibold">
-                  {custodySummary.this_month_days.parent_a} / 30 days
+                <View className="flex-row items-center mb-1">
+                  <View className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: SLATE }} />
+                  <Text className="text-white/60 text-xs">Their Time</Text>
+                </View>
+                <Text className="text-white font-semibold text-lg">
+                  {custodySummary.this_week_days.parent_b} days this week
                 </Text>
               </View>
             </View>
           </View>
         )}
 
-        {/* Next Exchange Card */}
+        {/* Next Exchange Card - Amber accent */}
         {custodySummary?.next_exchange && (
-          <View className="mx-4 mt-4 bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-4 border border-orange-200 dark:border-orange-800">
+          <View
+            className="mx-4 mt-4 rounded-2xl p-4 border"
+            style={{ backgroundColor: "#FEF7ED", borderColor: "#E8C4A0" }}
+          >
             <View className="flex-row items-center">
-              <View className="w-12 h-12 bg-orange-100 dark:bg-orange-800 rounded-full items-center justify-center">
-                <Ionicons name="swap-horizontal" size={24} color="#f97316" />
+              <View
+                className="w-12 h-12 rounded-2xl items-center justify-center"
+                style={{ backgroundColor: "#FDE8D0" }}
+              >
+                <Ionicons name="swap-horizontal" size={24} color={AMBER} />
               </View>
               <View className="flex-1 ml-3">
-                <Text className="text-orange-800 dark:text-orange-300 font-semibold">
+                <Text style={{ color: "#7F5636" }} className="font-semibold">
                   Next Exchange
                 </Text>
-                <Text className="text-orange-600 dark:text-orange-400 text-sm">
+                <Text style={{ color: "#A47246" }} className="text-sm">
                   {new Date(custodySummary.next_exchange.scheduled_at).toLocaleDateString("en-US", {
                     weekday: "short",
                     month: "short",
@@ -295,14 +317,14 @@ export default function ScheduleScreen() {
                 </Text>
                 {custodySummary.next_exchange.location_name && (
                   <View className="flex-row items-center mt-1">
-                    <Ionicons name="location" size={12} color="#f97316" />
-                    <Text className="text-orange-500 text-xs ml-1">
+                    <Ionicons name="location" size={12} color={AMBER} />
+                    <Text style={{ color: "#C08B5D" }} className="text-xs ml-1">
                       {custodySummary.next_exchange.location_name}
                     </Text>
                   </View>
                 )}
               </View>
-              <Ionicons name="chevron-forward" size={20} color="#f97316" />
+              <Ionicons name="chevron-forward" size={20} color={AMBER} />
             </View>
           </View>
         )}
@@ -310,13 +332,13 @@ export default function ScheduleScreen() {
         {/* Calendar Header */}
         <View className="flex-row items-center justify-between px-4 pt-6 pb-2">
           <TouchableOpacity onPress={() => navigateMonth(-1)} className="p-2">
-            <Ionicons name="chevron-back" size={24} color="#2563eb" />
+            <Ionicons name="chevron-back" size={24} color={SAGE} />
           </TouchableOpacity>
-          <Text className="text-lg font-semibold text-secondary-900 dark:text-white">
+          <Text className="text-lg font-semibold text-slate-800 dark:text-white">
             {MONTHS[currentMonth.getMonth()]} {currentMonth.getFullYear()}
           </Text>
           <TouchableOpacity onPress={() => navigateMonth(1)} className="p-2">
-            <Ionicons name="chevron-forward" size={24} color="#2563eb" />
+            <Ionicons name="chevron-forward" size={24} color={SAGE} />
           </TouchableOpacity>
         </View>
 
@@ -324,15 +346,15 @@ export default function ScheduleScreen() {
         <View className="flex-row px-2 mb-2">
           {DAYS.map((day) => (
             <View key={day} className="flex-1 items-center py-2">
-              <Text className="text-secondary-500 dark:text-secondary-400 text-xs font-medium">
+              <Text className="text-slate-500 dark:text-slate-400 text-xs font-medium">
                 {day}
               </Text>
             </View>
           ))}
         </View>
 
-        {/* Calendar Grid */}
-        <View className="flex-row flex-wrap px-2">
+        {/* Calendar Grid - Matching Web with Sage/Slate custody colors */}
+        <View className="flex-row flex-wrap px-2 bg-cream dark:bg-slate-800 mx-4 rounded-2xl py-2">
           {days.map((day, index) => (
             <TouchableOpacity
               key={index}
@@ -348,27 +370,32 @@ export default function ScheduleScreen() {
             >
               {day && (
                 <View
-                  className={`w-10 h-10 items-center justify-center rounded-full ${
-                    isSelected(day)
-                      ? "bg-primary-600"
+                  className="w-10 h-10 items-center justify-center rounded-xl"
+                  style={{
+                    backgroundColor: isSelected(day)
+                      ? SAGE
                       : isToday(day)
-                      ? "bg-primary-100 dark:bg-primary-900/30"
-                      : ""
-                  }`}
+                      ? "#E8F0EC"
+                      : "transparent",
+                  }}
                 >
                   <Text
-                    className={`text-sm font-medium ${
-                      isSelected(day)
-                        ? "text-white"
+                    className="text-sm font-medium"
+                    style={{
+                      color: isSelected(day)
+                        ? "white"
                         : isToday(day)
-                        ? "text-primary-600"
-                        : "text-secondary-900 dark:text-white"
-                    }`}
+                        ? SAGE
+                        : "#1e293b",
+                    }}
                   >
                     {day}
                   </Text>
                   {hasExchange(day) && (
-                    <View className="absolute bottom-0.5 w-1.5 h-1.5 bg-orange-500 rounded-full" />
+                    <View
+                      className="absolute bottom-0.5 w-1.5 h-1.5 rounded-full"
+                      style={{ backgroundColor: AMBER }}
+                    />
                   )}
                 </View>
               )}
@@ -376,16 +403,32 @@ export default function ScheduleScreen() {
           ))}
         </View>
 
+        {/* Custody Legend */}
+        <View className="flex-row items-center justify-center mt-4 gap-6">
+          <View className="flex-row items-center">
+            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: SAGE }} />
+            <Text className="text-slate-600 text-sm">Your Time</Text>
+          </View>
+          <View className="flex-row items-center">
+            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: SLATE }} />
+            <Text className="text-slate-600 text-sm">Their Time</Text>
+          </View>
+          <View className="flex-row items-center">
+            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: AMBER }} />
+            <Text className="text-slate-600 text-sm">Exchange</Text>
+          </View>
+        </View>
+
         {/* Upcoming Exchanges */}
         <View className="mt-6 px-4">
-          <Text className="text-lg font-semibold text-secondary-900 dark:text-white mb-3">
+          <Text className="text-lg font-semibold text-slate-800 dark:text-white mb-3">
             Upcoming Exchanges
           </Text>
 
           {exchanges.length === 0 ? (
-            <View className="card items-center py-8">
+            <View className="bg-cream dark:bg-slate-800 rounded-2xl items-center py-8 shadow-card">
               <Ionicons name="swap-horizontal-outline" size={48} color="#94a3b8" />
-              <Text className="text-secondary-500 dark:text-secondary-400 mt-3">
+              <Text className="text-slate-500 dark:text-slate-400 mt-3">
                 No upcoming exchanges
               </Text>
             </View>
@@ -397,6 +440,8 @@ export default function ScheduleScreen() {
                   exchange={exchange}
                   onCheckIn={() => handleSilentDropCheckIn(exchange)}
                   checkingIn={checkingIn}
+                  sageColor={SAGE}
+                  amberColor={AMBER}
                 />
               ))}
             </View>
@@ -404,9 +449,10 @@ export default function ScheduleScreen() {
         </View>
       </ScrollView>
 
-      {/* Add Event Button */}
+      {/* Add Event Button - Sage Green */}
       <TouchableOpacity
-        className="absolute bottom-6 right-6 w-14 h-14 bg-primary-600 rounded-full items-center justify-center shadow-lg"
+        className="absolute bottom-6 right-6 w-14 h-14 rounded-full items-center justify-center shadow-elevated"
+        style={{ backgroundColor: SAGE }}
         onPress={() => Alert.alert("Coming Soon", "Add exchange scheduling coming soon!")}
       >
         <Ionicons name="add" size={28} color="white" />
@@ -419,10 +465,14 @@ function ExchangeCard({
   exchange,
   onCheckIn,
   checkingIn,
+  sageColor = "#4A6C58",
+  amberColor = "#D4A574",
 }: {
   exchange: CustodyExchange;
   onCheckIn: () => void;
   checkingIn: boolean;
+  sageColor?: string;
+  amberColor?: string;
 }) {
   const isUpcoming = new Date(exchange.scheduled_at) > new Date();
   const isWithinWindow = (() => {
@@ -434,23 +484,26 @@ function ExchangeCard({
   })();
 
   return (
-    <View className="bg-white dark:bg-secondary-800 rounded-xl p-4 shadow-sm">
+    <View className="bg-cream dark:bg-slate-800 rounded-2xl p-4 shadow-card">
       <View className="flex-row items-start">
-        <View className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-full items-center justify-center">
-          <Ionicons name="swap-horizontal" size={24} color="#f97316" />
+        <View
+          className="w-12 h-12 rounded-2xl items-center justify-center"
+          style={{ backgroundColor: "#FEF7ED" }}
+        >
+          <Ionicons name="swap-horizontal" size={24} color={amberColor} />
         </View>
 
         <View className="flex-1 ml-3">
-          <Text className="text-secondary-900 dark:text-white font-semibold">
+          <Text className="text-slate-800 dark:text-white font-semibold">
             Custody Exchange
           </Text>
-          <Text className="text-secondary-500 text-sm">
+          <Text className="text-slate-500 text-sm">
             {exchange.from_parent === "parent_a" ? "You" : "Co-parent"} to{" "}
             {exchange.to_parent === "parent_a" ? "You" : "Co-parent"}
           </Text>
           <View className="flex-row items-center mt-2">
             <Ionicons name="calendar" size={14} color="#64748b" />
-            <Text className="text-secondary-500 text-sm ml-1">
+            <Text className="text-slate-500 text-sm ml-1">
               {new Date(exchange.scheduled_at).toLocaleDateString("en-US", {
                 weekday: "short",
                 month: "short",
@@ -462,8 +515,8 @@ function ExchangeCard({
           </View>
           {exchange.location_name && (
             <View className="flex-row items-center mt-1">
-              <Ionicons name="location" size={14} color="#64748b" />
-              <Text className="text-secondary-500 text-sm ml-1">
+              <Ionicons name="location" size={14} color={amberColor} />
+              <Text className="text-slate-500 text-sm ml-1">
                 {exchange.location_name}
               </Text>
             </View>
@@ -473,19 +526,22 @@ function ExchangeCard({
           {exchange.children_names && exchange.children_names.length > 0 && (
             <View className="flex-row items-center mt-2">
               <Ionicons name="people" size={14} color="#64748b" />
-              <Text className="text-secondary-500 text-sm ml-1">
+              <Text className="text-slate-500 text-sm ml-1">
                 {exchange.children_names.join(", ")}
               </Text>
             </View>
           )}
 
-          {/* Silent Drop Badge */}
+          {/* Silent Drop Badge - Using Sage instead of Purple */}
           {exchange.silent_handoff_enabled && (
             <View className="flex-row items-center mt-2">
-              <View className="bg-purple-100 dark:bg-purple-900/30 px-2 py-1 rounded-full flex-row items-center">
-                <Ionicons name="location" size={12} color="#9333ea" />
-                <Text className="text-purple-600 dark:text-purple-400 text-xs ml-1 font-medium">
-                  Silent Drop GPS Enabled
+              <View
+                className="px-2.5 py-1 rounded-full flex-row items-center"
+                style={{ backgroundColor: "#E8F0EC" }}
+              >
+                <Ionicons name="navigate" size={12} color={sageColor} />
+                <Text style={{ color: sageColor }} className="text-xs ml-1 font-medium">
+                  Silent Drop GPS
                 </Text>
               </View>
             </View>
@@ -493,10 +549,11 @@ function ExchangeCard({
         </View>
       </View>
 
-      {/* Check-in Button for Silent Drops */}
+      {/* Check-in Button for Silent Drops - Sage Green */}
       {exchange.silent_handoff_enabled && isWithinWindow && (
         <TouchableOpacity
-          className="mt-4 bg-purple-600 py-3 rounded-xl flex-row items-center justify-center"
+          className="mt-4 py-3.5 rounded-xl flex-row items-center justify-center"
+          style={{ backgroundColor: sageColor }}
           onPress={onCheckIn}
           disabled={checkingIn}
         >
@@ -512,9 +569,9 @@ function ExchangeCard({
       )}
 
       {exchange.silent_handoff_enabled && !isWithinWindow && isUpcoming && (
-        <View className="mt-4 bg-secondary-100 dark:bg-secondary-700 py-3 rounded-xl flex-row items-center justify-center">
+        <View className="mt-4 bg-slate-100 dark:bg-slate-700 py-3 rounded-xl flex-row items-center justify-center">
           <Ionicons name="time" size={18} color="#64748b" />
-          <Text className="text-secondary-500 font-medium ml-2">
+          <Text className="text-slate-500 font-medium ml-2">
             Check-in opens {exchange.check_in_window_before_minutes} min before
           </Text>
         </View>
