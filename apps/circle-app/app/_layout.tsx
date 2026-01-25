@@ -7,7 +7,12 @@ import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { DailyCallProvider } from "@commonground/daily-video";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
+import { configureAPI, videoAPIAdapter } from "@/lib/api";
+
+// Configure API on app start
+configureAPI();
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -59,7 +64,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AuthProvider>
-          <RootLayoutNav />
+          <DailyCallProvider userType="circle" videoAPI={videoAPIAdapter}>
+            <RootLayoutNav />
+          </DailyCallProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

@@ -7,8 +7,13 @@ import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { DailyCallProvider } from "@commonground/daily-video";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { configureAPI, videoAPIAdapter } from "@/lib/api";
+
+// Configure API on app start
+configureAPI();
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -44,7 +49,7 @@ function RootLayoutNav() {
           <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />
         )}
         <Stack.Screen
-          name="call/[id]"
+          name="call/[sessionId]"
           options={{
             presentation: "fullScreenModal",
             animation: "slide_from_bottom",
@@ -60,7 +65,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AuthProvider>
-          <RootLayoutNav />
+          <DailyCallProvider userType="parent" videoAPI={videoAPIAdapter}>
+            <RootLayoutNav />
+          </DailyCallProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

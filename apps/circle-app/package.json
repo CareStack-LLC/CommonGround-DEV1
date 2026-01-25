@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@commonground/api-client": "workspace:*",
+    "@commonground/daily-video": "workspace:*",
     "@commonground/types": "workspace:*",
     "@commonground/utils": "workspace:*",
     "@daily-co/daily-react-native": "^0.62.0",
