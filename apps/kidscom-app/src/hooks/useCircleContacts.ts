@@ -8,6 +8,7 @@ export interface CircleContact {
   relationship?: string;
   avatar_url?: string;
   is_online?: boolean;
+  family_file_id?: string;
 }
 
 interface UseCircleContactsReturn {
@@ -57,6 +58,7 @@ export function useCircleContacts(): UseCircleContactsReturn {
           display_name: "Grandma Rose",
           relationship: "grandparent",
           is_online: true,
+          family_file_id: "demo-family-file",
         },
         {
           id: "2",
@@ -64,6 +66,7 @@ export function useCircleContacts(): UseCircleContactsReturn {
           display_name: "Grandpa Joe",
           relationship: "grandparent",
           is_online: false,
+          family_file_id: "demo-family-file",
         },
         {
           id: "3",
@@ -71,6 +74,7 @@ export function useCircleContacts(): UseCircleContactsReturn {
           display_name: "Aunt Sarah",
           relationship: "aunt",
           is_online: true,
+          family_file_id: "demo-family-file",
         },
       ]);
     } finally {

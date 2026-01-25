@@ -96,7 +96,7 @@ export default function HomeScreen() {
               title="My Library"
               subtitle="Stories and more!"
               colors={["#84cc16", "#a3e635"]}
-              onPress={() => {}}
+              onPress={() => router.push("/(main)/library")}
             />
           </View>
         </ScrollView>

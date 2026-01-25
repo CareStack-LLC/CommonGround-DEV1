@@ -110,6 +110,21 @@ export default function MainTabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="library"
+        options={{
+          title: "Library",
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              name="book"
+              emoji="📚"
+              color={color}
+              focused={focused}
+              label="Library"
+            />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
