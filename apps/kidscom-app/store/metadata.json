@@ -1,0 +1,46 @@
+{
+  "name": "Kidscom by CommonGround",
+  "subtitle": "Stay connected with your family",
+  "description": {
+    "short": "A safe, fun app for kids to video call family members. Part of the CommonGround co-parenting platform.",
+    "full": "Kidscom is a child-friendly app that lets kids stay connected with both parents and approved family members through safe video calls, messages, and shared activities.\n\n🎨 DESIGNED FOR KIDS\n• Large, colorful buttons that are easy to tap\n• Fun emojis and friendly interface\n• Simple PIN login (no passwords to remember)\n• Age-appropriate design approved by child psychologists\n\n📞 VIDEO CALLS\n• Call Mom, Dad, grandparents, and family\n• High-quality video that works on any connection\n• One-tap calling with no complicated settings\n• Say goodbye with the friendly wave button\n\n👨‍👩‍👧‍👦 MY CIRCLE\n• See all approved family members\n• Know who's online and available\n• Parents control who's in the circle\n• Safe, parent-approved connections only\n\n🎬 THEATER MODE\n• Watch videos together with family\n• Shared viewing during video calls\n• Parent-approved content only\n• Quality time even when apart\n\n🎮 FUN GAMES\n• Play games during calls\n• Tic-tac-toe, drawing, and more\n• Multiplayer fun with family\n• New games added regularly\n\n🔒 PARENT CONTROLLED\n• Parents manage all settings from CommonGround app\n• No in-app purchases or ads\n• No social features or strangers\n• COPPA compliant for child safety\n\n⚠️ IMPORTANT: This app requires a CommonGround parent account to set up. Children cannot create accounts themselves - parents must invite them through the CommonGround parent app.\n\nKidscom is part of the CommonGround co-parenting platform, trusted by thousands of families to keep kids connected with the people who love them."
+  },
+  "keywords": [
+    "kids video call",
+    "family video chat",
+    "child safe",
+    "parenting",
+    "co-parenting kids",
+    "family connection",
+    "kid friendly",
+    "video calling for kids",
+    "safe messaging kids",
+    "family app"
+  ],
+  "category": {
+    "ios": "Lifestyle",
+    "android": "Parenting"
+  },
+  "contentRating": {
+    "ios": "4+",
+    "android": "Everyone"
+  },
+  "targetAudience": {
+    "ageRange": "5-12",
+    "note": "Designed for children under parent supervision"
+  },
+  "privacy_policy_url": "https://commonground.app/privacy",
+  "terms_url": "https://commonground.app/terms",
+  "support_url": "https://commonground.app/support",
+  "marketing_url": "https://commonground.app/kidscom",
+  "screenshots": {
+    "required": [
+      "Colorful home screen with activity options",
+      "My Circle showing family members",
+      "Video call with large friendly controls",
+      "Theater mode for shared viewing",
+      "Arcade with fun games"
+    ]
+  },
+  "whats_new": "• New colorful design kids will love\n• Improved video calling experience\n• Fun new games in the Arcade\n• Better connection for smoother calls"
+}
