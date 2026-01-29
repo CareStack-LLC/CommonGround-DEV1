@@ -91,7 +91,7 @@ export async function updateProfile(data: Partial<User>): Promise<User> {
  * Request password reset
  */
 export async function requestPasswordReset(email: string): Promise<void> {
-  await fetchPublic('/auth/password-reset', {
+  await fetchPublic('/auth/password-reset/request', {
     method: 'POST',
     body: { email },
   });
