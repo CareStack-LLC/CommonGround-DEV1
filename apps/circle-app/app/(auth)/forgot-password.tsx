@@ -1,3 +1,9 @@
+/**
+ * Forgot Password Screen for My Circle App
+ *
+ * Sends password reset email to circle users
+ */
+
 import { useState } from "react";
 import {
   View,
@@ -7,10 +13,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+
+import { circle } from "@/lib/api";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -26,13 +35,26 @@ export default function ForgotPasswordScreen() {
       return;
     }
 
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    setIsLoading(false);
-    setIsSent(true);
+    try {
+      await circle.auth.forgotPassword(email.trim());
+      setIsSent(true);
+    } catch (err: any) {
+      console.error("[ForgotPassword] Error:", err);
+      // Don't show specific errors for security - always show success
+      // The backend also always returns success to prevent email enumeration
+      setIsSent(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isSent) {
@@ -53,8 +75,12 @@ export default function ForgotPasswordScreen() {
             <Text className="text-2xl font-bold text-gray-800 text-center mb-2">
               Check Your Email
             </Text>
-            <Text className="text-gray-500 text-center mb-8">
-              We've sent password reset instructions to {email}
+            <Text className="text-gray-500 text-center mb-2">
+              If an account exists for {email}, we've sent password reset
+              instructions.
+            </Text>
+            <Text className="text-gray-400 text-sm text-center mb-8">
+              The link will expire in 1 hour.
             </Text>
             <TouchableOpacity
               className="bg-primary-500 py-4 px-8 rounded-xl"
@@ -62,6 +88,19 @@ export default function ForgotPasswordScreen() {
             >
               <Text className="text-white font-bold text-lg">
                 Back to Sign In
+              </Text>
+            </TouchableOpacity>
+
+            {/* Resend option */}
+            <TouchableOpacity
+              className="mt-6"
+              onPress={() => {
+                setIsSent(false);
+                setEmail("");
+              }}
+            >
+              <Text className="text-primary-600 font-medium">
+                Didn't receive the email? Try again
               </Text>
             </TouchableOpacity>
           </View>
@@ -89,7 +128,8 @@ export default function ForgotPasswordScreen() {
               Forgot Password?
             </Text>
             <Text className="text-gray-500 mb-8">
-              No worries! Enter your email and we'll send you reset instructions.
+              No worries! Enter your email and we'll send you reset
+              instructions.
             </Text>
 
             {/* Error Message */}
@@ -113,13 +153,16 @@ export default function ForgotPasswordScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
+                  editable={!isLoading}
                 />
               </View>
             </View>
 
             {/* Reset Button */}
             <TouchableOpacity
-              className="bg-primary-500 py-4 rounded-xl items-center shadow-md"
+              className={`py-4 rounded-xl items-center shadow-md ${
+                isLoading ? "bg-primary-400" : "bg-primary-500"
+              }`}
               onPress={handleResetPassword}
               disabled={isLoading}
             >
@@ -130,6 +173,17 @@ export default function ForgotPasswordScreen() {
                   Send Reset Link
                 </Text>
               )}
+            </TouchableOpacity>
+
+            {/* Back to login link */}
+            <TouchableOpacity
+              className="mt-6 items-center"
+              onPress={() => router.back()}
+            >
+              <Text className="text-gray-500">
+                Remember your password?{" "}
+                <Text className="text-primary-600 font-bold">Sign In</Text>
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

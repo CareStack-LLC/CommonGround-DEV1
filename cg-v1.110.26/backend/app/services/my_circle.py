@@ -388,6 +388,67 @@ async def get_circle_user_by_id(
     return result.scalar_one_or_none()
 
 
+async def create_password_reset_token(
+    db: AsyncSession,
+    email: str,
+) -> Optional[CircleUser]:
+    """
+    Create a password reset token for a circle user.
+    Returns the user if found, None if not.
+    """
+    user = await get_circle_user_by_email(db, email)
+    if not user:
+        return None
+
+    if not user.invite_accepted_at:
+        return None  # User hasn't set up their account yet
+
+    # Generate reset token
+    user.password_reset_token = secrets.token_urlsafe(32)
+    user.password_reset_expires_at = datetime.utcnow() + timedelta(hours=1)  # 1 hour expiry
+
+    await db.flush()
+    return user
+
+
+async def get_circle_user_by_reset_token(
+    db: AsyncSession,
+    reset_token: str,
+) -> Optional[CircleUser]:
+    """Get a circle user by their password reset token."""
+    result = await db.execute(
+        select(CircleUser)
+        .options(selectinload(CircleUser.circle_contact))
+        .where(CircleUser.password_reset_token == reset_token)
+    )
+    return result.scalar_one_or_none()
+
+
+async def reset_password(
+    db: AsyncSession,
+    reset_token: str,
+    new_password: str,
+) -> CircleUser:
+    """
+    Reset a circle user's password using a reset token.
+    Raises ValueError if token is invalid or expired.
+    """
+    user = await get_circle_user_by_reset_token(db, reset_token)
+    if not user:
+        raise ValueError("Invalid password reset token")
+
+    if user.is_password_reset_expired:
+        raise ValueError("Password reset token has expired")
+
+    # Set new password and clear reset token
+    user.password_hash = hash_password(new_password)
+    user.password_reset_token = None
+    user.password_reset_expires_at = None
+
+    await db.flush()
+    return user
+
+
 # ============================================================
 # Child User Management
 # ============================================================

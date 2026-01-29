@@ -1,8 +1,8 @@
 /**
  * Incoming Call Provider
  *
- * Polls for incoming KidComs calls and shows an incoming call UI
- * when a child is trying to call.
+ * Uses WebSocket to receive real-time incoming call notifications
+ * and shows an incoming call UI when a child is trying to call.
  */
 
 import React, {
@@ -28,6 +28,7 @@ import * as Haptics from 'expo-haptics';
 
 import { useAuth } from './AuthProvider';
 import { useFamilyFile } from '@/hooks/useFamilyFile';
+import { useRealtime } from './RealtimeProvider';
 import { incomingCallAPI } from '@/lib/api';
 
 interface IncomingCall {
@@ -64,62 +65,98 @@ interface IncomingCallProviderProps {
 export function IncomingCallProvider({ children }: IncomingCallProviderProps) {
   const { isAuthenticated } = useAuth();
   const { familyFile } = useFamilyFile();
+  const { subscribe, isConnected } = useRealtime();
   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
   const [isCheckingCalls, setIsCheckingCalls] = useState(false);
-  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const currentCallRef = useRef<string | null>(null);
 
   const familyFileId = familyFile?.id || null;
 
-  // Poll for incoming calls
-  const checkForCalls = useCallback(async () => {
-    if (!familyFileId || !isAuthenticated) return;
+  // Handle incoming call from WebSocket
+  const handleIncomingCall = useCallback((data: Record<string, unknown>) => {
+    const sessionId = data.session_id as string;
 
-    try {
-      setIsCheckingCalls(true);
-      const response = await incomingCallAPI.checkIncomingCalls(familyFileId);
+    // Only process if it's a new call
+    if (sessionId && sessionId !== currentCallRef.current) {
+      currentCallRef.current = sessionId;
 
-      if (response.calls && response.calls.length > 0) {
-        // Take the most recent call
-        const latestCall = response.calls[0];
-
-        // Only set if it's a new call and latestCall exists
-        if (latestCall && (!incomingCall || incomingCall.session_id !== latestCall.session_id)) {
-          setIncomingCall(latestCall);
-          // Vibrate to alert user
-          Vibration.vibrate([0, 500, 200, 500, 200, 500]);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-        }
-      } else {
-        // No active calls
-        if (incomingCall) {
-          setIncomingCall(null);
-        }
-      }
-    } catch (error) {
-      // Silently fail - might be 404 if no active sessions
-      console.log('No active incoming calls');
-    } finally {
-      setIsCheckingCalls(false);
-    }
-  }, [familyFileId, isAuthenticated, incomingCall]);
-
-  // Start polling when authenticated
-  useEffect(() => {
-    if (isAuthenticated && familyFileId) {
-      // Initial check
-      checkForCalls();
-
-      // Poll every 3 seconds
-      pollIntervalRef.current = setInterval(checkForCalls, 3000);
-
-      return () => {
-        if (pollIntervalRef.current) {
-          clearInterval(pollIntervalRef.current);
-        }
+      const newCall: IncomingCall = {
+        session_id: sessionId,
+        caller_id: data.caller_id as string,
+        caller_name: data.caller_name as string || data.child_name as string || 'Unknown',
+        caller_type: (data.caller_type as 'child' | 'circle') || 'child',
+        room_url: '', // Will be fetched when accepting
+        created_at: data.timestamp as string || new Date().toISOString(),
       };
+
+      setIncomingCall(newCall);
+
+      // Vibrate to alert user
+      Vibration.vibrate([0, 500, 200, 500, 200, 500]);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     }
-  }, [isAuthenticated, familyFileId, checkForCalls]);
+  }, []);
+
+  // Handle call ended from WebSocket
+  const handleCallEnded = useCallback((data: Record<string, unknown>) => {
+    const sessionId = data.session_id as string;
+
+    // Clear if this is the current incoming call
+    if (sessionId && sessionId === currentCallRef.current) {
+      currentCallRef.current = null;
+      setIncomingCall(null);
+      Vibration.cancel();
+    }
+  }, []);
+
+  // Subscribe to WebSocket events for incoming calls
+  useEffect(() => {
+    if (!isAuthenticated || !familyFileId) return;
+
+    // Subscribe to incoming call events
+    const unsubscribeIncoming = subscribe('kidcoms_call_incoming', handleIncomingCall);
+    const unsubscribeEnded = subscribe('kidcoms_call_ended', handleCallEnded);
+
+    return () => {
+      unsubscribeIncoming();
+      unsubscribeEnded();
+    };
+  }, [isAuthenticated, familyFileId, subscribe, handleIncomingCall, handleCallEnded]);
+
+  // Fallback: Check for existing calls when reconnecting
+  // This ensures we don't miss calls if WebSocket was disconnected
+  useEffect(() => {
+    if (!isAuthenticated || !familyFileId || !isConnected) return;
+
+    const checkExistingCalls = async () => {
+      try {
+        setIsCheckingCalls(true);
+        const response = await incomingCallAPI.checkIncomingCalls(familyFileId);
+
+        if (response.calls && response.calls.length > 0) {
+          const latestCall = response.calls[0];
+          if (latestCall && latestCall.session_id !== currentCallRef.current) {
+            handleIncomingCall({
+              session_id: latestCall.session_id,
+              caller_id: latestCall.caller_id,
+              caller_name: latestCall.caller_name,
+              caller_type: latestCall.caller_type,
+              timestamp: latestCall.created_at,
+            });
+          }
+        }
+      } catch (error) {
+        // Silently fail - might be 404 if no active sessions
+        console.log('[IncomingCall] No active incoming calls');
+      } finally {
+        setIsCheckingCalls(false);
+      }
+    };
+
+    // Check once when WebSocket connects
+    checkExistingCalls();
+  }, [isAuthenticated, familyFileId, isConnected, handleIncomingCall]);
 
   // Pulse animation for incoming call
   useEffect(() => {
@@ -154,6 +191,7 @@ export function IncomingCallProvider({ children }: IncomingCallProviderProps) {
       await incomingCallAPI.acceptCall(incomingCall.session_id);
 
       // Clear incoming call state
+      currentCallRef.current = null;
       setIncomingCall(null);
       Vibration.cancel();
 
@@ -182,6 +220,7 @@ export function IncomingCallProvider({ children }: IncomingCallProviderProps) {
       await incomingCallAPI.rejectCall(incomingCall.session_id);
 
       // Clear incoming call state
+      currentCallRef.current = null;
       setIncomingCall(null);
       Vibration.cancel();
     } catch (error) {

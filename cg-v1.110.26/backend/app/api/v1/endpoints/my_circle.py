@@ -47,6 +47,10 @@ from app.schemas.kidcoms import (
     CircleUserLoginRequest,
     CircleUserLoginResponse,
     CircleUserProfileResponse,
+    CircleUserForgotPasswordRequest,
+    CircleUserForgotPasswordResponse,
+    CircleUserResetPasswordRequest,
+    CircleUserResetPasswordResponse,
     # Child user schemas
     ChildUserSetupRequest,
     ChildUserUpdateRequest,
@@ -54,6 +58,10 @@ from app.schemas.kidcoms import (
     ChildUserLoginRequest,
     ChildUserLoginResponse,
     ChildUserListResponse,
+    # Device setup schemas
+    DeviceSetupCreateRequest,
+    DeviceSetupCreateResponse,
+    DeviceSetupResponse,
     # Permission schemas
     CirclePermissionCreate,
     CirclePermissionUpdate,
@@ -840,6 +848,135 @@ async def circle_user_login(
     )
 
 
+@router.post(
+    "/circle-users/forgot-password",
+    response_model=CircleUserForgotPasswordResponse,
+    summary="Request password reset",
+    description="Request a password reset email for a circle user."
+)
+async def forgot_password(
+    request_data: CircleUserForgotPasswordRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Request a password reset for a circle user.
+
+    - Sends a reset link to the email if it exists
+    - Returns success message regardless of whether email exists (security)
+    """
+    circle_user = await my_circle_service.create_password_reset_token(
+        db,
+        email=request_data.email,
+    )
+
+    if circle_user:
+        await db.commit()
+
+        # Get contact info for email
+        contact_result = await db.execute(
+            select(CircleContact).where(CircleContact.id == circle_user.circle_contact_id)
+        )
+        contact = contact_result.scalar_one_or_none()
+        contact_name = contact.contact_name if contact else "Circle Member"
+
+        # Build reset URL
+        base_url = settings.FRONTEND_URL
+        reset_url = f"{base_url}/my-circle/reset-password?token={circle_user.password_reset_token}"
+
+        # Send password reset email
+        try:
+            await email_service.send_password_reset(
+                to_email=circle_user.email,
+                to_name=contact_name,
+                reset_link=reset_url,
+            )
+            logger.info(f"Password reset email sent to {circle_user.email}")
+        except Exception as e:
+            logger.error(f"Failed to send password reset email: {e}")
+            # Don't expose email sending failures to client
+
+    # Always return success (security best practice)
+    return CircleUserForgotPasswordResponse(
+        message="If an account exists with this email, a password reset link has been sent.",
+        email_sent=True,
+    )
+
+
+@router.post(
+    "/circle-users/reset-password",
+    response_model=CircleUserResetPasswordResponse,
+    summary="Reset password",
+    description="Reset password using a reset token."
+)
+async def reset_password(
+    request_data: CircleUserResetPasswordRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Reset a circle user's password using a reset token.
+
+    - Token must be valid and not expired
+    - Passwords must match
+    """
+    if request_data.password != request_data.confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Passwords do not match"
+        )
+
+    try:
+        await my_circle_service.reset_password(
+            db,
+            reset_token=request_data.reset_token,
+            new_password=request_data.password,
+        )
+        await db.commit()
+
+        return CircleUserResetPasswordResponse(
+            message="Password has been reset successfully. You can now log in.",
+            success=True,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+
+@router.get(
+    "/circle-users/{reset_token}/reset-info",
+    summary="Get reset token info",
+    description="Validate a password reset token and get user info."
+)
+async def get_reset_token_info(
+    reset_token: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """Validate a password reset token before showing the reset form."""
+    circle_user = await my_circle_service.get_circle_user_by_reset_token(db, reset_token)
+
+    if not circle_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invalid password reset token"
+        )
+
+    if circle_user.is_password_reset_expired:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password reset token has expired"
+        )
+
+    # Get contact info
+    contact = circle_user.circle_contact
+
+    return {
+        "valid": True,
+        "email": circle_user.email,
+        "contact_name": contact.contact_name if contact else None,
+    }
+
+
 @router.get(
     "/circle-users/{invite_token}/info",
     summary="Get invite info",
@@ -1352,6 +1489,116 @@ async def child_user_login(
 async def get_avatar_choices():
     """Get the list of available avatars for child users."""
     return CHILD_AVATARS
+
+
+# ============================================================
+# Device Setup Endpoints (for configuring child's device)
+# ============================================================
+
+@router.post(
+    "/child-users/{child_user_id}/device-setup",
+    response_model=DeviceSetupCreateResponse,
+    summary="Create device setup code",
+    description="Generate a setup code for configuring a child's device."
+)
+async def create_device_setup_code(
+    child_user_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Generate a setup code for a child user that can be used to configure their device.
+
+    - Code is 8 characters (alphanumeric)
+    - Expires in 24 hours
+    - Parent must have access to the family file
+    """
+    import secrets
+    import string
+
+    # Get the child user
+    child_user = await my_circle_service.get_child_user_by_id(db, child_user_id)
+
+    if not child_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Child user not found"
+        )
+
+    # Verify parent has access
+    await get_family_file_with_access(db, child_user.family_file_id, current_user.id)
+
+    # Generate 8-character setup code (uppercase alphanumeric, excluding confusing chars)
+    safe_chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # No I, O, 0, 1
+    setup_code = ''.join(secrets.choice(safe_chars) for _ in range(8))
+
+    # Set expiration to 24 hours from now
+    expires_at = datetime.utcnow() + timedelta(hours=24)
+
+    # Update the child user with the setup code
+    child_user.device_setup_code = setup_code
+    child_user.device_setup_expires_at = expires_at
+
+    await db.commit()
+    await db.refresh(child_user)
+
+    # Get child name
+    child = child_user.child
+    child_name = child.display_name if child else child_user.username
+
+    return DeviceSetupCreateResponse(
+        setup_code=setup_code,
+        expires_at=expires_at,
+        child_name=child_name,
+        message="Send this code to set up the child's device. It expires in 24 hours.",
+    )
+
+
+@router.get(
+    "/device-setup/{code}",
+    response_model=DeviceSetupResponse,
+    summary="Validate device setup code",
+    description="Validate a setup code and return device configuration info."
+)
+async def validate_device_setup_code(
+    code: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Validate a device setup code (called from the child's device).
+
+    - Returns family_file_id and username needed for device configuration
+    - Does NOT consume the code (can be reused until expired)
+    """
+    # Look up the setup code
+    result = await db.execute(
+        select(ChildUser)
+        .options(selectinload(ChildUser.child))
+        .where(ChildUser.device_setup_code == code.upper())
+    )
+    child_user = result.scalar_one_or_none()
+
+    if not child_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invalid setup code"
+        )
+
+    if child_user.is_device_setup_expired:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Setup code has expired. Please request a new code from the parent app."
+        )
+
+    # Get child name
+    child = child_user.child
+    child_name = child.display_name if child else child_user.username
+
+    return DeviceSetupResponse(
+        family_file_id=child_user.family_file_id,
+        username=child_user.username,
+        child_name=child_name,
+    )
 
 
 # ============================================================

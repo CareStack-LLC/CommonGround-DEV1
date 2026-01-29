@@ -12,3 +12,4 @@ export * as dashboard from './dashboard';
 export * as messaging from './messaging';
 export * as timeline from './timeline';
 export * as aria from './aria';
+export * as intake from './intake';

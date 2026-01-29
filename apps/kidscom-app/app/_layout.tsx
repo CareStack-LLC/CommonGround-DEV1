@@ -43,7 +43,16 @@ function RootLayoutNav() {
         }}
       >
         {!isAuthenticated ? (
-          <Stack.Screen name="login" options={{ animation: "fade" }} />
+          <>
+            <Stack.Screen name="login" options={{ animation: "fade" }} />
+            <Stack.Screen
+              name="setup"
+              options={{
+                animation: "slide_from_right",
+                gestureEnabled: true,
+              }}
+            />
+          </>
         ) : (
           <Stack.Screen name="(main)" options={{ animation: "fade" }} />
         )}

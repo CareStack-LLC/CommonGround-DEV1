@@ -184,3 +184,48 @@ export async function validateSession(): Promise<{
     return { valid: false };
   }
 }
+
+/**
+ * Request password reset email
+ */
+export async function forgotPassword(email: string): Promise<{
+  message: string;
+  email_sent: boolean;
+}> {
+  return fetchPublic('/my-circle/circle-users/forgot-password', {
+    method: 'POST',
+    body: { email },
+  });
+}
+
+/**
+ * Get password reset token info (validate before showing reset form)
+ */
+export async function getResetTokenInfo(resetToken: string): Promise<{
+  valid: boolean;
+  email: string;
+  contact_name?: string;
+}> {
+  return fetchPublic(`/my-circle/circle-users/${resetToken}/reset-info`);
+}
+
+/**
+ * Reset password with token
+ */
+export async function resetPassword(
+  resetToken: string,
+  password: string,
+  confirmPassword: string
+): Promise<{
+  message: string;
+  success: boolean;
+}> {
+  return fetchPublic('/my-circle/circle-users/reset-password', {
+    method: 'POST',
+    body: {
+      reset_token: resetToken,
+      password,
+      confirm_password: confirmPassword,
+    },
+  });
+}

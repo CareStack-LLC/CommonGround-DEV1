@@ -68,7 +68,12 @@ class InterventionAction(BaseModel):
     @classmethod
     def validate_action(cls, v: str) -> str:
         """Validate action is one of allowed values."""
-        allowed_actions = ['accepted', 'modified', 'rejected', 'cancelled']
+        # accepted: Used ARIA suggestion as-is
+        # modified: Used ARIA suggestion but edited it
+        # rejected: Declined ARIA suggestion, rewrote message
+        # sent_anyway: Sent original message despite ARIA warning (non-severe only)
+        # cancelled: Abandoned message composition
+        allowed_actions = ['accepted', 'modified', 'rejected', 'sent_anyway', 'cancelled']
         if v not in allowed_actions:
             raise ValueError(f'Invalid action. Must be one of: {", ".join(allowed_actions)}')
         return v

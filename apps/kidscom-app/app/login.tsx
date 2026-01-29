@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
   Animated,
-  Vibration,
+  ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,14 +15,14 @@ import { useChildAuth } from "@/providers/ChildAuthProvider";
 
 const PIN_LENGTH = 4;
 
-// Demo account - Jayden Brown's KidsCom login
-const DEMO_FAMILY_FILE_ID = "d491d4f6-da26-4b27-a12f-b8c52e9fbdab";
-const DEMO_USERNAME = "SuperJayden";
-
 export default function PinLoginScreen() {
-  const { loginWithPin, isLoading, error } = useChildAuth();
+  const { loginWithPin, isLoading, error, isDeviceConfigured, deviceSetup, isTokenExpired, child } = useChildAuth();
   const [pin, setPin] = useState<string[]>([]);
   const [shake] = useState(new Animated.Value(0));
+
+  // Use child name from stored data if available (for returning users)
+  const displayName = child?.first_name || deviceSetup?.child_name || "there";
+  const isReturningUser = !!child && isTokenExpired;
 
   // Shake animation on error
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function PinLoginScreen() {
 
     // Auto-submit when PIN is complete
     if (newPin.length === PIN_LENGTH) {
-      const success = await loginWithPin(DEMO_FAMILY_FILE_ID, DEMO_USERNAME, newPin.join(""));
+      const success = await loginWithPin(newPin.join(""));
       if (success) {
         router.replace("/(main)");
       }
@@ -63,19 +63,75 @@ export default function PinLoginScreen() {
     }
   };
 
+  // Show setup screen if device isn't configured
+  if (!isDeviceConfigured) {
+    return (
+      <SafeAreaView className="flex-1 bg-purple-600">
+        <View className="flex-1 items-center justify-center px-8">
+          <View className="w-28 h-28 bg-white rounded-full items-center justify-center mb-6 shadow-xl">
+            <Text className="text-6xl">📱</Text>
+          </View>
+          <Text className="text-3xl font-bold text-white text-center mb-4">
+            Setup Needed
+          </Text>
+          <Text className="text-lg text-purple-200 text-center mb-8">
+            Ask a parent to set up this device for you using their CommonGround app.
+          </Text>
+
+          <View className="bg-white/20 rounded-2xl p-6 w-full">
+            <Text className="text-white font-bold text-lg mb-4">How to set up:</Text>
+            <View className="flex-row items-start mb-3">
+              <View className="w-8 h-8 bg-white rounded-full items-center justify-center mr-3">
+                <Text className="text-purple-600 font-bold">1</Text>
+              </View>
+              <Text className="flex-1 text-white">
+                Open the parent's CommonGround app
+              </Text>
+            </View>
+            <View className="flex-row items-start mb-3">
+              <View className="w-8 h-8 bg-white rounded-full items-center justify-center mr-3">
+                <Text className="text-purple-600 font-bold">2</Text>
+              </View>
+              <Text className="flex-1 text-white">
+                Go to Circle settings and tap "Set up child's device"
+              </Text>
+            </View>
+            <View className="flex-row items-start">
+              <View className="w-8 h-8 bg-white rounded-full items-center justify-center mr-3">
+                <Text className="text-purple-600 font-bold">3</Text>
+              </View>
+              <Text className="flex-1 text-white">
+                Scan the QR code or enter the setup code
+              </Text>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            className="mt-8 bg-white py-4 px-8 rounded-full"
+            onPress={() => router.push("/setup")}
+          >
+            <Text className="text-purple-600 font-bold text-lg">
+              Enter Setup Code
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-purple-600">
       <View className="flex-1 px-8 pt-12">
         {/* Fun Header */}
         <View className="items-center mb-12">
           <View className="w-28 h-28 bg-white rounded-full items-center justify-center mb-6 shadow-xl">
-            <Text className="text-6xl">👋</Text>
+            <Text className="text-6xl">{isReturningUser ? "🔄" : "👋"}</Text>
           </View>
           <Text className="text-4xl font-bold text-white text-center">
-            Hi there!
+            {isReturningUser ? `Welcome back, ${displayName}!` : `Hi ${displayName}!`}
           </Text>
           <Text className="text-xl text-purple-200 mt-2 text-center">
-            Enter your secret code
+            {isReturningUser ? "Enter your PIN to continue" : "Enter your secret code"}
           </Text>
         </View>
 
@@ -100,8 +156,15 @@ export default function PinLoginScreen() {
         {error && (
           <View className="items-center mb-6">
             <Text className="text-pink-300 text-lg">
-              Oops! Try again 🔄
+              Oops! Try again
             </Text>
+          </View>
+        )}
+
+        {/* Loading */}
+        {isLoading && (
+          <View className="items-center mb-6">
+            <ActivityIndicator color="white" size="large" />
           </View>
         )}
 
@@ -150,7 +213,7 @@ export default function PinLoginScreen() {
         {/* Fun Footer */}
         <View className="items-center mt-8">
           <Text className="text-purple-300 text-center">
-            Ask a parent if you forgot your code! 🔑
+            Ask a parent if you forgot your code!
           </Text>
         </View>
       </View>

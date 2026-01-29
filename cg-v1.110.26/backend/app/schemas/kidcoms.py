@@ -708,6 +708,30 @@ class CircleUserProfileResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class CircleUserForgotPasswordRequest(BaseModel):
+    """Schema for requesting a password reset."""
+    email: str = Field(..., description="Email address of the circle user")
+
+
+class CircleUserForgotPasswordResponse(BaseModel):
+    """Response after requesting password reset."""
+    message: str = "If an account exists with this email, a password reset link has been sent."
+    email_sent: bool = True
+
+
+class CircleUserResetPasswordRequest(BaseModel):
+    """Schema for resetting password with a reset token."""
+    reset_token: str = Field(..., description="Password reset token from email")
+    password: str = Field(..., min_length=8, max_length=100, description="New password")
+    confirm_password: str = Field(..., min_length=8, max_length=100, description="Confirm new password")
+
+
+class CircleUserResetPasswordResponse(BaseModel):
+    """Response after successfully resetting password."""
+    message: str = "Password has been reset successfully. You can now log in."
+    success: bool = True
+
+
 # ============================================================
 # My Circle - Child User (PIN Login) Schemas
 # ============================================================
@@ -773,6 +797,26 @@ class ChildUserListResponse(BaseModel):
     """Schema for listing child users in a family."""
     items: List[ChildUserResponse]
     total: int
+
+
+class DeviceSetupCreateRequest(BaseModel):
+    """Schema for creating a device setup code for a child."""
+    child_user_id: str
+
+
+class DeviceSetupCreateResponse(BaseModel):
+    """Response after creating a device setup code."""
+    setup_code: str = Field(..., description="8-character setup code")
+    expires_at: datetime
+    child_name: str
+    message: str = "Send this code to set up the child's device."
+
+
+class DeviceSetupResponse(BaseModel):
+    """Response after validating a device setup code."""
+    family_file_id: str
+    username: str
+    child_name: str
 
 
 # ============================================================

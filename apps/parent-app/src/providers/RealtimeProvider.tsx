@@ -34,7 +34,9 @@ type RealtimeEvent =
   | "exchange_update"
   | "agreement_update"
   | "expense_update"
-  | "event_update";
+  | "event_update"
+  | "kidcoms_call_incoming"
+  | "kidcoms_call_ended";
 
 type EventCallback = (data: Record<string, unknown>) => void;
 

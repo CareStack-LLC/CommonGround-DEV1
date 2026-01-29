@@ -428,6 +428,10 @@ class CircleUser(Base, UUIDMixin, TimestampMixin):
     invite_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     invite_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
+    # Password reset
+    password_reset_token: Mapped[Optional[str]] = mapped_column(String(100), unique=True, nullable=True, index=True)
+    password_reset_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     # Status
     email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
@@ -450,6 +454,13 @@ class CircleUser(Base, UUIDMixin, TimestampMixin):
         if self.invite_expires_at is None:
             return False
         return datetime.utcnow() > self.invite_expires_at
+
+    @property
+    def is_password_reset_expired(self) -> bool:
+        """Check if password reset token has expired."""
+        if self.password_reset_expires_at is None:
+            return True
+        return datetime.utcnow() > self.password_reset_expires_at
 
     def accept_invite(self, password_hash: str) -> None:
         """Accept invitation and set password."""
@@ -487,6 +498,10 @@ class ChildUser(Base, UUIDMixin, TimestampMixin):
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # Device setup (for configuring child's device)
+    device_setup_code: Mapped[Optional[str]] = mapped_column(String(8), unique=True, nullable=True, index=True)
+    device_setup_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     # Relationships
     child = relationship("Child", back_populates="user_account")
     family_file = relationship("FamilyFile", back_populates="child_users")
@@ -497,6 +512,13 @@ class ChildUser(Base, UUIDMixin, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<ChildUser {self.username}>"
+
+    @property
+    def is_device_setup_expired(self) -> bool:
+        """Check if device setup code has expired."""
+        if self.device_setup_expires_at is None:
+            return True
+        return datetime.utcnow() > self.device_setup_expires_at
 
 
 class CirclePermission(Base, UUIDMixin, TimestampMixin):

@@ -26,6 +26,8 @@ type MessageType =
   | "agreement_update"
   | "expense_update"
   | "event_update"
+  | "kidcoms_call_incoming"
+  | "kidcoms_call_ended"
   | "pong"
   | "error";
 
@@ -162,6 +164,8 @@ export function useWebSocket({
           case "agreement_update":
           case "expense_update":
           case "event_update":
+          case "kidcoms_call_incoming":
+          case "kidcoms_call_ended":
             onActivity?.(message.data || message);
             break;
 

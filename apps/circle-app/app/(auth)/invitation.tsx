@@ -1,3 +1,10 @@
+/**
+ * Invitation Screen for My Circle App
+ *
+ * Handles invitation code entry, verification, and account setup.
+ * Circle is invitation-only - users must have a valid invitation code from a parent.
+ */
+
 import { useState, useRef } from "react";
 import {
   View,
@@ -7,23 +14,39 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 
+import { circle } from "@/lib/api";
+import { useAuth } from "@/src/providers/AuthProvider";
+
 const CODE_LENGTH = 6;
 
+interface InviteDetails {
+  email: string;
+  contactName: string;
+  relationshipType: string;
+  inviteExpiresAt: string;
+}
+
 export default function InvitationScreen() {
+  const { acceptInvite, isLoading: authLoading } = useAuth();
   const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(""));
+  const [inviteToken, setInviteToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [inviteDetails, setInviteDetails] = useState<{
-    familyName: string;
-    childName: string;
-    invitedBy: string;
-  } | null>(null);
+  const [inviteDetails, setInviteDetails] = useState<InviteDetails | null>(null);
+
+  // Password setup state
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
@@ -75,101 +98,291 @@ export default function InvitationScreen() {
     setIsLoading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    // Simulate API verification
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const info = await circle.auth.getInviteInfo(fullCode);
 
-    // Demo: Accept any 6-character code
-    if (fullCode.length === CODE_LENGTH) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setInviteToken(fullCode);
       setInviteDetails({
-        familyName: "Johnson Family",
-        childName: "Emma",
-        invitedBy: "Sarah Johnson",
+        email: info.email,
+        contactName: info.contact_name,
+        relationshipType: info.relationship_type,
+        inviteExpiresAt: info.invite_expires_at,
       });
-    } else {
+    } catch (err: any) {
+      console.error("[Invitation] Verify error:", err);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      setError("Invalid invitation code. Please check and try again.");
+
+      if (err?.message?.includes("expired")) {
+        setError("This invitation has expired. Please ask for a new invitation.");
+      } else if (err?.message?.includes("not found") || err?.message?.includes("invalid")) {
+        setError("Invalid invitation code. Please check and try again.");
+      } else if (err?.message?.includes("already")) {
+        setError("This invitation has already been used. Please sign in instead.");
+      } else {
+        setError(err?.message || "Failed to verify invitation. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAcceptInvite = async () => {
+    setError("");
+
+    // Validate password
+    if (!password) {
+      setError("Please enter a password");
+      return;
     }
 
-    setIsLoading(false);
-  };
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
 
-  const handleAcceptInvite = () => {
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setIsSubmitting(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    // In real app, this would link the circle member to the family
-    router.replace("/(auth)/register");
+
+    try {
+      const success = await acceptInvite(inviteToken, password);
+
+      if (success) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        // Navigate to main app - auth state is already updated
+        router.replace("/(tabs)");
+      } else {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        setError("Failed to create account. Please try again.");
+      }
+    } catch (err: any) {
+      console.error("[Invitation] Accept error:", err);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
+      if (err?.message?.includes("expired")) {
+        setError("This invitation has expired. Please ask for a new invitation.");
+      } else if (err?.message?.includes("match")) {
+        setError("Passwords do not match");
+      } else {
+        setError(err?.message || "Failed to create account. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
+  const formatRelationship = (type: string): string => {
+    const mapping: Record<string, string> = {
+      grandparent: "Grandparent",
+      aunt_uncle: "Aunt/Uncle",
+      family_friend: "Family Friend",
+      other: "Family Circle Member",
+    };
+    return mapping[type] || type;
+  };
+
+  const getRelationshipEmoji = (type: string): string => {
+    const mapping: Record<string, string> = {
+      grandparent: "👵",
+      aunt_uncle: "👨‍👩‍👧",
+      family_friend: "🤝",
+      other: "💕",
+    };
+    return mapping[type] || "👋";
+  };
+
+  // Invitation verified - show account setup form
   if (inviteDetails) {
     return (
       <SafeAreaView className="flex-1 bg-white">
-        <View className="flex-1 px-6 pt-4">
-          <TouchableOpacity
-            onPress={() => {
-              setInviteDetails(null);
-              setCode(Array(CODE_LENGTH).fill(""));
-            }}
-            className="w-10 h-10 items-center justify-center"
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1"
+        >
+          <ScrollView
+            className="flex-1"
+            contentContainerStyle={{ flexGrow: 1 }}
+            keyboardShouldPersistTaps="handled"
           >
-            <Ionicons name="arrow-back" size={24} color="#374151" />
-          </TouchableOpacity>
+            <View className="flex-1 px-6 pt-4">
+              <TouchableOpacity
+                onPress={() => {
+                  setInviteDetails(null);
+                  setInviteToken("");
+                  setCode(Array(CODE_LENGTH).fill(""));
+                  setPassword("");
+                  setConfirmPassword("");
+                  setError("");
+                }}
+                className="w-10 h-10 items-center justify-center"
+              >
+                <Ionicons name="arrow-back" size={24} color="#374151" />
+              </TouchableOpacity>
 
-          <View className="flex-1 items-center justify-center px-4">
-            <View className="w-24 h-24 bg-primary-100 rounded-full items-center justify-center mb-6">
-              <Text className="text-5xl">🎉</Text>
-            </View>
-
-            <Text className="text-2xl font-bold text-gray-800 text-center mb-2">
-              You're Invited!
-            </Text>
-
-            <Text className="text-gray-500 text-center mb-8">
-              {inviteDetails.invitedBy} has invited you to connect with{" "}
-              <Text className="font-bold">{inviteDetails.childName}</Text> from
-              the {inviteDetails.familyName}
-            </Text>
-
-            <View className="bg-primary-50 rounded-2xl p-6 w-full mb-8">
-              <View className="flex-row items-center mb-4">
-                <View className="w-12 h-12 bg-primary-200 rounded-full items-center justify-center">
-                  <Text className="text-2xl">👧</Text>
-                </View>
-                <View className="ml-4">
-                  <Text className="font-bold text-gray-800 text-lg">
-                    {inviteDetails.childName}
-                  </Text>
-                  <Text className="text-gray-500">
-                    {inviteDetails.familyName}
+              <View className="pt-4">
+                {/* Success Header */}
+                <View className="items-center mb-6">
+                  <View className="w-20 h-20 bg-green-100 rounded-full items-center justify-center mb-4">
+                    <Text className="text-4xl">🎉</Text>
+                  </View>
+                  <Text className="text-2xl font-bold text-gray-800 text-center mb-2">
+                    You're Invited!
                   </Text>
                 </View>
+
+                {/* Invitation Details Card */}
+                <View className="bg-primary-50 rounded-2xl p-5 mb-6">
+                  <View className="flex-row items-center mb-3">
+                    <View className="w-12 h-12 bg-primary-200 rounded-full items-center justify-center">
+                      <Text className="text-2xl">
+                        {getRelationshipEmoji(inviteDetails.relationshipType)}
+                      </Text>
+                    </View>
+                    <View className="ml-4 flex-1">
+                      <Text className="font-bold text-gray-800 text-lg">
+                        {inviteDetails.contactName}
+                      </Text>
+                      <Text className="text-gray-500">
+                        {formatRelationship(inviteDetails.relationshipType)}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text className="text-gray-600 text-sm">
+                    As a member of their circle, you'll be able to video call, send
+                    messages, and share photos safely.
+                  </Text>
+                </View>
+
+                {/* Account Setup Form */}
+                <Text className="text-lg font-bold text-gray-800 mb-4">
+                  Create Your Account
+                </Text>
+
+                {/* Email (readonly) */}
+                <View className="mb-4">
+                  <Text className="text-gray-700 font-medium mb-2">Email</Text>
+                  <View className="flex-row items-center bg-gray-100 border border-gray-200 rounded-xl px-4 py-4">
+                    <Ionicons name="mail-outline" size={20} color="#9ca3af" />
+                    <Text className="flex-1 px-3 text-base text-gray-600">
+                      {inviteDetails.email}
+                    </Text>
+                    <Ionicons name="lock-closed" size={16} color="#9ca3af" />
+                  </View>
+                </View>
+
+                {/* Error Message */}
+                {error ? (
+                  <View className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                    <Text className="text-red-600">{error}</Text>
+                  </View>
+                ) : null}
+
+                {/* Password Input */}
+                <View className="mb-4">
+                  <Text className="text-gray-700 font-medium mb-2">Password</Text>
+                  <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4">
+                    <Ionicons
+                      name="lock-closed-outline"
+                      size={20}
+                      color="#9ca3af"
+                    />
+                    <TextInput
+                      className="flex-1 py-4 px-3 text-base text-gray-800"
+                      placeholder="Create a password"
+                      placeholderTextColor="#9ca3af"
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={!showPassword}
+                      editable={!isSubmitting}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                    >
+                      <Ionicons
+                        name={showPassword ? "eye-off-outline" : "eye-outline"}
+                        size={20}
+                        color="#9ca3af"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  <Text className="text-gray-400 text-sm mt-1">
+                    Must be at least 8 characters
+                  </Text>
+                </View>
+
+                {/* Confirm Password Input */}
+                <View className="mb-6">
+                  <Text className="text-gray-700 font-medium mb-2">
+                    Confirm Password
+                  </Text>
+                  <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4">
+                    <Ionicons
+                      name="lock-closed-outline"
+                      size={20}
+                      color="#9ca3af"
+                    />
+                    <TextInput
+                      className="flex-1 py-4 px-3 text-base text-gray-800"
+                      placeholder="Confirm your password"
+                      placeholderTextColor="#9ca3af"
+                      value={confirmPassword}
+                      onChangeText={setConfirmPassword}
+                      secureTextEntry={!showConfirmPassword}
+                      editable={!isSubmitting}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      <Ionicons
+                        name={
+                          showConfirmPassword ? "eye-off-outline" : "eye-outline"
+                        }
+                        size={20}
+                        color="#9ca3af"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* Submit Button */}
+                <TouchableOpacity
+                  className={`py-4 rounded-xl items-center shadow-md mb-4 ${
+                    isSubmitting ? "bg-primary-400" : "bg-primary-500"
+                  }`}
+                  onPress={handleAcceptInvite}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator color="white" />
+                  ) : (
+                    <Text className="text-white font-bold text-lg">
+                      Create Account & Join
+                    </Text>
+                  )}
+                </TouchableOpacity>
+
+                {/* Cancel */}
+                <TouchableOpacity
+                  className="py-4 items-center"
+                  onPress={() => router.back()}
+                  disabled={isSubmitting}
+                >
+                  <Text className="text-gray-500">Maybe Later</Text>
+                </TouchableOpacity>
               </View>
-              <Text className="text-gray-600 text-sm">
-                As a member of their circle, you'll be able to video call, send
-                messages, and share photos with {inviteDetails.childName}.
-              </Text>
             </View>
-
-            <TouchableOpacity
-              className="bg-primary-500 py-4 px-8 rounded-xl w-full items-center shadow-md mb-4"
-              onPress={handleAcceptInvite}
-            >
-              <Text className="text-white font-bold text-lg">
-                Accept & Create Account
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="py-4"
-              onPress={() => router.back()}
-            >
-              <Text className="text-gray-500">Maybe Later</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     );
   }
 
+  // Code entry screen
   return (
     <SafeAreaView className="flex-1 bg-white">
       <KeyboardAvoidingView
@@ -193,7 +406,7 @@ export default function InvitationScreen() {
                 Enter Invitation Code
               </Text>
               <Text className="text-gray-500 text-center">
-                Enter the 6-character code sent by a family member
+                Enter the code from your invitation email
               </Text>
             </View>
 
@@ -222,6 +435,7 @@ export default function InvitationScreen() {
                   maxLength={index === 0 ? CODE_LENGTH : 1}
                   autoCapitalize="characters"
                   autoCorrect={false}
+                  editable={!isLoading}
                 />
               ))}
             </View>
@@ -233,6 +447,14 @@ export default function InvitationScreen() {
                 <Text className="text-gray-500 mt-2">Verifying code...</Text>
               </View>
             )}
+
+            {/* Already have account link */}
+            <View className="flex-row justify-center mt-4">
+              <Text className="text-gray-500">Already have an account? </Text>
+              <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+                <Text className="text-primary-600 font-bold">Sign In</Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Info */}
             <View className="bg-gray-50 rounded-2xl p-4 mt-auto mb-8">

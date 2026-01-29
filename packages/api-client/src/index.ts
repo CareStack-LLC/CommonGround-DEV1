@@ -234,6 +234,19 @@ export type {
   ParentARIAMetrics,
 } from './api/professional/aria';
 
+export type {
+  IntakeStatus,
+  IntakeSessionCreate,
+  IntakeSessionListItem,
+  IntakeSessionDetail,
+  IntakeSessionCreatedResponse,
+  IntakeTranscript,
+  IntakeSummary,
+  IntakeOutputs,
+  IntakeQuestion,
+  IntakeQuestionCreate,
+} from './api/professional/intake';
+
 // Re-export ClearFund types
 export type {
   Obligation,

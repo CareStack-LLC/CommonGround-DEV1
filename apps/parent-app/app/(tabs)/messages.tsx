@@ -46,6 +46,9 @@ const SAND = "#F5F0E8";
 const TOKEN_KEY = "auth_token";
 const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com";
 
+// ARIA intervention action types
+type ARIAAction = "accepted" | "modified" | "rejected" | "sent_anyway" | "cancelled";
+
 interface Message {
   id: string;
   family_file_id: string;
@@ -83,6 +86,7 @@ export default function MessagesScreen() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [messageText, setMessageText] = useState("");
   const [analysis, setAnalysis] = useState<ARIAAnalysis | null>(null);
+  const [pendingAction, setPendingAction] = useState<ARIAAction | null>(null); // Track what user did with ARIA suggestion
   const [isTyping, setIsTyping] = useState(false);
   const [otherUserTyping, setOtherUserTyping] = useState(false);
   const [coParentId, setCoParentId] = useState<string | null>(null);
@@ -249,9 +253,20 @@ export default function MessagesScreen() {
           if (response.ok) {
             const result = await response.json() as ARIAAnalysis;
             setAnalysis(result);
+            // Reset pending action when new analysis arrives (user is typing new content)
+            if (pendingAction === "accepted" && messageText !== result.suggestion) {
+              // User modified the suggestion they accepted
+              setPendingAction("modified");
+            }
+          } else {
+            // Show analysis error but allow message send
+            console.error("ARIA analysis returned error");
+            setAnalysis(null);
           }
         } catch (err) {
           console.error("ARIA analysis failed:", err);
+          // Don't block sending - just clear analysis
+          setAnalysis(null);
         } finally {
           setIsAnalyzing(false);
         }
@@ -317,26 +332,63 @@ export default function MessagesScreen() {
       return;
     }
 
-    // Warn for high toxicity
-    if (analysis && (analysis.toxicity_level === "high" || analysis.toxicity_level === "severe")) {
+    // Warn for high toxicity (orange/red levels)
+    if (analysis && (analysis.toxicity_level === "high" || analysis.toxicity_level === "severe" ||
+                     analysis.toxicity_level === "orange" || analysis.toxicity_level === "red")) {
       Alert.alert(
         "Are you sure?",
         "ARIA has detected concerning language. Consider revising.\n\n" +
           (analysis.suggestion || ""),
         [
           { text: "Revise", style: "cancel" },
-          { text: "Send Anyway", style: "destructive", onPress: sendMessage },
+          {
+            text: "Send Anyway",
+            style: "destructive",
+            onPress: () => sendMessage("sent_anyway"), // Record as sent_anyway
+          },
         ]
       );
       return;
     }
 
+    // If there was a suggestion but user didn't explicitly accept it,
+    // and they didn't use "Send Anyway", treat as rejected/modified
+    if (analysis?.is_flagged && !pendingAction) {
+      // User saw suggestion but sent their own version
+      setPendingAction("rejected");
+    }
+
     await sendMessage();
   };
 
-  const sendMessage = async () => {
+  // Record ARIA intervention after message is sent
+  const recordIntervention = async (messageId: string, action: ARIAAction, finalMessage?: string) => {
+    try {
+      const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      if (!token) return;
+
+      await fetch(`${API_URL}/api/v1/messages/${messageId}/intervention`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action,
+          final_message: finalMessage,
+        }),
+      });
+      console.log("[Messages] Recorded ARIA intervention:", action);
+    } catch (err) {
+      console.error("[Messages] Failed to record intervention:", err);
+      // Don't fail the send - intervention tracking is secondary
+    }
+  };
+
+  const sendMessage = async (overrideAction?: ARIAAction) => {
     if (!familyFile?.id || !coParentId) return;
 
+    const actionToRecord = overrideAction || pendingAction;
     setIsSending(true);
     try {
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
@@ -357,8 +409,16 @@ export default function MessagesScreen() {
       });
 
       if (response.ok) {
+        const sentMessage = await response.json() as { id: string; was_flagged?: boolean };
+
+        // Record ARIA intervention if message was flagged and user took an action
+        if (sentMessage.was_flagged && actionToRecord) {
+          await recordIntervention(sentMessage.id, actionToRecord, messageText.trim());
+        }
+
         setMessageText("");
         setAnalysis(null);
+        setPendingAction(null);
         // Real-time will add the message, but let's also refresh to be safe
         await fetchMessages();
       } else {
@@ -553,16 +613,22 @@ export default function MessagesScreen() {
   };
 
   const getToxicityColor = (level: string) => {
+    // Handle both color names (from API) and severity names (legacy)
     switch (level) {
+      case "red":
       case "high":
       case "severe":
-        return "#DC2626";
+        return "#DC2626"; // Red - severe toxicity
+      case "orange":
       case "medium":
-        return "#F59E0B";
+        return "#F59E0B"; // Orange - medium toxicity
+      case "yellow":
       case "low":
-        return "#EAB308";
+        return "#EAB308"; // Yellow - low toxicity
+      case "green":
+      case "none":
       default:
-        return SAGE;
+        return SAGE; // Green - no toxicity
     }
   };
 
@@ -771,7 +837,10 @@ export default function MessagesScreen() {
                 </View>
                 {analysis.suggestion && (
                   <TouchableOpacity
-                    onPress={() => setMessageText(analysis.suggestion!)}
+                    onPress={() => {
+                      setMessageText(analysis.suggestion!);
+                      setPendingAction("accepted"); // Track that user accepted the suggestion
+                    }}
                     style={{
                       marginTop: 8,
                       padding: 8,

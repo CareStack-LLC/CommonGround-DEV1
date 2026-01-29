@@ -19,6 +19,7 @@ import Daily, {
   DailyEventObjectParticipantLeft,
   DailyParticipant,
 } from '@daily-co/react-native-daily-js';
+import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 
 import {
   CallState,
@@ -257,6 +258,8 @@ export function DailyCallProvider({
         const { session: apiSession, room_config } = response;
 
         // Create session object
+        // Recording is automatic based on family settings - check API response for recording_enabled
+        const recordingEnabled = (apiSession as any).recording_enabled ?? false;
         const newSession: CallSession = {
           id: apiSession.id,
           roomUrl: room_config.room_url,
@@ -270,8 +273,11 @@ export function DailyCallProvider({
           recipientType: apiSession.recipient_type,
           recipientName: apiSession.recipient_name,
           familyFileId: apiSession.family_file_id,
-          isRecording: false,
+          isRecording: recordingEnabled, // Recording starts automatically when call is active
         };
+
+        // Update isRecording state based on session
+        setIsRecording(recordingEnabled);
 
         setSession(newSession);
         setCallState('ringing');
@@ -321,6 +327,9 @@ export function DailyCallProvider({
         const response = await videoAPI.joinCall(sessionId, userType);
         const { session: apiSession, room_config } = response;
 
+        // Recording is automatic based on family settings - check API response for recording_enabled
+        const recordingEnabled = (apiSession as any).recording_enabled ?? false;
+
         // Create session object
         const newSession: CallSession = {
           id: apiSession.id,
@@ -335,10 +344,11 @@ export function DailyCallProvider({
           recipientType: apiSession.recipient_type,
           recipientName: apiSession.recipient_name,
           familyFileId: apiSession.family_file_id,
-          isRecording: false,
+          isRecording: recordingEnabled, // Recording starts automatically when call is active
         };
 
         setSession(newSession);
+        setIsRecording(recordingEnabled);
 
         // Create Daily.co call object
         const call = Daily.createCallObject({
@@ -425,10 +435,24 @@ export function DailyCallProvider({
     }
   }, [isAudioOn]);
 
-  // Toggle speaker
-  const toggleSpeaker = useCallback(() => {
-    // This would need platform-specific implementation
-    setIsSpeakerOn(!isSpeakerOn);
+  // Toggle speaker (earpiece vs loudspeaker)
+  const toggleSpeaker = useCallback(async () => {
+    const newSpeakerState = !isSpeakerOn;
+
+    try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+        interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+        shouldDuckAndroid: false,
+        playThroughEarpieceAndroid: !newSpeakerState, // false = speaker, true = earpiece
+        staysActiveInBackground: true,
+      });
+      setIsSpeakerOn(newSpeakerState);
+    } catch (error) {
+      console.error('[DailyCall] Error toggling speaker:', error);
+    }
   }, [isSpeakerOn]);
 
   // Switch camera (front/back)
@@ -439,32 +463,48 @@ export function DailyCallProvider({
   }, []);
 
   // Start recording (parent only)
+  // NOTE: Recording is automatic based on family settings.
+  // This function is kept for API compatibility but recording
+  // starts automatically when the call becomes active.
   const startRecording = useCallback(async (): Promise<boolean> => {
     if (!session || userType !== 'parent') {
       return false;
     }
 
+    // Recording is automatic - if session has recording enabled, it's already recording
+    if (session.isRecording) {
+      console.log('[DailyCall] Recording is automatic - already recording');
+      return true;
+    }
+
+    // Try to call API, but don't fail if endpoint doesn't exist
     try {
       await videoAPI.startRecording(session.id);
       setIsRecording(true);
       return true;
     } catch (err) {
-      console.error('Failed to start recording:', err);
+      // Recording is controlled by family settings, not manual start/stop
+      console.log('[DailyCall] Recording is automatic based on family settings');
       return false;
     }
   }, [session, userType, videoAPI]);
 
   // Stop recording (parent only)
+  // NOTE: Recording is automatic and stops when the call ends.
+  // This function is kept for API compatibility.
   const stopRecording = useCallback(async () => {
     if (!session || userType !== 'parent') {
       return;
     }
 
+    // Recording stops automatically when call ends
+    // Try to call API, but don't fail if endpoint doesn't exist
     try {
       await videoAPI.stopRecording(session.id);
       setIsRecording(false);
     } catch (err) {
-      console.error('Failed to stop recording:', err);
+      // Recording stops automatically when call ends
+      console.log('[DailyCall] Recording stops automatically when call ends');
     }
   }, [session, userType, videoAPI]);
 

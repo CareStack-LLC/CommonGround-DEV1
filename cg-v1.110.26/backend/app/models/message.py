@@ -160,8 +160,11 @@ class MessageFlag(Base, UUIDMixin, TimestampMixin):
     # User response
     user_action: Mapped[str] = mapped_column(
         String(20)
-    )  # accepted, modified, rejected, held
+    )  # accepted, modified, rejected, sent_anyway, cancelled
     user_action_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # User notes explaining their action (e.g., why they rejected the suggestion)
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Final content (what was actually sent)
     final_content_hash: Mapped[str] = mapped_column(String(64))
