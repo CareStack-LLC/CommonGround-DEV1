@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd cg-v1.110.26/frontend && npm install && npm run build",
+  "outputDirectory": "cg-v1.110.26/frontend/.next",
+  "installCommand": "cd cg-v1.110.26/frontend && npm install",
+  "framework": "nextjs",
+  "ignoreCommand": "exit 0"
+}
