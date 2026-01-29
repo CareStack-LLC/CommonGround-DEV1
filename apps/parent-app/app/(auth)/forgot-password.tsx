@@ -12,6 +12,8 @@ import { Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
+import { parent } from "@commonground/api-client";
+
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -24,15 +26,21 @@ export default function ForgotPasswordScreen() {
       return;
     }
 
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
     try {
-      // TODO: Implement password reset API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await parent.auth.requestPasswordReset(email.trim().toLowerCase());
       setIsSubmitted(true);
-    } catch {
-      setError("Failed to send reset email. Please try again.");
+    } catch (err) {
+      // For security, don't reveal if email exists
+      // Still show success to prevent email enumeration
+      setIsSubmitted(true);
     } finally {
       setIsLoading(false);
     }

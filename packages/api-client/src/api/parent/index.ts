@@ -14,3 +14,4 @@ export * as custody from './custody';
 export * as events from './events';
 export * as activities from './activities';
 export * as push from './push';
+export * as settings from './settings';

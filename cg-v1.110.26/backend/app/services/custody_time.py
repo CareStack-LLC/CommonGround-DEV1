@@ -7,8 +7,9 @@ comparing actual vs agreed custody percentages.
 
 import uuid
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Optional, List, Dict, Any, Tuple
+from zoneinfo import ZoneInfo
 from sqlalchemy import select, and_, or_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -20,8 +21,65 @@ from app.models.child import Child
 from app.models.family_file import FamilyFile
 from app.models.clearfund import Obligation
 from app.models.schedule import ScheduleEvent
+from app.models.user import User, UserProfile
 
 logger = logging.getLogger(__name__)
+
+# Default timezone for custody day determination
+DEFAULT_TIMEZONE = "America/Los_Angeles"
+
+
+def get_date_in_timezone(dt: datetime, tz_name: str) -> date:
+    """
+    Convert a datetime to a specific timezone and extract the date.
+
+    This ensures custody days are recorded correctly based on when the
+    exchange happened in the parent's local time, not UTC.
+
+    For example, an exchange at 11 PM Pacific (7 AM UTC next day) should
+    be recorded as the Pacific date, not the UTC date.
+
+    Args:
+        dt: The datetime to convert (assumed UTC if naive)
+        tz_name: IANA timezone name (e.g., "America/Los_Angeles")
+
+    Returns:
+        Date in the specified timezone
+    """
+    try:
+        tz = ZoneInfo(tz_name)
+    except Exception:
+        # Fall back to default timezone if invalid
+        logger.warning(f"Invalid timezone '{tz_name}', using {DEFAULT_TIMEZONE}")
+        tz = ZoneInfo(DEFAULT_TIMEZONE)
+
+    # If datetime is naive, assume UTC
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+
+    # Convert to target timezone and get date
+    local_dt = dt.astimezone(tz)
+    return local_dt.date()
+
+
+async def get_parent_timezone(db: AsyncSession, parent_id: str) -> str:
+    """
+    Get the timezone setting for a parent from their profile.
+
+    Args:
+        db: Database session
+        parent_id: The user ID of the parent
+
+    Returns:
+        IANA timezone string (defaults to America/Los_Angeles)
+    """
+    result = await db.execute(
+        select(UserProfile.timezone)
+        .join(User, User.id == UserProfile.user_id)
+        .where(User.id == parent_id)
+    )
+    tz = result.scalar_one_or_none()
+    return tz or DEFAULT_TIMEZONE
 
 
 # Schedule pattern to custody percentage mapping
@@ -126,9 +184,14 @@ class CustodyTimeService:
         if exchange.child_ids:
             child_ids = exchange.child_ids if isinstance(exchange.child_ids, list) else [exchange.child_ids]
 
-        record_date = exchange_instance.scheduled_time.date() if isinstance(
-            exchange_instance.scheduled_time, datetime
-        ) else exchange_instance.scheduled_time
+        # Determine record date in the receiving parent's timezone
+        # This ensures custody is recorded on the correct calendar day
+        # (e.g., 11 PM Pacific exchange is recorded as that Pacific date, not UTC next day)
+        to_parent_tz = await get_parent_timezone(db, exchange.to_parent_id)
+        if isinstance(exchange_instance.scheduled_time, datetime):
+            record_date = get_date_in_timezone(exchange_instance.scheduled_time, to_parent_tz)
+        else:
+            record_date = exchange_instance.scheduled_time
 
         records = []
         for child_id in child_ids:
@@ -201,14 +264,16 @@ class CustodyTimeService:
             child_id: Child ID
             parent_id: Parent who now has custody
             override_by: User who made the override
-            record_date: Date (defaults to today)
+            record_date: Date (defaults to today in override user's timezone)
             reason: Optional reason for override
 
         Returns:
             Updated CustodyDayRecord
         """
         if record_date is None:
-            record_date = date.today()
+            # Use the override user's timezone for "today" determination
+            user_tz = await get_parent_timezone(db, override_by)
+            record_date = get_date_in_timezone(datetime.now(timezone.utc), user_tz)
 
         record = await CustodyTimeService.get_or_create_day_record(
             db, family_file_id, child_id, record_date
@@ -272,19 +337,24 @@ class CustodyTimeService:
         parent_b_days = sum(1 for r in records if r.custodial_parent_id == parent_b_id)
         unknown_days = total_days - len(records)
 
-        # Calculate percentages based on recorded days
+        # Calculate percentages based on total days (not recorded days)
+        # This ensures unknown days are properly reflected in percentages
+        # and avoids inflating percentages during gaps in tracking
         recorded_days = len(records)
-        if recorded_days > 0:
-            parent_a_percentage = round((parent_a_days / recorded_days) * 100, 1)
-            parent_b_percentage = round((parent_b_days / recorded_days) * 100, 1)
+        if total_days > 0:
+            parent_a_percentage = round((parent_a_days / total_days) * 100, 1)
+            parent_b_percentage = round((parent_b_days / total_days) * 100, 1)
+            unknown_percentage = round((unknown_days / total_days) * 100, 1)
         else:
             parent_a_percentage = 0
             parent_b_percentage = 0
+            unknown_percentage = 0
 
         return {
             "total_days": total_days,
             "recorded_days": recorded_days,
             "unknown_days": unknown_days,
+            "unknown_percentage": unknown_percentage,
             "parent_a": {
                 "user_id": parent_a_id,
                 "days": parent_a_days,

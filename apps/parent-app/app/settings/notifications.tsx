@@ -2,13 +2,17 @@
  * Notification Preferences Screen
  */
 
-import { View, Text, ScrollView, Switch, TouchableOpacity, Alert } from "react-native";
-import { useState } from "react";
+import { View, Text, ScrollView, Switch, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { useState, useEffect, useCallback } from "react";
 import { Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { parent, type NotificationPreferences } from "@commonground/api-client";
 
 export default function NotificationsScreen() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
   // Notification settings state
   const [pushEnabled, setPushEnabled] = useState(true);
   const [emailEnabled, setEmailEnabled] = useState(true);
@@ -19,21 +23,95 @@ export default function NotificationsScreen() {
   const [legalAlerts, setLegalAlerts] = useState(true);
   const [quietHoursEnabled, setQuietHoursEnabled] = useState(false);
 
-  const handleSave = () => {
-    // TODO: Save to backend
-    Alert.alert("Saved", "Your notification preferences have been updated");
+  // Load notification preferences from backend
+  const loadPreferences = useCallback(async () => {
+    try {
+      setLoading(true);
+      const prefs = await parent.settings.getNotificationPreferences();
+
+      // Map backend preferences to local state
+      setPushEnabled(
+        prefs.push_messages ||
+          prefs.push_schedule ||
+          prefs.push_agreements ||
+          prefs.push_payments ||
+          prefs.push_court ||
+          prefs.push_aria
+      );
+      setEmailEnabled(
+        prefs.email_messages ||
+          prefs.email_schedule ||
+          prefs.email_agreements ||
+          prefs.email_payments ||
+          prefs.email_court ||
+          prefs.email_aria
+      );
+      setMessageNotifs(prefs.push_messages || prefs.email_messages);
+      setScheduleReminders(prefs.push_schedule || prefs.email_schedule);
+      setCallNotifs(prefs.push_messages); // Calls grouped with messages
+      setRecordingNotifs(prefs.push_messages); // Recordings grouped with messages
+      setLegalAlerts(prefs.push_court || prefs.email_court);
+    } catch (err) {
+      console.error("Failed to load notification preferences:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadPreferences();
+  }, [loadPreferences]);
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+
+      const preferences: NotificationPreferences = {
+        email_messages: emailEnabled && messageNotifs,
+        email_schedule: emailEnabled && scheduleReminders,
+        email_agreements: emailEnabled,
+        email_payments: emailEnabled,
+        email_court: emailEnabled && legalAlerts,
+        email_aria: emailEnabled,
+        push_messages: pushEnabled && messageNotifs,
+        push_schedule: pushEnabled && scheduleReminders,
+        push_agreements: pushEnabled,
+        push_payments: pushEnabled,
+        push_court: pushEnabled && legalAlerts,
+        push_aria: pushEnabled,
+      };
+
+      await parent.settings.updateNotificationPreferences(preferences);
+      Alert.alert("Saved", "Your notification preferences have been updated");
+    } catch (err) {
+      console.error("Failed to save notification preferences:", err);
+      Alert.alert("Error", "Failed to save notification preferences");
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 bg-secondary-50 dark:bg-secondary-900 items-center justify-center">
+        <ActivityIndicator size="large" color="#2563eb" />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-secondary-50 dark:bg-secondary-900" edges={["top"]}>
       <Stack.Screen
         options={{
           title: "Notifications",
-          headerRight: () => (
-            <TouchableOpacity onPress={handleSave} className="mr-4">
-              <Text className="text-primary-600 font-semibold">Save</Text>
-            </TouchableOpacity>
-          ),
+          headerRight: () =>
+            saving ? (
+              <ActivityIndicator size="small" color="#2563eb" className="mr-4" />
+            ) : (
+              <TouchableOpacity onPress={handleSave} className="mr-4">
+                <Text className="text-primary-600 font-semibold">Save</Text>
+              </TouchableOpacity>
+            ),
         }}
       />
 

@@ -97,3 +97,20 @@ class PasswordChangeResponse(BaseModel):
 
     message: str
     success: bool
+
+
+class PrivacySettings(BaseModel):
+    """Privacy settings for communication features."""
+
+    read_receipts: bool = True
+    typing_indicator: bool = True
+    last_seen: bool = True
+    analytics_enabled: bool = True
+    crash_reporting: bool = True
+
+
+class PrivacySettingsResponse(PrivacySettings):
+    """Privacy settings response."""
+
+    class Config:
+        from_attributes = True

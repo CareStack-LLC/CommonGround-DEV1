@@ -2,13 +2,17 @@
  * Privacy Settings Screen
  */
 
-import { View, Text, ScrollView, Switch, TouchableOpacity, Alert } from "react-native";
-import { useState } from "react";
+import { View, Text, ScrollView, Switch, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { useState, useEffect, useCallback } from "react";
 import { Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { parent, type PrivacySettings } from "@commonground/api-client";
 
 export default function PrivacyScreen() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
   // Privacy settings state
   const [readReceipts, setReadReceipts] = useState(true);
   const [typingIndicator, setTypingIndicator] = useState(true);
@@ -16,9 +20,49 @@ export default function PrivacyScreen() {
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
   const [crashReporting, setCrashReporting] = useState(true);
 
-  const handleSave = () => {
-    // TODO: Save to backend
-    Alert.alert("Saved", "Your privacy settings have been updated");
+  // Load privacy settings from backend
+  const loadSettings = useCallback(async () => {
+    try {
+      setLoading(true);
+      const settings = await parent.settings.getPrivacySettings();
+
+      setReadReceipts(settings.read_receipts);
+      setTypingIndicator(settings.typing_indicator);
+      setLastSeen(settings.last_seen);
+      setAnalyticsEnabled(settings.analytics_enabled);
+      setCrashReporting(settings.crash_reporting);
+    } catch (err) {
+      console.error("Failed to load privacy settings:", err);
+      // Use defaults on error
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+
+      const settings: PrivacySettings = {
+        read_receipts: readReceipts,
+        typing_indicator: typingIndicator,
+        last_seen: lastSeen,
+        analytics_enabled: analyticsEnabled,
+        crash_reporting: crashReporting,
+      };
+
+      await parent.settings.updatePrivacySettings(settings);
+      Alert.alert("Saved", "Your privacy settings have been updated");
+    } catch (err) {
+      console.error("Failed to save privacy settings:", err);
+      Alert.alert("Error", "Failed to save privacy settings");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDownloadData = () => {
@@ -58,16 +102,27 @@ export default function PrivacyScreen() {
     );
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 bg-secondary-50 dark:bg-secondary-900 items-center justify-center">
+        <ActivityIndicator size="large" color="#2563eb" />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-secondary-50 dark:bg-secondary-900" edges={["top"]}>
       <Stack.Screen
         options={{
           title: "Privacy Settings",
-          headerRight: () => (
-            <TouchableOpacity onPress={handleSave} className="mr-4">
-              <Text className="text-primary-600 font-semibold">Save</Text>
-            </TouchableOpacity>
-          ),
+          headerRight: () =>
+            saving ? (
+              <ActivityIndicator size="small" color="#2563eb" className="mr-4" />
+            ) : (
+              <TouchableOpacity onPress={handleSave} className="mr-4">
+                <Text className="text-primary-600 font-semibold">Save</Text>
+              </TouchableOpacity>
+            ),
         }}
       />
 

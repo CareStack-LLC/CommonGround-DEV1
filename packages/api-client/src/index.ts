@@ -289,3 +289,13 @@ export type {
   CommunicationLog,
   ChildAvatar,
 } from './api/parent/myCircle';
+
+// Re-export Settings types
+export type {
+  UserProfile,
+  UserProfileUpdate,
+  NotificationPreferences,
+  PasswordChangeRequest,
+  PasswordChangeResponse,
+  PrivacySettings,
+} from './api/parent/settings';

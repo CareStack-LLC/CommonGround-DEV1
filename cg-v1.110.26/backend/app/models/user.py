@@ -121,10 +121,17 @@ class UserProfile(Base, UUIDMixin, TimestampMixin):
         String(36), nullable=True
     )  # FK to grant_redemptions - not enforced for flexibility
 
-    # Preferences
+    # Notification Preferences
     notification_email: Mapped[bool] = mapped_column(Boolean, default=True)
     notification_sms: Mapped[bool] = mapped_column(Boolean, default=False)
     notification_push: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    # Privacy Settings
+    privacy_read_receipts: Mapped[bool] = mapped_column(Boolean, default=True)
+    privacy_typing_indicator: Mapped[bool] = mapped_column(Boolean, default=True)
+    privacy_last_seen: Mapped[bool] = mapped_column(Boolean, default=True)
+    privacy_analytics: Mapped[bool] = mapped_column(Boolean, default=True)
+    privacy_crash_reporting: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="profile")

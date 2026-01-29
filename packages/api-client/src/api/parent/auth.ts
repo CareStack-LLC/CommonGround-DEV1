@@ -108,6 +108,19 @@ export async function resetPassword(token: string, newPassword: string): Promise
 }
 
 /**
+ * Change password (when logged in)
+ */
+export async function changePassword(data: {
+  current_password: string;
+  new_password: string;
+}): Promise<{ message: string; success: boolean }> {
+  return fetchWithParentAuth('/users/me/password', {
+    method: 'PUT',
+    body: data,
+  });
+}
+
+/**
  * Verify email with token
  */
 export async function verifyEmail(token: string): Promise<void> {

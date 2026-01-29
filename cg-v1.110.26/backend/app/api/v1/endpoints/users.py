@@ -19,6 +19,8 @@ from app.schemas.user import (
     NotificationPreferencesResponse,
     PasswordChangeRequest,
     PasswordChangeResponse,
+    PrivacySettings,
+    PrivacySettingsResponse,
 )
 
 router = APIRouter()
@@ -298,3 +300,80 @@ async def change_password(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to change password: {str(e)}"
         )
+
+
+@router.get("/me/privacy", response_model=PrivacySettingsResponse)
+async def get_privacy_settings(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get current user's privacy settings.
+    """
+    # Load user with profile
+    result = await db.execute(
+        select(User)
+        .options(selectinload(User.profile))
+        .where(User.id == current_user.id)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user or not user.profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User profile not found"
+        )
+
+    profile = user.profile
+
+    return PrivacySettingsResponse(
+        read_receipts=profile.privacy_read_receipts,
+        typing_indicator=profile.privacy_typing_indicator,
+        last_seen=profile.privacy_last_seen,
+        analytics_enabled=profile.privacy_analytics,
+        crash_reporting=profile.privacy_crash_reporting,
+    )
+
+
+@router.put("/me/privacy", response_model=PrivacySettingsResponse)
+async def update_privacy_settings(
+    settings: PrivacySettings,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Update current user's privacy settings.
+    """
+    # Load user with profile
+    result = await db.execute(
+        select(User)
+        .options(selectinload(User.profile))
+        .where(User.id == current_user.id)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user or not user.profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User profile not found"
+        )
+
+    profile = user.profile
+
+    # Update privacy settings
+    profile.privacy_read_receipts = settings.read_receipts
+    profile.privacy_typing_indicator = settings.typing_indicator
+    profile.privacy_last_seen = settings.last_seen
+    profile.privacy_analytics = settings.analytics_enabled
+    profile.privacy_crash_reporting = settings.crash_reporting
+
+    await db.commit()
+    await db.refresh(profile)
+
+    return PrivacySettingsResponse(
+        read_receipts=profile.privacy_read_receipts,
+        typing_indicator=profile.privacy_typing_indicator,
+        last_seen=profile.privacy_last_seen,
+        analytics_enabled=profile.privacy_analytics,
+        crash_reporting=profile.privacy_crash_reporting,
+    )
