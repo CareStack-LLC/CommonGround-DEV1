@@ -18,6 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { parent } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
+import { useFamilyFile } from "@/hooks/useFamilyFile";
 
 const RELATIONSHIPS = [
   { id: "grandparent", label: "Grandparent", emoji: "👴" },
@@ -31,13 +32,14 @@ const RELATIONSHIPS = [
 
 export default function InviteScreen() {
   const { user } = useAuth();
+  const { familyFile } = useFamilyFile();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [relationship, setRelationship] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [inviteUrl, setInviteUrl] = useState<string | null>(null);
 
-  const familyFileId = user?.family_file_id || "demo-family";
+  const familyFileId = familyFile?.id || null;
 
   const handleSendInvite = async () => {
     if (!name.trim()) {

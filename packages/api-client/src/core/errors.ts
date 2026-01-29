@@ -16,8 +16,8 @@ export class APIError extends Error {
     this.data = data;
 
     // Maintains proper stack trace for where our error was thrown (V8 only)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, APIError);
+    if ((Error as any).captureStackTrace) {
+      (Error as any).captureStackTrace(this, APIError);
     }
   }
 
@@ -68,7 +68,7 @@ export class APIError extends Error {
  * Create an APIError from a fetch Response
  */
 export async function createErrorFromResponse(
-  response: Response,
+  response: any,
   url: string
 ): Promise<APIError> {
   let errorData: unknown;
@@ -92,12 +92,14 @@ export async function createErrorFromResponse(
       : `HTTP ${response.status}: ${response.statusText}`;
 
   // Log for debugging
-  console.error('API Error:', {
-    url,
-    status: response.status,
-    statusText: response.statusText,
-    errorData,
-  });
+  if (typeof console !== 'undefined') {
+    console.error('API Error:', {
+      url,
+      status: response.status,
+      statusText: response.statusText,
+      errorData,
+    });
+  }
 
   return new APIError(message, response.status, errorData);
 }

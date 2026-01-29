@@ -20,33 +20,33 @@ export class WebStorage implements TokenStorage {
   }
 
   async getToken(key: string): Promise<string | null> {
-    if (typeof window === 'undefined') {
+    if (typeof (globalThis as any).window === 'undefined') {
       return null;
     }
     try {
-      return localStorage.getItem(this.getKey(key));
+      return (globalThis as any).localStorage.getItem(this.getKey(key));
     } catch {
       return null;
     }
   }
 
   async setToken(key: string, value: string): Promise<void> {
-    if (typeof window === 'undefined') {
+    if (typeof (globalThis as any).window === 'undefined') {
       return;
     }
     try {
-      localStorage.setItem(this.getKey(key), value);
+      (globalThis as any).localStorage.setItem(this.getKey(key), value);
     } catch {
       // Storage full or disabled - fail silently
     }
   }
 
   async removeToken(key: string): Promise<void> {
-    if (typeof window === 'undefined') {
+    if (typeof (globalThis as any).window === 'undefined') {
       return;
     }
     try {
-      localStorage.removeItem(this.getKey(key));
+      (globalThis as any).localStorage.removeItem(this.getKey(key));
     } catch {
       // Fail silently
     }
@@ -56,18 +56,19 @@ export class WebStorage implements TokenStorage {
    * Clear all tokens with this prefix
    */
   async clearAll(): Promise<void> {
-    if (typeof window === 'undefined') {
+    if (typeof (globalThis as any).window === 'undefined') {
       return;
     }
     try {
+      const storage = (globalThis as any).localStorage;
       const keysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+      for (let i = 0; i < storage.length; i++) {
+        const key = storage.key(i);
         if (key?.startsWith(this.prefix)) {
           keysToRemove.push(key);
         }
       }
-      keysToRemove.forEach((key) => localStorage.removeItem(key));
+      keysToRemove.forEach((key) => storage.removeItem(key));
     } catch {
       // Fail silently
     }

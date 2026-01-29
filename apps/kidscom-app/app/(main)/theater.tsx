@@ -3,120 +3,206 @@
  * Watch videos alone or together with family members
  */
 
-import { useState } from "react";
-import { View, Text, ScrollView, TouchableOpacity, Image, Modal } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import { View, Text, ScrollView, TouchableOpacity, Image, Modal, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
+import { child, type TheaterContent, type ContentFilters } from "@commonground/api-client";
 import { useCircleContacts, CircleContact } from "@/hooks/useCircleContacts";
 
-interface Video {
-  id: string;
-  title: string;
-  thumbnail: string;
-  duration: string;
-  category: string;
-}
+// Supabase storage base URL
+const SUPABASE_STORAGE_URL = "https://qqttugwxmkbnrgzgqbkz.supabase.co/storage/v1/object/public/kidcoms";
 
-// Demo videos for the theater
-const DEMO_VIDEOS: Video[] = [
+// Real videos from Supabase storage
+const DEMO_VIDEOS: TheaterContent[] = [
   {
-    id: "1",
-    title: "Funny Animals",
-    thumbnail: "https://picsum.photos/seed/animals/300/200",
-    duration: "5:30",
-    category: "Animals",
+    id: "crunch",
+    title: "Crunch",
+    description: "A fun animated short about a hungry creature!",
+    thumbnail_url: "https://picsum.photos/seed/crunch/300/200",
+    content_url: `${SUPABASE_STORAGE_URL}/videos/Crunch.mp4`,
+    content_type: "video",
+    category: "fun",
+    duration_seconds: 240,
+    age_rating: "G",
+    is_approved: true,
+    created_at: new Date().toISOString(),
   },
   {
-    id: "2",
-    title: "Space Adventure",
-    thumbnail: "https://picsum.photos/seed/space/300/200",
-    duration: "12:45",
-    category: "Science",
+    id: "johnny-express",
+    title: "Johnny Express",
+    description: "Follow Johnny on his hilarious space delivery adventure!",
+    thumbnail_url: "https://picsum.photos/seed/johnny/300/200",
+    content_url: `${SUPABASE_STORAGE_URL}/videos/Johnny%20Express.mp4`,
+    content_type: "video",
+    category: "fun",
+    duration_seconds: 330,
+    age_rating: "G",
+    is_approved: true,
+    created_at: new Date().toISOString(),
   },
   {
-    id: "3",
-    title: "Silly Songs",
-    thumbnail: "https://picsum.photos/seed/music/300/200",
-    duration: "3:20",
-    category: "Music",
+    id: "minions",
+    title: "Minions",
+    description: "Watch the silly Minions in action!",
+    thumbnail_url: "https://picsum.photos/seed/minions/300/200",
+    content_url: `${SUPABASE_STORAGE_URL}/videos/minions-clip.mp4`,
+    content_type: "video",
+    category: "fun",
+    duration_seconds: 180,
+    age_rating: "G",
+    is_approved: true,
+    created_at: new Date().toISOString(),
   },
   {
-    id: "4",
-    title: "Dinosaur World",
-    thumbnail: "https://picsum.photos/seed/dinos/300/200",
-    duration: "8:15",
-    category: "Animals",
+    id: "sonic",
+    title: "Sonic The Hedgehog",
+    description: "Gotta go fast with Sonic!",
+    thumbnail_url: "https://picsum.photos/seed/sonic/300/200",
+    content_url: `${SUPABASE_STORAGE_URL}/videos/Sonic%20The%20Hedgehog.mp4`,
+    content_type: "video",
+    category: "fun",
+    duration_seconds: 150,
+    age_rating: "G",
+    is_approved: true,
+    created_at: new Date().toISOString(),
   },
   {
-    id: "5",
-    title: "Magic Tricks",
-    thumbnail: "https://picsum.photos/seed/magic/300/200",
-    duration: "6:00",
-    category: "Fun",
-  },
-  {
-    id: "6",
-    title: "Ocean Friends",
-    thumbnail: "https://picsum.photos/seed/ocean/300/200",
-    duration: "10:30",
-    category: "Animals",
+    id: "the-bread",
+    title: "The Bread",
+    description: "A charming animated short about bread!",
+    thumbnail_url: "https://picsum.photos/seed/bread/300/200",
+    content_url: `${SUPABASE_STORAGE_URL}/videos/The%20Bread.mp4`,
+    content_type: "video",
+    category: "fun",
+    duration_seconds: 120,
+    age_rating: "G",
+    is_approved: true,
+    created_at: new Date().toISOString(),
   },
 ];
 
-const CATEGORIES = ["All", "Animals", "Science", "Music", "Fun"];
+const CATEGORIES = [
+  { id: "all", label: "All" },
+  { id: "animals", label: "Animals" },
+  { id: "science", label: "Science" },
+  { id: "music", label: "Music" },
+  { id: "fun", label: "Fun" },
+];
+
+// Format seconds to MM:SS
+function formatDuration(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
 
 export default function TheaterScreen() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-  const [showPlayer, setShowPlayer] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedVideo, setSelectedVideo] = useState<TheaterContent | null>(null);
   const [showContactPicker, setShowContactPicker] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [videos, setVideos] = useState<TheaterContent[]>(DEMO_VIDEOS);
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [filters, setFilters] = useState<ContentFilters | null>(null);
 
   const { contacts } = useCircleContacts();
 
-  const filteredVideos =
-    selectedCategory === "All"
-      ? DEMO_VIDEOS
-      : DEMO_VIDEOS.filter((v) => v.category === selectedCategory);
+  // Load content - use demo data directly since child auth isn't set up
+  // In production, this would fetch from API with child.theater.getContent()
+  useEffect(() => {
+    // Use demo videos directly - no API call needed
+    setVideos(DEMO_VIDEOS);
+    setFilters({
+      allowed_categories: ["animals", "science", "music", "fun", "educational", "stories"],
+      max_age_rating: "G",
+      daily_time_limit_minutes: 60,
+      time_remaining_minutes: 45,
+    });
+    setIsLoading(false);
+  }, []);
 
-  const handleVideoPress = (video: Video) => {
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // Just reset to demo data
+    setVideos(DEMO_VIDEOS);
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
+
+  const filteredVideos =
+    selectedCategory === "all"
+      ? videos
+      : videos.filter((v) => v.category === selectedCategory);
+
+  const handleVideoPress = (video: TheaterContent) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSelectedVideo(video);
   };
 
   const handleWatchNow = () => {
+    if (!selectedVideo) return;
+
+    // Check time limit
+    if (filters && filters.time_remaining_minutes <= 0) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      alert("You've reached your screen time limit for today! Come back tomorrow! 🌟");
+      return;
+    }
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setShowPlayer(true);
-    setIsPlaying(true);
+    setSelectedVideo(null);
+
+    // Navigate to player
+    router.push({
+      pathname: "/theater/player",
+      params: {
+        contentId: selectedVideo.id,
+        title: selectedVideo.title,
+        url: selectedVideo.content_url,
+      },
+    });
   };
 
   const handleWatchTogether = () => {
+    if (!selectedVideo) return;
+
+    // Check time limit
+    if (filters && filters.time_remaining_minutes <= 0) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      alert("You've reached your screen time limit for today! Come back tomorrow! 🌟");
+      return;
+    }
+
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setShowContactPicker(true);
   };
 
   const handleSelectContact = (contact: CircleContact) => {
+    if (!selectedVideo) return;
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShowContactPicker(false);
-    setSelectedVideo(null);
-    // Navigate to call screen - "Watch Together" starts a video call
-    router.push(`/call/${contact.id}`);
-  };
 
-  const handleClosePlayer = () => {
-    setShowPlayer(false);
-    setIsPlaying(false);
+    // Navigate to Watch Together
+    router.push({
+      pathname: "/theater/watch-together",
+      params: {
+        contentId: selectedVideo.id,
+        contactName: contact.display_name || contact.name,
+      },
+    });
+
     setSelectedVideo(null);
   };
 
   return (
     <LinearGradient
       colors={["#f97316", "#fb923c", "#fdba74"]}
-      className="flex-1"
+      style={{ flex: 1 }}
     >
       <SafeAreaView className="flex-1" edges={["top"]}>
         {/* Header */}
@@ -129,45 +215,128 @@ export default function TheaterScreen() {
           </Text>
         </View>
 
+        {/* Time Remaining Banner */}
+        {filters && filters.time_remaining_minutes <= 30 && (
+          <View className="mx-4 mb-3 bg-white/20 rounded-xl px-4 py-2 flex-row items-center">
+            <Ionicons name="time-outline" size={20} color="white" />
+            <Text className="text-white font-medium ml-2">
+              {filters.time_remaining_minutes > 0
+                ? `${filters.time_remaining_minutes} minutes of screen time left today`
+                : "Screen time limit reached for today!"}
+            </Text>
+          </View>
+        )}
+
         {/* Category Tabs */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="px-4 mb-4"
-          contentContainerStyle={{ paddingRight: 16 }}
-        >
-          {CATEGORIES.map((category) => (
-            <TouchableOpacity
-              key={category}
-              className={`px-5 py-2 rounded-full mr-2 ${
-                selectedCategory === category ? "bg-white" : "bg-white/30"
-              }`}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                setSelectedCategory(category);
-              }}
-            >
-              <Text
-                className={`font-bold ${
-                  selectedCategory === category
-                    ? "text-orange-500"
-                    : "text-white"
+        <View className="h-10 mb-4">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 16, alignItems: 'center' }}
+          >
+            {CATEGORIES.map((category) => (
+              <TouchableOpacity
+                key={category.id}
+                className={`px-4 py-1.5 rounded-full mr-2 ${
+                  selectedCategory === category.id ? "bg-white" : "bg-white/30"
                 }`}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setSelectedCategory(category.id);
+                }}
               >
-                {category}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+                <Text
+                  className={`font-semibold text-sm ${
+                    selectedCategory === category.id
+                      ? "text-orange-500"
+                      : "text-white"
+                  }`}
+                >
+                  {category.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
         {/* Video Grid */}
         <ScrollView
           className="flex-1 px-4"
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="white"
+            />
+          }
         >
+          {/* Featured Video - Large Hero Card */}
+          {(() => {
+            const featuredVideo = filteredVideos[0];
+            if (!featuredVideo) return null;
+            return (
+              <TouchableOpacity
+                className="mb-6"
+                onPress={() => handleVideoPress(featuredVideo)}
+                activeOpacity={0.9}
+              >
+                <View className="bg-white rounded-3xl overflow-hidden shadow-2xl">
+                  <Image
+                    source={{ uri: featuredVideo.thumbnail_url }}
+                    className="w-full h-48"
+                    resizeMode="cover"
+                  />
+                  {/* Play button overlay */}
+                  <View className="absolute top-0 left-0 right-0 h-48 items-center justify-center">
+                    <View className="w-20 h-20 bg-white/90 rounded-full items-center justify-center shadow-lg">
+                      <Ionicons name="play" size={40} color="#f97316" />
+                    </View>
+                  </View>
+                  {/* Featured badge */}
+                  <View className="absolute top-3 left-3 bg-orange-500 px-3 py-1 rounded-full flex-row items-center">
+                    <Ionicons name="star" size={14} color="white" />
+                    <Text className="text-white font-bold text-sm ml-1">Featured</Text>
+                  </View>
+                  {/* Duration badge */}
+                  <View className="absolute top-3 right-3 bg-black/60 px-3 py-1 rounded-full">
+                    <Text className="text-white font-bold text-sm">
+                      {formatDuration(featuredVideo.duration_seconds)}
+                    </Text>
+                  </View>
+                  <View className="p-4">
+                    <Text className="text-2xl font-bold text-gray-800 mb-1">
+                      {featuredVideo.title}
+                    </Text>
+                    <Text className="text-gray-500 mb-3" numberOfLines={2}>
+                      {featuredVideo.description}
+                    </Text>
+                    <View className="flex-row items-center">
+                      <View className="bg-orange-100 px-3 py-1 rounded-full mr-2">
+                        <Text className="text-orange-600 font-medium capitalize">
+                          {featuredVideo.category}
+                        </Text>
+                      </View>
+                      <View className="bg-green-100 px-3 py-1 rounded-full">
+                        <Text className="text-green-600 font-medium">
+                          {featuredVideo.age_rating}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })()}
+
+          {/* More Videos Label */}
+          {filteredVideos.length > 1 && (
+            <Text className="text-white font-bold text-lg mb-3">More Videos</Text>
+          )}
+
           <View className="flex-row flex-wrap justify-between">
-            {filteredVideos.map((video) => (
+            {filteredVideos.slice(1).map((video) => (
               <VideoCard
                 key={video.id}
                 video={video}
@@ -186,19 +355,21 @@ export default function TheaterScreen() {
           )}
         </ScrollView>
 
-        {/* Selected Video Preview */}
-        {selectedVideo && !showPlayer && (
-          <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl p-6">
+        {/* Selected Video Preview - positioned above tab bar */}
+        {selectedVideo && (
+          <View className="absolute bottom-20 left-0 right-0 bg-white rounded-t-3xl shadow-2xl p-6">
             <View className="flex-row items-center mb-4">
               <Image
-                source={{ uri: selectedVideo.thumbnail }}
+                source={{ uri: selectedVideo.thumbnail_url }}
                 className="w-24 h-16 rounded-xl"
               />
               <View className="ml-4 flex-1">
                 <Text className="text-lg font-bold text-gray-800">
                   {selectedVideo.title}
                 </Text>
-                <Text className="text-gray-500">{selectedVideo.duration}</Text>
+                <Text className="text-gray-500">
+                  {formatDuration(selectedVideo.duration_seconds)}
+                </Text>
               </View>
               <TouchableOpacity
                 onPress={() => setSelectedVideo(null)}
@@ -210,15 +381,25 @@ export default function TheaterScreen() {
 
             <View className="flex-row space-x-3">
               <TouchableOpacity
-                className="flex-1 bg-orange-500 py-4 rounded-2xl items-center"
+                className={`flex-1 py-4 rounded-2xl items-center ${
+                  filters && filters.time_remaining_minutes <= 0
+                    ? "bg-gray-300"
+                    : "bg-orange-500"
+                }`}
                 onPress={handleWatchNow}
+                disabled={filters !== null && filters.time_remaining_minutes <= 0}
               >
                 <Text className="text-white font-bold text-lg">▶ Watch Now</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                className="flex-1 bg-purple-500 py-4 rounded-2xl items-center"
+                className={`flex-1 py-4 rounded-2xl items-center ${
+                  filters && filters.time_remaining_minutes <= 0
+                    ? "bg-gray-300"
+                    : "bg-purple-500"
+                }`}
                 onPress={handleWatchTogether}
+                disabled={filters !== null && filters.time_remaining_minutes <= 0}
               >
                 <Text className="text-white font-bold text-lg">
                   👥 Watch Together
@@ -227,82 +408,6 @@ export default function TheaterScreen() {
             </View>
           </View>
         )}
-
-        {/* Video Player Modal */}
-        <Modal
-          visible={showPlayer}
-          animationType="fade"
-          supportedOrientations={["portrait", "landscape"]}
-        >
-          <View className="flex-1 bg-black">
-            {/* Video placeholder - in a real app, use expo-av or similar */}
-            <View className="flex-1 items-center justify-center">
-              <Image
-                source={{ uri: selectedVideo?.thumbnail }}
-                className="absolute w-full h-full"
-                resizeMode="cover"
-              />
-              <View className="absolute inset-0 bg-black/30" />
-
-              {/* Play/Pause indicator */}
-              <TouchableOpacity
-                className="w-24 h-24 bg-white/30 rounded-full items-center justify-center"
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  setIsPlaying(!isPlaying);
-                }}
-              >
-                <Ionicons
-                  name={isPlaying ? "pause" : "play"}
-                  size={48}
-                  color="white"
-                />
-              </TouchableOpacity>
-
-              {/* Video title */}
-              <View className="absolute top-16 left-0 right-0 px-6">
-                <Text className="text-white text-2xl font-bold text-center">
-                  {selectedVideo?.title}
-                </Text>
-                {isPlaying && (
-                  <Text className="text-white/70 text-center mt-1">
-                    Now Playing
-                  </Text>
-                )}
-              </View>
-
-              {/* Close button */}
-              <TouchableOpacity
-                className="absolute top-16 right-4 w-12 h-12 bg-black/50 rounded-full items-center justify-center"
-                onPress={handleClosePlayer}
-              >
-                <Ionicons name="close" size={28} color="white" />
-              </TouchableOpacity>
-
-              {/* Progress bar placeholder */}
-              <View className="absolute bottom-20 left-6 right-6">
-                <View className="h-1 bg-white/30 rounded-full">
-                  <View className="w-1/3 h-1 bg-orange-500 rounded-full" />
-                </View>
-                <View className="flex-row justify-between mt-2">
-                  <Text className="text-white/70 text-sm">1:45</Text>
-                  <Text className="text-white/70 text-sm">
-                    {selectedVideo?.duration}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Info notice */}
-              <View className="absolute bottom-6 left-6 right-6">
-                <View className="bg-orange-500/80 px-4 py-2 rounded-xl">
-                  <Text className="text-white text-center text-sm">
-                    🎬 Video playback is a demo. Real videos coming soon!
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </View>
-        </Modal>
 
         {/* Contact Picker for Watch Together */}
         <Modal
@@ -393,7 +498,7 @@ function VideoCard({
   video,
   onPress,
 }: {
-  video: Video;
+  video: TheaterContent;
   onPress: () => void;
 }) {
   return (
@@ -404,7 +509,7 @@ function VideoCard({
     >
       <View className="bg-white rounded-2xl overflow-hidden shadow-lg">
         <Image
-          source={{ uri: video.thumbnail }}
+          source={{ uri: video.thumbnail_url }}
           className="w-full h-28"
           resizeMode="cover"
         />
@@ -415,13 +520,15 @@ function VideoCard({
           </View>
         </View>
         <View className="absolute top-2 right-2 bg-black/60 px-2 py-1 rounded-lg">
-          <Text className="text-white text-xs font-bold">{video.duration}</Text>
+          <Text className="text-white text-xs font-bold">
+            {formatDuration(video.duration_seconds)}
+          </Text>
         </View>
         <View className="p-3">
           <Text className="font-bold text-gray-800" numberOfLines={2}>
             {video.title}
           </Text>
-          <Text className="text-sm text-gray-500">{video.category}</Text>
+          <Text className="text-sm text-gray-500 capitalize">{video.category}</Text>
         </View>
       </View>
     </TouchableOpacity>

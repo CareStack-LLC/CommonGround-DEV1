@@ -68,8 +68,11 @@ export default function CallScreen() {
 
   // Initialize call
   useEffect(() => {
-    if (contactId && contact?.family_file_id) {
-      initiateCall(contactId, "circle", contact.family_file_id);
+    if (contactId && contact) {
+      // The child's auth token already has family file context
+      // Pass a placeholder family_file_id - the API will use the token's context
+      const familyFileId = contact.family_file_id || "child-context";
+      initiateCall(contact.contact_id || contactId, "parent", familyFileId);
     }
   }, [contactId, contact]);
 

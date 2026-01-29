@@ -55,7 +55,7 @@ function RootLayoutNav() {
           }}
         />
         <Stack.Screen
-          name="theater/[sessionId]"
+          name="theater"
           options={{
             presentation: "fullScreenModal",
             animation: "slide_from_bottom",

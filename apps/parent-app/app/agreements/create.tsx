@@ -72,7 +72,7 @@ export default function CreateAgreementScreen() {
     try {
       // First create the agreement
       const createResponse = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/agreements/family-file/${familyId}`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/family-files/${familyId}/agreements`,
         {
           method: "POST",
           headers: {
@@ -95,7 +95,7 @@ export default function CreateAgreementScreen() {
 
       // Start ARIA conversation
       const ariaResponse = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/agreements/${agreement.id}/aria/message`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/agreements/${agreement.id}/aria/message`,
         {
           method: "POST",
           headers: {
@@ -145,7 +145,7 @@ export default function CreateAgreementScreen() {
 
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/agreements/${agreementId}/aria/message`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/agreements/${agreementId}/aria/message`,
         {
           method: "POST",
           headers: {
@@ -192,7 +192,7 @@ export default function CreateAgreementScreen() {
 
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/agreements/${agreementId}/aria/finalize`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/agreements/${agreementId}/aria/finalize`,
         {
           method: "POST",
           headers: {

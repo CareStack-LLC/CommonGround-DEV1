@@ -13,7 +13,8 @@ from app.core.websocket import manager
 from app.core.security import decode_token
 from app.models.user import User
 from app.models.case import CaseParticipant
-from sqlalchemy import select
+from app.models.family_file import FamilyFile
+from sqlalchemy import select, or_
 from sqlalchemy.orm import selectinload
 
 router = APIRouter()
@@ -51,16 +52,17 @@ async def get_user_from_token(token: str, db: AsyncSession) -> Optional[User]:
 
 async def verify_case_access(user_id: str, case_id: str, db: AsyncSession) -> bool:
     """
-    Verify user has access to a case.
+    Verify user has access to a case or family file.
 
     Args:
         user_id: User ID
-        case_id: Case ID
+        case_id: Case ID or Family File ID
         db: Database session
 
     Returns:
         True if user has access, False otherwise
     """
+    # First check legacy CaseParticipant table
     result = await db.execute(
         select(CaseParticipant)
         .where(CaseParticipant.user_id == user_id)
@@ -69,7 +71,23 @@ async def verify_case_access(user_id: str, case_id: str, db: AsyncSession) -> bo
     )
     participant = result.scalar_one_or_none()
 
-    return participant is not None
+    if participant is not None:
+        return True
+
+    # Also check FamilyFile table (new system uses parent_a_id and parent_b_id)
+    result = await db.execute(
+        select(FamilyFile)
+        .where(FamilyFile.id == case_id)
+        .where(
+            or_(
+                FamilyFile.parent_a_id == user_id,
+                FamilyFile.parent_b_id == user_id
+            )
+        )
+    )
+    family_file = result.scalar_one_or_none()
+
+    return family_file is not None
 
 
 @router.websocket("/ws")

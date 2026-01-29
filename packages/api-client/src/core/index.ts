@@ -7,15 +7,15 @@ export {
   type TokenStorage,
   TOKEN_KEYS,
   MemoryStorage,
-  setStorageAdapter,
-  getStorageAdapter,
+  setStorage,
+  getStorage,
 } from './storage';
 
 // Configuration
 export { configure, getConfig, getApiUrl, type APIClientConfig } from './config';
 
 // Errors
-export { APIError, createErrorFromResponse, isAPIError } from './errors';
+export { APIError, createErrorFromResponse } from './errors';
 
 // Authentication
 export {
@@ -29,10 +29,8 @@ export {
   clearAuthTokens,
   clearChildToken,
   clearCircleToken,
-  clearAllTokens,
   getUser,
   setUser,
-  clearUser,
   isAuthenticated,
   isChildAuthenticated,
   isCircleAuthenticated,

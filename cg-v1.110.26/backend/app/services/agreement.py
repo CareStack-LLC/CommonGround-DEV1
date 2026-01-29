@@ -148,7 +148,10 @@ class AgreementService:
         """
         result = await self.db.execute(
             select(Agreement)
-            .options(selectinload(Agreement.sections))
+            .options(
+                selectinload(Agreement.sections),
+                selectinload(Agreement.family_file)
+            )
             .where(Agreement.id == agreement_id)
         )
         agreement = result.scalar_one_or_none()

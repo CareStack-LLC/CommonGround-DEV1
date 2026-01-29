@@ -37,7 +37,7 @@ const PURPOSES: { id: ObligationPurpose; label: string; icon: string; color: str
 
 export default function CreateExpenseScreen() {
   const { user } = useAuth();
-  const { children } = useFamilyFile();
+  const { familyFile, children } = useFamilyFile();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [purpose, setPurpose] = useState<ObligationPurpose | null>(null);
@@ -48,7 +48,7 @@ export default function CreateExpenseScreen() {
   const [vendorName, setVendorName] = useState("");
   const [dueDate, setDueDate] = useState<Date | null>(null);
 
-  const familyFileId = user?.family_file_id || "demo-family";
+  const familyFileId = familyFile?.id || null;
 
   const handleSubmit = async () => {
     if (!purpose) {

@@ -27,7 +27,10 @@
           "voip",
           "remote-notification"
         ]
-      }
+      },
+      "associatedDomains": [
+        "applinks:app.commonground.co"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -42,6 +45,23 @@
         "WRITE_EXTERNAL_STORAGE",
         "VIBRATE",
         "RECEIVE_BOOT_COMPLETED"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "commonground"
+            },
+            {
+              "scheme": "https",
+              "host": "app.commonground.co",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
       ]
     },
     "web": {
@@ -71,12 +91,7 @@
           "microphonePermission": "Allow CommonGround to access your microphone for calls"
         }
       ],
-      [
-        "@daily-co/react-native-daily-js",
-        {
-          "enableScreenShare": false
-        }
-      ]
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -4,3 +4,4 @@
 
 export * as auth from './auth';
 export * as kidcoms from './kidcoms';
+export * as theater from './theater';

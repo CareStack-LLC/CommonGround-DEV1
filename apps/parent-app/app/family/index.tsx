@@ -1,3 +1,6 @@
+/**
+ * Family Files List Screen - Matching Web Portal Design
+ */
 import { useState, useEffect } from "react";
 import {
   View,
@@ -14,24 +17,30 @@ import { router } from "expo-router";
 import { useAuth } from "@/providers/AuthProvider";
 
 // CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+const SAGE = "#4A6C58";
+const SAGE_LIGHT = "#E8F0EB";
+const SLATE = "#475569";
+const SLATE_LIGHT = "#94A3B8";
+const AMBER = "#D4A574";
+const AMBER_LIGHT = "#FEF3E2";
+const SAND = "#F5F0E8";
+const CREAM = "#FFFBF5";
+const WHITE = "#FFFFFF";
 
 interface FamilyFile {
   id: string;
-  family_name: string;
+  family_file_number?: string;
+  title?: string;
+  family_name?: string;
   status: "pending" | "active" | "archived";
-  parent_a?: { first_name: string; last_name: string };
-  parent_b?: { first_name: string; last_name: string };
-  invitation_email?: string;
-  children_count?: number;
+  parent_a_info?: { first_name: string; last_name: string };
+  parent_b_info?: { first_name: string; last_name: string };
+  parent_a_role?: string;
+  parent_b_role?: string;
+  children?: any[];
+  has_agreement?: boolean;
+  has_quick_accord?: boolean;
+  aria_enabled?: boolean;
   created_at: string;
 }
 
@@ -41,10 +50,18 @@ export default function FamilyFilesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Get time-appropriate greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  };
+
   const fetchFamilyFiles = async () => {
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/family-files`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/family-files`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -55,7 +72,8 @@ export default function FamilyFilesScreen() {
 
       if (response.ok) {
         const data = await response.json();
-        setFamilyFiles(data.items || data || []);
+        const files = data.items || data || [];
+        setFamilyFiles(files);
       }
     } catch (error) {
       console.error("Error fetching family files:", error);
@@ -74,160 +92,240 @@ export default function FamilyFilesScreen() {
     fetchFamilyFiles();
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return colors.sage;
-      case "pending":
-        return colors.amber;
-      case "archived":
-        return colors.slate;
-      default:
-        return colors.slate;
+  // Determine user's role in the family file
+  const getUserRole = (file: FamilyFile) => {
+    if (file.parent_a_info?.first_name === user?.first_name) {
+      return file.parent_a_role || "Parent A";
     }
+    return file.parent_b_role || "Parent B";
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "active":
-        return "Active";
-      case "pending":
-        return "Pending Co-Parent";
-      case "archived":
-        return "Archived";
-      default:
-        return status;
-    }
+  // Get display name for family file
+  const getDisplayName = (file: FamilyFile) => {
+    return file.title || file.family_name || file.family_file_number || "Family File";
   };
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4 text-slate-600">Loading family files...</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: CREAM, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={SAGE} />
+        <Text style={{ marginTop: 16, color: SLATE }}>Loading family files...</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: CREAM }} edges={["top"]}>
       <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ padding: 16 }}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.sage}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={SAGE} />
         }
       >
-        {/* Header Info */}
-        <View className="mb-6 p-4 rounded-xl" style={{ backgroundColor: colors.sand }}>
-          <View className="flex-row items-center mb-2">
-            <Ionicons name="folder-open" size={24} color={colors.sage} />
-            <Text className="ml-2 text-lg font-semibold" style={{ color: colors.slate }}>
-              Your Family Files
-            </Text>
-          </View>
-          <Text className="text-sm" style={{ color: colors.slate }}>
-            Family files contain all your co-parenting information including schedules,
-            expenses, agreements, and communication history.
+        {/* Header */}
+        <View style={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 8 }}>
+          <Text style={{ fontSize: 14, color: SLATE_LIGHT, marginBottom: 4 }}>
+            {getGreeting()}
+          </Text>
+          <Text style={{ fontSize: 32, fontWeight: "700", color: SLATE, marginBottom: 4 }}>
+            Family Files
+          </Text>
+          <Text style={{ fontSize: 15, color: SLATE_LIGHT }}>
+            Manage your co-parenting arrangements
           </Text>
         </View>
 
-        {/* Family Files List */}
-        {familyFiles.length === 0 ? (
-          <View className="items-center py-12">
-            <View
-              className="w-20 h-20 rounded-full items-center justify-center mb-4"
-              style={{ backgroundColor: colors.sand }}
-            >
-              <Ionicons name="folder-outline" size={40} color={colors.sage} />
+        {/* New Family File Button */}
+        <View style={{ paddingHorizontal: 20, paddingVertical: 16 }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: SAGE,
+              borderRadius: 12,
+              paddingVertical: 16,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              shadowColor: SAGE,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 4,
+            }}
+            onPress={() => router.push("/family/create")}
+          >
+            <Ionicons name="add" size={20} color={WHITE} />
+            <Text style={{ color: WHITE, fontSize: 16, fontWeight: "600", marginLeft: 8 }}>
+              New Family File
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Your Family Files Section */}
+        <View style={{ paddingHorizontal: 20 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
+            <View style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              backgroundColor: SAGE_LIGHT,
+              alignItems: "center",
+              justifyContent: "center",
+              marginRight: 12,
+            }}>
+              <Ionicons name="folder-open-outline" size={20} color={SAGE} />
             </View>
-            <Text className="text-lg font-semibold mb-2" style={{ color: colors.slate }}>
-              No Family Files Yet
+            <Text style={{ fontSize: 20, fontWeight: "600", color: SLATE }}>
+              Your Family Files
             </Text>
-            <Text className="text-center px-8 mb-6" style={{ color: colors.slate }}>
-              Create a family file to start tracking custody schedules, expenses,
-              and communication with your co-parent.
-            </Text>
-            <TouchableOpacity
-              className="px-6 py-3 rounded-xl flex-row items-center"
-              style={{ backgroundColor: colors.sage }}
-              onPress={() => router.push("/family/create")}
-            >
-              <Ionicons name="add" size={20} color="white" />
-              <Text className="text-white font-semibold ml-2">Create Family File</Text>
-            </TouchableOpacity>
           </View>
-        ) : (
-          <View className="space-y-4">
-            {familyFiles.map((file) => (
-              <TouchableOpacity
-                key={file.id}
-                className="rounded-xl p-4 shadow-sm"
-                style={{ backgroundColor: "white" }}
-                onPress={() => router.push(`/family/${file.id}`)}
-              >
-                <View className="flex-row items-start justify-between mb-3">
-                  <View className="flex-1">
-                    <Text className="text-lg font-semibold" style={{ color: colors.slate }}>
-                      {file.family_name}
-                    </Text>
-                    <View
-                      className="px-2 py-1 rounded-full self-start mt-1"
-                      style={{ backgroundColor: `${getStatusColor(file.status)}20` }}
-                    >
-                      <Text
-                        className="text-xs font-medium"
-                        style={{ color: getStatusColor(file.status) }}
-                      >
-                        {getStatusLabel(file.status)}
+
+          {familyFiles.length === 0 ? (
+            <View style={{
+              backgroundColor: WHITE,
+              borderRadius: 16,
+              padding: 32,
+              alignItems: "center",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
+            }}>
+              <View style={{
+                width: 64,
+                height: 64,
+                borderRadius: 32,
+                backgroundColor: SAND,
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 16,
+              }}>
+                <Ionicons name="folder-outline" size={32} color={SAGE} />
+              </View>
+              <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE, marginBottom: 8 }}>
+                No Family Files Yet
+              </Text>
+              <Text style={{ fontSize: 14, color: SLATE_LIGHT, textAlign: "center", paddingHorizontal: 16 }}>
+                Create a family file to start managing custody schedules, expenses, and communication.
+              </Text>
+            </View>
+          ) : (
+            <View style={{ gap: 12 }}>
+              {familyFiles.map((file) => (
+                <TouchableOpacity
+                  key={file.id}
+                  style={{
+                    backgroundColor: WHITE,
+                    borderRadius: 16,
+                    padding: 16,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.05,
+                    shadowRadius: 4,
+                    elevation: 2,
+                  }}
+                  onPress={() => router.push(`/family/${file.id}`)}
+                >
+                  {/* Top Row: Icon, Name, Status */}
+                  <View style={{ flexDirection: "row", alignItems: "flex-start", marginBottom: 12 }}>
+                    <View style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 12,
+                      backgroundColor: SAGE_LIGHT,
+                      borderWidth: 2,
+                      borderColor: SAGE,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}>
+                      <Ionicons name="folder-open-outline" size={24} color={SAGE} />
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 12 }}>
+                      <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE }}>
+                        {getDisplayName(file)}
+                      </Text>
+                      <Text style={{ fontSize: 13, color: SLATE_LIGHT, marginTop: 2 }}>
+                        {file.family_file_number || "FF-000000"}
+                      </Text>
+                    </View>
+                    {/* Status Badge */}
+                    <View style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                      borderRadius: 20,
+                      backgroundColor: file.status === "active" ? SAGE_LIGHT : AMBER_LIGHT,
+                    }}>
+                      <Ionicons
+                        name={file.status === "active" ? "checkmark-circle" : "time"}
+                        size={14}
+                        color={file.status === "active" ? SAGE : AMBER}
+                      />
+                      <Text style={{
+                        fontSize: 12,
+                        fontWeight: "600",
+                        color: file.status === "active" ? SAGE : AMBER,
+                        marginLeft: 4,
+                      }}>
+                        {file.status === "active" ? "Active" : "Pending"}
                       </Text>
                     </View>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color={colors.slate} />
-                </View>
 
-                {/* Parents */}
-                <View className="flex-row items-center mb-2">
-                  <Ionicons name="people" size={16} color={colors.slate} />
-                  <Text className="ml-2 text-sm" style={{ color: colors.slate }}>
-                    {file.parent_a?.first_name || user?.first_name || "You"}
-                    {file.parent_b?.first_name
-                      ? ` & ${file.parent_b.first_name}`
-                      : file.invitation_email
-                        ? ` (Pending: ${file.invitation_email})`
-                        : ""}
-                  </Text>
-                </View>
-
-                {/* Children count */}
-                {file.children_count && file.children_count > 0 && (
-                  <View className="flex-row items-center">
-                    <Ionicons name="heart" size={16} color={colors.amber} />
-                    <Text className="ml-2 text-sm" style={{ color: colors.slate }}>
-                      {file.children_count} {file.children_count === 1 ? "child" : "children"}
+                  {/* Role Row */}
+                  <View style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingBottom: 12,
+                    borderBottomWidth: 1,
+                    borderBottomColor: SAND,
+                  }}>
+                    <Ionicons name="people-outline" size={16} color={SLATE_LIGHT} />
+                    <Text style={{ fontSize: 14, color: SLATE, marginLeft: 8 }}>
+                      {getUserRole(file)}
                     </Text>
                   </View>
-                )}
-              </TouchableOpacity>
-            ))}
 
-            {/* Add New Button */}
-            <TouchableOpacity
-              className="rounded-xl p-4 flex-row items-center justify-center border-2 border-dashed"
-              style={{ borderColor: colors.sage }}
-              onPress={() => router.push("/family/create")}
-            >
-              <Ionicons name="add-circle" size={24} color={colors.sage} />
-              <Text className="ml-2 font-semibold" style={{ color: colors.sage }}>
-                Create New Family File
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
+                  {/* Feature Tags */}
+                  <View style={{ flexDirection: "row", marginTop: 12, gap: 8 }}>
+                    {(file.has_agreement || file.status === "active") && (
+                      <View style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 10,
+                        paddingVertical: 6,
+                        borderRadius: 8,
+                        backgroundColor: SAGE_LIGHT,
+                      }}>
+                        <Ionicons name="document-text" size={14} color={SAGE} />
+                        <Text style={{ fontSize: 12, fontWeight: "500", color: SAGE, marginLeft: 4 }}>
+                          SharedCare
+                        </Text>
+                      </View>
+                    )}
+                    {file.has_quick_accord && (
+                      <View style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        paddingHorizontal: 10,
+                        paddingVertical: 6,
+                        borderRadius: 8,
+                        backgroundColor: AMBER_LIGHT,
+                      }}>
+                        <Ionicons name="flash" size={14} color={AMBER} />
+                        <Text style={{ fontSize: 12, fontWeight: "500", color: AMBER, marginLeft: 4 }}>
+                          QuickAccord
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

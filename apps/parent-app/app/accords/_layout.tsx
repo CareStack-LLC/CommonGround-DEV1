@@ -38,7 +38,7 @@ export default function AccordsLayout() {
       <Stack.Screen
         name="[id]"
         options={{
-          title: "Accord Details",
+          headerShown: false,
         }}
       />
     </Stack>

@@ -82,7 +82,7 @@ export default function CreateQuickAccordScreen() {
 
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/aria/start/${familyId}`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/aria/start/${familyId}`,
         {
           method: "POST",
           headers: {
@@ -128,7 +128,7 @@ export default function CreateQuickAccordScreen() {
 
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/aria/message/${conversationId}`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/aria/message/${conversationId}`,
         {
           method: "POST",
           headers: {
@@ -175,7 +175,7 @@ export default function CreateQuickAccordScreen() {
 
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/aria/create/${conversationId}`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/aria/create/${conversationId}`,
         {
           method: "POST",
           headers: {

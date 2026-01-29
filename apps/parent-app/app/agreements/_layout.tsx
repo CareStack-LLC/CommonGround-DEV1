@@ -38,7 +38,7 @@ export default function AgreementsLayout() {
       <Stack.Screen
         name="[id]"
         options={{
-          title: "Agreement Details",
+          headerShown: false,
         }}
       />
     </Stack>

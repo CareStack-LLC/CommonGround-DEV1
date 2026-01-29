@@ -29,7 +29,7 @@ router = APIRouter()
 
 def _build_quick_accord_response(qa) -> dict:
     """Build a QuickAccordResponse dict from a QuickAccord model."""
-    return {
+    response = {
         "id": qa.id,
         "family_file_id": qa.family_file_id,
         "accord_number": qa.accord_number,
@@ -62,6 +62,26 @@ def _build_quick_accord_response(qa) -> dict:
         "is_active": qa.is_active,
         "is_expired": qa.is_expired,
     }
+
+    # Include family_file data if loaded
+    if hasattr(qa, 'family_file') and qa.family_file:
+        ff = qa.family_file
+        response["family_file"] = {
+            "id": ff.id,
+            "family_name": ff.family_name or ff.title,
+            "parent_a": {
+                "id": str(ff.parent_a_id),
+                "first_name": ff.parent_a_info.get("first_name", "Parent A") if ff.parent_a_info else "Parent A",
+                "last_name": ff.parent_a_info.get("last_name", "") if ff.parent_a_info else "",
+            } if ff.parent_a_id else None,
+            "parent_b": {
+                "id": str(ff.parent_b_id),
+                "first_name": ff.parent_b_info.get("first_name", "Parent B") if ff.parent_b_info else "Parent B",
+                "last_name": ff.parent_b_info.get("last_name", "") if ff.parent_b_info else "",
+            } if ff.parent_b_id else None,
+        }
+
+    return response
 
 
 @router.post("/family-file/{family_file_id}", status_code=status.HTTP_201_CREATED)

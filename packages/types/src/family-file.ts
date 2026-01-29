@@ -5,18 +5,32 @@
 import type { ParentInfo } from './user';
 import type { FamilyFileChild } from './child';
 
+export interface FamilyFileSettings {
+  aria_enabled: boolean;
+  aria_strictness: 'low' | 'medium' | 'high';
+  notifications_enabled: boolean;
+  location_sharing_enabled: boolean;
+  calendar_sync_enabled: boolean;
+}
+
 export interface FamilyFile {
   id: string;
   case_id?: string;
   family_name: string;
+  title?: string; // Backend returns this as display name
+  family_file_number?: string;
   state?: string;
+  county?: string;
   status: FamilyFileStatus;
   parent_a_id: string;
   parent_b_id?: string;
   parent_a?: ParentInfo;
   parent_b?: ParentInfo;
+  parent_a_role?: string;
+  parent_b_role?: string;
   invitation_token?: string;
   invitation_email?: string;
+  settings?: FamilyFileSettings;
   created_at: string;
   updated_at: string;
 }
@@ -24,6 +38,7 @@ export interface FamilyFile {
 export interface FamilyFileDetail extends FamilyFile {
   children?: FamilyFileChild[];
   has_agreement?: boolean;
+  can_create_shared_care_agreement?: boolean;
 }
 
 export type FamilyFileStatus = 'pending' | 'active' | 'archived';

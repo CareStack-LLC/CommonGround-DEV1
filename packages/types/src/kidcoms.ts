@@ -5,9 +5,10 @@
  * play games, and communicate with their approved circle contacts.
  */
 
-export type SessionType = 'video_call' | 'theater' | 'arcade' | 'whiteboard' | 'mixed';
+export type KidComsSessionType = 'video_call' | 'theater' | 'arcade' | 'whiteboard' | 'mixed';
 export type SessionStatus = 'scheduled' | 'waiting' | 'ringing' | 'active' | 'completed' | 'cancelled' | 'rejected' | 'missed';
 export type ParticipantType = 'child' | 'parent' | 'circle_contact';
+export type KidComsRecordingStatus = 'pending' | 'recording' | 'processing' | 'ready' | 'failed';
 
 export interface KidComsSettings {
   id: string;
@@ -78,7 +79,7 @@ export interface KidComsSession {
   family_file_id: string;
   child_id: string;
   circle_contact_id?: string;
-  session_type: SessionType;
+  session_type: KidComsSessionType;
   title?: string;
   status: SessionStatus;
   // Daily.co room info
@@ -101,12 +102,12 @@ export interface KidComsSession {
   flagged_messages: number;
   // Recording (new fields for server-side recording)
   recording_enabled?: boolean;
-  recording_status?: RecordingStatus;
+  recording_status?: KidComsRecordingStatus;
   recording_url?: string;
   recording_s3_key?: string;
   recording_duration_seconds?: number;
   // Transcript
-  transcript_status?: RecordingStatus;
+  transcript_status?: KidComsRecordingStatus;
   transcript_url?: string;
   transcript_s3_key?: string;
   // Timestamps
@@ -114,12 +115,10 @@ export interface KidComsSession {
   updated_at: string;
 }
 
-export type RecordingStatus = 'pending' | 'recording' | 'processing' | 'ready' | 'failed';
-
 export interface KidComsSessionCreate {
   child_id: string;
   circle_contact_id?: string;
-  session_type?: SessionType;
+  session_type?: KidComsSessionType;
   title?: string;
   scheduled_for?: string;
 }
@@ -162,12 +161,12 @@ export interface JoinSessionResponse {
 
 export interface ChildSessionCreate {
   circle_contact_id: string;
-  session_type?: SessionType;
+  session_type?: KidComsSessionType;
 }
 
 export interface CircleContactSessionCreate {
   child_id: string;
-  session_type?: SessionType;
+  session_type?: KidComsSessionType;
 }
 
 export interface KidComsRoom {

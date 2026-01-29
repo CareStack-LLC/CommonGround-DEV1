@@ -9,6 +9,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { DailyCallProvider } from "@commonground/daily-video";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
+import { NotificationProvider } from "@/providers/NotificationProvider";
+import { RealtimeProvider } from "@/providers/RealtimeProvider";
+import { IncomingCallProvider } from "@/providers/IncomingCallProvider";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { configureAPI, videoAPIAdapter } from "@/lib/api";
 
@@ -65,9 +68,15 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AuthProvider>
-          <DailyCallProvider userType="parent" videoAPI={videoAPIAdapter}>
-            <RootLayoutNav />
-          </DailyCallProvider>
+          <NotificationProvider>
+            <RealtimeProvider>
+              <IncomingCallProvider>
+                <DailyCallProvider userType="parent" videoAPI={videoAPIAdapter}>
+                  <RootLayoutNav />
+                </DailyCallProvider>
+              </IncomingCallProvider>
+            </RealtimeProvider>
+          </NotificationProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

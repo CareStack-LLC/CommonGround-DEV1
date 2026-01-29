@@ -60,12 +60,12 @@ export default function SettingsScreen() {
             <SettingsRow
               icon="folder-open-outline"
               label="Family Files"
-              onPress={() => router.push("/family")}
+              onPress={() => router.push("/(tabs)/files")}
             />
             <SettingsRow
               icon="person-add-outline"
               label="Invite Co-Parent"
-              onPress={() => router.push("/family")}
+              onPress={() => router.push("/(tabs)/files")}
               isLast
             />
           </View>

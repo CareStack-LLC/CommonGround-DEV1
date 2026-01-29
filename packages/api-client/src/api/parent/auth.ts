@@ -7,8 +7,15 @@ import type {
   AuthResponse,
   LoginCredentials,
   RegisterCredentials,
+  Subscription,
+  OAuthLoginRequest,
+  MFAVerifyRequest,
+  PushTokenRegistration,
 } from '@commonground/types';
-import { fetchPublic, fetchWithParentAuth, setAuthTokens, setUser, clearAuthTokens, clearUser } from '../../core';
+import { fetchPublic, fetchWithParentAuth, setAuthTokens, setUser, clearAuthTokens } from '../../core';
+
+// Re-export types for convenience
+export type { Subscription, OAuthLoginRequest, MFAVerifyRequest, PushTokenRegistration };
 
 /**
  * Login with email and password
@@ -57,7 +64,7 @@ export async function logout(): Promise<void> {
   }
 
   await clearAuthTokens();
-  await clearUser();
+  // TODO: Add clearUser function to storage
 }
 
 /**
@@ -107,4 +114,139 @@ export async function verifyEmail(token: string): Promise<void> {
   await fetchPublic(`/auth/verify-email/${token}`, {
     method: 'POST',
   });
+}
+
+// ============================================================================
+// OAuth Authentication
+// ============================================================================
+
+/**
+ * Login with OAuth provider (Google, Apple)
+ */
+export async function loginWithOAuth(data: OAuthLoginRequest): Promise<AuthResponse> {
+  const response = await fetchPublic<AuthResponse>('/auth/oauth', {
+    method: 'POST',
+    body: data,
+  });
+
+  await setAuthTokens(response.access_token, response.refresh_token);
+  if (response.user) {
+    await setUser(response.user);
+  }
+
+  return response;
+}
+
+// ============================================================================
+// MFA (Multi-Factor Authentication)
+// ============================================================================
+
+/**
+ * Verify MFA code during login
+ */
+export async function verifyMFA(data: MFAVerifyRequest): Promise<AuthResponse> {
+  const response = await fetchPublic<AuthResponse>('/auth/mfa/verify', {
+    method: 'POST',
+    body: data,
+  });
+
+  await setAuthTokens(response.access_token, response.refresh_token);
+  if (response.user) {
+    await setUser(response.user);
+  }
+
+  return response;
+}
+
+/**
+ * Enroll in MFA (TOTP)
+ */
+export async function enrollMFA(): Promise<{ qr_code: string; secret: string; factor_id: string }> {
+  return fetchWithParentAuth('/auth/mfa/enroll', { method: 'POST' });
+}
+
+/**
+ * Confirm MFA enrollment with verification code
+ */
+export async function confirmMFAEnrollment(factorId: string, code: string): Promise<void> {
+  await fetchWithParentAuth('/auth/mfa/confirm', {
+    method: 'POST',
+    body: { factor_id: factorId, code },
+  });
+}
+
+/**
+ * Disable MFA
+ */
+export async function disableMFA(code: string): Promise<void> {
+  await fetchWithParentAuth('/auth/mfa/disable', {
+    method: 'POST',
+    body: { code },
+  });
+}
+
+// ============================================================================
+// Subscription
+// ============================================================================
+
+/**
+ * Get current user's subscription details
+ */
+export async function getSubscription(): Promise<Subscription> {
+  return fetchWithParentAuth<Subscription>('/users/me/subscription');
+}
+
+/**
+ * Check if user has mobile access
+ */
+export async function checkMobileAccess(): Promise<{
+  has_access: boolean;
+  subscription: Subscription;
+  upgrade_url?: string;
+}> {
+  return fetchWithParentAuth('/users/me/mobile-access');
+}
+
+// ============================================================================
+// Push Notifications
+// ============================================================================
+
+/**
+ * Register push notification token
+ */
+export async function registerPushToken(data: PushTokenRegistration): Promise<void> {
+  await fetchWithParentAuth('/users/me/push-tokens', {
+    method: 'POST',
+    body: data,
+  });
+}
+
+/**
+ * Unregister push notification token
+ */
+export async function unregisterPushToken(token: string): Promise<void> {
+  await fetchWithParentAuth('/users/me/push-tokens', {
+    method: 'DELETE',
+    body: { token },
+  });
+}
+
+// ============================================================================
+// Token Management
+// ============================================================================
+
+/**
+ * Refresh authentication tokens
+ */
+export async function refreshTokens(): Promise<AuthResponse> {
+  const response = await fetchPublic<AuthResponse>('/auth/refresh', {
+    method: 'POST',
+  });
+
+  await setAuthTokens(response.access_token, response.refresh_token);
+  if (response.user) {
+    await setUser(response.user);
+  }
+
+  return response;
 }

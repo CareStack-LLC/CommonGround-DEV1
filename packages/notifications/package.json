@@ -9,18 +9,18 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "expo-notifications": "~0.28.0",
-    "expo-device": "~6.0.0",
-    "expo-constants": "~17.0.0"
+    "expo-notifications": "~0.32.0",
+    "expo-device": "~8.0.0",
+    "expo-constants": "~18.0.0"
   },
   "devDependencies": {
     "@commonground/tsconfig": "workspace:*",
-    "@types/react": "~18.3.0",
-    "typescript": "~5.3.0"
+    "@types/react": "~19.1.0",
+    "typescript": "~5.9.0"
   },
   "peerDependencies": {
     "@commonground/api-client": "workspace:*",
-    "expo-router": "~4.0.0",
-    "react": "18.3.1"
+    "expo-router": "~6.0.0",
+    "react": "19.1.0"
   }
 }

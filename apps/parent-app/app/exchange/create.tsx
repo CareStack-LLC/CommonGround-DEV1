@@ -44,7 +44,7 @@ const RECURRENCE_OPTIONS = [
 
 export default function CreateExchangeScreen() {
   const { user } = useAuth();
-  const { children } = useFamilyFile();
+  const { familyFile, children } = useFamilyFile();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
@@ -64,7 +64,7 @@ export default function CreateExchangeScreen() {
   const [checkInWindowAfter, setCheckInWindowAfter] = useState(30);
   const [notes, setNotes] = useState("");
 
-  const familyFileId = user?.family_file_id || "demo-family";
+  const familyFileId = familyFile?.id || null;
 
   // Determine if user is parent A or B
   const isParentA = true; // This would come from auth context

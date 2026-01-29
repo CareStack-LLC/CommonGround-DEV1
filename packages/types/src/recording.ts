@@ -5,14 +5,14 @@
  */
 
 export type RecordingStatus = 'pending' | 'recording' | 'processing' | 'ready' | 'failed';
-export type SessionType = 'parent_call' | 'kidcoms';
+export type RecordingSessionType = 'parent_call' | 'kidcoms';
 export type AccessType = 'view' | 'download' | 'export' | 'share';
 export type ExportFormat = 'pdf' | 'mp4' | 'vtt' | 'evidence_bundle';
 
 export interface Recording {
   id: string;
   session_id: string;
-  session_type: SessionType;
+  session_type: RecordingSessionType;
   family_file_id: string;
   // Recording data
   recording_url?: string;
@@ -47,7 +47,7 @@ export interface RecordingParticipant {
 export interface RecordingAccessLog {
   id: string;
   session_id: string;
-  session_type: SessionType;
+  session_type: RecordingSessionType;
   accessed_by_id: string;
   accessed_by_name?: string;
   access_type: AccessType;
@@ -66,7 +66,7 @@ export interface RecordingResponse {
 
 export interface TranscriptResponse {
   session_id: string;
-  session_type: SessionType;
+  session_type: RecordingSessionType;
   transcript_url: string;
   format: 'vtt' | 'json';
   word_count: number;
@@ -99,7 +99,7 @@ export interface TranscriptChunk {
 
 export interface RecordingExportRequest {
   session_id: string;
-  session_type: SessionType;
+  session_type: RecordingSessionType;
   format: ExportFormat;
   reason?: string;
   include_transcript?: boolean;

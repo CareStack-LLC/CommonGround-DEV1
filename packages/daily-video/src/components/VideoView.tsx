@@ -4,7 +4,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { DailyMediaView } from '@daily-co/daily-react-native';
+import { DailyMediaView } from '@daily-co/react-native-daily-js';
 
 import { CallParticipant } from '../types';
 

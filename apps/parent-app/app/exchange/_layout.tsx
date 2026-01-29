@@ -23,6 +23,27 @@ export default function ExchangeLayout() {
           presentation: "modal",
         }}
       />
+      <Stack.Screen
+        name="qr-scan"
+        options={{
+          title: "Scan QR Code",
+          presentation: "fullScreenModal",
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="qr-show"
+        options={{
+          title: "Your QR Code",
+          presentation: "fullScreenModal",
+        }}
+      />
+      <Stack.Screen
+        name="[instanceId]"
+        options={{
+          title: "Exchange Details",
+        }}
+      />
     </Stack>
   );
 }

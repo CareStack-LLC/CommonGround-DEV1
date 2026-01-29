@@ -24,13 +24,14 @@ import { useDailyCall, VideoView } from '@commonground/daily-video';
 const { width, height } = Dimensions.get('window');
 
 export default function CallScreen() {
-  const { sessionId, recipientId, recipientType, familyFileId, recipientName } =
+  const { sessionId, recipientId, recipientType, familyFileId, recipientName, callType } =
     useLocalSearchParams<{
       sessionId?: string;
       recipientId?: string;
       recipientType?: string;
       familyFileId?: string;
       recipientName?: string;
+      callType?: 'video' | 'audio';
     }>();
 
   const {
@@ -54,20 +55,38 @@ export default function CallScreen() {
   } = useDailyCall();
 
   const [showControls, setShowControls] = useState(true);
+  const isAudioOnly = callType === 'audio';
 
   // Initialize call on mount
   useEffect(() => {
     const initCall = async () => {
-      if (sessionId) {
+      // Check if this is a new call (sessionId === 'new') or joining an existing one
+      const isNewCall = sessionId === 'new' || !sessionId;
+
+      if (!isNewCall && sessionId) {
         // Joining an existing call
-        await joinCall(sessionId);
+        console.log('[Call] Joining existing call:', sessionId);
+        await joinCall(sessionId, {
+          videoEnabled: !isAudioOnly,
+          audioEnabled: true,
+        });
       } else if (recipientId && recipientType && familyFileId) {
         // Initiating a new call
+        console.log('[Call] Initiating new call to:', recipientId, 'type:', callType);
         await initiateCall(
           recipientId,
           recipientType as 'parent' | 'child' | 'circle',
-          familyFileId
+          familyFileId,
+          {
+            videoEnabled: !isAudioOnly,
+            audioEnabled: true,
+            userName: recipientName || 'Parent',
+          }
         );
+      } else {
+        console.error('[Call] Missing required parameters');
+        Alert.alert('Error', 'Unable to start call. Missing required information.');
+        router.back();
       }
     };
 
@@ -179,7 +198,7 @@ export default function CallScreen() {
         activeOpacity={1}
         onPress={() => setShowControls(!showControls)}
       >
-        {remoteParticipant ? (
+        {remoteParticipant && !isAudioOnly ? (
           <VideoView
             participant={remoteParticipant}
             style={styles.remoteVideo}
@@ -187,16 +206,24 @@ export default function CallScreen() {
           />
         ) : (
           <View style={styles.waitingContainer}>
-            <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarEmoji}>
-                {recipientType === 'child' ? '👧' : '👤'}
-              </Text>
+            <View style={[styles.avatarPlaceholder, isAudioOnly && styles.avatarPlaceholderAudio]}>
+              {isAudioOnly ? (
+                <Ionicons name="volume-high" size={60} color="white" />
+              ) : (
+                <Text style={styles.avatarEmoji}>
+                  {recipientType === 'child' ? '👧' : '👤'}
+                </Text>
+              )}
             </View>
             <Text style={styles.waitingText}>
               {recipientName || 'Participant'}
             </Text>
             <Text style={styles.waitingSubtext}>
-              {callState === 'ringing' ? 'Ringing...' : 'Waiting to join...'}
+              {callState === 'ringing'
+                ? 'Ringing...'
+                : callState === 'connected'
+                  ? (isAudioOnly ? 'Audio call in progress' : 'Waiting for video...')
+                  : 'Waiting to join...'}
             </Text>
           </View>
         )}
@@ -347,6 +374,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  avatarPlaceholderAudio: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: '#4A6C58', // SAGE color
   },
   avatarEmoji: {
     fontSize: 60,

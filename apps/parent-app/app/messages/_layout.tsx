@@ -28,6 +28,13 @@ export default function MessagesLayout() {
       }}
     >
       <Stack.Screen
+        name="[threadId]"
+        options={{
+          title: "Conversation",
+          headerShown: true,
+        }}
+      />
+      <Stack.Screen
         name="compose"
         options={{
           title: "New Message",

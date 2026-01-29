@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
+import { BottomNavBar } from "@/components/BottomNavBar";
 
 // CommonGround Design System Colors
 const colors = {
@@ -31,8 +32,14 @@ interface AgreementSection {
   section_title: string;
   section_type: string;
   content?: string;
+  structured_data?: any;
   is_completed: boolean;
   display_order: number;
+}
+
+interface AriaSummary {
+  summary: string | null;
+  key_terms: string[];
 }
 
 interface Agreement {
@@ -97,6 +104,7 @@ export default function AgreementDetailScreen() {
   const { id, familyId } = useLocalSearchParams<{ id: string; familyId: string }>();
   const { token, user } = useAuth();
   const [agreement, setAgreement] = useState<Agreement | null>(null);
+  const [ariaSummary, setAriaSummary] = useState<AriaSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
@@ -104,7 +112,7 @@ export default function AgreementDetailScreen() {
   const fetchAgreement = async () => {
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/agreements/${id}`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/agreements/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -115,9 +123,42 @@ export default function AgreementDetailScreen() {
 
       if (response.ok) {
         const data = await response.json();
-        setAgreement(data);
+        // API returns { agreement: {...}, sections: [...], completion_percentage: N }
+        // Transform to match our interface
+        const agreementData = data.agreement || data;
+        const transformedAgreement: Agreement = {
+          id: agreementData.id,
+          agreement_number: agreementData.agreement_number || `AGR-${agreementData.id?.slice(0, 8)?.toUpperCase()}`,
+          title: agreementData.title,
+          agreement_type: agreementData.agreement_type || "custody",
+          agreement_version: agreementData.agreement_version || "v2_standard",
+          status: agreementData.status,
+          petitioner_approved: agreementData.petitioner_approved,
+          petitioner_approved_at: agreementData.petitioner_approved_at,
+          respondent_approved: agreementData.respondent_approved,
+          respondent_approved_at: agreementData.respondent_approved_at,
+          effective_date: agreementData.effective_date,
+          court_ordered: agreementData.court_ordered || false,
+          sections: data.sections?.map((s: any) => ({
+            id: s.id,
+            section_number: s.section_number || s.display_order,
+            section_title: s.section_title,
+            section_type: s.section_type,
+            content: s.content,
+            structured_data: s.structured_data,
+            is_completed: s.is_completed,
+            display_order: s.display_order,
+          })) || [],
+          completion_percentage: data.completion_percentage,
+          created_at: agreementData.created_at,
+          // family_file is at root level in API response
+          family_file: data.family_file || agreementData.family_file,
+        };
+        setAgreement(transformedAgreement);
       } else {
-        Alert.alert("Error", "Failed to load agreement.");
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Failed to load agreement:", response.status, errorData);
+        Alert.alert("Error", errorData.detail || "Failed to load agreement.");
         router.back();
       }
     } catch (error) {
@@ -130,8 +171,72 @@ export default function AgreementDetailScreen() {
     }
   };
 
+  // Fetch ARIA summary from conversation
+  const fetchAriaSummary = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/agreements/${id}/aria/conversation`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.summary) {
+          setAriaSummary({ summary: data.summary, key_terms: [] });
+        }
+      }
+    } catch (error) {
+      console.log("No ARIA conversation available");
+    }
+  };
+
+  // Extract key terms from agreement sections
+  const extractKeyTerms = (sections: AgreementSection[]): string[] => {
+    const terms: string[] = [];
+
+    for (const section of sections) {
+      if (section.structured_data) {
+        const data = section.structured_data;
+
+        // Physical custody percentages
+        if (data.parent_a_percentage && data.parent_b_percentage) {
+          terms.push(`Parent A: ${data.parent_a_percentage}% of the time`);
+          terms.push(`Parent B: ${data.parent_b_percentage}% of the time`);
+        }
+
+        // Custody type
+        if (data.legal_custody_type) {
+          terms.push(`Legal custody: ${data.legal_custody_type.replace(/_/g, ' ')}`);
+        }
+
+        // Holiday alternating
+        if (data.holiday_alternating !== undefined) {
+          terms.push(data.holiday_alternating ? "Alternating holidays each year" : "Fixed holiday schedule");
+        }
+
+        // Child support
+        if (data.support_amount) {
+          terms.push(`Child support: $${data.support_amount}/month`);
+        }
+
+        // Exchange location
+        if (data.default_exchange_location) {
+          terms.push(`Exchange location: ${data.default_exchange_location}`);
+        }
+      }
+    }
+
+    return terms.slice(0, 5); // Limit to 5 key terms
+  };
+
   useEffect(() => {
     fetchAgreement();
+    fetchAriaSummary();
   }, [id]);
 
   const onRefresh = () => {
@@ -164,7 +269,7 @@ export default function AgreementDetailScreen() {
     setActionLoading(true);
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/agreements/${id}/submit`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/agreements/${id}/submit`,
         {
           method: "POST",
           headers: {
@@ -193,7 +298,7 @@ export default function AgreementDetailScreen() {
     setActionLoading(true);
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/agreements/${id}/approve`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/agreements/${id}/approve`,
         {
           method: "POST",
           headers: {
@@ -231,7 +336,7 @@ export default function AgreementDetailScreen() {
             setActionLoading(true);
             try {
               const response = await fetch(
-                `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/agreements/${id}/activate`,
+                `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/agreements/${id}/activate`,
                 {
                   method: "POST",
                   headers: {
@@ -268,6 +373,20 @@ export default function AgreementDetailScreen() {
     // In a real app, you'd use Linking.openURL or a document viewer
   };
 
+  // Menu options
+  const showMenu = () => {
+    Alert.alert(
+      "Agreement Options",
+      undefined,
+      [
+        { text: "Download PDF", onPress: handleDownloadPDF },
+        { text: "Preview Agreement", onPress: () => router.push(`/agreements/${id}/preview`) },
+        { text: "Settings", onPress: () => router.push("/settings") },
+        { text: "Cancel", style: "cancel" },
+      ]
+    );
+  };
+
   if (loading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
@@ -288,7 +407,35 @@ export default function AgreementDetailScreen() {
   const sections = agreement.sections?.sort((a, b) => a.display_order - b.display_order) || [];
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["top", "bottom"]}>
+      {/* Custom Header */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.sand,
+          backgroundColor: "white",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={{ flexDirection: "row", alignItems: "center" }}
+        >
+          <Ionicons name="chevron-back" size={24} color={colors.sage} />
+          <Text style={{ color: colors.sage, fontSize: 16, marginLeft: 4 }}>Back</Text>
+        </TouchableOpacity>
+        <Text style={{ fontSize: 17, fontWeight: "600", color: colors.slate }}>
+          Agreement
+        </Text>
+        <TouchableOpacity onPress={showMenu} style={{ padding: 4 }}>
+          <Ionicons name="ellipsis-horizontal" size={24} color={colors.slate} />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 16 }}
@@ -347,6 +494,72 @@ export default function AgreementDetailScreen() {
             </View>
           )}
         </View>
+
+        {/* ARIA Summary - Always show for active or pending agreements */}
+        {(agreement.status === "active" || agreement.status === "pending_approval" || ariaSummary?.summary) && (
+          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: `${colors.sage}10` }}>
+            <View className="flex-row items-center mb-3">
+              <View
+                className="w-8 h-8 rounded-full items-center justify-center mr-3"
+                style={{ backgroundColor: `${colors.sage}20` }}
+              >
+                <Ionicons name="sparkles" size={16} color={colors.sage} />
+              </View>
+              <Text className="font-semibold text-lg" style={{ color: colors.sage }}>
+                ARIA Summary
+              </Text>
+            </View>
+
+            {/* Summary Text */}
+            <Text className="mb-4" style={{ color: colors.slate, lineHeight: 22 }}>
+              {ariaSummary?.summary ||
+                `This ${agreement.title.toLowerCase()} allows both parents to be involved in decision-making while establishing a clear schedule for the children's time with each parent. The agreement covers custody arrangements, parenting schedules, holidays, financial responsibilities, and communication guidelines.`}
+            </Text>
+
+            {/* Key Terms - show extracted ones or default based on sections */}
+            <View>
+              <Text className="font-medium mb-2" style={{ color: colors.slate }}>
+                Key Terms:
+              </Text>
+              {agreement.sections && extractKeyTerms(agreement.sections).length > 0 ? (
+                extractKeyTerms(agreement.sections).map((term, index) => (
+                  <View key={index} className="flex-row items-center mb-2">
+                    <View
+                      className="w-2 h-2 rounded-full mr-3"
+                      style={{ backgroundColor: colors.sage }}
+                    />
+                    <Text style={{ color: colors.slate }}>{term}</Text>
+                  </View>
+                ))
+              ) : (
+                <>
+                  <View className="flex-row items-center mb-2">
+                    <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.sage }} />
+                    <Text style={{ color: colors.slate }}>
+                      {agreement.sections?.length || 7} sections covering all custody aspects
+                    </Text>
+                  </View>
+                  <View className="flex-row items-center mb-2">
+                    <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.sage }} />
+                    <Text style={{ color: colors.slate }}>
+                      {agreement.petitioner_approved && agreement.respondent_approved
+                        ? "Both parents have approved"
+                        : "Awaiting parent approval"}
+                    </Text>
+                  </View>
+                  {agreement.effective_date && (
+                    <View className="flex-row items-center mb-2">
+                      <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.sage }} />
+                      <Text style={{ color: colors.slate }}>
+                        Effective since {formatDate(agreement.effective_date)}
+                      </Text>
+                    </View>
+                  )}
+                </>
+              )}
+            </View>
+          </View>
+        )}
 
         {/* Completion Progress (for drafts) */}
         {agreement.status === "draft" && agreement.completion_percentage !== undefined && (
@@ -463,7 +676,13 @@ export default function AgreementDetailScreen() {
                   key={section.id}
                   className="flex-row items-center p-3 rounded-xl"
                   style={{ backgroundColor: colors.sand }}
-                  onPress={() => Alert.alert(section.section_title, section.content || "No content yet.")}
+                  onPress={() => {
+                    if (agreement?.status === "draft") {
+                      router.push(`/agreements/${id}/sections/${section.id}`);
+                    } else {
+                      Alert.alert(section.section_title, section.content || "No content yet.");
+                    }
+                  }}
                 >
                   <View
                     className="w-8 h-8 rounded-full items-center justify-center"
@@ -491,6 +710,9 @@ export default function AgreementDetailScreen() {
                       {section.is_completed ? "Complete" : "Incomplete"}
                     </Text>
                   </View>
+                  {agreement?.status === "draft" && (
+                    <Ionicons name="chevron-forward" size={16} color={colors.slate} className="ml-2" />
+                  )}
                 </TouchableOpacity>
               ))}
             </View>
@@ -570,6 +792,18 @@ export default function AgreementDetailScreen() {
             </TouchableOpacity>
           )}
 
+          {/* Preview Agreement */}
+          <TouchableOpacity
+            className="py-4 rounded-xl items-center flex-row justify-center border-2 mb-3"
+            style={{ borderColor: colors.slate }}
+            onPress={() => router.push(`/agreements/${id}/preview`)}
+          >
+            <Ionicons name="eye" size={20} color={colors.slate} />
+            <Text className="font-semibold ml-2" style={{ color: colors.slate }}>
+              Preview Full Agreement
+            </Text>
+          </TouchableOpacity>
+
           {/* Continue with ARIA (for drafts) */}
           {agreement.status === "draft" && (
             <TouchableOpacity
@@ -585,6 +819,9 @@ export default function AgreementDetailScreen() {
           )}
         </View>
       </ScrollView>
+
+      {/* Bottom Navigation */}
+      <BottomNavBar />
     </SafeAreaView>
   );
 }

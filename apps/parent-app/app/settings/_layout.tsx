@@ -3,30 +3,33 @@
  */
 
 import { Stack } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme";
+
+// CommonGround Design System Colors
+const SAGE = "#4A6C58";
+const SLATE = "#475569";
+const WHITE = "#FFFFFF";
+const SAND = "#F5F0E8";
 
 export default function SettingsLayout() {
-  const colorScheme = useColorScheme();
-
-  const colors = {
-    background: colorScheme === "dark" ? "#0f172a" : "#ffffff",
-    text: colorScheme === "dark" ? "#ffffff" : "#0f172a",
-  };
-
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: colors.background,
+          backgroundColor: WHITE,
         },
         headerTitleStyle: {
-          color: colors.text,
+          color: SLATE,
           fontWeight: "600",
         },
-        headerTintColor: "#2563eb",
+        headerTintColor: SAGE,
         headerBackTitle: "Back",
+        headerShadowVisible: false,
       }}
     >
+      <Stack.Screen
+        name="index"
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="edit-profile"
         options={{ title: "Edit Profile" }}

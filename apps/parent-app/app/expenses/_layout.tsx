@@ -1,4 +1,16 @@
+/**
+ * ClearFund Expenses Stack Layout
+ * Navigation for expense management screens
+ */
+
 import { Stack } from "expo-router";
+
+// CommonGround Design System Colors
+const colors = {
+  sage: "#4A6C58",
+  slate: "#475569",
+  cream: "#FFFBF5",
+};
 
 export default function ExpensesLayout() {
   return (
@@ -6,6 +18,9 @@ export default function ExpensesLayout() {
       screenOptions={{
         headerShown: true,
         headerBackTitle: "Back",
+        headerTintColor: colors.sage,
+        headerStyle: { backgroundColor: colors.cream },
+        headerTitleStyle: { color: colors.slate },
       }}
     >
       <Stack.Screen
@@ -14,7 +29,7 @@ export default function ExpensesLayout() {
       />
       <Stack.Screen
         name="[obligationId]"
-        options={{ title: "Expense Details" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="create"

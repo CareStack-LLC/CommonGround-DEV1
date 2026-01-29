@@ -19,19 +19,25 @@ import { Ionicons } from "@expo/vector-icons";
 import { parent } from "@commonground/api-client";
 import type { CommunicationLog } from "@commonground/api-client/src/api/parent/myCircle";
 import { useAuth } from "@/providers/AuthProvider";
+import { useFamilyFile } from "@/hooks/useFamilyFile";
 
 type FilterType = "all" | "flagged" | "calls" | "chat";
 
 export default function CommunicationLogsScreen() {
   const { user } = useAuth();
+  const { familyFile } = useFamilyFile();
   const [logs, setLogs] = useState<CommunicationLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<FilterType>("all");
 
-  const familyFileId = user?.family_file_id || "demo-family";
+  const familyFileId = familyFile?.id || null;
 
   const fetchLogs = useCallback(async () => {
+    if (!familyFileId) {
+      setIsLoading(false);
+      return;
+    }
     try {
       const data = await parent.myCircle.getCommunicationLogs(familyFileId);
       setLogs(data);

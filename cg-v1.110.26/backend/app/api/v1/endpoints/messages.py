@@ -819,6 +819,99 @@ async def list_messages(
     ]
 
 
+@router.get("/family-file/{family_file_id}", response_model=List[MessageResponse])
+async def list_messages_by_family_file(
+    family_file_id: str,
+    limit: int = Query(default=100, le=500),
+    offset: int = Query(default=0, ge=0),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get messages for a family file.
+
+    Args:
+        family_file_id: Family File ID
+        limit: Number of messages to return
+        offset: Offset for pagination
+
+    Returns:
+        List of messages (oldest first) with attachments
+    """
+    # Verify user has access to family file
+    result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == family_file_id)
+    )
+    family_file = result.scalar_one_or_none()
+
+    if not family_file:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Family file not found"
+        )
+
+    if current_user.id not in [family_file.parent_a_id, family_file.parent_b_id]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have access to this family file"
+        )
+
+    # Get messages with attachments, ordered oldest first
+    messages_result = await db.execute(
+        select(Message)
+        .options(selectinload(Message.attachments))
+        .where(
+            and_(
+                Message.family_file_id == family_file_id,
+                Message.is_hidden_by_recipient == False
+            )
+        )
+        .order_by(Message.sent_at)  # Oldest first for chat UI
+        .limit(limit)
+        .offset(offset)
+    )
+    messages = messages_result.scalars().all()
+
+    return [
+        MessageResponse(
+            id=msg.id,
+            case_id=msg.case_id,
+            family_file_id=msg.family_file_id,
+            thread_id=msg.thread_id,
+            agreement_id=msg.agreement_id,
+            sender_id=msg.sender_id,
+            recipient_id=msg.recipient_id,
+            content=msg.content,
+            message_type=msg.message_type,
+            sent_at=msg.sent_at,
+            delivered_at=msg.delivered_at,
+            read_at=msg.read_at,
+            acknowledged_at=msg.acknowledged_at,
+            was_flagged=msg.was_flagged,
+            original_content=msg.original_content,
+            attachments=[
+                MessageAttachmentResponse(
+                    id=att.id,
+                    message_id=att.message_id,
+                    family_file_id=att.family_file_id,
+                    file_name=att.file_name,
+                    file_type=att.file_type,
+                    file_size=att.file_size,
+                    file_category=att.file_category,
+                    storage_path=att.storage_path,
+                    storage_url=att.storage_url,
+                    sha256_hash=att.sha256_hash,
+                    virus_scanned=att.virus_scanned,
+                    uploaded_by=att.uploaded_by,
+                    uploaded_at=att.uploaded_at,
+                )
+                for att in (msg.attachments or [])
+            ]
+        )
+        for msg in messages
+    ]
+
+
 @router.get("/agreement/{agreement_id}", response_model=List[MessageResponse])
 async def list_messages_by_agreement(
     agreement_id: str,

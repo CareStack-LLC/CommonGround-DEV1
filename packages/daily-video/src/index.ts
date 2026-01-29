@@ -2,43 +2,12 @@
  * @commonground/daily-video
  *
  * Shared Daily.co video calling package for CommonGround mobile apps.
- * Provides React Native components and hooks for video calling.
  *
- * @example
- * // Setup in app root
- * import { DailyCallProvider } from '@commonground/daily-video';
- * import { video } from '@commonground/api-client';
- *
- * function App() {
- *   return (
- *     <DailyCallProvider userType="parent" videoAPI={video}>
- *       <YourApp />
- *     </DailyCallProvider>
- *   );
- * }
- *
- * @example
- * // Using in a call screen
- * import { useDailyCall, VideoView, CallControls } from '@commonground/daily-video';
- *
- * function CallScreen() {
- *   const { callState, participants, localParticipant, initiateCall, endCall } = useDailyCall();
- *
- *   return (
- *     <View>
- *       {participants.map(p => (
- *         <VideoView key={p.id} participant={p} />
- *       ))}
- *       {localParticipant && (
- *         <VideoView participant={localParticipant} mirror />
- *       )}
- *       <CallControls />
- *     </View>
- *   );
- * }
+ * NOTE: Full video calling requires a development build with native modules.
+ * In Expo Go, stub implementations are provided.
  */
 
-// Types
+// Types (always export - no native dependency)
 export type {
   CallState,
   CallSession,
@@ -51,8 +20,7 @@ export type {
   DailyCallContext,
 } from './types';
 
-// Provider and hook
-export { DailyCallProvider, useDailyCall } from './DailyCallProvider';
-
-// Components
-export { VideoView, CallControls } from './components';
+// Export stub implementations that work in Expo Go
+// For real video calling, a development build is required
+export { DailyCallProvider, useDailyCall } from './DailyCallProvider.stub';
+export { VideoView, CallControls } from './components/stubs';

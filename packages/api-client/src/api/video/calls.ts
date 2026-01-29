@@ -69,7 +69,7 @@ export interface CallParticipant {
 }
 
 // Helper to get the right fetch function based on auth type
-function getFetchForAuth(authType: AuthType) {
+export function getFetchForAuth(authType: AuthType) {
   switch (authType) {
     case 'parent':
       return fetchWithParentAuth;

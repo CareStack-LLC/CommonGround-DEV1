@@ -1,90 +1,88 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
+// CommonGround Design System Colors
+const SAGE = "#4A6C58";
+const SLATE_LIGHT = "#94A3B8";
+const WHITE = "#FFFFFF";
+const SAND = "#F5F0E8";
+
 function TabBarIcon({ name, color }: { name: IconName; color: string }) {
-  return <Ionicons size={24} name={name} color={color} />;
+  return <Ionicons size={22} name={name} color={color} />;
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
-  const colors = {
-    primary: "#2563eb",
-    inactive: colorScheme === "dark" ? "#64748b" : "#94a3b8",
-    background: colorScheme === "dark" ? "#0f172a" : "#ffffff",
-    border: colorScheme === "dark" ? "#1e293b" : "#e2e8f0",
-  };
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.inactive,
+        tabBarActiveTintColor: SAGE,
+        tabBarInactiveTintColor: SLATE_LIGHT,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
+          backgroundColor: WHITE,
+          borderTopColor: SAND,
           borderTopWidth: 1,
           paddingTop: 8,
-          paddingBottom: 8,
-          height: 60,
+          paddingBottom: 28,
+          height: 80,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: "500",
+          marginTop: 4,
         },
-        headerStyle: {
-          backgroundColor: colors.background,
-        },
-        headerTitleStyle: {
-          color: colorScheme === "dark" ? "#ffffff" : "#0f172a",
-          fontWeight: "600",
-        },
+        headerShown: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: "Dashboard",
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "home" : "home-outline"} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="messages"
         options={{
-          title: "Messages",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="chatbubbles" color={color} />
+          title: "Chat",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "chatbubble" : "chatbubble-outline"} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="schedule"
         options={{
-          title: "Schedule",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="calendar" color={color} />
+          title: "Calendar",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "calendar" : "calendar-outline"} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="family"
+        name="clearfund"
         options={{
-          title: "Family",
-          tabBarIcon: ({ color }) => <TabBarIcon name="people" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: "Settings",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="settings" color={color} />
+          title: "Clearfund",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "wallet" : "wallet-outline"} color={color} />
           ),
         }}
       />
+      <Tabs.Screen
+        name="files"
+        options={{
+          title: "Files",
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? "folder" : "folder-outline"} color={color} />
+          ),
+        }}
+      />
+      {/* Hidden tabs */}
+      <Tabs.Screen name="family" options={{ href: null }} />
+      <Tabs.Screen name="settings" options={{ href: null }} />
     </Tabs>
   );
 }

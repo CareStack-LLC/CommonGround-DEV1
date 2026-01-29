@@ -94,31 +94,9 @@ export default function ExpenseDetailScreen() {
     fetchData();
   };
 
-  const handleFundMyShare = async () => {
+  const handleFundMyShare = () => {
     if (!obligation) return;
-
-    Alert.alert(
-      "Fund Your Share",
-      `Contribute ${formatCurrency(obligation.parent_b_share - obligation.parent_b_funded)} to this expense?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Fund Now",
-          onPress: async () => {
-            try {
-              await parent.clearfund.recordFunding({
-                obligation_id: obligation.id,
-                amount: obligation.parent_b_share - obligation.parent_b_funded,
-                payment_method: "card",
-              });
-              fetchData();
-            } catch (error) {
-              Alert.alert("Error", "Failed to record funding");
-            }
-          },
-        },
-      ]
-    );
+    router.push(`/expenses/${obligationId}/fund`);
   };
 
   const handleUploadReceipt = () => {

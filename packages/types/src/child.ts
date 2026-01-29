@@ -2,12 +2,24 @@
  * Child-related types for CommonGround
  */
 
+export interface ChildKidscomSettings {
+  kidscom_enabled: boolean;
+  kidscom_chat_enabled: boolean;
+  kidscom_video_enabled: boolean;
+  kidscom_arcade_enabled: boolean;
+  kidscom_library_enabled: boolean;
+  kidscom_theater_enabled: boolean;
+  allowed_contacts: string[];
+  screen_time_limit_minutes?: number;
+}
+
 export interface Child {
   id: string;
   first_name: string;
   last_name: string;
   date_of_birth: string;
   gender: string;
+  settings?: ChildKidscomSettings;
 }
 
 export interface CreateChildRequest {
@@ -40,6 +52,9 @@ export interface ChildProfileBasic {
 }
 
 export interface ChildProfile extends ChildProfileBasic {
+  // Kidscom settings
+  settings?: ChildKidscomSettings;
+
   // Medical info
   blood_type?: string;
   allergies?: string[];

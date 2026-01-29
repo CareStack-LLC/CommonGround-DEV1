@@ -67,12 +67,6 @@
         {
           "microphonePermission": "Kidscom needs your microphone for calls"
         }
-      ],
-      [
-        "@daily-co/react-native-daily-js",
-        {
-          "enableScreenShare": false
-        }
       ]
     ],
     "experiments": {

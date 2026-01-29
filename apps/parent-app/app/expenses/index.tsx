@@ -23,20 +23,26 @@ import type {
   ObligationPurpose,
 } from "@commonground/api-client/src/api/parent/clearfund";
 import { useAuth } from "@/providers/AuthProvider";
+import { useFamilyFile } from "@/hooks/useFamilyFile";
 
 type FilterType = "all" | "pending" | "funded" | "completed";
 
 export default function ExpensesScreen() {
   const { user } = useAuth();
+  const { familyFile } = useFamilyFile();
   const [obligations, setObligations] = useState<Obligation[]>([]);
   const [balance, setBalance] = useState<BalanceSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<FilterType>("all");
 
-  const familyFileId = user?.family_file_id || "demo-family";
+  const familyFileId = familyFile?.id || null;
 
   const fetchData = useCallback(async () => {
+    if (!familyFileId) {
+      setIsLoading(false);
+      return;
+    }
     try {
       const [obligationsData, balanceData] = await Promise.all([
         parent.clearfund.getObligations(familyFileId),
@@ -248,9 +254,12 @@ export default function ExpensesScreen() {
                     : "All settled up!"}
                 </Text>
               </View>
-              <View className="bg-white/20 rounded-2xl p-4">
+              <TouchableOpacity
+                className="bg-white/20 rounded-2xl p-4"
+                onPress={() => router.push("/wallet")}
+              >
                 <Ionicons name="wallet" size={32} color="white" />
-              </View>
+              </TouchableOpacity>
             </View>
 
             <View className="flex-row mt-4 pt-4 border-t border-white/20">

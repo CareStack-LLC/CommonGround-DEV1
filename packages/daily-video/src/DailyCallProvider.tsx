@@ -18,7 +18,7 @@ import Daily, {
   DailyEventObjectParticipant,
   DailyEventObjectParticipantLeft,
   DailyParticipant,
-} from '@daily-co/daily-react-native';
+} from '@daily-co/react-native-daily-js';
 
 import {
   CallState,

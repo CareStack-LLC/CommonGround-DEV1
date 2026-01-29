@@ -19,7 +19,7 @@ export default function CircleScreen() {
   return (
     <LinearGradient
       colors={["#ec4899", "#f472b6", "#f9a8d4"]}
-      className="flex-1"
+      style={{ flex: 1 }}
     >
       <SafeAreaView className="flex-1" edges={["top"]}>
         <ScrollView

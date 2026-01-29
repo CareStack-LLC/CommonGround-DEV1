@@ -15,6 +15,10 @@ import { useChildAuth } from "@/providers/ChildAuthProvider";
 
 const PIN_LENGTH = 4;
 
+// Demo account - Jayden Brown's KidsCom login
+const DEMO_FAMILY_FILE_ID = "d491d4f6-da26-4b27-a12f-b8c52e9fbdab";
+const DEMO_USERNAME = "SuperJayden";
+
 export default function PinLoginScreen() {
   const { loginWithPin, isLoading, error } = useChildAuth();
   const [pin, setPin] = useState<string[]>([]);
@@ -45,7 +49,7 @@ export default function PinLoginScreen() {
 
     // Auto-submit when PIN is complete
     if (newPin.length === PIN_LENGTH) {
-      const success = await loginWithPin(newPin.join(""));
+      const success = await loginWithPin(DEMO_FAMILY_FILE_ID, DEMO_USERNAME, newPin.join(""));
       if (success) {
         router.replace("/(main)");
       }

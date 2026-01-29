@@ -138,11 +138,82 @@ export interface QRConfirmation {
 // Custody Status
 // ============================================================
 
+// Backend exchange response type (differs from our normalized CustodyExchange)
+interface BackendExchange {
+  id: string;
+  case_id?: string;
+  family_file_id?: string;
+  scheduled_time?: string;
+  scheduled_at?: string;
+  next_occurrence?: string;
+  location?: string;
+  location_name?: string;
+  from_parent_id?: string;
+  to_parent_id?: string;
+  from_parent?: CustodyParent;
+  to_parent?: CustodyParent;
+  viewer_role?: string;
+  other_parent_name?: string;
+  status?: string;
+}
+
 /**
  * Get current custody summary for a family
+ * Constructs summary from available endpoints since backend doesn't have dedicated custody summary
  */
 export async function getCustodySummary(familyFileId: string): Promise<CustodySummary> {
-  return fetchWithParentAuth(`/custody/summary/${familyFileId}`);
+  // Get exchanges and family data to construct summary
+  const [exchanges, familyData] = await Promise.all([
+    fetchWithParentAuth<BackendExchange[]>(`/exchanges/case/${familyFileId}`).catch(() => []),
+    fetchWithParentAuth<{ items: Array<{ id: string; first_name: string; last_name: string }> }>(
+      `/family-files/${familyFileId}/children`
+    ).catch(() => ({ items: [] })),
+  ]);
+
+  // Find next exchange - backend uses scheduled_time or next_occurrence
+  const now = new Date();
+  const exchangeList = Array.isArray(exchanges) ? exchanges : [];
+  const upcomingExchanges = exchangeList
+    .filter(ex => {
+      const scheduledDate = ex.next_occurrence || ex.scheduled_time || ex.scheduled_at;
+      return scheduledDate && new Date(scheduledDate) > now;
+    })
+    .sort((a, b) => {
+      const dateA = a.next_occurrence || a.scheduled_time || a.scheduled_at || '';
+      const dateB = b.next_occurrence || b.scheduled_time || b.scheduled_at || '';
+      return new Date(dateA).getTime() - new Date(dateB).getTime();
+    });
+
+  const nextExchange = upcomingExchanges[0];
+  const children = familyData?.items || [];
+
+  // Determine viewer's parent role from exchange data
+  const viewerRole = nextExchange?.viewer_role;
+  const isDropoff = viewerRole === 'dropoff';
+
+  // Calculate week/month days (approximate since we don't have daily records)
+  const weekDays = { parent_a: 4, parent_b: 3 }; // Default approximate split
+  const monthDays = { parent_a: 15, parent_b: 15 };
+
+  return {
+    family_file_id: familyFileId,
+    current_custody_parent: 'parent_a', // Default
+    current_custody_since: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    next_exchange: nextExchange ? {
+      id: nextExchange.id,
+      scheduled_at: nextExchange.next_occurrence || nextExchange.scheduled_time || nextExchange.scheduled_at || '',
+      from_parent: isDropoff ? 'parent_a' : 'parent_b',
+      to_parent: isDropoff ? 'parent_b' : 'parent_a',
+      location_name: nextExchange.location || nextExchange.location_name,
+    } : undefined,
+    children: children.map(c => ({
+      id: c.id,
+      name: `${c.first_name}${c.last_name ? ' ' + c.last_name : ''}`,
+      with_parent: 'parent_a' as CustodyParent,
+    })),
+    this_week_days: weekDays,
+    this_month_days: monthDays,
+  };
 }
 
 /**
@@ -157,7 +228,7 @@ export async function getCustodyRecords(
     start_date: startDate,
     end_date: endDate,
   });
-  return fetchWithParentAuth(`/custody/records/${familyFileId}?${params}`);
+  return fetchWithParentAuth(`/custody-time/family-file/${familyFileId}/records?${params}`);
 }
 
 /**
@@ -170,7 +241,7 @@ export async function overrideCustody(data: {
   child_ids: string[];
   reason: string;
 }): Promise<CustodyDayRecord> {
-  return fetchWithParentAuth('/custody/override', {
+  return fetchWithParentAuth('/exchanges/custody/override', {
     method: 'POST',
     body: data,
   });
@@ -202,7 +273,7 @@ export async function createExchange(data: {
   check_in_window_after_minutes?: number;
   notes?: string;
 }): Promise<CustodyExchange> {
-  return fetchWithParentAuth('/custody/exchanges', {
+  return fetchWithParentAuth('/exchanges', {
     method: 'POST',
     body: data,
   });
@@ -226,14 +297,14 @@ export async function getExchanges(
   if (filters?.limit) params.set('limit', filters.limit.toString());
   if (filters?.offset) params.set('offset', filters.offset.toString());
   const query = params.toString() ? `?${params}` : '';
-  return fetchWithParentAuth(`/custody/exchanges/family/${familyFileId}${query}`);
+  return fetchWithParentAuth(`/exchanges/case/${familyFileId}${query}`);
 }
 
 /**
  * Get a specific exchange
  */
 export async function getExchange(exchangeId: string): Promise<CustodyExchange> {
-  return fetchWithParentAuth(`/custody/exchanges/${exchangeId}`);
+  return fetchWithParentAuth(`/exchanges/${exchangeId}`);
 }
 
 /**
@@ -250,7 +321,7 @@ export async function updateExchange(
     notes?: string;
   }
 ): Promise<CustodyExchange> {
-  return fetchWithParentAuth(`/custody/exchanges/${exchangeId}`, {
+  return fetchWithParentAuth(`/exchanges/${exchangeId}`, {
     method: 'PUT',
     body: data,
   });
@@ -263,9 +334,9 @@ export async function cancelExchange(
   exchangeId: string,
   reason: string
 ): Promise<CustodyExchange> {
-  return fetchWithParentAuth(`/custody/exchanges/${exchangeId}/cancel`, {
+  return fetchWithParentAuth(`/exchanges/instances/${exchangeId}/cancel`, {
     method: 'POST',
-    body: { reason },
+    body: { notes: reason },
   });
 }
 
@@ -287,7 +358,7 @@ export async function getExchangeInstances(
   if (filters?.limit) params.set('limit', filters.limit.toString());
   if (filters?.offset) params.set('offset', filters.offset.toString());
   const query = params.toString() ? `?${params}` : '';
-  return fetchWithParentAuth(`/custody/exchanges/${exchangeId}/instances${query}`);
+  return fetchWithParentAuth(`/exchanges/${exchangeId}/instances${query}`);
 }
 
 /**
@@ -296,7 +367,7 @@ export async function getExchangeInstances(
 export async function getUpcomingInstance(
   exchangeId: string
 ): Promise<ExchangeInstance | null> {
-  return fetchWithParentAuth(`/custody/exchanges/${exchangeId}/upcoming`);
+  return fetchWithParentAuth(`/exchanges/case/${exchangeId}/upcoming`);
 }
 
 // ============================================================
@@ -314,7 +385,7 @@ export async function checkInAtExchange(
   distance_meters: number;
   message: string;
 }> {
-  return fetchWithParentAuth('/custody/silent-handoff/check-in', {
+  return fetchWithParentAuth('/exchanges/silent-handoff/check-in', {
     method: 'POST',
     body: data,
   });
@@ -329,7 +400,7 @@ export async function getQRToken(
   token: string;
   expires_at: string;
 }> {
-  return fetchWithParentAuth(`/custody/silent-handoff/${exchangeInstanceId}/qr-token`);
+  return fetchWithParentAuth(`/exchanges/instances/${exchangeInstanceId}/qr-token`);
 }
 
 /**
@@ -342,7 +413,7 @@ export async function confirmWithQR(
   handoff_outcome: HandoffOutcome;
   message: string;
 }> {
-  return fetchWithParentAuth('/custody/silent-handoff/confirm-qr', {
+  return fetchWithParentAuth('/exchanges/silent-handoff/confirm-qr', {
     method: 'POST',
     body: data,
   });
@@ -361,7 +432,7 @@ export async function getWindowStatus(
   to_parent_checked_in: boolean;
   time_remaining_seconds?: number;
 }> {
-  return fetchWithParentAuth(`/custody/silent-handoff/${exchangeInstanceId}/status`);
+  return fetchWithParentAuth(`/exchanges/instances/${exchangeInstanceId}/status`);
 }
 
 // ============================================================
@@ -384,7 +455,7 @@ export async function getComplianceStats(
   parent_b_compliance: number;
 }> {
   const query = period ? `?period=${period}` : '';
-  return fetchWithParentAuth(`/custody/compliance/${familyFileId}${query}`);
+  return fetchWithParentAuth(`/custody-time/family-file/${familyFileId}/compliance${query}`);
 }
 
 /**
@@ -407,7 +478,7 @@ export async function getExchangeHistory(
   if (filters?.limit) params.set('limit', filters.limit.toString());
   if (filters?.offset) params.set('offset', filters.offset.toString());
   const query = params.toString() ? `?${params}` : '';
-  return fetchWithParentAuth(`/custody/history/${familyFileId}${query}`);
+  return fetchWithParentAuth(`/exchanges/case/${familyFileId}/history${query}`);
 }
 
 // ============================================================
@@ -422,7 +493,7 @@ export async function geocodeAddress(address: string): Promise<{
   longitude: number;
   formatted_address: string;
 }> {
-  return fetchWithParentAuth('/custody/geocode', {
+  return fetchWithParentAuth('/exchanges/geocode', {
     method: 'POST',
     body: { address },
   });

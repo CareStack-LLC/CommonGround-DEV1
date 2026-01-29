@@ -1,6 +1,6 @@
 /**
  * Time Bridge Schedule Screen
- * Parenting time tracking, custody exchanges, and Silent Drops
+ * Parenting time tracking, custody exchanges, events, and Silent Drops
  */
 
 import { useState, useCallback, useEffect } from "react";
@@ -15,14 +15,18 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import * as Location from "expo-location";
 
-import { parent } from "@commonground/api-client";
-import type {
-  CustodySummary,
-  CustodyExchange,
-} from "@commonground/api-client/src/api/parent/custody";
+import {
+  parent,
+  type ScheduleEvent,
+  type EventCategory,
+  type CustodySummary,
+  type CustodyExchange,
+} from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
+import { useFamilyFile } from "@/hooks/useFamilyFile";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
@@ -30,28 +34,75 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December"
 ];
 
+// Category colors for events
+const CATEGORY_COLORS: Record<EventCategory, string> = {
+  medical: "#EF4444",
+  school: "#3B82F6",
+  sports: "#22C55E",
+  therapy: "#EC4899",
+  extracurricular: "#8B5CF6",
+  social: "#F97316",
+  travel: "#06B6D4",
+  exchange: "#D4A574",
+  other: "#6B7280",
+};
+
+const CATEGORY_ICONS: Record<EventCategory, string> = {
+  medical: "medkit",
+  school: "school",
+  sports: "football",
+  therapy: "heart",
+  extracurricular: "musical-notes",
+  social: "people",
+  travel: "airplane",
+  exchange: "swap-horizontal",
+  other: "calendar",
+};
+
 export default function ScheduleScreen() {
   const { user } = useAuth();
+  const { familyFile } = useFamilyFile();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [custodySummary, setCustodySummary] = useState<CustodySummary | null>(null);
   const [exchanges, setExchanges] = useState<CustodyExchange[]>([]);
+  const [events, setEvents] = useState<ScheduleEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [checkingIn, setCheckingIn] = useState(false);
 
-  const familyFileId = user?.family_file_id || "demo-family";
+  const familyFileId = familyFile?.id || null;
+
+  // Web design system colors - matching custody color coding
+  const SAGE = "#4A6C58"; // Mom's custody / Your time
+  const SLATE = "#475569"; // Dad's custody / Co-parent time
+  const AMBER = "#D4A574"; // Attention/exchanges
 
   const fetchData = useCallback(async () => {
+    if (!familyFileId) {
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const [summaryData, exchangesData] = await Promise.all([
+      // Get date range for current month
+      const startDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+      const endDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+
+      const [summaryData, exchangesData, eventsData] = await Promise.all([
         parent.custody.getCustodySummary(familyFileId),
-        parent.custody.getExchanges(familyFileId, { upcoming_only: true, limit: 5 }),
+        parent.custody.getExchanges(familyFileId, { upcoming_only: true, limit: 10 }),
+        parent.events.listEvents(familyFileId, {
+          start_date: startDate.toISOString(),
+          end_date: endDate.toISOString(),
+        }),
       ]);
       setCustodySummary(summaryData);
-      setExchanges(exchangesData.items);
+      // Backend returns array directly, not {items: [...]}
+      setExchanges(Array.isArray(exchangesData) ? exchangesData : exchangesData?.items || []);
+      setEvents(Array.isArray(eventsData) ? eventsData : eventsData?.items || []);
     } catch (error) {
-      console.error("Failed to fetch custody data:", error);
+      console.error("Failed to fetch schedule data:", error);
       // Demo data
       setCustodySummary({
         family_file_id: familyFileId,
@@ -96,11 +147,69 @@ export default function ScheduleScreen() {
           children_names: ["Emma", "Lucas"],
         },
       ]);
+      // Demo events
+      setEvents([
+        {
+          id: "evt-1",
+          family_file_id: familyFileId,
+          creator_id: user?.id || "demo",
+          title: "Emma's Soccer Practice",
+          start_time: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+          end_time: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000 + 90 * 60 * 1000).toISOString(),
+          all_day: false,
+          location: "Community Field",
+          location_shared: true,
+          visibility: "co_parent",
+          event_category: "sports",
+          child_ids: ["child-1"],
+          children_names: ["Emma"],
+          status: "scheduled",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          my_rsvp_status: "going",
+        },
+        {
+          id: "evt-2",
+          family_file_id: familyFileId,
+          creator_id: user?.id || "demo",
+          title: "Lucas Doctor Appointment",
+          start_time: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+          all_day: false,
+          location: "Pediatric Clinic",
+          location_shared: true,
+          visibility: "co_parent",
+          event_category: "medical",
+          child_ids: ["child-2"],
+          children_names: ["Lucas"],
+          status: "scheduled",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          my_rsvp_status: "no_response",
+        },
+        {
+          id: "evt-3",
+          family_file_id: familyFileId,
+          creator_id: user?.id || "demo",
+          title: "Parent-Teacher Conference",
+          start_time: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+          all_day: false,
+          location: "Elementary School",
+          location_shared: true,
+          visibility: "co_parent",
+          event_category: "school",
+          child_ids: ["child-1", "child-2"],
+          children_names: ["Emma", "Lucas"],
+          status: "scheduled",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          my_rsvp_status: "maybe",
+        },
+      ]);
     } finally {
       setIsLoading(false);
       setRefreshing(false);
     }
-  }, [familyFileId]);
+  }, [familyFileId, currentMonth]);
 
   useEffect(() => {
     fetchData();
@@ -154,32 +263,59 @@ export default function ScheduleScreen() {
     );
   };
 
-  const hasExchange = (day: number | null) => {
-    if (!day) return false;
+  const getDateItems = (day: number | null): { hasExchange: boolean; eventCount: number; eventColor?: string } => {
+    if (!day) return { hasExchange: false, eventCount: 0 };
+
     const date = new Date(currentMonth);
     date.setDate(day);
-    return exchanges.some((ex) => {
+    const dateStr = date.toDateString();
+
+    const hasExchange = exchanges.some((ex) => {
       const exDate = new Date(ex.scheduled_at);
-      return exDate.toDateString() === date.toDateString();
+      return exDate.toDateString() === dateStr;
     });
+
+    const dayEvents = events.filter((evt) => {
+      const evtDate = new Date(evt.start_time);
+      return evtDate.toDateString() === dateStr;
+    });
+
+    return {
+      hasExchange,
+      eventCount: dayEvents.length,
+      eventColor: dayEvents[0]?.event_category ? CATEGORY_COLORS[dayEvents[0].event_category] : undefined,
+    };
+  };
+
+  const getSelectedDateItems = () => {
+    const dateStr = selectedDate.toDateString();
+
+    const dayExchanges = exchanges.filter((ex) => {
+      const exDate = new Date(ex.scheduled_at);
+      return exDate.toDateString() === dateStr;
+    });
+
+    const dayEvents = events.filter((evt) => {
+      const evtDate = new Date(evt.start_time);
+      return evtDate.toDateString() === dateStr;
+    });
+
+    return { exchanges: dayExchanges, events: dayEvents };
   };
 
   const handleSilentDropCheckIn = async (exchange: CustodyExchange) => {
     setCheckingIn(true);
     try {
-      // Request location permission
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Permission Denied", "Location permission is required for check-in");
         return;
       }
 
-      // Get current location
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
 
-      // Check in
       const result = await parent.custody.checkInAtExchange({
         exchange_instance_id: exchange.id,
         latitude: location.coords.latitude,
@@ -207,11 +343,7 @@ export default function ScheduleScreen() {
   };
 
   const days = getDaysInMonth(currentMonth);
-
-  // Web design system colors - matching custody color coding
-  const SAGE = "#4A6C58"; // Mom's custody / Your time
-  const SLATE = "#475569"; // Dad's custody / Co-parent time
-  const AMBER = "#D4A574"; // Attention/exchanges
+  const selectedItems = getSelectedDateItems();
 
   if (isLoading) {
     return (
@@ -230,7 +362,7 @@ export default function ScheduleScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={SAGE} />
         }
       >
-        {/* Custody Status Banner - Sage Green (Your Time) or Slate (Their Time) */}
+        {/* Custody Status Banner */}
         {custodySummary && (
           <View
             className="mx-4 mt-4 rounded-3xl p-5 shadow-card"
@@ -265,7 +397,7 @@ export default function ScheduleScreen() {
               </View>
             </View>
 
-            {/* Time Stats - Custody Legend */}
+            {/* Time Stats */}
             <View className="flex-row mt-4 pt-4 border-t border-white/20">
               <View className="flex-1">
                 <View className="flex-row items-center mb-1">
@@ -289,7 +421,71 @@ export default function ScheduleScreen() {
           </View>
         )}
 
-        {/* Next Exchange Card - Amber accent */}
+        {/* Quick Actions */}
+        <View className="flex-row mx-4 mt-4 space-x-2">
+          <TouchableOpacity
+            className="flex-1 rounded-xl p-3 items-center"
+            style={{ backgroundColor: "white" }}
+            onPress={() => router.push("/custody/override")}
+          >
+            <View
+              className="w-10 h-10 rounded-full items-center justify-center mb-2"
+              style={{ backgroundColor: `${SAGE}15` }}
+            >
+              <Ionicons name="hand-left" size={20} color={SAGE} />
+            </View>
+            <Text className="text-xs font-medium" style={{ color: SLATE }}>
+              Children{"\n"}With Me
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-1 rounded-xl p-3 items-center"
+            style={{ backgroundColor: "white" }}
+            onPress={() => router.push("/events/create")}
+          >
+            <View
+              className="w-10 h-10 rounded-full items-center justify-center mb-2"
+              style={{ backgroundColor: `${SAGE}15` }}
+            >
+              <Ionicons name="calendar" size={20} color={SAGE} />
+            </View>
+            <Text className="text-xs font-medium text-center" style={{ color: SLATE }}>
+              New{"\n"}Event
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-1 rounded-xl p-3 items-center"
+            style={{ backgroundColor: "white" }}
+            onPress={() => router.push("/schedule/collections")}
+          >
+            <View
+              className="w-10 h-10 rounded-full items-center justify-center mb-2"
+              style={{ backgroundColor: `${SAGE}15` }}
+            >
+              <Ionicons name="time" size={20} color={SAGE} />
+            </View>
+            <Text className="text-xs font-medium text-center" style={{ color: SLATE }}>
+              My Time{"\n"}Blocks
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="flex-1 rounded-xl p-3 items-center"
+            style={{ backgroundColor: "white" }}
+            onPress={() => router.push("/exchange/create")}
+          >
+            <View
+              className="w-10 h-10 rounded-full items-center justify-center mb-2"
+              style={{ backgroundColor: `${AMBER}20` }}
+            >
+              <Ionicons name="swap-horizontal" size={20} color={AMBER} />
+            </View>
+            <Text className="text-xs font-medium text-center" style={{ color: SLATE }}>
+              New{"\n"}Exchange
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Next Exchange Card */}
         {custodySummary?.next_exchange && (
           <View
             className="mx-4 mt-4 rounded-2xl p-4 border"
@@ -353,88 +549,124 @@ export default function ScheduleScreen() {
           ))}
         </View>
 
-        {/* Calendar Grid - Matching Web with Sage/Slate custody colors */}
+        {/* Calendar Grid */}
         <View className="flex-row flex-wrap px-2 bg-cream dark:bg-slate-800 mx-4 rounded-2xl py-2">
-          {days.map((day, index) => (
-            <TouchableOpacity
-              key={index}
-              className="w-[14.28%] aspect-square items-center justify-center p-1"
-              onPress={() => {
-                if (day) {
-                  const newDate = new Date(currentMonth);
-                  newDate.setDate(day);
-                  setSelectedDate(newDate);
-                }
-              }}
-              disabled={!day}
-            >
-              {day && (
-                <View
-                  className="w-10 h-10 items-center justify-center rounded-xl"
-                  style={{
-                    backgroundColor: isSelected(day)
-                      ? SAGE
-                      : isToday(day)
-                      ? "#E8F0EC"
-                      : "transparent",
-                  }}
-                >
-                  <Text
-                    className="text-sm font-medium"
+          {days.map((day, index) => {
+            const dateInfo = getDateItems(day);
+            return (
+              <TouchableOpacity
+                key={index}
+                className="w-[14.28%] aspect-square items-center justify-center p-1"
+                onPress={() => {
+                  if (day) {
+                    const newDate = new Date(currentMonth);
+                    newDate.setDate(day);
+                    setSelectedDate(newDate);
+                  }
+                }}
+                disabled={!day}
+              >
+                {day && (
+                  <View
+                    className="w-10 h-10 items-center justify-center rounded-xl"
                     style={{
-                      color: isSelected(day)
-                        ? "white"
-                        : isToday(day)
+                      backgroundColor: isSelected(day)
                         ? SAGE
-                        : "#1e293b",
+                        : isToday(day)
+                        ? "#E8F0EC"
+                        : "transparent",
                     }}
                   >
-                    {day}
-                  </Text>
-                  {hasExchange(day) && (
-                    <View
-                      className="absolute bottom-0.5 w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: AMBER }}
-                    />
-                  )}
-                </View>
-              )}
-            </TouchableOpacity>
-          ))}
+                    <Text
+                      className="text-sm font-medium"
+                      style={{
+                        color: isSelected(day)
+                          ? "white"
+                          : isToday(day)
+                          ? SAGE
+                          : "#1e293b",
+                      }}
+                    >
+                      {day}
+                    </Text>
+                    {/* Dots for exchanges and events */}
+                    <View className="absolute bottom-0.5 flex-row space-x-0.5">
+                      {dateInfo.hasExchange && (
+                        <View
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ backgroundColor: AMBER }}
+                        />
+                      )}
+                      {dateInfo.eventCount > 0 && (
+                        <View
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ backgroundColor: dateInfo.eventColor || SAGE }}
+                        />
+                      )}
+                    </View>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        {/* Custody Legend */}
-        <View className="flex-row items-center justify-center mt-4 gap-6">
-          <View className="flex-row items-center">
-            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: SAGE }} />
-            <Text className="text-slate-600 text-sm">Your Time</Text>
-          </View>
-          <View className="flex-row items-center">
-            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: SLATE }} />
-            <Text className="text-slate-600 text-sm">Their Time</Text>
-          </View>
+        {/* Calendar Legend */}
+        <View className="flex-row items-center justify-center mt-4 gap-4 flex-wrap px-4">
           <View className="flex-row items-center">
             <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: AMBER }} />
             <Text className="text-slate-600 text-sm">Exchange</Text>
           </View>
+          <View className="flex-row items-center">
+            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: "#22C55E" }} />
+            <Text className="text-slate-600 text-sm">Sports</Text>
+          </View>
+          <View className="flex-row items-center">
+            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: "#EF4444" }} />
+            <Text className="text-slate-600 text-sm">Medical</Text>
+          </View>
+          <View className="flex-row items-center">
+            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: "#3B82F6" }} />
+            <Text className="text-slate-600 text-sm">School</Text>
+          </View>
         </View>
 
-        {/* Upcoming Exchanges */}
+        {/* Selected Date Events */}
         <View className="mt-6 px-4">
           <Text className="text-lg font-semibold text-slate-800 dark:text-white mb-3">
-            Upcoming Exchanges
+            {selectedDate.toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
           </Text>
 
-          {exchanges.length === 0 ? (
+          {selectedItems.exchanges.length === 0 && selectedItems.events.length === 0 ? (
             <View className="bg-cream dark:bg-slate-800 rounded-2xl items-center py-8 shadow-card">
-              <Ionicons name="swap-horizontal-outline" size={48} color="#94a3b8" />
+              <Ionicons name="calendar-outline" size={48} color="#94a3b8" />
               <Text className="text-slate-500 dark:text-slate-400 mt-3">
-                No upcoming exchanges
+                Nothing scheduled for this day
               </Text>
+              <TouchableOpacity
+                className="mt-4 px-4 py-2 rounded-xl flex-row items-center"
+                style={{ backgroundColor: `${SAGE}15` }}
+                onPress={() => router.push("/events/create")}
+              >
+                <Ionicons name="add" size={18} color={SAGE} />
+                <Text className="ml-2 font-medium" style={{ color: SAGE }}>
+                  Add Event
+                </Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <View className="space-y-3">
-              {exchanges.map((exchange) => (
+              {/* Events for selected date */}
+              {selectedItems.events.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+
+              {/* Exchanges for selected date */}
+              {selectedItems.exchanges.map((exchange) => (
                 <ExchangeCard
                   key={exchange.id}
                   exchange={exchange}
@@ -447,17 +679,125 @@ export default function ScheduleScreen() {
             </View>
           )}
         </View>
+
+        {/* Upcoming Events Section */}
+        {events.length > 0 && (
+          <View className="mt-6 px-4">
+            <View className="flex-row items-center justify-between mb-3">
+              <Text className="text-lg font-semibold text-slate-800 dark:text-white">
+                Upcoming Events
+              </Text>
+              <TouchableOpacity onPress={() => router.push("/events/create")}>
+                <Text style={{ color: SAGE }} className="font-medium">
+                  + Add
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View className="space-y-3">
+              {events.slice(0, 3).map((event) => (
+                <EventCard key={event.id} event={event} compact />
+              ))}
+            </View>
+          </View>
+        )}
       </ScrollView>
 
-      {/* Add Event Button - Sage Green */}
+      {/* Add Event FAB */}
       <TouchableOpacity
         className="absolute bottom-6 right-6 w-14 h-14 rounded-full items-center justify-center shadow-elevated"
         style={{ backgroundColor: SAGE }}
-        onPress={() => router.push("/exchange/create")}
+        onPress={() => router.push("/events/create")}
       >
         <Ionicons name="add" size={28} color="white" />
       </TouchableOpacity>
     </SafeAreaView>
+  );
+}
+
+function EventCard({ event, compact = false }: { event: ScheduleEvent; compact?: boolean }) {
+  const categoryColor = event.event_category ? CATEGORY_COLORS[event.event_category] : "#6B7280";
+  const categoryIcon = event.event_category ? CATEGORY_ICONS[event.event_category] : "calendar";
+
+  return (
+    <TouchableOpacity
+      className="bg-cream dark:bg-slate-800 rounded-2xl p-4 shadow-card"
+      onPress={() => router.push(`/events/${event.id}`)}
+    >
+      <View className="flex-row items-start">
+        <View
+          className="w-12 h-12 rounded-2xl items-center justify-center"
+          style={{ backgroundColor: `${categoryColor}15` }}
+        >
+          <Ionicons name={categoryIcon as any} size={24} color={categoryColor} />
+        </View>
+
+        <View className="flex-1 ml-3">
+          <Text className="text-slate-800 dark:text-white font-semibold">
+            {event.title}
+          </Text>
+          {!compact && event.children_names && event.children_names.length > 0 && (
+            <Text className="text-slate-500 text-sm">
+              {event.children_names.join(", ")}
+            </Text>
+          )}
+          <View className="flex-row items-center mt-2">
+            <Ionicons name="time" size={14} color="#64748b" />
+            <Text className="text-slate-500 text-sm ml-1">
+              {event.all_day
+                ? "All day"
+                : new Date(event.start_time).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
+            </Text>
+          </View>
+          {!compact && event.location && (
+            <View className="flex-row items-center mt-1">
+              <Ionicons name="location" size={14} color={categoryColor} />
+              <Text className="text-slate-500 text-sm ml-1">{event.location}</Text>
+            </View>
+          )}
+
+          {/* RSVP Status Badge */}
+          {event.my_rsvp_status && event.my_rsvp_status !== "no_response" && (
+            <View className="flex-row items-center mt-2">
+              <View
+                className="px-2.5 py-1 rounded-full"
+                style={{
+                  backgroundColor:
+                    event.my_rsvp_status === "going"
+                      ? "#DCFCE7"
+                      : event.my_rsvp_status === "not_going"
+                      ? "#FEE2E2"
+                      : "#FEF3C7",
+                }}
+              >
+                <Text
+                  className="text-xs font-medium"
+                  style={{
+                    color:
+                      event.my_rsvp_status === "going"
+                        ? "#166534"
+                        : event.my_rsvp_status === "not_going"
+                        ? "#991B1B"
+                        : "#92400E",
+                  }}
+                >
+                  {event.my_rsvp_status === "going"
+                    ? "Going"
+                    : event.my_rsvp_status === "not_going"
+                    ? "Can't Go"
+                    : "Maybe"}
+                </Text>
+              </View>
+            </View>
+          )}
+        </View>
+
+        <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
+      </View>
+    </TouchableOpacity>
   );
 }
 
@@ -502,12 +842,9 @@ function ExchangeCard({
             {exchange.to_parent === "parent_a" ? "You" : "Co-parent"}
           </Text>
           <View className="flex-row items-center mt-2">
-            <Ionicons name="calendar" size={14} color="#64748b" />
+            <Ionicons name="time" size={14} color="#64748b" />
             <Text className="text-slate-500 text-sm ml-1">
-              {new Date(exchange.scheduled_at).toLocaleDateString("en-US", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
+              {new Date(exchange.scheduled_at).toLocaleTimeString("en-US", {
                 hour: "numeric",
                 minute: "2-digit",
               })}
@@ -522,7 +859,6 @@ function ExchangeCard({
             </View>
           )}
 
-          {/* Children */}
           {exchange.children_names && exchange.children_names.length > 0 && (
             <View className="flex-row items-center mt-2">
               <Ionicons name="people" size={14} color="#64748b" />
@@ -532,7 +868,6 @@ function ExchangeCard({
             </View>
           )}
 
-          {/* Silent Drop Badge - Using Sage instead of Purple */}
           {exchange.silent_handoff_enabled && (
             <View className="flex-row items-center mt-2">
               <View
@@ -549,23 +884,49 @@ function ExchangeCard({
         </View>
       </View>
 
-      {/* Check-in Button for Silent Drops - Sage Green */}
       {exchange.silent_handoff_enabled && isWithinWindow && (
-        <TouchableOpacity
-          className="mt-4 py-3.5 rounded-xl flex-row items-center justify-center"
-          style={{ backgroundColor: sageColor }}
-          onPress={onCheckIn}
-          disabled={checkingIn}
-        >
-          {checkingIn ? (
-            <ActivityIndicator color="white" size="small" />
-          ) : (
-            <>
-              <Ionicons name="navigate" size={18} color="white" />
-              <Text className="text-white font-semibold ml-2">Check In at Location</Text>
-            </>
+        <View className="mt-4 space-y-2">
+          <TouchableOpacity
+            className="py-3.5 rounded-xl flex-row items-center justify-center"
+            style={{ backgroundColor: sageColor }}
+            onPress={onCheckIn}
+            disabled={checkingIn}
+          >
+            {checkingIn ? (
+              <ActivityIndicator color="white" size="small" />
+            ) : (
+              <>
+                <Ionicons name="navigate" size={18} color="white" />
+                <Text className="text-white font-semibold ml-2">Check In at Location</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          {exchange.qr_confirmation_required && (
+            <View className="flex-row space-x-2">
+              <TouchableOpacity
+                className="flex-1 py-3 rounded-xl flex-row items-center justify-center border-2"
+                style={{ borderColor: sageColor }}
+                onPress={() => router.push(`/exchange/qr-show?instanceId=${exchange.id}`)}
+              >
+                <Ionicons name="qr-code" size={18} color={sageColor} />
+                <Text className="font-medium ml-2" style={{ color: sageColor }}>
+                  Show QR
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-1 py-3 rounded-xl flex-row items-center justify-center border-2"
+                style={{ borderColor: sageColor }}
+                onPress={() => router.push(`/exchange/qr-scan?instanceId=${exchange.id}`)}
+              >
+                <Ionicons name="scan" size={18} color={sageColor} />
+                <Text className="font-medium ml-2" style={{ color: sageColor }}>
+                  Scan QR
+                </Text>
+              </TouchableOpacity>
+            </View>
           )}
-        </TouchableOpacity>
+        </View>
       )}
 
       {exchange.silent_handoff_enabled && !isWithinWindow && isUpcoming && (

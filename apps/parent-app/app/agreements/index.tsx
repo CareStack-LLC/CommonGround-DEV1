@@ -75,7 +75,7 @@ export default function AgreementsScreen() {
   const fetchFamilyFiles = async () => {
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/family-files`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/family-files`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -105,7 +105,7 @@ export default function AgreementsScreen() {
 
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/agreements/family-file/${selectedFamilyId}`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/family-files/${selectedFamilyId}/agreements`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

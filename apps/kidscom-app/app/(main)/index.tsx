@@ -18,7 +18,7 @@ export default function HomeScreen() {
   return (
     <LinearGradient
       colors={["#8b5cf6", "#a855f7", "#c084fc"]}
-      className="flex-1"
+      style={{ flex: 1 }}
     >
       <SafeAreaView className="flex-1" edges={["top"]}>
         <ScrollView
@@ -128,7 +128,7 @@ function ActivityCard({
         colors={colors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        className="p-6 flex-row items-center"
+        style={{ padding: 24, flexDirection: "row", alignItems: "center" }}
       >
         <View className="w-16 h-16 bg-white/30 rounded-2xl items-center justify-center">
           <Text className="text-4xl">{emoji}</Text>

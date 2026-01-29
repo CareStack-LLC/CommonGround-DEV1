@@ -27,5 +27,19 @@
   "packageManager": "pnpm@9.15.0",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "@react-native-async-storage/async-storage": "2"
+      },
+      "ignoreMissing": [
+        "react-helmet-async"
+      ]
+    }
+  },
+  "dependencies": {
+    "abort-controller": "^3.0.0",
+    "event-target-shim": "^6.0.2"
   }
 }

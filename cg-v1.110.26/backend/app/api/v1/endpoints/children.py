@@ -13,9 +13,14 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user, create_access_token
 from app.models.user import User
+from app.models.kidcoms import ChildUser
+from app.models.child import Child
 from app.services.child import ChildService
+from app.services.my_circle import verify_pin
+from pydantic import BaseModel
+from sqlalchemy import select
 from app.services.storage import (
     storage_service,
     StorageBucket,
@@ -597,3 +602,218 @@ async def get_child_counts(
     service = ChildService(db)
     counts = await service.get_case_child_counts(case_id, current_user)
     return counts
+
+
+# ============================================================
+# KidsCom App Authentication (PIN-only login)
+# ============================================================
+
+class ChildPinLoginRequest(BaseModel):
+    """Simple PIN login request for KidsCom app."""
+    pin: str
+
+
+class ChildPinLoginResponse(BaseModel):
+    """Response for child PIN login."""
+    access_token: str
+    token_type: str = "bearer"
+    child: dict
+
+
+@router.post(
+    "/login",
+    response_model=ChildPinLoginResponse,
+    summary="Child PIN login (KidsCom)",
+    description="Simple PIN-based login for the KidsCom app. For demo/testing purposes."
+)
+async def child_pin_login(
+    login_data: ChildPinLoginRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Authenticate a child with just a PIN.
+
+    This is a simplified login endpoint for the KidsCom mobile app.
+    It searches all active child users for a matching PIN.
+
+    Note: For production, this should require device registration or
+    be combined with a username/family identifier.
+    """
+    from datetime import datetime
+    import logging
+    logger = logging.getLogger(__name__)
+
+    # Get all active child users with their PIN hashes
+    logger.info(f"Child PIN login attempt")
+    result = await db.execute(
+        select(ChildUser)
+        .where(ChildUser.is_active == True)
+        .where(ChildUser.pin_hash.isnot(None))
+    )
+    child_users = result.scalars().all()
+    logger.info(f"Found {len(child_users)} active child users with PINs")
+
+    # Find matching PIN
+    matched_child_user = None
+    for child_user in child_users:
+        logger.info(f"Checking PIN for child user {child_user.id}, username: {child_user.username}")
+        if verify_pin(login_data.pin, child_user.pin_hash):
+            matched_child_user = child_user
+            logger.info(f"PIN matched for child user {child_user.id}")
+            break
+        else:
+            logger.info(f"PIN did not match for child user {child_user.id}")
+
+    if not matched_child_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid PIN"
+        )
+
+    # Get the child profile
+    child_result = await db.execute(
+        select(Child).where(Child.id == matched_child_user.child_id)
+    )
+    child = child_result.scalar_one_or_none()
+
+    if not child:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Child profile not found"
+        )
+
+    # Update last login
+    matched_child_user.last_login = datetime.utcnow()
+    await db.commit()
+
+    # Generate access token for child
+    token = create_access_token(
+        data={
+            "sub": str(matched_child_user.id),
+            "type": "child_user",
+            "child_id": str(matched_child_user.child_id),
+            "family_file_id": str(matched_child_user.family_file_id),
+        }
+    )
+
+    return ChildPinLoginResponse(
+        access_token=token,
+        child={
+            "id": str(child.id),
+            "first_name": child.first_name,
+            "last_name": child.last_name or "",
+            "avatar_url": child.photo_url,
+            "family_file_id": str(matched_child_user.family_file_id),
+            "username": matched_child_user.username,
+            "avatar_id": matched_child_user.avatar_id,
+        }
+    )
+
+
+# ============================================================
+# Child Circle Contacts (For KidsCom App)
+# ============================================================
+
+from app.core.security import get_current_child_user
+from app.models.circle import CircleContact
+from app.models.kidcoms import CirclePermission
+
+
+class ChildCircleContactResponse(BaseModel):
+    """Circle contact for a child to communicate with."""
+    id: str
+    name: str
+    display_name: Optional[str] = None
+    relationship: Optional[str] = None
+    avatar_url: Optional[str] = None
+    is_online: bool = False
+    family_file_id: str
+    # Permission flags
+    can_video_call: bool = True
+    can_voice_call: bool = True
+    can_chat: bool = True
+    can_theater: bool = True
+    is_within_allowed_time: bool = True
+    require_parent_present: bool = False
+
+
+class ChildCircleResponse(BaseModel):
+    """Response with child's circle contacts."""
+    contacts: List[ChildCircleContactResponse]
+
+
+@router.get(
+    "/circle",
+    response_model=ChildCircleResponse,
+    summary="Get child's circle contacts (KidsCom)",
+    description="Get the list of approved contacts a child can communicate with."
+)
+async def get_child_circle(
+    db: AsyncSession = Depends(get_db),
+    child_user: ChildUser = Depends(get_current_child_user)
+):
+    """
+    Get circle contacts for the authenticated child.
+
+    Returns all active, approved contacts from the child's family file
+    along with their permission settings.
+    """
+    from datetime import datetime
+    import logging
+    logger = logging.getLogger(__name__)
+
+    logger.info(f"Fetching circle contacts for child user {child_user.id}, family_file_id: {child_user.family_file_id}")
+
+    # Get all active circle contacts for this family file
+    result = await db.execute(
+        select(CircleContact)
+        .where(CircleContact.family_file_id == str(child_user.family_file_id))
+        .where(CircleContact.is_active == True)
+        # Only get contacts approved by at least one parent
+        .where(
+            (CircleContact.approved_by_parent_a_at.isnot(None)) |
+            (CircleContact.approved_by_parent_b_at.isnot(None))
+        )
+    )
+    contacts = result.scalars().all()
+    logger.info(f"Found {len(contacts)} circle contacts")
+
+    # Get permissions for this child
+    permissions_result = await db.execute(
+        select(CirclePermission)
+        .where(CirclePermission.family_file_id == str(child_user.family_file_id))
+        .where(CirclePermission.child_id == str(child_user.child_id))
+    )
+    permissions = {str(p.circle_contact_id): p for p in permissions_result.scalars().all()}
+
+    # Build response
+    contact_responses = []
+    for contact in contacts:
+        # Check if there are specific permissions for this contact+child
+        permission = permissions.get(str(contact.id))
+
+        # Determine if within allowed time
+        is_within_time = True
+        if permission and hasattr(permission, 'is_within_allowed_time'):
+            try:
+                is_within_time = permission.is_within_allowed_time()
+            except:
+                is_within_time = True
+
+        contact_responses.append(ChildCircleContactResponse(
+            id=str(contact.id),
+            name=contact.contact_name,
+            display_name=contact.contact_name,
+            relationship=contact.relationship_type,
+            avatar_url=contact.photo_url,
+            is_online=False,  # TODO: Check online status from presence system
+            family_file_id=str(contact.family_file_id),
+            can_video_call=permission.can_video_call if permission else True,
+            can_voice_call=permission.can_voice_call if permission else True,
+            can_chat=permission.can_chat if permission else True,
+            can_theater=permission.can_theater if permission else True,
+            is_within_allowed_time=is_within_time,
+            require_parent_present=permission.require_parent_present if permission else False,
+        ))
+
+    return ChildCircleResponse(contacts=contact_responses)

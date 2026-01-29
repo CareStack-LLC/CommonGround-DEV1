@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
+import { BottomNavBar } from "@/components/BottomNavBar";
 
 // CommonGround Design System Colors
 const colors = {
@@ -111,7 +112,7 @@ export default function QuickAccordDetailScreen() {
   const fetchAccord = async () => {
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/${id}`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -164,7 +165,9 @@ export default function QuickAccordDetailScreen() {
 
   // Check if current user is initiator or needs to approve
   const isInitiator = accord?.initiated_by === user?.id;
-  const isParentA = accord?.family_file?.parent_a?.id === user?.id;
+  // Determine if user is Parent A - check family_file first, then use initiator as fallback
+  const isParentA = accord?.family_file?.parent_a?.id === user?.id ||
+    (accord?.initiated_by === user?.id && !accord?.family_file);
   const needsMyApproval =
     accord?.status === "pending_approval" &&
     ((isParentA && !accord.parent_a_approved) ||
@@ -180,7 +183,7 @@ export default function QuickAccordDetailScreen() {
     setActionLoading(true);
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/${id}/submit`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/${id}/submit`,
         {
           method: "POST",
           headers: {
@@ -209,7 +212,7 @@ export default function QuickAccordDetailScreen() {
     setActionLoading(true);
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/${id}/approve`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/${id}/approve`,
         {
           method: "POST",
           headers: {
@@ -239,7 +242,7 @@ export default function QuickAccordDetailScreen() {
     setActionLoading(true);
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/${id}/approve`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/${id}/approve`,
         {
           method: "POST",
           headers: {
@@ -283,7 +286,7 @@ export default function QuickAccordDetailScreen() {
             setActionLoading(true);
             try {
               const response = await fetch(
-                `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/${id}/revoke`,
+                `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/${id}/revoke`,
                 {
                   method: "POST",
                   headers: {
@@ -316,7 +319,7 @@ export default function QuickAccordDetailScreen() {
     setActionLoading(true);
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/${id}/complete`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/${id}/complete`,
         {
           method: "POST",
           headers: {
@@ -340,6 +343,20 @@ export default function QuickAccordDetailScreen() {
     }
   };
 
+  // Menu options
+  const showMenu = () => {
+    Alert.alert(
+      "Accord Options",
+      undefined,
+      [
+        ...(canComplete ? [{ text: "Mark Complete", onPress: handleComplete }] : []),
+        ...(canRevoke ? [{ text: "Revoke Accord", onPress: handleRevoke, style: "destructive" as const }] : []),
+        { text: "Settings", onPress: () => router.push("/settings") },
+        { text: "Cancel", style: "cancel" as const },
+      ]
+    );
+  };
+
   if (loading) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
@@ -358,7 +375,35 @@ export default function QuickAccordDetailScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["top", "bottom"]}>
+      {/* Custom Header */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          paddingHorizontal: 16,
+          paddingVertical: 12,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.sand,
+          backgroundColor: "white",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          style={{ flexDirection: "row", alignItems: "center" }}
+        >
+          <Ionicons name="chevron-back" size={24} color={colors.sage} />
+          <Text style={{ color: colors.sage, fontSize: 16, marginLeft: 4 }}>Back</Text>
+        </TouchableOpacity>
+        <Text style={{ fontSize: 17, fontWeight: "600", color: colors.slate }}>
+          Quick Accord
+        </Text>
+        <TouchableOpacity onPress={showMenu} style={{ padding: 4 }}>
+          <Ionicons name="ellipsis-horizontal" size={24} color={colors.slate} />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 16 }}
@@ -405,27 +450,18 @@ export default function QuickAccordDetailScreen() {
           </Text>
         </View>
 
-        {/* AI Summary */}
-        {accord.ai_summary && (
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: `${colors.sage}10` }}>
-            <View className="flex-row items-center mb-2">
-              <Ionicons name="sparkles" size={16} color={colors.sage} />
-              <Text className="ml-2 font-medium" style={{ color: colors.sage }}>
-                Summary
-              </Text>
-            </View>
-            <Text style={{ color: colors.slate }}>{accord.ai_summary}</Text>
-          </View>
-        )}
-
-        {/* Date & Time */}
-        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
-          <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
-            Date & Time
+        {/* Details Section */}
+        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.sand }}>
+          <Text className="font-bold text-lg mb-3" style={{ color: colors.slate }}>
+            Details
           </Text>
-          <View className="flex-row items-center">
-            <Ionicons name="calendar" size={20} color={colors.sage} />
-            <Text className="ml-3" style={{ color: colors.slate }}>
+
+          {/* Date & Time */}
+          <View className="mb-4">
+            <Text className="text-sm font-medium mb-1" style={{ color: colors.slate }}>
+              Date & Time
+            </Text>
+            <Text style={{ color: colors.slate }}>
               {accord.is_single_event
                 ? accord.event_date
                   ? formatDate(accord.event_date)
@@ -435,62 +471,89 @@ export default function QuickAccordDetailScreen() {
                   : "Dates to be determined"}
             </Text>
           </View>
+
+          {/* Description */}
+          {accord.purpose_description && (
+            <View>
+              <Text className="text-sm font-medium mb-1" style={{ color: colors.slate }}>
+                Description
+              </Text>
+              <Text style={{ color: colors.slate }}>{accord.purpose_description}</Text>
+            </View>
+          )}
+
+          {/* AI Summary */}
+          {accord.ai_summary && (
+            <View className="mt-4 p-3 rounded-lg" style={{ backgroundColor: `${colors.sage}15` }}>
+              <View className="flex-row items-center mb-2">
+                <Ionicons name="sparkles" size={14} color={colors.sage} />
+                <Text className="ml-2 text-sm font-medium" style={{ color: colors.sage }}>
+                  ARIA Summary
+                </Text>
+              </View>
+              <Text className="text-sm" style={{ color: colors.slate }}>{accord.ai_summary}</Text>
+            </View>
+          )}
         </View>
 
-        {/* Location & Logistics */}
-        {(accord.location || accord.pickup_responsibility || accord.dropoff_responsibility || accord.transportation_notes) && (
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
-            <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
-              Logistics
-            </Text>
+        {/* Logistics Section */}
+        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.sand }}>
+          <Text className="font-bold text-lg mb-3" style={{ color: colors.slate }}>
+            Logistics
+          </Text>
 
-            {accord.location && (
-              <View className="flex-row items-center mb-3">
-                <Ionicons name="location" size={20} color={colors.sage} />
-                <Text className="ml-3" style={{ color: colors.slate }}>
-                  {accord.location}
-                </Text>
-              </View>
-            )}
+          {(accord.location || accord.pickup_responsibility || accord.dropoff_responsibility || accord.transportation_notes) ? (
+            <>
+              {accord.location && (
+                <View className="flex-row items-center mb-3">
+                  <Ionicons name="location" size={18} color={colors.sage} />
+                  <Text className="ml-3" style={{ color: colors.slate }}>
+                    {accord.location}
+                  </Text>
+                </View>
+              )}
 
-            {accord.pickup_responsibility && (
-              <View className="flex-row items-center mb-3">
-                <Ionicons name="arrow-up-circle" size={20} color={colors.amber} />
-                <Text className="ml-3" style={{ color: colors.slate }}>
-                  Pickup: {accord.pickup_responsibility}
-                </Text>
-              </View>
-            )}
+              {accord.pickup_responsibility && (
+                <View className="flex-row items-center mb-3">
+                  <Ionicons name="arrow-up-circle" size={18} color={colors.amber} />
+                  <Text className="ml-3" style={{ color: colors.slate }}>
+                    Pickup: {accord.pickup_responsibility}
+                  </Text>
+                </View>
+              )}
 
-            {accord.dropoff_responsibility && (
-              <View className="flex-row items-center mb-3">
-                <Ionicons name="arrow-down-circle" size={20} color={colors.amber} />
-                <Text className="ml-3" style={{ color: colors.slate }}>
-                  Dropoff: {accord.dropoff_responsibility}
-                </Text>
-              </View>
-            )}
+              {accord.dropoff_responsibility && (
+                <View className="flex-row items-center mb-3">
+                  <Ionicons name="arrow-down-circle" size={18} color={colors.amber} />
+                  <Text className="ml-3" style={{ color: colors.slate }}>
+                    Dropoff: {accord.dropoff_responsibility}
+                  </Text>
+                </View>
+              )}
 
-            {accord.transportation_notes && (
-              <View className="mt-2 p-3 rounded-lg" style={{ backgroundColor: colors.sand }}>
-                <Text className="text-sm" style={{ color: colors.slate }}>
-                  {accord.transportation_notes}
-                </Text>
-              </View>
-            )}
-          </View>
-        )}
+              {accord.transportation_notes && (
+                <View className="p-3 rounded-lg" style={{ backgroundColor: "white" }}>
+                  <Text className="text-sm" style={{ color: colors.slate }}>
+                    {accord.transportation_notes}
+                  </Text>
+                </View>
+              )}
+            </>
+          ) : (
+            <Text style={{ color: colors.slate }}>No logistics specified</Text>
+          )}
+        </View>
 
         {/* Expense Details */}
         {accord.has_shared_expense && (
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
-            <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.sand }}>
+            <Text className="font-bold text-lg mb-3" style={{ color: colors.slate }}>
               Shared Expense
             </Text>
 
             {accord.estimated_amount && (
               <View className="flex-row items-center mb-3">
-                <Ionicons name="cash" size={20} color={colors.sage} />
+                <Ionicons name="cash" size={18} color={colors.sage} />
                 <Text className="ml-3 font-medium" style={{ color: colors.slate }}>
                   {formatCurrency(accord.estimated_amount)}
                 </Text>
@@ -499,7 +562,7 @@ export default function QuickAccordDetailScreen() {
 
             {accord.expense_category && (
               <View className="flex-row items-center mb-3">
-                <Ionicons name="pricetag" size={20} color={colors.amber} />
+                <Ionicons name="pricetag" size={18} color={colors.amber} />
                 <Text className="ml-3" style={{ color: colors.slate }}>
                   Category: {accord.expense_category}
                 </Text>
@@ -508,7 +571,7 @@ export default function QuickAccordDetailScreen() {
 
             {accord.receipt_required && (
               <View className="flex-row items-center">
-                <Ionicons name="receipt" size={20} color={colors.slate} />
+                <Ionicons name="receipt" size={18} color={colors.slate} />
                 <Text className="ml-3 text-sm" style={{ color: colors.slate }}>
                   Receipt required
                 </Text>
@@ -518,75 +581,65 @@ export default function QuickAccordDetailScreen() {
         )}
 
         {/* Approval Status */}
-        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
-          <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.sand }}>
+          <Text className="font-bold text-lg mb-4" style={{ color: colors.slate }}>
             Approval Status
           </Text>
 
           <View className="space-y-3">
-            {/* Parent A */}
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center">
-                <View
-                  className="w-8 h-8 rounded-full items-center justify-center"
-                  style={{ backgroundColor: accord.parent_a_approved ? `${colors.sage}20` : colors.sand }}
-                >
-                  <Ionicons
-                    name={accord.parent_a_approved ? "checkmark" : "time"}
-                    size={16}
-                    color={accord.parent_a_approved ? colors.sage : colors.slate}
-                  />
-                </View>
-                <Text className="ml-3" style={{ color: colors.slate }}>
+            {/* Parent A Card */}
+            <View
+              className="rounded-xl p-4 flex-row items-center"
+              style={{ backgroundColor: `${colors.sage}15` }}
+            >
+              <View
+                className="w-12 h-12 rounded-full items-center justify-center"
+                style={{ backgroundColor: accord.parent_a_approved ? `${colors.sage}30` : "white" }}
+              >
+                <Ionicons
+                  name={accord.parent_a_approved ? "checkmark-circle" : "time-outline"}
+                  size={24}
+                  color={accord.parent_a_approved ? colors.sage : colors.slate}
+                />
+              </View>
+              <View className="ml-4 flex-1">
+                <Text className="font-semibold" style={{ color: colors.slate }}>
                   {accord.family_file?.parent_a?.first_name || "Parent A"}
                   {isParentA && " (You)"}
                 </Text>
+                <Text className="text-sm" style={{ color: accord.parent_a_approved ? colors.sage : colors.slate }}>
+                  {accord.parent_a_approved ? "Approved" : "Pending"}
+                </Text>
               </View>
-              <Text
-                className="text-sm font-medium"
-                style={{ color: accord.parent_a_approved ? colors.sage : colors.amber }}
-              >
-                {accord.parent_a_approved ? "Approved" : "Pending"}
-              </Text>
             </View>
 
-            {/* Parent B */}
-            <View className="flex-row items-center justify-between">
-              <View className="flex-row items-center">
-                <View
-                  className="w-8 h-8 rounded-full items-center justify-center"
-                  style={{ backgroundColor: accord.parent_b_approved ? `${colors.sage}20` : colors.sand }}
-                >
-                  <Ionicons
-                    name={accord.parent_b_approved ? "checkmark" : "time"}
-                    size={16}
-                    color={accord.parent_b_approved ? colors.sage : colors.slate}
-                  />
-                </View>
-                <Text className="ml-3" style={{ color: colors.slate }}>
+            {/* Parent B Card */}
+            <View
+              className="rounded-xl p-4 flex-row items-center"
+              style={{ backgroundColor: `${colors.sage}15` }}
+            >
+              <View
+                className="w-12 h-12 rounded-full items-center justify-center"
+                style={{ backgroundColor: accord.parent_b_approved ? `${colors.sage}30` : "white" }}
+              >
+                <Ionicons
+                  name={accord.parent_b_approved ? "checkmark-circle" : "time-outline"}
+                  size={24}
+                  color={accord.parent_b_approved ? colors.sage : colors.slate}
+                />
+              </View>
+              <View className="ml-4 flex-1">
+                <Text className="font-semibold" style={{ color: colors.slate }}>
                   {accord.family_file?.parent_b?.first_name || "Parent B"}
                   {!isParentA && " (You)"}
                 </Text>
+                <Text className="text-sm" style={{ color: accord.parent_b_approved ? colors.sage : colors.slate }}>
+                  {accord.parent_b_approved ? "Approved" : "Pending"}
+                </Text>
               </View>
-              <Text
-                className="text-sm font-medium"
-                style={{ color: accord.parent_b_approved ? colors.sage : colors.amber }}
-              >
-                {accord.parent_b_approved ? "Approved" : "Pending"}
-              </Text>
             </View>
           </View>
         </View>
-
-        {/* Purpose Description */}
-        {accord.purpose_description && (
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
-            <Text className="font-semibold mb-2" style={{ color: colors.slate }}>
-              Description
-            </Text>
-            <Text style={{ color: colors.slate }}>{accord.purpose_description}</Text>
-          </View>
-        )}
 
         {/* Action Buttons */}
         <View className="space-y-3 mb-6">
@@ -676,6 +729,9 @@ export default function QuickAccordDetailScreen() {
           )}
         </View>
       </ScrollView>
+
+      {/* Bottom Navigation */}
+      <BottomNavBar />
 
       {/* Reject Modal */}
       <Modal

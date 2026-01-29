@@ -48,9 +48,9 @@ export async function fetchAPI<T>(
   const config = getConfig();
   const url = `${getApiUrl()}${endpoint}`;
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...fetchOptions.headers,
+    ...(fetchOptions.headers as Record<string, string>),
   };
 
   // Add auth token if not skipped
@@ -200,7 +200,7 @@ export async function uploadFile<T>(
   const config = getConfig();
   const url = `${getApiUrl()}${endpoint}`;
 
-  const headers: HeadersInit = {};
+  const headers: Record<string, string> = {};
 
   // Add auth token
   const token = await getAuthToken(authType);
@@ -219,7 +219,7 @@ export async function uploadFile<T>(
       throw await createErrorFromResponse(response, url);
     }
 
-    return response.json();
+    return response.json() as Promise<T>;
   } catch (error) {
     if (error instanceof APIError) {
       config.onError?.(error);

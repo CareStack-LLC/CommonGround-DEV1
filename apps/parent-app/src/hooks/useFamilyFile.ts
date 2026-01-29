@@ -14,6 +14,7 @@ interface UseFamilyFileReturn {
 }
 
 const TOKEN_KEY = "auth_token";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com";
 
 export function useFamilyFile(): UseFamilyFileReturn {
   const [familyFile, setFamilyFile] = useState<FamilyFile | null>(null);
@@ -29,33 +30,67 @@ export function useFamilyFile(): UseFamilyFileReturn {
       setError(null);
 
       const token = await SecureStore.getItemAsync(TOKEN_KEY);
+      console.log("[useFamilyFile] Token check:", token ? `found (${token.substring(0, 20)}...)` : "NOT FOUND");
+
       if (!token) {
-        throw new Error("Not authenticated");
+        // Not authenticated yet - don't treat as error, just return empty state
+        console.log("[useFamilyFile] No token - returning empty state");
+        setFamilyFile(null);
+        setChildren([]);
+        setCoParent(null);
+        setCircleContacts([]);
+        setIsLoading(false);
+        return;
       }
 
-      const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+      console.log("[useFamilyFile] Fetching from:", `${API_URL}/api/v1/family-files/`);
 
-      // Fetch family file
-      const familyResponse = await fetch(`${apiUrl}/api/v1/family-files/mine`, {
+      // Fetch family files list (backend returns paginated response)
+      const familyResponse = await fetch(`${API_URL}/api/v1/family-files/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      console.log("[useFamilyFile] Response status:", familyResponse.status);
+
       if (!familyResponse.ok) {
+        const errorText = await familyResponse.text();
+        console.log("[useFamilyFile] Error response:", errorText);
         if (familyResponse.status === 404) {
           // No family file yet
           setFamilyFile(null);
           return;
         }
-        throw new Error("Failed to fetch family file");
+        throw new Error(`Failed to fetch family file: ${familyResponse.status}`);
       }
 
-      const familyData = await familyResponse.json();
-      setFamilyFile(familyData);
+      const responseData = await familyResponse.json();
+      console.log("[useFamilyFile] Response data:", JSON.stringify(responseData).substring(0, 200));
+
+      // Backend returns {items: [...], total: N} - extract first family file
+      const familyFiles = responseData.items || responseData;
+      console.log("[useFamilyFile] Family files count:", Array.isArray(familyFiles) ? familyFiles.length : "not array");
+
+      if (!familyFiles || familyFiles.length === 0) {
+        console.log("[useFamilyFile] No family files found");
+        setFamilyFile(null);
+        return;
+      }
+
+      // Get the first (primary) family file
+      const familyData = familyFiles[0];
+
+      // Map backend fields to mobile types (backend uses 'title', mobile expects 'family_name')
+      const mappedFamilyFile: FamilyFile = {
+        ...familyData,
+        family_name: familyData.title || familyData.family_file_number || "My Family",
+      };
+
+      setFamilyFile(mappedFamilyFile);
 
       // Fetch children
-      if (familyData.id) {
+      if (mappedFamilyFile.id) {
         const childrenResponse = await fetch(
-          `${apiUrl}/api/v1/family-files/${familyData.id}/children`,
+          `${API_URL}/api/v1/family-files/${mappedFamilyFile.id}/children`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -66,7 +101,7 @@ export function useFamilyFile(): UseFamilyFileReturn {
 
         // Fetch circle contacts
         const circleResponse = await fetch(
-          `${apiUrl}/api/v1/family-files/${familyData.id}/circle`,
+          `${API_URL}/api/v1/family-files/${mappedFamilyFile.id}/circle`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -76,9 +111,10 @@ export function useFamilyFile(): UseFamilyFileReturn {
         }
       }
 
-      // Get co-parent from family file data
-      if (familyData.parent_b) {
-        setCoParent(familyData.parent_b);
+      // Get co-parent from family file data (backend returns parent_b_info not parent_b)
+      const coParentInfo = familyData.parent_b_info || familyData.parent_b;
+      if (coParentInfo) {
+        setCoParent(coParentInfo);
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to load family data";

@@ -1,9 +1,15 @@
+/**
+ * Arcade Screen for Kidscom App
+ * Hub for all mini-games
+ */
+
 import { useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 interface Game {
   id: string;
@@ -12,17 +18,11 @@ interface Game {
   description: string;
   color: string[];
   type: "single" | "multiplayer";
+  route?: string;
+  comingSoon?: boolean;
 }
 
 const GAMES: Game[] = [
-  {
-    id: "tic-tac-toe",
-    title: "Tic Tac Toe",
-    emoji: "⭕",
-    description: "Play X's and O's!",
-    color: ["#ec4899", "#f472b6"],
-    type: "multiplayer",
-  },
   {
     id: "memory",
     title: "Memory Match",
@@ -30,14 +30,7 @@ const GAMES: Game[] = [
     description: "Find the pairs!",
     color: ["#8b5cf6", "#a78bfa"],
     type: "single",
-  },
-  {
-    id: "drawing",
-    title: "Draw Together",
-    emoji: "🎨",
-    description: "Draw with family!",
-    color: ["#06b6d4", "#22d3ee"],
-    type: "multiplayer",
+    route: "/arcade/memory",
   },
   {
     id: "quiz",
@@ -46,6 +39,16 @@ const GAMES: Game[] = [
     description: "Test your brain!",
     color: ["#f97316", "#fb923c"],
     type: "single",
+    route: "/arcade/quiz",
+  },
+  {
+    id: "tic-tac-toe",
+    title: "Tic Tac Toe",
+    emoji: "⭕",
+    description: "Play X's and O's!",
+    color: ["#ec4899", "#f472b6"],
+    type: "multiplayer",
+    route: "/arcade/tic-tac-toe",
   },
   {
     id: "puzzle",
@@ -54,6 +57,16 @@ const GAMES: Game[] = [
     description: "Solve puzzles!",
     color: ["#84cc16", "#a3e635"],
     type: "single",
+    route: "/arcade/puzzle",
+  },
+  {
+    id: "drawing",
+    title: "Draw Together",
+    emoji: "🎨",
+    description: "Draw with family!",
+    color: ["#06b6d4", "#22d3ee"],
+    type: "multiplayer",
+    comingSoon: true,
   },
   {
     id: "story",
@@ -62,6 +75,7 @@ const GAMES: Game[] = [
     description: "Create stories!",
     color: ["#eab308", "#facc15"],
     type: "multiplayer",
+    comingSoon: true,
   },
 ];
 
@@ -71,21 +85,33 @@ export default function ArcadeScreen() {
 
   const handleGamePress = (game: Game) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setSelectedGame(game);
-    setShowGameModal(true);
+
+    if (game.comingSoon) {
+      setSelectedGame(game);
+      setShowGameModal(true);
+    } else if (game.route) {
+      router.push(game.route);
+    }
   };
 
   const handlePlayGame = (withFamily: boolean) => {
+    if (!selectedGame) return;
+
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setShowGameModal(false);
-    // In real app, this would launch the game
-    alert(`Starting ${selectedGame?.title} ${withFamily ? "with family" : "alone"}!`);
+
+    if (selectedGame.route) {
+      router.push({
+        pathname: selectedGame.route,
+        params: withFamily ? { multiplayer: "true" } : undefined,
+      });
+    }
   };
 
   return (
     <LinearGradient
       colors={["#06b6d4", "#22d3ee", "#67e8f9"]}
-      className="flex-1"
+      style={{ flex: 1 }}
     >
       <SafeAreaView className="flex-1" edges={["top"]}>
         {/* Header */}
@@ -125,9 +151,9 @@ export default function ArcadeScreen() {
           </View>
         </ScrollView>
 
-        {/* Game Launch Modal */}
+        {/* Coming Soon Modal */}
         <Modal
-          visible={showGameModal}
+          visible={showGameModal && selectedGame?.comingSoon}
           transparent
           animationType="slide"
           onRequestClose={() => setShowGameModal(false)}
@@ -136,61 +162,36 @@ export default function ArcadeScreen() {
             <View className="bg-white rounded-t-3xl p-6">
               {selectedGame && (
                 <>
-                  {/* Game Info */}
                   <View className="items-center mb-6">
                     <LinearGradient
                       colors={selectedGame.color}
-                      className="w-24 h-24 rounded-3xl items-center justify-center mb-4"
+                      style={{ width: 96, height: 96, borderRadius: 24, alignItems: "center", justifyContent: "center", marginBottom: 16 }}
                     >
                       <Text className="text-5xl">{selectedGame.emoji}</Text>
                     </LinearGradient>
                     <Text className="text-2xl font-bold text-gray-800">
                       {selectedGame.title}
                     </Text>
-                    <Text className="text-gray-500">
-                      {selectedGame.description}
+                    <View className="flex-row items-center mt-2 bg-yellow-100 px-4 py-2 rounded-full">
+                      <Ionicons name="time" size={18} color="#eab308" />
+                      <Text className="text-yellow-600 ml-2 font-bold">
+                        Coming Soon!
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text className="text-gray-500 text-center mb-6">
+                    This game is still being built. Check back soon!
+                  </Text>
+
+                  <TouchableOpacity
+                    className="bg-gray-100 py-4 rounded-2xl items-center"
+                    onPress={() => setShowGameModal(false)}
+                  >
+                    <Text className="text-gray-600 font-bold text-lg">
+                      Got it!
                     </Text>
-                    {selectedGame.type === "multiplayer" && (
-                      <View className="flex-row items-center mt-2 bg-purple-100 px-3 py-1 rounded-full">
-                        <Ionicons name="people" size={16} color="#8b5cf6" />
-                        <Text className="text-purple-600 ml-1 font-medium">
-                          Multiplayer
-                        </Text>
-                      </View>
-                    )}
-                  </View>
-
-                  {/* Action Buttons */}
-                  <View className="space-y-3">
-                    <TouchableOpacity
-                      className="bg-cyan-500 py-4 rounded-2xl items-center"
-                      onPress={() => handlePlayGame(false)}
-                    >
-                      <Text className="text-white font-bold text-lg">
-                        ▶ Play Now
-                      </Text>
-                    </TouchableOpacity>
-
-                    {selectedGame.type === "multiplayer" && (
-                      <TouchableOpacity
-                        className="bg-purple-500 py-4 rounded-2xl items-center"
-                        onPress={() => handlePlayGame(true)}
-                      >
-                        <Text className="text-white font-bold text-lg">
-                          👥 Play with Family
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-
-                    <TouchableOpacity
-                      className="bg-gray-100 py-4 rounded-2xl items-center"
-                      onPress={() => setShowGameModal(false)}
-                    >
-                      <Text className="text-gray-600 font-bold text-lg">
-                        Cancel
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                  </TouchableOpacity>
                 </>
               )}
             </View>
@@ -210,31 +211,50 @@ function GameCard({ game, onPress }: { game: Game; onPress: () => void }) {
     >
       <LinearGradient
         colors={game.color}
-        className="rounded-3xl p-4 items-center shadow-lg"
+        style={{ borderRadius: 24, padding: 16, alignItems: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 8 }}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        {/* Emoji */}
-        <View className="w-16 h-16 bg-white/30 rounded-2xl items-center justify-center mb-3">
-          <Text className="text-4xl">{game.emoji}</Text>
-        </View>
-
-        {/* Title */}
-        <Text className="text-lg font-bold text-white text-center">
-          {game.title}
-        </Text>
-
-        {/* Description */}
-        <Text className="text-white/80 text-sm text-center">
-          {game.description}
-        </Text>
+        {/* Coming Soon Badge */}
+        {game.comingSoon && (
+          <View className="absolute top-2 left-2 bg-yellow-400 px-2 py-1 rounded-full">
+            <Text className="text-yellow-900 text-xs font-bold">Soon</Text>
+          </View>
+        )}
 
         {/* Multiplayer Badge */}
-        {game.type === "multiplayer" && (
+        {game.type === "multiplayer" && !game.comingSoon && (
           <View className="absolute top-2 right-2 bg-white/30 px-2 py-1 rounded-full">
             <Text className="text-white text-xs font-bold">👥</Text>
           </View>
         )}
+
+        {/* Emoji */}
+        <View
+          className={`w-16 h-16 bg-white/30 rounded-2xl items-center justify-center mb-3 ${
+            game.comingSoon ? "opacity-60" : ""
+          }`}
+        >
+          <Text className="text-4xl">{game.emoji}</Text>
+        </View>
+
+        {/* Title */}
+        <Text
+          className={`text-lg font-bold text-white text-center ${
+            game.comingSoon ? "opacity-60" : ""
+          }`}
+        >
+          {game.title}
+        </Text>
+
+        {/* Description */}
+        <Text
+          className={`text-white/80 text-sm text-center ${
+            game.comingSoon ? "opacity-60" : ""
+          }`}
+        >
+          {game.description}
+        </Text>
       </LinearGradient>
     </TouchableOpacity>
   );

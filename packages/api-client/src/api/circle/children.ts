@@ -2,7 +2,7 @@
  * Children API for My Circle app (circle contacts)
  */
 
-import type { Child, ChildProfile } from '@commonground/types';
+import type { Child } from '@commonground/types';
 import { fetchWithCircleAuth } from '../../core';
 
 /**

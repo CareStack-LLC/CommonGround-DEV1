@@ -24,13 +24,29 @@ const colors = {
   cream: "#FFFBF5",
 };
 
+// Backend status values differ from mobile display statuses
+type BackendAccordStatus = "draft" | "pending" | "approved" | "completed" | "revoked" | "expired" | "pending_approval" | "active";
+type DisplayAccordStatus = "draft" | "pending_approval" | "active" | "completed" | "revoked" | "expired";
+
+// Map backend status to mobile display status
+function mapAccordStatus(backendStatus: BackendAccordStatus): DisplayAccordStatus {
+  switch (backendStatus) {
+    case "pending":
+      return "pending_approval";
+    case "approved":
+      return "active";
+    default:
+      return backendStatus as DisplayAccordStatus;
+  }
+}
+
 interface QuickAccord {
   id: string;
   accord_number: string;
   title: string;
   purpose_category: string;
   purpose_description?: string;
-  status: "draft" | "pending_approval" | "active" | "completed" | "revoked" | "expired";
+  status: BackendAccordStatus;
   is_single_event: boolean;
   event_date?: string;
   start_date?: string;
@@ -94,7 +110,7 @@ export default function QuickAccordsScreen() {
   const fetchFamilyFiles = async () => {
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/family-files`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/family-files`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -124,7 +140,7 @@ export default function QuickAccordsScreen() {
 
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/quick-accords/family-file/${selectedFamilyId}`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/quick-accords/family-file/${selectedFamilyId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -170,13 +186,14 @@ export default function QuickAccordsScreen() {
   };
 
   const filteredAccords = accords.filter((accord) => {
+    const displayStatus = mapAccordStatus(accord.status);
     switch (activeTab) {
       case "active":
-        return accord.status === "active";
+        return displayStatus === "active";
       case "pending":
-        return accord.status === "draft" || accord.status === "pending_approval";
+        return displayStatus === "draft" || displayStatus === "pending_approval";
       case "past":
-        return ["completed", "revoked", "expired"].includes(accord.status);
+        return ["completed", "revoked", "expired"].includes(displayStatus);
       default:
         return true;
     }
@@ -335,93 +352,96 @@ export default function QuickAccordsScreen() {
           </View>
         ) : (
           <View className="space-y-3">
-            {filteredAccords.map((accord) => (
-              <TouchableOpacity
-                key={accord.id}
-                className="rounded-xl p-4"
-                style={{ backgroundColor: "white" }}
-                onPress={() => router.push(`/accords/${accord.id}?familyId=${selectedFamilyId}`)}
-              >
-                <View className="flex-row items-start justify-between mb-2">
-                  <View className="flex-row items-center flex-1">
-                    <View
-                      className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                      style={{ backgroundColor: `${colors.sage}20` }}
-                    >
-                      <Ionicons
-                        name={CATEGORY_ICONS[accord.purpose_category] || "document-text"}
-                        size={20}
-                        color={colors.sage}
-                      />
+            {filteredAccords.map((accord) => {
+              const displayStatus = mapAccordStatus(accord.status);
+              return (
+                <TouchableOpacity
+                  key={accord.id}
+                  className="rounded-xl p-4"
+                  style={{ backgroundColor: "white" }}
+                  onPress={() => router.push(`/accords/${accord.id}?familyId=${selectedFamilyId}`)}
+                >
+                  <View className="flex-row items-start justify-between mb-2">
+                    <View className="flex-row items-center flex-1">
+                      <View
+                        className="w-10 h-10 rounded-full items-center justify-center mr-3"
+                        style={{ backgroundColor: `${colors.sage}20` }}
+                      >
+                        <Ionicons
+                          name={CATEGORY_ICONS[accord.purpose_category] || "document-text"}
+                          size={20}
+                          color={colors.sage}
+                        />
+                      </View>
+                      <View className="flex-1">
+                        <Text className="font-semibold" style={{ color: colors.slate }}>
+                          {accord.title}
+                        </Text>
+                        <Text className="text-sm" style={{ color: colors.slate }}>
+                          {CATEGORY_LABELS[accord.purpose_category] || accord.purpose_category}
+                        </Text>
+                      </View>
                     </View>
-                    <View className="flex-1">
-                      <Text className="font-semibold" style={{ color: colors.slate }}>
-                        {accord.title}
-                      </Text>
-                      <Text className="text-sm" style={{ color: colors.slate }}>
-                        {CATEGORY_LABELS[accord.purpose_category] || accord.purpose_category}
+                    <View
+                      className="px-2 py-1 rounded-full"
+                      style={{ backgroundColor: `${STATUS_COLORS[displayStatus]}20` }}
+                    >
+                      <Text
+                        className="text-xs font-medium"
+                        style={{ color: STATUS_COLORS[displayStatus] }}
+                      >
+                        {STATUS_LABELS[displayStatus]}
                       </Text>
                     </View>
                   </View>
-                  <View
-                    className="px-2 py-1 rounded-full"
-                    style={{ backgroundColor: `${STATUS_COLORS[accord.status]}20` }}
-                  >
-                    <Text
-                      className="text-xs font-medium"
-                      style={{ color: STATUS_COLORS[accord.status] }}
-                    >
-                      {STATUS_LABELS[accord.status]}
+
+                  {/* Date Info */}
+                  <View className="flex-row items-center mt-2">
+                    <Ionicons name="calendar-outline" size={14} color={colors.slate} />
+                    <Text className="ml-2 text-sm" style={{ color: colors.slate }}>
+                      {accord.is_single_event
+                        ? accord.event_date
+                          ? formatDate(accord.event_date)
+                          : "Date TBD"
+                        : accord.start_date && accord.end_date
+                          ? `${formatDate(accord.start_date)} - ${formatDate(accord.end_date)}`
+                          : "Dates TBD"}
                     </Text>
                   </View>
-                </View>
 
-                {/* Date Info */}
-                <View className="flex-row items-center mt-2">
-                  <Ionicons name="calendar-outline" size={14} color={colors.slate} />
-                  <Text className="ml-2 text-sm" style={{ color: colors.slate }}>
-                    {accord.is_single_event
-                      ? accord.event_date
-                        ? formatDate(accord.event_date)
-                        : "Date TBD"
-                      : accord.start_date && accord.end_date
-                        ? `${formatDate(accord.start_date)} - ${formatDate(accord.end_date)}`
-                        : "Dates TBD"}
+                  {/* Approval Status */}
+                  {displayStatus === "pending_approval" && (
+                    <View className="flex-row items-center mt-2 pt-2 border-t" style={{ borderTopColor: colors.sand }}>
+                      <View className="flex-row items-center mr-4">
+                        <Ionicons
+                          name={accord.parent_a_approved ? "checkmark-circle" : "ellipse-outline"}
+                          size={16}
+                          color={accord.parent_a_approved ? colors.sage : colors.slate}
+                        />
+                        <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
+                          Parent A
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center">
+                        <Ionicons
+                          name={accord.parent_b_approved ? "checkmark-circle" : "ellipse-outline"}
+                          size={16}
+                          color={accord.parent_b_approved ? colors.sage : colors.slate}
+                        />
+                        <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
+                          Parent B
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+
+                  {/* Accord Number */}
+                  <Text className="text-xs mt-2" style={{ color: "#9CA3AF" }}>
+                    {accord.accord_number}
                   </Text>
-                </View>
-
-                {/* Approval Status */}
-                {accord.status === "pending_approval" && (
-                  <View className="flex-row items-center mt-2 pt-2 border-t" style={{ borderTopColor: colors.sand }}>
-                    <View className="flex-row items-center mr-4">
-                      <Ionicons
-                        name={accord.parent_a_approved ? "checkmark-circle" : "ellipse-outline"}
-                        size={16}
-                        color={accord.parent_a_approved ? colors.sage : colors.slate}
-                      />
-                      <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
-                        Parent A
-                      </Text>
-                    </View>
-                    <View className="flex-row items-center">
-                      <Ionicons
-                        name={accord.parent_b_approved ? "checkmark-circle" : "ellipse-outline"}
-                        size={16}
-                        color={accord.parent_b_approved ? colors.sage : colors.slate}
-                      />
-                      <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
-                        Parent B
-                      </Text>
-                    </View>
-                  </View>
-                )}
-
-                {/* Accord Number */}
-                <Text className="text-xs mt-2" style={{ color: "#9CA3AF" }}>
-                  {accord.accord_number}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              );
+            })}
           </View>
         )}
       </ScrollView>

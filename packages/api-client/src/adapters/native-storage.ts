@@ -75,9 +75,10 @@ export function createNativeStorage(prefix?: string): TokenStorage {
 export function isNativePlatform(): boolean {
   try {
     // Check for React Native environment
+    const nav = (globalThis as any).navigator;
     return (
-      typeof navigator !== 'undefined' &&
-      navigator.product === 'ReactNative'
+      typeof nav !== 'undefined' &&
+      nav.product === 'ReactNative'
     );
   } catch {
     return false;

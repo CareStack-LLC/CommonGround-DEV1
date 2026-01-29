@@ -7,7 +7,12 @@
     "base": {
       "node": "20.11.0",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.commonground.app/api/v1"
+        "APP_ENV": "production",
+        "EXPO_PUBLIC_API_URL": "https://commonground-api-gdxg.onrender.com",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://qqttugwxmkbnrgzgqbkz.supabase.co",
+        "EXPO_PUBLIC_ENABLE_BIOMETRIC": "true",
+        "EXPO_PUBLIC_ENABLE_OAUTH": "true",
+        "EXPO_PUBLIC_ENABLE_MFA": "true"
       }
     },
     "development": {
@@ -21,7 +26,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api-dev.commonground.app/api/v1"
+        "APP_ENV": "development",
+        "EXPO_PUBLIC_API_URL": "http://localhost:8000"
       }
     },
     "preview": {
@@ -34,8 +40,25 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api-staging.commonground.app/api/v1"
-      }
+        "APP_ENV": "staging",
+        "EXPO_PUBLIC_API_URL": "https://commonground-api-staging.onrender.com"
+      },
+      "channel": "preview"
+    },
+    "staging": {
+      "extends": "base",
+      "distribution": "internal",
+      "ios": {
+        "resourceClass": "m1-medium"
+      },
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "APP_ENV": "staging",
+        "EXPO_PUBLIC_API_URL": "https://commonground-api-staging.onrender.com"
+      },
+      "channel": "staging"
     },
     "production": {
       "extends": "base",
@@ -47,11 +70,23 @@
         "buildType": "app-bundle",
         "resourceClass": "medium"
       },
-      "autoIncrement": true
+      "autoIncrement": true,
+      "channel": "production"
     }
   },
   "submit": {
     "production": {
+      "ios": {
+        "appleId": "developer@commonground.app",
+        "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "YOUR_APPLE_TEAM_ID"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./google-services-key.json",
+        "track": "production"
+      }
+    },
+    "staging": {
       "ios": {
         "appleId": "developer@commonground.app",
         "ascAppId": "YOUR_APP_STORE_CONNECT_APP_ID",

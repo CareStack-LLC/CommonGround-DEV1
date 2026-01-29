@@ -53,7 +53,7 @@ export default function InviteCoParentScreen() {
 
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api.onrender.com"}/api/v1/family-files/${familyId}/invite`,
+        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/family-files/${familyId}/invite`,
         {
           method: "POST",
           headers: {

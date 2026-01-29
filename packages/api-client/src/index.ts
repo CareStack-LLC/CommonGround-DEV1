@@ -59,8 +59,8 @@ export {
   type TokenStorage,
   TOKEN_KEYS,
   MemoryStorage,
-  setStorageAdapter,
-  getStorageAdapter,
+  setStorage,
+  getStorage,
   // Configuration
   configure,
   getConfig,
@@ -69,7 +69,6 @@ export {
   // Errors
   APIError,
   createErrorFromResponse,
-  isAPIError,
   // Authentication
   getAccessToken,
   getRefreshToken,
@@ -81,10 +80,8 @@ export {
   clearAuthTokens,
   clearChildToken,
   clearCircleToken,
-  clearAllTokens,
   getUser,
   setUser,
-  clearUser,
   isAuthenticated,
   isChildAuthenticated,
   isCircleAuthenticated,
@@ -100,8 +97,132 @@ export {
 } from './core';
 
 // API modules
-export { parent, child, circle, video } from './api';
+export { parent, child, circle, video, professional } from './api';
+
+// Re-export types for events (commonly used)
+export type {
+  ScheduleEvent,
+  EventCategory,
+  EventAttendance,
+  RSVPStatus,
+  CategoryData,
+  ConflictCheckResult,
+  MyTimeCollection,
+  TimeBlock,
+} from './api/parent/events';
+
+// Re-export custody types
+export type {
+  CustodySummary,
+  CustodyExchange,
+} from './api/parent/custody';
+
+// Re-export activity types
+export type {
+  ActivityCategory,
+  ActivityFeedItem,
+  Activity,
+  ActivityList,
+  RecentActivities,
+} from './api/parent/activities';
 
 // Re-export adapters for convenience
 export { createWebStorage, WebStorage } from './adapters/web-storage';
 export { createNativeStorage, NativeStorage, isNativePlatform } from './adapters/native-storage';
+
+// Re-export Circle types
+export type {
+  Memory,
+  MemoryComment,
+  MemoryList,
+} from './api/circle/memories';
+
+export type {
+  CircleMessage,
+  CircleConversation,
+  CircleStickerPack,
+  CircleSticker,
+} from './api/circle/messages';
+
+export type {
+  WatchTogetherContent,
+  WatchTogetherSession,
+  WatchTogetherInvitation,
+} from './api/circle/watchTogether';
+
+// Re-export Theater types
+export type {
+  TheaterContent,
+  ContentCategory,
+  ContentFilters,
+  WatchTogetherSession as ChildWatchTogetherSession,
+  WatchProgress,
+} from './api/child/theater';
+
+// Re-export KidComs types
+export type {
+  LibraryItem,
+  LibraryCategory,
+  ChatMessage,
+  ChatConversation,
+  Sticker,
+  StickerPack,
+} from './api/child/kidcoms';
+
+// Re-export Professional types
+export type {
+  ProfessionalType,
+  ProfessionalUser,
+  AuthResponse as ProfessionalAuthResponse,
+} from './api/professional/auth';
+
+export type {
+  ProfessionalProfile,
+  ProfessionalProfileWithFirms,
+  FirmMembership,
+  FirmRole,
+  MembershipStatus,
+} from './api/professional/profile';
+
+export type {
+  Firm,
+  FirmType,
+  FirmWithMembers,
+  FirmPublicInfo,
+} from './api/professional/firms';
+
+export type {
+  CaseAssignment,
+  CaseAssignmentWithDetails,
+  CaseSummaryCard,
+  UpcomingEvent as ProfessionalUpcomingEvent,
+  AccessRequest,
+  AssignmentRole,
+  AssignmentStatus,
+} from './api/professional/cases';
+
+export type {
+  ProfessionalDashboard,
+  Alert,
+  PendingAction,
+  RecentActivity as ProfessionalRecentActivity,
+} from './api/professional/dashboard';
+
+export type {
+  ProfessionalMessage,
+  MessageThread,
+  MessageAttachment,
+} from './api/professional/messaging';
+
+export type {
+  TimelineEvent,
+  CaseTimeline,
+  ComplianceOverview,
+} from './api/professional/timeline';
+
+export type {
+  ARIASettings,
+  ARIAMetrics,
+  ARIAIntervention,
+  ParentARIAMetrics,
+} from './api/professional/aria';

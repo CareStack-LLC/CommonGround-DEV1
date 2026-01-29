@@ -10,14 +10,19 @@ type TabIconProps = {
   emoji: string;
 };
 
-function TabIcon({ emoji, color, focused, label }: TabIconProps) {
+function TabIcon({ emoji, focused, label }: TabIconProps) {
   return (
-    <View className="items-center justify-center pt-2">
-      <Text className={`text-2xl ${focused ? "scale-110" : ""}`}>{emoji}</Text>
+    <View style={{ alignItems: 'center', justifyContent: 'center', paddingTop: 4, width: 65 }}>
+      <Text style={{ fontSize: 22 }}>{emoji}</Text>
       <Text
-        className={`text-xs mt-1 font-bold ${
-          focused ? "text-purple-600" : "text-gray-400"
-        }`}
+        style={{
+          fontSize: 10,
+          marginTop: 2,
+          fontWeight: '600',
+          color: focused ? '#9333ea' : '#9ca3af',
+          textAlign: 'center',
+        }}
+        numberOfLines={1}
       >
         {label}
       </Text>

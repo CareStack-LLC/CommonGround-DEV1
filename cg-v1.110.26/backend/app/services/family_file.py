@@ -594,3 +594,45 @@ class FamilyFileService:
         except Exception:
             # Don't fail the operation if email fails
             pass
+
+
+# Standalone helper function for accessing family files
+async def get_user_family_file(
+    db: AsyncSession,
+    user_id: str,
+    family_file_id: str
+) -> FamilyFile:
+    """
+    Get a family file for a user, verifying access.
+
+    Args:
+        db: Database session
+        user_id: ID of the user requesting access
+        family_file_id: ID of the family file
+
+    Returns:
+        FamilyFile if user has access
+
+    Raises:
+        HTTPException: If not found or access denied
+    """
+    result = await db.execute(
+        select(FamilyFile)
+        .options(selectinload(FamilyFile.children))
+        .where(
+            FamilyFile.id == family_file_id,
+            or_(
+                FamilyFile.parent_a_id == user_id,
+                FamilyFile.parent_b_id == user_id
+            )
+        )
+    )
+    family_file = result.scalar_one_or_none()
+
+    if not family_file:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Family file not found or access denied"
+        )
+
+    return family_file
