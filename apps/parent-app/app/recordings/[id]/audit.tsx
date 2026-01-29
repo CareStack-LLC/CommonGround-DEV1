@@ -19,12 +19,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { format, formatDistanceToNow } from "date-fns";
 
-import { parent } from "@commonground/api-client";
-import type {
-  AccessHistoryResponse,
-  AccessLogEntry,
-  ChainVerificationResponse,
-} from "@commonground/api-client/src/api/parent/recordings";
+import {
+  parent,
+  type AccessHistoryResponse,
+  type AccessLogEntry,
+  type ChainVerificationResponse,
+} from "@commonground/api-client";
 
 export default function AuditTrailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

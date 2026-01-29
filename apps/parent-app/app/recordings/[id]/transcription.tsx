@@ -18,8 +18,7 @@ import { useLocalSearchParams, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-import { parent } from "@commonground/api-client";
-import type { Transcription, TranscriptionChunk } from "@commonground/api-client/src/api/parent/recordings";
+import { parent, type Transcription, type TranscriptionChunk } from "@commonground/api-client";
 
 export default function TranscriptionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

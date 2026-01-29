@@ -22,8 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
-import { parent } from "@commonground/api-client";
-import type { CustodyParent } from "@commonground/api-client/src/api/parent/custody";
+import { parent, type CustodyParent } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
 

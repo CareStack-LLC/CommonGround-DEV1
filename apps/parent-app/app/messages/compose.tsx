@@ -24,9 +24,8 @@ import { Stack, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-import { parent } from "@commonground/api-client";
+import { parent, type ARIAAnalysis, type ToxicityLevel } from "@commonground/api-client";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
-import type { ARIAAnalysis, ToxicityLevel } from "@commonground/api-client/src/api/parent/messages";
 
 export default function ComposeMessageScreen() {
   const { familyFile, coParent } = useFamilyFile();

@@ -16,8 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import { parent } from "@commonground/api-client";
-import type { CommunicationLog } from "@commonground/api-client/src/api/parent/myCircle";
+import { parent, type CommunicationLog } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
 

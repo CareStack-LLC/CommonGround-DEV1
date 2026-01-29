@@ -17,12 +17,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 
-import { parent } from "@commonground/api-client";
-import type {
-  Obligation,
-  ObligationFunding,
-  VerificationArtifact,
-} from "@commonground/api-client/src/api/parent/clearfund";
+import {
+  parent,
+  type Obligation,
+  type ObligationFunding,
+  type VerificationArtifact,
+} from "@commonground/api-client";
 
 export default function ExpenseDetailScreen() {
   const { obligationId } = useLocalSearchParams<{ obligationId: string }>();

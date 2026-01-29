@@ -12,9 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 
-import { parent } from "@commonground/api-client";
+import { parent, type Recording } from "@commonground/api-client";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
-import type { Recording } from "@commonground/api-client/src/api/parent/recordings";
 
 export default function RecordingsScreen() {
   const { familyFile } = useFamilyFile();

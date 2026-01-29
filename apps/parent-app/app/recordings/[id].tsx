@@ -20,12 +20,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 
-import { parent } from "@commonground/api-client";
-import type {
-  RecordingDetail,
-  LegalHold,
-  IntegrityVerificationResponse,
-} from "@commonground/api-client/src/api/parent/recordings";
+import {
+  parent,
+  type RecordingDetail,
+  type LegalHold,
+  type IntegrityVerificationResponse,
+} from "@commonground/api-client";
 
 export default function RecordingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();

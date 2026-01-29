@@ -24,10 +24,14 @@ import { Stack, useLocalSearchParams, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-import { parent } from "@commonground/api-client";
+import {
+  parent,
+  type Message,
+  type ARIAAnalysis,
+  type ToxicityLevel,
+} from "@commonground/api-client";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
 import { useAuth } from "@/providers/AuthProvider";
-import type { Message, ARIAAnalysis, ToxicityLevel } from "@commonground/api-client/src/api/parent/messages";
 
 export default function ThreadScreen() {
   const { threadId } = useLocalSearchParams<{ threadId: string }>();
