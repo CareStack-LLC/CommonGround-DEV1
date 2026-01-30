@@ -138,6 +138,54 @@ export interface QRConfirmation {
 // Custody Status
 // ============================================================
 
+/**
+ * Child-specific custody status from backend
+ */
+export interface ChildCustodyStatus {
+  child_id: string;
+  child_first_name: string;
+  child_last_name?: string;
+  with_current_user: boolean;
+  current_parent_id: string;
+  current_parent_name: string;
+  next_action?: 'pickup' | 'dropoff';
+  next_exchange_id?: string;
+  next_exchange_time?: string;
+  next_exchange_location?: string;
+  hours_remaining?: number;
+  time_with_current_parent_hours?: number;
+  days_with_current_parent?: number;
+  custody_started_at?: string;
+  progress_percentage: number;
+}
+
+/**
+ * Full custody status response from backend
+ */
+export interface CustodyStatusResponse {
+  family_file_id: string;
+  case_id?: string;
+  current_user_id: string;
+  coparent_id?: string;
+  coparent_name?: string;
+  children: ChildCustodyStatus[];
+  agreement_active_days?: number;
+}
+
+/**
+ * Get current custody status for the dashboard
+ * Returns real-time custody data including:
+ * - Which parent has each child
+ * - Time remaining until next exchange
+ * - Progress percentage
+ * - Days since agreement active
+ */
+export async function getCustodyStatus(familyFileId: string): Promise<CustodyStatusResponse> {
+  return fetchWithParentAuth<CustodyStatusResponse>(
+    `/exchanges/family-file/${familyFileId}/custody-status`
+  );
+}
+
 // Backend exchange response type (differs from our normalized CustodyExchange)
 interface BackendExchange {
   id: string;

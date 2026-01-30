@@ -8,11 +8,39 @@ import { useState, useCallback, useEffect } from "react";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { formatDistanceToNow, differenceInDays, differenceInHours, format, isToday, isTomorrow } from "date-fns";
+import { differenceInDays, differenceInHours, format, isToday } from "date-fns";
 
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
-import { parent, type ActivityFeedItem } from "@commonground/api-client";
+
+// Custody status types from API
+interface ChildCustodyStatus {
+  child_id: string;
+  child_first_name: string;
+  child_last_name?: string;
+  with_current_user: boolean;
+  current_parent_id: string;
+  current_parent_name: string;
+  next_action?: 'pickup' | 'dropoff';
+  next_exchange_id?: string;
+  next_exchange_time?: string;
+  next_exchange_location?: string;
+  hours_remaining?: number;
+  time_with_current_parent_hours?: number;
+  days_with_current_parent?: number;
+  custody_started_at?: string;
+  progress_percentage: number;
+}
+
+interface CustodyStatusResponse {
+  family_file_id: string;
+  case_id?: string;
+  current_user_id: string;
+  coparent_id?: string;
+  coparent_name?: string;
+  children: ChildCustodyStatus[];
+  agreement_active_days?: number;
+}
 
 // CommonGround Design System Colors - Matching Web Portal
 const SAGE = "#4A6C58";
@@ -43,18 +71,24 @@ interface DashboardSummary {
   pending_agreements_count: number;
   active_quick_accords_count: number;
   upcoming_events: UpcomingEvent[];
-  recent_activities: ActivityFeedItem[];
+  recent_activities: Array<{
+    id: string;
+    activity_type: string;
+    title: string;
+    created_at: string;
+  }>;
   unread_activity_count: number;
 }
 
 export default function DashboardScreen() {
   const { user } = useAuth();
-  const { familyFile, children, coParent, isLoading, refresh } = useFamilyFile();
+  const { familyFile, children, refresh } = useFamilyFile();
   const [refreshing, setRefreshing] = useState(false);
   const [dashboardData, setDashboardData] = useState<DashboardSummary | null>(null);
   const [nextExchange, setNextExchange] = useState<UpcomingEvent | null>(null);
+  const [custodyStatus, setCustodyStatus] = useState<CustodyStatusResponse | null>(null);
 
-  const familyFileId = user?.family_file_id || familyFile?.id;
+  const familyFileId = familyFile?.id;
 
   // Get time-appropriate greeting
   const getGreeting = () => {
@@ -64,27 +98,36 @@ export default function DashboardScreen() {
     return "Good Evening";
   };
 
-  // Fetch dashboard data
+  // Fetch dashboard data and custody status
   const fetchDashboard = useCallback(async () => {
     if (!familyFileId) return;
 
     try {
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com"}/api/v1/dashboard/summary/${familyFileId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${await getToken()}`,
-          },
-        }
-      );
+      const token = await getToken();
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com";
 
-      if (response.ok) {
-        const data = await response.json();
+      // Fetch dashboard summary and custody status in parallel
+      const [dashboardResponse, custodyResponse] = await Promise.all([
+        fetch(`${apiUrl}/api/v1/dashboard/summary/${familyFileId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch(`${apiUrl}/api/v1/exchanges/family-file/${familyFileId}/custody-status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
+
+      if (dashboardResponse.ok) {
+        const data = (await dashboardResponse.json()) as DashboardSummary;
         setDashboardData(data);
 
         // Find next exchange from upcoming events
         const exchange = data.upcoming_events?.find((e: UpcomingEvent) => e.is_exchange);
         setNextExchange(exchange || null);
+      }
+
+      if (custodyResponse.ok) {
+        const custodyData = (await custodyResponse.json()) as CustodyStatusResponse;
+        setCustodyStatus(custodyData);
       }
     } catch (error) {
       console.error("Failed to fetch dashboard:", error);
@@ -133,8 +176,33 @@ export default function DashboardScreen() {
     return { text: `${daysUntil}d`, subtext: format(date, "MMM d") };
   };
 
-  // Calculate exchange countdown
-  const getExchangeCountdown = () => {
+  // Get custody data for display - uses real backend data when available
+  const getCustodyDisplayData = () => {
+    // Use real custody status if available
+    const child = custodyStatus?.children?.[0];
+    if (child) {
+      const hoursRemaining = child.hours_remaining || 0;
+      const days = Math.floor(hoursRemaining / 24);
+      const hours = Math.round(hoursRemaining % 24);
+
+      let formattedTime = "";
+      if (child.next_exchange_time) {
+        formattedTime = format(new Date(child.next_exchange_time), "EEEE h:mm a");
+      }
+
+      return {
+        days,
+        hours,
+        progress: (child.progress_percentage || 0) / 100, // Convert percentage to decimal
+        formattedTime,
+        isDropoff: child.next_action === "dropoff",
+        withCurrentUser: child.with_current_user,
+        childName: child.child_first_name,
+        agreementActiveDays: custodyStatus?.agreement_active_days,
+      };
+    }
+
+    // Fallback to calculated from nextExchange
     if (!nextExchange) return null;
     const exchangeDate = new Date(nextExchange.start_time);
     const now = new Date();
@@ -145,7 +213,7 @@ export default function DashboardScreen() {
     const days = Math.floor(totalMs / (1000 * 60 * 60 * 24));
     const hours = Math.floor((totalMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
-    // Assume 7 day custody cycle for progress
+    // Approximate 7 day custody cycle for progress when no real data
     const totalCycleMs = 7 * 24 * 60 * 60 * 1000;
     const progress = Math.max(0, Math.min(1, 1 - (totalMs / totalCycleMs)));
 
@@ -155,12 +223,15 @@ export default function DashboardScreen() {
       progress,
       formattedTime: format(exchangeDate, "EEEE h:mm a"),
       isDropoff: nextExchange.viewer_role === "dropoff",
+      withCurrentUser: true,
+      childName: children?.[0]?.first_name || "Child",
+      agreementActiveDays: undefined,
     };
   };
 
   const firstName = user?.first_name || "Parent";
-  const childName = children?.[0]?.first_name || "Child";
-  const countdown = getExchangeCountdown();
+  const custodyData = getCustodyDisplayData();
+  const childName = custodyData?.childName || children?.[0]?.first_name || "Child";
   const pendingItemsCount =
     (dashboardData?.pending_expenses_count || 0) +
     (dashboardData?.pending_agreements_count || 0) +
@@ -239,19 +310,19 @@ export default function DashboardScreen() {
                   {childName}
                 </Text>
                 <Text style={{ fontSize: 14, color: SAGE, fontWeight: "500" }}>
-                  With You
+                  {custodyData?.withCurrentUser !== false ? "With You" : `With ${custodyStatus?.coparent_name || "Co-parent"}`}
                 </Text>
               </View>
             </View>
 
             {/* Next Exchange Info */}
-            {countdown && (
+            {custodyData && (
               <>
                 <View style={{ marginBottom: 12 }}>
-                  <Text style={{ fontSize: 14, color: countdown.isDropoff ? RED : SAGE, fontWeight: "600" }}>
-                    {countdown.isDropoff ? "Drop off" : "Pick up"}{" "}
+                  <Text style={{ fontSize: 14, color: custodyData.isDropoff ? RED : SAGE, fontWeight: "600" }}>
+                    {custodyData.isDropoff ? "Drop off" : "Pick up"}{" "}
                     <Text style={{ color: SLATE, fontWeight: "400" }}>
-                      {countdown.formattedTime}
+                      {custodyData.formattedTime}
                     </Text>
                   </Text>
                 </View>
@@ -266,7 +337,7 @@ export default function DashboardScreen() {
                   }}>
                     <View style={{
                       height: "100%",
-                      width: `${countdown.progress * 100}%`,
+                      width: `${custodyData.progress * 100}%`,
                       backgroundColor: SAGE,
                       borderRadius: 3,
                     }}>
@@ -287,7 +358,7 @@ export default function DashboardScreen() {
                 </View>
 
                 <Text style={{ fontSize: 12, color: SLATE_LIGHT }}>
-                  {countdown.days} days, {countdown.hours} hours remaining
+                  {custodyData.days} day{custodyData.days !== 1 ? "s" : ""}, {custodyData.hours} hour{custodyData.hours !== 1 ? "s" : ""} remaining
                 </Text>
               </>
             )}
@@ -315,7 +386,10 @@ export default function DashboardScreen() {
                 </Text>
               </View>
               <Text style={{ fontSize: 14, color: SAGE, fontWeight: "600" }}>
-                1 <Text style={{ fontWeight: "400", color: SLATE_LIGHT }}>days</Text>
+                {custodyData?.agreementActiveDays ?? custodyStatus?.agreement_active_days ?? 1}{" "}
+                <Text style={{ fontWeight: "400", color: SLATE_LIGHT }}>
+                  day{(custodyData?.agreementActiveDays ?? custodyStatus?.agreement_active_days ?? 1) !== 1 ? "s" : ""}
+                </Text>
               </Text>
             </View>
           </View>
@@ -326,41 +400,136 @@ export default function DashboardScreen() {
           <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE, marginBottom: 12 }}>
             Action Stream
           </Text>
-          <View style={{
-            backgroundColor: WHITE,
-            borderRadius: 16,
-            padding: 16,
-            flexDirection: "row",
-            alignItems: "center",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.05,
-            shadowRadius: 4,
-            elevation: 2,
-          }}>
+          {pendingItemsCount > 0 ? (
             <View style={{
-              width: 44,
-              height: 44,
-              borderRadius: 22,
-              backgroundColor: SAGE_LIGHT,
-              alignItems: "center",
-              justifyContent: "center",
+              backgroundColor: WHITE,
+              borderRadius: 16,
+              overflow: "hidden",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
             }}>
-              <Ionicons
-                name={pendingItemsCount > 0 ? "alert-circle" : "checkmark-circle"}
-                size={24}
-                color={SAGE}
-              />
+              {/* Summary Header */}
+              <View style={{
+                padding: 16,
+                flexDirection: "row",
+                alignItems: "center",
+                borderBottomWidth: 1,
+                borderBottomColor: SAND,
+              }}>
+                <View style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 22,
+                  backgroundColor: `${AMBER}20`,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}>
+                  <Ionicons name="alert-circle" size={24} color={AMBER} />
+                </View>
+                <View style={{ marginLeft: 12, flex: 1 }}>
+                  <Text style={{ fontSize: 16, fontWeight: "600", color: SLATE }}>
+                    {pendingItemsCount} item{pendingItemsCount !== 1 ? "s" : ""} need attention
+                  </Text>
+                  <Text style={{ fontSize: 14, color: SLATE_LIGHT }}>
+                    Tap to review pending items
+                  </Text>
+                </View>
+              </View>
+
+              {/* Pending Messages */}
+              {(dashboardData?.unread_messages_count || 0) > 0 && (
+                <TouchableOpacity
+                  style={{
+                    padding: 16,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderBottomWidth: 1,
+                    borderBottomColor: SAND,
+                  }}
+                  onPress={() => router.push("/(tabs)/messages")}
+                >
+                  <Ionicons name="chatbubble" size={20} color={SAGE} style={{ marginRight: 12 }} />
+                  <Text style={{ flex: 1, fontSize: 14, color: SLATE }}>
+                    {dashboardData?.unread_messages_count} unread message{dashboardData?.unread_messages_count !== 1 ? "s" : ""}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color={SLATE_LIGHT} />
+                </TouchableOpacity>
+              )}
+
+              {/* Pending Expenses */}
+              {(dashboardData?.pending_expenses_count || 0) > 0 && (
+                <TouchableOpacity
+                  style={{
+                    padding: 16,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    borderBottomWidth: 1,
+                    borderBottomColor: SAND,
+                  }}
+                  onPress={() => router.push("/expenses")}
+                >
+                  <Ionicons name="wallet" size={20} color={SAGE} style={{ marginRight: 12 }} />
+                  <Text style={{ flex: 1, fontSize: 14, color: SLATE }}>
+                    {dashboardData?.pending_expenses_count} pending expense{dashboardData?.pending_expenses_count !== 1 ? "s" : ""}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color={SLATE_LIGHT} />
+                </TouchableOpacity>
+              )}
+
+              {/* Pending Agreements */}
+              {(dashboardData?.pending_agreements_count || 0) > 0 && (
+                <TouchableOpacity
+                  style={{
+                    padding: 16,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                  onPress={() => router.push("/agreements")}
+                >
+                  <Ionicons name="document-text" size={20} color={SAGE} style={{ marginRight: 12 }} />
+                  <Text style={{ flex: 1, fontSize: 14, color: SLATE }}>
+                    {dashboardData?.pending_agreements_count} agreement{dashboardData?.pending_agreements_count !== 1 ? "s" : ""} need approval
+                  </Text>
+                  <Ionicons name="chevron-forward" size={16} color={SLATE_LIGHT} />
+                </TouchableOpacity>
+              )}
             </View>
-            <View style={{ marginLeft: 12, flex: 1 }}>
-              <Text style={{ fontSize: 16, fontWeight: "600", color: SLATE }}>
-                {pendingItemsCount > 0 ? `${pendingItemsCount} items need attention` : "All caught up!"}
-              </Text>
-              <Text style={{ fontSize: 14, color: SLATE_LIGHT }}>
-                {pendingItemsCount > 0 ? "Tap to review pending items" : "No pending items to review"}
-              </Text>
+          ) : (
+            <View style={{
+              backgroundColor: WHITE,
+              borderRadius: 16,
+              padding: 16,
+              flexDirection: "row",
+              alignItems: "center",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.05,
+              shadowRadius: 4,
+              elevation: 2,
+            }}>
+              <View style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: SAGE_LIGHT,
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+                <Ionicons name="checkmark-circle" size={24} color={SAGE} />
+              </View>
+              <View style={{ marginLeft: 12, flex: 1 }}>
+                <Text style={{ fontSize: 16, fontWeight: "600", color: SLATE }}>
+                  All caught up!
+                </Text>
+                <Text style={{ fontSize: 14, color: SLATE_LIGHT }}>
+                  No pending items to review
+                </Text>
+              </View>
             </View>
-          </View>
+          )}
         </View>
 
         {/* Coming Up */}
@@ -585,7 +754,7 @@ export default function DashboardScreen() {
                       justifyContent: "center",
                     }}>
                       <Ionicons
-                        name={activity.icon === "message" ? "chatbubble-outline" : "notifications-outline"}
+                        name={activity.activity_type.includes("message") ? "chatbubble-outline" : "notifications-outline"}
                         size={16}
                         color={SAGE}
                       />
