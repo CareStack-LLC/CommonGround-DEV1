@@ -494,9 +494,11 @@ export default function ScheduleScreen() {
 
         {/* Next Exchange Card */}
         {custodySummary?.next_exchange && (
-          <View
+          <TouchableOpacity
             className="mx-4 mt-4 rounded-2xl p-4 border"
             style={{ backgroundColor: "#FEF7ED", borderColor: "#E8C4A0" }}
+            onPress={() => router.push(`/exchange/${custodySummary.next_exchange!.id}`)}
+            activeOpacity={0.7}
           >
             <View className="flex-row items-center">
               <View
@@ -529,7 +531,7 @@ export default function ScheduleScreen() {
               </View>
               <Ionicons name="chevron-forward" size={20} color={AMBER} />
             </View>
-          </View>
+          </TouchableOpacity>
         )}
 
         {/* Calendar Header */}
@@ -831,7 +833,11 @@ function ExchangeCard({
   })();
 
   return (
-    <View className="bg-cream dark:bg-slate-800 rounded-2xl p-4 shadow-card">
+    <TouchableOpacity
+      className="bg-cream dark:bg-slate-800 rounded-2xl p-4 shadow-card"
+      onPress={() => router.push(`/exchange/${exchange.id}`)}
+      activeOpacity={0.7}
+    >
       <View className="flex-row items-start">
         <View
           className="w-12 h-12 rounded-2xl items-center justify-center"
@@ -889,6 +895,8 @@ function ExchangeCard({
             </View>
           )}
         </View>
+
+        <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
       </View>
 
       {exchange.silent_handoff_enabled && isWithinWindow && (
@@ -944,6 +952,6 @@ function ExchangeCard({
           </Text>
         </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 }
