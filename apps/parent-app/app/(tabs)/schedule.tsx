@@ -91,15 +91,22 @@ export default function ScheduleScreen() {
 
       const [summaryData, exchangesData, eventsData] = await Promise.all([
         parent.custody.getCustodySummary(familyFileId),
-        parent.custody.getExchanges(familyFileId, { upcoming_only: true, limit: 10 }),
+        parent.custody.getExchanges(familyFileId, { upcoming_only: false, limit: 50 }),
         parent.events.listEvents(familyFileId, {
           start_date: startDate.toISOString(),
           end_date: endDate.toISOString(),
         }),
       ]);
       setCustodySummary(summaryData);
-      // Backend returns array directly, not {items: [...]}
-      setExchanges(Array.isArray(exchangesData) ? exchangesData : exchangesData?.items || []);
+      // API client now returns normalized array with scheduled_at field
+      const normalizedExchanges = Array.isArray(exchangesData) ? exchangesData : [];
+      console.log("[Schedule] Exchanges fetched:", normalizedExchanges.length);
+      console.log("[Schedule] Exchange dates:", normalizedExchanges.map(e => ({
+        id: e.id,
+        scheduled_at: e.scheduled_at,
+        date: e.scheduled_at ? new Date(e.scheduled_at).toDateString() : 'N/A'
+      })));
+      setExchanges(normalizedExchanges);
       setEvents(Array.isArray(eventsData) ? eventsData : eventsData?.items || []);
     } catch (error) {
       console.error("Failed to fetch schedule data:", error);

@@ -200,7 +200,7 @@ export async function verifyExport(exportNumber: string): Promise<ExportVerifica
   if (!response.ok) {
     throw new Error('Failed to verify export');
   }
-  return response.json();
+  return response.json() as Promise<ExportVerification>;
 }
 
 // Helper functions

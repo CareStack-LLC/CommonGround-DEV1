@@ -4,7 +4,7 @@
  * Handles ARIA Paralegal intake session management for legal professionals
  */
 
-import { fetchWithAuth } from '../../core';
+import { fetchWithParentAuth } from '../../core';
 
 // =============================================================================
 // Types
@@ -151,7 +151,7 @@ export interface IntakeQuestionCreate {
 export async function createSession(
   data: IntakeSessionCreate
 ): Promise<IntakeSessionCreatedResponse> {
-  return fetchWithAuth<IntakeSessionCreatedResponse>('/intake/sessions', {
+  return fetchWithParentAuth<IntakeSessionCreatedResponse>('/intake/sessions', {
     method: 'POST',
     body: data,
   });
@@ -169,7 +169,7 @@ export async function listSessions(options?: {
   if (options?.status) params.append('status_filter', options.status);
 
   const query = params.toString();
-  return fetchWithAuth<{ items: IntakeSessionListItem[]; total: number }>(
+  return fetchWithParentAuth<{ items: IntakeSessionListItem[]; total: number }>(
     `/intake/sessions${query ? `?${query}` : ''}`
   );
 }
@@ -178,28 +178,28 @@ export async function listSessions(options?: {
  * Get detailed intake session information
  */
 export async function getSession(sessionId: string): Promise<IntakeSessionDetail> {
-  return fetchWithAuth<IntakeSessionDetail>(`/intake/sessions/${sessionId}`);
+  return fetchWithParentAuth<IntakeSessionDetail>(`/intake/sessions/${sessionId}`);
 }
 
 /**
  * Get intake session transcript
  */
 export async function getTranscript(sessionId: string): Promise<IntakeTranscript> {
-  return fetchWithAuth<IntakeTranscript>(`/intake/sessions/${sessionId}/transcript`);
+  return fetchWithParentAuth<IntakeTranscript>(`/intake/sessions/${sessionId}/transcript`);
 }
 
 /**
  * Get ARIA summary of the intake
  */
 export async function getSummary(sessionId: string): Promise<IntakeSummary> {
-  return fetchWithAuth<IntakeSummary>(`/intake/sessions/${sessionId}/summary`);
+  return fetchWithParentAuth<IntakeSummary>(`/intake/sessions/${sessionId}/summary`);
 }
 
 /**
  * Get all outputs from completed intake
  */
 export async function getOutputs(sessionId: string): Promise<IntakeOutputs> {
-  return fetchWithAuth<IntakeOutputs>(`/intake/sessions/${sessionId}/outputs`);
+  return fetchWithParentAuth<IntakeOutputs>(`/intake/sessions/${sessionId}/outputs`);
 }
 
 /**
@@ -214,7 +214,7 @@ export async function requestClarification(
   clarification_request: string;
   message: string;
 }> {
-  return fetchWithAuth(`/intake/sessions/${sessionId}/request-clarification`, {
+  return fetchWithParentAuth(`/intake/sessions/${sessionId}/request-clarification`, {
     method: 'POST',
     body: { clarification_request: clarificationRequest },
   });
@@ -233,7 +233,7 @@ export async function markReviewed(
   message: string;
 }> {
   const params = notes ? `?notes=${encodeURIComponent(notes)}` : '';
-  return fetchWithAuth(`/intake/sessions/${sessionId}/reviewed${params}`, {
+  return fetchWithParentAuth(`/intake/sessions/${sessionId}/reviewed${params}`, {
     method: 'PATCH',
   });
 }
@@ -254,7 +254,7 @@ export async function createQuestion(
   is_template: boolean;
   message: string;
 }> {
-  return fetchWithAuth('/intake/questions', {
+  return fetchWithParentAuth('/intake/questions', {
     method: 'POST',
     body: data,
   });
@@ -267,7 +267,7 @@ export async function listQuestions(options?: {
   templates_only?: boolean;
 }): Promise<{ items: IntakeQuestion[]; total: number }> {
   const params = options?.templates_only ? '?templates_only=true' : '';
-  return fetchWithAuth<{ items: IntakeQuestion[]; total: number }>(
+  return fetchWithParentAuth<{ items: IntakeQuestion[]; total: number }>(
     `/intake/questions${params}`
   );
 }
@@ -276,7 +276,7 @@ export async function listQuestions(options?: {
  * Delete an intake question
  */
 export async function deleteQuestion(questionId: string): Promise<{ message: string }> {
-  return fetchWithAuth<{ message: string }>(`/intake/questions/${questionId}`, {
+  return fetchWithParentAuth<{ message: string }>(`/intake/questions/${questionId}`, {
     method: 'DELETE',
   });
 }

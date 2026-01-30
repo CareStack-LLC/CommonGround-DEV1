@@ -2,7 +2,7 @@
  * Settings API - User profile and notification preferences
  */
 
-import { apiRequest, getDefaultHeaders } from "../../core/fetch";
+import { fetchWithParentAuth } from "../../core/fetch";
 
 export interface UserProfile {
   id: string;
@@ -69,10 +69,7 @@ export interface PasswordChangeResponse {
  * Get current user's profile
  */
 export async function getProfile(): Promise<UserProfile> {
-  return apiRequest<UserProfile>("/users/me/profile", {
-    method: "GET",
-    headers: await getDefaultHeaders(),
-  });
+  return fetchWithParentAuth<UserProfile>("/users/me/profile");
 }
 
 /**
@@ -81,10 +78,9 @@ export async function getProfile(): Promise<UserProfile> {
 export async function updateProfile(
   data: UserProfileUpdate
 ): Promise<UserProfile> {
-  return apiRequest<UserProfile>("/users/me/profile", {
+  return fetchWithParentAuth<UserProfile>("/users/me/profile", {
     method: "PUT",
-    headers: await getDefaultHeaders(),
-    body: JSON.stringify(data),
+    body: data,
   });
 }
 
@@ -92,10 +88,7 @@ export async function updateProfile(
  * Get notification preferences
  */
 export async function getNotificationPreferences(): Promise<NotificationPreferences> {
-  return apiRequest<NotificationPreferences>("/users/me/notifications", {
-    method: "GET",
-    headers: await getDefaultHeaders(),
-  });
+  return fetchWithParentAuth<NotificationPreferences>("/users/me/notifications");
 }
 
 /**
@@ -104,10 +97,9 @@ export async function getNotificationPreferences(): Promise<NotificationPreferen
 export async function updateNotificationPreferences(
   preferences: NotificationPreferences
 ): Promise<NotificationPreferences> {
-  return apiRequest<NotificationPreferences>("/users/me/notifications", {
+  return fetchWithParentAuth<NotificationPreferences>("/users/me/notifications", {
     method: "PUT",
-    headers: await getDefaultHeaders(),
-    body: JSON.stringify(preferences),
+    body: preferences,
   });
 }
 
@@ -117,10 +109,9 @@ export async function updateNotificationPreferences(
 export async function changePassword(
   request: PasswordChangeRequest
 ): Promise<PasswordChangeResponse> {
-  return apiRequest<PasswordChangeResponse>("/users/me/password", {
+  return fetchWithParentAuth<PasswordChangeResponse>("/users/me/password", {
     method: "PUT",
-    headers: await getDefaultHeaders(),
-    body: JSON.stringify(request),
+    body: request,
   });
 }
 
@@ -136,10 +127,7 @@ export interface PrivacySettings {
  * Get privacy settings
  */
 export async function getPrivacySettings(): Promise<PrivacySettings> {
-  return apiRequest<PrivacySettings>("/users/me/privacy", {
-    method: "GET",
-    headers: await getDefaultHeaders(),
-  });
+  return fetchWithParentAuth<PrivacySettings>("/users/me/privacy");
 }
 
 /**
@@ -148,9 +136,8 @@ export async function getPrivacySettings(): Promise<PrivacySettings> {
 export async function updatePrivacySettings(
   settings: PrivacySettings
 ): Promise<PrivacySettings> {
-  return apiRequest<PrivacySettings>("/users/me/privacy", {
+  return fetchWithParentAuth<PrivacySettings>("/users/me/privacy", {
     method: "PUT",
-    headers: await getDefaultHeaders(),
-    body: JSON.stringify(settings),
+    body: settings,
   });
 }

@@ -279,6 +279,69 @@ export async function createExchange(data: {
   });
 }
 
+// Backend response type for list exchanges
+interface BackendExchangeResponse {
+  id: string;
+  case_id?: string;
+  family_file_id?: string;
+  scheduled_time?: string;
+  scheduled_at?: string;
+  next_occurrence?: string;
+  location?: string;
+  location_name?: string;
+  from_parent_id?: string;
+  to_parent_id?: string;
+  from_parent?: CustodyParent;
+  to_parent?: CustodyParent;
+  child_ids?: string[];
+  is_recurring?: boolean;
+  recurrence_pattern?: string;
+  silent_handoff_enabled?: boolean;
+  qr_confirmation_required?: boolean;
+  check_in_window_before_minutes?: number;
+  check_in_window_after_minutes?: number;
+  geofence_radius_meters?: number;
+  location_lat?: number;
+  location_lng?: number;
+  location_address?: string;
+  status?: string;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+  children_names?: string[];
+  viewer_role?: string;
+  other_parent_name?: string;
+}
+
+// Normalize backend exchange response to our CustodyExchange type
+function normalizeExchange(backend: BackendExchangeResponse): CustodyExchange {
+  return {
+    id: backend.id,
+    family_file_id: backend.family_file_id || backend.case_id || '',
+    // Use scheduled_time, next_occurrence, or scheduled_at - prioritize scheduled_time
+    scheduled_at: backend.scheduled_time || backend.next_occurrence || backend.scheduled_at || '',
+    location_name: backend.location_name || backend.location,
+    location_address: backend.location_address,
+    location_lat: backend.location_lat,
+    location_lng: backend.location_lng,
+    from_parent: backend.from_parent || (backend.viewer_role === 'dropoff' ? 'parent_a' : 'parent_b'),
+    to_parent: backend.to_parent || (backend.viewer_role === 'dropoff' ? 'parent_b' : 'parent_a'),
+    child_ids: backend.child_ids || [],
+    is_recurring: backend.is_recurring || false,
+    recurrence_pattern: backend.recurrence_pattern,
+    silent_handoff_enabled: backend.silent_handoff_enabled || false,
+    qr_confirmation_required: backend.qr_confirmation_required || false,
+    check_in_window_before_minutes: backend.check_in_window_before_minutes || 30,
+    check_in_window_after_minutes: backend.check_in_window_after_minutes || 30,
+    geofence_radius_meters: backend.geofence_radius_meters || 100,
+    status: (backend.status as ExchangeStatus) || 'scheduled',
+    notes: backend.notes,
+    created_at: backend.created_at || new Date().toISOString(),
+    updated_at: backend.updated_at || new Date().toISOString(),
+    children_names: backend.children_names,
+  };
+}
+
 /**
  * Get all exchanges for a family
  */
@@ -290,21 +353,32 @@ export async function getExchanges(
     limit?: number;
     offset?: number;
   }
-): Promise<{ items: CustodyExchange[]; total: number }> {
+): Promise<CustodyExchange[]> {
   const params = new URLSearchParams();
   if (filters?.status) params.set('status', filters.status);
   if (filters?.upcoming_only) params.set('upcoming_only', 'true');
   if (filters?.limit) params.set('limit', filters.limit.toString());
   if (filters?.offset) params.set('offset', filters.offset.toString());
   const query = params.toString() ? `?${params}` : '';
-  return fetchWithParentAuth(`/exchanges/case/${familyFileId}${query}`);
+
+  // Backend returns array directly, not { items: [...] }
+  const response = await fetchWithParentAuth<BackendExchangeResponse[]>(
+    `/exchanges/case/${familyFileId}${query}`
+  );
+
+  // Normalize the response to our expected format
+  const exchanges = Array.isArray(response) ? response : [];
+  return exchanges.map(normalizeExchange);
 }
 
 /**
  * Get a specific exchange
  */
 export async function getExchange(exchangeId: string): Promise<CustodyExchange> {
-  return fetchWithParentAuth(`/exchanges/${exchangeId}`);
+  const response = await fetchWithParentAuth<BackendExchangeResponse>(
+    `/exchanges/${exchangeId}`
+  );
+  return normalizeExchange(response);
 }
 
 /**
