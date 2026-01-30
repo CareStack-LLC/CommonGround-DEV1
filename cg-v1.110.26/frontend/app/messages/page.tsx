@@ -786,12 +786,15 @@ function MessagesContent() {
     setShowCompose(false);
     setShowSidebar(false); // Hide sidebar on mobile when selecting
 
-    // Load messages
+    // Load messages - fetch by family file to include all messages (including those from mobile)
     try {
       setIsLoadingMessages(true);
       setError(null);
-      const data = await messagesAPI.listByAgreement(agreement.id);
-      setMessages(data.reverse());
+      const familyFileIdToUse = fileToUse?.id;
+      const data = familyFileIdToUse
+        ? await messagesAPI.listByFamilyFile(familyFileIdToUse)
+        : await messagesAPI.listByAgreement(agreement.id);
+      setMessages(data);
 
       // Mark messages as read when viewing them
       if (fileToUse?.id) {
@@ -813,8 +816,11 @@ function MessagesContent() {
     try {
       setIsLoadingMessages(true);
       setError(null);
-      const data = await messagesAPI.listByAgreement(agreementId);
-      setMessages(data.reverse());
+      // Fetch by family file to include all messages (including those from mobile without agreement_id)
+      const data = selectedFamilyFile?.id
+        ? await messagesAPI.listByFamilyFile(selectedFamilyFile.id)
+        : await messagesAPI.listByAgreement(agreementId);
+      setMessages(data);
 
       // Mark messages as read when viewing them
       if (selectedFamilyFile?.id) {

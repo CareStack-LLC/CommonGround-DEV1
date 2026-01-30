@@ -60,8 +60,9 @@ export function useRealtimeMessages({
     if (!familyFileId || !onNewMessage) return;
 
     const unsubscribe = onMessageInsert((row: MessageRow) => {
-      // Filter by agreement if specified
-      if (agreementId && row.agreement_id !== agreementId) return;
+      // Accept messages that match the agreement OR have no agreement (from mobile)
+      // This ensures cross-platform sync works correctly
+      if (agreementId && row.agreement_id && row.agreement_id !== agreementId) return;
 
       const message = rowToMessage(row);
       onNewMessage(message);
@@ -76,8 +77,8 @@ export function useRealtimeMessages({
     if (!onMessageRead && !onMessageAcknowledged) return;
 
     const unsubscribe = onMessageUpdate((row: MessageRow) => {
-      // Filter by agreement if specified
-      if (agreementId && row.agreement_id !== agreementId) return;
+      // Accept updates for messages that match the agreement OR have no agreement (from mobile)
+      if (agreementId && row.agreement_id && row.agreement_id !== agreementId) return;
 
       if (row.read_at && onMessageRead) {
         onMessageRead(row.id, row.read_at);

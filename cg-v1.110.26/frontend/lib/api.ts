@@ -758,6 +758,16 @@ export const messagesAPI = {
   },
 
   /**
+   * Get messages for a Family File
+   * This fetches all messages in the family file, regardless of agreement
+   */
+  async listByFamilyFile(familyFileId: string, limit = 100, offset = 0): Promise<Message[]> {
+    return fetchAPI<Message[]>(
+      `/messages/family-file/${familyFileId}?limit=${limit}&offset=${offset}`
+    );
+  },
+
+  /**
    * Analyze message before sending
    * Uses case-level or family file-level ARIA settings
    */

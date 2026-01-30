@@ -61,9 +61,8 @@ export function useMessages(options: UseMessagesOptions = {}): UseMessagesReturn
       if (agreementId) {
         endpoint = `${API_URL}/api/v1/messages/agreement/${agreementId}`;
       } else if (familyFileId) {
-        // For family file messages, we need to get messages for that context
-        // The backend uses a threads/messages structure
-        endpoint = `${API_URL}/api/v1/messages/agreement/${familyFileId}`;
+        // For family file messages, use the family-file endpoint
+        endpoint = `${API_URL}/api/v1/messages/family-file/${familyFileId}`;
       } else {
         // Get all messages for the user - need to get family files first
         setMessages([]);
@@ -85,7 +84,13 @@ export function useMessages(options: UseMessagesOptions = {}): UseMessagesReturn
       }
 
       const data = await response.json();
-      setMessages(data.items || data || []);
+      // Map backend field names to frontend expected names
+      const messages = (data.items || data || []).map((msg: any) => ({
+        ...msg,
+        created_at: msg.created_at || msg.sent_at, // Backend uses sent_at
+        is_read: msg.is_read ?? (msg.read_at !== null),
+      }));
+      setMessages(messages);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to load messages";
       setError(message);

@@ -669,6 +669,23 @@ class CustodyExchangeService:
             from app.services.custody_time import CustodyTimeService
             await CustodyTimeService.update_custody_from_exchange(db, instance)
 
+            # CRITICAL FIX: Update custody override on children to the receiving parent
+            # This ensures the custody days counter updates correctly after exchanges
+            from app.models.child import Child
+            children_result = await db.execute(
+                select(Child).where(
+                    Child.family_file_id == exchange.family_file_id,
+                    Child.is_active == True
+                )
+            )
+            children = children_result.scalars().all()
+
+            for child in children:
+                # Set custody to the receiving parent (to_parent)
+                child.current_custody_parent_id = exchange.to_parent_id
+                child.custody_override_at = datetime.utcnow()
+                child.custody_override_by = user_id  # Record who completed the exchange
+
         instance.updated_at = datetime.utcnow()
         await db.commit()
         await db.refresh(instance)
@@ -1447,17 +1464,38 @@ class CustodyExchangeService:
                 if not next_exchange_instance and all_upcoming_instances:
                     next_exchange_instance = all_upcoming_instances[0]
 
-                # Calculate time remaining
+                # Calculate time with current parent based on when custody started
                 hours_remaining = None
                 time_with_current_hours = None
                 progress_percentage = 0.0
                 default_custody_period = 168.0  # 7 days in hours
 
+                # Use custody_override_at to calculate actual time elapsed since custody started
+                if child.custody_override_at:
+                    # Make sure we compare naive datetimes
+                    override_time = child.custody_override_at
+                    if override_time.tzinfo is not None:
+                        override_time = override_time.replace(tzinfo=None)
+                    time_with_current_hours = (now - override_time).total_seconds() / 3600
+                    time_with_current_hours = max(0, time_with_current_hours)  # Ensure non-negative
+
                 if next_exchange_instance:
                     hours_remaining = (next_exchange_instance.scheduled_time - now).total_seconds() / 3600
-                    if hours_remaining < default_custody_period:
-                        time_with_current_hours = default_custody_period - hours_remaining
-                        progress_percentage = min(100.0, (time_with_current_hours / default_custody_period) * 100)
+
+                # Calculate progress based on time elapsed vs total custody period
+                if time_with_current_hours is not None and next_exchange_instance:
+                    # Total period from custody start to next exchange
+                    total_period = time_with_current_hours + max(0, hours_remaining or 0)
+                    if total_period > 0:
+                        progress_percentage = min(100.0, (time_with_current_hours / total_period) * 100)
+                elif time_with_current_hours is not None:
+                    # No next exchange - use default 7-day period
+                    progress_percentage = min(100.0, (time_with_current_hours / default_custody_period) * 100)
+
+                # Calculate days for display
+                days_with_current = None
+                if time_with_current_hours is not None:
+                    days_with_current = int(time_with_current_hours / 24)
 
                 child_statuses.append({
                     "child_id": child.id,
@@ -1475,6 +1513,8 @@ class CustodyExchangeService:
                     ),
                     "hours_remaining": round(hours_remaining, 1) if hours_remaining else None,
                     "time_with_current_parent_hours": round(time_with_current_hours, 1) if time_with_current_hours else None,
+                    "days_with_current_parent": days_with_current,
+                    "custody_started_at": child.custody_override_at.isoformat() if child.custody_override_at else None,
                     "progress_percentage": round(progress_percentage, 1)
                 })
                 continue  # Skip to next child - override handled
