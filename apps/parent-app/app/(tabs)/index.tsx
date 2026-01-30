@@ -181,9 +181,14 @@ export default function DashboardScreen() {
     // Use real custody status if available
     const child = custodyStatus?.children?.[0];
     if (child) {
+      // Use actual days from backend (tracked from last exchange check-in)
+      // days_with_current_parent: The day of pickup/dropoff counts as day 1
+      const daysWithParent = child.days_with_current_parent ?? 0;
+
+      // Calculate hours remaining until next exchange
       const hoursRemaining = child.hours_remaining || 0;
-      const days = Math.floor(hoursRemaining / 24);
-      const hours = Math.round(hoursRemaining % 24);
+      const daysUntilExchange = Math.floor(hoursRemaining / 24);
+      const hoursUntilExchange = Math.round(hoursRemaining % 24);
 
       let formattedTime = "";
       if (child.next_exchange_time) {
@@ -191,13 +196,21 @@ export default function DashboardScreen() {
       }
 
       return {
-        days,
-        hours,
+        // Days WITH current parent (actual tracked days from last check-in)
+        daysWithParent,
+        // Days/hours UNTIL next exchange
+        daysUntilExchange,
+        hoursUntilExchange,
+        // Legacy fields for backward compatibility
+        days: daysUntilExchange,
+        hours: hoursUntilExchange,
         progress: (child.progress_percentage || 0) / 100, // Convert percentage to decimal
         formattedTime,
         isDropoff: child.next_action === "dropoff",
         withCurrentUser: child.with_current_user,
         childName: child.child_first_name,
+        currentParentName: child.current_parent_name,
+        custodyStartedAt: child.custody_started_at,
         agreementActiveDays: custodyStatus?.agreement_active_days,
       };
     }
@@ -305,13 +318,21 @@ export default function DashboardScreen() {
                   {childName.charAt(0)}
                 </Text>
               </View>
-              <View style={{ marginLeft: 12 }}>
+              <View style={{ marginLeft: 12, flex: 1 }}>
                 <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE }}>
                   {childName}
                 </Text>
-                <Text style={{ fontSize: 14, color: SAGE, fontWeight: "500" }}>
-                  {custodyData?.withCurrentUser !== false ? "With You" : `With ${custodyStatus?.coparent_name || "Co-parent"}`}
-                </Text>
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 2 }}>
+                  <Text style={{ fontSize: 14, color: SAGE, fontWeight: "500" }}>
+                    {custodyData?.withCurrentUser !== false ? "With You" : `With ${custodyStatus?.coparent_name || "Co-parent"}`}
+                  </Text>
+                  {/* Show actual days with current parent */}
+                  {custodyData?.daysWithParent !== undefined && custodyData.daysWithParent > 0 && (
+                    <Text style={{ fontSize: 14, color: AMBER, fontWeight: "600", marginLeft: 8 }}>
+                      • {custodyData.daysWithParent} day{custodyData.daysWithParent !== 1 ? "s" : ""}
+                    </Text>
+                  )}
+                </View>
               </View>
             </View>
 
@@ -358,7 +379,7 @@ export default function DashboardScreen() {
                 </View>
 
                 <Text style={{ fontSize: 12, color: SLATE_LIGHT }}>
-                  {custodyData.days} day{custodyData.days !== 1 ? "s" : ""}, {custodyData.hours} hour{custodyData.hours !== 1 ? "s" : ""} remaining
+                  {custodyData.daysUntilExchange ?? custodyData.days} day{(custodyData.daysUntilExchange ?? custodyData.days) !== 1 ? "s" : ""}, {custodyData.hoursUntilExchange ?? custodyData.hours} hour{(custodyData.hoursUntilExchange ?? custodyData.hours) !== 1 ? "s" : ""} until exchange
                 </Text>
               </>
             )}

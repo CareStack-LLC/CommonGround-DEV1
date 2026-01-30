@@ -323,6 +323,8 @@ class ChildCustodyStatus(BaseModel):
     # Time calculations
     hours_remaining: Optional[float] = None
     time_with_current_parent_hours: Optional[float] = None
+    days_with_current_parent: Optional[int] = None  # Actual days from last check-in (pickup/dropoff day counts as day 1)
+    custody_started_at: Optional[str] = None  # ISO timestamp of when custody transferred
     progress_percentage: float = 0  # 0-100
 
 

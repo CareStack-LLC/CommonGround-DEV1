@@ -1403,7 +1403,62 @@ class CustodyExchangeService:
         children = children_result.scalars().all()
 
         now = datetime.utcnow()
+        today = now.date()
         child_statuses = []
+
+        # ============================================================
+        # Query COMPLETED exchanges to find when custody last transferred
+        # This gives us actual custody start times from real check-ins
+        # ============================================================
+        if family_file.legacy_case_id:
+            completed_exchange_filter = or_(
+                CustodyExchange.family_file_id == family_file_id,
+                CustodyExchange.case_id == family_file.legacy_case_id
+            )
+        else:
+            completed_exchange_filter = CustodyExchange.family_file_id == family_file_id
+
+        completed_exchanges_result = await db.execute(
+            select(CustodyExchangeInstance)
+            .options(selectinload(CustodyExchangeInstance.exchange))
+            .join(CustodyExchange, CustodyExchangeInstance.exchange_id == CustodyExchange.id)
+            .where(
+                and_(
+                    completed_exchange_filter,
+                    CustodyExchangeInstance.status == "completed"
+                )
+            )
+            .order_by(CustodyExchangeInstance.completed_at.desc())
+            .limit(20)
+        )
+        completed_exchanges = completed_exchanges_result.scalars().all()
+
+        # Build a map of child_id -> last custody transfer info
+        # This tracks when each child's custody actually changed hands
+        child_custody_starts: Dict[str, datetime] = {}
+        child_custody_parent: Dict[str, str] = {}  # child_id -> parent_id who received custody
+
+        for completed_inst in completed_exchanges:
+            exchange = completed_inst.exchange
+            if not exchange:
+                continue
+
+            # Get child IDs from this exchange
+            exchange_child_ids = exchange.child_ids or []
+            pickup_ids = exchange.pickup_child_ids or []
+            dropoff_ids = exchange.dropoff_child_ids or []
+            all_child_ids = set(exchange_child_ids + pickup_ids + dropoff_ids)
+
+            # The receiving parent (to_parent) got custody at completion time
+            custody_start_time = completed_inst.completed_at or completed_inst.to_parent_check_in_time
+            receiving_parent = exchange.to_parent_id
+
+            for child_id in all_child_ids:
+                # Only set if we haven't already found a more recent exchange for this child
+                if child_id not in child_custody_starts and custody_start_time:
+                    child_custody_starts[child_id] = custody_start_time
+                    if receiving_parent:
+                        child_custody_parent[child_id] = receiving_parent
 
         # First, get ALL upcoming exchanges for this family file (simpler query without child filter)
         # This avoids JSONB contains issues with JSON columns
@@ -1641,21 +1696,56 @@ class CustodyExchangeService:
                             current_parent_name = "You"
                             next_action = "dropoff"
 
-            # Calculate time remaining
+            # Calculate time remaining until next exchange
             hours_remaining = None
-            time_with_current_hours = None
-            progress_percentage = 0.0
-            default_custody_period = 168.0  # 7 days in hours
-
             if next_exchange_instance:
                 hours_remaining = (next_exchange_instance.scheduled_time - now).total_seconds() / 3600
 
-                # Progress calculation: use default period
-                if hours_remaining < default_custody_period:
+            # ============================================================
+            # Calculate ACTUAL days with current parent from last check-in
+            # Rule: The day of pickup/dropoff counts as a full day
+            # Example: Pickup Monday 10am, today is Tuesday = 2 days (Mon + Tue)
+            # ============================================================
+            time_with_current_hours = None
+            days_with_current_parent = None
+            custody_started_at = None
+            progress_percentage = 0.0
+
+            # Check if we have actual custody transfer data for this child
+            if child_id_str in child_custody_starts:
+                custody_started_at = child_custody_starts[child_id_str]
+                custody_start_date = custody_started_at.date()
+
+                # Calculate days: both start and end dates count as full days
+                # If pickup was Monday and today is Tuesday, that's 2 days (Mon, Tue)
+                days_with_current_parent = (today - custody_start_date).days + 1
+                days_with_current_parent = max(1, days_with_current_parent)  # At least 1 day
+
+                # Convert to hours for backward compatibility
+                time_with_current_hours = (now - custody_started_at).total_seconds() / 3600
+                time_with_current_hours = max(0, time_with_current_hours)
+
+                # Calculate progress based on actual custody period
+                # (time elapsed / total custody period from start to next exchange)
+                if hours_remaining is not None and hours_remaining > 0:
+                    total_custody_hours = time_with_current_hours + hours_remaining
+                    if total_custody_hours > 0:
+                        progress_percentage = min(100.0, (time_with_current_hours / total_custody_hours) * 100)
+                else:
+                    # No next exchange scheduled - use a reasonable default (7 days)
+                    default_period = 168.0  # 7 days in hours
+                    progress_percentage = min(100.0, (time_with_current_hours / default_period) * 100)
+            else:
+                # FALLBACK: No completed exchanges - use estimated calculation
+                default_custody_period = 168.0  # 7 days in hours
+                if hours_remaining is not None and hours_remaining < default_custody_period:
                     time_with_current_hours = default_custody_period - hours_remaining
+                    # Estimate days (round up to nearest day)
+                    days_with_current_parent = max(1, int(time_with_current_hours / 24) + 1)
                     progress_percentage = min(100.0, (time_with_current_hours / default_custody_period) * 100)
                 else:
                     time_with_current_hours = 0
+                    days_with_current_parent = 0
                     progress_percentage = 0.0
 
             child_statuses.append({
@@ -1674,6 +1764,8 @@ class CustodyExchangeService:
                 ),
                 "hours_remaining": round(hours_remaining, 1) if hours_remaining else None,
                 "time_with_current_parent_hours": round(time_with_current_hours, 1) if time_with_current_hours else None,
+                "days_with_current_parent": days_with_current_parent,
+                "custody_started_at": custody_started_at.isoformat() if custody_started_at else None,
                 "progress_percentage": round(progress_percentage, 1)
             })
 
