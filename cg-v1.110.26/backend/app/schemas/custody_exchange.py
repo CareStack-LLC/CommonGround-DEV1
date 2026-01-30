@@ -330,6 +330,10 @@ class ChildCustodyStatus(BaseModel):
     # Initial check-in state
     needs_initial_checkin: bool = False  # True if no custody data exists and parent needs to check in to start tracking
 
+    # Cumulative custody totals (from custody_day_records)
+    my_total_days: int = 0  # Total cumulative days the requesting user has had custody
+    coparent_total_days: int = 0  # Total cumulative days the co-parent has had custody
+
 
 class CustodyStatusResponse(BaseModel):
     """

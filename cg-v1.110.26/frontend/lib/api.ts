@@ -4624,6 +4624,8 @@ export interface ChildCustodyStatus {
   custody_started_at?: string;  // ISO timestamp when custody transferred
   needs_initial_checkin?: boolean;  // True if no custody data exists and parent needs to check in
   progress_percentage: number;
+  my_total_days?: number;  // Cumulative total days the requesting user has had custody
+  coparent_total_days?: number;  // Cumulative total days the co-parent has had custody
 }
 
 export interface CustodyStatusResponse {

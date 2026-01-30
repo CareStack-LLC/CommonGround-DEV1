@@ -305,17 +305,28 @@ function ChildCustodyCard({
           </>
         )}
 
-        {/* Days with parent - custody time tracking (always show) */}
+        {/* Cumulative custody totals - shows both parents' total days */}
         <div className="mt-4 pt-4 border-t-2 border-slate-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
               <span className="text-sm text-slate-700 font-semibold">
-                {isWithYou ? 'Days with you' : `Days with ${childStatus.current_parent_name || coparentName || 'co-parent'}`}
+                Your total days
               </span>
             </div>
             <span className="text-2xl font-bold text-[var(--portal-primary)]">
-              {childStatus.days_with_current_parent ?? myDays ?? 0} <span className="text-xs font-medium text-slate-400">days</span>
+              {childStatus.my_total_days ?? 0} <span className="text-xs font-medium text-slate-400">days</span>
+            </span>
+          </div>
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-slate-400 shadow-sm" />
+              <span className="text-sm text-slate-500 font-medium">
+                {coparentName || 'Co-parent'}&apos;s total
+              </span>
+            </div>
+            <span className="text-xl font-semibold text-slate-500">
+              {childStatus.coparent_total_days ?? 0} <span className="text-xs font-medium text-slate-400">days</span>
             </span>
           </div>
         </div>

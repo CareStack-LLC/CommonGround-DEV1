@@ -15,6 +15,7 @@ from sqlalchemy.orm import selectinload
 from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
 from app.models.case import Case, CaseParticipant
 from app.models.family_file import FamilyFile
+from app.models.custody_day_record import CustodyDayRecord
 from app.services.geolocation import GeolocationService
 from app.services.custody_time import CustodyTimeService
 from app.services.realtime import realtime_service, RealtimeEventType
@@ -1407,6 +1408,36 @@ class CustodyExchangeService:
         child_statuses = []
 
         # ============================================================
+        # Query CUMULATIVE custody days per parent per child
+        # This gives us total historical days from custody_day_records
+        # ============================================================
+        from sqlalchemy import func
+
+        # Get all custody day records for this family file grouped by child and parent
+        cumulative_days_result = await db.execute(
+            select(
+                CustodyDayRecord.child_id,
+                CustodyDayRecord.custodial_parent_id,
+                func.count(CustodyDayRecord.id).label('day_count')
+            )
+            .where(CustodyDayRecord.family_file_id == family_file_id)
+            .group_by(CustodyDayRecord.child_id, CustodyDayRecord.custodial_parent_id)
+        )
+        cumulative_rows = cumulative_days_result.all()
+
+        # Build a map: child_id -> {parent_id -> day_count}
+        child_cumulative_days: Dict[str, Dict[str, int]] = {}
+        for row in cumulative_rows:
+            child_id = str(row.child_id)
+            parent_id = str(row.custodial_parent_id) if row.custodial_parent_id else None
+            day_count = row.day_count
+
+            if child_id not in child_cumulative_days:
+                child_cumulative_days[child_id] = {}
+            if parent_id:
+                child_cumulative_days[child_id][parent_id] = day_count
+
+        # ============================================================
         # Query COMPLETED exchanges to find when custody last transferred
         # This gives us actual custody start times from real check-ins
         # ============================================================
@@ -1556,6 +1587,11 @@ class CustodyExchangeService:
                     days_with_current = (today - override_date).days + 1
                     days_with_current = max(1, days_with_current)  # At least 1 day
 
+                # Get cumulative days for this child
+                child_days = child_cumulative_days.get(child_id_str, {})
+                my_total_days = child_days.get(str(user_id), 0)
+                coparent_total_days = child_days.get(str(coparent_id), 0) if coparent_id else 0
+
                 child_statuses.append({
                     "child_id": child.id,
                     "child_first_name": child.first_name,
@@ -1576,6 +1612,8 @@ class CustodyExchangeService:
                     "custody_started_at": child.custody_override_at.isoformat() if child.custody_override_at else None,
                     "progress_percentage": round(progress_percentage, 1),
                     "needs_initial_checkin": False,  # Has manual override - no check-in needed
+                    "my_total_days": my_total_days,
+                    "coparent_total_days": coparent_total_days,
                 })
                 continue  # Skip to next child - override handled
 
@@ -1781,6 +1819,11 @@ class CustodyExchangeService:
                 child_id_str not in child_custody_starts
             )
 
+            # Get cumulative days for this child
+            child_days = child_cumulative_days.get(child_id_str, {})
+            my_total_days = child_days.get(str(user_id), 0)
+            coparent_total_days = child_days.get(str(coparent_id), 0) if coparent_id else 0
+
             child_statuses.append({
                 "child_id": child.id,
                 "child_first_name": child.first_name,
@@ -1801,6 +1844,8 @@ class CustodyExchangeService:
                 "custody_started_at": custody_started_at.isoformat() if custody_started_at else None,
                 "progress_percentage": round(progress_percentage, 1),
                 "needs_initial_checkin": needs_initial_checkin,
+                "my_total_days": my_total_days,
+                "coparent_total_days": coparent_total_days,
             })
 
         # Overall status
