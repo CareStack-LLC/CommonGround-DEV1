@@ -1600,15 +1600,33 @@ class CustodyExchangeService:
                 next_exchange_instance = all_upcoming_instances[0]
                 child_explicitly_assigned = False
 
-            # Determine who has the child based on upcoming exchange
-            # If child is in dropoff_child_ids for user's exchange → child is WITH user
-            # If child is in pickup_child_ids for user's exchange → child is WITH other parent
+            # ============================================================
+            # PRIORITY: Use completed exchange data to determine WHO HAS CUSTODY
+            # This is more accurate than inferring from upcoming exchanges
+            # ============================================================
             with_current_user = True  # Default: assume with current user if no exchange data
             current_parent_id = user_id
             current_parent_name = "You"
             next_action = None  # 'pickup' or 'dropoff'
 
-            if next_exchange_instance:
+            # Check if we know who has custody from completed exchanges
+            if child_id_str in child_custody_parent:
+                custody_holder_id = child_custody_parent[child_id_str]
+                if str(custody_holder_id) == str(user_id):
+                    # Current user has custody
+                    with_current_user = True
+                    current_parent_id = user_id
+                    current_parent_name = "You"
+                    next_action = "dropoff"  # They will drop off at next exchange
+                else:
+                    # Co-parent has custody
+                    with_current_user = False
+                    current_parent_id = coparent_id
+                    current_parent_name = coparent_name
+                    next_action = "pickup"  # User will pick up at next exchange
+
+            # If no completed exchange data, fall back to inferring from upcoming exchange
+            elif next_exchange_instance:
                 exchange = next_exchange_instance.exchange
                 exchange_creator = str(exchange.created_by)
                 user_id_str = str(user_id)
