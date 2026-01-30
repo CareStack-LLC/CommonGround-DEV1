@@ -157,6 +157,8 @@ export interface ChildCustodyStatus {
   days_with_current_parent?: number;
   custody_started_at?: string;
   progress_percentage: number;
+  /** True if no custody data exists and parent needs to check in to start tracking */
+  needs_initial_checkin?: boolean;
 }
 
 /**
@@ -290,6 +292,27 @@ export async function overrideCustody(data: {
   reason: string;
 }): Promise<CustodyDayRecord> {
   return fetchWithParentAuth('/exchanges/custody/override', {
+    method: 'POST',
+    body: data,
+  });
+}
+
+/**
+ * Claim custody of children ("With Me" / Initial Check-in)
+ *
+ * Used for:
+ * - Initial check-in when custody tracking starts
+ * - Claiming custody without a scheduled exchange
+ *
+ * Sets the current custody parent on the child records and starts
+ * tracking time from this moment.
+ */
+export async function claimCustody(data: {
+  family_file_id: string;
+  child_ids: string[];
+  notes?: string;
+}): Promise<{ success: boolean; message: string }> {
+  return fetchWithParentAuth('/exchanges/override-custody', {
     method: 'POST',
     body: data,
   });

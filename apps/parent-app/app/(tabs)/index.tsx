@@ -3,7 +3,7 @@
  * Clean, card-based layout with custody status, action stream, and quick actions
  */
 
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Alert, ActivityIndicator } from "react-native";
 import { useState, useCallback, useEffect } from "react";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -30,6 +30,8 @@ interface ChildCustodyStatus {
   days_with_current_parent?: number;
   custody_started_at?: string;
   progress_percentage: number;
+  /** True if no custody data exists and parent needs to check in to start tracking */
+  needs_initial_checkin?: boolean;
 }
 
 interface CustodyStatusResponse {
@@ -87,6 +89,7 @@ export default function DashboardScreen() {
   const [dashboardData, setDashboardData] = useState<DashboardSummary | null>(null);
   const [nextExchange, setNextExchange] = useState<UpcomingEvent | null>(null);
   const [custodyStatus, setCustodyStatus] = useState<CustodyStatusResponse | null>(null);
+  const [checkingIn, setCheckingIn] = useState(false);
 
   const familyFileId = familyFile?.id;
 
@@ -160,6 +163,47 @@ export default function DashboardScreen() {
     setRefreshing(false);
   }, [refresh, fetchDashboard]);
 
+  // Handle initial check-in - claims custody to start tracking
+  const handleCheckIn = useCallback(async () => {
+    if (!familyFileId || !children?.length) {
+      Alert.alert("Error", "No children found to check in");
+      return;
+    }
+
+    setCheckingIn(true);
+    try {
+      const token = await getToken();
+      const apiUrl = process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com";
+
+      const response = await fetch(`${apiUrl}/api/v1/exchanges/override-custody`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          family_file_id: familyFileId,
+          child_ids: children.map(c => c.id),
+          notes: "Initial check-in to start custody tracking",
+        }),
+      });
+
+      if (response.ok) {
+        Alert.alert("Success", "Custody check-in recorded. Time tracking has started.");
+        // Refresh custody status
+        await fetchDashboard();
+      } else {
+        const errorData = await response.json().catch(() => ({})) as { detail?: string };
+        Alert.alert("Error", errorData.detail || "Failed to check in");
+      }
+    } catch (error) {
+      console.error("Check-in error:", error);
+      Alert.alert("Error", "Failed to check in. Please try again.");
+    } finally {
+      setCheckingIn(false);
+    }
+  }, [familyFileId, children, fetchDashboard]);
+
   // Format relative time badge
   const formatTimeBadge = (dateString: string): { text: string; subtext: string } => {
     const date = new Date(dateString);
@@ -181,6 +225,9 @@ export default function DashboardScreen() {
     // Use real custody status if available
     const child = custodyStatus?.children?.[0];
     if (child) {
+      // Check if initial check-in is needed
+      const needsInitialCheckin = child.needs_initial_checkin ?? false;
+
       // Use actual days from backend (tracked from last exchange check-in)
       // days_with_current_parent: The day of pickup/dropoff counts as day 1
       const daysWithParent = child.days_with_current_parent ?? 0;
@@ -212,6 +259,7 @@ export default function DashboardScreen() {
         currentParentName: child.current_parent_name,
         custodyStartedAt: child.custody_started_at,
         agreementActiveDays: custodyStatus?.agreement_active_days,
+        needsInitialCheckin,
       };
     }
 
@@ -239,6 +287,7 @@ export default function DashboardScreen() {
       withCurrentUser: true,
       childName: children?.[0]?.first_name || "Child",
       agreementActiveDays: undefined,
+      needsInitialCheckin: false,
     };
   };
 
@@ -323,27 +372,67 @@ export default function DashboardScreen() {
                   {childName}
                 </Text>
                 <View style={{ flexDirection: "row", alignItems: "center", marginTop: 2 }}>
-                  <Text style={{ fontSize: 14, color: SAGE, fontWeight: "500" }}>
-                    {custodyData?.withCurrentUser !== false ? "With You" : `With ${custodyStatus?.coparent_name || "Co-parent"}`}
-                  </Text>
-                  {/* Show actual days with current parent */}
-                  {custodyData?.daysWithParent !== undefined && custodyData.daysWithParent > 0 && (
-                    <Text style={{ fontSize: 14, color: AMBER, fontWeight: "600", marginLeft: 8 }}>
-                      • {custodyData.daysWithParent} day{custodyData.daysWithParent !== 1 ? "s" : ""}
+                  {custodyData?.needsInitialCheckin ? (
+                    <Text style={{ fontSize: 14, color: AMBER, fontWeight: "500" }}>
+                      Check in to start tracking
                     </Text>
+                  ) : (
+                    <>
+                      <Text style={{ fontSize: 14, color: SAGE, fontWeight: "500" }}>
+                        {custodyData?.withCurrentUser !== false ? "With You" : `With ${custodyStatus?.coparent_name || "Co-parent"}`}
+                      </Text>
+                      {/* Show actual days with current parent */}
+                      {custodyData?.daysWithParent !== undefined && custodyData.daysWithParent > 0 && (
+                        <Text style={{ fontSize: 14, color: AMBER, fontWeight: "600", marginLeft: 8 }}>
+                          • {custodyData.daysWithParent} day{custodyData.daysWithParent !== 1 ? "s" : ""}
+                        </Text>
+                      )}
+                    </>
                   )}
                 </View>
               </View>
             </View>
 
-            {/* Next Exchange Info */}
-            {custodyData && (
+            {/* Initial Check-in Required */}
+            {custodyData?.needsInitialCheckin ? (
+              <View>
+                <Text style={{ fontSize: 14, color: SLATE, marginBottom: 12, lineHeight: 20 }}>
+                  To start tracking custody time, check in when your child is with you.
+                </Text>
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: SAGE,
+                    borderRadius: 12,
+                    paddingVertical: 14,
+                    paddingHorizontal: 20,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onPress={handleCheckIn}
+                  disabled={checkingIn}
+                >
+                  {checkingIn ? (
+                    <ActivityIndicator size="small" color={WHITE} />
+                  ) : (
+                    <>
+                      <Ionicons name="checkmark-circle" size={20} color={WHITE} style={{ marginRight: 8 }} />
+                      <Text style={{ color: WHITE, fontSize: 16, fontWeight: "600" }}>
+                        Check In - Child is With Me
+                      </Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              </View>
+            ) : custodyData ? (
+              /* Normal custody tracking display */
               <>
+                {/* Next Exchange Info */}
                 <View style={{ marginBottom: 12 }}>
                   <Text style={{ fontSize: 14, color: custodyData.isDropoff ? RED : SAGE, fontWeight: "600" }}>
                     {custodyData.isDropoff ? "Drop off" : "Pick up"}{" "}
                     <Text style={{ color: SLATE, fontWeight: "400" }}>
-                      {custodyData.formattedTime}
+                      {custodyData.formattedTime || "No exchange scheduled"}
                     </Text>
                   </Text>
                 </View>
@@ -358,7 +447,7 @@ export default function DashboardScreen() {
                   }}>
                     <View style={{
                       height: "100%",
-                      width: `${custodyData.progress * 100}%`,
+                      width: `${Math.min(100, custodyData.progress * 100)}%`,
                       backgroundColor: SAGE,
                       borderRadius: 3,
                     }}>
@@ -378,11 +467,44 @@ export default function DashboardScreen() {
                   </View>
                 </View>
 
-                <Text style={{ fontSize: 12, color: SLATE_LIGHT }}>
-                  {custodyData.daysUntilExchange ?? custodyData.days} day{(custodyData.daysUntilExchange ?? custodyData.days) !== 1 ? "s" : ""}, {custodyData.hoursUntilExchange ?? custodyData.hours} hour{(custodyData.hoursUntilExchange ?? custodyData.hours) !== 1 ? "s" : ""} until exchange
-                </Text>
+                {custodyData.formattedTime ? (
+                  <Text style={{ fontSize: 12, color: SLATE_LIGHT }}>
+                    {custodyData.daysUntilExchange ?? custodyData.days} day{(custodyData.daysUntilExchange ?? custodyData.days) !== 1 ? "s" : ""}, {custodyData.hoursUntilExchange ?? custodyData.hours} hour{(custodyData.hoursUntilExchange ?? custodyData.hours) !== 1 ? "s" : ""} until exchange
+                  </Text>
+                ) : (
+                  <Text style={{ fontSize: 12, color: SLATE_LIGHT }}>
+                    No upcoming exchange scheduled
+                  </Text>
+                )}
+
+                {/* Quick Check-in Button (for claiming custody outside of exchanges) */}
+                <TouchableOpacity
+                  style={{
+                    marginTop: 12,
+                    paddingVertical: 10,
+                    paddingHorizontal: 16,
+                    backgroundColor: `${SAGE}15`,
+                    borderRadius: 8,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onPress={handleCheckIn}
+                  disabled={checkingIn}
+                >
+                  {checkingIn ? (
+                    <ActivityIndicator size="small" color={SAGE} />
+                  ) : (
+                    <>
+                      <Ionicons name="hand-left" size={16} color={SAGE} style={{ marginRight: 6 }} />
+                      <Text style={{ color: SAGE, fontSize: 14, fontWeight: "500" }}>
+                        With Me
+                      </Text>
+                    </>
+                  )}
+                </TouchableOpacity>
               </>
-            )}
+            ) : null}
 
             {/* Days Since Agreement */}
             <View style={{
