@@ -1548,9 +1548,13 @@ class CustodyExchangeService:
                     progress_percentage = min(100.0, (time_with_current_hours / default_custody_period) * 100)
 
                 # Calculate days for display
+                # Use date-based calculation: check-in day counts as Day 1
                 days_with_current = None
-                if time_with_current_hours is not None:
-                    days_with_current = int(time_with_current_hours / 24)
+                if child.custody_override_at:
+                    override_date = child.custody_override_at.date()
+                    # Both check-in day and today count as full days
+                    days_with_current = (today - override_date).days + 1
+                    days_with_current = max(1, days_with_current)  # At least 1 day
 
                 child_statuses.append({
                     "child_id": child.id,
@@ -1570,7 +1574,8 @@ class CustodyExchangeService:
                     "time_with_current_parent_hours": round(time_with_current_hours, 1) if time_with_current_hours else None,
                     "days_with_current_parent": days_with_current,
                     "custody_started_at": child.custody_override_at.isoformat() if child.custody_override_at else None,
-                    "progress_percentage": round(progress_percentage, 1)
+                    "progress_percentage": round(progress_percentage, 1),
+                    "needs_initial_checkin": False,  # Has manual override - no check-in needed
                 })
                 continue  # Skip to next child - override handled
 
@@ -1766,6 +1771,16 @@ class CustodyExchangeService:
                     days_with_current_parent = 0
                     progress_percentage = 0.0
 
+            # ============================================================
+            # Determine if initial check-in is needed
+            # True when: no manual override AND no completed exchanges
+            # This means we have NO actual custody data for this child
+            # ============================================================
+            needs_initial_checkin = (
+                child.current_custody_parent_id is None and
+                child_id_str not in child_custody_starts
+            )
+
             child_statuses.append({
                 "child_id": child.id,
                 "child_first_name": child.first_name,
@@ -1784,7 +1799,8 @@ class CustodyExchangeService:
                 "time_with_current_parent_hours": round(time_with_current_hours, 1) if time_with_current_hours else None,
                 "days_with_current_parent": days_with_current_parent,
                 "custody_started_at": custody_started_at.isoformat() if custody_started_at else None,
-                "progress_percentage": round(progress_percentage, 1)
+                "progress_percentage": round(progress_percentage, 1),
+                "needs_initial_checkin": needs_initial_checkin,
             })
 
         # Overall status

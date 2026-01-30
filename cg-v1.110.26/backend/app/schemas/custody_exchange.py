@@ -327,6 +327,9 @@ class ChildCustodyStatus(BaseModel):
     custody_started_at: Optional[str] = None  # ISO timestamp of when custody transferred
     progress_percentage: float = 0  # 0-100
 
+    # Initial check-in state
+    needs_initial_checkin: bool = False  # True if no custody data exists and parent needs to check in to start tracking
+
 
 class CustodyStatusResponse(BaseModel):
     """
