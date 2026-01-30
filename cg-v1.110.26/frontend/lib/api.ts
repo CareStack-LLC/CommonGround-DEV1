@@ -4620,6 +4620,9 @@ export interface ChildCustodyStatus {
   next_exchange_location?: string;
   hours_remaining?: number;
   time_with_current_parent_hours?: number;
+  days_with_current_parent?: number;  // Days since last custody check-in (check-in day = Day 1)
+  custody_started_at?: string;  // ISO timestamp when custody transferred
+  needs_initial_checkin?: boolean;  // True if no custody data exists and parent needs to check in
   progress_percentage: number;
 }
 

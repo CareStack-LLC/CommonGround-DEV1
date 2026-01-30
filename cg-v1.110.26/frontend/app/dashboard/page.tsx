@@ -220,12 +220,20 @@ function ChildCustodyCard({
             <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
               {childStatus.child_first_name}
             </p>
-            <p className={`text-sm font-medium ${statusTextColor}`}>
-              {isWithYou ? 'With You' : `With ${childStatus.current_parent_name || coparentName || 'co-parent'}`}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className={`text-sm font-medium ${statusTextColor}`}>
+                {isWithYou ? 'With You' : `With ${childStatus.current_parent_name || coparentName || 'co-parent'}`}
+              </p>
+              {/* Show days with current parent if available */}
+              {childStatus.days_with_current_parent !== undefined && childStatus.days_with_current_parent > 0 && (
+                <span className="text-sm font-semibold text-cg-amber">
+                  • Day {childStatus.days_with_current_parent}
+                </span>
+              )}
+            </div>
           </div>
-          {/* "With Me" button */}
-          {!isWithYou && onWithMe && (
+          {/* "With Me" button - show for initial check-in OR when child is with co-parent */}
+          {(childStatus.needs_initial_checkin || !isWithYou) && onWithMe && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -233,10 +241,20 @@ function ChildCustodyCard({
               }}
               className="px-4 py-2 text-xs font-bold bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0"
             >
-              With Me
+              {childStatus.needs_initial_checkin ? 'Check In' : 'With Me'}
             </button>
           )}
         </div>
+
+        {/* Initial check-in prompt */}
+        {childStatus.needs_initial_checkin && (
+          <div className="mb-3 p-3 bg-cg-amber-subtle rounded-xl">
+            <p className="text-sm text-foreground">
+              <span className="font-medium text-cg-amber">Check in to start tracking</span>
+              <span className="text-muted-foreground"> — Tap the button when {childStatus.child_first_name} is with you to begin custody time tracking.</span>
+            </p>
+          </div>
+        )}
 
         {/* Next exchange info */}
         {hasNextExchange ? (
@@ -292,9 +310,13 @@ function ChildCustodyCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
-              <span className="text-sm text-slate-700 font-semibold">Days since agreement active</span>
+              <span className="text-sm text-slate-700 font-semibold">
+                {isWithYou ? 'Days with you' : `Days with ${childStatus.current_parent_name || coparentName || 'co-parent'}`}
+              </span>
             </div>
-            <span className="text-2xl font-bold text-[var(--portal-primary)]">{myDays ?? 0} <span className="text-xs font-medium text-slate-400">days</span></span>
+            <span className="text-2xl font-bold text-[var(--portal-primary)]">
+              {childStatus.days_with_current_parent ?? myDays ?? 0} <span className="text-xs font-medium text-slate-400">days</span>
+            </span>
           </div>
         </div>
       </div>
