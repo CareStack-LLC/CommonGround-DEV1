@@ -950,6 +950,37 @@ body.child-portal.portal-transition * {
 .stagger-3 { animation-delay: 0.3s; }
 .stagger-4 { animation-delay: 0.4s; }
 .stagger-5 { animation-delay: 0.5s; }
+.stagger-6 { animation-delay: 0.6s; }
+
+/* ============================================================================
+   BLOG PAGE ANIMATIONS
+   ============================================================================ */
+
+@keyframes blog-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-blog-fade-in {
+  animation: blog-fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+/* Blog card hover enhancement */
+.blog-card-hover {
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.blog-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(74, 108, 88, 0.15);
+}
 
 /* Text utilities */
 .text-balance {
