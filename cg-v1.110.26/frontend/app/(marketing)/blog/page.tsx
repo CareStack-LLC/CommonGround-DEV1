@@ -25,7 +25,7 @@ const blogPosts = [
     date: '2025-01-06',
     readTime: '8 min read',
     featured: true,
-    image: null,
+    image: '/images/blog/image1.png',
   },
   {
     slug: 'communication-tool-for-progress',
@@ -36,7 +36,7 @@ const blogPosts = [
     date: '2025-01-04',
     readTime: '10 min read',
     featured: true,
-    image: null,
+    image: '/images/blog/image2.png',
   },
   {
     slug: 'why-written-agreements-matter',
@@ -47,7 +47,7 @@ const blogPosts = [
     date: '2025-01-02',
     readTime: '7 min read',
     featured: true,
-    image: null,
+    image: '/images/blog/image3.png',
   },
   {
     slug: 'managing-high-conflict-coparenting',
@@ -58,7 +58,7 @@ const blogPosts = [
     date: '2024-12-28',
     readTime: '12 min read',
     featured: false,
-    image: null,
+    image: '/images/blog/image4.png',
   },
   {
     slug: 'putting-children-first',
@@ -69,7 +69,7 @@ const blogPosts = [
     date: '2024-12-24',
     readTime: '9 min read',
     featured: false,
-    image: null,
+    image: '/images/blog/image5.png',
   },
   {
     slug: 'holiday-custody-planning',
@@ -80,7 +80,7 @@ const blogPosts = [
     date: '2024-12-20',
     readTime: '8 min read',
     featured: false,
-    image: null,
+    image: '/images/blog/image6.png',
   },
 ];
 
@@ -157,8 +157,12 @@ export default function BlogPage() {
             {/* Main Featured Post */}
             <div className="lg:col-span-2">
               <Link href={`/blog/${featuredPosts[0].slug}`} className="group block">
-                <div className="aspect-[16/9] bg-gradient-to-br from-cg-sage-subtle to-cg-amber-subtle rounded-2xl mb-6 flex items-center justify-center">
-                  <span className="text-6xl">📝</span>
+                <div className="aspect-[16/9] rounded-2xl mb-6 overflow-hidden">
+                  <img
+                    src={featuredPosts[0].image || ''}
+                    alt={featuredPosts[0].title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
                 <div className="inline-block px-3 py-1 bg-cg-sage-subtle text-cg-sage text-sm font-medium rounded-full mb-3">
                   {featuredPosts[0].category}
@@ -184,10 +188,12 @@ export default function BlogPage() {
             <div className="space-y-8">
               {featuredPosts.slice(1).map((post) => (
                 <Link key={post.slug} href={`/blog/${post.slug}`} className="group block">
-                  <div className="aspect-[16/9] bg-gradient-to-br from-cg-slate-subtle to-cg-sage-subtle rounded-xl mb-4 flex items-center justify-center">
-                    <span className="text-4xl">
-                      {post.category === 'Communication' ? '💬' : '📋'}
-                    </span>
+                  <div className="aspect-[16/9] rounded-xl mb-4 overflow-hidden">
+                    <img
+                      src={post.image || ''}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
                   <div className="inline-block px-2 py-0.5 bg-cg-sage-subtle text-cg-sage text-xs font-medium rounded-full mb-2">
                     {post.category}
@@ -218,11 +224,12 @@ export default function BlogPage() {
                 href={`/blog/${post.slug}`}
                 className="group bg-background rounded-xl border border-border/50 overflow-hidden hover:border-cg-sage/30 transition-colors"
               >
-                <div className="aspect-[16/10] bg-gradient-to-br from-cg-sage-subtle to-background flex items-center justify-center">
-                  <span className="text-4xl">
-                    {post.category === 'High-Conflict' ? '🛡️' :
-                     post.category === 'Parenting' ? '👨‍👩‍👧‍👦' : '📅'}
-                  </span>
+                <div className="aspect-[16/10] overflow-hidden">
+                  <img
+                    src={post.image || ''}
+                    alt={post.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 </div>
                 <div className="p-6">
                   <div className="inline-block px-2 py-0.5 bg-cg-sage-subtle text-cg-sage text-xs font-medium rounded-full mb-3">
