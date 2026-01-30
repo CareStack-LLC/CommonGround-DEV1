@@ -58,6 +58,22 @@ function RootLayoutNav() {
             animation: "slide_from_bottom",
           }}
         />
+        {/* Feature screens */}
+        <Stack.Screen name="family" />
+        <Stack.Screen name="accords" />
+        <Stack.Screen name="agreements" />
+        <Stack.Screen name="expenses" />
+        <Stack.Screen name="events" />
+        <Stack.Screen name="exchange" />
+        <Stack.Screen name="messages" />
+        <Stack.Screen name="circle" />
+        <Stack.Screen name="schedule" />
+        <Stack.Screen name="custody" />
+        <Stack.Screen name="recordings" />
+        <Stack.Screen name="exports" />
+        <Stack.Screen name="activity" />
+        <Stack.Screen name="wallet" />
+        <Stack.Screen name="settings" />
       </Stack>
     </>
   );
