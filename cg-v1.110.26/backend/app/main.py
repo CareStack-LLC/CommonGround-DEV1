@@ -56,6 +56,52 @@ app.add_middleware(
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+
+# Global exception handler to ensure CORS headers are always present
+# This is important because uncaught exceptions skip the CORS middleware
+from fastapi import Request
+from fastapi.responses import JSONResponse
+import traceback
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """
+    Global exception handler that ensures CORS headers are included
+    even when the server returns a 500 error.
+    """
+    # Get the origin from the request
+    origin = request.headers.get("origin", "")
+    
+    # Log the error for debugging
+    print(f"🚨 Unhandled exception: {type(exc).__name__}: {exc}")
+    if settings.DEBUG:
+        traceback.print_exc()
+    
+    # Build response with CORS headers
+    response = JSONResponse(
+        status_code=500,
+        content={
+            "detail": str(exc) if settings.DEBUG else "Internal server error",
+            "type": type(exc).__name__,
+        }
+    )
+    
+    # Add CORS headers if origin is allowed
+    if origin:
+        # Check if origin matches allowed list or regex
+        import re
+        allowed = origin in settings.allowed_origins_list
+        if not allowed and settings.CORS_ORIGIN_REGEX:
+            allowed = bool(re.match(settings.CORS_ORIGIN_REGEX, origin))
+        
+        if allowed:
+            response.headers["Access-Control-Allow-Origin"] = origin
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+    
+    return response
+
+
 # Include API router
 app.include_router(api_router, prefix=f"/api/{settings.API_VERSION}")
 
