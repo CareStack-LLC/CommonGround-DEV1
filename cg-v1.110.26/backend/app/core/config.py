@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "https://common-ground-blue.vercel.app"
 
     # CORS
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://common-ground-blue.vercel.app"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://common-ground-blue.vercel.app,https://common-ground-git-main-teejays-projects-caad17d8.vercel.app"
     # Allow Vercel preview/branch URLs by default (regex must match full origin)
     CORS_ORIGIN_REGEX: str = r"https://.*\.vercel\.app$"
 
