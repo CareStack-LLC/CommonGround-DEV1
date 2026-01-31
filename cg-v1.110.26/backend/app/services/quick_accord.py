@@ -189,7 +189,11 @@ class QuickAccordService:
         # Verify access
         await self.family_file_service.get_family_file(family_file_id, user)
 
-        query = select(QuickAccord).where(QuickAccord.family_file_id == family_file_id)
+        query = (
+            select(QuickAccord)
+            .options(selectinload(QuickAccord.family_file))
+            .where(QuickAccord.family_file_id == family_file_id)
+        )
 
         if status_filter:
             query = query.where(QuickAccord.status == status_filter)
