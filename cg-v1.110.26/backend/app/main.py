@@ -74,16 +74,18 @@ async def global_exception_handler(request: Request, exc: Exception):
     origin = request.headers.get("origin", "")
     
     # Log the error for debugging
-    print(f"🚨 Unhandled exception: {type(exc).__name__}: {exc}")
-    if settings.DEBUG:
-        traceback.print_exc()
+    error_msg = f"{type(exc).__name__}: {exc}"
+    tb_str = traceback.format_exc()
+    print(f"🚨 Unhandled exception: {error_msg}")
+    print(tb_str)
     
-    # Build response with CORS headers
+    # Build response with CORS headers - always include details for debugging
     response = JSONResponse(
         status_code=500,
         content={
-            "detail": str(exc) if settings.DEBUG else "Internal server error",
+            "detail": str(exc),
             "type": type(exc).__name__,
+            "traceback": tb_str.split("\n")[-5:] if not settings.DEBUG else tb_str.split("\n"),
         }
     )
     
