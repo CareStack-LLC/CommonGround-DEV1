@@ -82,6 +82,10 @@ class ProfessionalEventsService:
         professional = prof_result.scalar_one_or_none()
         created_by = str(professional.user_id) if professional else professional_id
 
+        # Convert timezone-aware datetimes to naive for database storage
+        start_time_naive = self._make_naive(event_data.start_time)
+        end_time_naive = self._make_naive(event_data.end_time)
+
         # Create the event using ScheduleEvent model
         event = ScheduleEvent(
             id=str(uuid_module.uuid4()),
@@ -89,8 +93,8 @@ class ProfessionalEventsService:
             created_by=created_by,
             title=event_data.title,
             description=event_data.description,
-            start_time=event_data.start_time,
-            end_time=event_data.end_time,
+            start_time=start_time_naive,
+            end_time=end_time_naive,
             all_day=event_data.all_day,
             location=event_data.location,
             visibility=visibility,
@@ -277,6 +281,9 @@ class ProfessionalEventsService:
                     event.visibility = "private"
                 else:
                     event.visibility = "co_parent"
+            elif field in ("start_time", "end_time"):
+                # Convert timezone-aware to naive for database
+                setattr(event, field, self._make_naive(value))
             elif hasattr(event, field):
                 setattr(event, field, value)
 
