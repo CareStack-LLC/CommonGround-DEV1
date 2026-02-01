@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import {
-  Clock,
   MapPin,
   Video,
   FileText,
@@ -22,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { ConflictWarning } from "./conflict-warning";
 
 interface EventFormData {
@@ -199,12 +199,7 @@ export function EventForm({
     }
   };
 
-  // Get today's date in local time for datetime-local input
-  const getLocalDateTimeString = (date?: Date) => {
-    const d = date || new Date();
-    const offset = d.getTimezoneOffset() * 60000;
-    return new Date(d.getTime() - offset).toISOString().slice(0, 16);
-  };
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -290,36 +285,23 @@ export function EventForm({
       </div>
 
       {/* Date/Time */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="start_time">
-            <Clock className="h-4 w-4 inline mr-1" />
-            Start *
-          </Label>
-          <Input
-            id="start_time"
-            type={formData.all_day ? "date" : "datetime-local"}
-            value={formData.start_time}
-            onChange={(e) => handleChange("start_time", e.target.value)}
-            min={getLocalDateTimeString()}
-            required
-          />
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <DateTimePicker
+          label="Start"
+          value={formData.start_time}
+          onChange={(v) => handleChange("start_time", v)}
+          dateOnly={formData.all_day}
+          required
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="end_time">
-            <Clock className="h-4 w-4 inline mr-1" />
-            End *
-          </Label>
-          <Input
-            id="end_time"
-            type={formData.all_day ? "date" : "datetime-local"}
-            value={formData.end_time}
-            onChange={(e) => handleChange("end_time", e.target.value)}
-            min={formData.start_time || getLocalDateTimeString()}
-            required
-          />
-        </div>
+        <DateTimePicker
+          label="End"
+          value={formData.end_time}
+          onChange={(v) => handleChange("end_time", v)}
+          min={formData.start_time}
+          dateOnly={formData.all_day}
+          required
+        />
       </div>
 
       {/* Conflict Warning */}
