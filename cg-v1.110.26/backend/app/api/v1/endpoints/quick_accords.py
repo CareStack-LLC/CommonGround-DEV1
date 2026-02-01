@@ -63,22 +63,14 @@ def _build_quick_accord_response(qa) -> dict:
         "is_expired": qa.is_expired,
     }
 
-    # Include family_file data if loaded
+    # Include minimal family_file data if loaded (only essential fields)
     if hasattr(qa, 'family_file') and qa.family_file:
         ff = qa.family_file
         response["family_file"] = {
             "id": ff.id,
-            "family_name": getattr(ff, 'title', None) or getattr(ff, 'family_name', 'Family'),
-            "parent_a": {
-                "id": str(ff.parent_a_id),
-                "first_name": ff.parent_a_info.get("first_name", "Parent A") if ff.parent_a_info else "Parent A",
-                "last_name": ff.parent_a_info.get("last_name", "") if ff.parent_a_info else "",
-            } if ff.parent_a_id else None,
-            "parent_b": {
-                "id": str(ff.parent_b_id),
-                "first_name": ff.parent_b_info.get("first_name", "Parent B") if ff.parent_b_info else "Parent B",
-                "last_name": ff.parent_b_info.get("last_name", "") if ff.parent_b_info else "",
-            } if ff.parent_b_id else None,
+            "title": getattr(ff, 'title', 'Family'),
+            "parent_a_id": str(ff.parent_a_id) if ff.parent_a_id else None,
+            "parent_b_id": str(ff.parent_b_id) if ff.parent_b_id else None,
         }
 
     return response
