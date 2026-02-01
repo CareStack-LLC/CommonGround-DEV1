@@ -455,102 +455,112 @@ export default function ProfilePage() {
       </Card>
 
       {/* Firm Profile - Directory Listing */}
-      {firms.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Firm Profile
-            </CardTitle>
-            <CardDescription>
-              This information appears in the directory and is visible to parents searching for professionals
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Firm selector if multiple firms */}
-            {firms.length > 1 && (
-              <div className="space-y-2">
-                <Label>Select Firm to Edit</Label>
-                <Select
-                  value={selectedFirmId || ""}
-                  onValueChange={setSelectedFirmId}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a firm" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {firms.map((firm) => (
-                      <SelectItem key={firm.id} value={firm.id}>
-                        {firm.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {/* Description */}
-            <div className="space-y-2">
-              <Label htmlFor="firm_description">Firm Description</Label>
-              <Textarea
-                id="firm_description"
-                value={firmFormData.description}
-                onChange={(e) =>
-                  setFirmFormData((prev) => ({ ...prev, description: e.target.value }))
-                }
-                placeholder="Describe your firm's services, specialties, and what sets you apart..."
-                className="min-h-[120px]"
-              />
-              <p className="text-xs text-muted-foreground">
-                This description will be shown to parents browsing the professional directory
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Firm Profile
+          </CardTitle>
+          <CardDescription>
+            This information appears in the directory and is visible to parents searching for professionals
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {firms.length === 0 ? (
+            <div className="text-center py-6">
+              <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+              <p className="text-muted-foreground">Join a firm to edit its profile</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Create or join a firm in the Firm Memberships section above to edit firm details.
               </p>
             </div>
-
-            {/* Firm Practice Areas */}
-            <div className="space-y-2">
-              <Label>Firm Practice Areas</Label>
-              <p className="text-xs text-muted-foreground mb-2">
-                Select the areas your firm specializes in
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {FIRM_PRACTICE_AREAS.map((area) => (
-                  <Button
-                    key={area}
-                    variant={firmFormData.practice_areas.includes(area) ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => toggleFirmPracticeArea(area)}
-                    className={
-                      firmFormData.practice_areas.includes(area)
-                        ? "bg-emerald-600 hover:bg-emerald-700"
-                        : ""
-                    }
+          ) : (
+            <>
+              {/* Firm selector if multiple firms */}
+              {firms.length > 1 && (
+                <div className="space-y-2">
+                  <Label>Select Firm to Edit</Label>
+                  <Select
+                    value={selectedFirmId || ""}
+                    onValueChange={setSelectedFirmId}
                   >
-                    {area}
-                  </Button>
-                ))}
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <div className="flex items-center gap-3 pt-2">
-              <Button
-                onClick={handleSaveFirm}
-                disabled={isSavingFirm}
-                className="bg-emerald-600 hover:bg-emerald-700"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                {isSavingFirm ? "Saving..." : "Save Firm Profile"}
-              </Button>
-              {firmSaveSuccess && (
-                <span className="text-sm text-emerald-600 flex items-center gap-1">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Saved successfully!
-                </span>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a firm" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {firms.map((firm) => (
+                        <SelectItem key={firm.id} value={firm.id}>
+                          {firm.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
+              {/* Description */}
+              <div className="space-y-2">
+                <Label htmlFor="firm_description">Firm Description</Label>
+                <Textarea
+                  id="firm_description"
+                  value={firmFormData.description}
+                  onChange={(e) =>
+                    setFirmFormData((prev) => ({ ...prev, description: e.target.value }))
+                  }
+                  placeholder="Describe your firm's services, specialties, and what sets you apart..."
+                  className="min-h-[120px]"
+                />
+                <p className="text-xs text-muted-foreground">
+                  This description will be shown to parents browsing the professional directory
+                </p>
+              </div>
+
+              {/* Firm Practice Areas */}
+              <div className="space-y-2">
+                <Label>Firm Practice Areas</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Select the areas your firm specializes in
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {FIRM_PRACTICE_AREAS.map((area) => (
+                    <Button
+                      key={area}
+                      variant={firmFormData.practice_areas.includes(area) ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleFirmPracticeArea(area)}
+                      className={
+                        firmFormData.practice_areas.includes(area)
+                          ? "bg-emerald-600 hover:bg-emerald-700"
+                          : ""
+                      }
+                    >
+                      {area}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex items-center gap-3 pt-2">
+                <Button
+                  onClick={handleSaveFirm}
+                  disabled={isSavingFirm}
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSavingFirm ? "Saving..." : "Save Firm Profile"}
+                </Button>
+                {firmSaveSuccess && (
+                  <span className="text-sm text-emerald-600 flex items-center gap-1">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Saved successfully!
+                  </span>
+                )}
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Security */}
       <Card>
