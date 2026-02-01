@@ -61,23 +61,15 @@ async def get_agreement(
     # Calculate completion percentage
     completion = await agreement_service.get_completion_percentage(agreement)
 
-    # Build family_file info if available
+    # Build family_file info if available (using only valid attributes)
     family_file_data = None
     if hasattr(agreement, 'family_file') and agreement.family_file:
         ff = agreement.family_file
         family_file_data = {
             "id": str(ff.id),
-            "family_name": ff.family_name or ff.title,
-            "parent_a": {
-                "id": str(ff.parent_a_id),
-                "first_name": ff.parent_a_info.get("first_name", "Parent A") if ff.parent_a_info else "Parent A",
-                "last_name": ff.parent_a_info.get("last_name", "") if ff.parent_a_info else "",
-            } if ff.parent_a_id else None,
-            "parent_b": {
-                "id": str(ff.parent_b_id),
-                "first_name": ff.parent_b_info.get("first_name", "Parent B") if ff.parent_b_info else "Parent B",
-                "last_name": ff.parent_b_info.get("last_name", "") if ff.parent_b_info else "",
-            } if ff.parent_b_id else None,
+            "title": getattr(ff, 'title', 'Family'),
+            "parent_a_id": str(ff.parent_a_id) if ff.parent_a_id else None,
+            "parent_b_id": str(ff.parent_b_id) if ff.parent_b_id else None,
         }
 
     return {
