@@ -68,7 +68,7 @@ def _build_quick_accord_response(qa) -> dict:
         ff = qa.family_file
         response["family_file"] = {
             "id": ff.id,
-            "family_name": ff.family_name or ff.title,
+            "family_name": getattr(ff, 'title', None) or getattr(ff, 'family_name', 'Family'),
             "parent_a": {
                 "id": str(ff.parent_a_id),
                 "first_name": ff.parent_a_info.get("first_name", "Parent A") if ff.parent_a_info else "Parent A",
