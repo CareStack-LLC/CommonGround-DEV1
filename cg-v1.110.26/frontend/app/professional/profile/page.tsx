@@ -16,6 +16,7 @@ import {
   Edit,
   Save,
   X,
+  FileText,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,20 @@ const PRACTICE_AREAS = [
   "guardianship",
 ];
 
+const FIRM_PRACTICE_AREAS = [
+  "Family Law",
+  "Custody",
+  "Divorce",
+  "Mediation",
+  "Child Support",
+  "Adoption",
+  "Domestic Violence",
+  "Paternity",
+  "Guardianship",
+  "Property Division",
+  "Spousal Support",
+];
+
 const US_STATES = [
   "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
   "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
@@ -83,17 +98,55 @@ export default function ProfilePage() {
     phone: "",
   });
 
+  // Firm editing state
+  const [selectedFirmId, setSelectedFirmId] = useState<string | null>(null);
+  const [firmFormData, setFirmFormData] = useState<{ description: string; practice_areas: string[] }>({
+    description: "",
+    practice_areas: [],
+  });
+  const [isSavingFirm, setIsSavingFirm] = useState(false);
+  const [firmSaveSuccess, setFirmSaveSuccess] = useState(false);
+
   useEffect(() => {
     if (profile) {
       setFormData({
         license_number: profile.license_number || "",
         license_state: profile.license_state || "",
         bio: "",
-        practice_areas: [],
+        practice_areas: profile.practice_areas || [],
         phone: "",
       });
     }
   }, [profile]);
+
+  // Auto-select first firm if user has firms
+  useEffect(() => {
+    if (firms.length > 0 && !selectedFirmId) {
+      setSelectedFirmId(firms[0].id);
+    }
+  }, [firms, selectedFirmId]);
+
+  // Load firm data when firm is selected
+  useEffect(() => {
+    const loadFirmData = async () => {
+      if (!selectedFirmId || !token) return;
+      try {
+        const response = await fetch(`${API_BASE}/api/v1/professional/firms/${selectedFirmId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          const firmData = await response.json();
+          setFirmFormData({
+            description: firmData.description || "",
+            practice_areas: firmData.practice_areas || [],
+          });
+        }
+      } catch (error) {
+        console.error("Error loading firm data:", error);
+      }
+    };
+    loadFirmData();
+  }, [selectedFirmId, token]);
 
   const handleSave = async () => {
     if (!token) return;
@@ -127,6 +180,41 @@ export default function ProfilePage() {
         ? prev.practice_areas.filter((a) => a !== area)
         : [...prev.practice_areas, area],
     }));
+  };
+
+  const toggleFirmPracticeArea = (area: string) => {
+    setFirmFormData((prev) => ({
+      ...prev,
+      practice_areas: prev.practice_areas.includes(area)
+        ? prev.practice_areas.filter((a) => a !== area)
+        : [...prev.practice_areas, area],
+    }));
+  };
+
+  const handleSaveFirm = async () => {
+    if (!token || !selectedFirmId) return;
+
+    setIsSavingFirm(true);
+    setFirmSaveSuccess(false);
+    try {
+      const response = await fetch(`${API_BASE}/api/v1/professional/firms/${selectedFirmId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(firmFormData),
+      });
+
+      if (response.ok) {
+        setFirmSaveSuccess(true);
+        setTimeout(() => setFirmSaveSuccess(false), 3000);
+      }
+    } catch (error) {
+      console.error("Error saving firm:", error);
+    } finally {
+      setIsSavingFirm(false);
+    }
   };
 
   if (!profile) {
@@ -365,6 +453,104 @@ export default function ProfilePage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Firm Profile - Directory Listing */}
+      {firms.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Firm Profile
+            </CardTitle>
+            <CardDescription>
+              This information appears in the directory and is visible to parents searching for professionals
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Firm selector if multiple firms */}
+            {firms.length > 1 && (
+              <div className="space-y-2">
+                <Label>Select Firm to Edit</Label>
+                <Select
+                  value={selectedFirmId || ""}
+                  onValueChange={setSelectedFirmId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a firm" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {firms.map((firm) => (
+                      <SelectItem key={firm.id} value={firm.id}>
+                        {firm.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="firm_description">Firm Description</Label>
+              <Textarea
+                id="firm_description"
+                value={firmFormData.description}
+                onChange={(e) =>
+                  setFirmFormData((prev) => ({ ...prev, description: e.target.value }))
+                }
+                placeholder="Describe your firm's services, specialties, and what sets you apart..."
+                className="min-h-[120px]"
+              />
+              <p className="text-xs text-muted-foreground">
+                This description will be shown to parents browsing the professional directory
+              </p>
+            </div>
+
+            {/* Firm Practice Areas */}
+            <div className="space-y-2">
+              <Label>Firm Practice Areas</Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Select the areas your firm specializes in
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {FIRM_PRACTICE_AREAS.map((area) => (
+                  <Button
+                    key={area}
+                    variant={firmFormData.practice_areas.includes(area) ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => toggleFirmPracticeArea(area)}
+                    className={
+                      firmFormData.practice_areas.includes(area)
+                        ? "bg-emerald-600 hover:bg-emerald-700"
+                        : ""
+                    }
+                  >
+                    {area}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="flex items-center gap-3 pt-2">
+              <Button
+                onClick={handleSaveFirm}
+                disabled={isSavingFirm}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {isSavingFirm ? "Saving..." : "Save Firm Profile"}
+              </Button>
+              {firmSaveSuccess && (
+                <span className="text-sm text-emerald-600 flex items-center gap-1">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Saved successfully!
+                </span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Security */}
       <Card>

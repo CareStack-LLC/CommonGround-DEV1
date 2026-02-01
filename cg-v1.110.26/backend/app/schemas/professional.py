@@ -125,6 +125,8 @@ class FirmUpdate(BaseModel):
     primary_color: Optional[str] = None
     is_public: Optional[bool] = None
     settings: Optional[dict] = None
+    description: Optional[str] = None
+    practice_areas: Optional[list[str]] = None
 
     @field_validator('primary_color')
     @classmethod
@@ -148,6 +150,8 @@ class FirmResponse(FirmBase):
     created_by: str
     created_at: datetime
     updated_at: datetime
+    description: Optional[str] = None
+    practice_areas: Optional[list[str]] = None
 
     # Computed
     member_count: Optional[int] = None

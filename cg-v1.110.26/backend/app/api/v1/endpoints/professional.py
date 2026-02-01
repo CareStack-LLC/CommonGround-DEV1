@@ -174,6 +174,8 @@ def _firm_to_response(
         created_by=firm.created_by,
         created_at=firm.created_at,
         updated_at=firm.updated_at,
+        description=firm.description,
+        practice_areas=firm.practice_areas,
         member_count=member_count,
     )
 
