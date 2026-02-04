@@ -1407,7 +1407,6 @@ export interface EventV2 {
     rsvp_status: string;
   };
   created_at: string;
-  created_at: string;
   updated_at: string;
   event_type?: string;
 }
