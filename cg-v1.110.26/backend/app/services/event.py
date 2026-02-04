@@ -831,8 +831,7 @@ class EventService:
             visibility="co_parent",
             event_type="swap_request",
             event_category="general", # or 'exchange'
-            event_type="swap_request",
-            event_category="general", # or 'exchange'
+
             status="pending",
             custodial_parent_id=user_id, # Required field, defaults to requester for swap requests
             
