@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, MapPin, Clock, Users, Calendar, Check, X as XIcon, HelpCircle, Stethoscope, GraduationCap, Trophy, RefreshCw } from 'lucide-react';
-import { eventsAPI, EventV2, EventAttendance, UpdateRSVPRequest, MedicalCategoryData, SchoolCategoryData, SportsCategoryData, ExchangeCategoryData } from '@/lib/api';
+import { eventsAPI, EventV2, EventAttendance, UpdateRSVPRequest, MedicalCategoryData, SchoolCategoryData, SportsCategoryData, ExchangeCategoryData, SwapResponseAction } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
@@ -58,6 +58,26 @@ export default function EventDetails({
       onRsvpUpdate?.();
     } catch (err: any) {
       setError(err.message || 'Failed to update RSVP');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleSwapResponse = async (approved: boolean) => {
+    try {
+      setIsUpdating(true);
+      setError(null);
+
+      const action: SwapResponseAction = {
+        approved,
+        response_note: rsvpNote || undefined,
+      };
+
+      await eventsAPI.respondToSwap(event.id, action);
+      onRsvpUpdate?.();
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Failed to respond to swap request');
     } finally {
       setIsUpdating(false);
     }
@@ -181,23 +201,21 @@ export default function EventDetails({
 
             {/* Visibility */}
             <div className="flex items-center gap-2">
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                event.visibility === 'private'
+              <span className={`text-xs px-2 py-1 rounded-full ${event.visibility === 'private'
                   ? 'bg-gray-100 text-gray-600'
                   : 'bg-green-100 text-green-700'
-              }`}>
+                }`}>
                 {event.visibility === 'private' ? 'Private' : 'Shared with Co-parent'}
               </span>
             </div>
 
             {/* Category-specific details */}
             {event.event_category && event.event_category !== 'general' && event.category_data && (
-              <div className={`p-3 rounded-lg border ${
-                event.event_category === 'medical' ? 'bg-blue-50 border-blue-200' :
-                event.event_category === 'school' ? 'bg-green-50 border-green-200' :
-                event.event_category === 'sports' ? 'bg-orange-50 border-orange-200' :
-                'bg-purple-50 border-purple-200'
-              }`}>
+              <div className={`p-3 rounded-lg border ${event.event_category === 'medical' ? 'bg-blue-50 border-blue-200' :
+                  event.event_category === 'school' ? 'bg-green-50 border-green-200' :
+                    event.event_category === 'sports' ? 'bg-orange-50 border-orange-200' :
+                      'bg-purple-50 border-purple-200'
+                }`}>
                 <div className="flex items-center gap-2 mb-2">
                   {event.event_category === 'medical' && <Stethoscope className="h-4 w-4" />}
                   {event.event_category === 'school' && <GraduationCap className="h-4 w-4" />}
@@ -205,9 +223,9 @@ export default function EventDetails({
                   {event.event_category === 'exchange' && <RefreshCw className="h-4 w-4" />}
                   <span className="font-medium text-sm capitalize">
                     {event.event_category === 'medical' ? 'Medical Appointment' :
-                     event.event_category === 'school' ? 'School Activity' :
-                     event.event_category === 'sports' ? 'Sports/Recreation' :
-                     'Custody Exchange'}
+                      event.event_category === 'school' ? 'School Activity' :
+                        event.event_category === 'sports' ? 'Sports/Recreation' :
+                          'Custody Exchange'}
                   </span>
                 </div>
                 <div className="text-sm space-y-1">
@@ -280,12 +298,14 @@ export default function EventDetails({
               </div>
             </div>
 
-            {/* RSVP Buttons */}
+            {/* RSVP Buttons / Swap Actions */}
             {!event.is_owner && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">Update Your Response</h3>
+                <h3 className="font-semibold text-gray-900">
+                  {event.event_type === 'swap_request' ? 'Respond to Request' : 'Update Your Response'}
+                </h3>
 
-                {/* RSVP Note */}
+                {/* Response Note */}
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">
                     Note (optional)
@@ -299,48 +319,67 @@ export default function EventDetails({
                   />
                 </div>
 
-                {/* RSVP Buttons */}
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <Button
-                    onClick={() => handleRsvp('going')}
-                    disabled={isUpdating}
-                    className={`flex-1 ${
-                      currentRsvp === 'going'
-                        ? 'bg-green-600 hover:bg-green-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-700'
-                    }`}
-                    variant={currentRsvp === 'going' ? 'default' : 'outline'}
-                  >
-                    <Check className="h-4 w-4 mr-1" />
-                    Going
-                  </Button>
-                  <Button
-                    onClick={() => handleRsvp('maybe')}
-                    disabled={isUpdating}
-                    className={`flex-1 ${
-                      currentRsvp === 'maybe'
-                        ? 'bg-yellow-600 hover:bg-yellow-700'
-                        : ''
-                    }`}
-                    variant={currentRsvp === 'maybe' ? 'default' : 'outline'}
-                  >
-                    <HelpCircle className="h-4 w-4 mr-1" />
-                    Maybe
-                  </Button>
-                  <Button
-                    onClick={() => handleRsvp('not_going')}
-                    disabled={isUpdating}
-                    className={`flex-1 ${
-                      currentRsvp === 'not_going'
-                        ? 'bg-red-600 hover:bg-red-700'
-                        : ''
-                    }`}
-                    variant={currentRsvp === 'not_going' ? 'default' : 'outline'}
-                  >
-                    <XIcon className="h-4 w-4 mr-1" />
-                    Can't Go
-                  </Button>
-                </div>
+                {event.event_type === 'swap_request' ? (
+                  /* Swap Actions */
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      onClick={() => handleSwapResponse(true)}
+                      disabled={isUpdating || event.status !== 'pending'}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      Approve Swap
+                    </Button>
+                    <Button
+                      onClick={() => handleSwapResponse(false)}
+                      disabled={isUpdating || event.status !== 'pending'}
+                      className="flex-1 bg-red-600 hover:bg-red-700"
+                    >
+                      <XIcon className="h-4 w-4 mr-1" />
+                      Deny Request
+                    </Button>
+                  </div>
+                ) : (
+                  /* RSVP Buttons */
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      onClick={() => handleRsvp('going')}
+                      disabled={isUpdating}
+                      className={`flex-1 ${currentRsvp === 'going'
+                          ? 'bg-green-600 hover:bg-green-700'
+                          : 'bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-700'
+                        }`}
+                      variant={currentRsvp === 'going' ? 'default' : 'outline'}
+                    >
+                      <Check className="h-4 w-4 mr-1" />
+                      Going
+                    </Button>
+                    <Button
+                      onClick={() => handleRsvp('maybe')}
+                      disabled={isUpdating}
+                      className={`flex-1 ${currentRsvp === 'maybe'
+                          ? 'bg-yellow-600 hover:bg-yellow-700'
+                          : ''
+                        }`}
+                      variant={currentRsvp === 'maybe' ? 'default' : 'outline'}
+                    >
+                      <HelpCircle className="h-4 w-4 mr-1" />
+                      Maybe
+                    </Button>
+                    <Button
+                      onClick={() => handleRsvp('not_going')}
+                      disabled={isUpdating}
+                      className={`flex-1 ${currentRsvp === 'not_going'
+                          ? 'bg-red-600 hover:bg-red-700'
+                          : ''
+                        }`}
+                      variant={currentRsvp === 'not_going' ? 'default' : 'outline'}
+                    >
+                      <XIcon className="h-4 w-4 mr-1" />
+                      Can't Go
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 

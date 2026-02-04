@@ -209,7 +209,10 @@ class ScheduleEventResponse(BaseModel):
     event_category: str = "general"
     category_data: Optional[Dict[str, Any]] = None  # Filtered based on visibility
     created_at: datetime
+    category_data: Optional[Dict[str, Any]] = None  # Filtered based on visibility
+    created_at: datetime
     updated_at: datetime
+    event_type: str = "event"
 
     # Professional calendar fields
     professional_id: Optional[str] = None
@@ -423,3 +426,21 @@ class CalendarDataResponse(BaseModel):
     my_collections: List[MyTimeCollectionResponse]
     start_date: datetime
     end_date: datetime
+
+
+# ========== SWAP REQUEST SCHEMAS ==========
+
+class SwapRequestCreate(BaseModel):
+    """Create a swap request."""
+    
+    target_date: date
+    child_ids: List[str]
+    reason: str = Field(..., min_length=1, max_length=500)
+    family_file_id: str
+
+
+class SwapResponseAction(BaseModel):
+    """Respond to a swap request."""
+    
+    approved: bool
+    response_note: Optional[str] = None

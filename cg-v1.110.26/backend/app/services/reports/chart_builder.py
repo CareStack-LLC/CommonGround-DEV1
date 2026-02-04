@@ -127,6 +127,8 @@ class ChartBuilder:
         color_b: str = COLORS["slate"],
         size: int = 160,
         stroke_width: int = 24,
+        center_text: Optional[str] = None,
+        center_sublabel: Optional[str] = None,
     ) -> str:
         """
         Generate a split donut chart showing two values (e.g., custody split).
@@ -140,6 +142,8 @@ class ChartBuilder:
             color_b: Color for second segment
             size: Chart size in pixels
             stroke_width: Width of the donut ring
+            center_text: Optional override for center text (default: total value)
+            center_sublabel: Optional override for center sublabel (default: "total days")
 
         Returns:
             SVG markup string
@@ -158,6 +162,17 @@ class ChartBuilder:
         arc_a = (pct_a / 100) * circumference
         arc_b = (pct_b / 100) * circumference
         gap = 4  # Small gap between segments
+
+        # Determine center text
+        main_text = center_text if center_text is not None else str(int(total))
+        sub_text = center_sublabel if center_sublabel is not None else "total days"
+
+        # Adjust font size based on text length to prevent overflow
+        font_size = "20"
+        if len(main_text) > 8:
+            font_size = "16"
+        if len(main_text) > 12:
+            font_size = "14"
 
         return f'''
         <svg width="{size}" height="{size}" viewBox="0 0 {size} {size}" xmlns="http://www.w3.org/2000/svg">
@@ -188,17 +203,17 @@ class ChartBuilder:
                 x="{center}" y="{center - 8}"
                 text-anchor="middle"
                 font-family="DM Sans, sans-serif"
-                font-size="20"
+                font-size="{font_size}"
                 font-weight="700"
                 fill="{COLORS['text_primary']}"
-            >{int(total)}</text>
+            >{main_text}</text>
             <text
                 x="{center}" y="{center + 12}"
                 text-anchor="middle"
                 font-family="DM Sans, sans-serif"
                 font-size="11"
                 fill="{COLORS['text_secondary']}"
-            >total days</text>
+            >{sub_text}</text>
         </svg>
         '''
 

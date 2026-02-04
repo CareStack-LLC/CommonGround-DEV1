@@ -1,0 +1,287 @@
+{
+  "section_type": "financial_compliance",
+  "section_title": "Financial Compliance",
+  "section_order": 4,
+  "content_data": {
+    "payment_summary": {
+      "total_transactions": 120,
+      "completed_count": 120,
+      "completed_amount": 64399.0,
+      "pending_count": 0,
+      "pending_amount": 0,
+      "by_type": {
+        "expense_reimbursement": {
+          "count": 75,
+          "total": 10399.0
+        },
+        "child_support": {
+          "count": 45,
+          "total": 54000.0
+        }
+      }
+    },
+    "expense_summary": {
+      "total_requests": 75,
+      "approved_count": 75,
+      "approved_amount": 20798.0,
+      "rejected_count": 0,
+      "rejected_amount": 0,
+      "pending_count": 0,
+      "pending_amount": 0,
+      "by_category": {
+        "education": {
+          "count": 23,
+          "total": 6334.0
+        },
+        "medical": {
+          "count": 33,
+          "total": 8833.0
+        },
+        "sports": {
+          "count": 19,
+          "total": 5631.0
+        }
+      }
+    },
+    "current_balances": {
+      "eb9a2b70-76ed-4cb5-b8fb-23e1776423ee": {
+        "parent_type": "father",
+        "balance": 0.0
+      },
+      "cb157af9-69e8-4c81-943a-83deea6746cc": {
+        "parent_type": "mother",
+        "balance": 0.0
+      }
+    },
+    "payment_log": [
+      {
+        "date": "January 24, 2026",
+        "type": "expense_reimbursement",
+        "amount": 41.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 19, 2026",
+        "type": "expense_reimbursement",
+        "amount": 148.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 12, 2026",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 12, 2026",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 12, 2026",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 10, 2026",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 09, 2026",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 08, 2026",
+        "type": "expense_reimbursement",
+        "amount": 79.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 05, 2026",
+        "type": "expense_reimbursement",
+        "amount": 243.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 05, 2026",
+        "type": "expense_reimbursement",
+        "amount": 66.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 02, 2026",
+        "type": "expense_reimbursement",
+        "amount": 76.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "January 01, 2026",
+        "type": "expense_reimbursement",
+        "amount": 167.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 24, 2025",
+        "type": "expense_reimbursement",
+        "amount": 64.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 18, 2025",
+        "type": "expense_reimbursement",
+        "amount": 185.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 17, 2025",
+        "type": "expense_reimbursement",
+        "amount": 121.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 13, 2025",
+        "type": "expense_reimbursement",
+        "amount": 36.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 12, 2025",
+        "type": "expense_reimbursement",
+        "amount": 226.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 12, 2025",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 12, 2025",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 11, 2025",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 10, 2025",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 09, 2025",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 05, 2025",
+        "type": "expense_reimbursement",
+        "amount": 30.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "December 03, 2025",
+        "type": "expense_reimbursement",
+        "amount": 76.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "November 24, 2025",
+        "type": "expense_reimbursement",
+        "amount": 194.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "November 19, 2025",
+        "type": "expense_reimbursement",
+        "amount": 62.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "November 19, 2025",
+        "type": "expense_reimbursement",
+        "amount": 120.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "November 17, 2025",
+        "type": "expense_reimbursement",
+        "amount": 29.0,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "November 16, 2025",
+        "type": "expense_reimbursement",
+        "amount": 183.5,
+        "status": "completed",
+        "has_receipt": false
+      },
+      {
+        "date": "November 12, 2025",
+        "type": "child_support",
+        "amount": 1200.0,
+        "status": "completed",
+        "has_receipt": false
+      }
+    ],
+    "pending_expenses": [],
+    "report_period": {
+      "start": "May 07, 2025",
+      "end": "February 01, 2026"
+    },
+    "child_support_compliance": {
+      "status": "not_applicable"
+    },
+    "expense_compliance": {
+      "status": "not_applicable"
+    }
+  },
+  "evidence_count": 195,
+  "data_sources": [
+    "payments",
+    "expense_requests",
+    "payment_ledger"
+  ],
+  "generation_time_ms": null
+}

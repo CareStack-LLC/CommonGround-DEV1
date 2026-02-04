@@ -18,7 +18,8 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-value {% if stats.flag_rate <= 10 %}text-sage{% elif stats.flag_rate <= 25 %}amber{% else %}text-error{% endif %}">
+      <div
+        class="stat-value {% if stats.flag_rate <= 10 %}text-sage{% elif stats.flag_rate <= 25 %}amber{% else %}text-error{% endif %}">
         {{ stats.flagged_messages }}
       </div>
       <div class="stat-label">ARIA Interventions</div>
@@ -26,15 +27,17 @@
     </div>
 
     <div class="stat-card">
-      <div class="stat-value {% if stats.good_faith_rate >= 70 %}text-sage{% elif stats.good_faith_rate >= 50 %}amber{% else %}text-error{% endif %}">
-        {{ "%.0f"|format(stats.good_faith_rate) }}%
+      <div
+        class="stat-value {% if (parent_a_stats.communication_score + parent_b_stats.communication_score)/2 >= 80 %}text-sage{% elif (parent_a_stats.communication_score + parent_b_stats.communication_score)/2 >= 60 %}amber{% else %}text-error{% endif %}">
+        {{ "%.0f"|format((parent_a_stats.communication_score + parent_b_stats.communication_score)/2) }}
       </div>
-      <div class="stat-label">Good Faith Rate</div>
-      <div class="stat-sublabel">suggestions accepted</div>
+      <div class="stat-label">Avg. Comm. Score</div>
+      <div class="stat-sublabel">0-100 rating</div>
     </div>
 
     <div class="stat-card">
-      <div class="stat-value {% if stats.health_score >= 80 %}text-sage{% elif stats.health_score >= 60 %}amber{% else %}text-error{% endif %}">
+      <div
+        class="stat-value {% if stats.health_score >= 80 %}text-sage{% elif stats.health_score >= 60 %}amber{% else %}text-error{% endif %}">
         {{ stats.health_score }}
       </div>
       <div class="stat-label">Health Score</div>
@@ -50,37 +53,32 @@
   <div class="card keep-together">
     <div class="grid grid-2">
       <div class="chart-container" style="flex-direction: column;">
-        {{ intervention_donut | safe }}
-        <div class="chart-legend" style="margin-top: 1rem;">
-          <div class="legend-item">
-            <span class="legend-dot sage"></span>
-            <span>Accepted: {{ stats.accepted }} ({{ "%.0f"|format(stats.accepted_rate) }}%)</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot" style="background: var(--cg-amber)"></span>
-            <span>Modified: {{ stats.modified }} ({{ "%.0f"|format(stats.modified_rate) }}%)</span>
-          </div>
-          <div class="legend-item">
-            <span class="legend-dot" style="background: var(--cg-error, #dc3545)"></span>
-            <span>Rejected: {{ stats.rejected }} ({{ "%.0f"|format(stats.rejected_rate) }}%)</span>
-          </div>
-        </div>
+        <!-- Donut chart removed as requested -->
       </div>
 
       <div>
         <h3 class="mt-0">Understanding ARIA</h3>
         <p>
-          ARIA (AI Relationship Intelligence Assistant) monitors messages for potential conflict
-          and suggests more constructive rewrites. When a message is flagged:
+          ARIA (AI Relationship Intelligence Assistant) monitors messages for potential conflict. ARIA identifies:
         </p>
+        <ul style="font-size: 0.9em; margin-bottom: 1.5rem;">
+          {% for cat, desc in toxicity_descriptions.items() %}
+          <li style="margin-bottom: 4px;"><strong>{{ cat|replace('_', ' ')|title }}</strong>: {{ desc }}</li>
+          {% endfor %}
+        </ul>
+
+        <h4>User Actions</h4>
         <ul>
           <li><strong style="color: var(--cg-sage)">Accepted</strong> - Parent used ARIA's suggested rewrite</li>
-          <li><strong style="color: var(--cg-amber)">Modified</strong> - Parent edited the suggestion before sending</li>
-          <li><strong style="color: var(--cg-error, #dc3545)">Rejected</strong> - Parent sent original message unchanged</li>
+          <li><strong style="color: var(--cg-amber)">Modified</strong> - Parent edited the suggestion before sending
+          </li>
+          <li><strong style="color: var(--cg-error, #dc3545)">Rejected</strong> - Parent sent original message unchanged
+          </li>
         </ul>
 
         {% if stats.flagged_messages > 0 %}
-        <div class="note {% if stats.good_faith_rate >= 70 %}info{% elif stats.good_faith_rate >= 50 %}warning{% else %}warning{% endif %}">
+        <div
+          class="note {% if stats.good_faith_rate >= 70 %}info{% elif stats.good_faith_rate >= 50 %}warning{% else %}warning{% endif %}">
           <strong>Assessment:</strong>
           {% if stats.good_faith_rate >= 70 %}
           Both parents are demonstrating good faith by accepting ARIA's suggestions for more constructive communication.
@@ -110,7 +108,9 @@
       <thead>
         <tr>
           <th>Category</th>
-          <th>Occurrences</th>
+          <th>Total</th>
+          <th style="color: var(--cg-sage);">{{ parent_a_name }}</th>
+          <th style="color: var(--cg-slate);">{{ parent_b_name }}</th>
           <th>Description</th>
         </tr>
       </thead>
@@ -119,6 +119,8 @@
         <tr>
           <td><strong>{{ cat.name|replace('_', ' ')|title }}</strong></td>
           <td>{{ cat.count }}</td>
+          <td>{{ cat.parent_a_count }}</td>
+          <td>{{ cat.parent_b_count }}</td>
           <td class="text-muted">{{ cat.description }}</td>
         </tr>
         {% endfor %}
@@ -133,7 +135,7 @@
   <h2>Parent Communication Comparison</h2>
 
   <div class="card keep-together">
-    {{ parent_comparison_chart | safe }}
+    <!-- Comparison bar chart removed as requested -->
 
     <table style="margin-top: var(--spacing-lg);">
       <thead>
@@ -157,12 +159,14 @@
         <tr>
           <td>Intervention Rate</td>
           <td>
-            <span class="badge {% if parent_a_stats.intervention_rate <= 10 %}badge-success{% elif parent_a_stats.intervention_rate <= 25 %}badge-warning{% else %}badge-error{% endif %}">
+            <span
+              class="badge {% if parent_a_stats.intervention_rate <= 10 %}badge-success{% elif parent_a_stats.intervention_rate <= 25 %}badge-warning{% else %}badge-error{% endif %}">
               {{ "%.1f"|format(parent_a_stats.intervention_rate) }}%
             </span>
           </td>
           <td>
-            <span class="badge {% if parent_b_stats.intervention_rate <= 10 %}badge-success{% elif parent_b_stats.intervention_rate <= 25 %}badge-warning{% else %}badge-error{% endif %}">
+            <span
+              class="badge {% if parent_b_stats.intervention_rate <= 10 %}badge-success{% elif parent_b_stats.intervention_rate <= 25 %}badge-warning{% else %}badge-error{% endif %}">
               {{ "%.1f"|format(parent_b_stats.intervention_rate) }}%
             </span>
           </td>
@@ -173,16 +177,23 @@
           <td>{{ parent_b_stats.accepted }}</td>
         </tr>
         <tr>
-          <td>Good Faith Rate</td>
+          <td>Avg Response Time</td>
+          <td>{{ "%.1f"|format(parent_a_stats.avg_response_hours) }} hrs</td>
+          <td>{{ "%.1f"|format(parent_b_stats.avg_response_hours) }} hrs</td>
+        </tr>
+        <tr>
+          <td><strong>Communication Score</strong></td>
           <td>
-            <span class="badge {% if parent_a_stats.good_faith_rate >= 70 %}badge-success{% elif parent_a_stats.good_faith_rate >= 50 %}badge-warning{% else %}badge-error{% endif %}">
-              {{ "%.0f"|format(parent_a_stats.good_faith_rate) }}%
-            </span>
+            <div
+              class="badge {% if parent_a_stats.communication_score >= 80 %}badge-success{% elif parent_a_stats.communication_score >= 60 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ parent_a_stats.communication_score }} / 100
+            </div>
           </td>
           <td>
-            <span class="badge {% if parent_b_stats.good_faith_rate >= 70 %}badge-success{% elif parent_b_stats.good_faith_rate >= 50 %}badge-warning{% else %}badge-error{% endif %}">
-              {{ "%.0f"|format(parent_b_stats.good_faith_rate) }}%
-            </span>
+            <div
+              class="badge {% if parent_b_stats.communication_score >= 80 %}badge-success{% elif parent_b_stats.communication_score >= 60 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ parent_b_stats.communication_score }} / 100
+            </div>
           </td>
         </tr>
       </tbody>
@@ -197,25 +208,31 @@
 
   <div class="grid grid-3">
     <div class="stat-card">
-      <div class="stat-value {% if stats.avg_toxicity <= 0.3 %}text-sage{% elif stats.avg_toxicity <= 0.5 %}amber{% else %}text-error{% endif %}">
+      <div
+        class="stat-value {% if stats.avg_toxicity <= 0.3 %}text-sage{% elif stats.avg_toxicity <= 0.5 %}amber{% else %}text-error{% endif %}">
         {{ "%.2f"|format(stats.avg_toxicity) }}
       </div>
       <div class="stat-label">Avg. Toxicity</div>
       <div class="stat-sublabel">0.0 - 1.0 scale</div>
     </div>
 
-    <div class="stat-card">
-      <div class="stat-value">{{ stats.severe_count }}</div>
-      <div class="stat-label">Severe Flags</div>
-      <div class="stat-sublabel">high-severity issues</div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-value {% if stats.trend == 'improving' %}text-sage{% elif stats.trend == 'worsening' %}text-error{% else %}amber{% endif %}">
-        {{ stats.trend|title }}
+    <!-- Per-Parent Toxicity Breakdown -->
+    <div class="card" style="grid-column: span 2; display: flex; align-items: center; justify-content: space-around;">
+      <div style="text-align: center;">
+        <div style="font-weight: 600; color: var(--cg-sage); margin-bottom: 0.5rem;">{{ parent_a_name }}</div>
+        <div style="font-size: 1.5rem; font-weight: 700;">{{ "%.2f"|format(parent_a_stats.avg_toxicity) }}</div>
+        <div style="font-size: 0.8em; color: var(--cg-text-secondary);">Avg. Score</div>
+        <div style="font-size: 0.8em; color: var(--cg-error); margin-top: 4px;">{{ parent_a_stats.severe_count }} Severe
+        </div>
       </div>
-      <div class="stat-label">Trend</div>
-      <div class="stat-sublabel">vs. previous period</div>
+      <div style="height: 40px; border-left: 1px solid var(--cg-border);"></div>
+      <div style="text-align: center;">
+        <div style="font-weight: 600; color: var(--cg-slate); margin-bottom: 0.5rem;">{{ parent_b_name }}</div>
+        <div style="font-size: 1.5rem; font-weight: 700;">{{ "%.2f"|format(parent_b_stats.avg_toxicity) }}</div>
+        <div style="font-size: 0.8em; color: var(--cg-text-secondary);">Avg. Score</div>
+        <div style="font-size: 0.8em; color: var(--cg-error); margin-top: 4px;">{{ parent_b_stats.severe_count }} Severe
+        </div>
+      </div>
     </div>
   </div>
 
@@ -240,6 +257,58 @@
       </div>
     </div>
   </div>
+
+  {% if flagged_items %}
+  <div style="margin-top: 2rem;">
+    <h3>Flagged Message Analysis</h3>
+    <div class="note info mb-md">
+      Review of messages flagged by ARIA, including immediate context. Messages are shown as sent.
+    </div>
+
+    {% for item in flagged_items %}
+    <div class="card keep-together" style="margin-bottom: 1rem; border-left: 4px solid var(--cg-error);">
+
+      <!-- Metadata Header -->
+      <div
+        style="display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--cg-border-light);">
+        <div>
+          <span style="font-weight: 600; color: var(--cg-slate-dark);">{{ item.sender_name }}</span>
+          <span style="color: var(--cg-text-secondary); font-size: 0.9em;"> • {{ item.message.sent_at.strftime('%b %d,
+            %Y at %I:%M %p') }}</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <span class="badge badge-info" style="font-size: 0.8em;">Action: {{ item.user_action|title }}</span>
+        </div>
+      </div>
+
+      <!-- Context Message -->
+      {% if item.context %}
+      <div
+        style="margin-bottom: 1rem; padding: 0.75rem; background-color: var(--cg-slate-50); border-radius: 4px; border-left: 4px solid var(--cg-border);">
+        <div style="font-size: 0.8em; color: var(--cg-text-secondary); margin-bottom: 0.25rem;">PREVIOUS CONTEXT ({{
+          item.context_sender_name }})</div>
+        <div style="color: var(--cg-slate);">{{ item.context.content }}</div>
+      </div>
+      {% endif %}
+
+      <!-- Flagged Message -->
+      <div style="padding: 0.75rem; background-color: #fff5f5; border-radius: 4px; border: 1px solid #fecaca;">
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+          <span style="font-size: 0.8em; color: #dc2626; font-weight: 600;">FLAGGED MESSAGE</span>
+          <div style="display: flex; gap: 0.25rem;">
+            {% for cat in item.categories %}
+            <span class="badge badge-error" style="font-size: 0.7em; padding: 1px 4px;">{{ cat }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div style="color: var(--cg-slate-dark); font-weight: 500;">{{ item.message.content }}</div>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
 </section>
 {% endif %}
 

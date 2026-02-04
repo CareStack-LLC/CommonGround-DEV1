@@ -20,6 +20,8 @@ from app.schemas.schedule import (
     EventAttendanceUpdate,
     EventAttendanceResponse,
     ConflictCheckResponse,
+    SwapRequestCreate,
+    SwapResponseAction
 )
 from app.services.event import EventService
 from app.services.activity import log_event_activity
@@ -382,6 +384,86 @@ async def check_event_conflicts(
     )
 
     return ConflictCheckResponse(**result)
+
+
+
+# ========== SWAP REQUEST ENDPOINTS ==========
+
+@router.post(
+    "/swap-request",
+    response_model=ScheduleEventResponse,
+    summary="Request a swap",
+    description="Request a schedule swap (modification)."
+)
+async def request_swap(
+    swap_data: SwapRequestCreate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Request a swap.
+    """
+    try:
+        event = await EventService.create_swap_request(
+            db=db,
+            user_id=current_user.id,
+            family_file_id=swap_data.family_file_id,
+            target_date=swap_data.target_date,
+            child_ids=swap_data.child_ids,
+            reason=swap_data.reason
+        )
+        
+        # Filter for creator
+        filtered_data = await EventService.filter_for_coparent(
+            event=event,
+            viewer_id=current_user.id,
+            db=db
+        )
+        return ScheduleEventResponse(**filtered_data)
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+@router.post(
+    "/{event_id}/swap-response",
+    response_model=ScheduleEventResponse,
+    summary="Respond to swap request",
+    description="Approve or Deny a swap request."
+)
+async def respond_to_swap(
+    event_id: str,
+    response_data: SwapResponseAction,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Respond to a swap request.
+    """
+    try:
+        event = await EventService.respond_to_swap_request(
+            db=db,
+            event_id=event_id,
+            user_id=current_user.id,
+            approved=response_data.approved,
+            response_note=response_data.response_note
+        )
+        
+        # Filter for creator
+        filtered_data = await EventService.filter_for_coparent(
+            event=event,
+            viewer_id=current_user.id,
+            db=db
+        )
+        return ScheduleEventResponse(**filtered_data)
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
 
 @router.post(

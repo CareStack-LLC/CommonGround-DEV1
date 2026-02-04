@@ -1,0 +1,11 @@
+Mapbox Test URLs
+============================================================
+
+Test 3 - Both parents in geofence:
+https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-m+00AA00(-122.4268,37.7698),pin-s-t+00AA00(-122.427,37.7696)/-122.4269,37.7697,17/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false
+
+Test 4 - Exchange convenience method:
+https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.4268,37.7698),pin-s-r+00AA00(-122.427,37.7696)/-122.4269,37.7697,17/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false
+
+Test 5 - One parent outside:
+https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.4268,37.7698),pin-s-r+CC0000(-122.4269,37.772)/-122.4269,37.7697,17/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false

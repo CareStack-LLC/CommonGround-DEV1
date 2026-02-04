@@ -250,8 +250,8 @@ class CaseExportService:
         )
         last_event = result.scalar_one_or_none()
 
-        if last_event and last_event.current_hash:
-            return last_event.current_hash
+        if last_event and last_event.content_hash:
+            return last_event.content_hash
 
         return None
 

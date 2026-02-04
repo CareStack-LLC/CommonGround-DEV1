@@ -1407,7 +1407,9 @@ export interface EventV2 {
     rsvp_status: string;
   };
   created_at: string;
+  created_at: string;
   updated_at: string;
+  event_type?: string;
 }
 
 export interface CreateEventRequest {
@@ -1438,6 +1440,18 @@ export interface UpdateEventRequest {
   location_shared?: boolean;
   event_category?: EventCategory; // V2: category-specific forms
   category_data?: CategoryData; // V2: category-specific fields
+}
+
+export interface SwapRequestCreate {
+  target_date: string;
+  child_ids: string[];
+  reason: string;
+  family_file_id: string;
+}
+
+export interface SwapResponseAction {
+  approved: boolean;
+  response_note?: string;
 }
 
 // Conflict Detection Types
@@ -1764,6 +1778,26 @@ export const eventsAPI = {
     });
     return fetchAPI<ConflictCheckResponse>(`/events/check-conflicts?${params.toString()}`, {
       method: 'POST',
+    });
+  },
+
+  /**
+   * Request a schedule swap
+   */
+  async requestSwap(data: SwapRequestCreate): Promise<EventV2> {
+    return fetchAPI<EventV2>('/events/swap-request', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Respond to a swap request
+   */
+  async respondToSwap(eventId: string, data: SwapResponseAction): Promise<EventV2> {
+    return fetchAPI<EventV2>(`/events/${eventId}/swap-response`, {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 };

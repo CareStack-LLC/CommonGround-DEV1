@@ -798,6 +798,118 @@ class EventService:
             "can_proceed": True  # MVP: conflicts are warnings, not blockers
         }
 
+    # ========== SWAP REQUEST METHODS ==========
+
+    @staticmethod
+    async def create_swap_request(
+        db: AsyncSession,
+        user_id: str,
+        family_file_id: str,
+        target_date: datetime,
+        child_ids: List[str],
+        reason: str
+    ) -> ScheduleEvent:
+        """
+        Create a swap request event.
+        
+        This creates a 'modification' event with status 'pending'.
+        """
+        # Create event
+        start_time = datetime.combine(target_date, datetime.min.time()) # All day placeholder
+        end_time = datetime.combine(target_date, datetime.max.time())
+        
+        event = ScheduleEvent(
+            id=str(uuid.uuid4()),
+            family_file_id=family_file_id,
+            created_by=user_id,
+            title=f"Swap Request: {reason[:30]}...",
+            description=reason,
+            start_time=start_time,
+            end_time=end_time,
+            all_day=True,
+            child_ids=child_ids,
+            visibility="co_parent",
+            event_type="swap_request",
+            event_category="general", # or 'exchange'
+            status="pending",
+            
+            # Modification flags
+            is_modification=True,
+            modification_requested_by=user_id,
+            modification_approved=False
+        )
+
+        db.add(event)
+        await db.flush()
+        await db.refresh(event)
+
+        # Notify Co-Parent (WS) - reuse generic event created
+        await manager.broadcast_to_case({
+            "type": "swap_request_created",
+            "family_file_id": family_file_id,
+            "event_id": event.id,
+            "title": event.title,
+            "timestamp": datetime.utcnow().isoformat()
+        }, family_file_id)
+
+        return event
+
+    @staticmethod
+    async def respond_to_swap_request(
+        db: AsyncSession,
+        event_id: str,
+        user_id: str,
+        approved: bool,
+        response_note: Optional[str] = None
+    ) -> ScheduleEvent:
+        """
+        Approve or Deny a swap request.
+        """
+        result = await db.execute(
+            select(ScheduleEvent).where(ScheduleEvent.id == event_id)
+        )
+        event = result.scalar_one_or_none()
+        
+        if not event:
+            raise ValueError("Swap request not found")
+            
+        if not event.is_modification:
+             raise ValueError("This event is not a swap request")
+             
+        # Ideally check if user is the other parent
+        if event.modification_requested_by == user_id:
+            raise ValueError("You cannot approve your own request")
+
+        event.modification_approved = approved
+        event.modification_approved_by = user_id
+        
+        if approved:
+            event.status = "scheduled"
+            event.title = f"Swap Approved: {event.description[:30]}"
+            # Here we might actually create the real schedule change or modify existing events
+            # For this MVP, we just mark this request as Approved/Scheduled
+        else:
+            event.status = "cancelled"
+            event.title = f"Swap Denied: {event.description[:30]}"
+            
+        if response_note:
+            # Append note to description
+            event.description = f"{event.description}\n\nResponse Note: {response_note}"
+
+        event.updated_at = datetime.utcnow()
+        await db.flush()
+        
+        # Notify requester
+        await manager.broadcast_to_case({
+            "type": "swap_request_updated",
+            "family_file_id": event.family_file_id,
+            "event_id": event.id,
+            "approved": approved,
+            "timestamp": datetime.utcnow().isoformat()
+        }, event.family_file_id)
+        
+        return event
+
     @staticmethod
     async def check_in_with_gps(
         db: AsyncSession,

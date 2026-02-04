@@ -11,6 +11,8 @@ from sqlalchemy import select, func, and_
 from app.models.payment import Payment, ExpenseRequest, PaymentLedger
 from app.models.case import CaseParticipant
 from app.models.user import User
+from app.models.agreement import Agreement, AgreementSection
+import re
 from app.services.export.generators.base import (
     BaseSectionGenerator,
     GeneratorContext,
@@ -62,6 +64,13 @@ class FinancialComplianceGenerator(BaseSectionGenerator):
         # Get current balances from ledger
         balances = await self._calculate_balances(db, context)
 
+        # Get active agreement and terms
+        agreement_terms = await self._get_agreement_terms(db, context)
+        
+        # Analyze compliance
+        child_support_compliance = self._analyze_child_support_compliance(payments, agreement_terms, context)
+        expense_compliance = self._analyze_expense_compliance(expenses, agreement_terms)
+
         # Build payment summary
         payment_summary = self._summarize_payments(payments)
         expense_summary = self._summarize_expenses(expenses)
@@ -79,6 +88,8 @@ class FinancialComplianceGenerator(BaseSectionGenerator):
                 "start": self._format_date(context.date_start),
                 "end": self._format_date(context.date_end),
             },
+            "child_support_compliance": child_support_compliance,
+            "expense_compliance": expense_compliance,
         }
 
         return SectionContent(
@@ -217,3 +228,165 @@ class FinancialComplianceGenerator(BaseSectionGenerator):
                 ).days,
             })
         return pending
+
+    async def _get_agreement_terms(self, db, context: GeneratorContext) -> dict:
+        """Fetch active agreement and extract key financial terms."""
+        # Find active agreement
+        # Priority: Active > Draft > None
+        stmt = select(Agreement).where(
+            Agreement.case_id == context.case_id,
+        ).order_by(Agreement.updated_at.desc())
+        
+        result = await db.execute(stmt)
+        agreements = result.scalars().all()
+        
+        agreement = None
+        for a in agreements:
+            if a.status == "active":
+                agreement = a
+                break
+        
+        if not agreement and agreements:
+            agreement = agreements[0] # Fallback
+            
+        if not agreement:
+            return {}
+
+        # Load sections if needed
+        sections_res = await db.execute(select(AgreementSection).where(AgreementSection.agreement_id == agreement.id))
+        sections = sections_res.scalars().all()
+
+        return self._extract_agreement_terms(agreement, sections)
+
+    def _extract_agreement_terms(self, agreement: Agreement, sections: list) -> dict:
+        """Extract financial terms from agreement sections."""
+        terms = {
+            "child_support_amount": 0.0,
+            "child_support_period": "month",
+            "cost_split_petitioner": 50,
+            "cost_split_respondent": 50,
+            "has_agreement": True,
+            "agreement_title": agreement.title
+        }
+
+        for section in sections:
+            content = section.content or ""
+            
+            # Extract Child Support
+            if section.section_type == "financial":
+                # Look for "$X/month"
+                match_cs = re.search(r'\$([0-9,.]+)\s*(?:/|per\s*)month', content, re.IGNORECASE)
+                if match_cs:
+                    amount_str = match_cs.group(1).replace(',', '')
+                    try:
+                        terms["child_support_amount"] = float(amount_str)
+                    except ValueError:
+                        pass
+                
+                # Look for Cost Split
+                # "50/50", "60/40"
+                match_split = re.search(r'(\d+)\s*/\s*(\d+)\s*split', content, re.IGNORECASE)
+                if match_split:
+                    try:
+                        p_share = int(match_split.group(1))
+                        # Assume first number is usually mentioned first matching typical custody (Petitioner/Respondent)
+                        # This is a heuristic. Ideally agreement stores structured data.
+                        terms["cost_split_petitioner"] = p_share
+                        terms["cost_split_respondent"] = 100 - p_share
+                    except ValueError:
+                        pass
+                elif "shared equally" in content.lower() or "equal split" in content.lower():
+                     terms["cost_split_petitioner"] = 50
+                     terms["cost_split_respondent"] = 50
+
+        return terms
+
+    def _analyze_child_support_compliance(
+        self, 
+        payments: list[Payment], 
+        terms: dict,
+        context: GeneratorContext
+    ) -> dict:
+        """Analyze child support payments against agreement."""
+        if not terms.get("has_agreement") or terms.get("child_support_amount", 0) == 0:
+            return {"status": "not_applicable"}
+
+        required_monthly = terms["child_support_amount"]
+        
+        # Calculate months in report period
+        start = context.date_start
+        end = context.date_end
+        # Approximate months
+        days = (end - start).days
+        months = max(1, round(days / 30.44)) 
+        
+        expected_total = required_monthly * months
+
+        # Sum actual payments
+        child_support_payments = [
+            p for p in payments 
+            if p.payment_type == "child_support" and p.status == "completed"
+        ]
+        actual_total = sum(float(p.amount) for p in child_support_payments)
+        
+        # Calculate discrepancy
+        shortfall = max(0, expected_total - actual_total)
+        compliance_score = min(100, (actual_total / expected_total * 100)) if expected_total > 0 else 100
+
+        return {
+            "status": "active",
+            "required_monthly": required_monthly,
+            "expected_total": expected_total,
+            "actual_total": actual_total,
+            "shortfall": shortfall,
+            "compliance_score": round(compliance_score, 1),
+            "months_covered": months
+        }
+
+    def _analyze_expense_compliance(self, expenses: list[ExpenseRequest], terms: dict) -> dict:
+        """Verify if expense requests match agreed split."""
+        if not terms.get("has_agreement"):
+            return {"status": "not_applicable"}
+            
+        agreed_split = terms.get("cost_split_petitioner", 50) # Assuming request logic uses petitioner/requester share
+        
+        compliant_requests = []
+        deviating_requests = []
+        
+        for expense in expenses:
+            # Check if split matches (allow 1% variance)
+            # This logic assumes "split_percentage" in ExpenseRequest refers to the standard split user
+            # We might need to know WHO requested to know which side of split to check.
+            # For now, simplistic check: is it close to agreed or (100-agreed)?
+            
+            actual = expense.split_percentage
+            
+            is_match = (
+                abs(actual - agreed_split) <= 1 or 
+                abs(actual - (100 - agreed_split)) <= 1
+            )
+            
+            item = {
+                "id": expense.id,
+                "title": expense.title,
+                "amount": float(expense.total_amount),
+                "requested_split": actual,
+                "agreed_split": agreed_split
+            }
+            
+            if is_match:
+                compliant_requests.append(item)
+            else:
+                deviating_requests.append(item)
+                
+        total = len(expenses)
+        score = (len(compliant_requests) / total * 100) if total > 0 else 100
+        
+        return {
+            "status": "active",
+            "agreed_split": f"{agreed_split}/{100-agreed_split}",
+            "compliance_score": round(score, 1),
+            "deviating_items": deviating_requests,
+            "compliant_count": len(compliant_requests),
+            "total_count": total
+        }

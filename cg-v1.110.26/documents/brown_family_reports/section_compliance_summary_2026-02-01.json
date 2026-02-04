@@ -1,0 +1,10 @@
+{
+  "section_type": "compliance_summary",
+  "section_title": "Compliance Summary",
+  "section_order": 2,
+  "evidence_count": 0,
+  "data_sources": [],
+  "content_data": {
+    "error": "Requires two active participants"
+  }
+}

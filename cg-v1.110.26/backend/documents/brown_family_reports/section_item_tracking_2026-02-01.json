@@ -1,0 +1,32 @@
+{
+  "section_type": "item_tracking",
+  "section_title": "High-Value Item Tracking (KidsCubbie)",
+  "section_order": 10,
+  "content_data": {
+    "summary": {
+      "total_registered_items": 0,
+      "total_value": "0",
+      "items_transferred_in_period": 0,
+      "disputed_items": 0,
+      "condition_issues_reported": 0
+    },
+    "items_by_child": [],
+    "transfer_timeline": [],
+    "disputes": [],
+    "condition_changes": [],
+    "category_breakdown": {},
+    "location_summary": {},
+    "report_period": {
+      "start": "May 07, 2025",
+      "end": "February 01, 2026"
+    },
+    "evidence_note": "Item tracking provides documented evidence of high-value item transfers between parents. Photos and condition reports create an auditable trail for court review."
+  },
+  "evidence_count": 0,
+  "data_sources": [
+    "cubbie_items",
+    "cubbie_exchange_items",
+    "custody_exchanges"
+  ],
+  "generation_time_ms": null
+}

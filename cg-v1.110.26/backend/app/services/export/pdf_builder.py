@@ -10,6 +10,8 @@ Uses ReportLab to create professional multi-page PDFs with:
 """
 
 import io
+import base64
+from io import BytesIO
 import hashlib
 from datetime import datetime
 from typing import Optional
@@ -23,6 +25,9 @@ from reportlab.platypus import (
     PageBreak, ListFlowable, ListItem, Image, KeepTogether
 )
 from reportlab.pdfgen import canvas
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive backend
+import matplotlib.pyplot as plt
 
 from app.services.export.generators.base import SectionContent
 
@@ -334,6 +339,7 @@ class ExportPDFBuilder:
             "intervention_log": self._render_intervention_log,
             "parent_impact": self._render_parent_impact,
             "chain_of_custody": self._render_chain_of_custody,
+            "exchange_gps_verification": self._render_exchange_gps_verification,
         }
 
         renderer = renderers.get(section.section_type)
@@ -362,13 +368,15 @@ class ExportPDFBuilder:
             story.append(case_table)
             story.append(Spacer(1, 0.2 * inch))
 
-        # Participants
-        if data.get("participants"):
-            story.append(Paragraph("Participants", self._styles['CGHeading2']))
-            for p in data["participants"]:
-                role = p.get("parent_type", "Parent").title()
-                name = p.get("name", "Name Redacted")
-                story.append(Paragraph(f"<b>{role}:</b> {name}", self._styles['CGBody']))
+        # Petitioner & Respondent (Named Parties)
+        if data.get("petitioner") or data.get("respondent"):
+            story.append(Paragraph("Parties", self._styles['CGHeading2']))
+            if data.get("petitioner"):
+                p = data["petitioner"]
+                story.append(Paragraph(f"<b>Petitioner:</b> {p.get('name', 'N/A')}", self._styles['CGBody']))
+            if data.get("respondent"):
+                r = data["respondent"]
+                story.append(Paragraph(f"<b>Respondent:</b> {r.get('name', 'N/A')}", self._styles['CGBody']))
             story.append(Spacer(1, 0.2 * inch))
 
         # Children
@@ -381,14 +389,86 @@ class ExportPDFBuilder:
                 story.append(Paragraph(f"• {name}{age_str}", self._styles['CGBody']))
             story.append(Spacer(1, 0.2 * inch))
 
+        # Custody Summary - Donut Chart
+        if data.get("custody_summary"):
+            cs = data["custody_summary"]
+            story.append(Paragraph("Custody Time Summary", self._styles['CGHeading2']))
+            
+            pet_name = data.get("petitioner", {}).get("name", "Petitioner")
+            res_name = data.get("respondent", {}).get("name", "Respondent")
+            pet_pct = cs.get("petitioner_pct", 0)
+            res_pct = cs.get("respondent_pct", 0)
+            expected_split = data.get("agreement", {}).get("key_terms", {}).get("custody_split", "N/A")
+            
+            # Generate donut chart
+            chart_img = self._create_custody_donut_chart(
+                pet_name, res_name, pet_pct, res_pct, expected_split
+            )
+            if chart_img:
+                story.append(Image(chart_img, width=3.5*inch, height=2.5*inch))
+            
+            # Add stats underneath
+            story.append(Paragraph(
+                f"<b>Actual:</b> {pet_name}: {pet_pct}% ({cs.get('petitioner_days', 0)} days) | "
+                f"{res_name}: {res_pct}% ({cs.get('respondent_days', 0)} days)",
+                self._styles['CGBody']
+            ))
+            story.append(Paragraph(
+                f"<b>Expected (per Agreement):</b> {expected_split}",
+                self._styles['CGBody']
+            ))
+            story.append(Spacer(1, 0.2 * inch))
+
         # Agreement Status
         if data.get("agreement"):
-            story.append(Paragraph("Agreement Status", self._styles['CGHeading2']))
+            story.append(Paragraph("Agreement Details", self._styles['CGHeading2']))
             agmt = data["agreement"]
+            
+            # Title & Status
+            title = agmt.get("title", "Agreement")
             status = agmt.get("status", "Unknown").replace("_", " ").title()
+            story.append(Paragraph(f"<b>{title}</b>", self._styles['CGBody']))
             story.append(Paragraph(f"<b>Status:</b> {status}", self._styles['CGBody']))
+
+            # Summary (if available)
+            if agmt.get("summary"):
+                story.append(Spacer(1, 0.1 * inch))
+                story.append(Paragraph("<b>Summary:</b>", self._styles['CGBody']))
+                story.append(Paragraph(f"<i>{agmt['summary']}</i>", self._styles['CGBody']))
+                story.append(Spacer(1, 0.1 * inch))
+
+            # Key Terms (Custody Split, Child Support, Cost Split)
+            key_terms = agmt.get("key_terms", {})
+            if key_terms:
+                terms_list = []
+                if key_terms.get("custody_split"):
+                    terms_list.append(f"<b>Custody Split:</b> {key_terms['custody_split']}")
+                if key_terms.get("child_support"):
+                    terms_list.append(f"<b>Child Support:</b> {key_terms['child_support']}")
+                if key_terms.get("cost_split"):
+                    terms_list.append(f"<b>Expense Split:</b> {key_terms['cost_split']}")
+                
+                if terms_list:
+                    story.append(Paragraph("<b>Key Terms:</b>", self._styles['CGBody']))
+                    for term in terms_list:
+                        story.append(Paragraph(f"• {term}", self._styles['CGBody']))
+                    story.append(Spacer(1, 0.1 * inch))
+
+            # Dates Table
+            date_data = []
             if agmt.get("effective_date"):
-                story.append(Paragraph(f"<b>Effective Date:</b> {agmt['effective_date']}", self._styles['CGBody']))
+                date_data.append(["Date Active:", agmt['effective_date']])
+            if agmt.get("petitioner_approved_at"):
+                date_data.append(["Petitioner Approved:", agmt['petitioner_approved_at']])
+            if agmt.get("respondent_approved_at"):
+                date_data.append(["Respondent Approved:", agmt['respondent_approved_at']])
+            
+            if date_data:
+                # Add Spacer before dates
+                story.append(Spacer(1, 0.1 * inch))
+                t = Table(date_data, colWidths=[2.5*inch, 3*inch])
+                t.setStyle(self._basic_table_style())
+                story.append(t)
 
         return story
 
@@ -396,14 +476,20 @@ class ExportPDFBuilder:
         """Render Compliance Summary section - the 'power page'."""
         story = []
 
-        # Report period
+        # Report period and Agreement
         if data.get("report_period"):
             period = data["report_period"]
             story.append(Paragraph(
                 f"<b>Report Period:</b> {period.get('start', '')} to {period.get('end', '')}",
                 self._styles['CGBody']
             ))
-            story.append(Spacer(1, 0.2 * inch))
+        
+        if data.get("agreement_summary"):
+            story.append(Paragraph(
+                f"<b>Agreement:</b> {data['agreement_summary']}",
+                self._styles['CGBody']
+            ))
+        story.append(Spacer(1, 0.2 * inch))
 
         # Summary statement
         if data.get("summary"):
@@ -417,67 +503,207 @@ class ExportPDFBuilder:
 
             # Build comparison table
             p1, p2 = parents[0], parents[1]
+            
+            # Helper to get color-coded score as Paragraph
+            def score_para(val):
+                if val >= 80:
+                    color = "#10b981"  # Green
+                elif val >= 60:
+                    color = "#f59e0b"  # Amber
+                else:
+                    color = "#ef4444"  # Red
+                return Paragraph(f'<font color="{color}"><b>{val:.1f}%</b></font>', self._styles['CGBody'])
+            
+            # Helper for plain text cell
+            def text_para(text):
+                return Paragraph(str(text), self._styles['CGBody'])
+            
+            p1_name = p1.get("name", p1.get("parent_type", "Parent A").title())
+            p2_name = p2.get("name", p2.get("parent_type", "Parent B").title())
+            
             comparison_data = [
-                ["Metric", p1.get("parent_type", "Parent A").title(), p2.get("parent_type", "Parent B").title()],
-                ["Overall Compliance Score",
-                 f"{p1.get('overall_compliance_score', 0):.1f}%",
-                 f"{p2.get('overall_compliance_score', 0):.1f}%"],
+                [text_para("<b>Metric</b>"), text_para(f"<b>{p1_name}</b>"), text_para(f"<b>{p2_name}</b>")],
+                [text_para("<b>Overall Compliance Score</b>"),
+                 score_para(p1.get('overall_compliance_score', 0)),
+                 score_para(p2.get('overall_compliance_score', 0))],
             ]
+            
+            # Score Breakdown
+            story.append(Spacer(1, 0.1 * inch))
 
             # Exchange metrics
             if p1.get("exchange_metrics") and p2.get("exchange_metrics"):
                 e1, e2 = p1["exchange_metrics"], p2["exchange_metrics"]
                 comparison_data.append([
-                    "Exchange On-Time Rate",
-                    f"{e1.get('on_time_rate', 0):.1f}%",
-                    f"{e2.get('on_time_rate', 0):.1f}%"
-                ])
-                comparison_data.append([
-                    "Total Exchanges",
-                    str(e1.get('total', 0)),
-                    str(e2.get('total', 0))
+                    text_para("  └ Exchange On-Time (25%)"),
+                    score_para(e1.get('on_time_rate', 0)),
+                    score_para(e2.get('on_time_rate', 0))
                 ])
 
             # Communication metrics
             if p1.get("communication_metrics") and p2.get("communication_metrics"):
                 c1, c2 = p1["communication_metrics"], p2["communication_metrics"]
+                # Communication score = 100 - intervention_rate
+                comm_score1 = 100 - c1.get('intervention_rate', 0)
+                comm_score2 = 100 - c2.get('intervention_rate', 0)
                 comparison_data.append([
-                    "Messages Sent",
-                    str(c1.get('messages_sent', 0)),
-                    str(c2.get('messages_sent', 0))
+                    text_para("  └ Communication (25%)"),
+                    score_para(comm_score1),
+                    score_para(comm_score2)
+                ])
+                
+            # Custody Tracking
+            if p1.get("custody_tracking_metrics") and p2.get("custody_tracking_metrics"):
+                ct1, ct2 = p1["custody_tracking_metrics"], p2["custody_tracking_metrics"]
+                comparison_data.append([
+                    text_para("  └ Custody Tracking (20%)"),
+                    score_para(ct1.get('compliance_rate', 100)),
+                    score_para(ct2.get('compliance_rate', 100))
+                ])
+            
+            # Child Support
+            if p1.get("financial_metrics") and p2.get("financial_metrics"):
+                f1, f2 = p1["financial_metrics"], p2["financial_metrics"]
+                cs1 = f1.get("child_support", {}).get("compliance_rate")
+                cs2 = f2.get("child_support", {}).get("compliance_rate")
+                
+                # Show N/A for parent who doesn't pay child support (receiver)
+                cs1_display = score_para(cs1) if cs1 is not None else text_para("<i>N/A (Receiver)</i>")
+                cs2_display = score_para(cs2) if cs2 is not None else text_para("<i>N/A (Receiver)</i>")
+                
+                comparison_data.append([
+                    text_para("  └ Child Support (15%)"),
+                    cs1_display,
+                    cs2_display
+                ])
+                
+                # Expenses
+                exp1 = f1.get("expenses", {}).get("compliance_rate", 100)
+                exp2 = f2.get("expenses", {}).get("compliance_rate", 100)
+                comparison_data.append([
+                    text_para("  └ Expense Compliance (15%)"),
+                    score_para(exp1),
+                    score_para(exp2)
+                ])
+            
+            # Separator row
+            comparison_data.append([text_para(""), text_para(""), text_para("")])
+                
+            # Communication Toxic Category
+            if p1.get("communication_metrics") and p2.get("communication_metrics"):
+                c1, c2 = p1["communication_metrics"], p2["communication_metrics"]
+                comparison_data.append([
+                    text_para("ARIA Interventions"),
+                    text_para(str(c1.get('aria_interventions', 0))),
+                    text_para(str(c2.get('aria_interventions', 0)))
                 ])
                 comparison_data.append([
-                    "ARIA Interventions",
-                    str(c1.get('aria_interventions', 0)),
-                    str(c2.get('aria_interventions', 0))
+                    text_para("Top Toxic Category"),
+                    text_para(c1.get('top_toxic_category', 'None').title()),
+                    text_para(c2.get('top_toxic_category', 'None').title())
+                ])
+                
+            # Total Exchanges then Missed Exchanges (at the bottom)
+            if p1.get("exchange_metrics") and p2.get("exchange_metrics"):
+                e1, e2 = p1["exchange_metrics"], p2["exchange_metrics"]
+                comparison_data.append([
+                    text_para("Total Exchanges"),
+                    text_para(str(e1.get('total', 0))),
+                    text_para(str(e2.get('total', 0)))
                 ])
                 comparison_data.append([
-                    "Good Faith Rate",
-                    f"{c1.get('good_faith_rate', 0):.1f}%",
-                    f"{c2.get('good_faith_rate', 0):.1f}%"
+                    text_para("Missed Exchanges"),
+                    text_para(str(e1.get('missed', 0))),
+                    text_para(str(e2.get('missed', 0)))
+                ])
+                
+                # Last Exchange - show most recent exchange with status
+                le1 = e1.get('last_exchange')
+                le2 = e2.get('last_exchange')
+                le1_text = f"{le1['date']} ({le1['status'].title()})" if le1 else "None"
+                le2_text = f"{le2['date']} ({le2['status'].title()})" if le2 else "None"
+                comparison_data.append([
+                    text_para("Last Exchange"),
+                    text_para(le1_text),
+                    text_para(le2_text)
                 ])
 
             comp_table = Table(comparison_data, colWidths=[2.5 * inch, 1.75 * inch, 1.75 * inch])
             comp_table.setStyle(TableStyle([
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, -1), 10),
                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#1e40af")),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('TEXTCOLOR', (0, 1), (-1, -1), self.TEXT_COLOR),
                 ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('GRID', (0, 0), (-1, -1), 0.5, self.BORDER_COLOR),
                 ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
                 ('TOPPADDING', (0, 0), (-1, -1), 8),
+                # Highlight overall score row
+                ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor("#f0f9ff")),
             ]))
             story.append(comp_table)
+            story.append(Spacer(1, 0.2 * inch))
+
+            # NOTE: Missed Exchange Evidence has been moved to Section 3 (Parenting Time Report)
 
         return story
 
     def _render_parenting_time(self, data: dict) -> list:
         """Render Parenting Time Report section."""
         story = []
+
+        # Report period
+        if data.get("report_period"):
+            period = data["report_period"]
+            story.append(Paragraph(
+                f"<b>Report Period:</b> {period.get('start', '')} to {period.get('end', '')}",
+                self._styles['CGBody']
+            ))
+            story.append(Spacer(1, 0.15 * inch))
+
+        # ==============================================
+        # CUSTODY DAY TRACKING
+        # ==============================================
+        if data.get("custody_tracking") and data["custody_tracking"].get("parents"):
+            story.append(Paragraph("Custody Day Tracking", self._styles['CGHeading2']))
+            ct = data["custody_tracking"]
+            
+            # Summary table
+            tracking_data = [["Parent", "Days with Child", "Percentage"]]
+            for parent in ct["parents"]:
+                tracking_data.append([
+                    parent.get("name", "Unknown"),
+                    str(parent.get("days", 0)),
+                    f"{parent.get('percentage', 0):.1f}%"
+                ])
+            tracking_data.append([
+                "<b>Total Days Tracked</b>",
+                f"<b>{ct.get('total_days_tracked', 0)}</b>",
+                ""
+            ])
+            
+            tracking_table = Table(tracking_data, colWidths=[2.5 * inch, 1.5 * inch, 1.5 * inch])
+            tracking_table.setStyle(self._header_table_style())
+            story.append(tracking_table)
+            story.append(Spacer(1, 0.15 * inch))
+            
+            # Monthly breakdown (if available)
+            if ct.get("by_month"):
+                story.append(Paragraph("<i>Monthly Breakdown</i>", self._styles['CGHeading2']))
+                month_rows = [["Month"] + [p.get("name", "?") for p in ct["parents"]]]
+                for month_data in ct["by_month"][-6:]:  # Last 6 months
+                    row = [month_data.get("month", "")]
+                    parent_days = {p["name"]: p["days"] for p in month_data.get("parents", [])}
+                    for parent in ct["parents"]:
+                        row.append(str(parent_days.get(parent.get("name", ""), 0)))
+                    month_rows.append(row)
+                
+                col_count = len(ct["parents"]) + 1
+                col_widths = [2 * inch] + [1.5 * inch] * len(ct["parents"])
+                month_table = Table(month_rows, colWidths=col_widths)
+                month_table.setStyle(self._header_table_style())
+                story.append(month_table)
+                story.append(Spacer(1, 0.2 * inch))
 
         # Summary statistics
         if data.get("summary"):
@@ -509,34 +735,121 @@ class ExportPDFBuilder:
             story.append(time_table)
             story.append(Spacer(1, 0.2 * inch))
 
-        # Exchange log (recent exchanges)
-        if data.get("exchange_log"):
-            story.append(Paragraph("Recent Exchanges", self._styles['CGHeading2']))
-            log = data["exchange_log"][:10]  # Show first 10
-            if log:
-                log_data = [["Date", "Scheduled", "Actual", "Status"]]
-                for entry in log:
-                    log_data.append([
-                        entry.get("date", ""),
-                        entry.get("scheduled_time", ""),
-                        entry.get("actual_time", "—"),
-                        entry.get("status", "").title(),
-                    ])
-                log_table = Table(log_data, colWidths=[1.5 * inch, 1.5 * inch, 1.5 * inch, 1.5 * inch])
-                log_table.setStyle(self._header_table_style())
-                story.append(log_table)
-
         # Patterns
         if data.get("patterns") and data["patterns"].get("overall_trend"):
-            story.append(Spacer(1, 0.2 * inch))
             trend = data["patterns"]["overall_trend"]
-            story.append(Paragraph(f"<b>Overall Trend:</b> {trend.title()}", self._styles['CGBody']))
+            trend_color = "#10b981" if trend in ["excellent", "good"] else "#f59e0b" if trend == "needs_attention" else "#ef4444"
+            story.append(Paragraph(f"<b>Overall Trend:</b> <font color='{trend_color}'>{trend.replace('_', ' ').title()}</font>", self._styles['CGBody']))
+            story.append(Spacer(1, 0.2 * inch))
+
+        # ==============================================
+        # MISSED EXCHANGE EVIDENCE (moved from Section 2)
+        # ==============================================
+        if data.get("missed_exchange_details"):
+            missed_list = data["missed_exchange_details"]
+            if missed_list:
+                story.append(Paragraph("Missed Exchange Evidence", self._styles['CGHeading2']))
+                story.append(Spacer(1, 0.1 * inch))
+                
+                # Sort by date (newest first)
+                missed_list.sort(key=lambda x: str(x.get('date', '')) + str(x.get('time', '')), reverse=True)
+                
+                for item in missed_list:
+                    # Header: Date | Time | Responsible
+                    header_text = f"<b>{item.get('date')} at {item.get('time')}</b> - Responsible: {item.get('responsible')}"
+                    story.append(Paragraph(header_text, self._styles['CGBody']))
+                    
+                    # Location
+                    loc_text = f"Location: {item.get('location_name')}"
+                    story.append(Paragraph(loc_text, self._styles['CGBody']))
+                    story.append(Spacer(1, 0.1 * inch))
+                    
+                    # Map Image
+                    if item.get("map_image_b64"):
+                        try:
+                            img_data = base64.b64decode(item["map_image_b64"])
+                            img = Image(BytesIO(img_data), width=4*inch, height=2*inch)
+                            story.append(img)
+                        except Exception:
+                            pass  # Skip map image errors
+                    
+                    # Link
+                    if item.get("verify_link"):
+                        link = f'<a href="{item["verify_link"]}" color="blue">Verify Location on Map</a>'
+                        story.append(Paragraph(link, self._styles['CGBody']))
+                    
+                    story.append(Spacer(1, 0.3 * inch))
 
         return story
 
     def _render_financial_compliance(self, data: dict) -> list:
         """Render Financial Compliance section."""
         story = []
+
+        # Child Support Compliance (New)
+        if data.get("child_support_compliance"):
+            cs = data["child_support_compliance"]
+            if cs.get("status") == "active":
+                story.append(Paragraph("Child Support Compliance", self._styles['CGHeading2']))
+                
+                # Compliance Score Card
+                score = cs.get("compliance_score", 0)
+                score_color = "#10b981" if score >= 90 else "#f59e0b" if score >= 75 else "#ef4444"
+                
+                story.append(Paragraph(
+                    f"<b>Adherence Score:</b> <font color='{score_color}'>{score}%</font>", 
+                    self._styles['CGBody']
+                ))
+                
+                cs_data = [
+                    ["Terms", f"${cs.get('required_monthly', 0):,.2f}/month"],
+                    ["Expected Total", f"${cs.get('expected_total', 0):,.2f} ({cs.get('months_covered', 0)} months)"],
+                    ["Actual Paid", f"${cs.get('actual_total', 0):,.2f}"],
+                    ["Shortfall", f"${cs.get('shortfall', 0):,.2f}" if cs.get('shortfall', 0) > 0 else "None"],
+                ]
+                cs_table = Table(cs_data, colWidths=[2 * inch, 3.5 * inch])
+                cs_table.setStyle(self._basic_table_style())
+                story.append(cs_table)
+                story.append(Spacer(1, 0.2 * inch))
+
+        # Expense Split Compliance (New)
+        if data.get("expense_compliance"):
+            ec = data["expense_compliance"]
+            if ec.get("status") == "active":
+                story.append(Paragraph("Expense Split Compliance", self._styles['CGHeading2']))
+                
+                # Score
+                score = ec.get("compliance_score", 0)
+                score_color = "#10b981" if score >= 90 else "#f59e0b" if score >= 75 else "#ef4444"
+                
+                story.append(Paragraph(
+                    f"<b>Split Adherence:</b> <font color='{score_color}'>{score}%</font> follow agreed {ec.get('agreed_split')} split", 
+                    self._styles['CGBody']
+                ))
+                
+                # Deviating Items Table
+                deviations = ec.get("deviating_items", [])
+                if deviations:
+                    story.append(Spacer(1, 0.1 * inch))
+                    story.append(Paragraph("<b>Non-Standard Splits (Flagged):</b>", self._styles['CGBody']))
+                    
+                    dev_header = [["Expense", "Amount", "Requested Split"]]
+                    dev_rows = dev_header + [
+                        [
+                            d.get("title", "Unknown"), 
+                            f"${d.get('amount', 0):,.2f}", 
+                            f"{d.get('requested_split')}/{100-d.get('requested_split')}"
+                        ]
+                        for d in deviations[:5] # Limit to 5
+                    ]
+                    
+                    dev_table = Table(dev_rows, colWidths=[3 * inch, 1.5 * inch, 1 * inch])
+                    dev_table.setStyle(self._header_table_style())
+                    story.append(dev_table)
+                else:
+                     story.append(Paragraph("<i>All expenses followed the agreed split.</i>", self._styles['CGBody']))
+                
+                story.append(Spacer(1, 0.2 * inch))
 
         # Payment summary
         if data.get("payment_summary"):
@@ -836,6 +1149,170 @@ class ExportPDFBuilder:
             ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
             ('TOPPADDING', (0, 0), (-1, -1), 6),
         ])
+    
+    def _render_exchange_gps_verification(self, data: dict) -> list:
+        """Render Exchange GPS Verification section."""
+        story = []
+
+        # 1. Summary
+        if "summary" in data:
+            story.append(Paragraph("Summary", self._styles['CGHeading2']))
+            summary = data["summary"]
+            summary_data = [
+                ["Total Exchanges:", str(summary.get("total_exchanges", 0))],
+                ["GPS Verified:", f"{summary.get('gps_verified_count', 0)} ({summary.get('gps_verified_rate', 0)}%)"],
+            ]
+            
+            # Add dates if available
+            if "report_period" in summary:
+                s = summary["report_period"].get("start", "")
+                e = summary["report_period"].get("end", "")
+                summary_data.insert(0, ["Report Period:", f"{s} to {e}"])
+
+            table = Table(summary_data, colWidths=[2 * inch, 4 * inch])
+            table.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('TEXTCOLOR', (0, 0), (-1, -1), self.TEXT_COLOR),
+                ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ]))
+            story.append(table)
+            story.append(Spacer(1, 0.2 * inch))
+
+        # 2. Compliance Metrics
+        if "compliance_metrics" in data:
+            story.append(Paragraph("Compliance Metrics", self._styles['CGHeading2']))
+            metrics = data["compliance_metrics"].get("overall", {})
+            
+            metric_data = [
+                ["Metric", "Value"],
+                ["Geofence Compliance", f"{metrics.get('geofence_compliance_rate', 0)}%"],
+                ["On-Time Rate", f"{metrics.get('on_time_rate', 0)}%"],
+                ["Completed", str(metrics.get("completed_count", 0))],
+                ["Missed", str(metrics.get("missed_count", 0))],
+            ]
+            
+            t = Table(metric_data, colWidths=[3 * inch, 3 * inch])
+            t.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f3f4f6")),
+                ('GRID', (0, 0), (-1, -1), 0.5, self.BORDER_COLOR),
+                ('PADDING', (0, 0), (-1, -1), 6),
+            ]))
+            story.append(t)
+            story.append(Spacer(1, 0.2 * inch))
+
+        # 3. Exchange Log
+        if "exchange_log" in data and data["exchange_log"]:
+            story.append(Paragraph("Exchange Evidence Log", self._styles['CGHeading2']))
+            
+            headers = ["Date", "Time", "Title", "Location", "Status"]
+            table_data = [headers]
+            
+            for entry in data["exchange_log"][:40]: # Limit rows
+                row = [
+                    entry.get("date", "")[:12],
+                    entry.get("scheduled_time", ""),
+                    entry.get("title", "")[:20],
+                    entry.get("location", "")[:30],
+                    entry.get("status", "")
+                ]
+                table_data.append(row)
+                
+            # Fixed widths to prevent overlap: Total 7.5 inches available (8.5 - 1 margins)
+            # Actually margins are 0.75 left/right -> 7.0 inches usable
+            col_widths = [1.2 * inch, 1.0 * inch, 1.8 * inch, 2.0 * inch, 1.0 * inch]
+            
+            t = Table(table_data, colWidths=col_widths)
+            t.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8), # Smaller font for logs
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f3f4f6")),
+                ('GRID', (0, 0), (-1, -1), 0.5, self.BORDER_COLOR),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ]))
+            story.append(t)
+            story.append(Spacer(1, 0.3 * inch))
+
+        # 4. Evidence Maps
+        if "evidence_maps" in data and data["evidence_maps"]:
+            story.append(Paragraph("Evidence Maps (Sample)", self._styles['CGHeading2']))
+            
+            headers = ["Date", "Time", "Map Link"]
+            map_data = [headers]
+            
+            for m in data["evidence_maps"][:10]:
+                 # formatting link as text for now, or clickable if reportlab supports it easily
+                 # We'll just show the text "View Map" if we can make it a link, otherwise just the URL truncated
+                 url = m.get("map_url", "")
+                 row = [
+                     m.get("date", ""),
+                     m.get("time", ""),
+                     Paragraph(f'<a href="{url}" color="blue">View Map Evidence</a>', self._styles['CGBody']) if url else "N/A"
+                 ]
+                 map_data.append(row)
+            
+            t = Table(map_data, colWidths=[1.5 * inch, 1.5 * inch, 4.0 * inch])
+            t.setStyle(TableStyle([
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('GRID', (0, 0), (-1, -1), 0.5, self.BORDER_COLOR),
+                ('PADDING', (0, 0), (-1, -1), 6),
+            ]))
+            story.append(t)
+
+        return story
+
+    def _create_custody_donut_chart(
+        self,
+        pet_name: str,
+        res_name: str,
+        pet_pct: float,
+        res_pct: float,
+        expected_split: str
+    ) -> BytesIO:
+        """Create a donut chart showing custody time distribution."""
+        try:
+            fig, ax = plt.subplots(figsize=(5, 3.5))
+            
+            # Data
+            sizes = [pet_pct, res_pct]
+            labels = [f'{pet_name}\n{pet_pct}%', f'{res_name}\n{res_pct}%']
+            colors_list = ['#3b82f6', '#f97316']  # Blue for petitioner, Orange for respondent
+            explode = (0.02, 0.02)  # Slight separation
+            
+            # Create donut
+            wedges, texts, autotexts = ax.pie(
+                sizes,
+                labels=labels,
+                colors=colors_list,
+                explode=explode,
+                autopct='',
+                startangle=90,
+                wedgeprops=dict(width=0.5, edgecolor='white')
+            )
+            
+            # Center text with expected split
+            ax.text(0, 0, f'Expected\n{expected_split}', ha='center', va='center', 
+                    fontsize=12, fontweight='bold', color='#374151')
+            
+            # Title
+            ax.set_title('Custody Time Distribution', fontsize=14, fontweight='bold', pad=20)
+            
+            # Equal aspect ratio
+            ax.axis('equal')
+            
+            # Save to BytesIO
+            img_buffer = BytesIO()
+            plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight', 
+                        facecolor='white', edgecolor='none')
+            plt.close(fig)
+            img_buffer.seek(0)
+            
+            return img_buffer
+        except Exception as e:
+            print(f"Error creating donut chart: {e}")
+            return None
 
     def _render_dict(self, data: dict, level: int = 0) -> list:
         """Recursively render a dictionary as formatted content."""

@@ -104,11 +104,11 @@ class ChainOfCustodyGenerator(BaseSectionGenerator):
             prev_event = events[i - 1]
 
             # Verify the chain link
-            if event.previous_hash != prev_event.current_hash:
+            if event.previous_hash != prev_event.content_hash:
                 breaks.append({
                     "position": i,
                     "event_id": str(event.id),
-                    "expected_previous": prev_event.current_hash,
+                    "expected_previous": prev_event.content_hash,
                     "actual_previous": event.previous_hash,
                     "timestamp": self._format_datetime(event.created_at),
                 })
@@ -128,7 +128,7 @@ class ChainOfCustodyGenerator(BaseSectionGenerator):
             return hashlib.sha256(b"no_events").hexdigest()
 
         # Combine all event hashes
-        combined = "".join(event.current_hash or "" for event in events)
+        combined = "".join(event.content_hash or "" for event in events)
         return hashlib.sha256(combined.encode()).hexdigest()
 
     def _get_chain_statistics(self, events: list[EventLog]) -> dict:
@@ -153,12 +153,12 @@ class ChainOfCustodyGenerator(BaseSectionGenerator):
             "first_event": {
                 "timestamp": self._format_datetime(events[0].created_at),
                 "type": events[0].event_type,
-                "hash": events[0].current_hash[:16] + "..." if events[0].current_hash else None,
+                "hash": events[0].content_hash[:16] + "..." if events[0].content_hash else None,
             },
             "last_event": {
                 "timestamp": self._format_datetime(events[-1].created_at),
                 "type": events[-1].event_type,
-                "hash": events[-1].current_hash[:16] + "..." if events[-1].current_hash else None,
+                "hash": events[-1].content_hash[:16] + "..." if events[-1].content_hash else None,
             },
         }
 

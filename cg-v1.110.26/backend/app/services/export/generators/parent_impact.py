@@ -5,7 +5,7 @@ Section 7: 90-day rolling analysis of parent behavior impact.
 """
 
 from datetime import datetime, timedelta
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, or_
 
 from app.models.message import Message, MessageFlag
 from app.models.schedule import ExchangeCheckIn
@@ -214,39 +214,75 @@ class ParentImpactGenerator(BaseSectionGenerator):
         start: datetime,
         end: datetime
     ) -> dict:
-        """Get schedule compliance metrics for a user."""
-        # Total check-ins
-        total_result = await db.execute(
-            select(func.count(ExchangeCheckIn.id))
+        """Get schedule compliance metrics for a user using CustodyExchangeInstance."""
+        from app.models.custody_exchange import CustodyExchangeInstance, CustodyExchange
+        
+        # 1. Exchanges where user was the "From" parent (handing off)
+        # Check `from_parent_check_in_time` vs `scheduled_time`
+        
+        # We need to join with Exchange to know if they were 'from_parent_id' or 'to_parent_id'
+        # But actually CustodyExchangeInstance doesn't store parent IDs, it links to Exchange.
+        # AND we have `from_parent_checked_in` bools on the Instance.
+        # The Instance logic in seed script maps `from_parent` and `to_parent` roles.
+        
+        # We need to find Instances where:
+        # (Exchange.from_parent_id == user_id) OR (Exchange.to_parent_id == user_id)
+        
+        # Fetch all instances in period involved with this user
+        stmt = (
+            select(CustodyExchangeInstance, CustodyExchange)
+            .join(CustodyExchange, CustodyExchangeInstance.exchange_id == CustodyExchange.id)
             .where(
                 and_(
-                    ExchangeCheckIn.user_id == user_id,
-                    ExchangeCheckIn.checked_in_at >= start,
-                    ExchangeCheckIn.checked_in_at <= end
+                    CustodyExchangeInstance.scheduled_time >= start,
+                    CustodyExchangeInstance.scheduled_time <= end,
+                    or_(
+                        CustodyExchange.from_parent_id == user_id,
+                        CustodyExchange.to_parent_id == user_id
+                    )
                 )
             )
         )
-        total = total_result.scalar() or 0
+        
+        result = await db.execute(stmt)
+        rows = result.all()
+        
+        total_exchanges = 0
+        on_time_count = 0
+        
+        for instance, exchange in rows:
+            # Determine user's role in this specific exchange
+            if exchange.from_parent_id == user_id:
+                # User is FROM parent
+                # Did they check in?
+                if instance.from_parent_checked_in:
+                    total_exchanges += 1
+                    # Check timeliness (within 15 mins of scheduled?)
+                    # Seed script logic: m_offset = random.randint(-15, 5) is compliant
+                    # Late is > 15 mins
+                    # Let's say "On Time" is check_in_time <= scheduled_time + 15 mins
+                    if instance.from_parent_check_in_time:
+                         threshold = instance.scheduled_time + timedelta(minutes=15)
+                         if instance.from_parent_check_in_time <= threshold:
+                             on_time_count += 1
+                elif instance.status == "missed":
+                     total_exchanges += 1
+                     # Missed is not on time
+                     
+            elif exchange.to_parent_id == user_id:
+                # User is TO parent
+                if instance.to_parent_checked_in:
+                    total_exchanges += 1
+                    if instance.to_parent_check_in_time:
+                         threshold = instance.scheduled_time + timedelta(minutes=15)
+                         if instance.to_parent_check_in_time <= threshold:
+                             on_time_count += 1
 
-        # On-time check-ins
-        on_time_result = await db.execute(
-            select(func.count(ExchangeCheckIn.id))
-            .where(
-                and_(
-                    ExchangeCheckIn.user_id == user_id,
-                    ExchangeCheckIn.checked_in_at >= start,
-                    ExchangeCheckIn.checked_in_at <= end,
-                    ExchangeCheckIn.is_on_time == True
-                )
-            )
-        )
-        on_time = on_time_result.scalar() or 0
-
-        compliance_score = (on_time / total * 100) if total > 0 else 100
+        compliance_score = (on_time_count / total_exchanges * 100) if total_exchanges > 0 else 100.0
 
         return {
-            "total": total,
-            "on_time": on_time,
+            "total": total_exchanges,
+            "on_time": on_time_count,
             "compliance_score": round(compliance_score, 1),
         }
 

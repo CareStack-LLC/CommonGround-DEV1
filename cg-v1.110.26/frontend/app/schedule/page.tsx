@@ -15,6 +15,7 @@ import EventForm from '@/components/schedule/event-form';
 import EventDetails from '@/components/schedule/event-details';
 import ExchangeForm from '@/components/schedule/exchange-form';
 import SilentHandoffCheckIn from '@/components/schedule/silent-handoff-checkin';
+import SwapRequestModal from '@/components/schedule/swap-request-modal';
 import {
   Calendar,
   Clock,
@@ -66,10 +67,9 @@ function TabButton({
       className={`
         group relative flex items-center gap-2.5 px-4 py-3 text-sm font-bold
         rounded-xl transition-all duration-300 flex-shrink-0
-        ${
-          active
-            ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md'
-            : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
+        ${active
+          ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md'
+          : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
         }
       `}
     >
@@ -201,6 +201,7 @@ function ScheduleContent() {
   const [selectedCollection, setSelectedCollection] = useState<MyTimeCollection | null>(null);
   const [showEventForm, setShowEventForm] = useState(false);
   const [showExchangeForm, setShowExchangeForm] = useState(false);
+  const [showSwapModal, setShowSwapModal] = useState(false);
   const [eventFormDate, setEventFormDate] = useState<Date | undefined>();
   const [selectedEvent, setSelectedEvent] = useState<EventV2 | null>(null);
   const [activeTab, setActiveTab] = useState<'calendar' | 'collections' | 'blocks'>('calendar');
@@ -274,6 +275,11 @@ function ScheduleContent() {
 
   const handleExchangeCreated = () => {
     setShowExchangeForm(false);
+    setCalendarKey(prev => prev + 1);
+  };
+
+  const handleSwapCreated = () => {
+    setShowSwapModal(false);
     setCalendarKey(prev => prev + 1);
   };
 
@@ -453,6 +459,13 @@ function ScheduleContent() {
             onClick={() => setShowExchangeForm(true)}
           />
           <QuickActionCard
+            icon={RefreshCw}
+            title="Request Swap"
+            description="Propose schedule change"
+            color="sage"
+            onClick={() => setShowSwapModal(true)}
+          />
+          <QuickActionCard
             icon={FolderOpen}
             title="My Collections"
             description="Organize time blocks"
@@ -544,6 +557,14 @@ function ScheduleContent() {
           agreementId={selectedAgreement?.id}
           onClose={() => setShowExchangeForm(false)}
           onSuccess={handleExchangeCreated}
+        />
+      )}
+
+      {showSwapModal && (
+        <SwapRequestModal
+          caseId={selectedFamilyFile.id}
+          onClose={() => setShowSwapModal(false)}
+          onSuccess={handleSwapCreated}
         />
       )}
 
