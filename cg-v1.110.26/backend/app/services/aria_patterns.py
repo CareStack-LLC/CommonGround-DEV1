@@ -94,23 +94,26 @@ THREATENING_PATTERNS = [
 # ==============================================================================
 # INTENT: CUSTODY WEAPONIZATION (High Risk)
 # ==============================================================================
+# ==============================================================================
+# INTENT: CUSTODY WEAPONIZATION (High Risk)
+# ==============================================================================
 CUSTODY_WEAPONIZATION_PATTERNS = [
-    # Gatekeeping
-    r'\b(won\'?t|never)\s*see\s*(the\s*)?kids?\b', 
-    r'\bblock(ing)?\s*(ur\s*|your\s*)?number\b', 
-    r'\btaking\s*(the\s*)?kids?\s*away\b', 
-    r'\brun\s*away\s*with\s*them\b',
+    # Gatekeeping - Allow for fillers (damn, fscking, my) between key phrases
+    r'\b(won\'?t|never)\s+(?:[\w\'\*]+\s+){0,3}see\s+(?:[\w\'\*]+\s+){0,3}kids?\b', 
+    r'\bblock(ing)?\s+(?:[\w\'\*]+\s+){0,3}number\b', 
+    r'\btaking\s+(?:[\w\'\*]+\s+){0,3}kids?\s+(?:[\w\'\*]+\s+){0,3}away\b', 
+    r'\brun\s+away\s+with\s+(?:[\w\'\*]+\s+){0,3}(them|kids?)\b',
 
     # Parental Alienation
-    r'\btell\s*them\s*the\s*truth\s*about\s*(yo)?u\b', 
-    r'\bthey\s*hate\s*(yo)?u\b', 
-    r'\bnot\s*(ur\s*|your\s*)?real\s*(dad|mom)\b', 
-    r'\bthey\s*don\'?t\s*want\s*to\s*come\b',
+    r'\btell\s+(?:[\w\'\*]+\s+){0,3}them\s+(?:[\w\'\*]+\s+){0,3}truth\b', 
+    r'\bthey\s+hate\s+(yo)?u\b', 
+    r'\bnot\s+(?:[\w\'\*]+\s+){0,3}real\s*(dad|mom)\b', 
+    r'\bthey\s+don\'?t\s+want\s+to\s+come\b',
 
     # Legal Threats
-    r'\bfull\s*custody\b', r'\bsole\s*custody\b', 
-    r'\bunfit\s*parent\b', r'\bterminate\s*(ur\s*|your\s*)?rights\b', 
-    r'\bcall\s*cps\b', r'\bcall\s*dcf\b', r'\bcall\s*dcfs\b',
+    r'\bfull\s+custody\b', r'\bsole\s+custody\b', 
+    r'\bunfit\s+parent\b', r'\bterminate\s+(?:[\w\'\*]+\s+){0,3}rights\b', 
+    r'\bcall\s+(?:[\w\'\*]+\s+){0,3}(cps|dcf|dcfs)\b',
 ]
 
 # ==============================================================================
@@ -124,7 +127,7 @@ FINANCIAL_COERCION_PATTERNS = [
     r'\bsue\s*(yo)?u\s*for\s*everything\b', r'\bbleed\s*(yo)?u\s*dry\b',
 
     # Control
-    r'\bcut\s*(yo)?u\s*off\b', r'\starve\s*(yo)?u\s*out\b', 
+    r'\bcut\s*(yo)?u\s*off\b', r'\bstarve\s*(yo)?u\s*out\b', 
     r'\bfinancial\s*ruin\b', r'\bgarnish\b',
 ]
 
@@ -137,7 +140,7 @@ HOSTILITY_PATTERNS = [
     r'\bwish\s*i\s*never\s*met\s*(yo)?u\b', r'\bruined\s*my\s*life\b',
     
     # Dismissive
-    r'\bshut\s*up\b', r'\bstfu\b', r'\bshut\s*(ur\s*|your\s*)?mouth\b', 
+    r'\bshut\s+(?:[\w\'\*]+\s+){0,3}up\b', r'\bstfu\b', r'\bshut\s*(ur\s*|your\s*)?mouth\b', 
     r'\bzip\s*it\b', r'\btalk\s*to\s*the\s*hand\b',
 
     # Insults (General)
