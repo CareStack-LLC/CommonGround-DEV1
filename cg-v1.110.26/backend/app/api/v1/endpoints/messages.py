@@ -422,10 +422,6 @@ async def send_message(
             else:
                 toxicity_level = ToxicityLevel.SEVERE
 
-            aria_analysis = SentimentAnalysis(
-                original_message=message_data.content,
-                toxicity_level=toxicity_level,
-                toxicity_score=score,
             categories_list = [ToxicityCategory(cat) for cat in analysis_result.get("categories", [])]
             # STRICT BLOCKING: Enforce zero tolerance for AI results too
             block_send = (
@@ -463,10 +459,6 @@ async def send_message(
             else:
                 toxicity_level = ToxicityLevel.SEVERE
 
-            aria_analysis = SentimentAnalysis(
-                original_message=message_data.content,
-                toxicity_level=toxicity_level,
-                toxicity_score=score,
             categories_list = [ToxicityCategory(cat) for cat in analysis_result.get("categories", [])]
             # STRICT BLOCKING: Enforce zero tolerance for AI results too
             block_send = (
