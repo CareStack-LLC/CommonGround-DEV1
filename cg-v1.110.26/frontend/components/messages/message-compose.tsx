@@ -123,13 +123,13 @@ export function MessageCompose({
         prev.map(a => a.id === attachment.id ? { ...a, uploading: true } : a)
       );
 
-      await messagesAPI.uploadAttachment(messageId, attachment.file);
+      const uploadedAttachment = await messagesAPI.uploadAttachment(messageId, attachment.file);
 
       setAttachments(prev =>
         prev.map(a => a.id === attachment.id ? { ...a, uploading: false, uploaded: true } : a)
       );
 
-      return true;
+      return uploadedAttachment;
     } catch (error: any) {
       const errorMessage = error?.message || 'Upload failed';
       console.error('Failed to upload attachment:', attachment.file.name, errorMessage, error);
@@ -140,7 +140,7 @@ export function MessageCompose({
           error: errorMessage
         } : a)
       );
-      return false;
+      return null;
     }
   };
 
@@ -182,11 +182,13 @@ export function MessageCompose({
 
       // Upload attachments if any
       let uploadErrors: string[] = [];
+      const uploadedAttachments: MessageAttachment[] = [];
+
       if (attachments.length > 0 && newMessage.id) {
         const uploadResults = await Promise.all(
           attachments.map(async (attachment) => {
-            const success = await uploadAttachment(newMessage.id!, attachment);
-            return { name: attachment.file.name, success };
+            const result = await uploadAttachment(newMessage.id!, attachment);
+            return { name: attachment.file.name, success: !!result, attachment: result };
           })
         );
 
@@ -194,6 +196,13 @@ export function MessageCompose({
         uploadErrors = uploadResults
           .filter(r => !r.success)
           .map(r => r.name);
+
+        // Collect successful attachments
+        uploadResults.forEach(r => {
+          if (r.attachment) {
+            uploadedAttachments.push(r.attachment);
+          }
+        });
       }
 
       // Clear form state
@@ -206,7 +215,13 @@ export function MessageCompose({
         setError(`Message sent, but ${uploadErrors.length} attachment(s) failed to upload: ${uploadErrors.join(', ')}`);
       }
 
-      onMessageSent(newMessage);
+      // Construct final message with attachments for optimistic UI update
+      const finalMessage = {
+        ...newMessage,
+        attachments: uploadedAttachments
+      };
+
+      onMessageSent(finalMessage);
     } catch (err: any) {
       console.error('Failed to send message:', err);
 

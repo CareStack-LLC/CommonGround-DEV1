@@ -856,7 +856,7 @@ async def list_messages_by_family_file(
             detail="You don't have access to this family file"
         )
 
-    # Get messages with attachments, ordered oldest first
+    # Get messages with attachments, ordered newest first (to get the latest)
     messages_result = await db.execute(
         select(Message)
         .options(selectinload(Message.attachments))
@@ -866,11 +866,12 @@ async def list_messages_by_family_file(
                 Message.is_hidden_by_recipient == False
             )
         )
-        .order_by(Message.sent_at)  # Oldest first for chat UI
+        .order_by(desc(Message.sent_at))  # Newest first to get the tail
         .limit(limit)
         .offset(offset)
     )
-    messages = messages_result.scalars().all()
+    # Reverse to restore chronological order (Oldest -> Newest) for the UI
+    messages = list(reversed(messages_result.scalars().all()))
 
     return [
         MessageResponse(
