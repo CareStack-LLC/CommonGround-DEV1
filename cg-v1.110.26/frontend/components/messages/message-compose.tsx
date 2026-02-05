@@ -133,6 +133,27 @@ export function MessageCompose({
     } catch (error: any) {
       const errorMessage = error?.message || 'Upload failed';
       console.error('Failed to upload attachment:', attachment.file.name, errorMessage, error);
+
+      // Check for ARIA Visual Shield Block
+      if (errorMessage.includes('Image blocked by ARIA Safety Shield')) {
+        const explanation = errorMessage.split(': ').slice(1).join(': ') || 'Unsafe content detected by ARIA Vision.';
+
+        // Trigger the ARIA Intervention Modal
+        setAnalysis({
+          toxicity_level: 'red', // Force Red Level
+          is_flagged: true,
+          categories: ['Visual_Safety_Violation'], // Custom category for UI
+          triggers: ['Unsafe Image Content'],
+          explanation: explanation,
+          block_send: true, // Strictly block sending
+          status: 'blocked'
+        } as ARIAAnalysisResponse);
+
+        // Mark as error but don't show generic error toast if we show the modal
+        // We set uploading: false, but maybe we should remove it?
+        // Let's just mark it as error so the user sees the red X on the file too
+      }
+
       setAttachments(prev =>
         prev.map(a => a.id === attachment.id ? {
           ...a,
