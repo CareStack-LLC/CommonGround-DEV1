@@ -62,12 +62,15 @@ SEXUAL_HARASSMENT_PATTERNS = [
     r'\bcum\b', r'\bjizz\b', r'\bbukake\b', r'\bcreampie\b', 
     r'\bdeep\s*throat\b', r'\bglory\s*hole\b', r'\bsuck\s*me\b', r'\beat\s*me\b',
     r'\bjerking\s*off\b', r'\brubbing\s*one\s*out\b', r'\bhorny\b',
+    r'\blick\s*(ur\s*|your\s*|my\s*)?balls\b', r'\bsuck\s*(ur\s*|your\s*|my\s*)?dick\b',
+    r'\bhump(\s*me)?\b', r'\bput\s*that\s*pussy\s*on\s*me\b',
 
     # Objectification
     r'\bsugar\s*tits\b', r'\bnice\s*rack\b', r'\bbutterface\b', r'\bmilf\b',
     r'\bonlyfans\b', r'\bfansly\b',
     r'\bsexy\s*body\b', r'\bsexy\s*pic\b', r'\byou\'?re\s*sexy\b',
     r'\b(ur\s*|your\s*)?titt?ies\b', r'\b(ur\s*|your\s*)?tits\b',
+    r'\blet\s*me\s*see\s*(dem|them|ur|your)\s*titt?ies\b',
 ]
 
 # ==============================================================================
@@ -77,8 +80,10 @@ THREATENING_PATTERNS = [
     # Direct Physical Threats
     r'\bkill\s*(yo)?u\b', r'\bend\s*(yo)?u\b', r'\bput\s*(yo)?u\s*in\s*the\s*ground\b',
     r'\bslit\s*(ur\s*|your\s*)?throat\b', r'\bcurb\s*stomp\b', 
-    r'\bbeat\s*(ur\s*|your\s*)?ass\b', r'\bbreak\s*(ur\s*|your\s*)?legs\b',
+    r'\bbeat\s*(ur\s*|your\s*|yo)?\s*ass\b', r'\bbreak\s*(ur\s*|your\s*)?legs\b',
     r'\bdestroy\s*(yo)?u\b', r'\bcome\s*after\s*(yo)?u\b', r'\byou\'?re\s*dead\b',
+    r'\bknock\s*(yo)?u\s*out\b', r'\bi\s*will\s*hurt\s*(yo)?u\b',
+    r'\bslap\s*(ur\s*|your\s*|yo)?\s*face\b',
     
     # Weapons
     r'\bgot\s*a\s*gun\b', r'\bbullet\s*with\s*(ur\s*|your\s*)?name\b', 
@@ -157,6 +162,11 @@ HOSTILITY_PATTERNS = [
     # Intelligence Attacks
     r'\bstupid\b', r'\bidiot\b', r'\bdumb\b', r'\bmoron\b', r'\bimbecile\b',
     r'\bautistic\b', r'\bbrain\s*dead\b',
+
+    # Appearance/Character (Detailed)
+    r'\bigly\b', r'\bfat\b', r'\bdisgusting\b', r'\bgross\b',
+    r'\byou\s*a\s*funky\b', r'\bfunky\s*ass\b', r'\bbig\s*headed\s*ass\b',
+    r'\bbrokey\b', r'\bdon\'?t\s*piss\s*me\s*off\b',
 ]
 
 # ==============================================================================
