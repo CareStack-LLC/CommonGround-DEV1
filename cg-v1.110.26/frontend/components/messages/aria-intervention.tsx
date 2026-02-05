@@ -10,12 +10,10 @@ import {
   X,
   ChevronDown,
   ChevronUp,
-  Wand2,
+  Shield,
+  MicOff,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useFeatureGate } from '@/hooks/use-feature-gate';
-import { TierBadge } from '@/components/tier-badge';
-import { useRouter } from 'next/navigation';
 
 interface ARIAInterventionProps {
   analysis: ARIAAnalysisResponse;
@@ -25,10 +23,10 @@ interface ARIAInterventionProps {
 }
 
 /**
- * WS3: ARIA Intervention Component (Flag Only)
+ * WS3: ARIA Intervention Component (Guardian Visual Update)
  *
- * Simplified to show toxicity warnings without suggesting rewrites.
- * Users must revise their own messages.
+ * Visual refresh to match the "ARIA Guardian" splash screen aesthetic.
+ * uses Crimson Text for headings and cleaner status indicators.
  */
 export function ARIAIntervention({
   analysis,
@@ -36,107 +34,106 @@ export function ARIAIntervention({
   onSendAnyway,
   onCancel,
 }: ARIAInterventionProps) {
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(true);
 
-  const getLevelConfig = (level: string) => {
+  const getLevelConfig = (level: string, isBlocked: boolean) => {
+    if (isBlocked) {
+      return {
+        bg: 'bg-gradient-to-br from-red-50 to-white',
+        border: 'border-red-200',
+        iconBg: 'bg-red-100',
+        iconColor: 'text-red-500',
+        icon: <XCircle className="h-6 w-6 text-red-500" />,
+        title: 'Message Blocked',
+        subtitle: 'Severe violation of communication protocols.',
+        btnPrimary: 'bg-red-600 hover:bg-red-700 text-white',
+      };
+    }
+
     switch (level) {
       case 'green':
         return {
-          bg: 'bg-green-50',
-          border: 'border-green-200',
-          icon: <CheckCircle className="h-6 w-6 text-green-600" />,
-          title: 'Message looks good!',
+          bg: 'bg-gradient-to-br from-emerald-50 to-white',
+          border: 'border-emerald-200',
+          iconBg: 'bg-emerald-100',
+          iconColor: 'text-emerald-500',
+          icon: <CheckCircle className="h-6 w-6 text-emerald-500" />,
+          title: 'Communication Verified',
           subtitle: 'Your message maintains a constructive tone.',
-          color: 'text-green-700',
+          btnPrimary: 'bg-emerald-600 hover:bg-emerald-700 text-white',
         };
       case 'yellow':
         return {
-          bg: 'bg-amber-50',
-          border: 'border-amber-300',
-          icon: <Sparkles className="h-6 w-6 text-amber-600" />,
-          title: 'Tone Check',
-          subtitle: 'This message may be misunderstood.',
-          color: 'text-amber-700',
+          bg: 'bg-gradient-to-br from-amber-50 to-white',
+          border: 'border-amber-200',
+          iconBg: 'bg-amber-100',
+          iconColor: 'text-amber-500',
+          icon: <Sparkles className="h-6 w-6 text-amber-500" />,
+          title: 'Tone Calibration',
+          subtitle: 'This message may be misinterpreted.',
+          btnPrimary: 'bg-amber-600 hover:bg-amber-700 text-white',
         };
       case 'orange':
         return {
-          bg: 'bg-orange-50',
-          border: 'border-orange-400',
-          icon: <AlertTriangle className="h-6 w-6 text-orange-600" />,
+          bg: 'bg-gradient-to-br from-orange-50 to-white',
+          border: 'border-orange-200',
+          iconBg: 'bg-orange-100',
+          iconColor: 'text-orange-500',
+          icon: <AlertTriangle className="h-6 w-6 text-orange-500" />,
           title: 'Conflict Risk',
-          subtitle: 'This message is likely to escalate conflict.',
-          color: 'text-orange-700',
-        };
-      case 'red':
-        return {
-          bg: 'bg-red-50',
-          border: 'border-red-400',
-          icon: <XCircle className="h-6 w-6 text-red-600" />,
-          title: 'Message Blocked',
-          subtitle: 'This message violates safety policies and cannot be sent.',
-          color: 'text-red-700',
+          subtitle: 'High probability of escalation detected.',
+          btnPrimary: 'bg-orange-600 hover:bg-orange-700 text-white',
         };
       default:
         return {
-          bg: 'bg-amber-50',
-          border: 'border-amber-300',
-          icon: <Sparkles className="h-6 w-6 text-amber-600" />,
+          bg: 'bg-gradient-to-br from-amber-50 to-white',
+          border: 'border-amber-200',
+          iconBg: 'bg-amber-100',
+          iconColor: 'text-amber-500',
+          icon: <Sparkles className="h-6 w-6 text-amber-500" />,
           title: 'ARIA Review',
           subtitle: 'Analysis complete.',
-          color: 'text-amber-700',
+          btnPrimary: 'bg-amber-600 hover:bg-amber-700 text-white',
         };
     }
   };
 
-  const config = getLevelConfig(analysis.block_send ? 'red' : analysis.toxicity_level);
+  const config = getLevelConfig(analysis.toxicity_level, analysis.block_send);
   const canSendAnyway = !analysis.block_send;
 
-
-  const getCategoryStyle = (category: string) => {
+  const getCategoryColor = (category: string) => {
     const cat = category.toLowerCase();
-
-    // Critical (Red) - Zero Tolerance / Severe
-    if (['hate_speech', 'sexual_harassment', 'threatening'].includes(cat)) {
-      return 'bg-red-100 text-red-700 border-red-200';
-    }
-
-    // High Risk (Orange) - Court Damages
-    if (['custody_weaponization', 'financial_coercion', 'hostility'].includes(cat)) {
-      return 'bg-orange-100 text-orange-700 border-orange-200';
-    }
-
-    // Moderate (Amber) - Unproductive
-    if (['blame', 'insult', 'profanity'].includes(cat)) {
-      return 'bg-amber-100 text-amber-800 border-amber-200';
-    }
-
-    // Warning (Yellow) - Poor Tone
-    if (['passive_aggressive', 'dismissive', 'sarcasm', 'all_caps', 'manipulation'].includes(cat)) {
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    }
-
-    // Default
-    return 'bg-slate-100 text-slate-700 border-slate-200';
+    if (['hate_speech', 'sexual_harassment', 'threatening'].includes(cat)) return 'bg-red-500';
+    if (['custody_weaponization', 'financial_coercion', 'hostility'].includes(cat)) return 'bg-orange-500';
+    return 'bg-amber-500';
   };
 
   return (
-    <div className={`rounded-xl border-2 ${config.border} ${config.bg} overflow-hidden`}>
+    <div className={`rounded-2xl border-2 ${config.border} ${config.bg} shadow-lg overflow-hidden transition-all duration-300`}>
       {/* Header */}
-      <div className="p-5">
-        <div className="flex items-start gap-4">
-          {/* Icon */}
+      <div className="p-6">
+        <div className="flex items-start gap-5">
+          {/* Guardian Icon Box */}
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-full bg-white/70 flex items-center justify-center">
-              {config.icon}
+            <div className={`w-14 h-14 rounded-2xl ${config.iconBg} flex items-center justify-center shadow-sm`}>
+              {/* Use Shield for blocked/severe, normal icon for others? Or always Shield? User likes the Guardian branding. */}
+              {analysis.block_send ? (
+                <Shield className="h-7 w-7 text-red-600" />
+              ) : (
+                config.icon
+              )}
             </div>
           </div>
 
           {/* Title & Subtitle */}
-          <div className="flex-1 min-w-0">
-            <h3 className={`font-semibold text-lg ${config.color}`}>
-              {config.title}
-            </h3>
-            <p className="text-sm text-gray-700 mt-1">
+          <div className="flex-1 min-w-0 pt-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                {config.title}
+              </h3>
+              {/* Optional: Add 'Guardian Active' badge? */}
+            </div>
+            <p className="text-slate-500 font-medium text-sm leading-relaxed">
               {config.subtitle}
             </p>
           </div>
@@ -144,85 +141,51 @@ export function ARIAIntervention({
           {/* Close Button */}
           <button
             onClick={onCancel}
-            className="p-2 rounded-lg hover:bg-black/5 transition-colors"
+            className="p-2 rounded-xl hover:bg-black/5 text-slate-400 hover:text-slate-600 transition-colors"
           >
-            <X className="h-5 w-5 text-gray-500" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Explanation */}
+        {/* AI Explanation */}
         {analysis.explanation && (
-          <div className="mt-4 text-sm text-gray-700 leading-relaxed">
-            {analysis.explanation}
+          <div className="mt-5 text-slate-700 text-sm leading-relaxed bg-white/60 p-4 rounded-xl border border-slate-100 italic">
+            &quot;{analysis.explanation}&quot;
           </div>
         )}
 
-        {/* Conflict Risk Meter */}
-        <div className="mt-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-medium text-gray-600">Conflict Risk</span>
-            <span className="text-xs font-semibold text-gray-800">
-              {Math.round(analysis.toxicity_score * 100)}%
-            </span>
-          </div>
-          <div className="h-2 bg-white/60 rounded-full overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-all duration-500 ${analysis.toxicity_level === 'green'
-                  ? 'bg-green-500'
-                  : analysis.toxicity_level === 'yellow'
-                    ? 'bg-amber-500'
-                    : analysis.toxicity_level === 'orange'
-                      ? 'bg-orange-500'
-                      : 'bg-red-500'
-                }`}
-              style={{ width: `${analysis.toxicity_score * 100}%` }}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Detected Issues (Collapsible) */}
-      {analysis.categories && analysis.categories.length > 0 && (
-        <div className="px-5 pb-4">
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-          >
-            {showDetails ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-            <span>Detected Issues ({analysis.categories.length})</span>
-          </button>
-
-          {showDetails && (
-            <div className="mt-3 space-y-2">
+        {/* Categories (Guardian Steps Style) */}
+        {analysis.categories && analysis.categories.length > 0 && (
+          <div className="mt-6">
+            <div className="bg-white/80 rounded-xl p-4 border border-slate-200/60 shadow-sm space-y-3">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Detailed Analysis</p>
               {analysis.categories.map((category, idx) => (
-                <div
-                  key={idx}
-                  className={`text-xs px-3 py-2 rounded-lg border ${getCategoryStyle(category)}`}
-                >
-                  <span className="font-medium capitalize">{category.replace(/_/g, ' ')}</span>
+                <div key={idx} className="flex items-center gap-3 text-sm">
+                  <div className={`w-6 h-6 rounded-full ${getCategoryColor(category).replace('500', '100')} flex items-center justify-center flex-shrink-0`}>
+                    <div className={`w-2.5 h-2.5 rounded-full ${getCategoryColor(category)}`}></div>
+                  </div>
+                  <span className="text-slate-700 font-medium capitalize">
+                    {category.replace(/_/g, ' ')}
+                  </span>
                   {analysis.triggers && analysis.triggers[idx] && (
-                    <span className="opacity-75 ml-2">
-                      • "{analysis.triggers[idx]}"
+                    <span className="text-slate-400 text-xs ml-auto truncate max-w-[150px]">
+                      Detected: &quot;{analysis.triggers[idx]}&quot;
                     </span>
                   )}
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
       {/* Actions */}
-      <div className="px-5 pb-5 pt-2 border-t border-gray-200/50">
+      <div className="px-6 pb-6 pt-2">
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Edit Message Button (Primary) */}
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-3 bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-medium rounded-xl transition-all shadow-sm hover:shadow"
+            className="flex-1 px-6 py-3.5 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-bold rounded-xl transition-all shadow-sm hover:shadow-md"
           >
             Edit Message
           </button>
@@ -231,10 +194,7 @@ export function ARIAIntervention({
           {canSendAnyway && (
             <button
               onClick={onSendAnyway}
-              className={`flex-1 px-4 py-3 font-medium rounded-xl transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 ${analysis.toxicity_level === 'green'
-                  ? 'bg-green-600 hover:bg-green-700 text-white'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
-                }`}
+              className={`flex-1 px-6 py-3.5 font-bold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${config.btnPrimary}`}
             >
               <Send className="h-4 w-4" />
               <span>Send Anyway</span>
@@ -243,16 +203,17 @@ export function ARIAIntervention({
 
           {/* Blocked - Cannot Send */}
           {!canSendAnyway && (
-            <div className="flex-1 px-4 py-3 bg-red-100 text-red-700 font-medium rounded-xl text-center border-2 border-red-300">
-              Cannot Send
+            <div className="flex-1 px-6 py-3.5 bg-red-100 text-red-700 font-bold rounded-xl text-center border-2 border-red-200 cursor-not-allowed">
+              Message Restricted
             </div>
           )}
         </div>
 
-        {/* Warning Text */}
+        {/* Disclaimer */}
         {canSendAnyway && analysis.toxicity_level !== 'green' && (
-          <p className="mt-3 text-xs text-center text-gray-600">
-            Messages sent despite warnings may be reviewed by court or legal professionals.
+          <p className="mt-4 text-xs text-center text-slate-400 font-medium">
+            <Shield className="w-3 h-3 inline mr-1 mb-0.5" />
+            Guardian active. Messages are logged for court review.
           </p>
         )}
       </div>

@@ -15,7 +15,7 @@ from enum import Enum
 from datetime import datetime, timedelta
 import anthropic
 from openai import OpenAI
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -119,13 +119,60 @@ class ARIAService:
             ],
         }
 
+    async def analyze_message_hybrid(
+        self,
+        db: AsyncSession,
+        message_id: str,
+        message_text: str,
+        context: Optional[List[str]] = None
+    ) -> SentimentAnalysis:
+        """
+        Hybrid Analysis Flow (V3):
+        1. Fast Regex Check (Synchronous logic)
+        2. If Blocked -> Return Blocked Result
+        3. If Allowed/Flagged -> Queue for Async ML (aria_jobs) & Return Fast Result
+        """
+        # 1. Fast Regex Check
+        regex_result = self.analyze_message(message_text, context)
+
+        # 2. If already blocked, no need for ML (save cost + instant feedback)
+        if regex_result.block_send:
+            return regex_result
+
+        # 3. Queue for Async ML (Fire & Forget logic)
+        try:
+            # We insert raw SQL for speed/simplicity or use ORM if we had models. 
+            # Using raw insert to aria_jobs as defined in V3 schema.
+            # Safe to assume message_text is sanitized or parameterized by sqlalchemy.
+            
+            # Serialize context
+            context_json = json.dumps(context) if context else '[]'
+            
+            stmt = text("""
+                INSERT INTO aria_jobs (message_id, message_text, context, status)
+                VALUES (:msg_id, :msg_text, :ctx, 'pending')
+            """)
+            
+            await db.execute(stmt, {
+                "msg_id": message_id,
+                "msg_text": message_text,
+                "ctx": context_json
+            })
+            await db.commit() 
+            
+        except Exception as e:
+            print(f"FAILED TO QUEUE ARIA JOB: {e}")
+            # We don't fail the request, just log error. User still gets regex result.
+
+        return regex_result
+
     def analyze_message(
         self,
         message: str,
         context: Optional[List[str]] = None
     ) -> SentimentAnalysis:
         """
-        Analyze a message for toxicity.
+        Analyze a message for toxicity (Regex Pattern Engine).
 
         Args:
             message: The message to analyze

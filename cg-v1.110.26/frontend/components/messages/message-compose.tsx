@@ -393,17 +393,36 @@ export function MessageCompose({
               onBlur={onStopTyping}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
-              className="w-full cg-input min-h-[100px] pr-24 resize-none"
+              className={`w-full cg-input min-h-[100px] pr-24 resize-none transition-all duration-300 ${isAnalyzing ? 'blur-sm opacity-50' : ''}`}
               disabled={isSending || isAnalyzing}
             />
 
+            {/* ARIA Mini-Guardian Splash (Analysis State) */}
+            {isAnalyzing && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-[1px] rounded-xl">
+                <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl flex items-center justify-center shadow-sm mb-2">
+                    <Shield className="h-5 w-5 text-[#2C5F5D] animate-pulse" />
+                  </div>
+                  <h4 className="text-lg font-bold text-slate-800" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    ARIA Checking...
+                  </h4>
+                  <div className="flex gap-1 mt-1">
+                    <div className="w-1.5 h-1.5 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-1.5 h-1.5 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-1.5 h-1.5 bg-[#2C5F5D] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Character Count */}
-            <div className="absolute bottom-3 left-4 text-xs text-muted-foreground">
+            <div className={`absolute bottom-3 left-4 text-xs text-muted-foreground ${isAnalyzing ? 'opacity-0' : ''}`}>
               {message.length} / 10,000
             </div>
 
             {/* Attachment & Send Buttons */}
-            <div className="absolute bottom-3 right-3 flex gap-2">
+            <div className={`absolute bottom-3 right-3 flex gap-2 ${isAnalyzing ? 'opacity-0 pointer-events-none' : ''}`}>
               {/* Attachment Button */}
               <button
                 type="button"
@@ -423,11 +442,7 @@ export function MessageCompose({
                 className="p-2 rounded-lg text-muted-foreground hover:text-cg-amber hover:bg-cg-amber-subtle transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Preview with ARIA"
               >
-                {isAnalyzing ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Sparkles className="h-5 w-5" />
-                )}
+                <Sparkles className="h-5 w-5" />
               </button>
 
               {/* Send Button */}
@@ -438,11 +453,7 @@ export function MessageCompose({
                 className="p-2 rounded-lg bg-cg-sage text-white hover:bg-cg-sage-light transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Send message"
               >
-                {isSending ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Send className="h-5 w-5" />
-                )}
+                <Send className="h-5 w-5" />
               </button>
             </div>
 
