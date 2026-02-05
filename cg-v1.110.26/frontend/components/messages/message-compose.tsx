@@ -141,13 +141,15 @@ export function MessageCompose({
         // Trigger the ARIA Intervention Modal
         setAnalysis({
           toxicity_level: 'red', // Force Red Level
+          toxicity_score: 1.0, // Max toxicity
           is_flagged: true,
           categories: ['Visual_Safety_Violation'], // Custom category for UI
           triggers: ['Unsafe Image Content'],
           explanation: explanation,
+          suggestion: 'Please verify that this image is appropriate for a co-parenting context.',
           block_send: true, // Strictly block sending
           status: 'blocked'
-        } as ARIAAnalysisResponse);
+        } as unknown as ARIAAnalysisResponse);
 
         // Mark as error but don't show generic error toast if we show the modal
         // We set uploading: false, but maybe we should remove it?
