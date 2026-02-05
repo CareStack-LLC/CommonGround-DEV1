@@ -817,6 +817,15 @@ export const messagesAPI = {
   },
 
   /**
+   * Delete a message
+   */
+  async delete(messageId: string): Promise<void> {
+    return fetchAPI<void>(`/messages/${messageId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  /**
    * Upload an attachment to a message
    */
   async uploadAttachment(messageId: string, file: File): Promise<MessageAttachment> {

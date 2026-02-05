@@ -1443,6 +1443,45 @@ async def upload_message_attachment(
     }
 
 
+
+@router.delete("/{message_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_message(
+    message_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Delete a message (soft delete or hard delete depending on policy).
+    For now, strict deletion for blocked/failed messages cleanup.
+    """
+    # Get message
+    result = await db.execute(
+        select(Message).where(Message.id == message_id)
+    )
+    message = result.scalar_one_or_none()
+    
+    if not message:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Message not found"
+        )
+        
+    # Only sender can delete (or admin)
+    if message.sender_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to delete this message"
+        )
+        
+    # Delete attachments first (if any)
+    # We should also clean up storage, but let's stick to DB record for now
+    # or rely on cascades.
+    
+    await db.delete(message)
+    await db.commit()
+    
+    return None
+
 @router.get("/{message_id}/attachments", response_model=List[MessageAttachmentResponse])
 async def get_message_attachments(
     message_id: str,

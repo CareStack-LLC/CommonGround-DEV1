@@ -219,15 +219,22 @@ class ARIAService:
         categories = []
 
         # Check for ALL CAPS (shouting)
+        # TWEAK: Only trigger if message is reasonably long (>3 words) to avoid "LOL" or "OKAY" false positives
+        # TWEAK: Require > 60% caps to be safer
         words = message.split()
-        if words:
-            caps_words = sum(1 for w in words if w.isupper() and len(w) > 2)
-            if caps_words / len(words) > 0.5:
+        if len(words) > 3:
+            caps_words = sum(1 for w in words if w.isupper() and len(w) > 1) # Ignore single letter "I" or "A"
+            if caps_words / len(words) > 0.6:
                 categories.append(ToxicityCategory.ALL_CAPS)
                 triggers.append("EXCESSIVE CAPS")
 
         # Check each category of patterns
         for category, patterns in self.compiled_patterns.items():
+            # Skip ALL_CAPS in regex loop since we handled it manually above
+            # (Previously it was incorrectly mapped to EVASION_PATTERNS with IGNORECASE)
+            if category == ToxicityCategory.ALL_CAPS:
+                continue
+                
             for pattern in patterns:
                 matches = pattern.findall(message)
                 if matches:
