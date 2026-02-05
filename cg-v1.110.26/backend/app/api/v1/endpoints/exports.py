@@ -26,6 +26,8 @@ from app.schemas.export import (
     ExportVerification,
     ExportSectionResponse,
 )
+from app.models.professional import ProfessionalProfile
+from datetime import timedelta
 
 router = APIRouter()
 
@@ -153,13 +155,29 @@ async def create_export(
     # Import service here to avoid circular imports
     from app.services.export.case_export_service import CaseExportService
 
+    # Check if user is a professional
+    result = await db.execute(
+        select(ProfessionalProfile).where(ProfessionalProfile.user_id == current_user.id)
+    )
+    professional_profile = result.scalar_one_or_none()
+    is_professional = professional_profile is not None
+
+    # Enforce 30-day limit for non-professionals (parents)
+    if not is_professional:
+        date_end = datetime.utcnow().date()
+        date_start = date_end - timedelta(days=30)
+    else:
+        # Professionals can select their own range
+        date_start = data.date_start
+        date_end = data.date_end
+
     service = CaseExportService(db)
     export = await service.create_export(
         case_id=data.case_id,
         user_id=current_user.id,
         package_type=data.package_type.value,
-        date_start=data.date_start,
-        date_end=data.date_end,
+        date_start=date_start,
+        date_end=date_end,
         claim_type=data.claim_type.value if data.claim_type else None,
         claim_description=data.claim_description,
         redaction_level=data.redaction_level.value,

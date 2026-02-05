@@ -7,7 +7,7 @@ with real data from the CommonGround platform.
 
 import io
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -85,12 +85,10 @@ async def generate_parent_report(
     # Verify access
     await verify_family_file_access(db, str(current_user.id), family_file_id)
 
-    # Validate date range
-    if date_end < date_start:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="End date must be after start date"
-        )
+    # Enforce 30-day strict limit for self-service reports
+    # (Overrides any frontend-provided dates to prevent manipulation)
+    date_end = datetime.utcnow().date()
+    date_start = date_end - timedelta(days=30)
 
     # Generate report
     try:

@@ -180,6 +180,41 @@ class SectionGeneratorRegistry:
                 "intervention_log",
                 "chain_of_custody",
             ]
+
+        elif package_type == "communication_analysis":
+            return [
+                "communication_compliance",
+                "intervention_log",
+            ]
+        elif package_type == "financial_compliance_report":
+            return [
+                "financial_compliance",
+            ]
+        elif package_type == "custody_compliance_report":
+            return [
+                "parenting_time",
+                "exchange_gps_verification",
+                "chain_of_custody",
+            ]
+        elif package_type == "custody_time":
+            return [
+                "parenting_time",
+                "compliance_summary",
+            ]
+        elif package_type == "communication":
+             return [
+                "communication_compliance",
+                "intervention_log",
+            ]
+        elif package_type == "expense":
+            return [
+                "financial_compliance",
+            ]
+        elif package_type == "schedule":
+            return [
+                "parenting_time",
+                "agreement_overview",
+            ]
         else:
             return []
 

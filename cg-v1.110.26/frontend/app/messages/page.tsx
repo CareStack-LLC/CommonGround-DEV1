@@ -170,9 +170,8 @@ function MessageBubble({
     <div className={`flex gap-2 sm:gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}>
       {/* Avatar */}
       {showAvatar && (
-        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${
-          isOwn ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644]' : 'bg-gradient-to-br from-slate-400 to-slate-500'
-        }`}>
+        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isOwn ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644]' : 'bg-gradient-to-br from-slate-400 to-slate-500'
+          }`}>
           <span className="text-xs font-bold text-white">
             {isOwn ? 'You' : (userName?.charAt(0) || 'P')}
           </span>
@@ -182,16 +181,14 @@ function MessageBubble({
 
       {/* Bubble */}
       <div className={`max-w-[80%] sm:max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
-        <div className={`relative group ${
-          isOwn
+        <div className={`relative group ${isOwn
             ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
             : 'bg-white text-slate-900 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg border-2 border-slate-200'
-        }`}>
+          }`}>
           {/* ARIA Review Badge */}
           {message.was_flagged && (
-            <div className={`flex items-center gap-1.5 mb-2 pb-2 border-b ${
-              isOwn ? 'border-white/20' : 'border-border'
-            }`}>
+            <div className={`flex items-center gap-1.5 mb-2 pb-2 border-b ${isOwn ? 'border-white/20' : 'border-border'
+              }`}>
               <Sparkles className="h-3 w-3 text-cg-amber" />
               <span className={`text-xs ${isOwn ? 'text-white/70' : 'text-muted-foreground'}`}>
                 Reviewed by ARIA
@@ -210,9 +207,8 @@ function MessageBubble({
               {message.attachments.map((attachment) => (
                 <div
                   key={attachment.id}
-                  className={`rounded-lg overflow-hidden ${
-                    isOwn ? 'bg-white/10' : 'bg-slate-50'
-                  }`}
+                  className={`rounded-lg overflow-hidden ${isOwn ? 'bg-white/10' : 'bg-slate-50'
+                    }`}
                 >
                   {attachment.file_category === 'image' ? (
                     <a
@@ -233,9 +229,8 @@ function MessageBubble({
                       href={attachment.storage_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center gap-2 p-2 hover:opacity-80 transition-opacity ${
-                        isOwn ? 'text-white' : 'text-slate-900'
-                      }`}
+                      className={`flex items-center gap-2 p-2 hover:opacity-80 transition-opacity ${isOwn ? 'text-white' : 'text-slate-900'
+                        }`}
                     >
                       {attachment.file_category === 'video' ? (
                         <Video className="w-5 h-5 flex-shrink-0" />
@@ -259,17 +254,14 @@ function MessageBubble({
 
           {/* Original Content (if ARIA modified) */}
           {message.original_content && (
-            <details className={`mt-2 pt-2 border-t ${
-              isOwn ? 'border-white/20' : 'border-border'
-            }`}>
-              <summary className={`text-xs cursor-pointer ${
-                isOwn ? 'text-white/60' : 'text-muted-foreground'
+            <details className={`mt-2 pt-2 border-t ${isOwn ? 'border-white/20' : 'border-border'
               }`}>
+              <summary className={`text-xs cursor-pointer ${isOwn ? 'text-white/60' : 'text-muted-foreground'
+                }`}>
                 View original
               </summary>
-              <p className={`text-xs mt-1 italic ${
-                isOwn ? 'text-white/50' : 'text-muted-foreground'
-              }`}>
+              <p className={`text-xs mt-1 italic ${isOwn ? 'text-white/50' : 'text-muted-foreground'
+                }`}>
                 "{message.original_content}"
               </p>
             </details>
@@ -291,9 +283,8 @@ function MessageBubble({
         </div>
 
         {/* Timestamp and Status */}
-        <div className={`flex items-center gap-1.5 mt-1 text-xs text-muted-foreground ${
-          isOwn ? 'justify-end' : 'justify-start'
-        }`}>
+        <div className={`flex items-center gap-1.5 mt-1 text-xs text-muted-foreground ${isOwn ? 'justify-end' : 'justify-start'
+          }`}>
           <span>{formatTime(message.sent_at)}</span>
           {isOwn && message.acknowledged_at && (
             <div className="flex items-center gap-1 text-emerald-600">
@@ -404,11 +395,10 @@ function ChatHeader({
               <button
                 onClick={() => onInitiateCall('audio')}
                 disabled={!parentBJoined}
-                className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${
-                  parentBJoined
+                className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${parentBJoined
                     ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
                     : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
-                }`}
+                  }`}
                 title={parentBJoined ? "Audio call" : "Both parents must join before calling"}
               >
                 <Phone className={`h-5 w-5 ${parentBJoined ? 'text-[var(--portal-primary)]' : 'text-slate-400'}`} />
@@ -416,11 +406,10 @@ function ChatHeader({
               <button
                 onClick={() => onInitiateCall('video')}
                 disabled={!parentBJoined}
-                className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${
-                  parentBJoined
+                className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${parentBJoined
                     ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
                     : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
-                }`}
+                  }`}
                 title={parentBJoined ? "Video call" : "Both parents must join before calling"}
               >
                 <Video className={`h-5 w-5 ${parentBJoined ? 'text-[var(--portal-primary)]' : 'text-slate-400'}`} />
@@ -513,19 +502,17 @@ function ConversationSelector({
                   onSelectFamilyFile(item.familyFile);
                 }
               }}
-              className={`w-full text-left p-4 transition-all duration-200 ${
-                isSelected
+              className={`w-full text-left p-4 transition-all duration-200 ${isSelected
                   ? 'bg-[var(--portal-primary)]/5'
                   : 'hover:bg-slate-50 active:bg-slate-100'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-3">
                 {/* Avatar with initial */}
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-lg font-bold ${
-                  isSelected
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-lg font-bold ${isSelected
                     ? 'bg-[var(--portal-primary)] text-white'
                     : 'bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600'
-                }`}>
+                  }`}>
                   {coParentInitial}
                 </div>
 
@@ -570,18 +557,16 @@ function ConversationSelector({
                     <button
                       key={agreement.id}
                       onClick={() => onSelectAgreement(agreement, item.familyFile)}
-                      className={`w-full text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${
-                        selectedAgreement?.id === agreement.id
+                      className={`w-full text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${selectedAgreement?.id === agreement.id
                           ? 'bg-[var(--portal-primary)] text-white shadow-md'
                           : 'bg-white hover:bg-slate-100 text-slate-900 border border-slate-200'
-                      }`}
+                        }`}
                     >
                       <FileText className="h-4 w-4 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold truncate">{agreement.title}</p>
-                        <span className={`text-xs ${
-                          selectedAgreement?.id === agreement.id ? 'text-white/80' : 'text-slate-500'
-                        }`}>
+                        <span className={`text-xs ${selectedAgreement?.id === agreement.id ? 'text-white/80' : 'text-slate-500'
+                          }`}>
                           {agreement.status === 'approved' || agreement.status === 'active' ? 'Active' : agreement.status}
                         </span>
                       </div>
@@ -838,9 +823,21 @@ function MessagesContent() {
     }
   };
 
-  const handleMessageSent = () => {
+  const handleMessageSent = (newMessage?: any) => {
     setShowCompose(false);
-    if (selectedAgreement) {
+    if (newMessage) {
+      // Optimistically add the message to the list
+      setMessages((prev) => {
+        if (prev.some(m => m.id === newMessage.id)) return prev;
+        return [...prev, newMessage];
+      });
+      // Optionally scroll to bottom
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else if (selectedAgreement) {
       loadMessages(selectedAgreement.id);
     }
   };
@@ -1113,11 +1110,10 @@ function MessagesContent() {
                     <button
                       onClick={() => setShowCompose(true)}
                       disabled={!getOtherParentId()}
-                      className={`w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-xl border-2 transition-all duration-200 ${
-                        getOtherParentId()
+                      className={`w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-xl border-2 transition-all duration-200 ${getOtherParentId()
                           ? 'border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer shadow-md hover:shadow-lg'
                           : 'border-slate-200 bg-slate-50 cursor-not-allowed opacity-60'
-                      }`}
+                        }`}
                     >
                       <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-sm">
                         <Send className="h-4 w-4 text-[var(--portal-primary)]" />

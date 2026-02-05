@@ -24,7 +24,7 @@ interface MessageComposeProps {
   familyFileId?: string;
   agreementId?: string;
   recipientId: string;
-  onMessageSent: () => void;
+  onMessageSent: (message?: any) => void;
   ariaEnabled?: boolean;
   onTyping?: () => void;
   onStopTyping?: () => void;
@@ -206,7 +206,7 @@ export function MessageCompose({
         setError(`Message sent, but ${uploadErrors.length} attachment(s) failed to upload: ${uploadErrors.join(', ')}`);
       }
 
-      onMessageSent();
+      onMessageSent(newMessage);
     } catch (err: any) {
       console.error('Failed to send message:', err);
 
