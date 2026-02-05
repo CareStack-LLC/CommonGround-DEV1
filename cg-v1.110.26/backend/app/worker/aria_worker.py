@@ -81,7 +81,16 @@ async def run_worker():
                 context_list = json.loads(job.context) if job.context else []
                 
                 # --- LLM CALL ---
-                analysis = analyze_message_with_llm(str(job.message_id), job.message_text, context_list)
+                if isinstance(context_list, dict) and context_list.get("type") == "image":
+                    # Vision Analysis
+                    from app.services.aria_inference import analyze_image_with_llm
+                    print(f"👁️ Analyzing Image for Job {job.id}...")
+                    analysis = analyze_image_with_llm(str(job.message_id), context_list.get("image_url"))
+                    model_used = "gpt-4o"
+                else:
+                    # Text Analysis
+                    analysis = analyze_message_with_llm(str(job.message_id), job.message_text, context_list)
+                    model_used = "gpt-4o-mini"
                 # ----------------
                 
                 # Insert Result into aria_events
@@ -91,13 +100,14 @@ async def run_worker():
                         toxicity_score, severity_level, labels,
                         action_taken, intervention_text, explanation
                     ) VALUES (
-                        :job_id, :msg_id, 'llm', 'gpt-4o-mini',
+                        :job_id, :msg_id, 'llm', :model_ver,
                         :score, 'computed_later', :labels,
                         :action, :explanation, :explanation
                     )
                 """), {
                     "job_id": job.id,
                     "msg_id": job.message_id,
+                    "model_ver": model_used,
                     "score": analysis.get("severity", 0.0),
                     "labels": json.dumps(analysis.get("labels", [])),
                     "action": analysis.get("action", "ALLOW"),

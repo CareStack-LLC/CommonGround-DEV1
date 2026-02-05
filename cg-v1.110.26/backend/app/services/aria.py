@@ -166,6 +166,40 @@ class ARIAService:
 
         return regex_result
 
+    async def analyze_image_job_hybrid(
+        self,
+        db: AsyncSession,
+        message_id: str,
+        image_url: str,
+        context: Optional[Dict[str, Any]] = None
+    ) -> None:
+        """
+        Queue an image analysis job (Vision).
+        """
+        try:
+            # Prepare context for the job
+            job_context = context or {}
+            job_context["type"] = "image"
+            job_context["image_url"] = image_url
+            
+            context_json = json.dumps(job_context)
+            
+            # Using 'pending' status. We use message_text strictly as a label here since images have no text.
+            stmt = text("""
+                INSERT INTO aria_jobs (message_id, message_text, context, status)
+                VALUES (:msg_id, '[IMAGE_ATTACHMENT]', :ctx, 'pending')
+            """)
+            
+            await db.execute(stmt, {
+                "msg_id": message_id,
+                "ctx": context_json
+            })
+            await db.commit() 
+            
+        except Exception as e:
+            print(f"FAILED TO QUEUE ARIA IMAGE JOB: {e}")
+
+
     def analyze_message(
         self,
         message: str,

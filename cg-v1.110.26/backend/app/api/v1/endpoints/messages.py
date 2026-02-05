@@ -1361,6 +1361,17 @@ async def upload_message_attachment(
 
     logger.info(f"User {current_user.id} uploaded attachment {attachment.id} to message {message_id}")
 
+    # --- VISUAL MODERATION TRIGGER ---
+    if file_category == "image":
+        # Fire and forget image analysis
+        # In production this would be background task, here we await the db insert which is fast
+        await aria_service.analyze_image_job_hybrid(
+            db, 
+            message_id, 
+            storage_url # This assumes storage_url is publicly accessible or signed for the LLM
+        )
+    # ---------------------------------
+
     return {
         "attachment": attachment,
         "message": "Attachment uploaded successfully"

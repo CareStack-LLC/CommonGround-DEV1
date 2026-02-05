@@ -102,6 +102,79 @@ def analyze_message_with_llm(
             "error": str(e)
         }
 
+def analyze_image_with_llm(
+    message_id: str,
+    image_url: str,
+    context: Optional[List[str]] = None
+) -> Dict[str, Any]:
+    """
+    Analyzes an image for safety using GPT-4o (Vision).
+    Detects Nudity, Violence, Hate Symbols, and Weapons.
+    """
+    
+    system_prompt = """
+    You are ARIA Visual Safety Monitor.
+    Your goal is to detect court-inappropriate or unsafe visual content in co-parenting communications.
+
+    You must output a JSON object adhering strictly to this schema:
+    {
+      "labels": [
+        {"name": "Nudity", "score": 0.0-1.0},
+        {"name": "Violence", "score": 0.0-1.0},
+        {"name": "HateSymbols", "score": 0.0-1.0},
+        {"name": "Weapons", "score": 0.0-1.0},
+        {"name": "SelfHarm", "score": 0.0-1.0}
+      ],
+      "severity": 0.0-1.0,
+      "action": "ALLOW" | "FLAG" | "BLOCK",
+      "explanation": "Brief description of the visual risk found, or 'Safe' if none."
+    }
+
+    ### Detection Rules:
+    1. **BLOCK**: Nudity (including partial/suggestive), Graphic Violence, Hate Symbols (swastikas, etc.).
+    2. **FLAG**: Weapons (unless clearly hunting/sport context), subtle obscene gestures.
+    3. **ALLOW**: Everyday objects, documents, innocent family photos.
+
+    STRICT ZERO TOLERANCE for Nudity in a co-parenting context.
+    """
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o", # Vision supported
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {
+                    "role": "user", 
+                    "content": [
+                        {"type": "text", "text": "Analyze this image validation for a family court app."},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": image_url,
+                                "detail": "low" # Low detail is sufficient for safety check and faster/cheaper
+                            }
+                        }
+                    ]
+                }
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.1,
+            max_tokens=300
+        )
+        
+        result_json = response.choices[0].message.content
+        return json.loads(result_json)
+
+    except Exception as e:
+        print(f"ARIA Vision Error: {e}")
+        return {
+            "labels": [],
+            "severity": 0.0,
+            "action": "ALLOW",
+            "explanation": "Visual analysis failed, defaulting to allow.",
+            "error": str(e)
+        }
+
 # --- TEST HARNESS ---
 if __name__ == "__main__":
     # verification
