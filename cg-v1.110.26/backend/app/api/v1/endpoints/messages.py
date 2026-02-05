@@ -426,11 +426,24 @@ async def send_message(
                 original_message=message_data.content,
                 toxicity_level=toxicity_level,
                 toxicity_score=score,
-                categories=[ToxicityCategory(cat) for cat in analysis_result.get("categories", [])],
+            categories_list = [ToxicityCategory(cat) for cat in analysis_result.get("categories", [])]
+            # STRICT BLOCKING: Enforce zero tolerance for AI results too
+            block_send = (
+                ToxicityCategory.THREATENING in categories_list or
+                ToxicityCategory.HATE_SPEECH in categories_list or
+                ToxicityCategory.SEXUAL_HARASSMENT in categories_list
+            )
+
+            aria_analysis = SentimentAnalysis(
+                original_message=message_data.content,
+                toxicity_level=toxicity_level,
+                toxicity_score=score,
+                categories=categories_list,
                 triggers=analysis_result.get("triggers", []),
                 explanation=analysis_result.get("explanation", ""),
                 suggestion=analysis_result["suggestions"][0] if analysis_result.get("suggestions") else None,
                 is_flagged=score > 0.3,
+                block_send=block_send,
                 timestamp=datetime.utcnow()
             )
         elif ai_provider == "openai":
@@ -454,11 +467,24 @@ async def send_message(
                 original_message=message_data.content,
                 toxicity_level=toxicity_level,
                 toxicity_score=score,
-                categories=[ToxicityCategory(cat) for cat in analysis_result.get("categories", [])],
+            categories_list = [ToxicityCategory(cat) for cat in analysis_result.get("categories", [])]
+            # STRICT BLOCKING: Enforce zero tolerance for AI results too
+            block_send = (
+                ToxicityCategory.THREATENING in categories_list or
+                ToxicityCategory.HATE_SPEECH in categories_list or
+                ToxicityCategory.SEXUAL_HARASSMENT in categories_list
+            )
+
+            aria_analysis = SentimentAnalysis(
+                original_message=message_data.content,
+                toxicity_level=toxicity_level,
+                toxicity_score=score,
+                categories=categories_list,
                 triggers=analysis_result.get("triggers", []),
                 explanation=analysis_result.get("explanation", ""),
                 suggestion=analysis_result["suggestions"][0] if analysis_result.get("suggestions") else None,
                 is_flagged=score > 0.3,
+                block_send=block_send,
                 timestamp=datetime.utcnow()
             )
         else:
