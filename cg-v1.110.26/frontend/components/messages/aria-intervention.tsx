@@ -98,7 +98,7 @@ export function ARIAIntervention({
     }
   };
 
-  const config = getLevelConfig(analysis.toxicity_level, analysis.block_send);
+  const config = getLevelConfig(analysis.toxicity_level, analysis.block_send || false);
   const canSendAnyway = !analysis.block_send;
 
   const getCategoryColor = (category: string) => {
