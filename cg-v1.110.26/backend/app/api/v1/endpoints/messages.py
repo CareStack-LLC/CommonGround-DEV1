@@ -498,11 +498,20 @@ async def send_message(
         was_flagged=aria_analysis.is_flagged
     )
 
-    # BLOCKING LOGIC: If blocked (Severe Threats), hide from recipient
+    # BLOCKING LOGIC: If blocked (Severe Threats / Hate Speech / Sexual Harassment)
+    # Strict blocking: Reject the request entirely
     if aria_analysis.block_send:
-        new_message.is_hidden_by_recipient = True
-        # Don't broadcast blocked messages
-        context_id = None
+        # Check if it was an admin override? No, for now strict block for everyone on these patterns.
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Message blocked by ARIA Safety Shield: Content contains prohibited threats, hate speech, or sexual harassment."
+        )
+
+    # Legacy soft-block logic (kept for reference, but unreachable if we raise above)
+    # if aria_analysis.block_send:
+    #     new_message.is_hidden_by_recipient = True
+    #     context_id = None
+
     if aria_analysis.is_flagged:
         # Calculate severity/level (reuse logic)
         score = aria_analysis.toxicity_score

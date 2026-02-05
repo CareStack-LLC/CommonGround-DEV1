@@ -252,8 +252,9 @@ class ARIAService:
 
         # Blocking Logic: Block if SEVERE and THREATENING (physical harm)
         # Also block HATE SPEECH and SEXUAL HARASSMENT automatically
+        # UPDATE: User requested zero tolerance for threats ("ill knock you out")
         block_send = (
-            (toxicity_level == ToxicityLevel.SEVERE and ToxicityCategory.THREATENING in categories) or
+            ToxicityCategory.THREATENING in categories or
             ToxicityCategory.HATE_SPEECH in categories or
             ToxicityCategory.SEXUAL_HARASSMENT in categories
         )

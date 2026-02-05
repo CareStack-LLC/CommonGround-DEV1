@@ -84,6 +84,7 @@ THREATENING_PATTERNS = [
     r'\bdestroy\s*(yo)?u\b', r'\bcome\s*after\s*(yo)?u\b', r'\byou\'?re\s*dead\b',
     r'\bknock\s*(yo)?u\s*out\b', r'\bi\s*will\s*hurt\s*(yo)?u\b',
     r'\bslap\s*(ur\s*|your\s*|yo)?\s*face\b',
+    r'\byou\s*(will|r|are\s*gonna|are\s*going\s*to)\s*die\b', # "You will die"
     
     # Weapons
     r'\bgot\s*a\s*gun\b', r'\bbullet\s*with\s*(ur\s*|your\s*)?name\b', 
