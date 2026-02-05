@@ -91,6 +91,34 @@ export function ARIAIntervention({
   const config = getLevelConfig(analysis.block_send ? 'red' : analysis.toxicity_level);
   const canSendAnyway = !analysis.block_send;
 
+
+  const getCategoryStyle = (category: string) => {
+    const cat = category.toLowerCase();
+
+    // Critical (Red) - Zero Tolerance / Severe
+    if (['hate_speech', 'sexual_harassment', 'threatening'].includes(cat)) {
+      return 'bg-red-100 text-red-700 border-red-200';
+    }
+
+    // High Risk (Orange) - Court Damages
+    if (['custody_weaponization', 'financial_coercion', 'hostility'].includes(cat)) {
+      return 'bg-orange-100 text-orange-700 border-orange-200';
+    }
+
+    // Moderate (Amber) - Unproductive
+    if (['blame', 'insult', 'profanity'].includes(cat)) {
+      return 'bg-amber-100 text-amber-800 border-amber-200';
+    }
+
+    // Warning (Yellow) - Poor Tone
+    if (['passive_aggressive', 'dismissive', 'sarcasm', 'all_caps', 'manipulation'].includes(cat)) {
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    }
+
+    // Default
+    return 'bg-slate-100 text-slate-700 border-slate-200';
+  };
+
   return (
     <div className={`rounded-xl border-2 ${config.border} ${config.bg} overflow-hidden`}>
       {/* Header */}
@@ -139,15 +167,14 @@ export function ARIAIntervention({
           </div>
           <div className="h-2 bg-white/60 rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                analysis.toxicity_level === 'green'
+              className={`h-full rounded-full transition-all duration-500 ${analysis.toxicity_level === 'green'
                   ? 'bg-green-500'
                   : analysis.toxicity_level === 'yellow'
-                  ? 'bg-amber-500'
-                  : analysis.toxicity_level === 'orange'
-                  ? 'bg-orange-500'
-                  : 'bg-red-500'
-              }`}
+                    ? 'bg-amber-500'
+                    : analysis.toxicity_level === 'orange'
+                      ? 'bg-orange-500'
+                      : 'bg-red-500'
+                }`}
               style={{ width: `${analysis.toxicity_score * 100}%` }}
             />
           </div>
@@ -174,12 +201,12 @@ export function ARIAIntervention({
               {analysis.categories.map((category, idx) => (
                 <div
                   key={idx}
-                  className="text-xs bg-white/60 px-3 py-2 rounded-lg border border-gray-200"
+                  className={`text-xs px-3 py-2 rounded-lg border ${getCategoryStyle(category)}`}
                 >
-                  <span className="font-medium capitalize">{category}</span>
+                  <span className="font-medium capitalize">{category.replace(/_/g, ' ')}</span>
                   {analysis.triggers && analysis.triggers[idx] && (
-                    <span className="text-gray-600 ml-2">
-                      • {analysis.triggers[idx]}
+                    <span className="opacity-75 ml-2">
+                      • "{analysis.triggers[idx]}"
                     </span>
                   )}
                 </div>
@@ -204,11 +231,10 @@ export function ARIAIntervention({
           {canSendAnyway && (
             <button
               onClick={onSendAnyway}
-              className={`flex-1 px-4 py-3 font-medium rounded-xl transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 ${
-                analysis.toxicity_level === 'green'
+              className={`flex-1 px-4 py-3 font-medium rounded-xl transition-all shadow-sm hover:shadow flex items-center justify-center gap-2 ${analysis.toxicity_level === 'green'
                   ? 'bg-green-600 hover:bg-green-700 text-white'
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300'
-              }`}
+                }`}
             >
               <Send className="h-4 w-4" />
               <span>Send Anyway</span>
