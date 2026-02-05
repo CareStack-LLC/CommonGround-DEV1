@@ -66,6 +66,8 @@ SEXUAL_HARASSMENT_PATTERNS = [
     # Objectification
     r'\bsugar\s*tits\b', r'\bnice\s*rack\b', r'\bbutterface\b', r'\bmilf\b',
     r'\bonlyfans\b', r'\bfansly\b',
+    r'\bsexy\s*body\b', r'\bsexy\s*pic\b', r'\byou\'?re\s*sexy\b',
+    r'\b(ur\s*|your\s*)?titt?ies\b', r'\b(ur\s*|your\s*)?tits\b',
 ]
 
 # ==============================================================================
@@ -85,6 +87,8 @@ THREATENING_PATTERNS = [
     # Suicide Baiting (Criminal)
     r'\bkill\s*yoursel(f|ves)\b', r'\bkys\b', r'\bgo\s*die\b', r'\bdrink\s*bleach\b',
     r'\btoaster\s*bath\b', r'\btake\s*a\s*long\s*walk\b', r'\bunalive\b',
+    r'\bhope\s*(yo)?u\s*die\b', # Death Wish
+    
 
     # Stalking
     r'\bwatching\s*(yo)?u\b', r'\bknow\s*where\s*(yo)?u\s*sleep\b', 
@@ -138,6 +142,8 @@ HOSTILITY_PATTERNS = [
     # Hate
     r'\bhate\s*(ur\s*|your\s*)?guts\b', r'\bworst\s*mistake\b', 
     r'\bwish\s*i\s*never\s*met\s*(yo)?u\b', r'\bruined\s*my\s*life\b',
+    r'\bi\s*hate\s*(yo)?u\b', # Direct Hostility
+    
     
     # Dismissive
     r'\bshut\s+(?:[\w\'\*]+\s+){0,3}up\b', r'\bstfu\b', r'\bshut\s*(ur\s*|your\s*)?mouth\b', 

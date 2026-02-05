@@ -229,18 +229,22 @@ class ARIAService:
                 triggers.append("EXCESSIVE CAPS")
 
         # Check each category of patterns
+        # Check each category of patterns
         for category, patterns in self.compiled_patterns.items():
             # Skip ALL_CAPS in regex loop since we handled it manually above
-            # (Previously it was incorrectly mapped to EVASION_PATTERNS with IGNORECASE)
             if category == ToxicityCategory.ALL_CAPS:
                 continue
                 
             for pattern in patterns:
-                matches = pattern.findall(message)
-                if matches:
-                    if category not in categories:
-                        categories.append(category)
-                    triggers.extend(matches)
+                # Use finditer to get the FULL MATCH, ignoring capture groups
+                # valid_triggers avoids returning just "yo" from "(yo)?u"
+                matches = pattern.finditer(message)
+                for match in matches:
+                    full_phrase = match.group().strip()
+                    if full_phrase:
+                        if category not in categories:
+                            categories.append(category)
+                        triggers.append(full_phrase)
 
         # Calculate toxicity score and level
         toxicity_score = self._calculate_score(categories, triggers)
