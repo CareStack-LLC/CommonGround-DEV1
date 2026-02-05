@@ -1361,15 +1361,80 @@ async def upload_message_attachment(
 
     logger.info(f"User {current_user.id} uploaded attachment {attachment.id} to message {message_id}")
 
-    # --- VISUAL MODERATION TRIGGER ---
+    # --- VISUAL MODERATION TRIGGER (SYNCHRONOUS ENFORCEMENT) ---
     if file_category == "image":
-        # Fire and forget image analysis
-        # In production this would be background task, here we await the db insert which is fast
-        await aria_service.analyze_image_job_hybrid(
-            db, 
-            message_id, 
-            storage_url # This assumes storage_url is publicly accessible or signed for the LLM
+        # 1. Run Analysis Synchronously (Blocking)
+        # We need to ensure safety before confirming the upload
+        from app.services.aria_inference import analyze_image_with_llm
+        import asyncio
+        from functools import partial
+
+        # Run blocking LLM call in thread pool
+        loop = asyncio.get_event_loop()
+        analysis = await loop.run_in_executor(
+            None, 
+            partial(analyze_image_with_llm, message_id, storage_url)
         )
+
+        # 2. Check Verdict
+        action = analysis.get("action", "ALLOW")
+        
+        if action == "BLOCK":
+            logger.warning(f"BLOCKED UNSAFE IMAGE upload for user {current_user.id}: {analysis.get('explanation')}")
+            
+            # 3. Cleanup: Delete the unsafe file from storage
+            try:
+                await storage_service.delete_file(
+                    bucket=StorageBucket.MESSAGE_ATTACHMENTS,
+                    path=storage_path
+                )
+            except Exception as cleanup_error:
+                logger.error(f"Failed to cleanup unsafe file: {cleanup_error}")
+
+            # 4. Cleanup: Remove DB record (since we haven't committed yet? 
+            # Actually we typically commit before returning, let's check strict flow)
+            # The current code adds and commits at lines 1358-1359.
+            # We should move the commit AFTER this check or delete the record.
+            
+            # Since we already committed above (lines 1359), we must delete the record.
+            await db.delete(attachment)
+            await db.commit()
+
+            # 5. Return Error to User
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Image blocked by ARIA Safety Shield: {analysis.get('explanation', 'Unsafe content detected')}"
+            )
+        
+        # If not blocked, we can still log the event for the worker (or just create the event here)
+        # To avoid duplicate work, we can SKIP the queue since we already have the result.
+        # But for now, let's just logging it.
+        # Ideally we should save the event here since we paid for the token usage.
+        
+        # Log Success Event
+        try:
+            stmt = text("""
+                INSERT INTO aria_events (
+                    message_id, classification_source, model_version,
+                    toxicity_score, severity_level, labels,
+                    action_taken, intervention_text, explanation
+                ) VALUES (
+                    :msg_id, 'llm', 'gpt-4o',
+                    :score, 'computed_now', :labels,
+                    :action, :explanation, :explanation
+                )
+            """)
+            await db.execute(stmt, {
+                "msg_id": message_id,
+                "score": analysis.get("severity", 0.0),
+                "labels": json.dumps(analysis.get("labels", [])),
+                "action": action,
+                "explanation": analysis.get("explanation", "")
+            })
+            await db.commit()
+        except Exception as e:
+            logger.error(f"Failed to log ARIA event: {e}")
+
     # ---------------------------------
 
     return {
