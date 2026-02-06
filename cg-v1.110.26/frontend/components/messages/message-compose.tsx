@@ -117,7 +117,7 @@ export function MessageCompose({
     });
   };
 
-  const uploadAttachment = async (messageId: string, attachment: AttachmentFile) => {
+  const uploadAttachment = async (messageId: string, attachment: AttachmentFile): Promise<{ success: boolean; attachment?: MessageAttachment; error?: string; isAriaBlock?: boolean }> => {
     try {
       setAttachments(prev =>
         prev.map(a => a.id === attachment.id ? { ...a, uploading: true } : a)
@@ -129,31 +129,18 @@ export function MessageCompose({
         prev.map(a => a.id === attachment.id ? { ...a, uploading: false, uploaded: true } : a)
       );
 
-      return uploadedAttachment;
+      return { success: true, attachment: uploadedAttachment };
     } catch (error: any) {
       const errorMessage = error?.message || 'Upload failed';
       console.error('Failed to upload attachment:', attachment.file.name, errorMessage, error);
 
+      const isAriaBlock = errorMessage.includes('Image blocked by ARIA Safety Shield');
+
       // Check for ARIA Visual Shield Block
-      if (errorMessage.includes('Image blocked by ARIA Safety Shield')) {
-        const explanation = errorMessage.split(': ').slice(1).join(': ') || 'Unsafe content detected by ARIA Vision.';
-
-        // Trigger the ARIA Intervention Modal
-        setAnalysis({
-          toxicity_level: 'red', // Force Red Level
-          toxicity_score: 1.0, // Max toxicity
-          is_flagged: true,
-          categories: ['Visual_Safety_Violation'], // Custom category for UI
-          triggers: ['Unsafe Image Content'],
-          explanation: explanation,
-          suggestion: 'Please verify that this image is appropriate for a co-parenting context.',
-          block_send: true, // Strictly block sending
-          status: 'blocked'
-        } as unknown as ARIAAnalysisResponse);
-
-        // Mark as error but don't show generic error toast if we show the modal
-        // We set uploading: false, but maybe we should remove it?
-        // Let's just mark it as error so the user sees the red X on the file too
+      if (isAriaBlock) {
+        // We do NOT show the modal here anymore because the message is already "sent" (created).
+        // Instead we allow the error to bubble up so we can delete the message.
+        // But we still mark the local attachment as error.
       }
 
       setAttachments(prev =>
@@ -163,7 +150,8 @@ export function MessageCompose({
           error: errorMessage
         } : a)
       );
-      return null;
+
+      return { success: false, error: errorMessage, isAriaBlock };
     }
   };
 
@@ -204,28 +192,64 @@ export function MessageCompose({
       });
 
       // Upload attachments if any
-      let uploadErrors: string[] = [];
+      let uploadErrorMessages: string[] = [];
       const uploadedAttachments: MessageAttachment[] = [];
+      let hasAriaBlock = false;
 
       if (attachments.length > 0 && newMessage.id) {
         const uploadResults = await Promise.all(
-          attachments.map(async (attachment) => {
-            const result = await uploadAttachment(newMessage.id!, attachment);
-            return { name: attachment.file.name, success: !!result, attachment: result };
-          })
+          attachments.map(attachment => uploadAttachment(newMessage.id!, attachment))
         );
-
-        // Collect any failed uploads
-        uploadErrors = uploadResults
-          .filter(r => !r.success)
-          .map(r => r.name);
 
         // Collect successful attachments
         uploadResults.forEach(r => {
-          if (r.attachment) {
+          if (r.success && r.attachment) {
             uploadedAttachments.push(r.attachment);
           }
         });
+
+        // Collect errors
+        uploadResults.forEach((r, index) => {
+          if (!r.success) {
+            const filename = attachments[index].file.name;
+            if (r.isAriaBlock) {
+              hasAriaBlock = true;
+              // Extract reason if possible
+              const reasonIndex = r.error?.indexOf('Image blocked by ARIA Safety Shield:');
+              let reason = 'Content violation';
+              if (reasonIndex !== -1 && r.error) {
+                reason = r.error.substring(reasonIndex! + 'Image blocked by ARIA Safety Shield:'.length).trim();
+              }
+              uploadErrorMessages.push(`Failed to upload attachment: ${filename} Image blocked by ARIA Safety Shield: ${reason}`);
+            } else {
+              uploadErrorMessages.push(`Failed to upload ${filename}: ${r.error}`);
+            }
+          }
+        });
+      }
+
+      // Cleanup if ARIA blocked the image and it was an attachment-only message
+      if (hasAriaBlock && newMessage.content === '(Attachment)' && uploadedAttachments.length === 0) {
+        // Delete the message
+        try {
+          if (newMessage.id) {
+            await messagesAPI.delete(newMessage.id);
+          }
+        } catch (delErr) {
+          console.error("Failed to cleanup blocked message", delErr);
+        }
+
+        // Clear form state but KEEP error
+        setMessage('');
+        setAnalysis(null);
+        setAttachments([]); // Clear attachments so they don't stay stuck
+
+        if (uploadErrorMessages.length > 0) {
+          setError(uploadErrorMessages[0]); // Show the first significant error
+        }
+
+        // DO NOT call onMessageSent, so it doesn't appear in the list
+        return;
       }
 
       // Clear form state
@@ -233,9 +257,10 @@ export function MessageCompose({
       setAnalysis(null);
       setAttachments([]);
 
-      // Show warning if some uploads failed
-      if (uploadErrors.length > 0) {
-        setError(`Message sent, but ${uploadErrors.length} attachment(s) failed to upload: ${uploadErrors.join(', ')}`);
+      // Show warning if some uploads failed (but message preserved)
+      if (uploadErrorMessages.length > 0) {
+        // If we are here, either it wasn't an ARIA block, or it had text content, or some attachments succeeded
+        setError(`Message sent, but issues occurred: ${uploadErrorMessages.join('; ')}`);
       }
 
       // Construct final message with attachments for optimistic UI update
