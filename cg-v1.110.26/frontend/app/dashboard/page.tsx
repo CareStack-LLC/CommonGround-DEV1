@@ -40,7 +40,10 @@ import {
   Gavel,
   CheckCircle,
   Zap,
+  BarChart3,
 } from 'lucide-react';
+import { CustodyTimeCard } from '@/components/dashboard/custody-time-card';
+import { ComplianceLogCard } from '@/components/dashboard/compliance-log-card';
 import { UpgradeBanner } from '@/components/upgrade-banner';
 import { useSubscription } from '@/contexts/subscription-context';
 
@@ -1091,6 +1094,11 @@ function DashboardContent() {
   const needsSetup = familyFilesWithData.length === 0;
   const greeting = getGreeting();
 
+  // Find first active agreement for Smart Insights
+  const activeAgreementId = familyFilesWithData
+    .flatMap(f => f.agreements)
+    .find(a => a.status === 'active')?.id;
+
   // Show loading state
   if (isLoading) {
     return (
@@ -1223,6 +1231,22 @@ function DashboardContent() {
               </div>
             )}
 
+            {/* Smart Insights */}
+            {activeAgreementId && (
+              <section className="mb-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 className="w-5 h-5 text-[var(--portal-primary)]" />
+                  <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    Custody Insights
+                  </h3>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <CustodyTimeCard agreementId={activeAgreementId} />
+                  <ComplianceLogCard agreementId={activeAgreementId} />
+                </div>
+              </section>
+            )}
+
             {/* Action Stream */}
             <section>
               <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
@@ -1231,20 +1255,20 @@ function DashboardContent() {
               <div className="space-y-3">
                 {/* Show "all caught up" if no action items */}
                 {dashboardSummary &&
-                 dashboardSummary.pending_expenses_count === 0 &&
-                 dashboardSummary.unread_messages_count === 0 &&
-                 dashboardSummary.pending_agreements_count === 0 &&
-                 dashboardSummary.unread_court_count === 0 && (
-                  <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
-                    <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
-                      <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
+                  dashboardSummary.pending_expenses_count === 0 &&
+                  dashboardSummary.unread_messages_count === 0 &&
+                  dashboardSummary.pending_agreements_count === 0 &&
+                  dashboardSummary.unread_court_count === 0 && (
+                    <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
+                      <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
+                        <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
+                        <p className="text-sm text-muted-foreground font-medium">No pending items to review</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
-                      <p className="text-sm text-muted-foreground font-medium">No pending items to review</p>
-                    </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Pending Expenses */}
                 {(dashboardSummary?.pending_expenses_count ?? 0) > 0 && (

@@ -7795,5 +7795,60 @@ export const professionalIntakeAPI = {
   },
 };
 
+// ============================================================================
+// Smart Analytics API (V3 Custody Insights)
+// ============================================================================
+
+export interface CustodyTimeStats {
+  period: {
+    start: string;
+    end: string;
+    total_days: number;
+  };
+  scheduled: {
+    parent_a_percent: number;
+    parent_b_percent: number;
+  };
+  actual: {
+    parent_a_percent: number;
+    parent_b_percent: number;
+    data_quality: string;
+  };
+}
+
+export interface ComplianceLogEntry {
+  id: string;
+  type: string;
+  severity: string;
+  description: string;
+  timestamp: string;
+  is_verified: boolean;
+}
+
+export const smartAnalytics = {
+  /**
+   * Get Scheduled vs Actual custody time
+   */
+  async getCustodyTime(agreementId: string, startDate: string, endDate: string): Promise<CustodyTimeStats> {
+    const params = new URLSearchParams({
+      agreement_id: agreementId,
+      start_date: startDate,
+      end_date: endDate
+    });
+    return fetchAPI<CustodyTimeStats>(`/analytics/custody-time?${params.toString()}`);
+  },
+
+  /**
+   * Get Compliance Logs (verified events, violations)
+   */
+  async getComplianceLogs(agreementId: string, limit = 50): Promise<ComplianceLogEntry[]> {
+    const params = new URLSearchParams({
+      agreement_id: agreementId,
+      limit: limit.toString()
+    });
+    return fetchAPI<ComplianceLogEntry[]>(`/analytics/compliance?${params.toString()}`);
+  }
+};
+
 // Export commonly used functions
 export { getAuthToken, clearAuthTokens };

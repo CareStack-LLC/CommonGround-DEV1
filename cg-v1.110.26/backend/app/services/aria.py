@@ -119,34 +119,99 @@ class ARIAService:
             ],
         }
 
+    async def log_event(
+        self,
+        db: AsyncSession,
+        user_id: str,
+        family_file_id: Optional[str],
+        message_id: str,
+        content_type: str,
+        analysis: SentimentAnalysis,
+        context_data: Optional[Dict[str, Any]] = None
+    ) -> None:
+        """
+        Log an intervention event to DB (Synchronous/Blocking logging).
+        Critical for reporting on blocked messages that never hit the Message table.
+        """
+        try:
+            # Serialize generic labels/categories
+            labels = [{"name": cat.value, "score": 1.0} for cat in analysis.categories]
+            
+            stmt = text("""
+                INSERT INTO aria_events (
+                    message_id, user_id, family_file_id, content_type,
+                    classification_source, model_version,
+                    toxicity_score, severity_level, labels,
+                    action_taken, intervention_text, explanation,
+                    context_data, original_content
+                ) VALUES (
+                    :msg_id, :uid, :ff_id, :ctype,
+                    'regex', 'v3-hybrid',
+                    :score, :severity, :labels,
+                    :action, :intervention, :explanation,
+                    :ctx_data, :orig_content
+                )
+            """)
+            
+            await db.execute(stmt, {
+                "msg_id": message_id,
+                "uid": user_id,
+                "ff_id": family_file_id,
+                "ctype": content_type,
+                "score": analysis.toxicity_score,
+                "severity": analysis.toxicity_level.value,
+                "labels": json.dumps(labels),
+                "action": "blocked" if analysis.block_send else "flagged",
+                "intervention": "Action blocked by Safety Shield", # Generic for log
+                "explanation": analysis.explanation,
+                "ctx_data": json.dumps(context_data) if context_data else None,
+                "orig_content": analysis.original_message
+            })
+            await db.commit()
+        except Exception as e:
+            print(f"FAILED TO LOG ARIA EVENT: {e}")
+
     async def analyze_message_hybrid(
         self,
         db: AsyncSession,
         message_id: str,
         message_text: str,
+        user_id: str,
+        family_file_id: Optional[str],
         context: Optional[List[str]] = None
     ) -> SentimentAnalysis:
         """
         Hybrid Analysis Flow (V3):
         1. Fast Regex Check (Synchronous logic)
-        2. If Blocked -> Return Blocked Result
+        2. If Blocked -> Return Blocked Result & Log Event
         3. If Allowed/Flagged -> Queue for Async ML (aria_jobs) & Return Fast Result
         """
         # 1. Fast Regex Check
         regex_result = self.analyze_message(message_text, context)
 
-        # 2. If already blocked, no need for ML (save cost + instant feedback)
+        # 2. If already blocked, no need for ML
         if regex_result.block_send:
+            # LOG IT Synchronously because application will raise 400 and drop it
+            await self.log_event(
+                db=db,
+                user_id=user_id,
+                family_file_id=family_file_id,
+                message_id=message_id,
+                content_type="text",
+                analysis=regex_result,
+                context_data={"preceding_messages": context}
+            )
             return regex_result
 
         # 3. Queue for Async ML (Fire & Forget logic)
         try:
-            # We insert raw SQL for speed/simplicity or use ORM if we had models. 
-            # Using raw insert to aria_jobs as defined in V3 schema.
-            # Safe to assume message_text is sanitized or parameterized by sqlalchemy.
-            
-            # Serialize context
-            context_json = json.dumps(context) if context else '[]'
+            # Prepare context with metadata for worker
+            job_context = {
+                "lines": context or [],
+                "user_id": user_id,
+                "family_file_id": family_file_id
+            }
+            context_json = json.dumps(job_context)
             
             stmt = text("""
                 INSERT INTO aria_jobs (message_id, message_text, context, status)
@@ -162,7 +227,6 @@ class ARIAService:
             
         except Exception as e:
             print(f"FAILED TO QUEUE ARIA JOB: {e}")
-            # We don't fail the request, just log error. User still gets regex result.
 
         return regex_result
 
@@ -171,6 +235,8 @@ class ARIAService:
         db: AsyncSession,
         message_id: str,
         image_url: str,
+        user_id: str,
+        family_file_id: Optional[str],
         context: Optional[Dict[str, Any]] = None
     ) -> None:
         """
@@ -181,6 +247,8 @@ class ARIAService:
             job_context = context or {}
             job_context["type"] = "image"
             job_context["image_url"] = image_url
+            job_context["user_id"] = user_id
+            job_context["family_file_id"] = family_file_id
             
             context_json = json.dumps(job_context)
             

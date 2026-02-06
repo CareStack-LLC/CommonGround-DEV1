@@ -45,6 +45,8 @@ from app.api.v1.endpoints import (
     recording_webhooks,
     recordings,
     recording_audit,
+    analytics,
+    smart_analytics,
 )
 
 api_router = APIRouter()
@@ -142,3 +144,9 @@ api_router.include_router(recordings.router, prefix="/recordings", tags=["Record
 
 # Recording Audit - Chain of custody, legal hold, evidence export
 api_router.include_router(recording_audit.router, prefix="/recordings", tags=["Recording Audit"])
+
+# Analytics - Usage statistics and metric
+api_router.include_router(analytics.router, prefix="/analytics", tags=["Analytics"])
+
+# Smart Analytics - V3 Custody Insights
+api_router.include_router(smart_analytics.router, prefix="/analytics", tags=["Smart Analytics"])

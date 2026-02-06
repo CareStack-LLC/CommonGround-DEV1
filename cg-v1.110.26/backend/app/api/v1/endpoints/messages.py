@@ -520,6 +520,17 @@ async def send_message(
     # Strict blocking: Reject the request entirely
     if aria_analysis.block_send:
         # Check if it was an admin override? No, for now strict block for everyone on these patterns.
+        # LOG EVENT (Synchronous)
+        await aria_service.log_event(
+            db=db,
+            user_id=str(current_user.id),
+            family_file_id=message_data.family_file_id,
+            message_id=str(new_message.id),
+            content_type="text",
+            analysis=aria_analysis,
+            context_data={"preceding_messages": case_context}
+        )
+        
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Message blocked by ARIA Safety Shield: Content contains prohibited threats, hate speech, or sexual harassment."
@@ -1424,8 +1435,45 @@ async def upload_message_attachment(
             # We should move the commit AFTER this check or delete the record.
             
             # Since we already committed above (lines 1359), we must delete the record.
+            # 4. Cleanup: Remove DB record
             await db.delete(attachment)
-            await db.commit()
+            
+            # LOG BLOCK EVENT
+            try:
+                stmt = text("""
+                    INSERT INTO aria_events (
+                        message_id, user_id, family_file_id, content_type,
+                        classification_source, model_version,
+                        toxicity_score, severity_level, labels,
+                        action_taken, intervention_text, explanation,
+                        context_data, original_content
+                    ) VALUES (
+                        :msg_id, :uid, :ff_id, 'image',
+                        'llm', 'gpt-4o',
+                        :score, 'severe', :labels,
+                        'blocked', :explanation, :explanation,
+                        :ctx_data, :orig_content
+                    )
+                """)
+                await db.execute(stmt, {
+                    "msg_id": message_id,
+                    "uid": str(current_user.id),
+                    "ff_id": family_file_id,
+                    "score": analysis.get("severity", 1.0),
+                    "labels": json.dumps(analysis.get("labels", [])),
+                    "explanation": analysis.get("explanation", ""),
+                    "ctx_data": None,
+                    "orig_content": storage_url
+                })
+                # Commit deletion and log
+                await db.commit()
+            except Exception as e:
+                logger.error(f"Failed to log ARIA BLOCK event: {e}")
+                # Try to commit the deletion at least
+                try: 
+                    await db.commit()
+                except: 
+                    pass
 
             # 5. Return Error to User
             raise HTTPException(
@@ -1442,21 +1490,29 @@ async def upload_message_attachment(
         try:
             stmt = text("""
                 INSERT INTO aria_events (
-                    message_id, classification_source, model_version,
+                    message_id, user_id, family_file_id, content_type,
+                    classification_source, model_version,
                     toxicity_score, severity_level, labels,
-                    action_taken, intervention_text, explanation
+                    action_taken, intervention_text, explanation,
+                    context_data, original_content
                 ) VALUES (
-                    :msg_id, 'llm', 'gpt-4o',
+                    :msg_id, :uid, :ff_id, 'image',
+                     'llm', 'gpt-4o',
                     :score, 'computed_now', :labels,
-                    :action, :explanation, :explanation
+                    :action, :explanation, :explanation,
+                    :ctx_data, :orig_content
                 )
             """)
             await db.execute(stmt, {
                 "msg_id": message_id,
+                "uid": str(current_user.id),
+                "ff_id": family_file_id,
                 "score": analysis.get("severity", 0.0),
                 "labels": json.dumps(analysis.get("labels", [])),
                 "action": action,
-                "explanation": analysis.get("explanation", "")
+                "explanation": analysis.get("explanation", ""),
+                "ctx_data": None,
+                "orig_content": storage_url
             })
             await db.commit()
         except Exception as e:

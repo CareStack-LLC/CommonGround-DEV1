@@ -211,6 +211,9 @@ class AgreementSection(Base, UUIDMixin, TimestampMixin):
 
     # Machine-readable data (for rules engine)
     structured_data: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    
+    # Smart Custody Rules (V3 Executable Logic)
+    smart_rules: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
     # Ordering
     display_order: Mapped[int] = mapped_column(Integer, default=0)
@@ -259,3 +262,39 @@ class AgreementConversation(Base, UUIDMixin, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<AgreementConversation {self.agreement_id} ({len(self.messages)} messages)>"
+
+
+class ComplianceLog(Base, UUIDMixin, TimestampMixin):
+    """
+    Audit trail for Smart Custody compliance.
+    
+    Logs verified events (check-ins, payments) and deviations.
+    Immutable record for court reporting.
+    """
+    
+    __tablename__ = "compliance_logs"
+
+    # Links
+    family_file_id: Mapped[str] = mapped_column(String(36), ForeignKey("family_files.id"), index=True)
+    agreement_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("agreements.id"), index=True, nullable=True)
+    
+    # Event details
+    log_type: Mapped[str] = mapped_column(String(50))  # check_in, payment, communication, travel
+    severity: Mapped[str] = mapped_column(String(20), default="info")  # info, warning, violation
+    
+    # Source
+    source_system: Mapped[str] = mapped_column(String(50))  # gps_monitor, clearfund, aria, manual_override
+    recorded_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    
+    # The Fact (Objective observation)
+    description: Mapped[str] = mapped_column(Text)
+    
+    # Metadata (JSON for flexibility)
+    metadata_json: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    
+    # Verification
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    verification_method: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    
+    def __repr__(self) -> str:
+        return f"<ComplianceLog {self.log_type}: {self.description}>"

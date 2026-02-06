@@ -52,6 +52,13 @@ CREATE TABLE IF NOT EXISTS aria_events (
     intervention_text TEXT, -- The "Nudge" shown to user
     explanation TEXT, -- Internal or court-facing explanation
     
+    -- Analytics & Context
+    family_file_id UUID,
+    user_id UUID,
+    content_type TEXT DEFAULT 'text', -- 'text' or 'image'
+    original_content TEXT, -- Captured content (especially for blocked messages)
+    context_data JSONB, -- Snapshot of preceding messages for reporting
+    
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

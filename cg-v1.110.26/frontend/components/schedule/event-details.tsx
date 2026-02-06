@@ -122,9 +122,9 @@ export default function EventDetails({
   const getRsvpLabel = (status: string) => {
     switch (status) {
       case 'going':
-        return 'Going';
+        return 'Accepted';
       case 'not_going':
-        return 'Not Going';
+        return 'Rejected';
       case 'maybe':
         return 'Maybe';
       default:
@@ -202,8 +202,8 @@ export default function EventDetails({
             {/* Visibility */}
             <div className="flex items-center gap-2">
               <span className={`text-xs px-2 py-1 rounded-full ${event.visibility === 'private'
-                  ? 'bg-gray-100 text-gray-600'
-                  : 'bg-green-100 text-green-700'
+                ? 'bg-gray-100 text-gray-600'
+                : 'bg-green-100 text-green-700'
                 }`}>
                 {event.visibility === 'private' ? 'Private' : 'Shared with Co-parent'}
               </span>
@@ -212,9 +212,9 @@ export default function EventDetails({
             {/* Category-specific details */}
             {event.event_category && event.event_category !== 'general' && event.category_data && (
               <div className={`p-3 rounded-lg border ${event.event_category === 'medical' ? 'bg-blue-50 border-blue-200' :
-                  event.event_category === 'school' ? 'bg-green-50 border-green-200' :
-                    event.event_category === 'sports' ? 'bg-orange-50 border-orange-200' :
-                      'bg-purple-50 border-purple-200'
+                event.event_category === 'school' ? 'bg-green-50 border-green-200' :
+                  event.event_category === 'sports' ? 'bg-orange-50 border-orange-200' :
+                    'bg-purple-50 border-purple-200'
                 }`}>
                 <div className="flex items-center gap-2 mb-2">
                   {event.event_category === 'medical' && <Stethoscope className="h-4 w-4" />}
@@ -346,20 +346,20 @@ export default function EventDetails({
                       onClick={() => handleRsvp('going')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'going'
-                          ? 'bg-green-600 hover:bg-green-700'
-                          : 'bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-700'
+                        ? 'bg-green-600 hover:bg-green-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-700'
                         }`}
                       variant={currentRsvp === 'going' ? 'default' : 'outline'}
                     >
                       <Check className="h-4 w-4 mr-1" />
-                      Going
+                      Accept
                     </Button>
                     <Button
                       onClick={() => handleRsvp('maybe')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'maybe'
-                          ? 'bg-yellow-600 hover:bg-yellow-700'
-                          : ''
+                        ? 'bg-yellow-600 hover:bg-yellow-700'
+                        : ''
                         }`}
                       variant={currentRsvp === 'maybe' ? 'default' : 'outline'}
                     >
@@ -370,13 +370,13 @@ export default function EventDetails({
                       onClick={() => handleRsvp('not_going')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'not_going'
-                          ? 'bg-red-600 hover:bg-red-700'
-                          : ''
+                        ? 'bg-red-600 hover:bg-red-700'
+                        : ''
                         }`}
                       variant={currentRsvp === 'not_going' ? 'default' : 'outline'}
                     >
                       <XIcon className="h-4 w-4 mr-1" />
-                      Can't Go
+                      Reject
                     </Button>
                   </div>
                 )}

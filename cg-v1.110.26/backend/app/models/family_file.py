@@ -128,7 +128,11 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
     aria_provider: Mapped[str] = mapped_column(String(20), default="claude")
     aria_disabled_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     aria_disabled_by: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+    aria_disabled_by: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
     require_joint_approval: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    # Smart Custody Config (V3)
+    smart_config: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
     # Link to existing Case (for migration/backwards compatibility)
     legacy_case_id: Mapped[Optional[str]] = mapped_column(

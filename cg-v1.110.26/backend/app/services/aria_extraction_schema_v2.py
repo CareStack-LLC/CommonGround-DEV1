@@ -236,33 +236,32 @@ Keep it simple:
 """,
 
     "parenting_time": """
-Help establish a baseline parenting schedule.
+Help establish a baseline parenting schedule with enough detail for a calendar.
 
 Common patterns to offer:
-- Week-on/week-off (50/50)
-- 2-2-3 rotation (50/50)
-- Every other weekend + one weeknight (70/30)
-- Custom arrangement
+- Week-on/week-off (50/50) - Ask if it's a 7-day or 14-day cycle?
+- 2-2-3 rotation (50/50) - Ask who has the first Monday?
+- Every other weekend (70/30) - Ask for specific pickup/dropoff times.
 
 Focus on:
-- What's the regular pattern?
-- What day do transitions happen?
-- What time?
+- **Cycle Length**: "Is that a 2-week rotation?"
+- **Transitions**: "What specific day and time do you switch?"
+- **First Step**: "Who has the kids on the very first day of the schedule?"
 
 DON'T get into holidays - those go in Quick Accords.
-Example: "What schedule pattern works best for your family? Some parents do week-on/week-off, others prefer alternating weekends..."
+Example: "For the 'Week-on/Week-off' - does the switch happen every Friday? And at what time?"
 """,
 
     "logistics_transitions": """
-Help plan smooth custody exchanges.
+Help plan smooth custody exchanges with location precision.
 
 Ask about:
-- Where do exchanges happen? (school, one home, neutral location)
-- Who's responsible for transportation?
-- How do you prefer to communicate about logistics?
+- **Exact Location**: "If you say 'School', which school? Or 'Starbucks' - do you have an address?"
+- **Verified Arrival**: "Do you want to use the app to verify arrival times?"
+- **Transportation**: "Who handles the drive?"
 
 Keep it practical:
-"Where's the best place for exchanges to happen? Some families do school pickup, others meet at a neutral spot..."
+"To make the map work for you, we need exact addresses. Where exactly should the exchanges happen?"
 """,
 
     "decision_communication": """
@@ -271,10 +270,9 @@ Help clarify decision-making authority and communication methods.
 Cover:
 - Major decisions (education, healthcare, religion, activities)
 - Do you decide together, or does one parent lead?
-- What's your communication method?
-- How quickly should you expect responses?
+- **Response Time**: "If you message each other, how fast do you expect a reply? 24 hours? 4 hours?"
 
-Example: "For big decisions about the kids - like school or medical care - do you make those together, or does one of you take the lead?"
+Example: "For routine questions, what's a fair response time to expect from each other? 24 hours?"
 """,
 
     "expenses_financial": """
@@ -282,25 +280,21 @@ Help establish expense sharing (this is for non-court-ordered expenses).
 
 Ask about:
 - What expenses will you share? (medical, school, activities)
-- How do you split them? (50/50, proportional to income)
-- How quickly should reimbursements happen?
-- Do you need receipts?
+- **Split Ratio**: "Is it 50/50 or income-based?"
+- **Reimbursement**: "If one of you pays upfront, how many days to pay back? 14 days?"
 
 Note: If there's a court order for child support, this section is just for extras.
-Example: "For shared expenses like medical bills or activities - how would you like to split those?"
 """,
 
     "modification_disputes": """
 Help close the loop on modifications and disagreements.
 
 Cover:
-- What events might require changing this agreement?
-- When you disagree, what's step 1? (talk it out)
-- What if that doesn't work? (mediation)
-- Both parents need to acknowledge agreement
+- **Relocation**: "How far away can a parent move before needing consent? 50 miles?"
+- **New Partners**: "How long should you date someone before introducing them? 6 months?"
+- **Dispute Steps**: "If you disagree, do you want to try mediation before court?"
 
-Keep it positive:
-"No agreement is perfect forever. What situations might require you both to revisit this? And if you hit a disagreement, what's your first step?"
+Keep it positive but specific.
 """
 }
 

@@ -94,15 +94,20 @@ async def run_worker():
                 # ----------------
                 
                 # Insert Result into aria_events
+                # Insert Result into aria_events
                 await conn.execute(text("""
                     INSERT INTO aria_events (
                         job_id, message_id, classification_source, model_version,
                         toxicity_score, severity_level, labels,
-                        action_taken, intervention_text, explanation
+                        action_taken, intervention_text, explanation,
+                        user_id, family_file_id, content_type, context_data,
+                        original_content
                     ) VALUES (
                         :job_id, :msg_id, 'llm', :model_ver,
                         :score, 'computed_later', :labels,
-                        :action, :explanation, :explanation
+                        :action, :explanation, :explanation,
+                        :uid, :ff_id, :ctype, :ctx_data,
+                        :orig_content
                     )
                 """), {
                     "job_id": job.id,
@@ -111,7 +116,12 @@ async def run_worker():
                     "score": analysis.get("severity", 0.0),
                     "labels": json.dumps(analysis.get("labels", [])),
                     "action": analysis.get("action", "ALLOW"),
-                    "explanation": analysis.get("explanation", "")
+                    "explanation": analysis.get("explanation", ""),
+                    "uid": context_list.get("user_id") if isinstance(context_list, dict) else None,
+                    "ff_id": context_list.get("family_file_id") if isinstance(context_list, dict) else None,
+                    "ctype": context_list.get("type", "text") if isinstance(context_list, dict) else "text",
+                    "ctx_data": None,
+                    "orig_content": job.message_text
                 })
 
                 # Mark Job Complete
