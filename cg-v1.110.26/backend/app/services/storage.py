@@ -304,26 +304,45 @@ class SupabaseStorageService:
             return False
 
 
+import re
+
+def sanitize_filename(filename: str) -> str:
+    """
+    Sanitize filename for storage safety.
+    - Replaces spaces with underscores
+    - Removes non-alphanumeric characters (except ._-)
+    - Ensures filename is not empty
+    """
+    # Replace spaces with underscores
+    s = filename.replace(" ", "_")
+    # Remove all other non-safe characters
+    s = re.sub(r'[^a-zA-Z0-9._-]', '', s)
+    # Ensure it's not empty
+    if not s:
+        s = "unnamed_file"
+    return s
+
+
 # Helper functions for common upload patterns
 
 def build_avatar_path(user_id: str, filename: str) -> str:
     """Build storage path for user avatar."""
-    return f"{user_id}/{filename}"
+    return f"{user_id}/{sanitize_filename(filename)}"
 
 
 def build_child_photo_path(family_file_id: str, child_id: str, filename: str) -> str:
     """Build storage path for child profile photo."""
-    return f"{family_file_id}/{child_id}/{filename}"
+    return f"{family_file_id}/{child_id}/{sanitize_filename(filename)}"
 
 
 def build_cubbie_path(family_file_id: str, item_id: str, filename: str) -> str:
     """Build storage path for cubbie item photo."""
-    return f"{family_file_id}/{item_id}/{filename}"
+    return f"{family_file_id}/{item_id}/{sanitize_filename(filename)}"
 
 
 def build_receipt_path(family_file_id: str, obligation_id: str, filename: str) -> str:
     """Build storage path for expense receipt."""
-    return f"{family_file_id}/{obligation_id}/{filename}"
+    return f"{family_file_id}/{obligation_id}/{sanitize_filename(filename)}"
 
 
 def build_document_path(family_file_id: str, doc_type: str, filename: str) -> str:
@@ -335,7 +354,7 @@ def build_document_path(family_file_id: str, doc_type: str, filename: str) -> st
         doc_type: Document type (e.g., "agreements", "evidence", "court_orders")
         filename: File name
     """
-    return f"{family_file_id}/{doc_type}/{filename}"
+    return f"{family_file_id}/{doc_type}/{sanitize_filename(filename)}"
 
 
 def build_attachment_path(family_file_id: str, message_id: str, filename: str) -> str:
@@ -347,7 +366,7 @@ def build_attachment_path(family_file_id: str, message_id: str, filename: str) -
         message_id: Message ID
         filename: File name
     """
-    return f"{family_file_id}/messages/{message_id}/{filename}"
+    return f"{family_file_id}/messages/{message_id}/{sanitize_filename(filename)}"
 
 
 def build_recording_path(family_file_id: str, session_id: str, filename: str) -> str:
@@ -359,7 +378,7 @@ def build_recording_path(family_file_id: str, session_id: str, filename: str) ->
         session_id: Call session ID
         filename: File name
     """
-    return f"{family_file_id}/calls/{session_id}/{filename}"
+    return f"{family_file_id}/calls/{session_id}/{sanitize_filename(filename)}"
 
 
 # File validation constants
