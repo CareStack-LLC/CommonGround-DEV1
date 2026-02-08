@@ -863,6 +863,7 @@ export interface Agreement {
   case_id: string | null;  // Optional for Family File-based agreements
   family_file_id: string | null;  // Primary container for SharedCare Agreements
   title: string;
+  summary?: string | null;  // Concise agreement description
   version: number;
   agreement_version: 'v1' | 'v2_standard' | 'v2_lite';  // v1 = 18 sections, v2_standard = 7 sections
   status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'expired' | 'active';
