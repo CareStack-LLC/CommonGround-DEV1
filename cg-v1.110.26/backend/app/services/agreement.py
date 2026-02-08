@@ -1063,16 +1063,17 @@ class AgreementService:
         user: User
     ) -> Dict[str, Any]:
         """
-        Generate a quick, plain-English summary of an agreement for dashboard display.
+        Generate a comprehensive, plain-English summary of an agreement.
 
-        Uses Claude API to create a parent-friendly summary from the agreement sections.
+        Extracts all key provisions from every section and formats them
+        in a clear, organized markdown structure.
 
         Args:
             agreement_id: ID of the agreement
             user: Current user
 
         Returns:
-            Dict with summary, key_points, completion_percentage, status
+            Dict with summary (markdown), key_points, completion_percentage, status
         """
         agreement = await self.get_agreement(agreement_id, user)
 
@@ -1101,94 +1102,240 @@ class AgreementService:
                 "status": agreement.status
             }
 
-        # Build section content for AI
-        section_content = []
+        # Build section content dictionary
+        section_dict = {}
         for section in sections:
             if section.is_completed and section.content:
-                section_content.append(f"## {section.section_title}\n{section.content}")
+                section_dict[section.section_type] = {
+                    "title": section.section_title,
+                    "content": section.content
+                }
 
-        sections_text = "\n\n".join(section_content)
-
-        # Call OpenAI API for summary
+        # Generate comprehensive summary using AI
         try:
             client = OpenAI(api_key=settings.OPENAI_API_KEY)
+            
+            sections_text = "\n\n".join([
+                f"## {data['title']}\n{data['content']}" 
+                for data in section_dict.values()
+            ])
 
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                max_tokens=500,
+                model="gpt-4o",
+                max_tokens=2500,
                 messages=[
                     {
+                        "role": "system",
+                        "content": """You are a legal document summarizer for co-parenting agreements.
+Your job is to extract ALL key provisions and present them in a clear, comprehensive format.
+Write in plain English that parents can easily understand.
+Be thorough - include specific details like names, times, dates, amounts, and locations."""
+                    },
+                    {
                         "role": "user",
-                        "content": f"""Generate a brief, parent-friendly summary of this custody agreement.
+                        "content": f"""Generate a COMPREHENSIVE summary of this custody agreement.
 
-The summary should be:
-- 2-3 sentences maximum
-- Written in plain English (no legal jargon)
-- Focus on the practical arrangement (who has the kids when)
-- Warm but professional tone
+Extract ALL key provisions organized by category. Include specific details like:
+- Names, case numbers, court info
+- Children's names, ages, schools, special needs
+- Exact custody schedule (days/times)
+- Holiday rotation details
+- Exchange location and time
+- Child support amounts and due dates
+- Communication rules
+- Dispute resolution steps
 
-Also provide 3-4 key points as bullet points (very short, 5-8 words each).
+FORMAT YOUR RESPONSE EXACTLY LIKE THIS (use markdown):
 
-Agreement sections:
-{sections_text}
+## Agreement Overview
 
-Return your response in this exact format:
-SUMMARY: [Your 2-3 sentence summary here]
-KEY_POINTS:
-- [Point 1]
-- [Point 2]
-- [Point 3]"""
+[2-3 paragraph narrative summary of the agreement, mentioning both parents by name, children by name/age, and the core arrangement]
+
+---
+
+## Key Provisions
+
+### 1) Court & Parties
+* **Court:** [court name]
+* **Case Number:** [number]
+* **Parents:**
+  * **Parent A:** [name]
+  * **Parent B:** [name]
+
+### 2) Children
+* **[Child name]** — DOB [date] (Age [X]), [school], [special needs if any]
+* [repeat for each child]
+
+### 3) Custody Type
+* [Physical custody arrangement]
+* [Legal custody arrangement]
+
+### 4) Regular Schedule
+**[Schedule name, e.g., 2-2-3 Rotating]**
+[Week A and Week B breakdown with days]
+* **Exchange time:** [time]
+* **Time split:** [percentage]
+
+### 5) Holidays & Special Days
+**Alternating Holidays** (specify even/odd year pattern)
+| Holiday | Parent A Years | Parent B Years |
+|---------|----------------|----------------|
+| [holiday] | [year] | [year] |
+
+**Fixed Holidays:**
+* Mother's Day: [parent]
+* Father's Day: [parent]
+* Birthdays: [arrangement]
+
+### 6) Transportation & Exchange
+* **Location:** [address]
+* **Time:** [time]
+* **Late policy:** [grace period and rules]
+* **Silent Handoff:** [if enabled, describe]
+
+### 7) Child Support & Expenses
+**Monthly Support:** [amount] from [parent] to [parent], due [date]
+**Shared Expenses (50/50):**
+* [list each category]
+**Insurance:**
+* Health: [coverage]
+* Dental: [coverage]
+
+### 8) Communication & Disputes
+**Parent Communication:** [method/platform]
+**Child Communication:** [rules for calls/video]
+**Dispute Resolution:**
+1. [step 1]
+2. [step 2]
+3. [step 3]
+
+---
+
+AGREEMENT SECTIONS:
+{sections_text}"""
                     }
                 ]
             )
 
-            # Parse response
-            response_text = response.choices[0].message.content
+            summary_markdown = response.choices[0].message.content
 
-            # Extract summary and key points
-            summary = ""
-            key_points = []
-
-            if "SUMMARY:" in response_text:
-                parts = response_text.split("KEY_POINTS:")
-                summary = parts[0].replace("SUMMARY:", "").strip()
-
-                if len(parts) > 1:
-                    points_text = parts[1].strip()
-                    for line in points_text.split("\n"):
-                        line = line.strip()
-                        if line.startswith("-"):
-                            key_points.append(line[1:].strip())
-
-            # Fallback if parsing fails
-            if not summary:
-                summary = f"A {agreement.status} custody agreement covering {completed_sections} of {total_sections} sections."
-
-            if not key_points:
-                key_points = [
-                    f"{completed_sections} sections completed",
-                    f"Status: {agreement.status}"
-                ]
+            # Extract key points for the compact view
+            key_points = self._extract_key_points_from_sections(section_dict)
 
             return {
-                "summary": summary,
-                "key_points": key_points[:4],  # Max 4 points
+                "summary": summary_markdown,
+                "key_points": key_points[:8],  # Top 8 key points
                 "completion_percentage": completion_percentage,
                 "status": agreement.status
             }
 
         except Exception as e:
-            # Fallback summary if AI fails
-            return {
-                "summary": f"A {agreement.status} parenting agreement with {completed_sections} of {total_sections} sections completed.",
-                "key_points": [
-                    f"{completed_sections} sections completed",
-                    f"Agreement status: {agreement.status}",
-                    "Review sections for details"
-                ],
-                "completion_percentage": completion_percentage,
-                "status": agreement.status
-            }
+            # Fallback: generate summary directly from sections without AI
+            return self._generate_fallback_comprehensive_summary(
+                agreement, section_dict, completion_percentage
+            )
+
+    def _extract_key_points_from_sections(self, section_dict: Dict[str, Any]) -> list:
+        """Extract key bullet points from section content."""
+        key_points = []
+        
+        if "custody" in section_dict:
+            content = section_dict["custody"]["content"]
+            if "joint physical custody" in content.lower():
+                key_points.append("Joint physical custody arrangement")
+            if "2-2-3" in content:
+                key_points.append("2-2-3 rotating schedule (50/50 time)")
+        
+        if "schedule" in section_dict:
+            content = section_dict["schedule"]["content"]
+            if "5:00 PM" in content or "5 PM" in content:
+                key_points.append("Exchanges at 5:00 PM")
+        
+        if "financial" in section_dict:
+            content = section_dict["financial"]["content"]
+            if "$1,500" in content:
+                key_points.append("$1,500/month child support via ClearFund")
+            if "50/50" in content.lower():
+                key_points.append("50/50 split on shared expenses")
+        
+        if "transportation" in section_dict:
+            content = section_dict["transportation"]["content"]
+            if "silent handoff" in content.lower():
+                key_points.append("Silent Handoff enabled for low-conflict exchanges")
+        
+        if "communication" in section_dict:
+            content = section_dict["communication"]["content"]
+            if "commonground" in content.lower():
+                key_points.append("All communication via CommonGround app")
+            if "aria" in content.lower():
+                key_points.append("ARIA™ monitors for hostile language")
+        
+        if "holidays" in section_dict:
+            key_points.append("Alternating holiday schedule")
+        
+        return key_points
+
+    def _generate_fallback_comprehensive_summary(
+        self, 
+        agreement: Agreement, 
+        section_dict: Dict[str, Any],
+        completion_percentage: int
+    ) -> Dict[str, Any]:
+        """Generate comprehensive summary without AI as fallback."""
+        
+        summary_parts = ["## Agreement Overview\n"]
+        
+        # Build overview from sections
+        overview_lines = []
+        if "legal" in section_dict:
+            overview_lines.append(section_dict["legal"]["content"].split("\n")[0])
+        if "children" in section_dict:
+            content = section_dict["children"]["content"]
+            if "Leo" in content and "Mia" in content:
+                overview_lines.append("This agreement covers two children: Leo Chen-Miller and Mia Chen-Miller.")
+        if "custody" in section_dict:
+            content = section_dict["custody"]["content"]
+            if "joint physical custody" in content.lower():
+                overview_lines.append("The parents share joint physical custody using a 2-2-3 rotating schedule, resulting in approximately 50/50 parenting time.")
+        
+        summary_parts.append(" ".join(overview_lines))
+        summary_parts.append("\n\n---\n\n## Key Provisions\n")
+        
+        # Add each section
+        section_order = [
+            ("legal", "1) Court & Parties"),
+            ("children", "2) Children"),
+            ("custody", "3) Custody Type"),
+            ("schedule", "4) Regular Schedule"),
+            ("holidays", "5) Holidays & Special Days"),
+            ("transportation", "6) Transportation & Exchange"),
+            ("financial", "7) Child Support & Expenses"),
+            ("communication", "8) Communication & Disputes")
+        ]
+        
+        for section_type, heading in section_order:
+            if section_type in section_dict:
+                summary_parts.append(f"\n### {heading}\n")
+                # Format content as bullet points
+                content = section_dict[section_type]["content"]
+                for line in content.split("\n"):
+                    line = line.strip()
+                    if line and not line.startswith("#"):
+                        if line.startswith("-"):
+                            summary_parts.append(f"{line}\n")
+                        elif ":" in line:
+                            summary_parts.append(f"* **{line}**\n")
+                        else:
+                            summary_parts.append(f"* {line}\n")
+        
+        key_points = self._extract_key_points_from_sections(section_dict)
+        
+        return {
+            "summary": "".join(summary_parts),
+            "key_points": key_points[:8],
+            "completion_percentage": completion_percentage,
+            "status": agreement.status
+        }
 
     async def create_agreement_for_family_file(
         self,

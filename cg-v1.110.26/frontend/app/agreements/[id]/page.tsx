@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useAuth } from '@/lib/auth-context';
 import { agreementsAPI, Agreement, AgreementSection, AgreementQuickSummary } from '@/lib/api';
 import { ProtectedRoute } from '@/components/protected-route';
@@ -736,29 +738,33 @@ function AgreementDetailsContent() {
                   )}
                 </div>
 
-                {/* Agreement Summary - Use direct summary or QuickSummary with key points */}
-                {(agreement.summary || summary?.summary) && (
+                {/* Agreement Summary - Comprehensive markdown-formatted summary */}
+                {summary?.summary && (
                   <div className="mt-6 pt-6 border-t border-border">
-                    <div className="flex items-start gap-3 mb-3">
+                    <div className="flex items-start gap-3 mb-4">
                       <Quote className="h-5 w-5 text-cg-sage flex-shrink-0 mt-0.5" />
                       <h2 className="font-semibold text-foreground">Agreement Summary</h2>
                     </div>
-                    <p className="font-serif text-muted-foreground leading-relaxed pl-8">
-                      {agreement.summary || summary?.summary}
-                    </p>
 
-                    {/* Key Points from QuickSummary */}
-                    {summary?.key_points && summary.key_points.length > 0 && (
-                      <div className="mt-4 pl-8">
-                        <p className="text-sm font-medium text-foreground mb-2">Key Provisions:</p>
-                        <ul className="space-y-1.5">
+                    {/* Render comprehensive markdown summary */}
+                    <div className="prose prose-sm max-w-none pl-8 prose-headings:text-foreground prose-headings:font-semibold prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h3:text-base prose-h3:mt-4 prose-h3:mb-2 prose-p:text-muted-foreground prose-p:leading-relaxed prose-ul:text-muted-foreground prose-ul:space-y-1 prose-li:text-muted-foreground prose-strong:text-foreground prose-table:text-sm prose-th:bg-muted prose-th:p-2 prose-td:p-2 prose-td:border prose-hr:border-border">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {summary.summary}
+                      </ReactMarkdown>
+                    </div>
+
+                    {/* Key Provisions Quick Reference */}
+                    {summary.key_points && summary.key_points.length > 0 && (
+                      <div className="mt-6 p-4 bg-cg-sage-subtle/30 rounded-lg">
+                        <p className="text-sm font-semibold text-foreground mb-3">Quick Facts:</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {summary.key_points.map((point, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                            <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
                               <CheckCircle className="h-4 w-4 text-cg-success flex-shrink-0 mt-0.5" />
                               {point}
-                            </li>
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     )}
                   </div>
