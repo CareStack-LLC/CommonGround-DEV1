@@ -1236,42 +1236,105 @@ AGREEMENT SECTIONS:
             )
 
     def _extract_key_points_from_sections(self, section_dict: Dict[str, Any]) -> list:
-        """Extract key bullet points from section content."""
+        """
+        Extract the 5 most important Quick Facts for easy reference.
+        Always returns these 5 categories:
+        1. Custody Arrangement
+        2. Pickup/Dropoff Info
+        3. Child Support
+        4. Holidays
+        5. Communication
+        """
+        import re
         key_points = []
         
+        # 1. CUSTODY ARRANGEMENT - Always include
+        custody_info = "Joint physical custody"
         if "custody" in section_dict:
             content = section_dict["custody"]["content"]
-            if "joint physical custody" in content.lower():
-                key_points.append("Joint physical custody arrangement")
+            if "sole" in content.lower():
+                custody_info = "Sole physical custody"
+            elif "joint" in content.lower():
+                custody_info = "Joint physical custody"
+            # Look for schedule type
             if "2-2-3" in content:
-                key_points.append("2-2-3 rotating schedule (50/50 time)")
+                custody_info += " • 2-2-3 rotating (50/50)"
+            elif "week on/week off" in content.lower():
+                custody_info += " • Week on/week off"
+            elif "alternating" in content.lower():
+                custody_info += " • Alternating schedule"
+        key_points.append(f"🏠 {custody_info}")
         
-        if "schedule" in section_dict:
-            content = section_dict["schedule"]["content"]
-            if "5:00 PM" in content or "5 PM" in content:
-                key_points.append("Exchanges at 5:00 PM")
+        # 2. PICKUP/DROPOFF - Always include
+        pickup_info = "See schedule for details"
+        if "transportation" in section_dict or "schedule" in section_dict:
+            content = section_dict.get("transportation", {}).get("content", "")
+            content += " " + section_dict.get("schedule", {}).get("content", "")
+            
+            # Extract time
+            time_match = re.search(r'(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)|\d{1,2}\s*(?:AM|PM|am|pm))', content)
+            time_str = time_match.group(1) if time_match else "5:00 PM"
+            
+            # Extract location
+            if "school" in content.lower():
+                location = "School"
+            elif "neutral" in content.lower():
+                location = "Neutral location"
+            elif "residence" in content.lower():
+                location = "Receiving parent's home"
+            else:
+                location = "Designated location"
+            
+            pickup_info = f"{location} at {time_str}"
+        key_points.append(f"🚗 {pickup_info}")
         
+        # 3. CHILD SUPPORT - Always include
+        support_info = "Per agreement terms"
         if "financial" in section_dict:
             content = section_dict["financial"]["content"]
-            if "$1,500" in content:
-                key_points.append("$1,500/month child support via ClearFund")
-            if "50/50" in content.lower():
-                key_points.append("50/50 split on shared expenses")
+            # Extract dollar amount
+            amount_match = re.search(r'\$[\d,]+(?:\.00)?', content)
+            if amount_match:
+                amount = amount_match.group(0)
+                # Try to find who pays
+                if "from" in content.lower() or "by" in content.lower():
+                    support_info = f"{amount}/month"
+                else:
+                    support_info = f"{amount}/month"
+            elif "no support" in content.lower() or "waived" in content.lower():
+                support_info = "No support ordered"
+            elif "50/50" in content.lower():
+                support_info = "Expenses split 50/50"
+        key_points.append(f"💰 {support_info}")
         
-        if "transportation" in section_dict:
-            content = section_dict["transportation"]["content"]
-            if "silent handoff" in content.lower():
-                key_points.append("Silent Handoff enabled for low-conflict exchanges")
+        # 4. HOLIDAYS - Always include
+        holiday_info = "Alternating schedule"
+        if "holidays" in section_dict:
+            content = section_dict["holidays"]["content"]
+            if "alternating" in content.lower():
+                holiday_info = "Alternating holidays (even/odd years)"
+            elif "split" in content.lower():
+                holiday_info = "Holidays split between parents"
+            # Check for specific holidays mentioned
+            if "thanksgiving" in content.lower() or "christmas" in content.lower():
+                holiday_info = "Major holidays alternate by year"
+        key_points.append(f"🎄 {holiday_info}")
         
+        # 5. COMMUNICATION - Always include
+        comm_info = "Via CommonGround app"
         if "communication" in section_dict:
             content = section_dict["communication"]["content"]
             if "commonground" in content.lower():
-                key_points.append("All communication via CommonGround app")
+                comm_info = "Via CommonGround app"
+            elif "text" in content.lower():
+                comm_info = "Via text/phone"
+            elif "email" in content.lower():
+                comm_info = "Via email"
+            
+            # Add ARIA if mentioned
             if "aria" in content.lower():
-                key_points.append("ARIA™ monitors for hostile language")
-        
-        if "holidays" in section_dict:
-            key_points.append("Alternating holiday schedule")
+                comm_info += " (ARIA™ monitored)"
+        key_points.append(f"💬 {comm_info}")
         
         return key_points
 

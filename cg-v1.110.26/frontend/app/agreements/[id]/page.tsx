@@ -753,15 +753,21 @@ function AgreementDetailsContent() {
                       </ReactMarkdown>
                     </div>
 
-                    {/* Key Provisions Quick Reference */}
+                    {/* Quick Facts - Essential Reference */}
                     {summary.key_points && summary.key_points.length > 0 && (
-                      <div className="mt-6 p-4 bg-cg-sage-subtle/30 rounded-lg">
-                        <p className="text-sm font-semibold text-foreground mb-3">Quick Facts:</p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div className="mt-6 p-4 bg-cg-sage-subtle/30 rounded-xl border border-cg-sage/10">
+                        <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-cg-sage" />
+                          Quick Facts
+                        </h3>
+                        <div className="space-y-2">
                           {summary.key_points.map((point, idx) => (
-                            <div key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                              <CheckCircle className="h-4 w-4 text-cg-success flex-shrink-0 mt-0.5" />
-                              {point}
+                            <div
+                              key={idx}
+                              className="flex items-center gap-3 p-3 bg-white/60 rounded-lg border border-border/50 text-sm"
+                            >
+                              <span className="text-base flex-shrink-0">{point.slice(0, 2)}</span>
+                              <span className="text-foreground font-medium">{point.slice(3)}</span>
                             </div>
                           ))}
                         </div>
@@ -799,36 +805,6 @@ function AgreementDetailsContent() {
               </div>
             </div>
 
-            {/* AI Summary Card */}
-            {summary && summary.completion_percentage > 0 && (
-              <div className="cg-card p-6 bg-cg-amber-subtle/30 border-cg-amber/20">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-cg-amber flex items-center justify-center flex-shrink-0 aria-glow">
-                    <Sparkles className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground mb-2">ARIA Summary</h3>
-                    <p className="font-serif text-muted-foreground leading-relaxed">
-                      {summary.summary}
-                    </p>
-
-                    {summary.key_points && summary.key_points.length > 0 && (
-                      <div className="mt-4 pt-4 border-t border-cg-amber/20">
-                        <p className="text-sm font-medium text-foreground mb-2">Key Terms:</p>
-                        <ul className="space-y-1.5">
-                          {summary.key_points.map((point, idx) => (
-                            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
-                              <CheckCircle className="h-4 w-4 text-cg-success flex-shrink-0 mt-0.5" />
-                              {point}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Actions Card */}
             <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
