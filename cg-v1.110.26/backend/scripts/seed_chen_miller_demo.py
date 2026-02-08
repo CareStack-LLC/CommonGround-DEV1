@@ -40,6 +40,7 @@ from app.models.message_attachment import MessageAttachment
 from app.models.schedule import ScheduleEvent
 from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
 from app.models.clearfund import Obligation, ObligationFunding, Attestation
+from app.models.event_attendance import EventAttendance
 from app.core.security import hash_password
 
 # --- DATA CONFIGURATION ---
@@ -65,26 +66,41 @@ class StoryDirector:
 
     async def nuke_all_data(self):
         print("☢️  NUKING SYSTEM DATA (Factory Reset)...")
-        # Top-level Deletions
-        await self.db.execute(delete(MessageFlag))
-        await self.db.execute(delete(MessageAttachment))
-        await self.db.execute(delete(Message))
+        # Use raw SQL with TRUNCATE CASCADE for robust FK handling
+        # This handles all dependent tables automatically
+        tables_to_clear = [
+            "message_flags",
+            "message_attachments", 
+            "messages",
+            "message_threads",
+            "custody_exchange_instances",
+            "custody_exchanges",
+            "compliance_logs",
+            "event_attendance",
+            "schedule_events",
+            "obligation_funding",
+            "obligations",
+            "attestations",
+            "agreement_sections",
+            "agreement_conversations",
+            "aria_agreement_conversations",
+            "agreements",
+            "quick_accords",
+            "cubbie_items",
+            "children",
+            "family_files",
+            "cases",
+            "user_profiles",
+            "users"
+        ]
         
-        await self.db.execute(delete(CustodyExchangeInstance))
-        await self.db.execute(delete(CustodyExchange))
-        await self.db.execute(delete(ComplianceLog))
-        await self.db.execute(delete(ScheduleEvent))
-        
-        await self.db.execute(delete(ObligationFunding))
-        await self.db.execute(delete(Obligation))
-        
-        await self.db.execute(delete(AgreementSection))
-        await self.db.execute(delete(Agreement))
-        
-        await self.db.execute(delete(Child))
-        await self.db.execute(delete(FamilyFile))
-        await self.db.execute(delete(Case))
-        await self.db.execute(delete(User))
+        from sqlalchemy import text
+        for table in tables_to_clear:
+            try:
+                await self.db.execute(text(f"TRUNCATE TABLE {table} CASCADE"))
+            except Exception as e:
+                # Table might not exist, skip silently
+                print(f"   ⚠️  Skipping {table}: {e}")
         
         await self.db.commit()
         print("   ✅ System Wiped Clean.")
@@ -150,7 +166,7 @@ class StoryDirector:
     async def create_family_structure(self):
         print("🏠 Building Family Infrastructure...")
         
-        # FamilyFile with Smart Config
+        # FamilyFile 
         self.family_file = FamilyFile(
             id=DEMO_FAMILY_ID,
             family_file_number="LA-DR-2024-5592",
@@ -159,11 +175,7 @@ class StoryDirector:
             parent_a_id=self.mom.id,
             parent_b_id=self.dad.id,
             status="active",
-            created_at=START_DATE,
-            smart_config={
-                "exchange_protocol": {"grace_period_mins": 15},
-                "holidays": ["Thanksgiving", "Christmas"]
-            }
+            created_at=START_DATE
         )
         self.db.add(self.family_file)
         
@@ -292,7 +304,7 @@ class StoryDirector:
             family_file_id=DEMO_FAMILY_ID,
             title="Court Ordered Parenting Plan",
             status="active",
-            version="1.0",
+            version=1,
             created_at=activation_date,
             effective_date=activation_date,
             petitioner_approved=True,
@@ -333,7 +345,6 @@ class StoryDirector:
         # Friday Exchange at Starbucks
         self.friday_exchange = CustodyExchange(
             id=str(uuid.uuid4()),
-            case_id=DEMO_CASE_ID, # Optional link
             family_file_id=DEMO_FAMILY_ID,
             agreement_id=self.agreement.id,
             created_by=self.mom.id,
