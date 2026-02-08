@@ -15,6 +15,7 @@ Usage:
 import sys
 import asyncio
 import hashlib
+import os
 from pathlib import Path
 from datetime import datetime, timedelta, date, time as dt_time
 import random
@@ -23,6 +24,8 @@ import json
 
 # Add parent directory for imports
 sys.path.append(str(Path(__file__).parent.parent))
+
+from supabase import create_client, Client
 
 from sqlalchemy import select, delete, and_
 from app.core.database import AsyncSessionLocal, init_db
@@ -86,8 +89,38 @@ class StoryDirector:
         await self.db.commit()
         print("   ✅ System Wiped Clean.")
 
+    async def create_supabase_user(self, email: str, password: str) -> str:
+        """Create user in Supabase Auth and return the user ID."""
+        supabase_url = os.getenv("SUPABASE_URL")
+        supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        
+        if not supabase_url or not supabase_key:
+            print(f"   ⚠️  Supabase credentials missing, using mock ID for {email}")
+            return str(uuid.uuid4())
+        
+        try:
+            supabase: Client = create_client(supabase_url, supabase_key)
+            
+            # Create auth user
+            response = supabase.auth.admin.create_user({
+                "email": email,
+                "password": password,
+                "email_confirm": True
+            })
+            
+            print(f"   ✅ Created Supabase user: {email}")
+            return response.user.id
+        except Exception as e:
+            print(f"   ⚠️  Supabase error for {email}: {e}, using mock ID")
+            return str(uuid.uuid4())
+
     async def create_cast(self):
         print("🎭 Casting Roles...")
+        
+        # Create real Supabase Auth users
+        mom_supabase_id = await self.create_supabase_user("sarah.chen@demo.com", "Demo2026!")
+        dad_supabase_id = await self.create_supabase_user("david.miller@demo.com", "Demo2026!")
+        
         # Mother
         self.mom = User(
             id=str(uuid.uuid4()),
@@ -96,7 +129,7 @@ class StoryDirector:
             last_name="Chen",
             is_active=True,
             phone="555-0101",
-            supabase_id=str(uuid.uuid4()) # Fake Supabase ID
+            supabase_id=mom_supabase_id
         )
         
         # Father
@@ -107,7 +140,7 @@ class StoryDirector:
             last_name="Miller",
             is_active=True,
             phone="555-0102",
-            supabase_id=str(uuid.uuid4()) # Fake Supabase ID
+            supabase_id=dad_supabase_id
         )
         
         self.db.add(self.mom)
