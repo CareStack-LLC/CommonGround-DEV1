@@ -20,8 +20,9 @@ from sqlalchemy import (
     Numeric,
     String,
     Text,
+    JSON,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+# from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDMixin
@@ -82,7 +83,7 @@ class SubscriptionPlan(Base, UUIDMixin, TimestampMixin):
     )
 
     # Feature flags and limits (JSON structure)
-    features: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
+    features: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
 
     # Status
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

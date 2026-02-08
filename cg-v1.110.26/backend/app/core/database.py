@@ -16,13 +16,17 @@ from app.models.base import Base
 # Note: statement_cache_size=0 is required for Supabase connection pooler (Supavisor/PgBouncer)
 # which doesn't support prepared statements in transaction mode
 # pool_pre_ping=True ensures connections are valid before use (handles dropped connections)
+connect_args = {}
+if "sqlite" not in settings.async_database_url:
+    connect_args["statement_cache_size"] = 0
+
 engine = create_async_engine(
     settings.async_database_url,
     echo=settings.DATABASE_ECHO,
     future=True,
     poolclass=NullPool if settings.is_development else None,
     pool_pre_ping=True,  # Test connections before use to handle Supabase pooler drops
-    connect_args={"statement_cache_size": 0},
+    connect_args=connect_args,
 )
 
 # Create async session factory
