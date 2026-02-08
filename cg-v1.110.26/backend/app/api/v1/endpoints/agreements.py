@@ -78,6 +78,7 @@ async def get_agreement(
             case_id=agreement.case_id,
             family_file_id=agreement.family_file_id,
             title=agreement.title,
+            summary=agreement.summary,  # Include the summary field
             version=agreement.version,
             agreement_version=agreement.agreement_version or "v2_standard",
             status=agreement.status,

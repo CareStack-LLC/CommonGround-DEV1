@@ -344,8 +344,8 @@ function AgreementSectionCard({
   return (
     <div
       className={`border-l-4 transition-all duration-200 ${section.is_completed
-          ? 'border-l-cg-sage bg-card'
-          : 'border-l-muted bg-muted/30'
+        ? 'border-l-cg-sage bg-card'
+        : 'border-l-muted bg-muted/30'
         }`}
     >
       <div className="p-5">
@@ -736,16 +736,31 @@ function AgreementDetailsContent() {
                   )}
                 </div>
 
-                {/* Agreement Summary */}
-                {agreement.summary && (
+                {/* Agreement Summary - Use direct summary or QuickSummary with key points */}
+                {(agreement.summary || summary?.summary) && (
                   <div className="mt-6 pt-6 border-t border-border">
                     <div className="flex items-start gap-3 mb-3">
                       <Quote className="h-5 w-5 text-cg-sage flex-shrink-0 mt-0.5" />
-                      <h2 className="font-semibold text-foreground">Summary</h2>
+                      <h2 className="font-semibold text-foreground">Agreement Summary</h2>
                     </div>
                     <p className="font-serif text-muted-foreground leading-relaxed pl-8">
-                      {agreement.summary}
+                      {agreement.summary || summary?.summary}
                     </p>
+
+                    {/* Key Points from QuickSummary */}
+                    {summary?.key_points && summary.key_points.length > 0 && (
+                      <div className="mt-4 pl-8">
+                        <p className="text-sm font-medium text-foreground mb-2">Key Provisions:</p>
+                        <ul className="space-y-1.5">
+                          {summary.key_points.map((point, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                              <CheckCircle className="h-4 w-4 text-cg-success flex-shrink-0 mt-0.5" />
+                              {point}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
 
