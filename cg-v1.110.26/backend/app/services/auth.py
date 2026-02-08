@@ -145,11 +145,24 @@ class AuthService:
 
             supabase_user = auth_response.user
 
-            # Get user from local database
+            # First, try to get user by supabase_id
             result = await self.db.execute(
                 select(User).where(User.supabase_id == supabase_user.id)
             )
             user = result.scalar_one_or_none()
+
+            # If not found by supabase_id, try by email
+            if not user:
+                result = await self.db.execute(
+                    select(User).where(User.email == supabase_user.email)
+                )
+                user = result.scalar_one_or_none()
+                
+                # If found by email, sync the supabase_id
+                if user:
+                    user.supabase_id = supabase_user.id
+                    await self.db.commit()
+                    await self.db.refresh(user)
 
             if not user:
                 # Auto-create user if they exist in Supabase Auth but not locally

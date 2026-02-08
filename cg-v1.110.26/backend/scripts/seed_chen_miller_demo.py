@@ -73,6 +73,7 @@ class StoryDirector:
             "message_attachments", 
             "messages",
             "message_threads",
+            "custody_day_records",
             "custody_exchange_instances",
             "custody_exchanges",
             "compliance_logs",
@@ -90,20 +91,31 @@ class StoryDirector:
             "children",
             "family_files",
             "cases",
+            "professional_profiles",
             "user_profiles",
             "users"
         ]
         
         from sqlalchemy import text
-        for table in tables_to_clear:
-            try:
-                await self.db.execute(text(f"TRUNCATE TABLE {table} CASCADE"))
-            except Exception as e:
-                # Table might not exist, skip silently
-                print(f"   ⚠️  Skipping {table}: {e}")
         
-        await self.db.commit()
-        print("   ✅ System Wiped Clean.")
+        # Try to truncate all tables at once for better FK handling
+        tables_str = ", ".join(tables_to_clear)
+        try:
+            await self.db.execute(text(f"TRUNCATE TABLE {tables_str} CASCADE"))
+            await self.db.commit()
+            print("   ✅ System Wiped Clean.")
+        except Exception as e:
+            await self.db.rollback()
+            print(f"   ⚠️  Bulk truncate failed: {e}")
+            # Fallback: try each table individually with rollback
+            for table in tables_to_clear:
+                try:
+                    await self.db.execute(text(f"TRUNCATE TABLE {table} CASCADE"))
+                    await self.db.commit()
+                except Exception as table_e:
+                    await self.db.rollback()
+                    # Could be missing table or other issue - just skip
+            print("   ✅ System Wiped Clean (fallback mode).")
 
     async def create_supabase_user(self, email: str, password: str) -> str:
         """Create user in Supabase Auth and return the user ID."""
@@ -132,36 +144,60 @@ class StoryDirector:
 
     async def create_cast(self):
         print("🎭 Casting Roles...")
+        from sqlalchemy import select
         
-        # Create real Supabase Auth users
-        mom_supabase_id = await self.create_supabase_user("sarah.chen@demo.com", "Demo2026!")
-        dad_supabase_id = await self.create_supabase_user("david.miller@demo.com", "Demo2026!")
-        
-        # Mother
-        self.mom = User(
-            id=str(uuid.uuid4()),
-            email="sarah.chen@demo.com",
-            first_name="Sarah",
-            last_name="Chen",
-            is_active=True,
-            phone="555-0101",
-            supabase_id=mom_supabase_id
+        # Check if demo users already exist
+        result = await self.db.execute(
+            select(User).where(User.email == "sarah.chen@demo.com")
         )
+        existing_mom = result.scalar_one_or_none()
         
-        # Father
-        self.dad = User(
-            id=str(uuid.uuid4()),
-            email="david.miller@demo.com",
-            first_name="David",
-            last_name="Miller",
-            is_active=True,
-            phone="555-0102",
-            supabase_id=dad_supabase_id
+        result = await self.db.execute(
+            select(User).where(User.email == "david.miller@demo.com")
         )
+        existing_dad = result.scalar_one_or_none()
         
-        self.db.add(self.mom)
-        self.db.add(self.dad)
-        await self.db.flush()
+        if existing_mom and existing_dad:
+            print("   ✅ Found existing demo users!")
+            self.mom = existing_mom
+            self.dad = existing_dad
+            
+            # Sync supabase IDs with actual auth users
+            mom_supabase_id = await self.create_supabase_user("sarah.chen@demo.com", "Demo2026!")
+            dad_supabase_id = await self.create_supabase_user("david.miller@demo.com", "Demo2026!")
+            
+            self.mom.supabase_id = mom_supabase_id
+            self.dad.supabase_id = dad_supabase_id
+            await self.db.flush()
+        else:
+            # Create new users
+            mom_supabase_id = await self.create_supabase_user("sarah.chen@demo.com", "Demo2026!")
+            dad_supabase_id = await self.create_supabase_user("david.miller@demo.com", "Demo2026!")
+            
+            self.mom = User(
+                id=str(uuid.uuid4()),
+                email="sarah.chen@demo.com",
+                first_name="Sarah",
+                last_name="Chen",
+                is_active=True,
+                phone="555-0101",
+                supabase_id=mom_supabase_id
+            )
+            
+            self.dad = User(
+                id=str(uuid.uuid4()),
+                email="david.miller@demo.com",
+                first_name="David",
+                last_name="Miller",
+                is_active=True,
+                phone="555-0102",
+                supabase_id=dad_supabase_id
+            )
+            
+            self.db.add(self.mom)
+            self.db.add(self.dad)
+            await self.db.flush()
+            print("   ✅ Created new demo users")
 
     async def create_family_structure(self):
         print("🏠 Building Family Infrastructure...")
@@ -297,7 +333,7 @@ class StoryDirector:
         await self.db.flush()
 
     async def activate_agreement(self, activation_date):
-        print("📜 Signing Smart Agreement (2-2-3)...")
+        print("📜 Signing Smart Agreement (Full 8-Section SharedCare Agreement)...")
         
         self.agreement = Agreement(
             id=str(uuid.uuid4()),
@@ -311,61 +347,477 @@ class StoryDirector:
             respondent_approved=True
         )
         self.db.add(self.agreement)
+        await self.db.flush()
         
-        # Schedule Section with Smart Rules
-        schedule_section = AgreementSection(
+        # Section 1: Legal Basis
+        section1 = AgreementSection(
+            id=str(uuid.uuid4()),
+            agreement_id=self.agreement.id,
+            section_type="legal",
+            section_number="1",
+            section_title="Legal Basis & Jurisdiction",
+            display_order=1,
+            content="""This Parenting Plan is entered into pursuant to California Family Code Section 3080 et seq.
+
+Case Number: LA-DR-2024-5592
+Court: Los Angeles County Superior Court
+
+Parties:
+- Petitioner: Sarah Chen (Parent A)
+- Respondent: David Miller (Parent B)
+
+This agreement supersedes all prior verbal and written agreements regarding custody and visitation of the minor children.""",
+            smart_rules={"case_number": "LA-DR-2024-5592", "court": "Los Angeles County Superior Court"}
+        )
+        self.db.add(section1)
+        
+        # Section 2: Children
+        section2 = AgreementSection(
+            id=str(uuid.uuid4()),
+            agreement_id=self.agreement.id,
+            section_type="children",
+            section_number="2",
+            section_title="Children Subject to This Agreement",
+            display_order=2,
+            content="""This agreement covers the following minor children:
+
+1. Leo Chen-Miller
+   - DOB: May 15, 2014 (Age 11)
+   - School: Franklin Classical Middle School
+   - Special Needs: None documented
+
+2. Mia Chen-Miller  
+   - DOB: February 10, 2022 (Age 3)
+   - School: N/A (preschool age)
+   - Special Needs: Mild asthma, requires nebulizer""",
+            smart_rules={"children_ids": [self.leo.id, self.mia.id]}
+        )
+        self.db.add(section2)
+        
+        # Section 3: Physical Custody
+        section3 = AgreementSection(
+            id=str(uuid.uuid4()),
+            agreement_id=self.agreement.id,
+            section_type="custody",
+            section_number="3",
+            section_title="Physical Custody Arrangement",
+            display_order=3,
+            content="""The parties shall share joint physical custody of the minor children pursuant to a 2-2-3 rotating schedule.
+
+JOINT PHYSICAL CUSTODY is awarded to both parents.
+
+Primary Residences:
+- Parent A (Sarah): 707 E Ocean Blvd, Long Beach, CA 90802
+- Parent B (David): 889 Francisco St, Los Angeles, CA 90017""",
+            smart_rules={
+                "custody_type": "joint_physical",
+                "primary_residence_a": LOCATIONS["mom"]["addr"],
+                "primary_residence_b": LOCATIONS["dad"]["addr"]
+            }
+        )
+        self.db.add(section3)
+        
+        # Section 4: Regular Parenting Schedule
+        section4 = AgreementSection(
             id=str(uuid.uuid4()),
             agreement_id=self.agreement.id,
             section_type="schedule",
             section_number="4",
             section_title="Regular Parenting Schedule",
-            content="Parents shall follow a 2-2-3 schedule per the stored logic.",
+            display_order=4,
+            content="""Parents shall follow a 2-2-3 rotating schedule:
+
+WEEK A:
+- Monday & Tuesday: Parent A (Sarah)
+- Wednesday & Thursday: Parent B (David)  
+- Friday, Saturday, Sunday: Parent A (Sarah)
+
+WEEK B:
+- Monday & Tuesday: Parent B (David)
+- Wednesday & Thursday: Parent A (Sarah)
+- Friday, Saturday, Sunday: Parent B (David)
+
+Transitions occur at 5:00 PM on exchange days.
+
+This schedule results in approximately equal parenting time:
+- Parent A: 7 days per 14-day cycle (50%)
+- Parent B: 7 days per 14-day cycle (50%)""",
             smart_rules={
                 "type": "schedule_pattern",
                 "cycle_length_days": 14,
                 "start_date": activation_date.strftime("%Y-%m-%d"),
                 "pattern_name": "2-2-3",
+                "exchange_time": "17:00",
                 "rules": [
-                    {"days": 2, "custodian": "parent_a"}, # Mom Mon/Tue
-                    {"days": 2, "custodian": "parent_b"}, # Dad Wed/Thu
-                    {"days": 3, "custodian": "parent_a"}, # Mom Fri/Sat/Sun
-                    {"days": 2, "custodian": "parent_b"}, # Dad Mon/Tue
-                    {"days": 2, "custodian": "parent_a"}, # Mom Wed/Thu
-                    {"days": 3, "custodian": "parent_b"}  # Dad Fri/Sat/Sun
+                    {"days": 2, "custodian": "parent_a"},
+                    {"days": 2, "custodian": "parent_b"},
+                    {"days": 3, "custodian": "parent_a"},
+                    {"days": 2, "custodian": "parent_b"},
+                    {"days": 2, "custodian": "parent_a"},
+                    {"days": 3, "custodian": "parent_b"}
                 ]
             }
         )
-        self.db.add(schedule_section)
+        self.db.add(section4)
+        
+        # Section 5: Holiday Schedule
+        section5 = AgreementSection(
+            id=str(uuid.uuid4()),
+            agreement_id=self.agreement.id,
+            section_type="holidays",
+            section_number="5",
+            section_title="Holiday & Special Days Schedule",
+            display_order=5,
+            content="""ALTERNATING HOLIDAYS (Even Years: Parent A first choice)
+
+| Holiday | 2025 | 2026 |
+|---------|------|------|
+| Thanksgiving | Parent A | Parent B |
+| Christmas Eve | Parent B | Parent A |
+| Christmas Day | Parent A | Parent B |
+| New Year's Eve | Parent B | Parent A |
+| Easter | Parent A | Parent B |
+| July 4th | Parent B | Parent A |
+
+FIXED HOLIDAYS:
+- Mother's Day: Always with Parent A (Sarah)
+- Father's Day: Always with Parent B (David)
+- Children's Birthdays: Split (morning/afternoon)
+
+PARENT BIRTHDAYS:
+- Each parent has the children on their birthday from 4pm-8pm""",
+            smart_rules={
+                "type": "holiday_schedule",
+                "alternating_holidays": ["thanksgiving", "christmas_eve", "christmas_day", "new_years", "easter", "july_4th"],
+                "fixed_holidays": {"mothers_day": "parent_a", "fathers_day": "parent_b"},
+                "start_year_parent": "parent_a"
+            }
+        )
+        self.db.add(section5)
+        
+        # Section 6: Transportation & Exchanges
+        section6 = AgreementSection(
+            id=str(uuid.uuid4()),
+            agreement_id=self.agreement.id,
+            section_type="transportation",
+            section_number="6",
+            section_title="Transportation & Exchange Protocol",
+            display_order=6,
+            content="""EXCHANGE LOCATION:
+Primary: Starbucks, 203 Pine Ave, Long Beach, CA
+(Neutral public location with parking)
+
+EXCHANGE TIME: 5:00 PM
+
+TRANSPORTATION RESPONSIBILITY:
+- Sending parent delivers children to exchange point
+- Receiving parent picks up children from exchange point
+
+GRACE PERIOD: 15 minutes
+- Parent must notify if running late
+- After 30 minutes with no contact, exchange is marked "missed"
+
+SILENT HANDOFF ENABLED:
+- GPS check-in required within 100m of exchange point
+- Both parents confirm arrival via app
+- Minimizes direct parent contact""",
+            smart_rules={
+                "exchange_location": {
+                    "name": "Starbucks Long Beach",
+                    "address": LOCATIONS["starbucks"]["addr"],
+                    "lat": LOCATIONS["starbucks"]["lat"],
+                    "lng": LOCATIONS["starbucks"]["lng"],
+                    "geofence_radius_meters": 100
+                },
+                "grace_period_minutes": 15,
+                "silent_handoff": True,
+                "check_in_required": True
+            }
+        )
+        self.db.add(section6)
+        
+        # Section 7: Financial Obligations
+        section7 = AgreementSection(
+            id=str(uuid.uuid4()),
+            agreement_id=self.agreement.id,
+            section_type="financial",
+            section_number="7",
+            section_title="Financial Support & Shared Expenses",
+            display_order=7,
+            content="""CHILD SUPPORT:
+Parent B (David) shall pay Parent A (Sarah) $1,500/month
+Due: 1st of each month via ClearFund
+
+SHARED EXPENSES (50/50 Split):
+- Medical expenses not covered by insurance
+- Extracurricular activities (sports, music, camps)
+- School supplies and fees
+- Clothing exceeding $100/item
+
+EXPENSE REIMBURSEMENT:
+- Submit via ClearFund within 30 days of expense
+- Include receipt/documentation
+- Other parent has 14 days to contest or pay
+
+INSURANCE:
+- Health: Covered by Parent A's employer plan
+- Dental: Covered by Parent B's employer plan""",
+            smart_rules={
+                "child_support": {
+                    "payer": "parent_b",
+                    "recipient": "parent_a",
+                    "amount": 1500,
+                    "frequency": "monthly",
+                    "due_day": 1
+                },
+                "shared_expense_split": 0.50,
+                "reimbursement_window_days": 30,
+                "contest_window_days": 14
+            }
+        )
+        self.db.add(section7)
+        
+        # Section 8: Communication
+        section8 = AgreementSection(
+            id=str(uuid.uuid4()),
+            agreement_id=self.agreement.id,
+            section_type="communication",
+            section_number="8",
+            section_title="Communication & Conflict Resolution",
+            display_order=8,
+            content="""PARENT COMMUNICATION:
+- All communication via CommonGround messaging
+- ARIA™ monitors for hostile language
+- Emergency calls permitted for child safety
+
+CHILD COMMUNICATION:
+- Children may call either parent daily between 7-8 PM
+- Video calls permitted twice per week
+- Neither parent shall monitor or record calls
+
+DISPUTE RESOLUTION:
+1. Attempt to resolve via messaging (48 hours)
+2. Request QuickAccord mediation
+3. Escalate to professional mediator
+4. Return to court as last resort
+
+MODIFICATION REQUESTS:
+- Submit via QuickAccord system
+- Both parents must approve
+- Changes documented in Compliance Log""",
+            smart_rules={
+                "messaging_platform": "commonground",
+                "aria_monitoring": True,
+                "call_window": {"start": "19:00", "end": "20:00"},
+                "video_calls_per_week": 2,
+                "dispute_resolution_hours": 48
+            }
+        )
+        self.db.add(section8)
+        
         await self.db.flush()
+        print(f"   ✅ Created 8 Agreement Sections")
         
         await self.create_custody_schedules(activation_date)
 
     async def create_custody_schedules(self, activation_date):
-        print("📍 establishing Custody Exchange Points...")
-        # Friday Exchange at Starbucks
+        print("📍 Establishing Custody Exchange Points...")
+        
+        # Get child IDs
+        child_ids = [self.leo.id, self.mia.id]
+        
+        # Items to bring list (from cubbie)
+        cubbie_items = "Backpacks, homework folders, medication (Leo's inhaler)"
+        
+        # Wednesday Exchange at Starbucks (every week)
+        # Week A: Mom drops off to Dad | Week B: Dad drops off to Mom
+        self.wednesday_exchange = CustodyExchange(
+            id=str(uuid.uuid4()),
+            family_file_id=DEMO_FAMILY_ID,
+            agreement_id=self.agreement.id,
+            created_by=self.mom.id,
+            exchange_type="dropoff",  # Parent dropping off children
+            title="Wednesday Exchange",
+            from_parent_id=self.mom.id,
+            to_parent_id=self.dad.id,
+            child_ids=child_ids,
+            pickup_child_ids=[],  # No pickup, just dropoff
+            dropoff_child_ids=child_ids,  # Dropping off both children
+            location="Starbucks, 203 Pine Ave, Long Beach",
+            location_notes="Meet inside near the pickup counter",
+            location_lat=LOCATIONS["starbucks"]["lat"],
+            location_lng=LOCATIONS["starbucks"]["lng"],
+            geofence_radius_meters=100,
+            scheduled_time=datetime.combine(activation_date, dt_time(17, 0)),
+            duration_minutes=30,
+            is_recurring=True,
+            recurrence_pattern="weekly",
+            recurrence_days=[2],  # Wednesday
+            items_to_bring=cubbie_items,
+            special_instructions="Kids should have eaten snack before exchange",
+            silent_handoff_enabled=True,
+            check_in_window_before_minutes=30,
+            check_in_window_after_minutes=30
+        )
+        self.db.add(self.wednesday_exchange)
+        
+        # Friday Exchange at Starbucks (every week)
+        # Week A: Dad drops off to Mom | Week B: Mom drops off to Dad
         self.friday_exchange = CustodyExchange(
             id=str(uuid.uuid4()),
             family_file_id=DEMO_FAMILY_ID,
             agreement_id=self.agreement.id,
             created_by=self.mom.id,
-            exchange_type="both", # Mom drops, Dad picks up (or vice versa depending on week)
-            title="Friday Exchange at Starbucks",
-            from_parent_id=self.mom.id, # Default flow
-            to_parent_id=self.dad.id,
+            exchange_type="dropoff",
+            title="Friday Exchange",
+            from_parent_id=self.dad.id,
+            to_parent_id=self.mom.id,
+            child_ids=child_ids,
+            pickup_child_ids=[],
+            dropoff_child_ids=child_ids,
             location="Starbucks, 203 Pine Ave, Long Beach",
+            location_notes="Meet inside near the pickup counter",
             location_lat=LOCATIONS["starbucks"]["lat"],
             location_lng=LOCATIONS["starbucks"]["lng"],
             geofence_radius_meters=100,
             scheduled_time=datetime.combine(activation_date, dt_time(17, 0)),
+            duration_minutes=30,
             is_recurring=True,
             recurrence_pattern="weekly",
-            recurrence_days=[4], # Friday
+            recurrence_days=[4],  # Friday
+            items_to_bring=cubbie_items,
+            special_instructions="Weekend bags with clothes for 2-3 days",
             silent_handoff_enabled=True,
             check_in_window_before_minutes=30,
             check_in_window_after_minutes=30
         )
         self.db.add(self.friday_exchange)
+        
+        # Monday Exchange at Starbucks (alternating weeks - Week B only)
+        # Week B: Mom drops off to Dad (after Mom's weekend)
+        self.monday_exchange = CustodyExchange(
+            id=str(uuid.uuid4()),
+            family_file_id=DEMO_FAMILY_ID,
+            agreement_id=self.agreement.id,
+            created_by=self.mom.id,
+            exchange_type="dropoff",
+            title="Monday Exchange",
+            from_parent_id=self.mom.id,
+            to_parent_id=self.dad.id,
+            child_ids=child_ids,
+            pickup_child_ids=[],
+            dropoff_child_ids=child_ids,
+            location="Starbucks, 203 Pine Ave, Long Beach",
+            location_notes="Meet inside near the pickup counter",
+            location_lat=LOCATIONS["starbucks"]["lat"],
+            location_lng=LOCATIONS["starbucks"]["lng"],
+            geofence_radius_meters=100,
+            scheduled_time=datetime.combine(activation_date, dt_time(17, 0)),
+            duration_minutes=30,
+            is_recurring=True,
+            recurrence_pattern="biweekly",  # Every other week
+            recurrence_days=[0],  # Monday
+            items_to_bring=cubbie_items,
+            special_instructions="School day - ensure homework is complete",
+            silent_handoff_enabled=True,
+            check_in_window_before_minutes=30,
+            check_in_window_after_minutes=30
+        )
+        self.db.add(self.monday_exchange)
+        
         await self.db.flush()
+        print("   ✅ Created 3 Custody Exchanges (Wed, Fri, Mon-alt)")
+        
+        # Generate instances for the date range
+        await self.generate_exchange_instances(activation_date)
+    
+    async def generate_exchange_instances(self, start_date):
+        """Generate CustodyExchangeInstance records for each scheduled exchange occurrence."""
+        print("📅 Generating Custody Exchange Instances...")
+        
+        end_date = start_date + timedelta(days=275)  # ~9 months
+        instance_count = 0
+        
+        curr = start_date
+        while curr <= end_date:
+            day_of_week = curr.weekday()  # 0=Mon, 2=Wed, 4=Fri
+            day_in_cycle = ((curr - start_date).days) % 14
+            is_week_b = day_in_cycle >= 7
+            
+            exchange = None
+            from_parent = None
+            to_parent = None
+            
+            if day_of_week == 2:  # Wednesday
+                exchange = self.wednesday_exchange
+                if is_week_b:
+                    from_parent, to_parent = self.dad, self.mom
+                else:
+                    from_parent, to_parent = self.mom, self.dad
+                    
+            elif day_of_week == 4:  # Friday
+                exchange = self.friday_exchange
+                if is_week_b:
+                    from_parent, to_parent = self.mom, self.dad
+                else:
+                    from_parent, to_parent = self.dad, self.mom
+                    
+            elif day_of_week == 0 and is_week_b:  # Monday (Week B only)
+                exchange = self.monday_exchange
+                from_parent, to_parent = self.mom, self.dad
+            
+            if exchange:
+                scheduled_dt = datetime.combine(curr, dt_time(17, 0))
+                window_start = scheduled_dt - timedelta(minutes=30)
+                window_end = scheduled_dt + timedelta(minutes=30)
+                
+                # Determine status based on date
+                if curr.date() < datetime.utcnow().date():
+                    # Past dates - simulate outcomes
+                    day_hash = hash(curr.isoformat()) % 10
+                    if day_hash == 0:
+                        status = "missed"
+                        handoff_outcome = "missed"
+                    elif day_hash < 4:
+                        status = "completed"
+                        handoff_outcome = "completed"
+                    else:
+                        status = "completed"
+                        handoff_outcome = "completed"
+                else:
+                    status = "scheduled"
+                    handoff_outcome = None
+                
+                instance = CustodyExchangeInstance(
+                    id=str(uuid.uuid4()),
+                    exchange_id=exchange.id,
+                    scheduled_time=scheduled_dt,
+                    status=status,
+                    completed_at=scheduled_dt if status == "completed" else None,
+                    window_start=window_start,
+                    window_end=window_end,
+                    handoff_outcome=handoff_outcome,
+                    # Simulate GPS check-ins for completed exchanges
+                    from_parent_checked_in=(status == "completed"),
+                    from_parent_check_in_time=scheduled_dt - timedelta(minutes=5) if status == "completed" else None,
+                    from_parent_check_in_lat=LOCATIONS["starbucks"]["lat"] if status == "completed" else None,
+                    from_parent_check_in_lng=LOCATIONS["starbucks"]["lng"] if status == "completed" else None,
+                    from_parent_in_geofence=True if status == "completed" else None,
+                    from_parent_distance_meters=15.0 if status == "completed" else None,
+                    to_parent_checked_in=(status == "completed"),
+                    to_parent_check_in_time=scheduled_dt + timedelta(minutes=2) if status == "completed" else None,
+                    to_parent_check_in_lat=LOCATIONS["starbucks"]["lat"] if status == "completed" else None,
+                    to_parent_check_in_lng=LOCATIONS["starbucks"]["lng"] if status == "completed" else None,
+                    to_parent_in_geofence=True if status == "completed" else None,
+                    to_parent_distance_meters=20.0 if status == "completed" else None,
+                )
+                self.db.add(instance)
+                instance_count += 1
+            
+            curr += timedelta(days=1)
+        
+        await self.db.flush()
+        print(f"   ✅ Created {instance_count} Exchange Instances")
         
     async def generate_exchange_instance(self, exchange, scheduled_time, actual_time, status, parent_activity):
         """
@@ -549,12 +1001,65 @@ class StoryDirector:
         # "Temporary Summer Schedule Adjustment"
         qa_date = q2_start + timedelta(days=15)
         await self.generate_quick_accord(
-            "Summer Schedule Adjustment", 
-            "schedule_swap", 
-            self.mom, 
-            "active", 
+            title="Summer Schedule Adjustment", 
+            category="schedule_swap", 
+            initiator=self.mom, 
+            status="active", 
             approved_by_other=True, 
-            date_time=qa_date
+            date_time=qa_date,
+            end_date=qa_date + timedelta(days=60),
+            description="""Temporarily modify the 2-2-3 schedule for summer break.
+
+Sarah requests an extended week (June 15-22) to take the children to visit grandparents in San Francisco. 
+David agrees in exchange for an extended week in August (Aug 10-17) for a beach vacation.
+
+Both parents agree to transport children during their extended weeks.""",
+            ai_summary="Parents agreed to swap extended summer weeks. Sarah gets June 15-22, David gets Aug 10-17."
+        )
+        
+        # 2. QuickAccord #4: Leo's Soccer Registration (NEW)
+        qa_soccer = q2_start + timedelta(days=45)
+        await self.generate_quick_accord(
+            title="Leo's Fall Soccer Registration",
+            category="activity",
+            initiator=self.dad,
+            status="active",
+            approved_by_other=True,
+            date_time=qa_soccer,
+            end_date=qa_soccer + timedelta(days=70),
+            amount=185.00,
+            description="""Register Leo for Fall 2025 AYSO soccer season.
+
+League: AYSO Region 68 (Long Beach)
+Season: Sep 6 - Nov 15, 2025
+Practice: Tuesdays 4-5:30pm
+Games: Saturdays 9am-12pm
+
+Both parents agree to transport to games during their custody time.
+Registration fee of $185 to be split 50/50 via ClearFund.""",
+            ai_summary="Both parents approved Leo's soccer registration. $185 fee split 50/50."
+        )
+        
+        # 3. QuickAccord #5: Dental Appointment (NEW)
+        qa_dental = q2_start + timedelta(days=60)
+        await self.generate_quick_accord(
+            title="Children's Dental Checkup",
+            category="medical",
+            initiator=self.mom,
+            status="active",
+            approved_by_other=True,
+            date_time=qa_dental,
+            amount=75.00,
+            description="""Schedule routine dental checkup for both Leo and Mia.
+
+Provider: Dr. Martinez, Coastal Kids Dental
+Date: October 15, 2025 at 3:30 PM
+Location: 1250 Pine Ave, Long Beach
+
+Sarah will take the children (falls on her day).
+David to receive summary of any recommended treatment.
+Copay of $75 to be split 50/50.""",
+            ai_summary="Both parents approved dental appointment. Sarah to take children, share results with David."
         )
         
         # Filler Chat (Background noise)
@@ -686,12 +1191,25 @@ class StoryDirector:
         # "Proposal: Thanksgiving Plan"
         qa_date_1 = q3_start + timedelta(days=5)
         await self.generate_quick_accord(
-            "Proposed Thanksgiving Plan", 
-            "travel", 
-            self.mom, 
-            "pending_approval", 
+            title="Thanksgiving 2025 Travel Plan",
+            category="travel", 
+            initiator=self.mom, 
+            status="pending_approval", 
             approved_by_other=False, 
-            date_time=qa_date_1
+            date_time=qa_date_1,
+            end_date=qa_date_1 + timedelta(days=4),
+            amount=450.00,
+            description="""Sarah proposes to take the children to her sister's home in Sacramento for Thanksgiving (Nov 27-30, 2025).
+
+This is Sarah's year for Thanksgiving per the holiday schedule in Section 5.
+
+Travel details:
+- Depart: Wed Nov 26 evening flight
+- Return: Sun Nov 30 afternoon flight
+- Flight cost: ~$450 total
+
+David requests FaceTime with children on Thanksgiving Day at 4pm.""",
+            ai_summary="Pending: Sarah requests Thanksgiving travel to Sacramento. David has not yet approved."
         )
         
         # 2. Swap Request -> Explosion
@@ -704,24 +1222,99 @@ class StoryDirector:
         
         # QuickAccord #3 (Dad) - Rejected/Revoked (The "Vegas Swap")
         await self.generate_quick_accord(
-            "Vegas Weekend Swap", 
-            "schedule_swap", 
-            self.dad, 
-            "revoked", 
+            title="Vegas Weekend Swap", 
+            category="schedule_swap", 
+            initiator=self.dad, 
+            status="revoked", 
             approved_by_other=False, 
-            date_time=d1
+            date_time=d1,
+            description="""David requests to swap his weekend (Oct 10-12) with Sarah's weekend (Oct 17-19) to attend a business conference in Las Vegas.
+
+Reason: Important client dinner and networking event.
+
+Sarah's response: Declined due to prior commitments (Leo's soccer tournament that weekend).""",
+            ai_summary="REJECTED: David's swap request denied. Sarah has prior commitments (Leo's soccer tournament)."
         )
         
         # Toxic Explosion
         await self.generate_message(d1 + timedelta(minutes=15), self.dad, self.mom, "You ungrateful bitch. I pay for your life.",
                                   flags={"category": "profanity", "severity": "high", "blocked": True})
 
-        # 2. Financial Abuse (Missed Child Support)
-        d_cs = q3_start + timedelta(days=15)
-        # We model Child Support as a recurring obligation that gets IGNORED
-        await self.generate_obligation(d_cs, "Child Support - October", 1500.00, self.mom, self.dad, status="open", category="child_support")
+        # ========== COMPREHENSIVE CHILD SUPPORT HISTORY ==========
+        # Monthly child support from agreement effective date
+        months_data = [
+            # (month_offset, status, paid_days_late)
+            (0, "completed", 3),   # May - paid 3 days late
+            (1, "completed", 0),   # June - on time
+            (2, "completed", 5),   # July - 5 days late
+            (3, "completed", 0),   # Aug - on time
+            (4, "completed", 2),   # Sep - 2 days late
+            (5, "open", None),     # Oct - MISSED (story escalation point)
+            (6, "completed", 15),  # Nov - 15 days late after lawyer letter
+            (7, "completed", 0),   # Dec - on time (Q4 resolution)
+        ]
         
-        # 3. Large Expense Rejection
+        q2_start = START_DATE + timedelta(days=90)  # Agreement effective date
+        for month_offset, status, paid_days_late in months_data:
+            month_date = q2_start + timedelta(days=month_offset * 30)
+            month_name = ["May", "June", "July", "August", "September", "October", "November", "December"][month_offset]
+            
+            await self.generate_obligation(
+                month_date, 
+                f"Child Support - {month_name} 2025", 
+                1500.00, 
+                self.mom, 
+                self.dad, 
+                status=status, 
+                category="child_support"
+            )
+        
+        # Shared expenses from QuickAccords
+        # Soccer registration fee (from QA #4)
+        await self.generate_obligation(
+            q3_start + timedelta(days=20), 
+            "Leo's Soccer Registration (AYSO)", 
+            185.00, 
+            self.dad,  # Dad initiated the QuickAccord
+            self.mom, 
+            status="completed", 
+            category="extracurricular"
+        )
+        
+        # Dental copay (from QA #5)
+        await self.generate_obligation(
+            q3_start + timedelta(days=40), 
+            "Children's Dental Checkup Copay", 
+            75.00, 
+            self.mom,  # Mom initiated
+            self.dad, 
+            status="completed", 
+            category="medical"
+        )
+        
+        # Nebulizer supplies (ongoing medical)
+        await self.generate_obligation(
+            q3_start + timedelta(days=25), 
+            "Mia's Nebulizer Supplies", 
+            65.00, 
+            self.mom, 
+            self.dad, 
+            status="completed", 
+            category="medical"
+        )
+        
+        # Back to school supplies
+        await self.generate_obligation(
+            q3_start + timedelta(days=35), 
+            "Back to School Supplies", 
+            220.00, 
+            self.mom, 
+            self.dad, 
+            status="completed", 
+            category="education"
+        )
+        
+        # 3. Large Expense Rejection (already in story - Leo's Braces)
         d2 = q3_start + timedelta(days=30)
         await self.generate_obligation(d2, "Leo's Orthodontist (Braces)", 3000.00, self.mom, self.dad, status="disputed", category="medical")
 
@@ -799,8 +1392,9 @@ class StoryDirector:
             )
             self.db.add(funding)
 
-    async def generate_quick_accord(self, title, category, initiator, status, approved_by_other=False, date_time=None):
-        """Generates a QuickAccord (Lightweight Agreement)."""
+    async def generate_quick_accord(self, title, category, initiator, status, approved_by_other=False, date_time=None, 
+                                     description=None, amount=0, ai_summary=None, end_date=None):
+        """Generates a QuickAccord (Lightweight Agreement) with full description."""
         accord_num = generate_quick_accord_number()
         other_parent = self.dad if initiator.id == self.mom.id else self.mom
         
@@ -810,62 +1404,124 @@ class StoryDirector:
             accord_number=accord_num,
             title=title,
             purpose_category=category,
+            purpose_description=description,
             initiated_by=initiator.id,
             status=status,
             start_date=date_time,
+            end_date=end_date,
             created_at=date_time or datetime.utcnow(),
             
+            # Financial
+            has_shared_expense=(amount > 0),
+            estimated_amount=amount if amount > 0 else None,
+            
+            # AI Summary
+            ai_summary=ai_summary,
+            
             # Approval
-            parent_a_approved=True, # Initiator implicitly approves
+            parent_a_approved=True,  # Initiator implicitly approves
             parent_a_approved_at=date_time,
             
             parent_b_approved=approved_by_other,
             parent_b_approved_at=date_time if approved_by_other else None
         )
         self.db.add(qa)
-        await self.db.flush() # Ensure ID is generated
+        await self.db.flush()
         return qa
 
     async def generate_calendar_events(self, start_date, end_date):
-        """Generates 2-2-3 Schedule Events for the Agreement."""
-        print("📅 Populating Calendar (2-2-3 Schedule)...")
-        # 2-2-3 Pattern: 
-        # A, A, B, B, A, A, A
-        # B, B, A, A, B, B, B
-        pattern = ["A", "A", "B", "B", "A", "A", "A", "B", "B", "A", "A", "B", "B", "B"]
+        """
+        Generates EXCHANGE-ONLY schedule events for the 2-2-3 agreement.
+        
+        Exchange days:
+        - Wednesday (every week): custody transfer
+        - Friday (every week): custody transfer  
+        - Monday (alternating weeks - Week B only): custody transfer
+        
+        2-2-3 Pattern (14-day cycle):
+        Week A: Mon Tue (A) | Wed Thu (B) | Fri Sat Sun (A)
+        Week B: Mon Tue (B) | Wed Thu (A) | Fri Sat Sun (B)
+        """
+        print("📅 Populating Calendar (Exchange Events Only)...")
+        
         curr = start_date
-        
-        # Sync with cycle start (ensure consistent rotation)
-        cycle_idx = 0
-        
         days_to_gen = (end_date - start_date).days
+        exchange_count = 0
         
-        events = []
+        # Determine which week we're starting in (need to align to cycle)
+        # We'll treat the start_date as Day 0 of Week A
+        
         for i in range(days_to_gen):
-            day_role = pattern[cycle_idx % 14]
-            custodian = self.mom if day_role == "A" else self.dad
+            day_of_week = curr.weekday()  # 0=Mon, 2=Wed, 4=Fri
+            day_in_cycle = i % 14  # 0-13 for the 14-day cycle
+            is_week_b = day_in_cycle >= 7
             
-            # Create All-Day Event for Custody
-            evt = ScheduleEvent(
-                id=str(uuid.uuid4()),
-                family_file_id=DEMO_FAMILY_ID,
-                agreement_id=self.agreement.id,
-                title=f"{custodian.first_name}'s Parenting Time",
-                event_type="regular",
-                start_time=datetime.combine(curr, dt_time(9, 0)), # 9 AM start for visual simplicity
-                end_time=datetime.combine(curr, dt_time(20, 0)),
-                all_day=True,
-                custodial_parent_id=custodian.id,
-                child_ids=[child.id for child in [self.mom] if False], # Placeholder
-                created_by=self.mom.id, # Admin/System
-                status="scheduled"
-            )
-            self.db.add(evt)
+            # Determine if this is an exchange day
+            is_exchange_day = False
+            from_parent = None
+            to_parent = None
+            exchange_title = None
+            
+            if day_of_week == 2:  # Wednesday - every week
+                is_exchange_day = True
+                if is_week_b:
+                    # Week B Wed: Dad → Mom
+                    from_parent = self.dad
+                    to_parent = self.mom
+                else:
+                    # Week A Wed: Mom → Dad
+                    from_parent = self.mom
+                    to_parent = self.dad
+                exchange_title = "Wednesday Custody Exchange"
+                    
+            elif day_of_week == 4:  # Friday - every week
+                is_exchange_day = True
+                if is_week_b:
+                    # Week B Fri: Mom → Dad
+                    from_parent = self.mom
+                    to_parent = self.dad
+                else:
+                    # Week A Fri: Dad → Mom
+                    from_parent = self.dad
+                    to_parent = self.mom
+                exchange_title = "Friday Custody Exchange"
+                    
+            elif day_of_week == 0 and is_week_b:  # Monday - Week B only
+                is_exchange_day = True
+                # Week B Mon: Mom → Dad (after Mom's weekend in Week A)
+                from_parent = self.mom
+                to_parent = self.dad
+                exchange_title = "Monday Custody Exchange"
+            
+            if is_exchange_day:
+                evt = ScheduleEvent(
+                    id=str(uuid.uuid4()),
+                    family_file_id=DEMO_FAMILY_ID,
+                    agreement_id=self.agreement.id,
+                    title=exchange_title,
+                    event_type="exchange",
+                    is_exchange=True,
+                    start_time=datetime.combine(curr, dt_time(17, 0)),  # 5 PM
+                    end_time=datetime.combine(curr, dt_time(17, 30)),   # 30 min window
+                    all_day=False,
+                    custodial_parent_id=to_parent.id,  # Who is receiving
+                    transition_from_id=from_parent.id,
+                    transition_to_id=to_parent.id,
+                    exchange_location="Starbucks, 203 Pine Ave, Long Beach",
+                    exchange_lat=LOCATIONS["starbucks"]["lat"],
+                    exchange_lng=LOCATIONS["starbucks"]["lng"],
+                    child_ids=[],
+                    created_by=self.mom.id,
+                    status="scheduled",
+                    is_agreement_derived=True
+                )
+                self.db.add(evt)
+                exchange_count += 1
             
             curr += timedelta(days=1)
-            cycle_idx += 1
-            
+        
         await self.db.flush()
+        print(f"   ✅ Created {exchange_count} Exchange Events")
 
     async def generate_swap_request(self, date_time, requester, approver, status="rejected"):
         """Generates a structured Swap Request (Schedule Modification)."""
@@ -896,78 +1552,80 @@ class StoryDirector:
 
     async def generate_custody_reports(self, start_date, end_date):
         """
-        Generates daily CustodyDayRecord entries.
-        Crucial for the 'Custody Tracker' to show actual vs scheduled.
-        Logic: Start with 2-2-3, then apply 'Missed Exchange' overrides.
+        Generates daily CustodyDayRecord entries for BOTH children.
+        
+        2-2-3 Pattern (aligned to start on Monday):
+        Week A: Mon(A) Tue(A) Wed(B) Thu(B) Fri(A) Sat(A) Sun(A)
+        Week B: Mon(B) Tue(B) Wed(A) Thu(A) Fri(B) Sat(B) Sun(B)
+        
+        A = Mom (Sarah), B = Dad (David)
         """
         print("📊 Generating Custody Day Records (The Truth Layer)...")
         from app.models.custody_day_record import CustodyDayRecord, DeterminationMethod
-        
-        # 2-2-3 Pattern: Mon/Tue(A), Wed/Thu(B), Fri/Sat/Sun(A), Mon/Tue(B), Wed/Thu(A), Fri/Sat/Sun(B)
-        # A = Mom, B = Dad
-        pattern = ["A", "A", "B", "B", "A", "A", "A", "B", "B", "A", "A", "B", "B", "B"]
-        curr = start_date
-        cycle_idx = 0
-        days_to_gen = (end_date - start_date).days
-        
         from sqlalchemy import delete
-        await self.db.execute(delete(CustodyDayRecord)) # Clear for fresh run
         
-        current_custodian = self.mom # Start with Mom
+        # Clear existing CDRs for fresh run
+        await self.db.execute(delete(CustodyDayRecord).where(
+            CustodyDayRecord.family_file_id == DEMO_FAMILY_ID
+        ))
+        
+        # Align start_date to previous Monday for proper 2-2-3 cycle
+        days_from_monday = start_date.weekday()  # 0=Mon, 1=Tue, etc.
+        cycle_start = start_date - timedelta(days=days_from_monday)
+        
+        # 2-2-3 pattern for a 14-day cycle (starting Monday)
+        # Week A: A A B B A A A (indices 0-6)
+        # Week B: B B A A B B B (indices 7-13)
+        pattern = ["A", "A", "B", "B", "A", "A", "A", "B", "B", "A", "A", "B", "B", "B"]
+        
+        curr = start_date
+        days_to_gen = (end_date - start_date).days
+        cdr_count = 0
+        
+        # Get both children
+        children = [self.leo, self.mia]
         
         for i in range(days_to_gen):
-            # 1. Determine Scheduled Custodian
-            day_role = pattern[cycle_idx % 14]
+            # Calculate position in the 14-day cycle based on actual day
+            days_since_cycle_start = (curr - cycle_start).days
+            cycle_idx = days_since_cycle_start % 14
+            
+            day_role = pattern[cycle_idx]
             scheduled_custodian = self.mom if day_role == "A" else self.dad
-            
-            # 2. Check for Deviations (Logic from Q2/Q3 runs)
-            # We treat the schedule as the baseline, but "Missed" exchanges mean NO TRANSFER.
-            # However, simpler for seed: Just rely on "Actual" logic.
-            # If today is Friday (Exchange Day) AND it's a "Missed" day...
-            
             actual_custodian = scheduled_custodian
             determination = DeterminationMethod.SCHEDULED
             
-            # Q2/Q3 Logic Simulation:
-            # If it's a Friday in Q2/Q3, there's a chance Dad missed it.
-            # If Dad missed pickup (Mom -> Dad), Mom KEEPS custody for the weekend.
+            # Simulate some missed exchanges in Q2/Q3 period
+            # Q2 starts at day 90, Q3 ends at day 270
+            days_from_start = (curr - start_date).days
+            is_q2_or_q3 = 0 <= days_from_start <= 180  # First 6 months
+            is_exchange_day = curr.weekday() in [0, 2, 4]  # Mon, Wed, Fri
             
-            is_exchange_day = (curr.weekday() == 4) # Friday
-            is_q2_or_q3 = (start_date + timedelta(days=90)) <= curr <= (start_date + timedelta(days=270))
-            
-            # Deterministic "Missed" logic matching the loops
-            # In Q2 loop, we used random.random(). Here we need to align or over-write.
-            # Let's say: If Dad is scheduled to have them (B), but it matches our "Missed" criteria:
             if is_q2_or_q3 and is_exchange_day and day_role == "B":
-                 # In run_q2, we had 10% missed.
-                 # Let's bake in specific dates for missed pickups to be consistent.
-                 # Using a simple hash to deterministicly pick "bad days"
-                 day_hash = hash(curr.isoformat()) % 10
-                 if day_hash == 0: # 1 in 10 chance
-                     actual_custodian = self.mom # Mom keeps them!
-                     determination = DeterminationMethod.MANUAL_OVERRIDE
-                     
-            # Create Record
-            rec = CustodyDayRecord(
-                id=str(uuid.uuid4()),
-                family_file_id=DEMO_FAMILY_ID,
-                child_id=self.leo.id, 
-                record_date=curr,
-                custodial_parent_id=actual_custodian.id,
-                determination_method=determination,
-                confidence_score=100
-            )
-            # Hack: Need to fetch child IDs properly or store them on self
-            # For now, let's fetch Leo again or store him in __init__
-            # Just committing raw sql valid ID? No, use self.db query if needed
-            # Better: Store children in self during create_family_structure
+                # 10% chance of missed exchange (Dad no-show)
+                day_hash = hash(curr.isoformat()) % 10
+                if day_hash == 0:
+                    actual_custodian = self.mom  # Mom keeps custody
+                    determination = DeterminationMethod.MANUAL_OVERRIDE
             
-            self.db.add(rec)
+            # Create CDR for EACH child
+            for child in children:
+                rec = CustodyDayRecord(
+                    id=str(uuid.uuid4()),
+                    family_file_id=DEMO_FAMILY_ID,
+                    child_id=child.id,
+                    record_date=curr,
+                    custodial_parent_id=actual_custodian.id,
+                    determination_method=determination,
+                    confidence_score=100
+                )
+                self.db.add(rec)
+                cdr_count += 1
             
             curr += timedelta(days=1)
-            cycle_idx += 1
-            
+        
         await self.db.flush()
+        print(f"   ✅ Created {cdr_count} Custody Day Records ({cdr_count // 2} days × 2 children)")
 
     async def generate(self):
         await self.nuke_all_data()
@@ -977,16 +1635,18 @@ class StoryDirector:
         await self.run_q1_chaos()
         await self.run_q2_implementation()
         
-        # Generate Calendar Background (Q2-Q4)
+        # Generate Calendar Background (Q2-Q4) - CRITICAL: Both must use same start date
         q2_start = START_DATE + timedelta(days=90)
-        await self.generate_calendar_events(q2_start, START_DATE + timedelta(days=365))
+        end_date = START_DATE + timedelta(days=365)
+        await self.generate_calendar_events(q2_start, end_date)
         
         await self.run_q3_escalation()
         await self.run_q4_resolution()
         
         # FINAL: Generate the Truth Layer for Custody Stats
-        # We access self.leo which we will stash in create_family_structure
-        await self.generate_custody_reports(START_DATE, START_DATE + timedelta(days=365))
+        # CRITICAL FIX: CDR must start from same date as calendar events (q2_start)
+        # to ensure schedule and CDR are in sync
+        await self.generate_custody_reports(q2_start, end_date)
         
         await self.db.commit()
         print("✨ Scene Complete.")
