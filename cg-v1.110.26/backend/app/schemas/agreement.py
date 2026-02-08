@@ -51,6 +51,7 @@ class AgreementResponse(BaseModel):
     case_id: Optional[str] = None  # Optional for Family File-based agreements
     family_file_id: Optional[str] = None  # Primary container for SharedCare Agreements
     title: str
+    summary: Optional[str] = None  # Concise summary of the agreement
     version: int
     agreement_version: str = "v2_standard"  # v1, v2_standard, or v2_lite
     status: str
