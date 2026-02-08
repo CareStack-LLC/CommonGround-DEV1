@@ -302,9 +302,8 @@ function ApprovalTracker({
     <div className="flex items-center gap-6">
       <div className="flex items-center gap-2">
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-            approvedByA ? 'bg-cg-success text-white' : 'bg-muted text-muted-foreground'
-          }`}
+          className={`w-8 h-8 rounded-full flex items-center justify-center ${approvedByA ? 'bg-cg-success text-white' : 'bg-muted text-muted-foreground'
+            }`}
         >
           {approvedByA ? <CheckCircle className="h-4 w-4" /> : <span className="text-xs font-medium">A</span>}
         </div>
@@ -315,9 +314,8 @@ function ApprovalTracker({
       <div className="h-px w-8 bg-border" />
       <div className="flex items-center gap-2">
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center ${
-            approvedByB ? 'bg-cg-success text-white' : 'bg-muted text-muted-foreground'
-          }`}
+          className={`w-8 h-8 rounded-full flex items-center justify-center ${approvedByB ? 'bg-cg-success text-white' : 'bg-muted text-muted-foreground'
+            }`}
         >
           {approvedByB ? <CheckCircle className="h-4 w-4" /> : <span className="text-xs font-medium">B</span>}
         </div>
@@ -345,11 +343,10 @@ function AgreementSectionCard({
 
   return (
     <div
-      className={`border-l-4 transition-all duration-200 ${
-        section.is_completed
+      className={`border-l-4 transition-all duration-200 ${section.is_completed
           ? 'border-l-cg-sage bg-card'
           : 'border-l-muted bg-muted/30'
-      }`}
+        }`}
     >
       <div className="p-5">
         <div className="flex items-start gap-4">
@@ -738,6 +735,19 @@ function AgreementDetailsContent() {
                     </div>
                   )}
                 </div>
+
+                {/* Agreement Summary */}
+                {agreement.summary && (
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <div className="flex items-start gap-3 mb-3">
+                      <Quote className="h-5 w-5 text-cg-sage flex-shrink-0 mt-0.5" />
+                      <h2 className="font-semibold text-foreground">Summary</h2>
+                    </div>
+                    <p className="font-serif text-muted-foreground leading-relaxed pl-8">
+                      {agreement.summary}
+                    </p>
+                  </div>
+                )}
 
                 {/* Approval Tracker */}
                 {agreement.status === 'pending_approval' && (

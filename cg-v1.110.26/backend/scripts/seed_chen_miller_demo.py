@@ -169,6 +169,9 @@ class StoryDirector:
             self.mom.supabase_id = mom_supabase_id
             self.dad.supabase_id = dad_supabase_id
             await self.db.flush()
+            
+            # Ensure both parents have UserProfiles with complete subscription
+            await self.ensure_user_profiles()
         else:
             # Create new users
             mom_supabase_id = await self.create_supabase_user("sarah.chen@demo.com", "Demo2026!")
@@ -198,6 +201,45 @@ class StoryDirector:
             self.db.add(self.dad)
             await self.db.flush()
             print("   ✅ Created new demo users")
+            
+            # Create UserProfiles with complete subscription
+            await self.ensure_user_profiles()
+    
+    async def ensure_user_profiles(self):
+        """Ensure both demo parents have UserProfiles with complete subscription."""
+        from app.models.user import UserProfile
+        from sqlalchemy import select
+        
+        for user, name in [(self.mom, "Sarah"), (self.dad, "David")]:
+            # Check if profile exists
+            result = await self.db.execute(
+                select(UserProfile).where(UserProfile.user_id == user.id)
+            )
+            profile = result.scalar_one_or_none()
+            
+            if not profile:
+                # Create profile with complete subscription
+                profile = UserProfile(
+                    user_id=user.id,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    subscription_tier="complete",
+                    subscription_status="active",
+                    subscription_period_start=datetime.utcnow(),
+                    subscription_period_end=datetime.utcnow() + timedelta(days=365),
+                    timezone="America/Los_Angeles",
+                    locale="en-US"
+                )
+                self.db.add(profile)
+            else:
+                # Update existing profile to complete subscription
+                profile.subscription_tier = "complete"
+                profile.subscription_status = "active"
+                profile.subscription_period_start = datetime.utcnow()
+                profile.subscription_period_end = datetime.utcnow() + timedelta(days=365)
+        
+        await self.db.flush()
+        print("   ✅ Set both parents to Complete subscription (active, 1 year)")
 
     async def create_family_structure(self):
         print("🏠 Building Family Infrastructure...")
@@ -339,6 +381,7 @@ class StoryDirector:
             id=str(uuid.uuid4()),
             family_file_id=DEMO_FAMILY_ID,
             title="Court Ordered Parenting Plan",
+            summary="Comprehensive parenting plan establishing 2-2-3 custody schedule, joint legal custody, and detailed provisions for child support, education, healthcare, and dispute resolution for Leo Chen-Miller (8) and Mia Chen-Miller (5).",
             status="active",
             version=1,
             created_at=activation_date,
