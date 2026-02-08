@@ -112,6 +112,9 @@ class Agreement(Base, UUIDMixin, TimestampMixin):
     # Machine-readable rules (compiled from sections)
     rules: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 
+    # Agreement summary (concise description)
+    summary: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # PDF document
     pdf_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     pdf_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # SHA-256
