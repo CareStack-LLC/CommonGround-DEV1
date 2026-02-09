@@ -1162,6 +1162,11 @@ export const agreementsAPI = {
 export interface AgreementQuickSummary {
   summary: string;
   key_points: string[];
+  shared_expenses_table?: {
+    split: string;
+    covered: string[];
+    not_covered: string[];
+  };
   completion_percentage: number;
   status: string;
 }
