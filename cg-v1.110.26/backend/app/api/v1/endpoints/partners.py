@@ -342,10 +342,12 @@ async def get_partner_dashboard(
         )
         total_messages = msg_result.scalar() or 0
         
+        # Count ALL ARIA interventions (flags) regardless of user action
         aria_result = await db.execute(
-            select(func.count(Message.id)).where(
-                Message.sender_id.in_(user_ids),
-                Message.was_flagged == True
+            select(func.count(MessageFlag.id))
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(
+                Message.sender_id.in_(user_ids)
             )
         )
         aria_interventions = aria_result.scalar() or 0
