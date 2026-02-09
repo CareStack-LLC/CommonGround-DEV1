@@ -125,6 +125,11 @@ class GrantCode(Base, UUIDMixin, TimestampMixin):
         String(500), nullable=True
     )
 
+    # Partner organization link (for structured partner program)
+    partner_id: Mapped[Optional[str]] = mapped_column(
+        ForeignKey("partners.id", ondelete="SET NULL"), index=True, nullable=True
+    )
+
     # Validity period
     valid_from: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
@@ -155,6 +160,9 @@ class GrantCode(Base, UUIDMixin, TimestampMixin):
     # Relationships
     redemptions: Mapped[list["GrantRedemption"]] = relationship(
         "GrantRedemption", back_populates="grant_code", cascade="all, delete-orphan"
+    )
+    partner: Mapped[Optional["Partner"]] = relationship(
+        "Partner", back_populates="grant_codes"
     )
 
     def __repr__(self) -> str:

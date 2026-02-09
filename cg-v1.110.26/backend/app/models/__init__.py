@@ -213,6 +213,14 @@ from app.models.recording import (
     RecordingExportLog,
     RecordingAccessAction,
 )
+from app.models.partner import (
+    Partner,
+    PartnerStaff,
+    PartnerMetric,
+    UserAnonymizationMap,
+    PartnerStatus,
+    PartnerStaffRole,
+)
 
 __all__ = [
     "Base",
@@ -423,4 +431,11 @@ __all__ = [
     "RecordingAccessLog",
     "RecordingExportLog",
     "RecordingAccessAction",
+    # Partner Program (Nonprofit Grants)
+    "Partner",
+    "PartnerStaff",
+    "PartnerMetric",
+    "UserAnonymizationMap",
+    "PartnerStatus",
+    "PartnerStaffRole",
 ]

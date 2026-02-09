@@ -66,6 +66,14 @@ class User(Base, UUIDMixin, TimestampMixin):
         "PushSubscription", back_populates="user", cascade="all, delete-orphan"
     )
 
+    # Partner program relationships
+    partner_staff_roles: Mapped[List["PartnerStaff"]] = relationship(
+        "PartnerStaff", back_populates="user", cascade="all, delete-orphan"
+    )
+    anonymization_maps: Mapped[List["UserAnonymizationMap"]] = relationship(
+        "UserAnonymizationMap", back_populates="user", cascade="all, delete-orphan"
+    )
+
     def __repr__(self) -> str:
         return f"<User {self.email}>"
 

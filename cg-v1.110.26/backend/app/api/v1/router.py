@@ -7,6 +7,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     auth,
     users,
+    partners,
     cases,
     family_files,
     quick_accords,
@@ -150,3 +151,6 @@ api_router.include_router(analytics.router, prefix="/analytics", tags=["Analytic
 
 # Smart Analytics - V3 Custody Insights
 api_router.include_router(smart_analytics.router, prefix="/analytics", tags=["Smart Analytics"])
+
+# Partner Program - Nonprofit grant partnerships
+api_router.include_router(partners.router, prefix="/partners", tags=["Partner Program"])
