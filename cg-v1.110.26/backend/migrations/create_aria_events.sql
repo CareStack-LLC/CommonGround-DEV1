@@ -1,7 +1,9 @@
 -- Create table for tracking ARIA security interventions (blocked/flagged content)
 -- This table is required for the Partner Dashboard metrics and general safety logging.
 
-CREATE TABLE IF NOT EXISTS aria_events (
+DROP TABLE IF EXISTS aria_events;
+
+CREATE TABLE aria_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     message_id UUID NOT NULL, -- May/May NOT reference a message in messages table (if blocked)
     user_id UUID NOT NULL REFERENCES auth.users(id), -- Link to auth user
