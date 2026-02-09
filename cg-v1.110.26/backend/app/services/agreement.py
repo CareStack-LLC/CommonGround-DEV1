@@ -1127,87 +1127,51 @@ class AgreementService:
                     {
                         "role": "system",
                         "content": """You are a legal document summarizer for co-parenting agreements.
-Your job is to extract ALL key provisions and present them in a clear, comprehensive format.
+Your job is to extract key provisions and present them in a clear, mobile-friendly format.
 Write in plain English that parents can easily understand.
-Be thorough - include specific details like names, times, dates, amounts, and locations."""
+Be concise but include specific details like names, times, dates, amounts, and locations.
+Use emojis for holidays to make them scannable."""
                     },
                     {
                         "role": "user",
-                        "content": f"""Generate a COMPREHENSIVE summary of this custody agreement.
-
-Extract ALL key provisions organized by category. Include specific details like:
-- Names, case numbers, court info
-- Children's names, ages, schools, special needs
-- Exact custody schedule (days/times)
-- Holiday rotation details
-- Exchange location and time
-- Child support amounts and due dates
-- Communication rules
-- Dispute resolution steps
+                        "content": f"""Generate a summary of this custody agreement.
 
 FORMAT YOUR RESPONSE EXACTLY LIKE THIS (use markdown):
 
-## Agreement Overview
-
-[2-3 paragraph narrative summary of the agreement, mentioning both parents by name, children by name/age, and the core arrangement]
+[Write a single paragraph summary. Include: parent names (Parent A/B), children's names and ages, any special needs, court name and case number, custody type (joint legal + joint physical), the schedule type (like 2-2-3), exchange location and time, child support amount and due date, communication platform, and dispute resolution process. Keep it to one flowing paragraph.]
 
 ---
 
-## Key Provisions
+## 📅 Regular Schedule ([Schedule name], Exchange at [time])
 
-### 1) Court & Parties
-* **Court:** [court name]
-* **Case Number:** [number]
-* **Parents:**
-  * **Parent A:** [name]
-  * **Parent B:** [name]
+| Week | Mon–Tue | Wed–Thu | Fri–Sun |
+|------|---------|---------|---------|
+| Week A | Parent A ([name]) | Parent B ([name]) | Parent A ([name]) |
+| Week B | Parent B ([name]) | Parent A ([name]) | Parent B ([name]) |
 
-### 2) Children
-* **[Child name]** — DOB [date] (Age [X]), [school], [special needs if any]
-* [repeat for each child]
+---
 
-### 3) Custody Type
-* [Physical custody arrangement]
-* [Legal custody arrangement]
+## 🎄 Holidays & Special Days
 
-### 4) Regular Schedule
-**[Schedule name, e.g., 2-2-3 Rotating]**
-[Week A and Week B breakdown with days]
-* **Exchange time:** [time]
-* **Time split:** [percentage]
+**Alternating Holidays** (Even years: Parent A has first choice)
 
-### 5) Holidays & Special Days
-**Alternating Holidays** (specify even/odd year pattern)
-| Holiday | Parent A Years | Parent B Years |
-|---------|----------------|----------------|
-| [holiday] | [year] | [year] |
+| Holiday | 2025 | 2026 |
+|---------|------|------|
+| 🦃 Thanksgiving | Parent A | Parent B |
+| 🎄 Christmas Eve | Parent B | Parent A |
+| 🎁 Christmas Day | Parent A | Parent B |
+| 🎆 New Year's Eve | Parent B | Parent A |
+| 🐰 Easter | Parent A | Parent B |
+| 🎇 July 4th | Parent B | Parent A |
 
-**Fixed Holidays:**
-* Mother's Day: [parent]
-* Father's Day: [parent]
-* Birthdays: [arrangement]
+**Fixed Holidays / Special Days**
 
-### 6) Transportation & Exchange
-* **Location:** [address]
-* **Time:** [time]
-* **Late policy:** [grace period and rules]
-* **Silent Handoff:** [if enabled, describe]
-
-### 7) Child Support & Expenses
-**Monthly Support:** [amount] from [parent] to [parent], due [date]
-**Shared Expenses (50/50):**
-* [list each category]
-**Insurance:**
-* Health: [coverage]
-* Dental: [coverage]
-
-### 8) Communication & Disputes
-**Parent Communication:** [method/platform]
-**Child Communication:** [rules for calls/video]
-**Dispute Resolution:**
-1. [step 1]
-2. [step 2]
-3. [step 3]
+| Day | Rule |
+|-----|------|
+| 💐 Mother's Day | Always with Parent A ([mom name]) |
+| 👔 Father's Day | Always with Parent B ([dad name]) |
+| 🎂 Children's Birthdays | Split (morning/afternoon) |
+| 🎈 Parent Birthdays | Birthday parent has children 4:00 PM–8:00 PM |
 
 ---
 
