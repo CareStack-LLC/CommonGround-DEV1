@@ -22,6 +22,11 @@ interface InviteData {
   token: string;
 }
 
+interface GrantData {
+  code: string;
+  partner: string;
+}
+
 function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -36,6 +41,7 @@ function RegisterContent() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
+  const [grantData, setGrantData] = useState<GrantData | null>(null);
   const [oauthLoading, setOauthLoading] = useState<'google' | 'apple' | null>(null);
 
   const handleGoogleSignIn = async () => {
@@ -62,8 +68,9 @@ function RegisterContent() {
     }
   };
 
-  // Parse invite parameter on mount
+  // Parse invite and grant code parameters on mount
   useEffect(() => {
+    // Parse invite parameter
     const invite = searchParams.get('invite');
     if (invite) {
       try {
@@ -84,6 +91,16 @@ function RegisterContent() {
       } catch (e) {
         console.error('Failed to parse invite data:', e);
       }
+    }
+
+    // Parse grant code parameter (from partner landing page)
+    const grantCode = searchParams.get('grant_code');
+    const partner = searchParams.get('partner');
+    if (grantCode) {
+      setGrantData({
+        code: grantCode.toUpperCase(),
+        partner: partner || ''
+      });
     }
   }, [searchParams]);
 
@@ -144,6 +161,36 @@ function RegisterContent() {
         } catch (inviteErr) {
           console.error('Error accepting invite:', inviteErr);
           // Don't block registration even if invite fails
+        }
+      }
+
+      // If we have grant code data, redeem the code to create redemption record
+      if (grantData) {
+        try {
+          const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+          const token = localStorage.getItem('access_token');
+
+          const response = await fetch(`${API_BASE}/api/v1/grants/redeem`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            body: JSON.stringify({
+              code: grantData.code,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Failed to redeem grant code:', errorData);
+            // Don't block registration - user can redeem later from settings
+          } else {
+            console.log('Grant code redeemed successfully');
+          }
+        } catch (grantErr) {
+          console.error('Error redeeming grant code:', grantErr);
+          // Don't block registration even if grant redemption fails
         }
       }
 
@@ -423,7 +470,7 @@ function RegisterContent() {
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 ) : (
                   <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                   </svg>
                 )}
                 <span className="text-sm font-medium text-foreground">Apple</span>
