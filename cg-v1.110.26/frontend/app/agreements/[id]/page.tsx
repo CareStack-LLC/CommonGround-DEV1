@@ -747,30 +747,23 @@ function AgreementDetailsContent() {
                     </div>
 
                     {/* Render comprehensive markdown summary */}
-                    <div className="prose prose-sm max-w-none pl-8 prose-headings:text-foreground prose-headings:font-semibold prose-h2:text-lg prose-h2:mt-6 prose-h2:mb-3 prose-h3:text-base prose-h3:mt-4 prose-h3:mb-2 prose-p:text-muted-foreground prose-p:leading-relaxed prose-ul:text-muted-foreground prose-ul:space-y-1 prose-li:text-muted-foreground prose-strong:text-foreground prose-table:text-sm prose-th:bg-muted prose-th:p-2 prose-td:p-2 prose-td:border prose-hr:border-border">
+                    <div className="prose prose-sm max-w-none px-2 md:pl-8 prose-headings:text-foreground prose-headings:font-semibold prose-h2:text-base md:prose-h2:text-lg prose-h2:mt-4 md:prose-h2:mt-6 prose-h2:mb-2 md:prose-h2:mb-3 prose-h3:text-sm md:prose-h3:text-base prose-h3:mt-3 md:prose-h3:mt-4 prose-h3:mb-2 prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-sm prose-ul:text-muted-foreground prose-ul:space-y-1 prose-ul:text-sm prose-li:text-muted-foreground prose-strong:text-foreground prose-table:text-xs md:prose-table:text-sm prose-table:w-full prose-th:bg-muted prose-th:p-1.5 md:prose-th:p-2 prose-td:p-1.5 md:prose-td:p-2 prose-td:border prose-hr:border-border">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>
                         {summary.summary}
                       </ReactMarkdown>
                     </div>
 
-                    {/* Quick Facts - Essential Reference */}
+                    {/* Quick Facts - Compact One-Screen Reference */}
                     {summary.key_points && summary.key_points.length > 0 && (
-                      <div className="mt-6 p-4 bg-cg-sage-subtle/30 rounded-xl border border-cg-sage/10">
-                        <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-cg-sage" />
-                          Quick Facts
-                        </h3>
-                        <div className="space-y-2">
+                      <div className="mt-6 p-5 bg-cg-sage-subtle/20 rounded-xl border border-cg-sage/10">
+                        <h3 className="text-base font-semibold text-foreground mb-4">Quick Facts</h3>
+                        <ul className="space-y-2.5 text-sm leading-relaxed">
                           {summary.key_points.map((point, idx) => (
-                            <div
-                              key={idx}
-                              className="flex items-center gap-3 p-3 bg-white/60 rounded-lg border border-border/50 text-sm"
-                            >
-                              <span className="text-base flex-shrink-0">{point.slice(0, 2)}</span>
-                              <span className="text-foreground font-medium">{point.slice(3)}</span>
-                            </div>
+                            <li key={idx} className="text-foreground">
+                              • {point}
+                            </li>
                           ))}
-                        </div>
+                        </ul>
                       </div>
                     )}
                   </div>
