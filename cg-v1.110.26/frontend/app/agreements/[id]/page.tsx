@@ -753,17 +753,56 @@ function AgreementDetailsContent() {
                       </ReactMarkdown>
                     </div>
 
-                    {/* Quick Facts - Compact One-Screen Reference */}
+
+                    {/* Quick Facts - Labeled Reference */}
                     {summary.key_points && summary.key_points.length > 0 && (
                       <div className="mt-6 p-5 bg-cg-sage-subtle/20 rounded-xl border border-cg-sage/10">
                         <h3 className="text-base font-semibold text-foreground mb-4">Quick Facts</h3>
-                        <ul className="space-y-2.5 text-sm leading-relaxed">
+
+                        {/* Key points with markdown labels */}
+                        <div className="space-y-2.5 text-sm leading-relaxed">
                           {summary.key_points.map((point, idx) => (
-                            <li key={idx} className="text-foreground">
-                              • {point}
-                            </li>
+                            <div key={idx} className="text-foreground prose prose-sm max-w-none prose-strong:text-foreground prose-strong:font-semibold">
+                              <ReactMarkdown>{point}</ReactMarkdown>
+                            </div>
                           ))}
-                        </ul>
+                        </div>
+
+                        {/* Shared Expenses Table */}
+                        {summary.shared_expenses_table && (
+                          <div className="mt-4 pt-4 border-t border-border/30">
+                            <p className="text-sm font-semibold text-foreground mb-3">
+                              <strong>Shared Expenses:</strong> {summary.shared_expenses_table.split}
+                            </p>
+                            <div className="grid grid-cols-2 gap-3 text-xs">
+                              {/* Covered Column */}
+                              <div className="bg-green-50 dark:bg-green-900/10 rounded-lg p-3 border border-green-200 dark:border-green-800">
+                                <p className="font-semibold text-green-900 dark:text-green-100 mb-2">✓ Covered</p>
+                                <ul className="space-y-1.5 text-green-800 dark:text-green-200">
+                                  {summary.shared_expenses_table.covered?.map((item, idx) => (
+                                    <li key={idx}>• {item}</li>
+                                  ))}
+                                  {(!summary.shared_expenses_table.covered || summary.shared_expenses_table.covered.length === 0) && (
+                                    <li className="text-muted-foreground italic">None specified</li>
+                                  )}
+                                </ul>
+                              </div>
+
+                              {/* Not Covered Column */}
+                              <div className="bg-red-50 dark:bg-red-900/10 rounded-lg p-3 border border-red-200 dark:border-red-800">
+                                <p className="font-semibold text-red-900 dark:text-red-100 mb-2">✗ Not Covered</p>
+                                <ul className="space-y-1.5 text-red-800 dark:text-red-200">
+                                  {summary.shared_expenses_table.not_covered?.map((item, idx) => (
+                                    <li key={idx}>• {item}</li>
+                                  ))}
+                                  {(!summary.shared_expenses_table.not_covered || summary.shared_expenses_table.not_covered.length === 0) && (
+                                    <li className="text-muted-foreground italic">None specified</li>
+                                  )}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

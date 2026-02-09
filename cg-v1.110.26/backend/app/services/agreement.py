@@ -1220,11 +1220,12 @@ AGREEMENT SECTIONS:
             summary_markdown = response.choices[0].message.content
 
             # Extract key points for the compact view
-            key_points = self._extract_key_points_from_sections(section_dict)
+            key_points_data = self._extract_key_points_from_sections(section_dict)
 
             return {
                 "summary": summary_markdown,
-                "key_points": key_points[:8],  # Top 8 key points
+                "key_points": key_points_data.get("key_points", []),
+                "shared_expenses_table": key_points_data.get("shared_expenses_table"),
                 "completion_percentage": completion_percentage,
                 "status": agreement.status
             }
@@ -1235,47 +1236,46 @@ AGREEMENT SECTIONS:
                 agreement, section_dict, completion_percentage
             )
 
-    def _extract_key_points_from_sections(self, section_dict: Dict[str, Any]) -> list:
+    def _extract_key_points_from_sections(self, section_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Extract detailed Quick Facts for one-screen reference.
-        Combines related info into compact, info-dense bullet points.
+        Extract labeled Quick Facts for easy reference.
+        Returns dict with key_points (list) and shared_expenses_table (dict).
         """
         import re
         key_points = []
+        shared_expenses_table = None
         
-        # 1. CUSTODY TYPE (Sections 1,2,3 combined)
-        custody_parts = []
+        # 1. CUSTODY TYPE
         if "custody" in section_dict:
             content = section_dict["custody"]["content"]
-            # Legal custody
+            custody_parts = []
+            
             if "joint legal" in content.lower():
                 custody_parts.append("Joint legal")
             elif "sole legal" in content.lower():
                 custody_parts.append("Sole legal")
             
-            # Physical custody
             if "joint physical" in content.lower():
                 custody_parts.append("joint physical custody")
             elif "sole physical" in content.lower():
                 custody_parts.append("sole physical custody")
             
-        if custody_parts:
-            key_points.append(" + ".join(custody_parts))
+            if custody_parts:
+                key_points.append(f"**Custody Type:** {' + '.join(custody_parts)}")
         
-        # 2. SCHEDULE TYPE
+        # 2. SCHEDULE
         if "schedule" in section_dict or "custody" in section_dict:
             content = section_dict.get("schedule", {}).get("content", "")
             content += " " + section_dict.get("custody", {}).get("content", "")
             
             if "2-2-3" in content:
-                key_points.append("2-2-3 schedule (50/50 time)")
+                key_points.append("**Schedule:** 2-2-3 schedule (50/50 time)")
             elif "week on" in content.lower() or "alternating weeks" in content.lower():
-                key_points.append("Week on/week off schedule")
+                key_points.append("**Schedule:** Week on/week off schedule")
             elif "every other weekend" in content.lower():
-                key_points.append("Every other weekend schedule")
+                key_points.append("**Schedule:** Every other weekend schedule")
         
-        # 3. EXCHANGES (Sections 4,5,6 combined - location, time, late policy)
-        exchange_parts = []
+        # 3. EXCHANGES
         if "transportation" in section_dict or "schedule" in section_dict:
             trans_content = section_dict.get("transportation", {}).get("content", "")
             sched_content = section_dict.get("schedule", {}).get("content", "")
@@ -1285,15 +1285,15 @@ AGREEMENT SECTIONS:
             time_match = re.search(r'(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm))', content, re.IGNORECASE)
             time_str = time_match.group(1) if time_match else "5:00 PM"
             
-            # Extract location - look for specific venue/address
+            # Extract location with address
             location = None
-            # Look for @ symbol pattern
-            at_match = re.search(r'@\s*([^,\.\n]+(?:,\s*[^,\.\n]+)?)', content)
+            # Look for @ symbol pattern with address
+            at_match = re.search(r'@\s*([^,\.\n]+(?:\([^)]+\))?)', content)
             if at_match:
                 location = at_match.group(1).strip()
-            # Look for specific venue types
+            # Look for specific addresses
             elif "starbucks" in content.lower():
-                addr_match = re.search(r'(\d+\s+[^,\n]+)', content)
+                addr_match = re.search(r'(\d+\s+[A-Za-z\s]+(?:Ave|Avenue|St|Street|Blvd|Boulevard|Dr|Drive|Rd|Road)[^,\.\n]*)', content, re.IGNORECASE)
                 if addr_match:
                     location = f"Starbucks ({addr_match.group(1).strip()})"
                 else:
@@ -1305,66 +1305,23 @@ AGREEMENT SECTIONS:
             else:
                 location = "Designated location"
             
-            exchange_parts.append(f"{time_str} @ {location}")
-            
-        if exchange_parts:
-            key_points.append(f"Exchanges: {exchange_parts[0]}")
+            key_points.append(f"**Exchanges:** {time_str} @ {location}")
         
         # 4. LATE POLICY
         if "transportation" in section_dict:
             content = section_dict["transportation"]["content"]
-            # Look for grace period and missed threshold
             grace_match = re.search(r'(\d+)[\s-]*minute[s]?\s*grace', content, re.IGNORECASE)
             missed_match = re.search(r'(\d+)[\s-]*minute[s]?.*(?:missed|no contact)', content, re.IGNORECASE)
             
             if grace_match and missed_match:
                 grace = grace_match.group(1)
                 missed = missed_match.group(1)
-                key_points.append(f"Late policy: {grace}-minute grace; \"missed\" after {missed} minutes no contact")
+                key_points.append(f"**Late policy:** {grace}-minute grace; \"missed\" after {missed} minutes no contact")
             elif grace_match:
                 grace = grace_match.group(1)
-                key_points.append(f"Late policy: {grace}-minute grace period")
+                key_points.append(f"**Late policy:** {grace}-minute grace period")
         
-        # 5. CHILD SUPPORT
-        if "financial" in section_dict:
-            content = section_dict["financial"]["content"]
-            amount_match = re.search(r'\$[\d,]+', content)
-            if amount_match:
-                amount = amount_match.group(0)
-                # Check for payment platform
-                if "clearfund" in content.lower():
-                    key_points.append(f"Child support: {amount}/month via ClearFund")
-                else:
-                    key_points.append(f"Child support: {amount}/month")
-            elif "no support" in content.lower() or "waived" in content.lower():
-                key_points.append("Child support: None ordered")
-        
-        # 6. SHARED EXPENSES
-        if "financial" in section_dict:
-            content = section_dict["financial"]["content"]
-            if "50/50" in content or "50-50" in content:
-                # Extract what's covered
-                covered = []
-                if "medical" in content.lower():
-                    covered.append("medical not covered" if "not covered" in content.lower() else "medical")
-                if "activities" in content.lower() or "extracurricular" in content.lower():
-                    covered.append("activities")
-                if "school" in content.lower():
-                    covered.append("school costs")
-                if "clothing" in content.lower():
-                    # Check for threshold
-                    threshold_match = re.search(r'\$(\d+)', content)
-                    if threshold_match:
-                        covered.append(f"clothing > ${threshold_match.group(1)}")
-                    else:
-                        covered.append("clothing")
-                
-                if covered:
-                    key_points.append(f"Shared expenses: 50/50 ({', '.join(covered)})")
-                else:
-                    key_points.append("Shared expenses: 50/50 split")
-        
-        # 7. SILENT HANDOFF (if applicable)
+        # 5. SILENT HANDOFF (if applicable)
         if "transportation" in section_dict:
             content = section_dict["transportation"]["content"]
             if "silent handoff" in content.lower():
@@ -1375,14 +1332,15 @@ AGREEMENT SECTIONS:
                     features.append("in-app confirmation")
                 
                 if features:
-                    key_points.append(f"Silent Handoff: {' + '.join(features)}")
+                    key_points.append(f"**Silent Handoff:** {' + '.join(features)}")
                 else:
-                    key_points.append("Silent Handoff: Enabled")
+                    key_points.append("**Silent Handoff:** Enabled")
         
-        # 8. COMMUNICATION
+        # 6. COMMUNICATION
         if "communication" in section_dict:
             content = section_dict["communication"]["content"]
             comm_method = "Per agreement"
+            
             if "commonground" in content.lower():
                 comm_method = "CommonGround only"
             elif "text" in content.lower():
@@ -1390,17 +1348,15 @@ AGREEMENT SECTIONS:
             elif "email" in content.lower():
                 comm_method = "Email"
             
-            # Add ARIA monitoring
             if "aria" in content.lower():
                 comm_method += "; ARIA™ monitors tone"
             
-            key_points.append(f"Communication: {comm_method}")
+            key_points.append(f"**Communication:** {comm_method}")
         
-        # 9. DISPUTE RESOLUTION
+        # 7. DISPUTES
         if "communication" in section_dict:
             content = section_dict["communication"]["content"]
             if "dispute" in content.lower() or "resolution" in content.lower():
-                # Look for step-by-step process
                 steps = []
                 if "48" in content or "two days" in content.lower():
                     steps.append("48 hours")
@@ -1412,9 +1368,62 @@ AGREEMENT SECTIONS:
                     steps.append("court")
                 
                 if steps:
-                    key_points.append(f"Disputes: {' → '.join(steps)}")
+                    key_points.append(f"**Disputes:** {' → '.join(steps)}")
         
-        return key_points
+        # 8. CHILD SUPPORT
+        if "financial" in section_dict:
+            content = section_dict["financial"]["content"]
+            amount_match = re.search(r'\$[\d,]+', content)
+            if amount_match:
+                amount = amount_match.group(0)
+                if "clearfund" in content.lower():
+                    key_points.append(f"**Child support:** {amount}/month via ClearFund")
+                else:
+                    key_points.append(f"**Child support:** {amount}/month")
+            elif "no support" in content.lower() or "waived" in content.lower():
+                key_points.append("**Child support:** None ordered")
+        
+        # 9. SHARED EXPENSES - Return as structured table data
+        if "financial" in section_dict:
+            content = section_dict["financial"]["content"]
+            if "50/50" in content or "50-50" in content:
+                # Build expense table
+                covered = []
+                not_covered = []
+                
+                # Medical
+                if "medical" in content.lower():
+                    if "not covered" in content.lower() or "insurance only" in content.lower():
+                        not_covered.append("Medical not covered by insurance")
+                    else:
+                        covered.append("Medical expenses")
+                
+                # Activities
+                if "activities" in content.lower() or "extracurricular" in content.lower():
+                    covered.append("Activities/extracurricular")
+                
+                # School
+                if "school" in content.lower():
+                    covered.append("School costs")
+                
+                # Clothing
+                if "clothing" in content.lower():
+                    threshold_match = re.search(r'\$(\d+)', content)
+                    if threshold_match:
+                        covered.append(f"Clothing over ${threshold_match.group(1)}")
+                    else:
+                        covered.append("Clothing")
+                
+                shared_expenses_table = {
+                    "split": "50/50",
+                    "covered": covered,
+                    "not_covered": not_covered
+                }
+        
+        return {
+            "key_points": key_points,
+            "shared_expenses_table": shared_expenses_table
+        }
 
     def _generate_fallback_comprehensive_summary(
         self, 
