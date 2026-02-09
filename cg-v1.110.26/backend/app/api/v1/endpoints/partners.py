@@ -54,6 +54,41 @@ router = APIRouter()
 
 
 # ============================================================================
+# Authenticated User Endpoints (MUST come before /{partner_slug} catch-all)
+# ============================================================================
+
+@router.get("/my-partners", response_model=list[PartnerStaffInfo])
+async def get_my_partner_access(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get list of all partners where current user has staff access.
+    Used by frontend navigation to show Partner Dashboard link.
+    """
+    result = await db.execute(
+        select(PartnerStaff).options(
+            selectinload(PartnerStaff.partner)
+        ).where(
+            PartnerStaff.user_id == current_user.id
+        )
+    )
+    staff_roles = result.scalars().all()
+    
+    return [
+        PartnerStaffInfo(
+            user_id=current_user.id,
+            partner_id=staff.partner_id,
+            partner_slug=staff.partner.partner_slug,
+            role=staff.role,
+            display_name=f"{current_user.first_name} {current_user.last_name}"
+        )
+        for staff in staff_roles
+        if staff.partner and staff.partner.status == PartnerStatus.ACTIVE
+    ]
+
+
+# ============================================================================
 # Public Endpoints (No Auth)
 # ============================================================================
 
@@ -372,35 +407,7 @@ async def get_partner_dashboard(
     )
 
 
-@router.get("/my-partners", response_model=list[PartnerStaffInfo])
-async def get_my_partner_access(
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
-):
-    """
-    Get list of all partners where current user has staff access.
-    Used by frontend navigation to show Partner Dashboard link.
-    """
-    result = await db.execute(
-        select(PartnerStaff).options(
-            selectinload(PartnerStaff.partner)
-        ).where(
-            PartnerStaff.user_id == current_user.id
-        )
-    )
-    staff_roles = result.scalars().all()
-    
-    return [
-        PartnerStaffInfo(
-            user_id=current_user.id,
-            partner_id=staff.partner_id,
-            partner_slug=staff.partner.partner_slug,
-            role=staff.role,
-            display_name=f"{current_user.first_name} {current_user.last_name}"
-        )
-        for staff in staff_roles
-        if staff.partner and staff.partner.status == PartnerStatus.ACTIVE
-    ]
+
 
 
 @router.get("/{partner_slug}/staff/me", response_model=PartnerStaffInfo)
