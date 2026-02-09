@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { messagesAPI, ARIAAnalysisResponse, MessageAttachment } from '@/lib/api';
+import { messagesAPI, ARIAAnalysisResponse, MessageAttachment, InterventionAction } from '@/lib/api';
 import { ARIAIntervention } from './aria-intervention';
 import {
   Send,
@@ -63,6 +63,9 @@ export function MessageCompose({
   const [analysis, setAnalysis] = useState<ARIAAnalysisResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
+  // Track previous flagged state for "modified" interventions
+  const [lastFlaggedAnalysis, setLastFlaggedAnalysis] = useState<ARIAAnalysisResponse | null>(null);
+  const [lastFlaggedMessage, setLastFlaggedMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Helper functions for attachments
@@ -165,6 +168,10 @@ export function MessageCompose({
       setIsAnalyzing(true);
       setError(null);
       const result = await messagesAPI.analyze(message, { caseId, familyFileId });
+      if (result.is_flagged) {
+        setLastFlaggedAnalysis(result);
+        setLastFlaggedMessage(message);
+      }
       setAnalysis(result);
     } catch (err: any) {
       console.error('Analysis failed:', err);
@@ -174,7 +181,7 @@ export function MessageCompose({
     }
   };
 
-  const handleSendDirect = async (content: string) => {
+  const handleSendDirect = async (content: string, interventionAction?: InterventionAction) => {
     try {
       setIsSending(true);
       setError(null);
@@ -182,13 +189,21 @@ export function MessageCompose({
       // Determine content - use placeholder only if there are pending attachments
       const messageContent = content.trim() || (attachments.length > 0 ? '' : '');
 
+      // If modifying, send the ORIGINAL toxic message as content (so backend creates flag),
+      // and the NEW clean message as the final_message in intervention_action.
+      // If sending anyway, content is already the toxic message.
+      const payloadContent = (interventionAction?.action === 'modified' && lastFlaggedMessage)
+        ? lastFlaggedMessage
+        : (messageContent || '(Attachment)');
+
       const newMessage = await messagesAPI.send({
         case_id: caseId,
         family_file_id: familyFileId,
         agreement_id: agreementId,
         recipient_id: recipientId,
-        content: messageContent || '(Attachment)',
+        content: payloadContent,
         message_type: 'text',
+        intervention_action: interventionAction,
       });
 
       // Upload attachments if any
@@ -255,6 +270,8 @@ export function MessageCompose({
       // Clear form state
       setMessage('');
       setAnalysis(null);
+      setLastFlaggedAnalysis(null);
+      setLastFlaggedMessage(null);
       setAttachments([]);
 
       // Show warning if some uploads failed (but message preserved)
@@ -291,7 +308,10 @@ export function MessageCompose({
   };
 
   const handleSendAnyway = () => {
-    handleSendDirect(message);
+    handleSendDirect(message, {
+      action: 'sent_anyway',
+      final_message: message
+    });
   };
 
   const handleCancel = () => {
@@ -314,13 +334,24 @@ export function MessageCompose({
         const result = await messagesAPI.analyze(message, { caseId, familyFileId });
 
         if (result.is_flagged) {
+          setLastFlaggedAnalysis(result);
+          setLastFlaggedMessage(message);
           setAnalysis(result);
           setIsAnalyzing(false);
           return;
         }
 
         setIsAnalyzing(false);
-        await handleSendDirect(message);
+
+        // Check if this was a modification of a previously flagged message
+        if (lastFlaggedAnalysis && lastFlaggedMessage && message !== lastFlaggedMessage) {
+          await handleSendDirect(message, {
+            action: 'modified',
+            final_message: message
+          });
+        } else {
+          await handleSendDirect(message);
+        }
       } catch (err: any) {
         console.error('ARIA analysis failed:', err);
         setError(err.message || 'Failed to analyze message');

@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -352,6 +352,18 @@ async def get_partner_dashboard(
             )
         )
         aria_interventions = aria_result.scalar() or 0
+        
+        # ALSO count blocked interventions from aria_events table (raw SQL since no model)
+        # These are messages that were blocked (Severe/Hate/Threats) and never created a Message record
+        # Use ANY(:user_ids) for postgres array support
+        if user_ids:
+            blocked_result = await db.execute(
+                text("SELECT COUNT(*) FROM aria_events WHERE user_id = ANY(:user_ids)"),
+                {"user_ids": list(user_ids)}
+            )
+            blocked_count = blocked_result.scalar() or 0
+            
+            aria_interventions += blocked_count
     
     # Get schedule count
     schedules_created = 0

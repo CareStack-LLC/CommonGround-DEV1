@@ -17,6 +17,7 @@ class MessageCreate(BaseModel):
     thread_id: Optional[str] = Field(None, max_length=100)
     agreement_id: Optional[str] = Field(None, max_length=100)  # SharedCare Agreement context
     message_type: str = Field(default="text", max_length=50)
+    intervention_action: Optional[InterventionAction] = None
 
     @field_validator('content')
     @classmethod

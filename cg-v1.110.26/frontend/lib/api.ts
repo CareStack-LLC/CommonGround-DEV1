@@ -672,6 +672,12 @@ export const casesAPI = {
 // Messages API
 // ============================================================================
 
+export interface InterventionAction {
+  action: 'accepted' | 'modified' | 'rejected' | 'sent_anyway' | 'cancelled';
+  final_message?: string;
+  notes?: string;
+}
+
 export interface SendMessageRequest {
   case_id?: string;  // Court case context (legacy)
   family_file_id?: string;  // Family file context (preferred)
@@ -680,6 +686,7 @@ export interface SendMessageRequest {
   content: string;
   thread_id?: string;
   message_type?: string;
+  intervention_action?: InterventionAction;
 }
 
 export interface MessageAttachment {

@@ -497,8 +497,28 @@ async def send_message(
             timestamp=datetime.utcnow()
         )
 
-    # Calculate content hash
-    content_hash = hashlib.sha256(message_data.content.encode()).hexdigest()
+    # Determine final content and original content based on intervention
+    final_content = message_data.content
+    original_content = None
+    user_action = "pending"
+    
+    if aria_analysis and aria_analysis.is_flagged and message_data.intervention_action:
+        action = message_data.intervention_action
+        user_action = action.action
+        
+        # If flagged, track original content
+        original_content = message_data.content
+        
+        if action.action == "accepted" and aria_analysis.suggestion:
+            final_content = aria_analysis.suggestion
+        elif action.action == "modified" and action.final_message:
+            final_content = action.final_message
+        elif action.action == "rejected" and action.final_message:
+             final_content = action.final_message
+        # "sent_anyway" keeps original content
+            
+    # Calculate content hash of the FINAL content
+    content_hash = hashlib.sha256(final_content.encode()).hexdigest()
 
     # Create message
     new_message = Message(
@@ -509,11 +529,13 @@ async def send_message(
         agreement_id=message_data.agreement_id,  # Link to SharedCare Agreement
         sender_id=current_user.id,
         recipient_id=message_data.recipient_id,
-        content=message_data.content,
+        recipient_id=message_data.recipient_id,
+        content=final_content,
         content_hash=content_hash,
         message_type=message_data.message_type,
         sent_at=datetime.utcnow(),
-        was_flagged=aria_analysis.is_flagged
+        was_flagged=aria_analysis.is_flagged,
+        original_content=original_content
     )
 
     # BLOCKING LOGIC: If blocked (Severe Threats / Hate Speech / Sexual Harassment)
@@ -564,8 +586,8 @@ async def send_message(
             toxicity_score=aria_analysis.toxicity_score,
             categories=[cat.value for cat in aria_analysis.categories],
             suggested_content=aria_analysis.suggestion,
-            user_action="pending",
-            original_content_hash=content_hash,
+            user_action=user_action,
+            original_content_hash=hashlib.sha256(message_data.content.encode()).hexdigest(),
             final_content_hash=content_hash,
             intervention_level=intervention_level,
             intervention_message=aria_analysis.explanation or "Content flagged by ARIA",
@@ -1417,6 +1439,45 @@ async def upload_message_attachment(
         # 2. Check Verdict
         action = analysis.get("action", "ALLOW")
         
+        if action == "BLOCK" or action == "FLAG":
+            from app.services.aria import SentimentAnalysis, ToxicityLevel, ToxicityCategory
+            
+            # Map Vision labels to ToxicityCategory
+            categories = []
+            for label in analysis.get("labels", []):
+                if label["score"] > 0.5:
+                    if label["name"] == "Nudity":
+                        categories.append(ToxicityCategory.SEXUAL_HARASSMENT)
+                    elif label["name"] in ["Violence", "Weapons", "SelfHarm"]:
+                        categories.append(ToxicityCategory.THREATENING)
+                    elif label["name"] == "HateSymbols":
+                        categories.append(ToxicityCategory.HATE_SPEECH)
+            
+            # Create SentimentAnalysis object for logging
+            vision_analysis = SentimentAnalysis(
+                original_message=f"Image Attachment: {file.filename}",
+                toxicity_level=ToxicityLevel.SEVERE if action == "BLOCK" else ToxicityLevel.HIGH,
+                toxicity_score=analysis.get("severity", 1.0),
+                categories=categories,
+                triggers=[l["name"] for l in analysis.get("labels", []) if l["score"] > 0.5],
+                explanation=analysis.get("explanation", "Flagged by ARIA Vision"),
+                suggestion=None,
+                is_flagged=True,
+                block_send=(action == "BLOCK"),
+                timestamp=datetime.utcnow()
+            )
+            
+            # Log the event
+            await aria_service.log_event(
+                db=db,
+                user_id=str(current_user.id),
+                family_file_id=family_file_id,
+                message_id=message_id,  # Note: Message exists, but attachment might be deleted
+                content_type="image",
+                analysis=vision_analysis,
+                context_data={"file_name": file.filename, "storage_path": storage_path}
+            )
+
         if action == "BLOCK":
             logger.warning(f"BLOCKED UNSAFE IMAGE upload for user {current_user.id}: {analysis.get('explanation')}")
             
