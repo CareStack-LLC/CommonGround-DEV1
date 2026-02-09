@@ -91,9 +91,9 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                     </h1>
 
                     <p className="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
-                        The digital era is tough. We make sure you're documenting
-                        correctly through custody exchanges while AI-powered tools
-                        give you confidence & support.
+                        The digital era moves fast. We ensure you're leading the way
+                        with the right tools to document your journey, protect your rights,
+                        and build a stable foundation for your children.
                     </p>
 
                     {/* Grant Code Box */}
@@ -158,11 +158,11 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                            Built for Fathers, By the Community.
+                            Strong. Safe. Smart.
                         </h2>
                         <p className="text-gray-400 max-w-2xl mx-auto">
-                            Forever Forward isn't just a grant program. It's a commitment to
-                            ensuring fathers have the tools they need to stay present and protected.
+                            Forever Forward exists because talent is everywhere, but access isn't.
+                            We equip fathers with modern tools to lead at home and in the community.
                         </p>
                     </div>
 
@@ -170,22 +170,22 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                         {[
                             {
                                 icon: Scale,
-                                title: "Strength",
-                                desc: "Go into mediation with verified data, organized reports and clear history.",
+                                title: "Leading with Strength",
+                                desc: "Cultivate the discipline required to lead. Enter mediation with verified data, organized reports, and a clear history of your involvement.",
                                 color: "text-amber-400",
                                 bg: "bg-amber-500/10"
                             },
                             {
                                 icon: Clock,
-                                title: "Consistency",
-                                desc: "Consistency creates stability. Our tools track every exchange and schedule change.",
+                                title: "Creating Safety",
+                                desc: "Consistency creates stability. Secure your family's future with tools that track every exchange, schedule change, and career milestone.",
                                 color: "text-orange-400",
                                 bg: "bg-orange-500/10"
                             },
                             {
                                 icon: MessageSquare,
-                                title: "Communication",
-                                desc: "Master the art of responding, not reacting. AI helps you keep it professional.",
+                                title: "Staying Smart",
+                                desc: "Master the art of responding, not reacting. AI-powered communication helps you keep it professional, protecting your peace and your legacy.",
                                 color: "text-yellow-400",
                                 bg: "bg-yellow-500/10"
                             }
