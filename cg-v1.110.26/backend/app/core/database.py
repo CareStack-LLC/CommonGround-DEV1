@@ -13,20 +13,26 @@ from app.models.base import Base
 
 
 # Create async engine
-# Note: statement_cache_size=0 is required for Supabase connection pooler (Supavisor/PgBouncer)
-# which doesn't support prepared statements in transaction mode
-# pool_pre_ping=True ensures connections are valid before use (handles dropped connections)
-# NullPool is required for Supabase's Supavisor - SQLAlchemy's pool conflicts with external poolers
+# Note: For Supabase connection pooler (Supavisor/PgBouncer):
+# - statement_cache_size=0: Required because pooler doesn't support prepared statements in transaction mode
+# - NullPool: Required so SQLAlchemy doesn't maintain its own pool (conflicts with Supavisor)
+# - command_timeout=60: Prevents connections from hanging indefinitely
+# - server_settings: Ensure proper session configuration
 connect_args = {}
 if "sqlite" not in settings.async_database_url:
     connect_args["statement_cache_size"] = 0
+    connect_args["command_timeout"] = 60  # 60 second timeout for long queries
+    # Supabase Supavisor requires these settings for stability
+    connect_args["server_settings"] = {
+        "application_name": "commonground_backend",
+        "jit": "off",  # Disable JIT for connection pooler compatibility
+    }
 
 engine = create_async_engine(
     settings.async_database_url,
     echo=settings.DATABASE_ECHO,
     future=True,
     poolclass=NullPool,  # Always use NullPool for Supabase Supavisor compatibility
-    pool_pre_ping=True,  # Test connections before use to handle Supabase pooler drops
     connect_args=connect_args,
 )
 
