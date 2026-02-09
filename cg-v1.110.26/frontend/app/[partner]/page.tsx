@@ -21,6 +21,8 @@ import {
     Loader2
 } from 'lucide-react';
 
+import ForeverForwardLanding from './components/ForeverForwardLanding';
+
 interface PartnerBranding {
     logo_url: string;
     primary_color: string;
@@ -50,36 +52,7 @@ interface PartnerInfo {
     is_active: boolean;
 }
 
-// Forever Forward specific content
-const FOREVER_FORWARD_CONTENT = {
-    headline: "Building Stronger Fathers, Building Stronger Families",
-    subheadline: "Forever Forward + CommonGround partnership provides you with FREE Complete tier access (6 months, $209.94 value)",
-    hero_message: "You're learning to lead your career. Now lead your family with the same confidence.",
-    why_matters: [
-        {
-            icon: Clock,
-            title: "Consistency",
-            description: "Show up reliably. Build trust. Prove your commitment."
-        },
-        {
-            icon: MessageSquare,
-            title: "Communication",
-            description: "Stay professional under pressure. AI helps you respond, not react."
-        },
-        {
-            icon: FileText,
-            title: "Documentation",
-            description: "Court-ready records of your involvement. Your receipts."
-        },
-        {
-            icon: Scale,
-            title: "Leadership",
-            description: "Organized, in control, making it work for your kids."
-        }
-    ],
-    cta_text: "Activate Your Free Access",
-    closing: "Your family is worth 10 minutes of setup. Let's move forward together."
-};
+
 
 export default function PartnerLandingPage() {
     const params = useParams();
@@ -179,8 +152,9 @@ export default function PartnerLandingPage() {
     }
 
     // Check if this is Forever Forward for custom content
-    const isForeverForward = partnerSlug.toLowerCase() === 'foreverforward';
-    const content = isForeverForward ? FOREVER_FORWARD_CONTENT : null;
+    if (partnerSlug.toLowerCase() === 'foreverforward') {
+        return <ForeverForwardLanding partnerSlug={partnerSlug} />;
+    }
 
     // Apply partner branding as CSS variables
     const brandingStyle = {
@@ -221,19 +195,13 @@ export default function PartnerLandingPage() {
                     </div>
 
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                        {content?.headline || `${partner.display_name} + CommonGround`}
+                        {partner.display_name} + CommonGround
                     </h1>
 
                     <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                        {content?.subheadline || partner.branding_config.tagline ||
+                        {partner.branding_config.tagline ||
                             `Through our partnership with ${partner.display_name}, you receive free access to CommonGround's Complete co-parenting platform.`}
                     </p>
-
-                    {content?.hero_message && (
-                        <p className="text-lg text-amber-400 font-medium mb-10">
-                            {content.hero_message}
-                        </p>
-                    )}
 
                     {/* Grant Code Entry */}
                     <Card className="max-w-md mx-auto bg-gray-800/50 border-gray-700">
@@ -246,7 +214,7 @@ export default function PartnerLandingPage() {
                             <div className="flex gap-2">
                                 <Input
                                     type="text"
-                                    placeholder="FOREVERFORWARD0001"
+                                    placeholder="GRANTCODE001"
                                     value={grantCode}
                                     onChange={(e) => {
                                         setGrantCode(e.target.value.toUpperCase());
@@ -283,30 +251,6 @@ export default function PartnerLandingPage() {
                     </Card>
                 </div>
             </section>
-
-            {/* Why This Matters (for fathers) */}
-            {content?.why_matters && (
-                <section className="py-16 px-6 bg-gray-800/30">
-                    <div className="max-w-5xl mx-auto">
-                        <h2 className="text-2xl font-bold text-white text-center mb-10">
-                            Why This Matters For Fathers
-                        </h2>
-                        <div className="grid md:grid-cols-4 gap-6">
-                            {content.why_matters.map((item, idx) => (
-                                <Card key={idx} className="bg-gray-800/50 border-gray-700 text-center">
-                                    <CardContent className="pt-6">
-                                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 mb-4">
-                                            <item.icon className="h-6 w-6 text-amber-400" />
-                                        </div>
-                                        <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-                                        <p className="text-sm text-gray-400">{item.description}</p>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
 
             {/* Features Grid */}
             <section className="py-16 px-6">
@@ -366,26 +310,6 @@ export default function PartnerLandingPage() {
                     </div>
                 </section>
             )}
-
-            {/* Final CTA */}
-            <section className="py-16 px-6 bg-gradient-to-r from-amber-600/20 to-amber-500/20">
-                <div className="max-w-2xl mx-auto text-center">
-                    {content?.closing && (
-                        <p className="text-xl text-white font-medium mb-6">{content.closing}</p>
-                    )}
-                    <Button
-                        size="lg"
-                        onClick={() => document.querySelector('input')?.focus()}
-                        className="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold text-lg px-8"
-                    >
-                        {content?.cta_text || "Activate Your Free Access"}
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                    <p className="text-gray-400 text-sm mt-4">
-                        Questions? Contact {partner.display_name} or email support@mycommonground.app
-                    </p>
-                </div>
-            </section>
 
             {/* Footer */}
             <footer className="py-8 px-6 border-t border-gray-800">
