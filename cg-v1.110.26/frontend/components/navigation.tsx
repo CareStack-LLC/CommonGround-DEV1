@@ -153,11 +153,10 @@ export function Navigation() {
                   <Link
                     key={item.path}
                     href={item.path}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
                         ? 'bg-white/20 text-white'
                         : 'text-white/80 hover:text-white hover:bg-white/10'
-                    }`}
+                      }`}
                   >
                     {item.name}
                   </Link>
@@ -194,9 +193,8 @@ export function Navigation() {
                         <span className="text-sm font-medium text-white">{initials}</span>
                       </div>
                       <ChevronDown
-                        className={`h-4 w-4 text-white transition-transform hidden sm:block ${
-                          userMenuOpen ? 'rotate-180' : ''
-                        }`}
+                        className={`h-4 w-4 text-white transition-transform hidden sm:block ${userMenuOpen ? 'rotate-180' : ''
+                          }`}
                       />
                     </button>
 
@@ -229,6 +227,13 @@ export function Navigation() {
                               Professional Portal
                             </button>
                           )}
+                          <button
+                            onClick={() => handleNavigation('/dashboard/partners/foreverforward')}
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-amber-50 transition-smooth"
+                          >
+                            <Users className="h-4 w-4 text-amber-600" />
+                            Partner Dashboard
+                          </button>
                           <button
                             onClick={() => handleNavigation('/family-files')}
                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-[var(--portal-primary)]/10 transition-smooth"
@@ -312,11 +317,10 @@ export function Navigation() {
                       key={item.path}
                       href={item.path}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        isActive
+                      className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
                           ? 'bg-white/20 text-white'
                           : 'text-white/80 hover:text-white hover:bg-white/10'
-                      }`}
+                        }`}
                     >
                       {Icon && <Icon className="h-5 w-5" />}
                       {item.name}
