@@ -58,7 +58,7 @@ export default function PartnerDashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [copiedCode, setCopiedCode] = useState<string | null>(null);
+    const [isStaff, setIsStaff] = useState(false);
 
     useEffect(() => {
         fetchDashboard();
@@ -66,9 +66,12 @@ export default function PartnerDashboardPage() {
 
     async function fetchDashboard() {
         setLoading(true);
+        setError(null);
         try {
             const token = localStorage.getItem('access_token');
-            const res = await fetch(
+
+            // 1. Try fetching protected dashboard data
+            let res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/v1/partners/${partnerSlug}/dashboard`,
                 {
                     headers: {
@@ -78,30 +81,42 @@ export default function PartnerDashboardPage() {
                 }
             );
 
-            if (res.status === 403) {
-                setError('You do not have access to this dashboard');
+            if (res.ok) {
+                const dashboardData = await res.json();
+                setData(dashboardData);
+                setIsStaff(true);
+                setLoading(false);
                 return;
             }
+
+            // 2. Fallback to public impact metrics if unauthorized or not logged in
+            res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/v1/partners/${partnerSlug}/impact-metrics`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
 
             if (!res.ok) {
-                setError('Failed to load dashboard');
+                if (res.status === 404) {
+                    setError('Partner not found');
+                } else {
+                    setError('Failed to load impact data');
+                }
                 return;
             }
 
-            const dashboardData = await res.json();
-            setData(dashboardData);
+            const publicData = await res.json();
+            setData(publicData);
+            setIsStaff(false);
         } catch (err) {
             setError('Failed to connect to server');
         } finally {
             setLoading(false);
         }
     }
-
-    const copyCode = async (code: string) => {
-        await navigator.clipboard.writeText(code);
-        setCopiedCode(code);
-        setTimeout(() => setCopiedCode(null), 2000);
-    };
 
     if (loading) {
         return (
@@ -113,22 +128,24 @@ export default function PartnerDashboardPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6 text-center">
                 <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-                <h1 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h1>
-                <p className="text-gray-600">{error}</p>
+                <h1 className="text-xl font-semibold text-gray-900 mb-2">{error}</h1>
+                <p className="text-gray-600 max-w-sm">
+                    We couldn't retrieve the impact data for this partner. Please check the URL or try again later.
+                </p>
             </div>
         );
     }
 
     if (!data) return null;
 
-    const { partner, metrics, active_users, grant_codes } = data;
+    const { partner, metrics } = data;
 
     // Use ImpactBoard for all partners (as per user request "overhaul this dashboard")
     // or specifically check for Forever Forward if we wanted to be cautious.
     // Given the prompt "overhaul this dashboard... into something like an ImpactBoard",
     // we will default to the new view.
-    return <ImpactBoard partner={partner} metrics={metrics} />;
+    return <ImpactBoard partner={partner} metrics={metrics} isStaff={isStaff} />;
 
 }

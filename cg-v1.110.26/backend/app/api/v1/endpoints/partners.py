@@ -216,6 +216,119 @@ async def validate_partner_code(
     )
 
 
+@router.get("/{partner_slug}/impact-metrics", response_model=PartnerDashboardData)
+async def get_public_impact_metrics(
+    partner_slug: str,
+    days: int = 30,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get public impact metrics for a partner (public).
+    
+    Returns the same metrics as the dashboard, but without sensitive grant code or user lists.
+    """
+    result = await db.execute(
+        select(Partner).where(
+            Partner.partner_slug == partner_slug.lower()
+        )
+    )
+    partner = result.scalar_one_or_none()
+    
+    if not partner:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Partner not found"
+        )
+    
+    period_end = datetime.utcnow()
+    period_start = period_end - timedelta(days=days)
+    
+    # Get all grant codes for this partner to calculate activation rates
+    codes_result = await db.execute(
+        select(GrantCode).where(
+            GrantCode.partner_id == partner.id
+        )
+    )
+    grant_codes = codes_result.scalars().all()
+    
+    # Build metrics
+    codes_distributed = len(grant_codes)
+    codes_activated = sum(1 for c in grant_codes if c.redemption_count > 0)
+    activation_rate = (codes_activated / codes_distributed * 100) if codes_distributed > 0 else 0
+    
+    # Get anonymized user IDs for message/aria counts
+    redemptions_result = await db.execute(
+        select(GrantRedemption.user_id).join(GrantCode).where(
+            GrantCode.partner_id == partner.id,
+            GrantRedemption.is_active == True
+        )
+    )
+    user_ids = [r[0] for r in redemptions_result.all()]
+    
+    total_messages = 0
+    aria_interventions = 0
+    if user_ids:
+        msg_result = await db.execute(
+            select(func.count(Message.id)).where(
+                Message.sender_id.in_(user_ids)
+            )
+        )
+        total_messages = msg_result.scalar() or 0
+        
+        aria_result = await db.execute(
+            select(func.count(MessageFlag.id))
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(
+                Message.sender_id.in_(user_ids)
+            )
+        )
+        aria_interventions = aria_result.scalar() or 0
+        
+        # Also count blocked interventions
+        try:
+            blocked_stmt = text("SELECT COUNT(*) FROM aria_events WHERE user_id IN :user_ids")
+            blocked_stmt = blocked_stmt.bindparams(bindparam("user_ids", expanding=True))
+            blocked_result = await db.execute(blocked_stmt, {"user_ids": list(user_ids)})
+            aria_interventions += (blocked_result.scalar() or 0)
+        except Exception:
+            pass
+    
+    # Count remaining codes
+    rem_result = await db.execute(
+        select(func.count(GrantCode.id)).where(
+            GrantCode.partner_id == partner.id,
+            GrantCode.is_active == True,
+            GrantCode.redemption_count == 0
+        )
+    )
+    codes_remaining = rem_result.scalar() or 0
+
+    return PartnerDashboardData(
+        partner=PartnerPublicInfo(
+            partner_slug=partner.partner_slug,
+            display_name=partner.display_name,
+            mission_statement=partner.mission_statement,
+            branding_config=PartnerBrandingConfig(**partner.branding_config),
+            landing_config=PartnerLandingConfig(**partner.landing_config),
+            codes_remaining=codes_remaining,
+            is_active=partner.status == PartnerStatus.ACTIVE
+        ),
+        metrics=PartnerMetricsSummary(
+            codes_distributed=codes_distributed,
+            codes_activated=codes_activated,
+            activation_rate=round(activation_rate, 1),
+            active_users=len(user_ids),
+            messages_sent=total_messages,
+            aria_interventions=aria_interventions,
+            schedules_created=0 # Placeholder
+        ),
+        active_users=[], # Hide for public view
+        grant_codes=[], # Hide for public view
+        period_start=period_start,
+        period_end=period_end
+    )
+
+
 # ============================================================================
 # Protected Endpoints (Partner Staff Auth)
 # ============================================================================

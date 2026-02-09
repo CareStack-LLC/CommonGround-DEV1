@@ -1,15 +1,18 @@
 'use client';
 
+import Link from 'next/link';
 import {
-    Users,
-    CheckCircle,
-    MessageSquare,
     Shield,
     TrendingUp,
-    Heart,
+    MessageSquare,
     Share2,
+    Users,
     Calendar,
-    ArrowRight,
+    ArrowUpRight,
+    Heart,
+    Zap,
+    Lock,
+    Settings,
     Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -33,9 +36,10 @@ interface ImpactBoardProps {
         codes_remaining: number;
     };
     metrics: PartnerMetrics;
+    isStaff?: boolean;
 }
 
-export default function ImpactBoard({ partner, metrics }: ImpactBoardProps) {
+export default function ImpactBoard({ partner, metrics, isStaff = false }: ImpactBoardProps) {
     // Calculated impacts
     const familiesHelped = metrics.active_users > 0 ? metrics.active_users : metrics.codes_activated;
     const peaceMoments = metrics.aria_interventions; // "Conflicts Prevented" -> "Moments of Peace"
@@ -72,15 +76,21 @@ export default function ImpactBoard({ partner, metrics }: ImpactBoardProps) {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
+                        {isStaff && (
+                            <Link href={`/dashboard/partners/${partner.partner_slug}/codes`}>
+                                <Button className="bg-white text-gray-900 font-bold hover:bg-amber-400 transition-colors">
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    Manage Codes
+                                </Button>
+                            </Link>
+                        )}
                         <Button
+                            variant="outline"
                             className="bg-white/5 hover:bg-white/10 text-white border border-white/10 backdrop-blur-sm"
                             onClick={() => window.print()}
                         >
                             <Share2 className="mr-2 h-4 w-4" />
                             Share Report
-                        </Button>
-                        <Button className="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold">
-                            Partner With Us
                         </Button>
                     </div>
                 </header>
@@ -115,12 +125,12 @@ export default function ImpactBoard({ partner, metrics }: ImpactBoardProps) {
                                 <div className="h-2 w-full bg-gray-700/30 rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000 ease-out"
-                                        style={{ width: `${Math.min(metrics.activation_rate, 100)}%` }}
+                                        style={{ width: `${Math.min(stabilityScore, 100)}%` }}
                                     />
                                 </div>
                                 <div className="flex justify-between mt-3 text-sm">
-                                    <span className="text-gray-400">Grant Utilization</span>
-                                    <span className="text-white font-medium">{metrics.activation_rate}% of goal</span>
+                                    <span className="text-gray-400">Stability Score</span>
+                                    <span className="text-white font-medium">{stabilityScore}% of goal</span>
                                 </div>
                             </div>
                         </CardContent>
@@ -190,11 +200,8 @@ export default function ImpactBoard({ partner, metrics }: ImpactBoardProps) {
                         </div>
                     </div>
 
-                    {/* Visual/Image Placeholder - ideally this would be dynamic or a chart */}
                     <div className="relative aspect-square md:aspect-auto md:h-full min-h-[400px] rounded-3xl overflow-hidden bg-gray-800 border border-gray-700">
                         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-indigo-500/10" />
-
-                        {/* Abstract Visualization of Impact */}
                         <div className="absolute inset-x-12 top-12 bottom-12 flex flex-col justify-center space-y-3">
                             <h3 className="text-center text-gray-500 text-sm uppercase tracking-widest mb-4">Grant Distribution Velocity</h3>
                             {[65, 45, 75, 55, 80, 70].map((h, i) => (
@@ -208,13 +215,12 @@ export default function ImpactBoard({ partner, metrics }: ImpactBoardProps) {
                                     </div>
                                 </div>
                             ))}
-                            {/* Highlighted current week */}
                             <div className="flex items-center gap-4">
                                 <div className="text-xs text-amber-500 font-mono w-8">Now</div>
                                 <div className="flex-1 h-3 bg-gray-700/50 rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full animate-pulse"
-                                        style={{ width: `${metrics.activation_rate}%` }}
+                                        style={{ width: `${stabilityScore}%` }}
                                     />
                                 </div>
                             </div>
