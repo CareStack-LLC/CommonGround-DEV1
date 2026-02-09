@@ -12,6 +12,8 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Optional
 
+logger = logging.getLogger(__name__)
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, func, text, bindparam
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -357,16 +359,21 @@ async def get_partner_dashboard(
         # These are messages that were blocked (Severe/Hate/Threats) and never created a Message record
         # Use ANY(:user_ids) for postgres array support
         if user_ids:
-            blocked_stmt = text("SELECT COUNT(*) FROM aria_events WHERE user_id IN :user_ids")
-            blocked_stmt = blocked_stmt.bindparams(bindparam("user_ids", expanding=True))
-            
-            blocked_result = await db.execute(
-                blocked_stmt,
-                {"user_ids": list(user_ids)}
-            )
-            blocked_count = blocked_result.scalar() or 0
-            
-            aria_interventions += blocked_count
+            try:
+                blocked_stmt = text("SELECT COUNT(*) FROM aria_events WHERE user_id IN :user_ids")
+                blocked_stmt = blocked_stmt.bindparams(bindparam("user_ids", expanding=True))
+                
+                blocked_result = await db.execute(
+                    blocked_stmt,
+                    {"user_ids": list(user_ids)}
+                )
+                blocked_count = blocked_result.scalar() or 0
+                
+                aria_interventions += blocked_count
+            except Exception as e:
+                # If table doesn't exist yet (migration pending), log and skip to avoid crashing dashboard
+                logger.error(f"Failed to query blocked interventions from aria_events: {e}")
+                pass
     
     # Get schedule count
     schedules_created = 0
