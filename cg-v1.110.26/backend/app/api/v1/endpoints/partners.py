@@ -345,7 +345,7 @@ async def get_partner_dashboard(
         aria_result = await db.execute(
             select(func.count(Message.id)).where(
                 Message.sender_id.in_(user_ids),
-                Message.aria_flagged == True
+                Message.was_flagged == True
             )
         )
         aria_interventions = aria_result.scalar() or 0
