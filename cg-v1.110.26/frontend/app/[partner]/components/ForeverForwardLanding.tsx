@@ -8,7 +8,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
     Clock,
     MessageSquare,
-    FileText,
     Scale,
     CheckCircle,
     ArrowRight,
@@ -209,26 +208,51 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
 
             {/* Co-Branding Context */}
             <section className="py-24 px-6 bg-gray-800/50">
-                <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12">
-                    <div className="flex-1">
-                        <h2 className="text-3xl font-bold text-white mb-6">
-                            Empowering Fathers in the Digital Era.
-                        </h2>
-                        <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
-                            <p>
-                                <strong className="text-amber-400">Forever Forward</strong> works directly with policy makers and community leaders to advocate for father's rights and family stability.
-                            </p>
-                            <p>
-                                Through our partnership with <strong className="text-cg-sage">CommonGround</strong>, we provide the tactical digital infrastructure you need to execute on that vision.
-                            </p>
-                            <p className="text-sm text-gray-500 italic mt-8 border-l-2 border-amber-500 pl-4">
-                                "Confidence isn't about being loud. It's about having the receipts." — Forever Forward
-                            </p>
+                <div className="max-w-5xl mx-auto">
+                    <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
+                        <div className="flex-1">
+                            <h2 className="text-3xl font-bold text-white mb-6">
+                                Empowering Fathers in the Digital Era.
+                            </h2>
+                            <div className="space-y-4 text-gray-300 text-lg leading-relaxed">
+                                <p>
+                                    <strong className="text-amber-400">Forever Forward</strong> works directly with policy makers and community leaders to advocate for father's rights and family stability.
+                                </p>
+                                <p>
+                                    Through our partnership with <strong className="text-cg-sage">CommonGround</strong>, we provide the tactical digital infrastructure you need to execute on that vision.
+                                </p>
+                                <p className="text-sm text-gray-500 italic mt-8 border-l-2 border-amber-500 pl-4">
+                                    "Confidence isn't about being loud. It's about having the receipts." — Forever Forward
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Premium Document Icon */}
+                        <div className="w-full md:w-1/3 aspect-square relative group perspective-1000">
+                            <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/10 to-transparent rounded-3xl blur-xl group-hover:bg-amber-500/20 transition-colors duration-500" />
+                            <div className="relative h-full w-full bg-gray-900/50 backdrop-blur-sm border border-white/5 rounded-3xl p-8 flex items-center justify-center overflow-hidden hover:border-amber-500/30 transition-all duration-500 hover:scale-[1.02] shadow-2xl">
+                                <img
+                                    src="/assets/marketing/premium_document_icon.png"
+                                    alt="Secure Document Shield"
+                                    className="w-48 h-48 object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.3)] animate-in fade-in zoom-in-50 duration-1000"
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div className="w-full md:w-1/3 aspect-square bg-gray-700 rounded-3xl flex items-center justify-center relative overflow-hidden group">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/20 to-transparent group-hover:opacity-75 transition-opacity" />
-                        <FileText className="w-24 h-24 text-gray-500 group-hover:text-amber-400 transition-colors duration-500" />
+
+                    {/* New Hero Image at Bottom */}
+                    <div className="relative rounded-3xl overflow-hidden aspect-[21/9] border border-white/5 group">
+                        <img
+                            src="/assets/marketing/empowering_father_son.png"
+                            alt="Father and son connection"
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-60" />
+                        <div className="absolute bottom-0 left-0 p-8 md:p-12">
+                            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 drop-shadow-lg">
+                                Real connections, protected by real data.
+                            </h3>
+                        </div>
                     </div>
                 </div>
             </section>
