@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, func, text
+from sqlalchemy import select, func, text, bindparam
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -357,8 +357,11 @@ async def get_partner_dashboard(
         # These are messages that were blocked (Severe/Hate/Threats) and never created a Message record
         # Use ANY(:user_ids) for postgres array support
         if user_ids:
+            blocked_stmt = text("SELECT COUNT(*) FROM aria_events WHERE user_id IN :user_ids")
+            blocked_stmt = blocked_stmt.bindparams(bindparam("user_ids", expanding=True))
+            
             blocked_result = await db.execute(
-                text("SELECT COUNT(*) FROM aria_events WHERE user_id = ANY(:user_ids)"),
+                blocked_stmt,
                 {"user_ids": list(user_ids)}
             )
             blocked_count = blocked_result.scalar() or 0
