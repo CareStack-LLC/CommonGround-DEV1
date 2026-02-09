@@ -28,6 +28,7 @@ from app.models import (
     GrantCode,
     GrantRedemption,
     Message,
+    MessageFlag,
     ScheduleEvent,
     PartnerStatus,
     PartnerStaffRole,
