@@ -529,7 +529,7 @@ async def send_message(
         agreement_id=message_data.agreement_id,  # Link to SharedCare Agreement
         sender_id=current_user.id,
         recipient_id=message_data.recipient_id,
-        recipient_id=message_data.recipient_id,
+
         content=final_content,
         content_hash=content_hash,
         message_type=message_data.message_type,
