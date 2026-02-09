@@ -99,6 +99,13 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
   );
 }
 
+// Partner staff access info
+interface PartnerStaffInfo {
+  partner_slug: string;
+  role: string;
+  display_name: string;
+}
+
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
@@ -106,7 +113,34 @@ export function Navigation() {
   const { unreadCount } = useNotification();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [partnerAccess, setPartnerAccess] = useState<PartnerStaffInfo[]>([]);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fetch partner staff access for current user
+  useEffect(() => {
+    const fetchPartnerAccess = async () => {
+      if (!user) {
+        setPartnerAccess([]);
+        return;
+      }
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+        const token = localStorage.getItem('access_token');
+        if (!token) return;
+
+        const res = await fetch(`${API_URL}/api/v1/partners/my-partners`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setPartnerAccess(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch partner access:', error);
+      }
+    };
+    fetchPartnerAccess();
+  }, [user]);
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -154,8 +188,8 @@ export function Navigation() {
                     key={item.path}
                     href={item.path}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                        ? 'bg-white/20 text-white'
-                        : 'text-white/80 hover:text-white hover:bg-white/10'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
                       }`}
                   >
                     {item.name}
@@ -227,13 +261,15 @@ export function Navigation() {
                               Professional Portal
                             </button>
                           )}
-                          <button
-                            onClick={() => handleNavigation('/dashboard/partners/foreverforward')}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-amber-50 transition-smooth"
-                          >
-                            <Users className="h-4 w-4 text-amber-600" />
-                            Partner Dashboard
-                          </button>
+                          {partnerAccess.length > 0 && (
+                            <button
+                              onClick={() => handleNavigation(`/dashboard/partners/${partnerAccess[0].partner_slug}`)}
+                              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-amber-50 transition-smooth"
+                            >
+                              <Users className="h-4 w-4 text-amber-600" />
+                              Partner Dashboard
+                            </button>
+                          )}
                           <button
                             onClick={() => handleNavigation('/family-files')}
                             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--portal-text)] hover:bg-[var(--portal-primary)]/10 transition-smooth"
@@ -318,8 +354,8 @@ export function Navigation() {
                       href={item.path}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-                          ? 'bg-white/20 text-white'
-                          : 'text-white/80 hover:text-white hover:bg-white/10'
+                        ? 'bg-white/20 text-white'
+                        : 'text-white/80 hover:text-white hover:bg-white/10'
                         }`}
                     >
                       {Icon && <Icon className="h-5 w-5" />}
