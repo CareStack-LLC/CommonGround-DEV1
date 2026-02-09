@@ -163,85 +163,118 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
 
                 {/* Narrative Sections */}
                 <div className="grid md:grid-cols-2 gap-12 items-center mb-24">
-                    <div className="space-y-6">
-                        <h2 className="text-3xl font-bold text-white">Why This Matters</h2>
+                    <div className="space-y-8">
+                        <div>
+                            <h2 className="text-3xl font-bold text-white mb-2">Strong. Safe. Smart.</h2>
+                            <p className="text-gray-400">
+                                How {partner.display_name} is delivering on its promise to fathers.
+                            </p>
+                        </div>
+
                         <div className="space-y-4">
-                            <div className="flex gap-4 p-4 rounded-xl bg-gray-800/30 border border-gray-700/30">
+                            <div className="flex gap-4 p-4 rounded-xl bg-gray-800/30 border border-gray-700/30 hover:bg-gray-800/50 transition-colors">
                                 <div className="mt-1">
-                                    <div className="h-8 w-8 rounded-full bg-amber-500/10 flex items-center justify-center">
-                                        <Sparkles className="h-4 w-4 text-amber-400" />
+                                    <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                                        <Shield className="h-5 w-5 text-amber-500" />
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 className="text-lg font-semibold text-white">Every Message Counts</h4>
-                                    <p className="text-gray-400 leading-relaxed">
-                                        Communication is the lifeline of co-parenting. By providing a secure channel,
-                                        {partner.display_name} ensures that {connectionPoints} messages resulted in
-                                        coordinated care, not conflict.
+                                    <h4 className="text-lg font-bold text-white">Leading with Strength</h4>
+                                    <p className="text-gray-400 text-sm leading-relaxed mt-1">
+                                        Fathers are entering mediation prepared. {familiesHelped} families
+                                        now have verified data and organized reports, giving them the
+                                        strength to advocate for their rights.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="flex gap-4 p-4 rounded-xl bg-gray-800/30 border border-gray-700/30">
+                            <div className="flex gap-4 p-4 rounded-xl bg-gray-800/30 border border-gray-700/30 hover:bg-gray-800/50 transition-colors">
                                 <div className="mt-1">
-                                    <div className="h-8 w-8 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                                        <Shield className="h-4 w-4 text-indigo-400" />
+                                    <div className="h-10 w-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                                        <Lock className="h-5 w-5 text-indigo-400" />
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 className="text-lg font-semibold text-white">Protecting the Child's Peace</h4>
-                                    <p className="text-gray-400 leading-relaxed">
+                                    <h4 className="text-lg font-bold text-white">Creating Safety</h4>
+                                    <p className="text-gray-400 text-sm leading-relaxed mt-1">
                                         The ARIA Safety Shield intercepted {peaceMoments} toxic interactions.
-                                        That's {peaceMoments} times a child didn't have to witness an argument
-                                        or feel the tension of a hostile exchange.
+                                        That's {peaceMoments} moments where a child was protected from
+                                        conflict, preserving their peace of mind.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 p-4 rounded-xl bg-gray-800/30 border border-gray-700/30 hover:bg-gray-800/50 transition-colors">
+                                <div className="mt-1">
+                                    <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                                        <Sparkles className="h-5 w-5 text-green-400" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="text-lg font-bold text-white">Staying Smart</h4>
+                                    <p className="text-gray-400 text-sm leading-relaxed mt-1">
+                                        AI-powered communication tools ensured {connectionPoints} messages
+                                        remained professional and productive, helping fathers master
+                                        the art of responding, not reacting.
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="relative aspect-square md:aspect-auto md:h-full min-h-[400px] rounded-3xl overflow-hidden bg-gray-800 border border-gray-700">
-                        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-indigo-500/10" />
-                        <div className="absolute inset-x-12 top-12 bottom-12 flex flex-col justify-center space-y-3">
-                            <h3 className="text-center text-gray-500 text-sm uppercase tracking-widest mb-4">Grant Distribution Velocity</h3>
-                            {[65, 45, 75, 55, 80, 70].map((h, i) => (
-                                <div key={i} className="flex items-center gap-4">
-                                    <div className="text-xs text-gray-600 font-mono w-8">Wk {i + 1}</div>
-                                    <div className="flex-1 h-3 bg-gray-700/50 rounded-full overflow-hidden">
-                                        <div
-                                            className="h-full bg-gradient-to-r from-gray-600 to-gray-500 rounded-full"
-                                            style={{ width: `${h}%` }}
-                                        />
-                                    </div>
+                    <div className="space-y-6">
+                        {/* Hero Image Card */}
+                        <div className="relative aspect-video rounded-3xl overflow-hidden border border-gray-700 shadow-2xl group">
+                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent z-10 opacity-80" />
+                            <img
+                                src="/assets/marketing/empowering_father_son.png"
+                                alt="Father and son moment"
+                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                            <div className="absolute bottom-6 left-6 z-20">
+                                <p className="text-white font-bold text-xl">Protecting Legacies.</p>
+                                <p className="text-gray-300 text-sm">One family at a time.</p>
+                            </div>
+                        </div>
+
+                        {/* Premium Icon Card */}
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="bg-gray-800/50 border border-gray-700/50 p-6 rounded-3xl flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent group-hover:from-amber-500/10 transition-colors" />
+                                <img
+                                    src="/assets/marketing/premium_document_icon.png"
+                                    alt="Premium Security"
+                                    className="w-20 h-20 object-contain mb-4 drop-shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                                />
+                                <p className="text-white font-bold">Bank-Grade Security</p>
+                                <p className="text-xs text-gray-500 mt-1">256-bit Encryption</p>
+                            </div>
+                            <div className="bg-gray-800/50 border border-gray-700/50 p-6 rounded-3xl flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent group-hover:from-indigo-500/10 transition-colors" />
+                                <div className="h-20 w-20 rounded-full bg-indigo-500/10 flex items-center justify-center mb-4">
+                                    <Users className="h-10 w-10 text-indigo-400" />
                                 </div>
-                            ))}
-                            <div className="flex items-center gap-4">
-                                <div className="text-xs text-amber-500 font-mono w-8">Now</div>
-                                <div className="flex-1 h-3 bg-gray-700/50 rounded-full overflow-hidden">
-                                    <div
-                                        className="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full animate-pulse"
-                                        style={{ width: `${stabilityScore}%` }}
-                                    />
-                                </div>
+                                <p className="text-white font-bold">Community Led</p>
+                                <p className="text-xs text-gray-500 mt-1">Built for Fathers</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Call to Action Footer */}
-                <div className="rounded-3xl bg-amber-500 text-gray-900 p-12 text-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('/assets/grain.png')] opacity-10" />
+                <div className="rounded-3xl bg-gradient-to-r from-amber-500 to-orange-600 text-gray-900 p-12 text-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-[url('/assets/grain.png')] opacity-20 mix-blend-overlay" />
                     <div className="relative z-10 max-w-2xl mx-auto">
-                        <h2 className="text-3xl font-black mb-4">Join the Movement</h2>
-                        <p className="text-lg font-medium text-gray-900/80 mb-8">
+                        <h2 className="text-3xl font-black mb-4 tracking-tight">Join the Movement</h2>
+                        <p className="text-lg font-medium text-gray-900/90 mb-8 leading-relaxed">
                             {partner.display_name} and CommonGround are proving that technology can heal families.
-                            Help us expand this program to more families in need.
+                            Help us expand this program to more fathers who need to stay present and protected.
                         </p>
-                        <div className="flex justify-center gap-4">
-                            <Button className="bg-gray-900 text-white hover:bg-gray-800 h-12 px-8 text-lg font-bold">
+                        <div className="flex flex-col sm:flex-row justify-center gap-4">
+                            <Button className="bg-gray-900 text-white hover:bg-gray-800 h-14 px-8 text-lg font-bold rounded-xl shadow-xl shadow-black/20 hover:scale-105 transition-all">
                                 Support This Program
                             </Button>
-                            <Button variant="ghost" className="bg-white/20 hover:bg-white/30 text-gray-900 h-12 px-8 text-lg font-bold">
+                            <Button variant="ghost" className="bg-white/20 hover:bg-white/30 text-gray-900 h-14 px-8 text-lg font-bold rounded-xl backdrop-blur-sm">
                                 Download Case Study
                             </Button>
                         </div>
