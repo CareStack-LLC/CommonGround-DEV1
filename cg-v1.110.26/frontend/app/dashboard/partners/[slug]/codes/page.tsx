@@ -12,7 +12,8 @@ import {
     RefreshCw,
     Shield,
     Calendar,
-    Search
+    Search,
+    Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -185,8 +186,8 @@ export default function GrantCodeManagementPage() {
                                         <div
                                             key={code.code}
                                             className={`group flex items-center justify-between p-4 rounded-xl border transition-all ${code.is_activated
-                                                    ? 'bg-amber-500/5 border-amber-500/10'
-                                                    : 'bg-gray-800/30 border-gray-800 hover:border-gray-700'
+                                                ? 'bg-amber-500/5 border-amber-500/10'
+                                                : 'bg-gray-800/30 border-gray-800 hover:border-gray-700'
                                                 }`}
                                         >
                                             <div className="flex items-center gap-4">
