@@ -148,7 +148,7 @@ function NewCubbieItemPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <PageContainer className="pb-32 max-w-2xl">
         {/* Back Button */}
@@ -161,7 +161,7 @@ function NewCubbieItemPageContent() {
         </button>
 
         <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
-          <div className="px-6 py-6 border-b border-slate-100 bg-slate-50/50">
+          <div className="px-6 py-6 border-b border-slate-100 bg-muted/30">
             <h1 className="text-2xl font-bold text-foreground mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Add Item to {child?.first_name}'s Cubbie</h1>
             <p className="text-muted-foreground">
               Register a high-value item that travels with {child?.first_name}
@@ -174,7 +174,7 @@ function NewCubbieItemPageContent() {
                 <Label className="text-sm font-medium text-foreground uppercase tracking-wide">Item Photo</Label>
                 <div className="flex items-start gap-4">
                   <div
-                    className="w-32 h-32 bg-slate-50 rounded-xl flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-slate-300 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 transition-all duration-200 group"
+                    className="w-32 h-32 bg-muted/30 rounded-xl flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-slate-300 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 transition-all duration-200 group"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     {photoPreview ? (

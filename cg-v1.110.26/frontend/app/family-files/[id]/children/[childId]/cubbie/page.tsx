@@ -123,7 +123,7 @@ function ChildCubbiePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <PageContainer className="pb-32">
         {/* Back Button */}
@@ -230,8 +230,8 @@ function ChildCubbiePageContent() {
                     </span>
                     <span
                       className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full ${item.current_location === 'child_traveling'
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-slate-100 text-slate-600'
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'bg-slate-100 text-slate-600'
                         }`}
                     >
                       {item.current_location === 'child_traveling' ? 'Traveling' : 'Home'}
