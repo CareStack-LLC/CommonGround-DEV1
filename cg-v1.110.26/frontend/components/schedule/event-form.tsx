@@ -131,11 +131,11 @@ export default function EventForm({
     try {
       setIsGeocoding(true);
       const result = await exchangesAPI.geocodeAddress(formData.location);
-      if (result && result.lat && result.lng) {
+      if (result && result.latitude && result.longitude) {
         setFormData(prev => ({
           ...prev,
-          location_lat: result.lat,
-          location_lng: result.lng
+          location_lat: result.latitude,
+          location_lng: result.longitude
         }));
       }
     } catch (err) {
