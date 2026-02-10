@@ -999,441 +999,365 @@ function DashboardContent() {
       f.familyFile.children?.some(c => c.id === childId)
     );
 
-    if (!familyFileWithChild) {
-      alert('Unable to find family file for this child.');
-      return;
+
+    // Get all children from active family files
+    const allChildren = familyFilesWithData
+      .filter((f) => f.familyFile.status === 'active')
+      .flatMap((f) => f.familyFile.children || []);
+
+    const needsSetup = familyFilesWithData.length === 0;
+    const greeting = getGreeting();
+
+
+
+    // Show loading state
+    if (isLoading) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+          <Navigation />
+          <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
+            <div className="flex items-center justify-center h-[60vh]">
+              <div className="text-center">
+                <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
+                <p className="mt-4 text-slate-600 font-medium">Loading your dashboard...</p>
+              </div>
+            </div>
+          </main>
+        </div>
+      );
     }
 
-    const confirmed = window.confirm(
-      `Mark ${childName} as "With Me"?\n\nThis will update the custody status to reflect that ${childName} is currently with you.`
-    );
-
-    if (confirmed) {
-      try {
-        // Call the custody override API
-        await familyFilesAPI.overrideCustody(
-          familyFileWithChild.familyFile.id,
-          [childId]
-        );
-
-        // Refresh custody status for all active family files
-        const custodyPromises = activeFiles.map(f =>
-          familyFilesAPI.getCustodyStatus(f.familyFile.id)
-        );
-        const results = await Promise.allSettled(custodyPromises);
-        const successfulStatuses = results
-          .filter((r): r is PromiseFulfilledResult<CustodyStatusResponse> => r.status === 'fulfilled')
-          .map(r => r.value);
-        setAllCustodyStatuses(successfulStatuses);
-      } catch (error) {
-        console.error('Failed to update custody status:', error);
-        alert('Unable to update custody status. Please try again.');
-      }
-    }
-  };
-
-  // Get all children from active family files
-  const allChildren = familyFilesWithData
-    .filter((f) => f.familyFile.status === 'active')
-    .flatMap((f) => f.familyFile.children || []);
-
-  const needsSetup = familyFilesWithData.length === 0;
-  const greeting = getGreeting();
-
-
-
-  // Show loading state
-  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         <Navigation />
-        <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
-          <div className="flex items-center justify-center h-[60vh]">
-            <div className="text-center">
-              <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
-              <p className="mt-4 text-slate-600 font-medium">Loading your dashboard...</p>
-            </div>
+
+        <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
+          {/* Header with Greeting */}
+          <div className="mb-8">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              {greeting},
+            </h1>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              {user?.first_name}
+            </h2>
           </div>
+
+          {/* Upgrade Banner for Free Users */}
+          {isFree() && !needsSetup && (
+            <div className="mb-6">
+              <UpgradeBanner variant="card" dismissible />
+            </div>
+          )}
+
+          {needsSetup ? (
+            // Getting Started
+            <div className="space-y-6">
+              <div className="bg-white rounded-3xl border-2 border-slate-200 p-10 text-center shadow-2xl">
+                <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <FolderOpen className="w-10 h-10 text-[var(--portal-primary)]" />
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  Welcome to CommonGround
+                </h3>
+                <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
+                  Create a Family File to get started with co-parenting tools, shared calendars, and secure messaging.
+                </p>
+                <button
+                  onClick={() => router.push('/family-files/new')}
+                  className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                >
+                  Create Family File
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Quick Info Cards */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+                    <MessageSquare className="w-6 h-6 text-[var(--portal-primary)]" />
+                  </div>
+                  <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>ARIA Messaging</h4>
+                  <p className="text-sm text-muted-foreground mt-2 font-medium">
+                    AI-powered communication that reduces conflict
+                  </p>
+                </div>
+                <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+                    <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
+                  </div>
+                  <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Shared Calendar</h4>
+                  <p className="text-sm text-muted-foreground mt-2 font-medium">
+                    Track custody schedules and exchanges
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Custody Status Cards - One per child across all family files */}
+
+
+
+
+              {/* Action Stream */}
+              <section>
+                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  Action Stream
+                </h3>
+                <div className="space-y-3">
+                  {/* Show "all caught up" if no action items */}
+                  {dashboardSummary &&
+                    dashboardSummary.pending_expenses_count === 0 &&
+                    dashboardSummary.unread_messages_count === 0 &&
+                    dashboardSummary.pending_agreements_count === 0 &&
+                    dashboardSummary.unread_court_count === 0 && (
+                      <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
+                        <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
+                          <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
+                          <p className="text-sm text-muted-foreground font-medium">No pending items to review</p>
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Pending Expenses */}
+                  {(dashboardSummary?.pending_expenses_count ?? 0) > 0 && (
+                    <ActionStreamItem
+                      icon={Wallet}
+                      iconBg="bg-cg-error-subtle"
+                      iconColor="text-cg-error"
+                      title="Pending Expenses"
+                      subtitle={`${dashboardSummary!.pending_expenses_count} item${dashboardSummary!.pending_expenses_count > 1 ? 's' : ''} to review`}
+                      hasNotification
+                      onClick={() => router.push('/payments')}
+                    />
+                  )}
+
+                  {/* Unread Messages */}
+                  {(dashboardSummary?.unread_messages_count ?? 0) > 0 && (
+                    <ActionStreamItem
+                      icon={MessageSquare}
+                      iconBg="bg-cg-slate-subtle"
+                      iconColor="text-cg-slate"
+                      title="Unread Messages"
+                      subtitle={
+                        dashboardSummary!.sender_name
+                          ? `${dashboardSummary!.unread_messages_count} message${dashboardSummary!.unread_messages_count > 1 ? 's' : ''} from ${dashboardSummary!.sender_name}`
+                          : `${dashboardSummary!.unread_messages_count} unread message${dashboardSummary!.unread_messages_count > 1 ? 's' : ''}`
+                      }
+                      hasNotification
+                      onClick={() => router.push('/messages')}
+                    />
+                  )}
+
+                  {/* Pending SharedCare Agreements */}
+                  {(() => {
+                    const sharedCareAgreements = dashboardSummary?.pending_agreements.filter(
+                      a => a.agreement_type === 'shared_care'
+                    ) || [];
+                    if (sharedCareAgreements.length === 0) return null;
+                    const count = sharedCareAgreements.length;
+                    return (
+                      <ActionStreamItem
+                        icon={FileText}
+                        iconBg="bg-[var(--portal-primary)]/10"
+                        iconColor="text-[var(--portal-primary)]"
+                        title="Agreement Approval"
+                        subtitle={
+                          count === 1
+                            ? `"${sharedCareAgreements[0].title}" needs approval`
+                            : `${count} agreements need approval`
+                        }
+                        hasNotification
+                        onClick={() => router.push('/agreements')}
+                      />
+                    );
+                  })()}
+
+                  {/* Pending QuickAccords */}
+                  {(() => {
+                    const quickAccords = dashboardSummary?.pending_agreements.filter(
+                      a => a.agreement_type === 'quick_accord'
+                    ) || [];
+                    if (quickAccords.length === 0) return null;
+                    const familyFileId = activeFileIdsRef.current[0];
+                    const count = quickAccords.length;
+                    return (
+                      <ActionStreamItem
+                        icon={Zap}
+                        iconBg="bg-cg-amber-subtle"
+                        iconColor="text-cg-amber"
+                        title="QuickAccord Approval"
+                        subtitle={
+                          count === 1
+                            ? `"${quickAccords[0].title}" needs your approval`
+                            : `${count} QuickAccords need your approval`
+                        }
+                        hasNotification
+                        onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${quickAccords[0].id}`)}
+                      />
+                    );
+                  })()}
+
+                  {/* Active QuickAccords - Awaiting Completion */}
+                  {(() => {
+                    const activeAccords = dashboardSummary?.active_quick_accords || [];
+                    if (activeAccords.length === 0) return null;
+                    const familyFileId = activeFileIdsRef.current[0];
+                    const count = activeAccords.length;
+                    return (
+                      <ActionStreamItem
+                        icon={CheckCircle}
+                        iconBg="bg-[var(--portal-primary)]/10"
+                        iconColor="text-[var(--portal-primary)]"
+                        title="QuickAccord Active"
+                        subtitle={
+                          count === 1
+                            ? `"${activeAccords[0].title}" - mark as completed when done`
+                            : `${count} QuickAccords ready for completion tracking`
+                        }
+                        onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${activeAccords[0].id}`)}
+                      />
+                    );
+                  })()}
+
+                  {/* Court Notifications */}
+                  {(dashboardSummary?.unread_court_count ?? 0) > 0 && (
+                    <ActionStreamItem
+                      icon={Gavel}
+                      iconBg="bg-cg-amber-subtle"
+                      iconColor="text-cg-amber"
+                      title="Court Notification"
+                      subtitle={
+                        dashboardSummary!.court_notifications.some(n => n.is_urgent)
+                          ? `${dashboardSummary!.unread_court_count} notification${dashboardSummary!.unread_court_count > 1 ? 's' : ''} (urgent)`
+                          : `${dashboardSummary!.unread_court_count} notification${dashboardSummary!.unread_court_count > 1 ? 's' : ''} from court`
+                      }
+                      hasNotification={dashboardSummary!.court_notifications.some(n => n.is_urgent)}
+                      onClick={() => router.push('/court')}
+                    />
+                  )}
+
+                  {/* Loading state for action stream */}
+                  {!dashboardSummary && (
+                    <div className="cg-card p-4 animate-pulse">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-muted rounded-xl" />
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-muted rounded w-1/3" />
+                          <div className="h-3 bg-muted rounded w-1/2" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              {/* Upcoming Events */}
+              <section>
+                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  Coming Up
+                </h3>
+                <UpcomingEventsList events={dashboardSummary?.upcoming_events} />
+              </section>
+
+              {/* Quick Actions */}
+              <section>
+                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  Quick Actions
+                </h3>
+                <div className="grid grid-cols-4 gap-3">
+                  <QuickActionButton
+                    icon={MessageSquare}
+                    label="Message"
+                    onClick={() => router.push('/messages')}
+                  />
+                  <QuickActionButton
+                    icon={Calendar}
+                    label="Schedule"
+                    onClick={() => router.push('/schedule')}
+                  />
+                  <QuickActionButton
+                    icon={Wallet}
+                    label="Expense"
+                    onClick={() => router.push('/payments/new')}
+                  />
+                  <QuickActionButton
+                    icon={FolderOpen}
+                    label="Files"
+                    onClick={() => router.push('/family-files')}
+                  />
+                </div>
+              </section>
+
+              {/* Family Files Summary */}
+              {familyFilesWithData.length > 0 && (
+                <section>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                      Family Files
+                    </h3>
+                    <button
+                      onClick={() => router.push('/family-files')}
+                      className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#1e4442] transition-colors flex items-center gap-1"
+                    >
+                      View all
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {familyFilesWithData.slice(0, 2).map(({ familyFile }) => (
+                      <button
+                        key={familyFile.id}
+                        onClick={() => router.push(`/family-files/${familyFile.id}`)}
+                        className="group w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                      >
+                        <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                          <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                            {familyFile.title}
+                          </p>
+                          <p className="text-sm text-muted-foreground font-medium">
+                            {familyFile.children?.length || 0} children
+                          </p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Recent Activity */}
+              <section>
+                <h3 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  Recent Activity
+                </h3>
+                <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                  <ActivityFeed
+                    activities={dashboardSummary?.recent_activities || []}
+                    unreadCount={dashboardSummary?.unread_activity_count || 0}
+                    onSeeAll={() => router.push('/activities')}
+                    isLoading={!dashboardSummary}
+                  />
+                </div>
+              </section>
+            </div>
+          )}
         </main>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      <Navigation />
-
-      <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
-        {/* Header with Greeting */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            {greeting},
-          </h1>
-          <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            {user?.first_name}
-          </h2>
-        </div>
-
-        {/* Upgrade Banner for Free Users */}
-        {isFree() && !needsSetup && (
-          <div className="mb-6">
-            <UpgradeBanner variant="card" dismissible />
-          </div>
-        )}
-
-        {needsSetup ? (
-          // Getting Started
-          <div className="space-y-6">
-            <div className="bg-white rounded-3xl border-2 border-slate-200 p-10 text-center shadow-2xl">
-              <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <FolderOpen className="w-10 h-10 text-[var(--portal-primary)]" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Welcome to CommonGround
-              </h3>
-              <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
-                Create a Family File to get started with co-parenting tools, shared calendars, and secure messaging.
-              </p>
-              <button
-                onClick={() => router.push('/family-files/new')}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
-              >
-                Create Family File
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Quick Info Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
-                  <MessageSquare className="w-6 h-6 text-[var(--portal-primary)]" />
-                </div>
-                <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>ARIA Messaging</h4>
-                <p className="text-sm text-muted-foreground mt-2 font-medium">
-                  AI-powered communication that reduces conflict
-                </p>
-              </div>
-              <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
-                  <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
-                </div>
-                <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Shared Calendar</h4>
-                <p className="text-sm text-muted-foreground mt-2 font-medium">
-                  Track custody schedules and exchanges
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Custody Status Cards - One per child across all family files */}
-            {allChildren.length > 0 && allCustodyStatuses.length > 0 && (
-              <div className="space-y-3">
-                {allCustodyStatuses.flatMap((custodyStatus) =>
-                  (custodyStatus.children || []).map((childStatus) => {
-                    const childData = allChildren.find(c => c.id === childStatus.child_id);
-                    // Look up custody time stats for this child
-                    const childStats = familyCustodyStats?.children.find(
-                      c => c.child_id === childStatus.child_id
-                    );
-                    // Determine if current user is parent A or B
-                    const isParentA = user?.id === familyCustodyStats?.parent_a_id;
-                    const myDays = childStats
-                      ? (isParentA ? childStats.parent_a.days : childStats.parent_b.days)
-                      : undefined;
-                    const theirDays = childStats
-                      ? (isParentA ? childStats.parent_b.days : childStats.parent_a.days)
-                      : undefined;
-                    return (
-                      <ChildCustodyCard
-                        key={childStatus.child_id}
-                        childStatus={childStatus}
-                        childData={childData}
-                        coparentName={custodyStatus.coparent_name}
-                        onWithMe={handleWithMe}
-                        myDays={myDays}
-                        theirDays={theirDays}
-                        familyFileId={custodyStatus.family_file_id}
-                        onClick={() => router.push(`/family-files/${custodyStatus.family_file_id}/children/${childStatus.child_id}`)}
-                      />
-                    );
-                  })
-                )}
-              </div>
-            )}
-            {/* Fallback if no custody data but children exist */}
-            {allChildren.length > 0 && allCustodyStatuses.length === 0 && (
-              <div className="cg-card overflow-hidden">
-                <div className="h-2 bg-[var(--portal-primary)]" />
-                <div className="p-5">
-                  <p className="text-sm text-muted-foreground">
-                    Set up custody exchanges to see status
-                  </p>
-                </div>
-              </div>
-            )}
-
-
-
-            {/* Action Stream */}
-            <section>
-              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Action Stream
-              </h3>
-              <div className="space-y-3">
-                {/* Show "all caught up" if no action items */}
-                {dashboardSummary &&
-                  dashboardSummary.pending_expenses_count === 0 &&
-                  dashboardSummary.unread_messages_count === 0 &&
-                  dashboardSummary.pending_agreements_count === 0 &&
-                  dashboardSummary.unread_court_count === 0 && (
-                    <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
-                      <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
-                        <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
-                        <p className="text-sm text-muted-foreground font-medium">No pending items to review</p>
-                      </div>
-                    </div>
-                  )}
-
-                {/* Pending Expenses */}
-                {(dashboardSummary?.pending_expenses_count ?? 0) > 0 && (
-                  <ActionStreamItem
-                    icon={Wallet}
-                    iconBg="bg-cg-error-subtle"
-                    iconColor="text-cg-error"
-                    title="Pending Expenses"
-                    subtitle={`${dashboardSummary!.pending_expenses_count} item${dashboardSummary!.pending_expenses_count > 1 ? 's' : ''} to review`}
-                    hasNotification
-                    onClick={() => router.push('/payments')}
-                  />
-                )}
-
-                {/* Unread Messages */}
-                {(dashboardSummary?.unread_messages_count ?? 0) > 0 && (
-                  <ActionStreamItem
-                    icon={MessageSquare}
-                    iconBg="bg-cg-slate-subtle"
-                    iconColor="text-cg-slate"
-                    title="Unread Messages"
-                    subtitle={
-                      dashboardSummary!.sender_name
-                        ? `${dashboardSummary!.unread_messages_count} message${dashboardSummary!.unread_messages_count > 1 ? 's' : ''} from ${dashboardSummary!.sender_name}`
-                        : `${dashboardSummary!.unread_messages_count} unread message${dashboardSummary!.unread_messages_count > 1 ? 's' : ''}`
-                    }
-                    hasNotification
-                    onClick={() => router.push('/messages')}
-                  />
-                )}
-
-                {/* Pending SharedCare Agreements */}
-                {(() => {
-                  const sharedCareAgreements = dashboardSummary?.pending_agreements.filter(
-                    a => a.agreement_type === 'shared_care'
-                  ) || [];
-                  if (sharedCareAgreements.length === 0) return null;
-                  const count = sharedCareAgreements.length;
-                  return (
-                    <ActionStreamItem
-                      icon={FileText}
-                      iconBg="bg-[var(--portal-primary)]/10"
-                      iconColor="text-[var(--portal-primary)]"
-                      title="Agreement Approval"
-                      subtitle={
-                        count === 1
-                          ? `"${sharedCareAgreements[0].title}" needs approval`
-                          : `${count} agreements need approval`
-                      }
-                      hasNotification
-                      onClick={() => router.push('/agreements')}
-                    />
-                  );
-                })()}
-
-                {/* Pending QuickAccords */}
-                {(() => {
-                  const quickAccords = dashboardSummary?.pending_agreements.filter(
-                    a => a.agreement_type === 'quick_accord'
-                  ) || [];
-                  if (quickAccords.length === 0) return null;
-                  const familyFileId = activeFileIdsRef.current[0];
-                  const count = quickAccords.length;
-                  return (
-                    <ActionStreamItem
-                      icon={Zap}
-                      iconBg="bg-cg-amber-subtle"
-                      iconColor="text-cg-amber"
-                      title="QuickAccord Approval"
-                      subtitle={
-                        count === 1
-                          ? `"${quickAccords[0].title}" needs your approval`
-                          : `${count} QuickAccords need your approval`
-                      }
-                      hasNotification
-                      onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${quickAccords[0].id}`)}
-                    />
-                  );
-                })()}
-
-                {/* Active QuickAccords - Awaiting Completion */}
-                {(() => {
-                  const activeAccords = dashboardSummary?.active_quick_accords || [];
-                  if (activeAccords.length === 0) return null;
-                  const familyFileId = activeFileIdsRef.current[0];
-                  const count = activeAccords.length;
-                  return (
-                    <ActionStreamItem
-                      icon={CheckCircle}
-                      iconBg="bg-[var(--portal-primary)]/10"
-                      iconColor="text-[var(--portal-primary)]"
-                      title="QuickAccord Active"
-                      subtitle={
-                        count === 1
-                          ? `"${activeAccords[0].title}" - mark as completed when done`
-                          : `${count} QuickAccords ready for completion tracking`
-                      }
-                      onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${activeAccords[0].id}`)}
-                    />
-                  );
-                })()}
-
-                {/* Court Notifications */}
-                {(dashboardSummary?.unread_court_count ?? 0) > 0 && (
-                  <ActionStreamItem
-                    icon={Gavel}
-                    iconBg="bg-cg-amber-subtle"
-                    iconColor="text-cg-amber"
-                    title="Court Notification"
-                    subtitle={
-                      dashboardSummary!.court_notifications.some(n => n.is_urgent)
-                        ? `${dashboardSummary!.unread_court_count} notification${dashboardSummary!.unread_court_count > 1 ? 's' : ''} (urgent)`
-                        : `${dashboardSummary!.unread_court_count} notification${dashboardSummary!.unread_court_count > 1 ? 's' : ''} from court`
-                    }
-                    hasNotification={dashboardSummary!.court_notifications.some(n => n.is_urgent)}
-                    onClick={() => router.push('/court')}
-                  />
-                )}
-
-                {/* Loading state for action stream */}
-                {!dashboardSummary && (
-                  <div className="cg-card p-4 animate-pulse">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-muted rounded-xl" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-muted rounded w-1/3" />
-                        <div className="h-3 bg-muted rounded w-1/2" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-
-            {/* Upcoming Events */}
-            <section>
-              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Coming Up
-              </h3>
-              <UpcomingEventsList events={dashboardSummary?.upcoming_events} />
-            </section>
-
-            {/* Quick Actions */}
-            <section>
-              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Quick Actions
-              </h3>
-              <div className="grid grid-cols-4 gap-3">
-                <QuickActionButton
-                  icon={MessageSquare}
-                  label="Message"
-                  onClick={() => router.push('/messages')}
-                />
-                <QuickActionButton
-                  icon={Calendar}
-                  label="Schedule"
-                  onClick={() => router.push('/schedule')}
-                />
-                <QuickActionButton
-                  icon={Wallet}
-                  label="Expense"
-                  onClick={() => router.push('/payments/new')}
-                />
-                <QuickActionButton
-                  icon={FolderOpen}
-                  label="Files"
-                  onClick={() => router.push('/family-files')}
-                />
-              </div>
-            </section>
-
-            {/* Family Files Summary */}
-            {familyFilesWithData.length > 0 && (
-              <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                    Family Files
-                  </h3>
-                  <button
-                    onClick={() => router.push('/family-files')}
-                    className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#1e4442] transition-colors flex items-center gap-1"
-                  >
-                    View all
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {familyFilesWithData.slice(0, 2).map(({ familyFile }) => (
-                    <button
-                      key={familyFile.id}
-                      onClick={() => router.push(`/family-files/${familyFile.id}`)}
-                      className="group w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
-                    >
-                      <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                          {familyFile.title}
-                        </p>
-                        <p className="text-sm text-muted-foreground font-medium">
-                          {familyFile.children?.length || 0} children
-                        </p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
-                    </button>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Recent Activity */}
-            <section>
-              <h3 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Recent Activity
-              </h3>
-              <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-                <ActivityFeed
-                  activities={dashboardSummary?.recent_activities || []}
-                  unreadCount={dashboardSummary?.unread_activity_count || 0}
-                  onSeeAll={() => router.push('/activities')}
-                  isLoading={!dashboardSummary}
-                />
-              </div>
-            </section>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <ProtectedRoute>
-      <DashboardContent />
-    </ProtectedRoute>
-  );
-}
+  export default function DashboardPage() {
+    return (
+      <ProtectedRoute>
+        <DashboardContent />
+      </ProtectedRoute>
+    );
+  }
