@@ -53,6 +53,7 @@ class AgreementResponse(BaseModel):
     title: str
     summary: Optional[str] = None  # Concise summary of the agreement
     version: int
+    agreement_type: str  # shared_care, parenting, etc.
     agreement_version: str = "v2_standard"  # v1, v2_standard, or v2_lite
     status: str
     petitioner_approved: bool
