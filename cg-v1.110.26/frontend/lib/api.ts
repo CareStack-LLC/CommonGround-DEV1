@@ -1428,14 +1428,7 @@ export interface EventV2 {
   check_in_window_before_minutes?: number;
   check_in_window_after_minutes?: number;
   qr_confirmation_required?: boolean;
-  // Silent Handoff
-  silent_handoff_enabled?: boolean;
-  location_lat?: number;
-  location_lng?: number;
-  geofence_radius_meters?: number;
-  check_in_window_before_minutes?: number;
-  check_in_window_after_minutes?: number;
-  qr_confirmation_required?: boolean;
+
   visibility: 'private' | 'co_parent';
   status: string;
   is_owner: boolean;
