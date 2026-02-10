@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, AlertTriangle, Navigation, QrCode, Loader2 } from 'lucide-react';
+import { AlertTriangle, Navigation, QrCode, Loader2 } from 'lucide-react';
 import {
   eventsAPI,
   exchangesAPI,
@@ -21,7 +21,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { MedicalFields, SchoolFields, SportsFields, ExchangeFields } from './categories';
 
 interface EventFormProps {
@@ -195,20 +200,13 @@ export default function EventForm({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <Card className="w-full max-w-2xl max-h-[95vh] overflow-y-auto">
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold">Create Event</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
-              aria-label="Close"
-            >
-              <X className="h-6 w-6" />
-            </button>
-          </div>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto sm:max-w-[650px]">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-serif">Create Event</DialogTitle>
+        </DialogHeader>
+
+        <div className="py-2">
 
           {error && (
             <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
@@ -583,8 +581,8 @@ export default function EventForm({
             </div>
           </form>
         </div>
-      </Card>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

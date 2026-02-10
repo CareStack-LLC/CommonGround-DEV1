@@ -10,9 +10,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 interface CustodyTimelineProps {
     childId: string;
     className?: string;
+    compact?: boolean;
 }
 
-export function CustodyTimeline({ childId, className }: CustodyTimelineProps) {
+export function CustodyTimeline({ childId, className, compact = false }: CustodyTimelineProps) {
+
     const [loading, setLoading] = useState(true);
     const [sessions, setSessions] = useState<CustodySession[]>([]);
     const [stats, setStats] = useState<RealTimeComplianceStats | null>(null);
@@ -77,18 +79,29 @@ export function CustodyTimeline({ childId, className }: CustodyTimelineProps) {
 
     return (
         <Card className={className}>
-            <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-serif">Real-Time Custody</CardTitle>
-                    <Badge variant={currentSession ? "default" : "secondary"} className="animate-pulse">
-                        {currentSession ? 'Tracking' : 'OFFLINE'}
-                    </Badge>
-                </div>
-            </CardHeader>
+            {!compact && (
+                <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg font-serif">Real-Time Custody</CardTitle>
+                        <Badge variant={currentSession ? "default" : "secondary"} className="animate-pulse">
+                            {currentSession ? 'Tracking' : 'OFFLINE'}
+                        </Badge>
+                    </div>
+                </CardHeader>
+            )}
             <CardContent className="space-y-6">
+                {compact && (
+                    <div className="flex justify-end mb-2">
+                        <Badge variant={currentSession ? "default" : "secondary"} className="animate-pulse">
+                            {currentSession ? 'Tracking' : 'OFFLINE'}
+                        </Badge>
+                    </div>
+                )}
+
                 {/* Live Timer Status */}
                 {currentSession && (
                     <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center space-x-4">
+
                         <div className="bg-white p-2 rounded-full shadow-sm">
                             <Clock className="h-6 w-6 text-indigo-600" />
                         </div>

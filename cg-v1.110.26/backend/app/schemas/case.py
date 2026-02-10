@@ -93,7 +93,7 @@ class CaseResponse(BaseModel):
     id: str
     case_name: str
     case_number: str | None
-    state: str
+    state: str | None
     status: str
     created_at: datetime
     participants: list[CaseParticipantResponse]

@@ -13,7 +13,7 @@ import {
   agreementsAPI,
   dashboardAPI,
   activitiesAPI,
-  custodyTimeAPI,
+
   getImageUrl,
   FamilyFileDetail,
   FamilyFileChild,
@@ -22,7 +22,7 @@ import {
   ChildCustodyStatus,
   DashboardSummary,
   UpcomingEvent,
-  FamilyCustodyStats,
+
 } from '@/lib/api';
 import {
   Calendar,
@@ -45,7 +45,7 @@ import {
 
 import { UpgradeBanner } from '@/components/upgrade-banner';
 import { useSubscription } from '@/contexts/subscription-context';
-import { CustodyTimeline } from '@/components/schedule/custody-timeline';
+
 
 /**
  * CommonGround Dashboard - "The Morning Brief"
@@ -335,9 +335,7 @@ function ChildCustodyCard({
         </div>
 
         {/* Real-time Custody Timeline */}
-        <div className="mt-4 pt-4 border-t-2 border-slate-100">
-          <CustodyTimeline childId={childStatus.child_id} className="border-0 shadow-none p-0" />
-        </div>
+
       </div>
     </div>
   );
@@ -696,11 +694,7 @@ function DashboardContent() {
     onAgreementApproved,
   } = useWebSocket();
   const [familyFilesWithData, setFamilyFilesWithData] = useState<FamilyFileWithData[]>([]);
-  const [allCustodyStatuses, setAllCustodyStatuses] = useState<CustodyStatusResponse[]>([]);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
-  const [familyCustodyStats, setFamilyCustodyStats] = useState<FamilyCustodyStats | null>(null);
-  const [custodyStatsFile, setCustodyStatsFile] = useState<FamilyFileDetail | null>(null);
-  const [custodyStatsLoading, setCustodyStatsLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const activeFileIdsRef = useRef<string[]>([]);
 
@@ -877,616 +871,595 @@ function DashboardContent() {
           console.log('No dashboard summaries returned');
         }
 
-        // Fetch parenting time stats for a family file that has children
-        // Find the first active family file with children
-        const fileWithChildren = filesWithData.find(
-          f => f.familyFile.status === 'active' && (f.familyFile.children?.length ?? 0) > 0
-        );
-
-        if (fileWithChildren) {
-          try {
-            setCustodyStatsLoading(true);
-            setCustodyStatsFile(fileWithChildren.familyFile);
-            const stats = await custodyTimeAPI.getFamilyStats(fileWithChildren.familyFile.id, '30_days');
-            setFamilyCustodyStats(stats);
-          } catch (err) {
-            console.error('Failed to load custody time stats:', err);
-            setFamilyCustodyStats(null);
-          } finally {
-            setCustodyStatsLoading(false);
-          }
-        } else {
-          // No family files with children - skip custody stats
-          setCustodyStatsLoading(false);
-          setFamilyCustodyStats(null);
-          setCustodyStatsFile(null);
-        }
+        // No family files with children
       }
+
+    }
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    console.error('Failed to load dashboard data:', error);
+  } finally {
+    setIsLoading(false);
+  }
+}, []);
 
-  // Initial load
-  useEffect(() => {
-    loadDashboardData();
-  }, [loadDashboardData]);
+// Initial load
+useEffect(() => {
+  loadDashboardData();
+}, [loadDashboardData]);
 
-  // WS5: WebSocket subscriptions and real-time event handling
-  useEffect(() => {
-    // Subscribe to all active family files
+// WS5: WebSocket subscriptions and real-time event handling
+useEffect(() => {
+  // Subscribe to all active family files
+  activeFileIdsRef.current.forEach(familyFileId => {
+    subscribe(familyFileId);
+  });
+
+  // Set up event listeners for real-time updates
+  const unsubscribeFns = [
+    onExchangeCreated(() => {
+      console.log('[Dashboard] Exchange created - refreshing...');
+      refreshSummary();
+    }),
+    onExchangeUpdated(() => {
+      console.log('[Dashboard] Exchange updated - refreshing...');
+      refreshSummary();
+    }),
+    onExchangeCheckin(() => {
+      console.log('[Dashboard] Exchange check-in - refreshing...');
+      refreshSummary();
+    }),
+    onObligationCreated(() => {
+      console.log('[Dashboard] Obligation created - refreshing...');
+      refreshSummary();
+    }),
+    onObligationUpdated(() => {
+      console.log('[Dashboard] Obligation updated - refreshing...');
+      refreshSummary();
+    }),
+    onPaymentReceived(() => {
+      console.log('[Dashboard] Payment received - refreshing...');
+      refreshSummary();
+    }),
+    onDashboardUpdate(() => {
+      console.log('[Dashboard] Dashboard update - refreshing...');
+      refreshSummary();
+    }),
+    // WS5: Event notifications
+    onEventCreated(() => {
+      console.log('[Dashboard] Event created - refreshing...');
+      refreshSummary();
+    }),
+    onEventUpdated(() => {
+      console.log('[Dashboard] Event updated - refreshing...');
+      refreshSummary();
+    }),
+    onEventDeleted(() => {
+      console.log('[Dashboard] Event deleted - refreshing...');
+      refreshSummary();
+    }),
+    // WS5: Agreement notifications
+    onAgreementCreated(() => {
+      console.log('[Dashboard] Agreement created - refreshing...');
+      refreshSummary();
+    }),
+    onAgreementUpdated(() => {
+      console.log('[Dashboard] Agreement updated - refreshing...');
+      refreshSummary();
+    }),
+    onAgreementApproved(() => {
+      console.log('[Dashboard] Agreement approved - refreshing...');
+      refreshSummary();
+    }),
+  ];
+
+  // Cleanup: unsubscribe from WebSocket and remove listeners
+  return () => {
     activeFileIdsRef.current.forEach(familyFileId => {
-      subscribe(familyFileId);
+      unsubscribe(familyFileId);
     });
+    unsubscribeFns.forEach(fn => fn());
+  };
+}, [
+  subscribe,
+  unsubscribe,
+  onExchangeCreated,
+  onExchangeUpdated,
+  onExchangeCheckin,
+  onObligationCreated,
+  onObligationUpdated,
+  onPaymentReceived,
+  onDashboardUpdate,
+  onEventCreated,
+  onEventUpdated,
+  onEventDeleted,
+  onAgreementCreated,
+  onAgreementUpdated,
+  onAgreementApproved,
+  refreshSummary,
+]);
 
-    // Set up event listeners for real-time updates
-    const unsubscribeFns = [
-      onExchangeCreated(() => {
-        console.log('[Dashboard] Exchange created - refreshing...');
-        refreshSummary();
-      }),
-      onExchangeUpdated(() => {
-        console.log('[Dashboard] Exchange updated - refreshing...');
-        refreshSummary();
-      }),
-      onExchangeCheckin(() => {
-        console.log('[Dashboard] Exchange check-in - refreshing...');
-        refreshSummary();
-      }),
-      onObligationCreated(() => {
-        console.log('[Dashboard] Obligation created - refreshing...');
-        refreshSummary();
-      }),
-      onObligationUpdated(() => {
-        console.log('[Dashboard] Obligation updated - refreshing...');
-        refreshSummary();
-      }),
-      onPaymentReceived(() => {
-        console.log('[Dashboard] Payment received - refreshing...');
-        refreshSummary();
-      }),
-      onDashboardUpdate(() => {
-        console.log('[Dashboard] Dashboard update - refreshing...');
-        refreshSummary();
-      }),
-      // WS5: Event notifications
-      onEventCreated(() => {
-        console.log('[Dashboard] Event created - refreshing...');
-        refreshSummary();
-      }),
-      onEventUpdated(() => {
-        console.log('[Dashboard] Event updated - refreshing...');
-        refreshSummary();
-      }),
-      onEventDeleted(() => {
-        console.log('[Dashboard] Event deleted - refreshing...');
-        refreshSummary();
-      }),
-      // WS5: Agreement notifications
-      onAgreementCreated(() => {
-        console.log('[Dashboard] Agreement created - refreshing...');
-        refreshSummary();
-      }),
-      onAgreementUpdated(() => {
-        console.log('[Dashboard] Agreement updated - refreshing...');
-        refreshSummary();
-      }),
-      onAgreementApproved(() => {
-        console.log('[Dashboard] Agreement approved - refreshing...');
-        refreshSummary();
-      }),
-    ];
+// WS5: Polling removed - dashboard now relies entirely on WebSocket updates
+// The window focus refresh below provides fallback when user returns to tab
 
-    // Cleanup: unsubscribe from WebSocket and remove listeners
-    return () => {
-      activeFileIdsRef.current.forEach(familyFileId => {
-        unsubscribe(familyFileId);
-      });
-      unsubscribeFns.forEach(fn => fn());
-    };
-  }, [
-    subscribe,
-    unsubscribe,
-    onExchangeCreated,
-    onExchangeUpdated,
-    onExchangeCheckin,
-    onObligationCreated,
-    onObligationUpdated,
-    onPaymentReceived,
-    onDashboardUpdate,
-    onEventCreated,
-    onEventUpdated,
-    onEventDeleted,
-    onAgreementCreated,
-    onAgreementUpdated,
-    onAgreementApproved,
-    refreshSummary,
-  ]);
-
-  // WS5: Polling removed - dashboard now relies entirely on WebSocket updates
-  // The window focus refresh below provides fallback when user returns to tab
-
-  // Refresh when window regains focus (user comes back to tab)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && !isLoading) {
-        refreshSummary();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isLoading, refreshSummary]);
-
-  // Auto-mark activities as read when dashboard loads with unread activities
-  useEffect(() => {
-    const markActivitiesAsRead = async () => {
-      if (activeFileIdsRef.current.length === 0) return;
-      if (!dashboardSummary) return;
-      if (dashboardSummary.unread_activity_count === 0) return;
-
-      try {
-        await activitiesAPI.markAllAsRead(activeFileIdsRef.current[0]);
-        // Update local state to reflect that activities are now read
-        setDashboardSummary(prev => prev ? {
-          ...prev,
-          unread_activity_count: 0,
-          recent_activities: prev.recent_activities.map(a => ({ ...a, is_read: true }))
-        } : null);
-      } catch (error) {
-        console.error('Failed to mark activities as read:', error);
-      }
-    };
-
-    // Small delay to ensure the user has "seen" the dashboard
-    const timeoutId = setTimeout(markActivitiesAsRead, 2000);
-    return () => clearTimeout(timeoutId);
-  }, [dashboardSummary?.unread_activity_count]);
-
-  // Handle manual "With Me" check-in
-  const handleWithMe = async (childId: string) => {
-    const activeFiles = familyFilesWithData.filter(f => f.familyFile.status === 'active');
-    if (activeFiles.length === 0) return;
-
-    const child = allChildren.find(c => c.id === childId);
-    const childName = child?.first_name || 'Child';
-
-    // Find the family file for this child
-    const familyFileWithChild = activeFiles.find(f =>
-      f.familyFile.children?.some(c => c.id === childId)
-    );
-
-    if (!familyFileWithChild) {
-      alert('Unable to find family file for this child.');
-      return;
-    }
-
-    const confirmed = window.confirm(
-      `Mark ${childName} as "With Me"?\n\nThis will update the custody status to reflect that ${childName} is currently with you.`
-    );
-
-    if (confirmed) {
-      try {
-        // Call the custody override API
-        await familyFilesAPI.overrideCustody(
-          familyFileWithChild.familyFile.id,
-          [childId]
-        );
-
-        // Refresh custody status for all active family files
-        const custodyPromises = activeFiles.map(f =>
-          familyFilesAPI.getCustodyStatus(f.familyFile.id)
-        );
-        const results = await Promise.allSettled(custodyPromises);
-        const successfulStatuses = results
-          .filter((r): r is PromiseFulfilledResult<CustodyStatusResponse> => r.status === 'fulfilled')
-          .map(r => r.value);
-        setAllCustodyStatuses(successfulStatuses);
-      } catch (error) {
-        console.error('Failed to update custody status:', error);
-        alert('Unable to update custody status. Please try again.');
-      }
+// Refresh when window regains focus (user comes back to tab)
+useEffect(() => {
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible' && !isLoading) {
+      refreshSummary();
     }
   };
 
-  // Get all children from active family files
-  const allChildren = familyFilesWithData
-    .filter((f) => f.familyFile.status === 'active')
-    .flatMap((f) => f.familyFile.children || []);
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+}, [isLoading, refreshSummary]);
 
-  const needsSetup = familyFilesWithData.length === 0;
-  const greeting = getGreeting();
+// Auto-mark activities as read when dashboard loads with unread activities
+useEffect(() => {
+  const markActivitiesAsRead = async () => {
+    if (activeFileIdsRef.current.length === 0) return;
+    if (!dashboardSummary) return;
+    if (dashboardSummary.unread_activity_count === 0) return;
 
+    try {
+      await activitiesAPI.markAllAsRead(activeFileIdsRef.current[0]);
+      // Update local state to reflect that activities are now read
+      setDashboardSummary(prev => prev ? {
+        ...prev,
+        unread_activity_count: 0,
+        recent_activities: prev.recent_activities.map(a => ({ ...a, is_read: true }))
+      } : null);
+    } catch (error) {
+      console.error('Failed to mark activities as read:', error);
+    }
+  };
 
+  // Small delay to ensure the user has "seen" the dashboard
+  const timeoutId = setTimeout(markActivitiesAsRead, 2000);
+  return () => clearTimeout(timeoutId);
+}, [dashboardSummary?.unread_activity_count]);
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-        <Navigation />
-        <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
-          <div className="flex items-center justify-center h-[60vh]">
-            <div className="text-center">
-              <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
-              <p className="mt-4 text-slate-600 font-medium">Loading your dashboard...</p>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
+// Handle manual "With Me" check-in
+const handleWithMe = async (childId: string) => {
+  const activeFiles = familyFilesWithData.filter(f => f.familyFile.status === 'active');
+  if (activeFiles.length === 0) return;
+
+  const child = allChildren.find(c => c.id === childId);
+  const childName = child?.first_name || 'Child';
+
+  // Find the family file for this child
+  const familyFileWithChild = activeFiles.find(f =>
+    f.familyFile.children?.some(c => c.id === childId)
+  );
+
+  if (!familyFileWithChild) {
+    alert('Unable to find family file for this child.');
+    return;
   }
 
+  const confirmed = window.confirm(
+    `Mark ${childName} as "With Me"?\n\nThis will update the custody status to reflect that ${childName} is currently with you.`
+  );
+
+  if (confirmed) {
+    try {
+      // Call the custody override API
+      await familyFilesAPI.overrideCustody(
+        familyFileWithChild.familyFile.id,
+        [childId]
+      );
+
+      // Refresh custody status for all active family files
+      const custodyPromises = activeFiles.map(f =>
+        familyFilesAPI.getCustodyStatus(f.familyFile.id)
+      );
+      const results = await Promise.allSettled(custodyPromises);
+      const successfulStatuses = results
+        .filter((r): r is PromiseFulfilledResult<CustodyStatusResponse> => r.status === 'fulfilled')
+        .map(r => r.value);
+      setAllCustodyStatuses(successfulStatuses);
+    } catch (error) {
+      console.error('Failed to update custody status:', error);
+      alert('Unable to update custody status. Please try again.');
+    }
+  }
+};
+
+// Get all children from active family files
+const allChildren = familyFilesWithData
+  .filter((f) => f.familyFile.status === 'active')
+  .flatMap((f) => f.familyFile.children || []);
+
+const needsSetup = familyFilesWithData.length === 0;
+const greeting = getGreeting();
+
+
+
+// Show loading state
+if (isLoading) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation />
-
-      <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
-        {/* Header with Greeting */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            {greeting},
-          </h1>
-          <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            {user?.first_name}
-          </h2>
+      <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="text-center">
+            <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
+            <p className="mt-4 text-slate-600 font-medium">Loading your dashboard...</p>
+          </div>
         </div>
-
-        {/* Upgrade Banner for Free Users */}
-        {isFree() && !needsSetup && (
-          <div className="mb-6">
-            <UpgradeBanner variant="card" dismissible />
-          </div>
-        )}
-
-        {needsSetup ? (
-          // Getting Started
-          <div className="space-y-6">
-            <div className="bg-white rounded-3xl border-2 border-slate-200 p-10 text-center shadow-2xl">
-              <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <FolderOpen className="w-10 h-10 text-[var(--portal-primary)]" />
-              </div>
-              <h3 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Welcome to CommonGround
-              </h3>
-              <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
-                Create a Family File to get started with co-parenting tools, shared calendars, and secure messaging.
-              </p>
-              <button
-                onClick={() => router.push('/family-files/new')}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
-              >
-                Create Family File
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Quick Info Cards */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
-                  <MessageSquare className="w-6 h-6 text-[var(--portal-primary)]" />
-                </div>
-                <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>ARIA Messaging</h4>
-                <p className="text-sm text-muted-foreground mt-2 font-medium">
-                  AI-powered communication that reduces conflict
-                </p>
-              </div>
-              <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
-                  <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
-                </div>
-                <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Shared Calendar</h4>
-                <p className="text-sm text-muted-foreground mt-2 font-medium">
-                  Track custody schedules and exchanges
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Custody Status Cards - One per child across all family files */}
-            {allChildren.length > 0 && allCustodyStatuses.length > 0 && (
-              <div className="space-y-3">
-                {allCustodyStatuses.flatMap((custodyStatus) =>
-                  (custodyStatus.children || []).map((childStatus) => {
-                    const childData = allChildren.find(c => c.id === childStatus.child_id);
-                    // Look up custody time stats for this child
-                    const childStats = familyCustodyStats?.children.find(
-                      c => c.child_id === childStatus.child_id
-                    );
-                    // Determine if current user is parent A or B
-                    const isParentA = user?.id === familyCustodyStats?.parent_a_id;
-                    const myDays = childStats
-                      ? (isParentA ? childStats.parent_a.days : childStats.parent_b.days)
-                      : undefined;
-                    const theirDays = childStats
-                      ? (isParentA ? childStats.parent_b.days : childStats.parent_a.days)
-                      : undefined;
-                    return (
-                      <ChildCustodyCard
-                        key={childStatus.child_id}
-                        childStatus={childStatus}
-                        childData={childData}
-                        coparentName={custodyStatus.coparent_name}
-                        onWithMe={handleWithMe}
-                        myDays={myDays}
-                        theirDays={theirDays}
-                        familyFileId={custodyStatus.family_file_id}
-                        onClick={() => router.push(`/family-files/${custodyStatus.family_file_id}/children/${childStatus.child_id}`)}
-                      />
-                    );
-                  })
-                )}
-              </div>
-            )}
-            {/* Fallback if no custody data but children exist */}
-            {allChildren.length > 0 && allCustodyStatuses.length === 0 && (
-              <div className="cg-card overflow-hidden">
-                <div className="h-2 bg-[var(--portal-primary)]" />
-                <div className="p-5">
-                  <p className="text-sm text-muted-foreground">
-                    Set up custody exchanges to see status
-                  </p>
-                </div>
-              </div>
-            )}
-
-
-
-            {/* Action Stream */}
-            <section>
-              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Action Stream
-              </h3>
-              <div className="space-y-3">
-                {/* Show "all caught up" if no action items */}
-                {dashboardSummary &&
-                  dashboardSummary.pending_expenses_count === 0 &&
-                  dashboardSummary.unread_messages_count === 0 &&
-                  dashboardSummary.pending_agreements_count === 0 &&
-                  dashboardSummary.unread_court_count === 0 && (
-                    <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
-                      <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
-                        <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
-                        <p className="text-sm text-muted-foreground font-medium">No pending items to review</p>
-                      </div>
-                    </div>
-                  )}
-
-                {/* Pending Expenses */}
-                {(dashboardSummary?.pending_expenses_count ?? 0) > 0 && (
-                  <ActionStreamItem
-                    icon={Wallet}
-                    iconBg="bg-cg-error-subtle"
-                    iconColor="text-cg-error"
-                    title="Pending Expenses"
-                    subtitle={`${dashboardSummary!.pending_expenses_count} item${dashboardSummary!.pending_expenses_count > 1 ? 's' : ''} to review`}
-                    hasNotification
-                    onClick={() => router.push('/payments')}
-                  />
-                )}
-
-                {/* Unread Messages */}
-                {(dashboardSummary?.unread_messages_count ?? 0) > 0 && (
-                  <ActionStreamItem
-                    icon={MessageSquare}
-                    iconBg="bg-cg-slate-subtle"
-                    iconColor="text-cg-slate"
-                    title="Unread Messages"
-                    subtitle={
-                      dashboardSummary!.sender_name
-                        ? `${dashboardSummary!.unread_messages_count} message${dashboardSummary!.unread_messages_count > 1 ? 's' : ''} from ${dashboardSummary!.sender_name}`
-                        : `${dashboardSummary!.unread_messages_count} unread message${dashboardSummary!.unread_messages_count > 1 ? 's' : ''}`
-                    }
-                    hasNotification
-                    onClick={() => router.push('/messages')}
-                  />
-                )}
-
-                {/* Pending SharedCare Agreements */}
-                {(() => {
-                  const sharedCareAgreements = dashboardSummary?.pending_agreements.filter(
-                    a => a.agreement_type === 'shared_care'
-                  ) || [];
-                  if (sharedCareAgreements.length === 0) return null;
-                  const count = sharedCareAgreements.length;
-                  return (
-                    <ActionStreamItem
-                      icon={FileText}
-                      iconBg="bg-[var(--portal-primary)]/10"
-                      iconColor="text-[var(--portal-primary)]"
-                      title="Agreement Approval"
-                      subtitle={
-                        count === 1
-                          ? `"${sharedCareAgreements[0].title}" needs approval`
-                          : `${count} agreements need approval`
-                      }
-                      hasNotification
-                      onClick={() => router.push('/agreements')}
-                    />
-                  );
-                })()}
-
-                {/* Pending QuickAccords */}
-                {(() => {
-                  const quickAccords = dashboardSummary?.pending_agreements.filter(
-                    a => a.agreement_type === 'quick_accord'
-                  ) || [];
-                  if (quickAccords.length === 0) return null;
-                  const familyFileId = activeFileIdsRef.current[0];
-                  const count = quickAccords.length;
-                  return (
-                    <ActionStreamItem
-                      icon={Zap}
-                      iconBg="bg-cg-amber-subtle"
-                      iconColor="text-cg-amber"
-                      title="QuickAccord Approval"
-                      subtitle={
-                        count === 1
-                          ? `"${quickAccords[0].title}" needs your approval`
-                          : `${count} QuickAccords need your approval`
-                      }
-                      hasNotification
-                      onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${quickAccords[0].id}`)}
-                    />
-                  );
-                })()}
-
-                {/* Active QuickAccords - Awaiting Completion */}
-                {(() => {
-                  const activeAccords = dashboardSummary?.active_quick_accords || [];
-                  if (activeAccords.length === 0) return null;
-                  const familyFileId = activeFileIdsRef.current[0];
-                  const count = activeAccords.length;
-                  return (
-                    <ActionStreamItem
-                      icon={CheckCircle}
-                      iconBg="bg-[var(--portal-primary)]/10"
-                      iconColor="text-[var(--portal-primary)]"
-                      title="QuickAccord Active"
-                      subtitle={
-                        count === 1
-                          ? `"${activeAccords[0].title}" - mark as completed when done`
-                          : `${count} QuickAccords ready for completion tracking`
-                      }
-                      onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${activeAccords[0].id}`)}
-                    />
-                  );
-                })()}
-
-                {/* Court Notifications */}
-                {(dashboardSummary?.unread_court_count ?? 0) > 0 && (
-                  <ActionStreamItem
-                    icon={Gavel}
-                    iconBg="bg-cg-amber-subtle"
-                    iconColor="text-cg-amber"
-                    title="Court Notification"
-                    subtitle={
-                      dashboardSummary!.court_notifications.some(n => n.is_urgent)
-                        ? `${dashboardSummary!.unread_court_count} notification${dashboardSummary!.unread_court_count > 1 ? 's' : ''} (urgent)`
-                        : `${dashboardSummary!.unread_court_count} notification${dashboardSummary!.unread_court_count > 1 ? 's' : ''} from court`
-                    }
-                    hasNotification={dashboardSummary!.court_notifications.some(n => n.is_urgent)}
-                    onClick={() => router.push('/court')}
-                  />
-                )}
-
-                {/* Loading state for action stream */}
-                {!dashboardSummary && (
-                  <div className="cg-card p-4 animate-pulse">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-muted rounded-xl" />
-                      <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-muted rounded w-1/3" />
-                        <div className="h-3 bg-muted rounded w-1/2" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-
-            {/* Upcoming Events */}
-            <section>
-              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Coming Up
-              </h3>
-              <UpcomingEventsList events={dashboardSummary?.upcoming_events} />
-            </section>
-
-            {/* Quick Actions */}
-            <section>
-              <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Quick Actions
-              </h3>
-              <div className="grid grid-cols-4 gap-3">
-                <QuickActionButton
-                  icon={MessageSquare}
-                  label="Message"
-                  onClick={() => router.push('/messages')}
-                />
-                <QuickActionButton
-                  icon={Calendar}
-                  label="Schedule"
-                  onClick={() => router.push('/schedule')}
-                />
-                <QuickActionButton
-                  icon={Wallet}
-                  label="Expense"
-                  onClick={() => router.push('/payments/new')}
-                />
-                <QuickActionButton
-                  icon={FolderOpen}
-                  label="Files"
-                  onClick={() => router.push('/family-files')}
-                />
-              </div>
-            </section>
-
-            {/* Family Files Summary */}
-            {familyFilesWithData.length > 0 && (
-              <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                    Family Files
-                  </h3>
-                  <button
-                    onClick={() => router.push('/family-files')}
-                    className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#1e4442] transition-colors flex items-center gap-1"
-                  >
-                    View all
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {familyFilesWithData.slice(0, 2).map(({ familyFile }) => (
-                    <button
-                      key={familyFile.id}
-                      onClick={() => router.push(`/family-files/${familyFile.id}`)}
-                      className="group w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
-                    >
-                      <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                          {familyFile.title}
-                        </p>
-                        <p className="text-sm text-muted-foreground font-medium">
-                          {familyFile.children?.length || 0} children
-                        </p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
-                    </button>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Recent Activity */}
-            <section>
-              <h3 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Recent Activity
-              </h3>
-              <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-                <ActivityFeed
-                  activities={dashboardSummary?.recent_activities || []}
-                  unreadCount={dashboardSummary?.unread_activity_count || 0}
-                  onSeeAll={() => router.push('/activities')}
-                  isLoading={!dashboardSummary}
-                />
-              </div>
-            </section>
-          </div>
-        )}
       </main>
     </div>
   );
+}
+
+return (
+  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <Navigation />
+
+    <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
+      {/* Header with Greeting */}
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          {greeting},
+        </h1>
+        <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          {user?.first_name}
+        </h2>
+      </div>
+
+      {/* Upgrade Banner for Free Users */}
+      {isFree() && !needsSetup && (
+        <div className="mb-6">
+          <UpgradeBanner variant="card" dismissible />
+        </div>
+      )}
+
+      {needsSetup ? (
+        // Getting Started
+        <div className="space-y-6">
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-10 text-center shadow-2xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <FolderOpen className="w-10 h-10 text-[var(--portal-primary)]" />
+            </div>
+            <h3 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              Welcome to CommonGround
+            </h3>
+            <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
+              Create a Family File to get started with co-parenting tools, shared calendars, and secure messaging.
+            </p>
+            <button
+              onClick={() => router.push('/family-files/new')}
+              className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+            >
+              Create Family File
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Quick Info Cards */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+                <MessageSquare className="w-6 h-6 text-[var(--portal-primary)]" />
+              </div>
+              <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>ARIA Messaging</h4>
+              <p className="text-sm text-muted-foreground mt-2 font-medium">
+                AI-powered communication that reduces conflict
+              </p>
+            </div>
+            <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
+                <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
+              </div>
+              <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Shared Calendar</h4>
+              <p className="text-sm text-muted-foreground mt-2 font-medium">
+                Track custody schedules and exchanges
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* Custody Status Cards - One per child across all family files */}
+          {allChildren.length > 0 && allCustodyStatuses.length > 0 && (
+            <div className="space-y-3">
+              {allCustodyStatuses.flatMap((custodyStatus) =>
+                (custodyStatus.children || []).map((childStatus) => {
+                  const childData = allChildren.find(c => c.id === childStatus.child_id);
+                  // Look up custody time stats for this child
+                  const childStats = familyCustodyStats?.children.find(
+                    c => c.child_id === childStatus.child_id
+                  );
+                  // Determine if current user is parent A or B
+                  const isParentA = user?.id === familyCustodyStats?.parent_a_id;
+                  const myDays = childStats
+                    ? (isParentA ? childStats.parent_a.days : childStats.parent_b.days)
+                    : undefined;
+                  const theirDays = childStats
+                    ? (isParentA ? childStats.parent_b.days : childStats.parent_a.days)
+                    : undefined;
+                  return (
+                    <ChildCustodyCard
+                      key={childStatus.child_id}
+                      childStatus={childStatus}
+                      childData={childData}
+                      coparentName={custodyStatus.coparent_name}
+                      onWithMe={handleWithMe}
+                      myDays={myDays}
+                      theirDays={theirDays}
+                      familyFileId={custodyStatus.family_file_id}
+                      onClick={() => router.push(`/family-files/${custodyStatus.family_file_id}/children/${childStatus.child_id}`)}
+                    />
+                  );
+                })
+              )}
+            </div>
+          )}
+          {/* Fallback if no custody data but children exist */}
+          {allChildren.length > 0 && allCustodyStatuses.length === 0 && (
+            <div className="cg-card overflow-hidden">
+              <div className="h-2 bg-[var(--portal-primary)]" />
+              <div className="p-5">
+                <p className="text-sm text-muted-foreground">
+                  Set up custody exchanges to see status
+                </p>
+              </div>
+            </div>
+          )}
+
+
+
+          {/* Action Stream */}
+          <section>
+            <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              Action Stream
+            </h3>
+            <div className="space-y-3">
+              {/* Show "all caught up" if no action items */}
+              {dashboardSummary &&
+                dashboardSummary.pending_expenses_count === 0 &&
+                dashboardSummary.unread_messages_count === 0 &&
+                dashboardSummary.pending_agreements_count === 0 &&
+                dashboardSummary.unread_court_count === 0 && (
+                  <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
+                    <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
+                      <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
+                      <p className="text-sm text-muted-foreground font-medium">No pending items to review</p>
+                    </div>
+                  </div>
+                )}
+
+              {/* Pending Expenses */}
+              {(dashboardSummary?.pending_expenses_count ?? 0) > 0 && (
+                <ActionStreamItem
+                  icon={Wallet}
+                  iconBg="bg-cg-error-subtle"
+                  iconColor="text-cg-error"
+                  title="Pending Expenses"
+                  subtitle={`${dashboardSummary!.pending_expenses_count} item${dashboardSummary!.pending_expenses_count > 1 ? 's' : ''} to review`}
+                  hasNotification
+                  onClick={() => router.push('/payments')}
+                />
+              )}
+
+              {/* Unread Messages */}
+              {(dashboardSummary?.unread_messages_count ?? 0) > 0 && (
+                <ActionStreamItem
+                  icon={MessageSquare}
+                  iconBg="bg-cg-slate-subtle"
+                  iconColor="text-cg-slate"
+                  title="Unread Messages"
+                  subtitle={
+                    dashboardSummary!.sender_name
+                      ? `${dashboardSummary!.unread_messages_count} message${dashboardSummary!.unread_messages_count > 1 ? 's' : ''} from ${dashboardSummary!.sender_name}`
+                      : `${dashboardSummary!.unread_messages_count} unread message${dashboardSummary!.unread_messages_count > 1 ? 's' : ''}`
+                  }
+                  hasNotification
+                  onClick={() => router.push('/messages')}
+                />
+              )}
+
+              {/* Pending SharedCare Agreements */}
+              {(() => {
+                const sharedCareAgreements = dashboardSummary?.pending_agreements.filter(
+                  a => a.agreement_type === 'shared_care'
+                ) || [];
+                if (sharedCareAgreements.length === 0) return null;
+                const count = sharedCareAgreements.length;
+                return (
+                  <ActionStreamItem
+                    icon={FileText}
+                    iconBg="bg-[var(--portal-primary)]/10"
+                    iconColor="text-[var(--portal-primary)]"
+                    title="Agreement Approval"
+                    subtitle={
+                      count === 1
+                        ? `"${sharedCareAgreements[0].title}" needs approval`
+                        : `${count} agreements need approval`
+                    }
+                    hasNotification
+                    onClick={() => router.push('/agreements')}
+                  />
+                );
+              })()}
+
+              {/* Pending QuickAccords */}
+              {(() => {
+                const quickAccords = dashboardSummary?.pending_agreements.filter(
+                  a => a.agreement_type === 'quick_accord'
+                ) || [];
+                if (quickAccords.length === 0) return null;
+                const familyFileId = activeFileIdsRef.current[0];
+                const count = quickAccords.length;
+                return (
+                  <ActionStreamItem
+                    icon={Zap}
+                    iconBg="bg-cg-amber-subtle"
+                    iconColor="text-cg-amber"
+                    title="QuickAccord Approval"
+                    subtitle={
+                      count === 1
+                        ? `"${quickAccords[0].title}" needs your approval`
+                        : `${count} QuickAccords need your approval`
+                    }
+                    hasNotification
+                    onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${quickAccords[0].id}`)}
+                  />
+                );
+              })()}
+
+              {/* Active QuickAccords - Awaiting Completion */}
+              {(() => {
+                const activeAccords = dashboardSummary?.active_quick_accords || [];
+                if (activeAccords.length === 0) return null;
+                const familyFileId = activeFileIdsRef.current[0];
+                const count = activeAccords.length;
+                return (
+                  <ActionStreamItem
+                    icon={CheckCircle}
+                    iconBg="bg-[var(--portal-primary)]/10"
+                    iconColor="text-[var(--portal-primary)]"
+                    title="QuickAccord Active"
+                    subtitle={
+                      count === 1
+                        ? `"${activeAccords[0].title}" - mark as completed when done`
+                        : `${count} QuickAccords ready for completion tracking`
+                    }
+                    onClick={() => router.push(`/family-files/${familyFileId}/quick-accord/${activeAccords[0].id}`)}
+                  />
+                );
+              })()}
+
+              {/* Court Notifications */}
+              {(dashboardSummary?.unread_court_count ?? 0) > 0 && (
+                <ActionStreamItem
+                  icon={Gavel}
+                  iconBg="bg-cg-amber-subtle"
+                  iconColor="text-cg-amber"
+                  title="Court Notification"
+                  subtitle={
+                    dashboardSummary!.court_notifications.some(n => n.is_urgent)
+                      ? `${dashboardSummary!.unread_court_count} notification${dashboardSummary!.unread_court_count > 1 ? 's' : ''} (urgent)`
+                      : `${dashboardSummary!.unread_court_count} notification${dashboardSummary!.unread_court_count > 1 ? 's' : ''} from court`
+                  }
+                  hasNotification={dashboardSummary!.court_notifications.some(n => n.is_urgent)}
+                  onClick={() => router.push('/court')}
+                />
+              )}
+
+              {/* Loading state for action stream */}
+              {!dashboardSummary && (
+                <div className="cg-card p-4 animate-pulse">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-muted rounded-xl" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-muted rounded w-1/3" />
+                      <div className="h-3 bg-muted rounded w-1/2" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Upcoming Events */}
+          <section>
+            <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              Coming Up
+            </h3>
+            <UpcomingEventsList events={dashboardSummary?.upcoming_events} />
+          </section>
+
+          {/* Quick Actions */}
+          <section>
+            <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              Quick Actions
+            </h3>
+            <div className="grid grid-cols-4 gap-3">
+              <QuickActionButton
+                icon={MessageSquare}
+                label="Message"
+                onClick={() => router.push('/messages')}
+              />
+              <QuickActionButton
+                icon={Calendar}
+                label="Schedule"
+                onClick={() => router.push('/schedule')}
+              />
+              <QuickActionButton
+                icon={Wallet}
+                label="Expense"
+                onClick={() => router.push('/payments/new')}
+              />
+              <QuickActionButton
+                icon={FolderOpen}
+                label="Files"
+                onClick={() => router.push('/family-files')}
+              />
+            </div>
+          </section>
+
+          {/* Family Files Summary */}
+          {familyFilesWithData.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  Family Files
+                </h3>
+                <button
+                  onClick={() => router.push('/family-files')}
+                  className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#1e4442] transition-colors flex items-center gap-1"
+                >
+                  View all
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="space-y-3">
+                {familyFilesWithData.slice(0, 2).map(({ familyFile }) => (
+                  <button
+                    key={familyFile.id}
+                    onClick={() => router.push(`/family-files/${familyFile.id}`)}
+                    className="group w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                  >
+                    <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                      <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                        {familyFile.title}
+                      </p>
+                      <p className="text-sm text-muted-foreground font-medium">
+                        {familyFile.children?.length || 0} children
+                      </p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Recent Activity */}
+          <section>
+            <h3 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              Recent Activity
+            </h3>
+            <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+              <ActivityFeed
+                activities={dashboardSummary?.recent_activities || []}
+                unreadCount={dashboardSummary?.unread_activity_count || 0}
+                onSeeAll={() => router.push('/activities')}
+                isLoading={!dashboardSummary}
+              />
+            </div>
+          </section>
+        </div>
+      )}
+    </main>
+  </div>
+);
 }
 
 export default function DashboardPage() {

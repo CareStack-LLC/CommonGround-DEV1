@@ -3,8 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { childrenAPI, ChildProfile, getImageUrl, custodyTimeAPI, ChildCustodyStats, TimePeriod, familyFilesAPI, FamilyFileDetail, agreementsAPI, Agreement } from '@/lib/api';
-import { ParentingTimeCard } from '@/components/custody';
+import { childrenAPI, ChildProfile, getImageUrl, familyFilesAPI, FamilyFileDetail, agreementsAPI, Agreement } from '@/lib/api';
+import { CustodyTimeline } from '@/components/schedule/custody-timeline';
 import { useAuth } from '@/lib/auth-context';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
@@ -343,10 +343,7 @@ function ChildProfileContent() {
     setMounted(true);
   }, []);
 
-  // Custody stats state
-  const [custodyStats, setCustodyStats] = useState<ChildCustodyStats | null>(null);
-  const [custodyStatsLoading, setCustodyStatsLoading] = useState(true);
-  const [custodyPeriod, setCustodyPeriod] = useState<TimePeriod>('30_days');
+
 
   // Family file data for parent names
   const [familyFile, setFamilyFile] = useState<FamilyFileDetail | null>(null);
@@ -431,24 +428,7 @@ function ChildProfileContent() {
     loadFamilyData();
   }, [familyFileId]);
 
-  // Load custody stats
-  useEffect(() => {
-    const loadCustodyStats = async () => {
-      try {
-        setCustodyStatsLoading(true);
-        const stats = await custodyTimeAPI.getChildStats(childId, custodyPeriod);
-        setCustodyStats(stats);
-      } catch (err) {
-        // Silently fail - custody stats are not critical
-        console.error('Failed to load custody stats:', err);
-        setCustodyStats(null);
-      } finally {
-        setCustodyStatsLoading(false);
-      }
-    };
 
-    loadCustodyStats();
-  }, [childId, custodyPeriod]);
 
   const loadChild = async () => {
     try {
@@ -914,35 +894,13 @@ function ChildProfileContent() {
         </div>
       </div>
 
-      {/* Parenting Time Card */}
-      {(custodyStats || custodyStatsLoading) && (
-        <ParentingTimeCard
-          stats={custodyStats || {
-            child_id: childId,
-            child_name: `${child.first_name} ${child.last_name}`,
-            total_days: 30,
-            recorded_days: 0,
-            unknown_days: 30,
-            parent_a: { user_id: '', days: 0, percentage: 50 },
-            parent_b: { user_id: '', days: 0, percentage: 50 },
-            agreed_schedule: { pattern: null, parent_a_percentage: 50, parent_b_percentage: 50 },
-            variance: { parent_a: 0, parent_b: 0 },
-            comparison_summary: 'Loading custody data...',
-          }}
-          parentAName={
-            familyFile?.parent_a_info?.first_name ||
-            familyFile?.parent_a_info?.email?.split('@')[0] ||
-            'Parent A'
-          }
-          parentBName={
-            familyFile?.parent_b_info?.first_name ||
-            familyFile?.parent_b_info?.email?.split('@')[0] ||
-            'Parent B'
-          }
-          currentPeriod={custodyPeriod}
-          onPeriodChange={(period) => setCustodyPeriod(period as TimePeriod)}
-        />
-      )}
+      {/* Real-Time Custody Card */}
+      <SectionCard
+        title="Real-Time Custody"
+        icon={<Clock className="h-4 w-4 text-cg-sage" />}
+      >
+        <CustodyTimeline childId={childId} className="border-0 shadow-none p-0" compact />
+      </SectionCard>
 
       {/* Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2">
