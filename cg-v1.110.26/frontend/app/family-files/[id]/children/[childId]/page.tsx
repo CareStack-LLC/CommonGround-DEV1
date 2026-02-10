@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { childrenAPI, ChildProfile, getImageUrl, familyFilesAPI, FamilyFileDetail, agreementsAPI, Agreement } from '@/lib/api';
+import { childrenAPI, ChildProfile, getImageUrl, familyFilesAPI, FamilyFileDetail, agreementsAPI, Agreement, custodyTimeAPI } from '@/lib/api';
 import { CustodyTimeline } from '@/components/schedule/custody-timeline';
 import { useAuth } from '@/lib/auth-context';
 import { Navigation } from '@/components/navigation';
