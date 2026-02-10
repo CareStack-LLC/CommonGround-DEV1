@@ -598,7 +598,7 @@ function ConversationSelector({
   );
 }
 
-const DISCLAIMER_ACCEPTED_KEY = 'cg_messages_disclaimer_accepted';
+
 
 function MessagesContent() {
   const { user } = useAuth();
@@ -620,18 +620,9 @@ function MessagesContent() {
   const [pendingCallType, setPendingCallType] = useState<'video' | 'audio'>('video');
   const [isStartingCall, setIsStartingCall] = useState(false);
   const [acknowledgingMessageId, setAcknowledgingMessageId] = useState<string | null>(null);
-  const [showDisclaimer, setShowDisclaimer] = useState(false);
-
-  // Check if user has accepted disclaimer
-  useEffect(() => {
-    const accepted = localStorage.getItem(DISCLAIMER_ACCEPTED_KEY);
-    if (!accepted) {
-      setShowDisclaimer(true);
-    }
-  }, []);
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   const handleAcceptDisclaimer = () => {
-    localStorage.setItem(DISCLAIMER_ACCEPTED_KEY, 'true');
     setShowDisclaimer(false);
   };
 
