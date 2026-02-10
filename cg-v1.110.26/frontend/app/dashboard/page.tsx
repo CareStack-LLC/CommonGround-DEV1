@@ -12,6 +12,7 @@ import {
   familyFilesAPI,
   agreementsAPI,
   dashboardAPI,
+  activitiesAPI,
 
   getImageUrl,
   FamilyFileDetail,
