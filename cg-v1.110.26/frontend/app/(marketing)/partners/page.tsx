@@ -180,7 +180,7 @@ export default function PartnersDirectoryPage() {
                 <div className="max-w-6xl mx-auto space-y-12">
                     {/* Forever Forward Card */}
                     <PartnerCard
-                        slug="forever-forward"
+                        slug="foreverforward"
                         name="Forever Forward"
                         description="Forever Forward is committed to empowering dads to be the best parents they can be. Through education, mentorship, and community support, we help fathers navigate the challenges of co-parenting and build lasting, positive relationships with their children."
                         website="foreverforward.org"
