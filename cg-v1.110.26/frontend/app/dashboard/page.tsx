@@ -703,27 +703,12 @@ function DashboardContent() {
     if (activeFileIdsRef.current.length === 0) return;
 
     try {
-      // Fetch custody status for all active family files
-      const custodyPromises = activeFileIdsRef.current.map(id =>
-        familyFilesAPI.getCustodyStatus(id)
-      );
-
       // Fetch dashboard summaries for ALL active family files
       const summaryPromises = activeFileIdsRef.current.map(id =>
         dashboardAPI.getSummary(id).catch(() => null)
       );
 
-      const [custodyResults, summaryResults] = await Promise.all([
-        Promise.allSettled(custodyPromises),
-        Promise.all(summaryPromises),
-      ]);
-
-      // Collect successful custody statuses
-      const successfulStatuses = custodyResults
-        .filter((r): r is PromiseFulfilledResult<CustodyStatusResponse> => r.status === 'fulfilled')
-        .map(r => r.value);
-
-      setAllCustodyStatuses(successfulStatuses);
+      const summaryResults = await Promise.all(summaryPromises);
 
       // Merge summaries from all family files
       const validSummaries = summaryResults.filter((s): s is DashboardSummary => s !== null);
