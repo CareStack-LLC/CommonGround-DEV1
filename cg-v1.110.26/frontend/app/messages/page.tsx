@@ -182,8 +182,8 @@ function MessageBubble({
       {/* Bubble */}
       <div className={`max-w-[80%] sm:max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
         <div className={`relative group ${isOwn
-            ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
-            : 'bg-white text-slate-900 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg border-2 border-slate-200'
+          ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
+          : 'bg-white text-slate-900 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg border-2 border-slate-200'
           }`}>
           {/* ARIA Review Badge */}
           {message.was_flagged && (
@@ -396,8 +396,8 @@ function ChatHeader({
                 onClick={() => onInitiateCall('audio')}
                 disabled={!parentBJoined}
                 className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${parentBJoined
-                    ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
-                    : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
+                  ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
+                  : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
                   }`}
                 title={parentBJoined ? "Audio call" : "Both parents must join before calling"}
               >
@@ -407,8 +407,8 @@ function ChatHeader({
                 onClick={() => onInitiateCall('video')}
                 disabled={!parentBJoined}
                 className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${parentBJoined
-                    ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
-                    : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
+                  ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
+                  : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
                   }`}
                 title={parentBJoined ? "Video call" : "Both parents must join before calling"}
               >
@@ -503,15 +503,15 @@ function ConversationSelector({
                 }
               }}
               className={`w-full text-left p-4 transition-all duration-200 ${isSelected
-                  ? 'bg-[var(--portal-primary)]/5'
-                  : 'hover:bg-slate-50 active:bg-slate-100'
+                ? 'bg-[var(--portal-primary)]/5'
+                : 'hover:bg-slate-50 active:bg-slate-100'
                 }`}
             >
               <div className="flex items-center gap-3">
                 {/* Avatar with initial */}
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-lg font-bold ${isSelected
-                    ? 'bg-[var(--portal-primary)] text-white'
-                    : 'bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600'
+                  ? 'bg-[var(--portal-primary)] text-white'
+                  : 'bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600'
                   }`}>
                   {coParentInitial}
                 </div>
@@ -558,8 +558,8 @@ function ConversationSelector({
                       key={agreement.id}
                       onClick={() => onSelectAgreement(agreement, item.familyFile)}
                       className={`w-full text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${selectedAgreement?.id === agreement.id
-                          ? 'bg-[var(--portal-primary)] text-white shadow-md'
-                          : 'bg-white hover:bg-slate-100 text-slate-900 border border-slate-200'
+                        ? 'bg-[var(--portal-primary)] text-white shadow-md'
+                        : 'bg-white hover:bg-slate-100 text-slate-900 border border-slate-200'
                         }`}
                     >
                       <FileText className="h-4 w-4 flex-shrink-0" />
@@ -929,7 +929,7 @@ function MessagesContent() {
           <aside className={`
             ${showSidebar ? 'flex' : 'hidden lg:flex'}
             w-full lg:w-80 flex-col border-r-2 border-slate-200 bg-white shadow-sm
-            absolute lg:relative inset-0 lg:inset-auto z-20 lg:z-auto
+            absolute top-0 left-0 right-0 bottom-20 lg:relative lg:inset-auto lg:bottom-auto z-20 lg:z-auto
           `}>
             {/* Sidebar Header */}
             <div className="p-4 border-b-2 border-slate-200 bg-white">
@@ -1111,8 +1111,8 @@ function MessagesContent() {
                       onClick={() => setShowCompose(true)}
                       disabled={!getOtherParentId()}
                       className={`w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-xl border-2 transition-all duration-200 ${getOtherParentId()
-                          ? 'border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer shadow-md hover:shadow-lg'
-                          : 'border-slate-200 bg-slate-50 cursor-not-allowed opacity-60'
+                        ? 'border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer shadow-md hover:shadow-lg'
+                        : 'border-slate-200 bg-slate-50 cursor-not-allowed opacity-60'
                         }`}
                     >
                       <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-sm">
