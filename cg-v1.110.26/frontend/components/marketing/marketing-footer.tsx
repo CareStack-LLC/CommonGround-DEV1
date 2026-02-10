@@ -44,6 +44,13 @@ const footerLinks = {
       { label: 'Security', href: '/security' },
     ],
   },
+  partners: {
+    title: 'Partners',
+    links: [
+      { label: 'Grant Program', href: '/grant-partnership' },
+      { label: 'Partner Directory', href: '/partners' },
+    ],
+  },
   support: {
     title: 'Support',
     links: [
