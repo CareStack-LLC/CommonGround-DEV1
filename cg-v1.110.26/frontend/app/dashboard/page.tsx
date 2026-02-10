@@ -946,7 +946,8 @@ function DashboardContent() {
               </section>
             </div>
           )
-      </main >
+        }
+      </main>
     </div >
   );
 }
