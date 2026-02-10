@@ -22,26 +22,16 @@ import {
 } from 'lucide-react';
 
 import GenericPartnerLanding from './components/GenericPartnerLanding';
+import ForeverForwardLanding from './components/ForeverForwardLanding';
 
-// ... (existing interfaces)
-
-// Inside PartnerLandingPage component:
-
-// Check if this is Forever Forward for custom content
-if (partnerSlug.toLowerCase() === 'foreverforward') {
-    return <ForeverForwardLanding partnerSlug={partnerSlug} />;
-}
-
-// Use GenericPartnerLanding for all other partners
-return <GenericPartnerLanding partner={partner} />;
-}
-logo_url: string;
-primary_color: string;
-secondary_color: string;
-accent_color: string;
-font_family: string;
-hero_image_url: string;
-tagline: string;
+interface PartnerBranding {
+    logo_url: string;
+    primary_color: string;
+    secondary_color: string;
+    accent_color: string;
+    font_family: string;
+    hero_image_url: string;
+    tagline: string;
 }
 
 interface PartnerLandingConfig {
@@ -62,8 +52,6 @@ interface PartnerInfo {
     codes_remaining: number;
     is_active: boolean;
 }
-
-
 
 export default function PartnerLandingPage() {
     const params = useParams();
