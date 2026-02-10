@@ -42,11 +42,11 @@ export default function EventSilentHandoffCheckIn({
     } | null>(null);
 
     // Determine user role (custodial vs non-custodial)
-    // custodial_parent_id is set on the event
-    const isCustodial = user?.id === event.custodial_parent_id;
+    // We use is_owner as a proxy since custodial_parent_id is not available on EventV2
+    const isCustodial = event.is_owner;
     // For standard events, we assume:
-    // - Custodial parent is "dropping off" (if it's an exchange) or just "host"
-    // - Non-custodial is "picking up" or "guest"
+    // - Owner/Creator is "dropping off" (Host)
+    // - Non-owner is "picking up" (Guest)
     // But for simple check-in, we just need to send a role.
     // The backend `create_check_in` expects `parent_role`.
     // Let's infer it or just use a generic one if not strictly an exchange.
