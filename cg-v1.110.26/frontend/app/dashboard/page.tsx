@@ -791,11 +791,6 @@ function DashboardContent() {
         // Store active file IDs for auto-refresh
         activeFileIdsRef.current = activeFiles.map(f => f.id);
 
-        // Fetch custody status for all active family files in parallel
-        const custodyPromises = activeFiles.map(file =>
-          familyFilesAPI.getCustodyStatus(file.id)
-        );
-
         // Fetch dashboard summaries for ALL active family files
         const summaryPromises = activeFiles.map(file =>
           dashboardAPI.getSummary(file.id).catch((err) => {
@@ -804,17 +799,7 @@ function DashboardContent() {
           })
         );
 
-        const [custodyResults, summaryResults] = await Promise.all([
-          Promise.allSettled(custodyPromises),
-          Promise.all(summaryPromises),
-        ]);
-
-        // Collect successful custody statuses
-        const successfulStatuses = custodyResults
-          .filter((r): r is PromiseFulfilledResult<CustodyStatusResponse> => r.status === 'fulfilled')
-          .map(r => r.value);
-
-        setAllCustodyStatuses(successfulStatuses);
+        const summaryResults = await Promise.all(summaryPromises);
 
         // Merge summaries from all family files
         const validSummaries = summaryResults.filter((s): s is DashboardSummary => s !== null);
