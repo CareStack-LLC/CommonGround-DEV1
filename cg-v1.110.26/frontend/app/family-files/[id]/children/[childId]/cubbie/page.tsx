@@ -123,13 +123,13 @@ function ChildCubbiePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation />
       <PageContainer className="pb-32">
         {/* Back Button */}
         <button
           onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}`)}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-smooth mb-6"
+          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-[var(--portal-primary)] transition-colors font-medium mb-6"
         >
           <ChevronLeft className="h-4 w-4" />
           Back to {child?.first_name}'s Profile
@@ -138,16 +138,16 @@ function ChildCubbiePageContent() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
+            <h1 className="text-2xl font-bold text-foreground sm:text-3xl" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
               {child?.first_name}'s Cubbie
             </h1>
-            <p className="mt-1 text-muted-foreground">
+            <p className="mt-1 text-muted-foreground font-medium">
               Track high-value items that travel with {child?.first_name}
             </p>
           </div>
           <Button
             onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie/new`)}
-            className="bg-cg-sage hover:bg-cg-sage/90 text-white"
+            className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white hover:shadow-lg hover:scale-105 transition-all duration-200 rounded-xl"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Item
@@ -156,111 +156,110 @@ function ChildCubbiePageContent() {
 
         {/* Summary */}
         {items.length > 0 && (
-          <Card className="bg-card border-border mb-8">
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="flex items-center justify-center gap-2 mb-1">
+          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg mb-8 p-6">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-cg-sage/10 flex items-center justify-center">
                     <Package className="h-5 w-5 text-cg-sage" />
                   </div>
-                  <p className="text-2xl font-bold text-foreground">{items.length}</p>
-                  <p className="text-muted-foreground text-sm">Total Items</p>
                 </div>
-                <div>
-                  <div className="flex items-center justify-center gap-2 mb-1">
+                <p className="text-2xl font-bold text-foreground">{items.length}</p>
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">Total Items</p>
+              </div>
+              <div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-cg-sage/10 flex items-center justify-center">
                     <DollarSign className="h-5 w-5 text-cg-sage" />
                   </div>
-                  <p className="text-2xl font-bold text-foreground">
-                    {formatCurrency(totalValue.toString())}
-                  </p>
-                  <p className="text-muted-foreground text-sm">Total Value</p>
                 </div>
-                <div>
-                  <div className="flex items-center justify-center gap-2 mb-1">
+                <p className="text-2xl font-bold text-foreground">
+                  {formatCurrency(totalValue.toString())}
+                </p>
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">Total Value</p>
+              </div>
+              <div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-cg-sage/10 flex items-center justify-center">
                     <MapPin className="h-5 w-5 text-cg-sage" />
                   </div>
-                  <p className="text-2xl font-bold text-foreground">
-                    {items.filter((i) => i.current_location === 'child_traveling').length}
-                  </p>
-                  <p className="text-muted-foreground text-sm">Currently Traveling</p>
                 </div>
+                <p className="text-2xl font-bold text-foreground">
+                  {items.filter((i) => i.current_location === 'child_traveling').length}
+                </p>
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">Traveling</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* Items Grid */}
         {items.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {items.map((item) => (
-              <Card
+              <div
                 key={item.id}
-                className="bg-card border-border cursor-pointer hover:shadow-lg hover:border-cg-sage/50 transition-all duration-200"
+                className="bg-white rounded-2xl border-2 border-slate-200 shadow-md hover:shadow-xl hover:border-[var(--portal-primary)]/30 transition-all duration-300 cursor-pointer overflow-hidden group"
                 onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie/${item.id}`)}
               >
-                <CardContent className="pt-6">
+                <div className="p-5">
                   {/* Item Photo */}
-                  <div className="aspect-square bg-secondary rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                  <div className="aspect-square bg-slate-50 rounded-xl mb-4 flex items-center justify-center overflow-hidden border border-slate-100 group-hover:scale-[1.02] transition-transform duration-300">
                     {item.photo_url ? (
                       <img
                         src={item.photo_url}
                         alt={item.name}
-                        className="w-full h-full object-cover rounded-lg"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-4xl">
+                      <span className="text-5xl filter drop-shadow-sm">
                         {CATEGORY_ICONS[item.category] || '📦'}
                       </span>
                     )}
                   </div>
 
                   {/* Item Details */}
-                  <h3 className="font-semibold text-lg text-foreground">{item.name}</h3>
-                  <p className="text-muted-foreground text-sm mb-2">
+                  <h3 className="font-bold text-lg text-foreground mb-1 group-hover:text-[var(--portal-primary)] transition-colors" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{item.name}</h3>
+                  <p className="text-muted-foreground text-sm mb-3 font-medium">
                     {CATEGORY_LABELS[item.category]}
                   </p>
 
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-foreground">
+                  <div className="flex justify-between items-center pt-3 border-t border-slate-100">
+                    <span className="font-bold text-foreground">
                       {formatCurrency(item.estimated_value)}
                     </span>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        item.current_location === 'child_traveling'
-                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-                          : 'bg-secondary text-muted-foreground'
-                      }`}
+                      className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full ${item.current_location === 'child_traveling'
+                          ? 'bg-amber-100 text-amber-700'
+                          : 'bg-slate-100 text-slate-600'
+                        }`}
                     >
-                      {LOCATION_LABELS[item.current_location]}
+                      {item.current_location === 'child_traveling' ? 'Traveling' : 'Home'}
                     </span>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         ) : (
-          <Card className="bg-card border-border">
-            <CardContent className="pt-6">
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Package className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <p className="text-muted-foreground mb-4">
-                  No items registered for {child?.first_name} yet.
-                </p>
-                <p className="text-muted-foreground/70 text-sm mb-6">
-                  Add high-value items like electronics, school laptops, tablets, or sports equipment.
-                </p>
-                <Button
-                  onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie/new`)}
-                  className="bg-cg-sage hover:bg-cg-sage/90 text-white"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add First Item
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-10 text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+              <Package className="h-10 w-10 text-[var(--portal-primary)]" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              No items registered for {child?.first_name} yet
+            </h3>
+            <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
+              Add high-value items like electronics, school laptops, tablets, or sports equipment to keep track of them.
+            </p>
+            <Button
+              onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie/new`)}
+              className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-6 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Add First Item
+            </Button>
+          </div>
         )}
       </PageContainer>
     </div>

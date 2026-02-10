@@ -40,10 +40,9 @@ import {
   Gavel,
   CheckCircle,
   Zap,
-  BarChart3,
+
 } from 'lucide-react';
-import { CustodyTimeCard } from '@/components/dashboard/custody-time-card';
-import { ComplianceLogCard } from '@/components/dashboard/compliance-log-card';
+
 import { UpgradeBanner } from '@/components/upgrade-banner';
 import { useSubscription } from '@/contexts/subscription-context';
 
@@ -1094,10 +1093,7 @@ function DashboardContent() {
   const needsSetup = familyFilesWithData.length === 0;
   const greeting = getGreeting();
 
-  // Find first active agreement for Smart Insights
-  const activeAgreementId = familyFilesWithData
-    .flatMap(f => f.agreements)
-    .find(a => a.status === 'active')?.id;
+
 
   // Show loading state
   if (isLoading) {
@@ -1231,21 +1227,7 @@ function DashboardContent() {
               </div>
             )}
 
-            {/* Smart Insights */}
-            {activeAgreementId && (
-              <section className="mb-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <BarChart3 className="w-5 h-5 text-[var(--portal-primary)]" />
-                  <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                    Custody Insights
-                  </h3>
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <CustodyTimeCard agreementId={activeAgreementId} />
-                  <ComplianceLogCard agreementId={activeAgreementId} />
-                </div>
-              </section>
-            )}
+
 
             {/* Action Stream */}
             <section>

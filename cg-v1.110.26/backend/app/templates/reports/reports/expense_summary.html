@@ -7,124 +7,43 @@
 
 {% block content %}
 <style>
-  /* Local styles for report enhancement */
-  .insights-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .insight-card {
-    background: #FFFFFF;
-    border-radius: 0.75rem;
-    padding: 1rem;
-    border-left: 4px solid #64748B;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  }
-
-  .insight-card.success {
-    border-left-color: #4A6C58;
-  }
-
-  .insight-card.warning {
-    border-left-color: #D4A574;
-  }
-
-  .insight-card.error {
-    border-left-color: #C53030;
-  }
-
-  .insight-card.info {
-    border-left-color: #3B82F6;
-  }
-
-  .insight-title {
-    font-weight: 700;
-    font-size: 0.95rem;
-    margin-bottom: 0.25rem;
-    color: #2D3A35;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .insight-text {
-    font-size: 0.9rem;
-    color: #475569;
-    line-height: 1.4;
-  }
-
-  .explainer-box {
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-top: 1rem;
-  }
-
-  .explainer-title {
-    display: flex;
-    align-items: center;
-    font-weight: 700;
-    font-size: 0.85rem;
-    color: #64748B;
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-  }
-
-  .explainer-content {
-    font-size: 0.85rem;
-    color: #475569;
-    line-height: 1.5;
-  }
-
-  .compliance-section {
-    background: #E8F0EC;
-    /* Sage subtle */
-    border-radius: 0.75rem;
-    padding: 1.5rem;
-    margin-top: 2rem;
-  }
-
-  .metric-large {
-    font-size: 2.5rem;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 0.25rem;
-  }
-
-  .metric-label {
-    font-size: 0.85rem;
-    color: #6B7B74;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
+  /* Local styles removed in favor of design system in _brand.css */
 </style>
 
-<!-- Understanding Compliance (Moved) -->
+<!-- Understanding Compliance -->
 <section class="section compliance-section keep-together">
-  <h2 style="margin-top: 0; color: #2D3A35;">Understanding Compliance</h2>
-  <div class="grid grid-2">
-    <div>
-      <p style="margin-bottom: 0.5rem; font-weight: 600;">What is the Compliance Score?</p>
-      <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1rem;">
-        The compliance score represents the percentage of financial obligations that were funded on time and in full. It
-        is a key indicator of financial reliability and adherence to the support order.
-      </p>
-      <div class="card" style="flex: 2;">
-        <h3>Why it matters</h3>
-        <p style="color: #475569; line-height: 1.6;">
-          Consistent funding ensures the child's needs—such as medical care, education, and extracurricular
-          activities—are met without interruption. High compliance demonstrates a commitment to co-parenting stability.
-          Discrepancies may arise from disputed charges or processing delays.
+  <div class="card" style="background: var(--cg-sage-subtle); border: 1px solid var(--cg-sage-light);">
+    <h3 style="margin-top: 0; color: var(--cg-sage-dark); margin-bottom: 1rem;">Understanding Compliance</h3>
+    <div class="grid grid-2" style="gap: 2rem;">
+      <div>
+        <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--cg-text-primary);">What is the Compliance Score?
         </p>
+        <p style="font-size: 0.9rem; color: var(--cg-text-secondary); margin-bottom: 1rem; line-height: 1.5;">
+          The compliance score represents the percentage of financial obligations that were funded on time and in full.
+          It
+          is a key indicator of financial reliability and adherence to the support order.
+        </p>
+        <div>
+          <h4 style="margin-bottom: 0.5rem; font-size: 0.9rem;">Why it matters</h4>
+          <p style="font-size: 0.9rem; color: var(--cg-text-secondary); line-height: 1.5;">
+            Consistent funding ensures the child's needs—such as medical care, education, and extracurricular
+            activities—are met without interruption. High compliance demonstrates a commitment to co-parenting
+            stability.
+          </p>
+        </div>
       </div>
-    </div>
-    <div>
-      <div class="stat-card" style="background: white;">
-        <div class="stat-label">Calculation</div>
-        <div class="stat-sublabel" style="margin-top: 0.5rem;">
-          Excludes disputed or cancelled items.
+      <div>
+        <div class="card"
+          style="background: white; border: 1px solid var(--cg-sage-light); height: 100%; display: flex; flex-direction: column; justify-content: center;">
+          <div class="text-center">
+            <div class="text-sm text-muted uppercase tracking-wide font-bold mb-xs">Calculation</div>
+            <div style="font-size: 0.9rem; color: var(--cg-text-secondary);">
+              (Funded / Required) × 100
+            </div>
+            <div class="text-xs text-muted mt-sm" style="font-style: italic;">
+              Excludes disputed or cancelled items.
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -148,38 +67,38 @@
 
 
 
-<!-- Agreement Overview Section (New) -->
+<!-- Agreement Overview -->
 {% if agreement %}
 <section class="section">
   <h2>Agreement Overview</h2>
   <div class="card">
-    <div class="grid grid-2">
+    <div class="grid grid-2" style="gap: 2rem;">
       <div>
-        <div
-          style="font-size: 0.85rem; color: #64748B; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">
-          Active Agreement</div>
-        <div style="font-size: 1.2rem; font-weight: 700; color: #2D3A35; margin-bottom: 0.25rem;">{{ agreement.title }}
+        <div class="text-sm text-muted uppercase tracking-wide font-bold mb-xs">Active Agreement</div>
+        <div style="font-size: 1.2rem; font-weight: 700; color: var(--cg-text-primary); margin-bottom: 0.25rem;">{{
+          agreement.title }}
         </div>
-        <div style="font-size: 0.9rem; color: #475569;">Effective: {{ agreement.effective_date.strftime('%b %d, %Y') if
+        <div style="font-size: 0.9rem; color: var(--cg-text-secondary);">Effective: {{
+          agreement.effective_date.strftime('%b %d, %Y') if
           agreement.effective_date else 'Pending' }}
         </div>
         {% if agreement.approved_date %}
-        <div style="font-size: 0.9rem; color: #475569;">Approved: {{ agreement.approved_date.strftime('%b %d, %Y') }}
+        <div style="font-size: 0.9rem; color: var(--cg-text-secondary);">Approved: {{
+          agreement.approved_date.strftime('%b %d, %Y') }}
         </div>
         {% endif %}
       </div>
       <div>
         <!-- Financial Terms -->
         {% if agreement.key_terms %}
-        <div
-          style="font-size: 0.85rem; color: #64748B; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">
+        <div class="text-sm text-muted uppercase tracking-wide font-bold mb-xs">
           Financial Terms</div>
-        <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.9rem; color: #475569;">
+        <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.9rem; color: var(--cg-text-secondary);">
           {% for term in agreement.key_terms %}
           {% if 'financial' in term.category|lower or 'support' in term.category|lower or 'expense' in
           term.category|lower %}
           <li style="margin-bottom: 0.25rem; display: flex; align-items: flex-start;">
-            <span style="color: #4A6C58; margin-right: 0.5rem;">•</span>
+            <span style="color: var(--cg-sage); margin-right: 0.5rem;">•</span>
             {{ term.term }}
           </li>
           {% endif %}
@@ -192,33 +111,33 @@
 </section>
 {% endif %}
 
-<!-- Executive Summary Section -->
+<!-- Financial Overview -->
 <section class="section">
   <h2>Financial Overview</h2>
 
-  <div class="grid grid-4">
+  <div class="grid grid-4" style="gap: var(--spacing-lg);">
     <div class="stat-card">
-      <div class="metric-large">{{ stats.total_obligations }}</div>
-      <div class="metric-label">Total Transactions</div>
+      <div class="stat-value">{{ stats.total_obligations }}</div>
+      <div class="stat-label">Total Transactions</div>
     </div>
 
     <div class="stat-card">
-      <div class="metric-large">${{ "{:,.2f}".format(stats.total_amount) }}</div>
-      <div class="metric-label">Total Amount</div>
+      <div class="stat-value">${{ "{:,.2f}".format(stats.total_amount) }}</div>
+      <div class="stat-label">Total Amount</div>
     </div>
 
     <div class="stat-card">
-      <div style="color: #4A6C58" class="metric-large">${{ "{:,.2f}".format(stats.funded_amount) }}</div>
-      <div class="metric-label">Total Funded</div>
+      <div class="stat-value text-sage">${{ "{:,.2f}".format(stats.funded_amount) }}</div>
+      <div class="stat-label">Total Funded</div>
       <div class="stat-sublabel">{{ "%.0f"|format(stats.funding_rate) }}% Collected</div>
     </div>
 
     <div class="stat-card">
       <div
-        class="metric-large {% if stats.compliance_rate >= 90 %}text-sage{% elif stats.compliance_rate >= 70 %}text-amber{% else %}text-error{% endif %}">
+        class="stat-value {% if stats.compliance_rate >= 90 %}text-sage{% elif stats.compliance_rate >= 70 %}text-amber{% else %}text-error{% endif %}">
         {{ "%.0f"|format(stats.compliance_rate) }}%
       </div>
-      <div class="metric-label">Compliance Score</div>
+      <div class="stat-label">Compliance Score</div>
       <div class="stat-sublabel">Reliability Metric</div>
     </div>
   </div>
@@ -227,25 +146,20 @@
 <!-- Parent Contributions Section -->
 <section class="section">
   <h2>Parent Contributions</h2>
-  <p class="section-intro">Breakdown of support provided by each parent based on assigned shares.</p>
-
-  <div class="card keep-together">
-    <div class="grid grid-2" style="align-items: center;">
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div class="grid grid-2" style="align-items: center; gap: 3rem;">
       <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-        <!-- Donut chart removed for cleaner layout -->
-        <div style="text-align: center; margin-bottom: 1.5rem;">
-          <div style="font-size: 2.5rem; font-weight: 700; color: #4A6C58;">${{
+        <div style="text-align: center; margin-bottom: 2rem;">
+          <div style="font-size: 3rem; font-weight: 700; color: var(--cg-sage); line-height: 1;">${{
             "{:,.2f}".format(parent_a_stats.amount_funded) }}</div>
-          <div style="color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 0.85rem;">{{ parent_a_name
-            }} Paid</div>
-          <div style="color: #94A3B8; font-size: 0.9rem; margin-top: 0.25rem;">Total Contributed</div>
+          <div class="text-sm text-muted uppercase tracking-wide font-bold mt-xs">{{ parent_a_name }} Paid</div>
+          <div class="text-xs text-muted mt-xs">Total Contributed</div>
         </div>
         <div style="text-align: center;">
-          <div style="font-size: 2.5rem; font-weight: 700; color: #64748B;">${{
+          <div style="font-size: 3rem; font-weight: 700; color: var(--cg-slate); line-height: 1;">${{
             "{:,.2f}".format(parent_b_stats.amount_funded) }}</div>
-          <div style="color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 0.85rem;">{{ parent_b_name
-            }} Paid</div>
-          <div style="color: #94A3B8; font-size: 0.9rem; margin-top: 0.25rem;">Total Contributed</div>
+          <div class="text-sm text-muted uppercase tracking-wide font-bold mt-xs">{{ parent_b_name }} Paid</div>
+          <div class="text-xs text-muted mt-xs">Total Contributed</div>
         </div>
       </div>
       <div>
@@ -260,21 +174,23 @@
           </thead>
           <tbody>
             <tr>
-              <td style="color: #4A6C58; font-weight: 600;">{{ parent_a_name }}</td>
+              <td style="color: var(--cg-sage); font-weight: 700;">{{ parent_a_name }}</td>
               <td style="text-align: right;">${{ "{:,.2f}".format(parent_a_stats.share_required) }}</td>
               <td style="text-align: right;">${{ "{:,.2f}".format(parent_a_stats.amount_funded) }}</td>
               <td style="text-align: right;">
-                <span class="badge {% if parent_a_stats.funding_rate >= 90 %}success{% else %}warning{% endif %}">
+                <span
+                  class="badge {% if parent_a_stats.funding_rate >= 90 %}badge-success{% else %}badge-warning{% endif %}">
                   {{ "%.0f"|format(parent_a_stats.funding_rate) }}%
                 </span>
               </td>
             </tr>
             <tr>
-              <td style="color: #475569; font-weight: 600;">{{ parent_b_name }}</td>
+              <td style="color: var(--cg-slate); font-weight: 700;">{{ parent_b_name }}</td>
               <td style="text-align: right;">${{ "{:,.2f}".format(parent_b_stats.share_required) }}</td>
               <td style="text-align: right;">${{ "{:,.2f}".format(parent_b_stats.amount_funded) }}</td>
               <td style="text-align: right;">
-                <span class="badge {% if parent_b_stats.funding_rate >= 90 %}success{% else %}warning{% endif %}">
+                <span
+                  class="badge {% if parent_b_stats.funding_rate >= 90 %}badge-success{% else %}badge-warning{% endif %}">
                   {{ "%.0f"|format(parent_b_stats.funding_rate) }}%
                 </span>
               </td>
@@ -284,21 +200,11 @@
       </div>
     </div>
 
-    <div class="explainer-box">
-      <div class="explainer-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-          style="margin-right: 6px;">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="16" x2="12" y2="12"></line>
-          <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
-        About Contributions
-      </div>
-      <div class="explainer-content">
-        Expense shares are calculated based on the court-ordered split. A 100% funding rate means a parent has paid
-        their full share of expenses entered into ClearFund. Discrepancies may arise from disputed charges or processing
-        delays.
-      </div>
+    <div class="note info" style="margin-top: 1.5rem;">
+      <strong>About Contributions</strong><br>
+      Expense shares are calculated based on the court-ordered split. A 100% funding rate means a parent has paid
+      their full share of expenses entered into ClearFund. Discrepancies may arise from disputed charges or processing
+      delays.
     </div>
   </div>
 </section>
@@ -307,20 +213,18 @@
 {% if categories %}
 <section class="section">
   <h2>Spending by Category</h2>
-  <div class="card keep-together">
-    <div class="grid grid-2">
-      <div class="chart-container" style="flex-direction: column; justify-content: center; align-items: flex-start;">
-        <!-- Chart removed -->
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div class="grid grid-2" style="gap: 2rem;">
+      <div style="display: flex; flex-direction: column; justify-content: center;">
         {% if categories %}
         {% set top = categories[0] %}
         <div
-          style="width: 100%; padding: 1.5rem; background: #F8FAFC; border-radius: 0.5rem; border-left: 4px solid #4A6C58;">
-          <div
-            style="font-size: 0.85rem; color: #64748B; text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">
-            Top Category</div>
-          <div style="font-size: 1.5rem; font-weight: 700; color: #2D3A35; margin-bottom: 0.25rem;">{{
+          style="width: 100%; padding: 2rem; background: var(--cg-sage-subtle); border-radius: 8px; border: 1px solid var(--cg-sage-light); text-align: center;">
+          <div class="text-sm text-muted uppercase tracking-wide font-bold mb-xs">Top Category</div>
+          <div style="font-size: 2rem; font-weight: 700; color: var(--cg-text-primary); margin-bottom: 0.5rem;">{{
             top.name|replace('_', ' ')|title }}</div>
-          <div style="font-size: 1.1rem; color: #4A6C58;">{{ "%.1f"|format(top.percentage) }}% of total</div>
+          <div style="font-size: 1.2rem; color: var(--cg-sage-dark); font-weight: 600;">{{ "%.1f"|format(top.percentage)
+            }}% of total</div>
         </div>
         {% endif %}
       </div>
@@ -337,7 +241,7 @@
           <tbody>
             {% for cat in categories %}
             <tr>
-              <td><strong>{{ cat.name|replace('_', ' ')|title }}</strong></td>
+              <td><strong style="color: var(--cg-text-primary);">{{ cat.name|replace('_', ' ')|title }}</strong></td>
               <td style="text-align: right;">${{ "{:,.2f}".format(cat.amount) }}</td>
               <td style="text-align: right;">{{ "%.1f"|format(cat.percentage) }}%</td>
             </tr>
@@ -355,9 +259,9 @@
 <!-- Child Support Obligations Section -->
 {% if child_support_obligations %}
 <section class="section">
-  <div style="display: flex; justify-content: space-between; align-items: baseline;">
-    <h2>Child Support Obligations</h2>
-    <div style="font-size: 0.9rem; color: #475569; font-weight: 500;">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem;">
+    <h2 style="margin-bottom: 0;">Child Support Obligations</h2>
+    <div style="font-size: 0.9rem; color: var(--cg-text-secondary); font-weight: 500;">
       {% set paid_count = child_support_obligations|selectattr("status", "in", ["funded", "completed",
       "verified"])|list|length %}
       {{ paid_count }} of {{ child_support_obligations|length }} Payments Made
@@ -365,32 +269,35 @@
   </div>
   <p class="section-intro">Monthly support payments and their funding status.</p>
 
-  <table class="full-width">
-    <thead>
-      <tr>
-        <th>Period</th>
-        <th>Due Date</th>
-        <th style="text-align: right;">Required</th>
-        <th style="text-align: right;">Funded</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for ob in child_support_obligations %}
-      <tr>
-        <td>{{ ob.title }}</td>
-        <td>{{ ob.due_date.strftime('%b %d, %Y') if ob.due_date else 'N/A' }}</td>
-        <td style="text-align: right;">${{ "{:,.2f}".format(ob.total_amount) }}</td>
-        <td style="text-align: right;">${{ "{:,.2f}".format(ob.amount_funded) }}</td>
-        <td>
-          <span class="badge {{ 'success' if ob.status in ['funded', 'completed', 'verified'] else 'warning' }}">
-            {{ ob.status|replace('_', ' ')|title }}
-          </span>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table class="full-width">
+      <thead>
+        <tr>
+          <th>Period</th>
+          <th>Due Date</th>
+          <th style="text-align: right;">Required</th>
+          <th style="text-align: right;">Funded</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ob in child_support_obligations %}
+        <tr>
+          <td style="font-weight: 500; color: var(--cg-text-primary);">{{ ob.title }}</td>
+          <td>{{ ob.due_date.strftime('%b %d, %Y') if ob.due_date else 'N/A' }}</td>
+          <td style="text-align: right;">${{ "{:,.2f}".format(ob.total_amount) }}</td>
+          <td style="text-align: right;">${{ "{:,.2f}".format(ob.amount_funded) }}</td>
+          <td>
+            <span
+              class="badge {{ 'badge-success' if ob.status in ['funded', 'completed', 'verified'] else 'badge-warning' }}">
+              {{ ob.status|replace('_', ' ')|title }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 {% endif %}
 
@@ -400,48 +307,50 @@
   <h2>Expenses</h2>
   <p class="section-intro">Shared expenses (medical, education, extracurricular, etc).</p>
 
-  <table class="full-width">
-    <thead>
-      <tr>
-        <th>Requested By</th>
-        <th>Category</th>
-        <th>Title</th>
-        <th>Status</th>
-        <th>Date Created</th>
-        <th>Date Paid</th>
-        <th style="text-align: right;">Amount</th>
-        <th style="text-align: right;">Split</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for ob in other_obligations %}
-      <tr>
-        <td>
-          <span style="font-weight: 500;">
-            {{ parent_a_name if ob.created_by == family_file.parent_a_id else parent_b_name }}
-          </span>
-        </td>
-        <td>{{ ob.purpose_category|replace('_', ' ')|title }}</td>
-        <td style="font-weight: 500; color: #2D3A35;">{{ ob.title }}</td>
-        <td>
-          <span class="badge {{ 'success' if ob.status in ['funded', 'completed', 'verified'] else 'warning' }}">
-            {{ ob.status|replace('_', ' ')|title }}
-          </span>
-        </td>
-        <td>{{ ob.created_at.strftime('%b %d, %Y') }}</td>
-        <td>{{ ob.funded_at.strftime('%b %d, %Y') if ob.funded_at else '-' }}</td>
-        <td style="text-align: right; font-weight: 600;">${{ "{:,.2f}".format(ob.total_amount) }}</td>
-        <td style="text-align: right;">
-          {% if ob.petitioner_percentage == 50 %}
-          50/50
-          {% else %}
-          {{ ob.petitioner_percentage }}/{{ 100 - ob.petitioner_percentage }}
-          {% endif %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table class="full-width">
+      <thead>
+        <tr>
+          <th>Requested By</th>
+          <th>Category</th>
+          <th>Title</th>
+          <th>Status</th>
+          <th>Date Created</th>
+          <th style="text-align: right;">Amount</th>
+          <th style="text-align: right;">Split</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ob in other_obligations %}
+        <tr>
+          <td>
+            <span
+              style="font-weight: 600; color: {{ 'var(--cg-sage)' if ob.created_by == family_file.parent_a_id else 'var(--cg-slate)' }};">
+              {{ parent_a_name if ob.created_by == family_file.parent_a_id else parent_b_name }}
+            </span>
+          </td>
+          <td>{{ ob.purpose_category|replace('_', ' ')|title }}</td>
+          <td style="font-weight: 500; color: var(--cg-text-primary);">{{ ob.title }}</td>
+          <td>
+            <span
+              class="badge {{ 'badge-success' if ob.status in ['funded', 'completed', 'verified'] else 'badge-warning' }}">
+              {{ ob.status|replace('_', ' ')|title }}
+            </span>
+          </td>
+          <td>{{ ob.created_at.strftime('%b %d, %Y') }}</td>
+          <td style="text-align: right; font-weight: 600;">${{ "{:,.2f}".format(ob.total_amount) }}</td>
+          <td style="text-align: right;">
+            {% if ob.petitioner_percentage == 50 %}
+            50/50
+            {% else %}
+            {{ ob.petitioner_percentage }}/{{ 100 - ob.petitioner_percentage }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </section>
 {% endif %}
 

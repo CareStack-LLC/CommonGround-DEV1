@@ -11,9 +11,12 @@ import {
   FamilyFileDetail,
   QuickAccord,
   Agreement,
+  AgreementQuickSummary,
   ProfessionalAccess,
   ProfessionalAccessRequest,
 } from '@/lib/api';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
@@ -100,6 +103,8 @@ function FamilyFileDetailContent() {
   const [familyFile, setFamilyFile] = useState<FamilyFileDetail | null>(null);
   const [quickAccords, setQuickAccords] = useState<QuickAccord[]>([]);
   const [agreements, setAgreements] = useState<Agreement[]>([]);
+  const [activeAgreement, setActiveAgreement] = useState<Agreement | null>(null);
+  const [activeAgreementSummary, setActiveAgreementSummary] = useState<AgreementQuickSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -149,6 +154,29 @@ function FamilyFileDetailContent() {
       setFamilyFile(fileData);
       setQuickAccords(accordsData.items);
       setAgreements(agreementsData.items || []);
+
+      // Find active shared care agreement and fetch its summary
+      // Prioritize 'active', then 'approved', then sorted by date (newest first)
+      const sortedAgreements = (agreementsData.items || []).sort((a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      const active = sortedAgreements.find(a => a.status === 'active') ||
+        sortedAgreements.find(a => a.status === 'approved');
+
+      if (active) {
+        setActiveAgreement(active);
+        try {
+          const summary = await agreementsAPI.getQuickSummary(active.id);
+          setActiveAgreementSummary(summary);
+        } catch (err) {
+          console.error('Failed to load agreement summary:', err);
+          // Don't fail the whole page load if summary fails
+        }
+      } else {
+        setActiveAgreement(null);
+        setActiveAgreementSummary(null);
+      }
 
       // Load professional access data (non-blocking)
       loadProfessionalAccess();
@@ -1134,6 +1162,23 @@ function FamilyFileDetailContent() {
           {/* Info */}
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
             <h2 className="text-xl font-bold text-slate-900 mb-6" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Details</h2>
+
+            {/* Quick Facts from Active Agreement */}
+            {activeAgreementSummary && activeAgreementSummary.key_points && activeAgreementSummary.key_points.length > 0 && (
+              <div className="mb-6 pb-6 border-b border-slate-100">
+                <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-3">Quick Facts</h3>
+                <div className="space-y-2">
+                  {activeAgreementSummary.key_points.map((point, idx) => (
+                    <div key={idx} className="flex gap-2 text-sm text-slate-600">
+                      <div className="prose prose-sm max-w-none prose-p:my-0 prose-strong:text-slate-900 prose-strong:font-semibold">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{point}</ReactMarkdown>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-3 text-sm">
               {familyFile.state && (
                 <div className="flex justify-between">
@@ -1143,7 +1188,17 @@ function FamilyFileDetailContent() {
                   </span>
                 </div>
               )}
-              <div className="flex justify-between">
+
+              {activeAgreement && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Active Agreement</span>
+                  <span className="text-foreground font-medium">
+                    {new Date(activeAgreement.effective_date || activeAgreement.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+
+              <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">ARIA</span>
                 <CGBadge variant={familyFile.aria_enabled ? 'sage' : 'default'}>
                   {familyFile.aria_enabled ? 'Enabled' : 'Disabled'}

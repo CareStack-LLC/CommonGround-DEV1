@@ -10,36 +10,36 @@
 {% if agreement %}
 <section class="section">
   <h2>Agreement Summary</h2>
-  <div class="card">
-    <div class="grid grid-3" style="margin-bottom: 1rem;">
+  <div class="card" style="padding: var(--spacing-xl);">
+    <div class="grid grid-3" style="margin-bottom: 1.5rem; gap: var(--spacing-xl);">
       <div>
-        <span class="text-sm text-slate-500 uppercase tracking-wide">Agreement</span>
-        <div class="font-bold" style="font-size: 1.1rem;">{{ agreement.title }}</div>
+        <span class="text-sm text-muted uppercase tracking-wide font-bold">Agreement Title</span>
+        <div class="font-bold text-primary" style="font-size: 1.2rem; margin-top: 4px;">{{ agreement.title }}</div>
       </div>
       <div>
-        <span class="text-sm text-slate-500 uppercase tracking-wide">Status</span>
-        <div><span class="status-badge status-{{ agreement.status }}">{{ agreement.status|title }}</span></div>
+        <span class="text-sm text-muted uppercase tracking-wide font-bold">Current Status</span>
+        <div style="margin-top: 4px;"><span class="badge badge-success">{{ agreement.status|title }}</span></div>
       </div>
       <div>
-        <span class="text-sm text-slate-500 uppercase tracking-wide">Child Support</span>
-        <div class="font-bold">{{ agreement.key_terms.child_support }}</div>
+        <span class="text-sm text-muted uppercase tracking-wide font-bold">Child Support</span>
+        <div class="font-bold text-primary" style="margin-top: 4px;">{{ agreement.key_terms.child_support }}</div>
       </div>
     </div>
 
     <!-- Children Info -->
     {% if children %}
     <div
-      style="padding: 0.75rem 0; border-top: 1px solid var(--cg-border-light); border-bottom: 1px solid var(--cg-border-light); margin-bottom: 0.75rem;">
-      <span class="text-sm text-slate-500 uppercase tracking-wide">Children Covered</span>
-      <div style="display: flex; gap: 1.5rem; margin-top: 0.5rem;">
+      style="padding: 1rem 0; border-top: 1px solid var(--cg-border-light); border-bottom: 1px solid var(--cg-border-light); margin-bottom: 1rem;">
+      <span class="text-sm text-muted uppercase tracking-wide font-bold">Children Covered</span>
+      <div style="display: flex; gap: 2rem; margin-top: 0.75rem;">
         {% for child in children %}
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
           <span
-            style="width: 32px; height: 32px; border-radius: 50%; background: var(--cg-sage-light); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">{{
+            style="width: 36px; height: 36px; border-radius: 50%; background: var(--cg-sage-subtle); color: var(--cg-sage-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px;">{{
             child.first_name[0] }}</span>
           <div>
-            <div class="font-bold">{{ child.first_name }} {{ child.last_name }}</div>
-            <div class="text-sm text-slate-500">{{ child.age }} years old</div>
+            <div class="font-bold text-primary">{{ child.first_name }} {{ child.last_name }}</div>
+            <div class="text-sm text-muted">{{ child.age }} years old</div>
           </div>
         </div>
         {% endfor %}
@@ -48,7 +48,7 @@
     {% endif %}
 
     <div>
-      <div class="text-slate-700 text-sm leading-relaxed">{{ agreement.summary }}</div>
+      <div class="text-secondary text-sm leading-relaxed" style="font-style: italic;">"{{ agreement.summary }}"</div>
     </div>
   </div>
 </section>
@@ -58,8 +58,8 @@
 <section class="section">
   <h2>Custody Time Distribution</h2>
 
-  <div class="card keep-together">
-    <div class="grid grid-2" style="align-items: center; gap: 2rem;">
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div class="grid grid-2" style="align-items: center; gap: 3rem;">
 
       <!-- Left: Chart -->
       <div style="text-align: center;">
@@ -68,41 +68,43 @@
 
       <!-- Right: Stats -->
       <div>
-        <div style="margin-bottom: 1.5rem;">
-          <div class="text-sm text-slate-500 uppercase tracking-wide">Report Period</div>
-          <div style="font-size: 2rem; font-weight: 700; color: var(--cg-text-primary);">{{ stats.total_days }}</div>
-          <div class="text-slate-500">Total Days</div>
+        <div style="margin-bottom: 2rem;">
+          <div class="text-sm text-muted uppercase tracking-wide font-bold">Report Period</div>
+          <div style="font-size: 2.5rem; font-weight: 700; color: var(--cg-text-primary); line-height: 1;">{{
+            stats.total_days }}</div>
+          <div class="text-muted font-medium">Total Recorded Days</div>
         </div>
 
-        <div style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; gap: 3rem; margin-bottom: 2rem;">
           <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="width: 12px; height: 12px; border-radius: 50%; background: #3B82F6;"></span>
-              <span class="font-bold">{{ parent_a_name }}</span>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: #3B82F6;"></span>
+              <span class="font-bold text-primary">{{ parent_a_name }}</span>
             </div>
-            <div style="font-size: 1.75rem; font-weight: 700; color: #3B82F6;">{{
+            <div style="font-size: 2rem; font-weight: 700; color: #3B82F6;">{{
               "%.1f"|format(stats.parent_a_percentage) }}%</div>
-            <div class="text-slate-500">{{ stats.parent_a_days }} days</div>
+            <div class="text-muted text-sm">{{ stats.parent_a_days }} days</div>
           </div>
           <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span style="width: 12px; height: 12px; border-radius: 50%; background: #F97316;"></span>
-              <span class="font-bold">{{ parent_b_name }}</span>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: #F97316;"></span>
+              <span class="font-bold text-primary">{{ parent_b_name }}</span>
             </div>
-            <div style="font-size: 1.75rem; font-weight: 700; color: #F97316;">{{
+            <div style="font-size: 2rem; font-weight: 700; color: #F97316;">{{
               "%.1f"|format(stats.parent_b_percentage) }}%</div>
-            <div class="text-slate-500">{{ stats.parent_b_days }} days</div>
+            <div class="text-muted text-sm">{{ stats.parent_b_days }} days</div>
           </div>
         </div>
 
-        <div style="padding-top: 1rem; border-top: 1px solid var(--cg-border-light);">
-          <div class="text-sm text-slate-500 uppercase tracking-wide">Exchange Compliance</div>
-          <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+        <div style="padding-top: 1.5rem; border-top: 1px solid var(--cg-border-light);">
+          <div class="text-sm text-muted uppercase tracking-wide font-bold">Exchange Compliance</div>
+          <div style="display: flex; align-items: baseline; gap: 0.75rem;">
             <span
-              style="font-size: 1.5rem; font-weight: 700; color: {% if exchange_stats.completion_rate >= 90 %}var(--cg-sage){% elif exchange_stats.completion_rate >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %};">
+              style="font-size: 1.75rem; font-weight: 700; color: {% if exchange_stats.completion_rate >= 90 %}var(--cg-sage){% elif exchange_stats.completion_rate >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %};">
               {{ "%.0f"|format(exchange_stats.completion_rate) }}%
             </span>
-            <span class="text-slate-500">{{ exchange_stats.completed }}/{{ exchange_stats.total }} completed</span>
+            <span class="text-muted font-medium">{{ exchange_stats.completed }}/{{ exchange_stats.total }}
+              completed</span>
           </div>
         </div>
       </div>
@@ -110,17 +112,21 @@
     </div>
 
     {% if comparison %}
-    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--cg-border);">
-      <div class="note {% if comparison.variance|abs > 10 %}warning{% endif %}">
-        <strong>Variance from Agreement:</strong>
-        {% if comparison.variance > 0 %}
-        {{ parent_a_name }} had <strong>+{{ "%.1f"|format(comparison.variance|abs) }}%</strong> more time than the
-        agreed {{ agreement.key_terms.custody_split if agreement else "schedule" }}.
-        {% elif comparison.variance < 0 %} {{ parent_a_name }} had <strong>-{{ "%.1f"|format(comparison.variance|abs)
-          }}%</strong> less time than agreed.
-          {% else %}
-          Actual time perfectly matched the agreement.
-          {% endif %}
+    <div
+      style="margin-top: 2rem; padding: 1rem; background: var(--cg-cream); border-radius: var(--radius-md); border: 1px solid var(--cg-border-light);">
+      <div class="note {% if comparison.variance|abs > 10 %}warning{% endif %}"
+        style="margin: 0; background: none; border: none; padding: 0;">
+        <strong style="color: var(--cg-text-primary);">Variance from Agreement:</strong>
+        <span style="color: var(--cg-text-secondary);">
+          {% if comparison.variance > 0 %}
+          {{ parent_a_name }} had <strong>+{{ "%.1f"|format(comparison.variance|abs) }}%</strong> more time than the
+          agreed {{ agreement.key_terms.custody_split if agreement else "schedule" }}.
+          {% elif comparison.variance < 0 %} {{ parent_a_name }} had <strong>-{{ "%.1f"|format(comparison.variance|abs)
+            }}%</strong> less time than agreed.
+            {% else %}
+            Actual time perfectly matched the agreement.
+            {% endif %}
+        </span>
       </div>
     </div>
     {% endif %}
@@ -133,31 +139,35 @@
   <h2>Actual vs. Agreed Parenting Time</h2>
 
   <div class="card keep-together">
-    <div class="grid grid-2">
+    <div class="grid grid-2" style="gap: var(--spacing-xl);">
       <div>
-        <h4 class="mb-sm">{{ parent_a_name }}</h4>
-        {{ comparison_chart_a | safe }}
+        <h4 class="mb-sm text-center text-secondary">{{ parent_a_name }}</h4>
+        <div style="display: flex; justify-content: center;">
+          {{ comparison_chart_a | safe }}
+        </div>
       </div>
       <div>
-        <h4 class="mb-sm">{{ parent_b_name }}</h4>
-        {{ comparison_chart_b | safe }}
+        <h4 class="mb-sm text-center text-secondary">{{ parent_b_name }}</h4>
+        <div style="display: flex; justify-content: center;">
+          {{ comparison_chart_b | safe }}
+        </div>
       </div>
     </div>
 
-    <table style="margin-top: var(--spacing-lg);">
+    <table style="margin-top: var(--spacing-xl);">
       <thead>
         <tr>
           <th>Parent</th>
-          <th>Agreed</th>
-          <th>Actual</th>
+          <th>Agreed Share</th>
+          <th>Actual Share</th>
           <th>Variance</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><strong style="color: var(--cg-sage)">{{ parent_a_name }}</strong></td>
-          <td>{{ "%.1f"|format(comparison.agreed_a) }}%</td>
-          <td>{{ "%.1f"|format(stats.parent_a_percentage) }}%</td>
+          <td><strong style="color: var(--cg-sage-dark)">{{ parent_a_name }}</strong></td>
+          <td class="font-mono">{{ "%.1f"|format(comparison.agreed_a) }}%</td>
+          <td class="font-mono">{{ "%.1f"|format(stats.parent_a_percentage) }}%</td>
           <td>
             {% set var_a = stats.parent_a_percentage - comparison.agreed_a %}
             <span
@@ -167,9 +177,9 @@
           </td>
         </tr>
         <tr>
-          <td><strong style="color: var(--cg-slate)">{{ parent_b_name }}</strong></td>
-          <td>{{ "%.1f"|format(comparison.agreed_b) }}%</td>
-          <td>{{ "%.1f"|format(stats.parent_b_percentage) }}%</td>
+          <td><strong style="color: var(--cg-slate-dark)">{{ parent_b_name }}</strong></td>
+          <td class="font-mono">{{ "%.1f"|format(comparison.agreed_b) }}%</td>
+          <td class="font-mono">{{ "%.1f"|format(stats.parent_b_percentage) }}%</td>
           <td>
             {% set var_b = stats.parent_b_percentage - comparison.agreed_b %}
             <span
@@ -188,7 +198,7 @@
 <section class="section">
   <h2>Custody Exchange Compliance</h2>
 
-  <div class="grid grid-3">
+  <div class="grid grid-3" style="gap: var(--spacing-lg);">
     <div class="stat-card">
       <div class="stat-value">{{ exchange_stats.total }}</div>
       <div class="stat-label">Scheduled</div>
@@ -212,36 +222,38 @@
 
   {% if exchanges %}
   <div class="card" style="margin-top: var(--spacing-lg);">
-    <div class="card-header">Exchange History</div>
-    <table style="font-size: 12px;">
+    <div class="card-header">Exchange History Log</div>
+    <table style="font-size: 13px;">
       <thead>
-        <tr style="background: var(--cg-slate-50);">
-          <th style="padding: 8px 12px;">Date</th>
-          <th style="padding: 8px 12px;">Time</th>
-          <th style="padding: 8px 12px;">Status</th>
-          <th style="padding: 8px 12px;">Check-ins</th>
+        <tr style="background: var(--cg-slate-subtle);">
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Date</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Time</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Status</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Check-ins Verified</th>
         </tr>
       </thead>
       <tbody>
-        {% for exchange in exchanges[:15] %}
-        <tr style="{% if loop.index is odd %}background: #fafafa;{% endif %}">
-          <td style="padding: 6px 12px;">{{ exchange.scheduled_time.strftime('%b %d, %Y') }}</td>
-          <td style="padding: 6px 12px;">{{ exchange.scheduled_time.strftime('%I:%M %p') if exchange.scheduled_time else
+        {% for exchange in exchanges[:20] %}
+        <tr
+          style="{% if loop.index is odd %}background: #FCFCFC;{% endif %} border-bottom: 1px solid var(--cg-border-light);">
+          <td style="padding: 10px 16px; font-weight: 500;">{{ exchange.scheduled_time.strftime('%b %d, %Y') }}</td>
+          <td style="padding: 10px 16px; color: var(--cg-text-secondary);">{{ exchange.scheduled_time.strftime('%I:%M
+            %p') if exchange.scheduled_time else
             'N/A' }}</td>
-          <td style="padding: 6px 12px;">
+          <td style="padding: 10px 16px;">
             <span
               class="badge {% if exchange.status == 'completed' %}badge-success{% elif exchange.status == 'missed' %}badge-error{% else %}badge-info{% endif %}"
-              style="font-size: 10px; padding: 2px 6px;">
+              style="font-size: 11px; padding: 3px 8px;">
               {{ exchange.status|title }}
             </span>
           </td>
-          <td style="padding: 6px 12px;">
+          <td style="padding: 10px 16px;">
             {% if exchange.from_parent_checked_in and exchange.to_parent_checked_in %}
-            <span class="text-sage">✓ Both</span>
+            <span class="text-sage font-bold">✓ Both Parents</span>
             {% elif exchange.from_parent_checked_in %}
-            <span>Drop-off only</span>
+            <span class="text-secondary">Drop-off only</span>
             {% elif exchange.to_parent_checked_in %}
-            <span>Pick-up only</span>
+            <span class="text-secondary">Pick-up only</span>
             {% else %}
             <span class="text-muted">—</span>
             {% endif %}
@@ -250,9 +262,9 @@
         {% endfor %}
       </tbody>
     </table>
-    {% if exchanges|length > 15 %}
-    <p class="text-muted text-center" style="margin-top: var(--spacing-sm); font-size: 11px;">
-      Showing 15 of {{ exchanges|length }} exchanges. Full history available in platform.
+    {% if exchanges|length > 20 %}
+    <p class="text-muted text-center" style="margin-top: var(--spacing-md); font-size: 12px; font-style: italic;">
+      Showing recent 20 of {{ exchanges|length }} exchanges. Full history available in platform.
     </p>
     {% endif %}
   </div>
@@ -267,17 +279,21 @@
     Maps show scheduled locations for exchanges marked as "Missed".
   </div>
 
-  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
     {% for map in missed_exchange_maps %}
-    <div style="border: 1px solid var(--cg-border); border-radius: 6px; overflow: hidden; background: white;">
+    <div
+      style="border: 1px solid var(--cg-border); border-radius: 8px; overflow: hidden; background: white; box-shadow: var(--shadow-sm);">
       <div
-        style="padding: 6px 8px; border-bottom: 1px solid var(--cg-border-light); display: flex; justify-content: space-between; align-items: center;">
-        <strong style="font-size: 10px;">{{ map.date }}</strong>
-        <span class="badge badge-error" style="font-size: 9px; padding: 1px 4px;">Missed</span>
+        style="padding: 8px 12px; border-bottom: 1px solid var(--cg-border-light); display: flex; justify-content: space-between; align-items: center; background: var(--cg-slate-subtle);">
+        <strong style="font-size: 11px; color: var(--cg-text-primary);">{{ map.date }}</strong>
+        <span class="badge badge-error" style="font-size: 9px; padding: 1px 6px;">Missed</span>
       </div>
-      <img src="{{ map.map_url }}" style="width: 100%; height: 120px; object-fit: cover; display: block;"
+      <img src="{{ map.map_url }}" style="width: 100%; height: 140px; object-fit: cover; display: block;"
         alt="Map for {{ map.date }}">
-      <div style="padding: 4px 8px; font-size: 9px; color: var(--cg-text-secondary);">{{ map.location }}</div>
+      <div style="padding: 8px 12px; font-size: 10px; color: var(--cg-text-secondary); background: white;">
+        <span class="text-muted uppercase" style="font-size: 9px; display: block; margin-bottom: 2px;">Location</span>
+        {{ map.location }}
+      </div>
     </div>
     {% endfor %}
   </div>
@@ -286,8 +302,8 @@
 
 
 <!-- Data Sources Note -->
-<div class="note info" style="margin-top: var(--spacing-2xl);">
-  <strong>How This Data Was Collected</strong><br>
+<div class="note info" style="margin-top: var(--spacing-3xl); background: white; border: 1px solid var(--cg-border);">
+  <strong class="text-primary">How This Data Was Collected</strong><br>
   Custody time is determined from: exchange check-ins (highest confidence),
   completed custody exchanges, the agreed parenting schedule, and manual "With Me" confirmations.
   Days without any recorded data are marked as unrecorded.

@@ -148,33 +148,33 @@ function NewCubbieItemPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <Navigation />
       <PageContainer className="pb-32 max-w-2xl">
         {/* Back Button */}
         <button
           onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie`)}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-smooth mb-6"
+          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-[var(--portal-primary)] transition-colors font-medium mb-6"
         >
           <ChevronLeft className="h-4 w-4" />
           Back to {child?.first_name}'s Cubbie
         </button>
 
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="text-foreground">Add Item to {child?.first_name}'s Cubbie</CardTitle>
-            <CardDescription>
+        <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
+          <div className="px-6 py-6 border-b border-slate-100 bg-slate-50/50">
+            <h1 className="text-2xl font-bold text-foreground mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Add Item to {child?.first_name}'s Cubbie</h1>
+            <p className="text-muted-foreground">
               Register a high-value item that travels with {child?.first_name}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+            </p>
+          </div>
+          <div className="p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Photo Upload */}
-              <div className="space-y-2">
-                <Label className="text-foreground">Item Photo</Label>
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-foreground uppercase tracking-wide">Item Photo</Label>
                 <div className="flex items-start gap-4">
                   <div
-                    className="w-32 h-32 bg-secondary rounded-lg flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-border hover:border-cg-sage/50 transition-colors"
+                    className="w-32 h-32 bg-slate-50 rounded-xl flex items-center justify-center overflow-hidden cursor-pointer border-2 border-dashed border-slate-300 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 transition-all duration-200 group"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     {photoPreview ? (
@@ -185,8 +185,8 @@ function NewCubbieItemPageContent() {
                       />
                     ) : (
                       <div className="text-center p-2">
-                        <Camera className="h-8 w-8 text-muted-foreground mx-auto mb-1" />
-                        <p className="text-xs text-muted-foreground">Click to add photo</p>
+                        <Camera className="h-8 w-8 text-muted-foreground group-hover:text-[var(--portal-primary)] transition-colors mx-auto mb-1" />
+                        <p className="text-xs text-muted-foreground group-hover:text-[var(--portal-primary)] transition-colors">Click to add</p>
                       </div>
                     )}
                   </div>
@@ -198,155 +198,166 @@ function NewCubbieItemPageContent() {
                     className="hidden"
                   />
                   {photoPreview && (
-                    <Button type="button" variant="outline" size="sm" onClick={removePhoto}>
+                    <Button type="button" variant="outline" size="sm" onClick={removePhoto} className="border-slate-200 text-muted-foreground hover:text-destructive hover:border-destructive hover:bg-destructive/5">
                       <X className="h-4 w-4 mr-1" />
                       Remove
                     </Button>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Add a photo for documentation purposes
-                </p>
               </div>
 
               {/* Item Name */}
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground">Item Name *</Label>
+                <Label htmlFor="name" className="text-sm font-medium text-foreground uppercase tracking-wide">Item Name *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g., Nintendo Switch, School Laptop"
-                  className="bg-background border-border text-foreground"
+                  className="bg-white border-slate-200 text-foreground rounded-xl focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]"
                   required
                 />
               </div>
 
               {/* Category */}
               <div className="space-y-2">
-                <Label htmlFor="category" className="text-foreground">Category *</Label>
-                <select
-                  id="category"
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value as ItemCategory })
-                  }
-                  className="w-full p-2 bg-background border border-border rounded-md text-foreground"
-                  required
-                >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat.value} value={cat.value}>
-                      {cat.label}
-                    </option>
-                  ))}
-                </select>
+                <Label htmlFor="category" className="text-sm font-medium text-foreground uppercase tracking-wide">Category *</Label>
+                <div className="relative">
+                  <select
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value as ItemCategory })
+                    }
+                    className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-foreground appearance-none shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]"
+                    required
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-foreground">Description</Label>
+                <Label htmlFor="description" className="text-sm font-medium text-foreground uppercase tracking-wide">Description</Label>
                 <textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="e.g., Red/Blue Joy-Cons, Mario carrying case"
-                  className="w-full p-2 bg-background border border-border rounded-md text-foreground min-h-[80px]"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-foreground min-h-[80px] shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]"
                 />
               </div>
 
-              {/* Estimated Value */}
-              <div className="space-y-2">
-                <Label htmlFor="estimated_value" className="text-foreground">Estimated Value ($)</Label>
-                <Input
-                  id="estimated_value"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.estimated_value}
-                  onChange={(e) => setFormData({ ...formData, estimated_value: e.target.value })}
-                  placeholder="299.99"
-                  className="bg-background border-border text-foreground"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Important for documentation if item is lost or damaged
-                </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {/* Estimated Value */}
+                <div className="space-y-2">
+                  <Label htmlFor="estimated_value" className="text-sm font-medium text-foreground uppercase tracking-wide">Estimated Value ($)</Label>
+                  <Input
+                    id="estimated_value"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.estimated_value}
+                    onChange={(e) => setFormData({ ...formData, estimated_value: e.target.value })}
+                    placeholder="299.99"
+                    className="bg-white border-slate-200 text-foreground rounded-xl focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]"
+                  />
+                </div>
+
+                {/* Serial Number */}
+                <div className="space-y-2">
+                  <Label htmlFor="serial_number" className="text-sm font-medium text-foreground uppercase tracking-wide">Serial Number</Label>
+                  <Input
+                    id="serial_number"
+                    value={formData.serial_number}
+                    onChange={(e) => setFormData({ ...formData, serial_number: e.target.value })}
+                    placeholder="Optional"
+                    className="bg-white border-slate-200 text-foreground rounded-xl focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]"
+                  />
+                </div>
               </div>
 
               {/* Current Location */}
               <div className="space-y-2">
-                <Label htmlFor="current_location" className="text-foreground">Current Location *</Label>
-                <select
-                  id="current_location"
-                  value={formData.current_location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, current_location: e.target.value as ItemLocation })
-                  }
-                  className="w-full p-2 bg-background border border-border rounded-md text-foreground"
-                  required
-                >
-                  {LOCATIONS.map((loc) => (
-                    <option key={loc.value} value={loc.value}>
-                      {loc.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Serial Number */}
-              <div className="space-y-2">
-                <Label htmlFor="serial_number" className="text-foreground">Serial Number (optional)</Label>
-                <Input
-                  id="serial_number"
-                  value={formData.serial_number}
-                  onChange={(e) => setFormData({ ...formData, serial_number: e.target.value })}
-                  placeholder="For electronics"
-                  className="bg-background border-border text-foreground"
-                />
+                <Label htmlFor="current_location" className="text-sm font-medium text-foreground uppercase tracking-wide">Current Location *</Label>
+                <div className="relative">
+                  <select
+                    id="current_location"
+                    value={formData.current_location}
+                    onChange={(e) =>
+                      setFormData({ ...formData, current_location: e.target.value as ItemLocation })
+                    }
+                    className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-foreground appearance-none shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]"
+                    required
+                  >
+                    {LOCATIONS.map((loc) => (
+                      <option key={loc.value} value={loc.value}>
+                        {loc.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
+                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Purchase Date */}
               <div className="space-y-2">
-                <Label htmlFor="purchase_date" className="text-foreground">Purchase Date (optional)</Label>
+                <Label htmlFor="purchase_date" className="text-sm font-medium text-foreground uppercase tracking-wide">Purchase Date</Label>
                 <Input
                   id="purchase_date"
                   type="date"
                   value={formData.purchase_date}
                   onChange={(e) => setFormData({ ...formData, purchase_date: e.target.value })}
-                  className="bg-background border-border text-foreground"
+                  className="bg-white border-slate-200 text-foreground rounded-xl focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]"
                 />
               </div>
 
               {/* Notes */}
               <div className="space-y-2">
-                <Label htmlFor="notes" className="text-foreground">Special Care Instructions</Label>
+                <Label htmlFor="notes" className="text-sm font-medium text-foreground uppercase tracking-wide">Special Care Instructions</Label>
                 <textarea
                   id="notes"
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Any special care or handling instructions"
-                  className="w-full p-2 bg-background border border-border rounded-md text-foreground min-h-[80px]"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-foreground min-h-[80px] shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]"
                 />
               </div>
 
               {error && (
-                <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive text-sm">
+                <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-xl text-destructive text-sm font-medium">
                   {error}
                 </div>
               )}
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 pt-4 border-t border-slate-100">
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie`)}
                   disabled={submitting}
+                  className="flex-1 rounded-xl hover:bg-slate-100 text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="bg-cg-sage hover:bg-cg-sage/90 text-white"
+                  className="flex-1 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white hover:shadow-lg hover:scale-[1.02] transition-all duration-200 rounded-xl font-bold"
                 >
                   {submitting ? (
                     <>
@@ -359,8 +370,8 @@ function NewCubbieItemPageContent() {
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </PageContainer>
     </div>
   );

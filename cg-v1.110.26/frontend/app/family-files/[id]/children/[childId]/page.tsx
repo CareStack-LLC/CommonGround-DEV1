@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { childrenAPI, ChildProfile, getImageUrl, custodyTimeAPI, ChildCustodyStats, TimePeriod, familyFilesAPI, FamilyFileDetail } from '@/lib/api';
+import { childrenAPI, ChildProfile, getImageUrl, custodyTimeAPI, ChildCustodyStats, TimePeriod, familyFilesAPI, FamilyFileDetail, agreementsAPI, Agreement } from '@/lib/api';
 import { ParentingTimeCard } from '@/components/custody';
 import { useAuth } from '@/lib/auth-context';
 import { Navigation } from '@/components/navigation';
@@ -32,6 +32,8 @@ import {
   Plus,
   Trash2,
   Camera,
+  FileText,
+  FolderOpen,
 } from 'lucide-react';
 
 /* =============================================================================
@@ -348,6 +350,7 @@ function ChildProfileContent() {
 
   // Family file data for parent names
   const [familyFile, setFamilyFile] = useState<FamilyFileDetail | null>(null);
+  const [activeAgreement, setActiveAgreement] = useState<Agreement | null>(null);
 
   // Form states
   const [basicForm, setBasicForm] = useState({
@@ -408,17 +411,24 @@ function ChildProfileContent() {
     loadChild();
   }, [childId]);
 
-  // Load family file data for parent names
+  // Load family file data and agreements
   useEffect(() => {
-    const loadFamilyFile = async () => {
+    const loadFamilyData = async () => {
       try {
         const data = await familyFilesAPI.get(familyFileId);
         setFamilyFile(data);
+
+        // Load agreements to find active shared care agreement
+        const agreementsResponse = await agreementsAPI.listForFamilyFile(familyFileId);
+        const sharedCare = agreementsResponse.items.find(
+          a => a.agreement_type === 'shared_care' && a.status === 'active'
+        );
+        setActiveAgreement(sharedCare || null);
       } catch (err) {
-        console.error('Failed to load family file:', err);
+        console.error('Failed to load family data:', err);
       }
     };
-    loadFamilyFile();
+    loadFamilyData();
   }, [familyFileId]);
 
   // Load custody stats
@@ -832,6 +842,29 @@ function ChildProfileContent() {
                     {child.school_name && <span className="hidden sm:inline"> • {child.school_name}</span>}
                     {child.grade_level && <span className="hidden sm:inline">, {child.grade_level}</span>}
                   </p>
+
+                  {/* Context Links - Family File & Agreement */}
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    {familyFile && (
+                      <Link
+                        href={`/family-files/${familyFileId}`}
+                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-medium hover:bg-slate-200 transition-colors"
+                      >
+                        <FolderOpen className="w-3 h-3" />
+                        {familyFile.title}
+                      </Link>
+                    )}
+
+                    {activeAgreement && (
+                      <Link
+                        href={`/agreements/${activeAgreement.id}`}
+                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold hover:bg-[var(--portal-primary)]/20 transition-colors"
+                      >
+                        <FileText className="w-3 h-3" />
+                        SharedCare Agreement
+                      </Link>
+                    )}
+                  </div>
                 </div>
                 <StatusBadge status={child.status} />
               </div>
@@ -847,11 +880,10 @@ function ChildProfileContent() {
                 <button
                   onClick={handleWithMeCheckIn}
                   disabled={checkingIn || isChildWithMe}
-                  className={`px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2 font-medium ${
-                    isChildWithMe
-                      ? 'bg-[#2C5F5D]/10 text-[#2C5F5D] cursor-not-allowed border-2 border-[#2C5F5D]/20'
-                      : 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50'
-                  }`}
+                  className={`px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2 font-medium ${isChildWithMe
+                    ? 'bg-[#2C5F5D]/10 text-[#2C5F5D] cursor-not-allowed border-2 border-[#2C5F5D]/20'
+                    : 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50'
+                    }`}
                 >
                   {checkingIn ? (
                     <>
