@@ -81,8 +81,8 @@ export default function SwapRequestModal({
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+            <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-slate-50 border-slate-200 shadow-xl rounded-2xl">
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-bold flex items-center gap-2">

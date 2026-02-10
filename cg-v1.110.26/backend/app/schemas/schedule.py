@@ -140,6 +140,15 @@ class ScheduleEventCreate(BaseModel):
     description: Optional[str] = None
     location: Optional[str] = None
     location_shared: bool = False
+    
+    # Silent Handoff
+    silent_handoff_enabled: bool = False
+    location_lat: Optional[float] = None
+    location_lng: Optional[float] = None
+    geofence_radius_meters: Optional[int] = 100
+    check_in_window_before_minutes: Optional[int] = 30
+    check_in_window_after_minutes: Optional[int] = 30
+    qr_confirmation_required: bool = False
     visibility: str = Field(default="co_parent", pattern=r"^(private|co_parent)$")
     all_day: bool = False
     attendance_invites: Optional[List[Dict[str, str]]] = None  # [{parent_id, invited_role}]
@@ -201,6 +210,9 @@ class ScheduleEventResponse(BaseModel):
     all_day: bool
     child_ids: List[str]
     location: Optional[str] = None  # Filtered based on location_shared
+    location_lat: Optional[float] = None
+    location_lng: Optional[float] = None
+    silent_handoff_enabled: bool = False
     visibility: str
     status: str
     is_owner: bool  # Whether viewer created this event

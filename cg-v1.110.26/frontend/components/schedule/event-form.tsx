@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, Navigation, QrCode, Loader2 } from 'lucide-react';
 import {
   eventsAPI,
+  exchangesAPI,
   collectionsAPI,
   casesAPI,
   MyTimeCollection,
@@ -61,7 +62,17 @@ export default function EventForm({
     visibility: 'co_parent' as 'private' | 'co_parent',
     event_category: 'general' as EventCategory,
     category_data: {} as CategoryData,
+    // Silent Handoff
+    silent_handoff_enabled: false,
+    location_lat: undefined as number | undefined,
+    location_lng: undefined as number | undefined,
+    geofence_radius_meters: 100,
+    check_in_window_before_minutes: 30,
+    check_in_window_after_minutes: 30,
+    qr_confirmation_required: false,
   });
+
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
   useEffect(() => {
     loadInitialData();
@@ -114,6 +125,26 @@ export default function EventForm({
     }
   };
 
+  const handleGeocodeAddress = async () => {
+    if (!formData.location) return;
+
+    try {
+      setIsGeocoding(true);
+      const result = await exchangesAPI.geocodeAddress(formData.location);
+      if (result && result.lat && result.lng) {
+        setFormData(prev => ({
+          ...prev,
+          location_lat: result.lat,
+          location_lng: result.lng
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to geocode address:', err);
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -133,6 +164,14 @@ export default function EventForm({
         all_day: formData.all_day,
         event_category: formData.event_category,
         category_data: Object.keys(formData.category_data).length > 0 ? formData.category_data : undefined,
+        // Silent Handoff
+        silent_handoff_enabled: formData.silent_handoff_enabled,
+        location_lat: formData.location_lat,
+        location_lng: formData.location_lng,
+        geofence_radius_meters: formData.geofence_radius_meters,
+        check_in_window_before_minutes: formData.check_in_window_before_minutes,
+        check_in_window_after_minutes: formData.check_in_window_after_minutes,
+        qr_confirmation_required: formData.qr_confirmation_required,
       };
 
       await eventsAPI.create(eventData);
@@ -359,8 +398,13 @@ export default function EventForm({
               <Label htmlFor="location">Location (Optional)</Label>
               <Input
                 id="location"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  location: e.target.value,
+                  // Reset geocoding if location changes
+                  location_lat: undefined,
+                  location_lng: undefined
+                })}
                 placeholder="e.g., School Auditorium"
                 className="mt-1"
               />
@@ -376,6 +420,180 @@ export default function EventForm({
                   Share location with co-parent
                 </Label>
               </div>
+            </div>
+
+            {/* Silent Handoff Section */}
+            <div className="pt-4 border-t border-gray-100">
+              <div className="flex items-start gap-3">
+                <div className="mt-1">
+                  <input
+                    type="checkbox"
+                    id="silent_handoff"
+                    checked={formData.silent_handoff_enabled}
+                    onChange={(e) => setFormData({ ...formData, silent_handoff_enabled: e.target.checked })}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="silent_handoff" className="font-semibold text-gray-900">Enable Silent Handoff</Label>
+                  <p className="text-sm text-gray-500 mt-1">
+                    GPS-verified check-ins for custody exchanges. Location is captured only at check-in moment - no continuous tracking.
+                  </p>
+                </div>
+              </div>
+
+              {formData.silent_handoff_enabled && (
+                <div className="mt-4 pl-8 space-y-4">
+                  {/* Geolocation Status */}
+                  <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-slate-700">Event Location</span>
+                      {formData.location_lat && formData.location_lng ? (
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
+                          <Navigation className="w-3 h-3" />
+                          Geocoded
+                        </span>
+                      ) : (
+                        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          Location required
+                        </span>
+                      )}
+                    </div>
+                    {!formData.location_lat && formData.location && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGeocodeAddress}
+                        disabled={isGeocoding}
+                        className="mt-2 w-full text-xs"
+                      >
+                        {isGeocoding ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Navigation className="w-3 h-3 mr-1" />}
+                        Verify Address for GPS
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Geofence Radius */}
+                  <div>
+                    <Label htmlFor="geofence_radius" className="text-xs text-gray-500">Geofence Radius (meters)</Label>
+                    <select
+                      id="geofence_radius"
+                      value={formData.geofence_radius_meters}
+                      onChange={(e) => setFormData({ ...formData, geofence_radius_meters: parseInt(e.target.value) })}
+                      className="w-full mt-1 text-sm border-gray-300 rounded-md"
+                    >
+                      <option value="50">50m (Strict)</option>
+                      <option value="100">100m (Standard)</option>
+                      <option value="200">200m (Relaxed)</option>
+                      <option value="500">500m (Wide Area)</option>
+                    </select>
+                  </div>
+
+                  {/* QR Code Toggle */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="qr_required"
+                      checked={formData.qr_confirmation_required}
+                      onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
+                      className="rounded border-gray-300"
+                    />
+                    <Label htmlFor="qr_required" className="text-sm text-gray-700 flex items-center gap-1">
+                      <QrCode className="w-4 h-4 text-gray-500" />
+                      Require QR Check-in
+                    </Label>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Silent Handoff Section */}
+            <div className="pt-4 border-t border-gray-100">
+              <div className="flex items-start gap-3">
+                <div className="mt-1">
+                  <input
+                    type="checkbox"
+                    id="silent_handoff"
+                    checked={formData.silent_handoff_enabled}
+                    onChange={(e) => setFormData({ ...formData, silent_handoff_enabled: e.target.checked })}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="silent_handoff" className="font-semibold text-gray-900">Enable Silent Handoff</Label>
+                  <p className="text-sm text-gray-500 mt-1">
+                    GPS-verified check-ins for custody exchanges. Location is captured only at check-in moment - no continuous tracking.
+                  </p>
+                </div>
+              </div>
+
+              {formData.silent_handoff_enabled && (
+                <div className="mt-4 pl-8 space-y-4">
+                  {/* Geolocation Status */}
+                  <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-slate-700">Event Location</span>
+                      {formData.location_lat && formData.location_lng ? (
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
+                          <Navigation className="w-3 h-3" />
+                          Geocoded
+                        </span>
+                      ) : (
+                        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" />
+                          Location required
+                        </span>
+                      )}
+                    </div>
+                    {!formData.location_lat && formData.location && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGeocodeAddress}
+                        disabled={isGeocoding}
+                        className="mt-2 w-full text-xs"
+                      >
+                        {isGeocoding ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Navigation className="w-3 h-3 mr-1" />}
+                        Verify Address for GPS
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Geofence Radius */}
+                  <div>
+                    <Label htmlFor="geofence_radius" className="text-xs text-gray-500">Geofence Radius (meters)</Label>
+                    <select
+                      id="geofence_radius"
+                      value={formData.geofence_radius_meters}
+                      onChange={(e) => setFormData({ ...formData, geofence_radius_meters: parseInt(e.target.value) })}
+                      className="w-full mt-1 text-sm border-gray-300 rounded-md"
+                    >
+                      <option value="50">50m (Strict)</option>
+                      <option value="100">100m (Standard)</option>
+                      <option value="200">200m (Relaxed)</option>
+                      <option value="500">500m (Wide Area)</option>
+                    </select>
+                  </div>
+
+                  {/* QR Code Toggle */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="qr_required"
+                      checked={formData.qr_confirmation_required}
+                      onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
+                      className="rounded border-gray-300"
+                    />
+                    <Label htmlFor="qr_required" className="text-sm text-gray-700 flex items-center gap-1">
+                      <QrCode className="w-4 h-4 text-gray-500" />
+                      Require QR Check-in
+                    </Label>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Visibility */}

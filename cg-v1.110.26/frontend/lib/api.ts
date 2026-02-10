@@ -1420,6 +1420,22 @@ export interface EventV2 {
   all_day: boolean;
   child_ids: string[];
   location?: string; // Privacy filtered based on location_shared
+  // Silent Handoff
+  silent_handoff_enabled?: boolean;
+  location_lat?: number;
+  location_lng?: number;
+  geofence_radius_meters?: number;
+  check_in_window_before_minutes?: number;
+  check_in_window_after_minutes?: number;
+  qr_confirmation_required?: boolean;
+  // Silent Handoff
+  silent_handoff_enabled?: boolean;
+  location_lat?: number;
+  location_lng?: number;
+  geofence_radius_meters?: number;
+  check_in_window_before_minutes?: number;
+  check_in_window_after_minutes?: number;
+  qr_confirmation_required?: boolean;
   visibility: 'private' | 'co_parent';
   status: string;
   is_owner: boolean;
@@ -1443,6 +1459,14 @@ export interface CreateEventRequest {
   description?: string;
   location?: string;
   location_shared?: boolean;
+  // Silent Handoff
+  silent_handoff_enabled?: boolean;
+  location_lat?: number;
+  location_lng?: number;
+  geofence_radius_meters?: number;
+  check_in_window_before_minutes?: number;
+  check_in_window_after_minutes?: number;
+  qr_confirmation_required?: boolean;
   visibility?: 'private' | 'co_parent';
   all_day?: boolean;
   attendance_invites?: Array<{
@@ -1460,6 +1484,14 @@ export interface UpdateEventRequest {
   end_time?: string;
   location?: string;
   location_shared?: boolean;
+  // Silent Handoff
+  silent_handoff_enabled?: boolean;
+  location_lat?: number;
+  location_lng?: number;
+  geofence_radius_meters?: number;
+  check_in_window_before_minutes?: number;
+  check_in_window_after_minutes?: number;
+  qr_confirmation_required?: boolean;
   event_category?: EventCategory; // V2: category-specific forms
   category_data?: CategoryData; // V2: category-specific fields
 }

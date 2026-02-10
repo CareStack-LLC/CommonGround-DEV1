@@ -99,6 +99,15 @@ class ScheduleEvent(Base, UUIDMixin, TimestampMixin):
     exchange_lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     grace_period_minutes: Mapped[int] = mapped_column(Integer, default=15)
 
+    # Silent Handoff Settings (for regular events)
+    silent_handoff_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    location_lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    location_lng: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    geofence_radius_meters: Mapped[int] = mapped_column(Integer, default=100)
+    check_in_window_before_minutes: Mapped[int] = mapped_column(Integer, default=30)
+    check_in_window_after_minutes: Mapped[int] = mapped_column(Integer, default=30)
+    qr_confirmation_required: Mapped[bool] = mapped_column(Boolean, default=False)
+
     # Status
     status: Mapped[str] = mapped_column(
         String(20), default="scheduled"

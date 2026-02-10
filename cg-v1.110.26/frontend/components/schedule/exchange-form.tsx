@@ -177,6 +177,14 @@ export default function ExchangeForm({
       const pickupChildIds: string[] = [];
       const dropoffChildIds: string[] = [];
 
+
+      // Validate location is required
+      if (!formData.location.trim()) {
+        setError('Location is required for exchanges');
+        setIsLoading(false);
+        return;
+      }
+
       for (const [childId, direction] of Object.entries(formData.child_directions)) {
         if (direction === 'pickup') {
           pickupChildIds.push(childId);
@@ -353,7 +361,7 @@ export default function ExchangeForm({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <Card className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-background">
+      <Card className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-slate-50">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -411,22 +419,20 @@ export default function ExchangeForm({
                         <button
                           type="button"
                           onClick={() => setChildDirection(child.id, formData.child_directions[child.id] === 'dropoff' ? 'none' : 'dropoff')}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex-1 ${
-                            formData.child_directions[child.id] === 'dropoff'
-                              ? 'bg-cg-slate text-white shadow-md'
-                              : 'bg-cg-slate-subtle text-cg-slate hover:bg-cg-slate/20 border border-cg-slate/30'
-                          }`}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex-1 ${formData.child_directions[child.id] === 'dropoff'
+                            ? 'bg-cg-slate text-white shadow-md'
+                            : 'bg-cg-slate-subtle text-cg-slate hover:bg-cg-slate/20 border border-cg-slate/30'
+                            }`}
                         >
                           Drop Off
                         </button>
                         <button
                           type="button"
                           onClick={() => setChildDirection(child.id, formData.child_directions[child.id] === 'pickup' ? 'none' : 'pickup')}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex-1 ${
-                            formData.child_directions[child.id] === 'pickup'
-                              ? 'bg-cg-sage text-white shadow-md'
-                              : 'bg-cg-sage-subtle text-cg-sage hover:bg-cg-sage/20 border border-cg-sage/30'
-                          }`}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex-1 ${formData.child_directions[child.id] === 'pickup'
+                            ? 'bg-cg-sage text-white shadow-md'
+                            : 'bg-cg-sage-subtle text-cg-sage hover:bg-cg-sage/20 border border-cg-sage/30'
+                            }`}
                         >
                           Pick Up
                         </button>
@@ -490,7 +496,7 @@ export default function ExchangeForm({
             <div>
               <Label htmlFor="location" className="text-foreground">
                 <MapPin className="inline h-4 w-4 mr-1" />
-                Location
+                Location *
               </Label>
               <div className="flex gap-2 mt-1">
                 <Input
@@ -500,21 +506,6 @@ export default function ExchangeForm({
                   placeholder="e.g., School parking lot, Police station"
                   className="flex-1"
                 />
-                {formData.silent_handoff_enabled && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleGeocodeAddress}
-                    disabled={isGeocodingAddress || !formData.location.trim()}
-                    className="shrink-0"
-                  >
-                    {isGeocodingAddress ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Navigation className="h-4 w-4" />
-                    )}
-                  </Button>
-                )}
               </div>
               {formData.location_lat && formData.location_lng && (
                 <p className="text-xs text-green-600 mt-1">
@@ -534,109 +525,7 @@ export default function ExchangeForm({
               />
             </div>
 
-            {/* Silent Handoff Settings */}
-            <div className="p-4 bg-cg-sage-subtle rounded-lg border border-cg-sage/30">
-              <div className="flex items-center gap-2 mb-3">
-                <input
-                  type="checkbox"
-                  id="silent_handoff_enabled"
-                  checked={formData.silent_handoff_enabled}
-                  onChange={(e) => setFormData({ ...formData, silent_handoff_enabled: e.target.checked })}
-                  className="rounded border-input"
-                />
-                <Label htmlFor="silent_handoff_enabled" className="cursor-pointer flex items-center gap-2 text-foreground font-medium">
-                  <Navigation className="h-4 w-4 text-cg-sage" />
-                  Enable Silent Handoff
-                </Label>
-              </div>
-              <p className="text-xs text-muted-foreground mb-4">
-                GPS-verified check-ins for custody exchanges. Location is captured only at check-in moment - no continuous tracking.
-              </p>
-
-              {formData.silent_handoff_enabled && (
-                <div className="space-y-4 pl-6 border-l-2 border-cg-sage/30">
-                  {/* Geofence Radius */}
-                  <div>
-                    <Label htmlFor="geofence_radius" className="text-foreground text-sm">
-                      Geofence Radius: {formData.geofence_radius_meters}m
-                    </Label>
-                    <input
-                      type="range"
-                      id="geofence_radius"
-                      min="25"
-                      max="500"
-                      step="25"
-                      value={formData.geofence_radius_meters}
-                      onChange={(e) => setFormData({ ...formData, geofence_radius_meters: parseInt(e.target.value) })}
-                      className="w-full mt-1"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>25m</span>
-                      <span>500m</span>
-                    </div>
-                  </div>
-
-                  {/* Check-in Window */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="window_before" className="text-foreground text-sm">
-                        Window Before (min)
-                      </Label>
-                      <Input
-                        type="number"
-                        id="window_before"
-                        min="5"
-                        max="120"
-                        value={formData.check_in_window_before_minutes}
-                        onChange={(e) => setFormData({ ...formData, check_in_window_before_minutes: parseInt(e.target.value) || 30 })}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="window_after" className="text-foreground text-sm">
-                        Window After (min)
-                      </Label>
-                      <Input
-                        type="number"
-                        id="window_after"
-                        min="5"
-                        max="120"
-                        value={formData.check_in_window_after_minutes}
-                        onChange={(e) => setFormData({ ...formData, check_in_window_after_minutes: parseInt(e.target.value) || 30 })}
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
-
-                  {/* QR Confirmation */}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="qr_confirmation"
-                      checked={formData.qr_confirmation_required}
-                      onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
-                      className="rounded border-input"
-                    />
-                    <Label htmlFor="qr_confirmation" className="cursor-pointer flex items-center gap-2 text-foreground text-sm">
-                      <QrCode className="h-4 w-4" />
-                      Require QR code confirmation
-                    </Label>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    When enabled, both parents must scan a QR code to complete the exchange.
-                  </p>
-
-                  {/* Geocode reminder */}
-                  {!formData.location_lat && formData.location && (
-                    <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded p-2">
-                      <p className="text-xs text-amber-800 dark:text-amber-300">
-                        Click the <Navigation className="inline h-3 w-3" /> button next to the location to set GPS coordinates for the geofence.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            {/* Silent Handoff Settings Removed */}
 
             {/* Recurring */}
             <div className="p-4 bg-secondary/50 rounded-lg border border-border">
@@ -705,11 +594,10 @@ export default function ExchangeForm({
                             key={day.value}
                             type="button"
                             onClick={() => toggleDay(day.value)}
-                            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                              formData.recurrence_days.includes(day.value)
-                                ? 'bg-cg-primary text-white'
-                                : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
-                            }`}
+                            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${formData.recurrence_days.includes(day.value)
+                              ? 'bg-cg-primary text-white'
+                              : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+                              }`}
                           >
                             {day.label}
                           </button>
@@ -757,11 +645,10 @@ export default function ExchangeForm({
                               key={item.id}
                               type="button"
                               onClick={() => toggleCubbieItem(item.id)}
-                              className={`flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all ${
-                                isSelected
-                                  ? 'border-green-500 bg-green-500/20'
-                                  : 'border-border bg-background hover:border-green-500/50'
-                              }`}
+                              className={`flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all ${isSelected
+                                ? 'border-green-500 bg-green-500/20'
+                                : 'border-border bg-background hover:border-green-500/50'
+                                }`}
                             >
                               {isSelected ? (
                                 <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />

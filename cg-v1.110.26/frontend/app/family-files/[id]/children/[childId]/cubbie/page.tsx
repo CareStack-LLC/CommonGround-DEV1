@@ -91,7 +91,7 @@ function ChildCubbiePageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-slate-50">
         <Navigation />
         <PageContainer className="pb-32">
           <div className="flex items-center justify-center min-h-[400px]">
@@ -104,7 +104,7 @@ function ChildCubbiePageContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-slate-50">
         <Navigation />
         <PageContainer className="pb-32">
           <Card className="bg-card border-border">
@@ -123,7 +123,7 @@ function ChildCubbiePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50">
       <Navigation />
       <PageContainer className="pb-32">
         {/* Back Button */}

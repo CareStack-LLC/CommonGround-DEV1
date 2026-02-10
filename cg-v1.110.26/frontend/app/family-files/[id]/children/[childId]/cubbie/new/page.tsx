@@ -136,7 +136,7 @@ function NewCubbieItemPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-slate-50">
         <Navigation />
         <PageContainer className="pb-32">
           <div className="flex items-center justify-center min-h-[400px]">
@@ -148,7 +148,7 @@ function NewCubbieItemPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-50">
       <Navigation />
       <PageContainer className="pb-32 max-w-2xl">
         {/* Back Button */}
