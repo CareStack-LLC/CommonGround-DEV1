@@ -5,7 +5,7 @@ import { X, MapPin, Clock, Users, Calendar, Check, X as XIcon, HelpCircle, Steth
 import { eventsAPI, scheduleAPI, EventV2, EventAttendance, UpdateRSVPRequest, MedicalCategoryData, SchoolCategoryData, SportsCategoryData, ExchangeCategoryData, SwapResponseAction, ExchangeCheckIn } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useAuth } from '@/components/providers/auth-provider';
+import { useAuth } from '@/lib/auth-context';
 import EventSilentHandoffCheckIn from './event-silent-handoff-checkin';
 
 interface EventDetailsProps {

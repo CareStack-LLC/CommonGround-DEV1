@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/components/providers/auth-provider';
+import { useAuth } from '@/lib/auth-context';
 
 interface EventSilentHandoffCheckInProps {
     event: EventV2;
