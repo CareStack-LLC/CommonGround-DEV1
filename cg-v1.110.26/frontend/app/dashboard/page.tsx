@@ -34,6 +34,8 @@ import {
   MapPin,
   FileText,
   CheckCircle,
+  Zap,
+  Gavel,
 
 } from 'lucide-react';
 
