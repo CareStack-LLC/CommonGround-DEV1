@@ -437,7 +437,7 @@ export default function EventForm({
                 <div>
                   <Label htmlFor="silent_handoff" className="font-semibold text-gray-900">Enable Silent Handoff</Label>
                   <p className="text-sm text-gray-500 mt-1">
-                    GPS-verified check-ins for custody exchanges. Location is captured only at check-in moment - no continuous tracking.
+                    GPS-verified check-ins for custody exchanges. Location is captured only at check-in moment.
                   </p>
                 </div>
               </div>
@@ -445,152 +445,82 @@ export default function EventForm({
               {formData.silent_handoff_enabled && (
                 <div className="mt-4 pl-8 space-y-4">
                   {/* Geolocation Status */}
-                  <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-slate-700">Event Location</span>
+                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <Label className="text-sm font-medium text-slate-700">Event Location GPS</Label>
                       {formData.location_lat && formData.location_lng ? (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
-                          <Navigation className="w-3 h-3" />
-                          Geocoded
+                        <span className="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-green-200">
+                          <Navigation className="w-3.5 h-3.5" />
+                          Verified
                         </span>
                       ) : (
-                        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3" />
-                          Location required
+                        <span className="text-xs bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-amber-200">
+                          <AlertTriangle className="w-3.5 h-3.5" />
+                          Required
                         </span>
                       )}
                     </div>
-                    {!formData.location_lat && formData.location && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleGeocodeAddress}
-                        disabled={isGeocoding}
-                        className="mt-2 w-full text-xs"
-                      >
-                        {isGeocoding ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Navigation className="w-3 h-3 mr-1" />}
-                        Verify Address for GPS
-                      </Button>
+
+                    {formData.location_lat && formData.location_lng && (
+                      <div className="text-xs text-slate-500 mb-3 font-mono bg-white p-2 rounded border border-slate-100">
+                        {formData.location_lat.toFixed(6)}, {formData.location_lng.toFixed(6)}
+                      </div>
+                    )}
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGeocodeAddress}
+                      disabled={isGeocoding || !formData.location}
+                      className="w-full text-xs bg-white hover:bg-slate-50 border-slate-300 text-slate-700"
+                    >
+                      {isGeocoding ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : <Navigation className="w-3.5 h-3.5 mr-2" />}
+                      {formData.location_lat ? 'Update GPS Coordinates' : 'Verify Address for GPS'}
+                    </Button>
+                    {!formData.location && (
+                      <p className="text-xs text-amber-600 mt-2">
+                        Please enter a location address above first.
+                      </p>
                     )}
                   </div>
 
                   {/* Geofence Radius */}
                   <div>
-                    <Label htmlFor="geofence_radius" className="text-xs text-gray-500">Geofence Radius (meters)</Label>
+                    <Label htmlFor="geofence_radius" className="text-xs font-medium text-gray-500 uppercase tracking-wide">Geofence Radius</Label>
                     <select
                       id="geofence_radius"
                       value={formData.geofence_radius_meters}
                       onChange={(e) => setFormData({ ...formData, geofence_radius_meters: parseInt(e.target.value) })}
-                      className="w-full mt-1 text-sm border-gray-300 rounded-md"
+                      className="w-full mt-1.5 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
-                      <option value="50">50m (Strict)</option>
-                      <option value="100">100m (Standard)</option>
-                      <option value="200">200m (Relaxed)</option>
+                      <option value="50">50m (Strict - Good for buildings)</option>
+                      <option value="100">100m (Standard - Recommended)</option>
+                      <option value="200">200m (Relaxed - Parks/Large venues)</option>
                       <option value="500">500m (Wide Area)</option>
                     </select>
                   </div>
 
                   {/* QR Code Toggle */}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="qr_required"
-                      checked={formData.qr_confirmation_required}
-                      onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
-                      className="rounded border-gray-300"
-                    />
-                    <Label htmlFor="qr_required" className="text-sm text-gray-700 flex items-center gap-1">
-                      <QrCode className="w-4 h-4 text-gray-500" />
-                      Require QR Check-in
-                    </Label>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Silent Handoff Section */}
-            <div className="pt-4 border-t border-gray-100">
-              <div className="flex items-start gap-3">
-                <div className="mt-1">
-                  <input
-                    type="checkbox"
-                    id="silent_handoff"
-                    checked={formData.silent_handoff_enabled}
-                    onChange={(e) => setFormData({ ...formData, silent_handoff_enabled: e.target.checked })}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="silent_handoff" className="font-semibold text-gray-900">Enable Silent Handoff</Label>
-                  <p className="text-sm text-gray-500 mt-1">
-                    GPS-verified check-ins for custody exchanges. Location is captured only at check-in moment - no continuous tracking.
-                  </p>
-                </div>
-              </div>
-
-              {formData.silent_handoff_enabled && (
-                <div className="mt-4 pl-8 space-y-4">
-                  {/* Geolocation Status */}
-                  <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-slate-700">Event Location</span>
-                      {formData.location_lat && formData.location_lng ? (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
-                          <Navigation className="w-3 h-3" />
-                          Geocoded
-                        </span>
-                      ) : (
-                        <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full flex items-center gap-1">
-                          <AlertTriangle className="w-3 h-3" />
-                          Location required
-                        </span>
-                      )}
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div className="flex items-center h-5">
+                      <input
+                        type="checkbox"
+                        id="qr_required"
+                        checked={formData.qr_confirmation_required}
+                        onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                      />
                     </div>
-                    {!formData.location_lat && formData.location && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleGeocodeAddress}
-                        disabled={isGeocoding}
-                        className="mt-2 w-full text-xs"
-                      >
-                        {isGeocoding ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <Navigation className="w-3 h-3 mr-1" />}
-                        Verify Address for GPS
-                      </Button>
-                    )}
-                  </div>
-
-                  {/* Geofence Radius */}
-                  <div>
-                    <Label htmlFor="geofence_radius" className="text-xs text-gray-500">Geofence Radius (meters)</Label>
-                    <select
-                      id="geofence_radius"
-                      value={formData.geofence_radius_meters}
-                      onChange={(e) => setFormData({ ...formData, geofence_radius_meters: parseInt(e.target.value) })}
-                      className="w-full mt-1 text-sm border-gray-300 rounded-md"
-                    >
-                      <option value="50">50m (Strict)</option>
-                      <option value="100">100m (Standard)</option>
-                      <option value="200">200m (Relaxed)</option>
-                      <option value="500">500m (Wide Area)</option>
-                    </select>
-                  </div>
-
-                  {/* QR Code Toggle */}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="qr_required"
-                      checked={formData.qr_confirmation_required}
-                      onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
-                      className="rounded border-gray-300"
-                    />
-                    <Label htmlFor="qr_required" className="text-sm text-gray-700 flex items-center gap-1">
-                      <QrCode className="w-4 h-4 text-gray-500" />
-                      Require QR Check-in
-                    </Label>
+                    <div className="flex-1">
+                      <Label htmlFor="qr_required" className="text-sm font-medium text-gray-700 flex items-center gap-2 cursor-pointer">
+                        <QrCode className="w-4 h-4 text-gray-500" />
+                        Require QR Code Check-in
+                      </Label>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Co-parent must scan a code on your device to confirm transfer.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}

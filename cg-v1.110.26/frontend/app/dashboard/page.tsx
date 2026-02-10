@@ -45,6 +45,7 @@ import {
 
 import { UpgradeBanner } from '@/components/upgrade-banner';
 import { useSubscription } from '@/contexts/subscription-context';
+import { CustodyTimeline } from '@/components/schedule/custody-timeline';
 
 /**
  * CommonGround Dashboard - "The Morning Brief"
@@ -331,6 +332,11 @@ function ChildCustodyCard({
               {childStatus.coparent_total_days ?? 0} <span className="text-xs font-medium text-slate-400">days</span>
             </span>
           </div>
+        </div>
+
+        {/* Real-time Custody Timeline */}
+        <div className="mt-4 pt-4 border-t-2 border-slate-100">
+          <CustodyTimeline childId={childStatus.child_id} className="border-0 shadow-none p-0" />
         </div>
       </div>
     </div>

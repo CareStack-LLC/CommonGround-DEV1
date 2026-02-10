@@ -602,6 +602,11 @@ class CustodyTimeService:
         completed_exchanges = sum(1 for e in exchanges if e.status == "completed")
         missed_exchanges = sum(1 for e in exchanges if e.status in ["missed", "cancelled"])
 
+        # Calculate Real-Time Compliance
+        real_time_stats = await CustodyTimeService.calculate_real_time_compliance(
+            db, family_file_id, start_date, end_date
+        )
+
         # Get event statistics
         event_result = await db.execute(
             select(ScheduleEvent).where(
@@ -644,7 +649,13 @@ class CustodyTimeService:
                 "end_date": end_date.isoformat(),
                 "total_days": (end_date - start_date).days + 1,
             },
+            "report_period": {
+                "start_date": start_date.isoformat(),
+                "end_date": end_date.isoformat(),
+                "total_days": (end_date - start_date).days + 1,
+            },
             "custody_time": custody_stats,
+            "real_time_stats": real_time_stats,
             "exchanges": {
                 "total_scheduled": total_exchanges,
                 "completed": completed_exchanges,
@@ -815,6 +826,188 @@ class CustodyTimeService:
                 updated_count += 1
 
         return updated_count
+
+    # =========================================================================
+    # Real-Time Custody Tracking (Minute-Level Precision)
+    # =========================================================================
+
+    @staticmethod
+    async def get_custody_timeline(
+        db: AsyncSession,
+        family_file_id: str,
+        start_date: date,
+        end_date: date
+    ) -> List[Dict[str, Any]]:
+        """
+        Generate a chronological timeline of custody sessions based on check-ins.
+
+        A 'Custody Session' is the duration between two completed exchanges.
+        This provides minute-level accuracy for custody tracking.
+
+        Args:
+            db: Database session
+            family_file_id: Family file ID
+            start_date: Start of calculation period
+            end_date: End of calculation period
+
+        Returns:
+            List of custody sessions (start, end, duration, parent_id)
+        """
+        # 1. Fetch completed exchanges in the period (plus one before to establish start state)
+        # We need the last exchange BEFORE the start_date to know who started with custody
+        past_exchange_result = await db.execute(
+            select(CustodyExchangeInstance)
+            .join(CustodyExchange)
+            .where(
+                and_(
+                    or_(
+                        CustodyExchange.case_id == family_file_id,
+                        CustodyExchange.family_file_id == family_file_id
+                    ),
+                    CustodyExchangeInstance.status == "completed",
+                    CustodyExchangeInstance.completed_at < datetime.combine(start_date, datetime.min.time())
+                )
+            )
+            .order_by(CustodyExchangeInstance.completed_at.desc())
+            .limit(1)
+        )
+        last_prior_exchange = past_exchange_result.scalar_one_or_none()
+
+        # Fetch all completed exchanges DURING the period
+        period_exchange_result = await db.execute(
+            select(CustodyExchangeInstance)
+            .join(CustodyExchange)
+            .where(
+                and_(
+                    or_(
+                        CustodyExchange.case_id == family_file_id,
+                        CustodyExchange.family_file_id == family_file_id
+                    ),
+                    CustodyExchangeInstance.status == "completed",
+                    CustodyExchangeInstance.completed_at >= datetime.combine(start_date, datetime.min.time()),
+                    CustodyExchangeInstance.completed_at <= datetime.combine(end_date, datetime.max.time())
+                )
+            )
+            .order_by(CustodyExchangeInstance.completed_at)
+        )
+        period_exchanges = period_exchange_result.scalars().all()
+
+        # Combine for processing
+        all_relevant_exchanges = []
+        if last_prior_exchange:
+            all_relevant_exchanges.append(last_prior_exchange)
+        all_relevant_exchanges.extend(period_exchanges)
+
+        sessions = []
+        period_start_dt = datetime.combine(start_date, datetime.min.time()).replace(tzinfo=timezone.utc)
+        period_end_dt = datetime.combine(end_date, datetime.max.time()).replace(tzinfo=timezone.utc)
+        now = datetime.utcnow().replace(tzinfo=timezone.utc)
+
+        # If no exchanges at all, we can't calculate real-time custody
+        if not all_relevant_exchanges:
+            return []
+
+        # 2. Iterate through exchanges to build sessions
+        for i in range(len(all_relevant_exchanges)):
+            current_exchange = all_relevant_exchanges[i]
+            
+            # The parent receiving the child (to_parent) starts their session now
+            # We need to load the exchange details to get parent IDs
+            if not current_exchange.exchange:
+                 await db.refresh(current_exchange, ["exchange"])
+            
+            custodial_parent_id = current_exchange.exchange.to_parent_id
+            session_start = current_exchange.completed_at.replace(tzinfo=timezone.utc)
+
+            # Determine session end
+            if i < len(all_relevant_exchanges) - 1:
+                next_exchange = all_relevant_exchanges[i + 1]
+                session_end = next_exchange.completed_at.replace(tzinfo=timezone.utc)
+            else:
+                # If this is the last exchange, the session goes until NOW (or period end)
+                session_end = min(now, period_end_dt)
+
+            # 3. Clip session to requested date range
+            effective_start = max(session_start, period_start_dt)
+            effective_end = min(session_end, period_end_dt)
+
+            if effective_end > effective_start:
+                duration_seconds = (effective_end - effective_start).total_seconds()
+                duration_minutes = duration_seconds / 60
+                
+                sessions.append({
+                    "parent_id": custodial_parent_id,
+                    "start_time": effective_start,
+                    "end_time": effective_end,
+                    "duration_minutes": round(duration_minutes, 1),
+                    "is_current": (i == len(all_relevant_exchanges) - 1) and (session_end == now)
+                })
+
+        return sessions
+
+    @staticmethod
+    async def calculate_real_time_compliance(
+        db: AsyncSession,
+        family_file_id: str,
+        start_date: date,
+        end_date: date
+    ) -> Dict[str, Any]:
+        """
+        Calculate compliance percentages based on actual minute-by-minute custody time.
+
+        Args:
+            db: Database session
+            family_file_id: Family file ID
+            start_date: Start date
+            end_date: End date
+
+        Returns:
+            Dictionary with minutes and percentages per parent
+        """
+        # Get family file to identify parents
+        result = await db.execute(
+            select(FamilyFile).where(FamilyFile.id == family_file_id)
+        )
+        family_file = result.scalar_one_or_none()
+        if not family_file:
+            return {}
+
+        sessions = await CustodyTimeService.get_custody_timeline(
+            db, family_file_id, start_date, end_date
+        )
+
+        total_minutes = sum(s["duration_minutes"] for s in sessions)
+        parent_a_minutes = sum(s["duration_minutes"] for s in sessions if s["parent_id"] == family_file.parent_a_id)
+        parent_b_minutes = sum(s["duration_minutes"] for s in sessions if s["parent_id"] == family_file.parent_b_id)
+
+        if total_minutes > 0:
+            parent_a_pct = round((parent_a_minutes / total_minutes) * 100, 1)
+            parent_b_pct = round((parent_b_minutes / total_minutes) * 100, 1)
+        else:
+            parent_a_pct = 0
+            parent_b_pct = 0
+
+        # Get agreed percentages for comparison
+        _, agreed_a, agreed_b = await CustodyTimeService.get_agreed_schedule_percentages(db, family_file_id)
+
+        return {
+            "total_tracked_minutes": total_minutes,
+            "parent_a": {
+                "user_id": family_file.parent_a_id,
+                "minutes": parent_a_minutes,
+                "percentage": parent_a_pct,
+                "agreed_percentage": agreed_a,
+                "variance": round(parent_a_pct - agreed_a, 1)
+            },
+            "parent_b": {
+                "user_id": family_file.parent_b_id,
+                "minutes": parent_b_minutes,
+                "percentage": parent_b_pct,
+                "agreed_percentage": agreed_b,
+                "variance": round(parent_b_pct - agreed_b, 1)
+            },
+            "is_real_time": True
+        }
 
 
 # Helper function to calculate date ranges for periods

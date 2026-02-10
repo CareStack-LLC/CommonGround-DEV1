@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, MapPin, Clock, Users, Calendar, Check, X as XIcon, HelpCircle, Stethoscope, GraduationCap, Trophy, RefreshCw } from 'lucide-react';
-import { eventsAPI, EventV2, EventAttendance, UpdateRSVPRequest, MedicalCategoryData, SchoolCategoryData, SportsCategoryData, ExchangeCategoryData, SwapResponseAction } from '@/lib/api';
+import { X, MapPin, Clock, Users, Calendar, Check, X as XIcon, HelpCircle, Stethoscope, GraduationCap, Trophy, RefreshCw, Smartphone } from 'lucide-react';
+import { eventsAPI, scheduleAPI, EventV2, EventAttendance, UpdateRSVPRequest, MedicalCategoryData, SchoolCategoryData, SportsCategoryData, ExchangeCategoryData, SwapResponseAction, ExchangeCheckIn } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { useAuth } from '@/components/providers/auth-provider';
+import EventSilentHandoffCheckIn from './event-silent-handoff-checkin';
 
 interface EventDetailsProps {
   event: EventV2;
@@ -17,18 +19,36 @@ export default function EventDetails({
   onClose,
   onRsvpUpdate,
 }: EventDetailsProps) {
+  const { user } = useAuth();
   const [attendance, setAttendance] = useState<EventAttendance[]>([]);
   const [currentRsvpStatus, setCurrentRsvpStatus] = useState<string>(
     event.my_attendance?.rsvp_status || 'no_response'
   );
+  const [checkIns, setCheckIns] = useState<ExchangeCheckIn[]>([]);
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rsvpNote, setRsvpNote] = useState('');
 
+  // Determine if user has already checked in
+  const myCheckIn = checkIns.find(ci => ci.user_id === user?.id);
+
   useEffect(() => {
     loadAttendance();
-  }, [event.id]);
+    if (event.silent_handoff_enabled) {
+      loadCheckIns();
+    }
+  }, [event.id, event.silent_handoff_enabled]);
+
+  const loadCheckIns = async () => {
+    try {
+      const data = await scheduleAPI.getCheckIns(event.id);
+      setCheckIns(data);
+    } catch (err) {
+      console.error('Error loading check-ins:', err);
+    }
+  };
 
   const loadAttendance = async () => {
     try {
@@ -283,6 +303,46 @@ export default function EventDetails({
                 </div>
               </div>
             )}
+            )}
+
+            {/* Silent Handoff Check-In */}
+            {event.silent_handoff_enabled && (
+              <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="h-4 w-4 text-blue-600" />
+                    <h3 className="font-semibold text-sm">Check-in Required</h3>
+                  </div>
+                  {myCheckIn && (
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full flex items-center">
+                      <Check className="h-3 w-3 mr-1" />
+                      Checked In
+                    </span>
+                  )}
+                </div>
+
+                {myCheckIn ? (
+                  <div className="text-sm text-slate-600">
+                    <p>Checked in at {new Date(myCheckIn.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                    {myCheckIn.location_lat && <p className="text-xs text-slate-500 mt-1">Location verified via GPS</p>}
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-sm text-slate-600 mb-3">
+                      Please check in when you arrive at the location.
+                    </p>
+                    <Button
+                      size="sm"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={() => setShowCheckInModal(true)}
+                    >
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Check In Now
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Divider */}
@@ -412,6 +472,21 @@ export default function EventDetails({
           </div>
         </div>
       </Card>
-    </div>
+    </Card>
+
+      {/* Check-in Modal */ }
+  {
+    showCheckInModal && (
+      <EventSilentHandoffCheckIn
+        event={event}
+        onClose={() => setShowCheckInModal(false)}
+        onCheckInComplete={() => {
+          loadCheckIns();
+          // Optional: close modal automatically or let user close it
+        }}
+      />
+    )
+  }
+    </div >
   );
 }

@@ -130,6 +130,29 @@ class CustodyDayRecordResponse(BaseModel):
     updated_at: str
 
 
+class CustodySession(BaseModel):
+    """A continuous block of custody time."""
+    parent_id: str
+    start_time: datetime
+    end_time: datetime
+    duration_minutes: float
+    is_current: bool = False
+
+
+class RealTimeComplianceStats(BaseModel):
+    """Real-time compliance statistics."""
+    total_tracked_minutes: float
+    parent_a: Dict[str, Any]
+    parent_b: Dict[str, Any]
+    is_real_time: bool = True
+
+
+class CustodyTimelineResponse(BaseModel):
+    """Full timeline response with sessions and stats."""
+    sessions: List[CustodySession]
+    stats: RealTimeComplianceStats
+
+
 # =============================================================================
 # Request Models
 # =============================================================================

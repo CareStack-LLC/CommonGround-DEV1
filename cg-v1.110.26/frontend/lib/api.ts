@@ -669,6 +669,53 @@ export const casesAPI = {
 };
 
 // ============================================================================
+// Custody Time API
+// ============================================================================
+
+export interface CustodySession {
+  parent_id: string;
+  start_time: string;
+  end_time: string;
+  duration_minutes: number;
+  is_current: boolean;
+}
+
+export interface RealTimeComplianceStats {
+  total_tracked_minutes: number;
+  parent_a: {
+    user_id: string;
+    minutes: number;
+    percentage: number;
+    agreed_percentage: number;
+    variance: number;
+  };
+  parent_b: {
+    user_id: string;
+    minutes: number;
+    percentage: number;
+    agreed_percentage: number;
+    variance: number;
+  };
+  is_real_time: boolean;
+}
+
+export interface CustodyTimelineResponse {
+  sessions: CustodySession[];
+  stats: RealTimeComplianceStats;
+}
+
+export const custodyTimeAPI = {
+  /**
+   * Get real-time custody timeline
+   */
+  async getTimeline(childId: string, days: number = 30): Promise<CustodyTimelineResponse> {
+    return fetchAPI<CustodyTimelineResponse>(
+      `/custody-time/child/${childId}/timeline?period=${days}_days`
+    );
+  },
+};
+
+// ============================================================================
 // Messages API
 // ============================================================================
 

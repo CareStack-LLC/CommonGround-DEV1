@@ -24,6 +24,7 @@ from app.schemas.custody_time import (
     CustodyOverrideRequest,
     BackfillRequest,
     BackfillResponse,
+    CustodyTimelineResponse,
 )
 from app.services.custody_time import CustodyTimeService, get_period_dates
 
@@ -145,6 +146,46 @@ async def get_child_custody_stats(
         )
 
     return ChildCustodyStatsResponse(**stats)
+
+
+@router.get("/child/{child_id}/timeline")
+async def get_child_custody_timeline(
+    child_id: str,
+    period: TimePeriod = Query(TimePeriod.THIRTY_DAYS, description="Rolling period"),
+    start_date: Optional[str] = Query(None, description="Custom start date (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(None, description="Custom end date (YYYY-MM-DD)"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> CustodyTimelineResponse:
+    """
+    Get real-time custody timeline and compliance statistics.
+
+    Returns chronological custody sessions and minute-level compliance.
+    """
+    # Verify access
+    child = await verify_child_access(db, child_id, str(current_user.id))
+
+    # Determine date range
+    if start_date and end_date:
+        start = parse_date_or_none(start_date)
+        end = parse_date_or_none(end_date)
+    else:
+        start, end = get_period_dates(period.value)
+
+    # Get timeline sessions
+    sessions = await CustodyTimeService.get_custody_timeline(
+        db, child.family_file_id, start, end
+    )
+
+    # Get real-time stats
+    stats = await CustodyTimeService.calculate_real_time_compliance(
+        db, child.family_file_id, start, end
+    )
+
+    return CustodyTimelineResponse(
+        sessions=sessions,
+        stats=stats
+    )
 
 
 # =============================================================================
