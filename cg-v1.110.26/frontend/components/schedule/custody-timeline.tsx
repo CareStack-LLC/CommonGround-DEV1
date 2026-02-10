@@ -166,13 +166,11 @@ export function CustodyTimeline({ childId, className }: CustodyTimelineProps) {
                                     </div>
                                 </div>
                             </div>
-                                </div>
-                </div>
                         ))}
-            </div>
-        </div>
-            </CardContent >
-        </Card >
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
     );
 }
 

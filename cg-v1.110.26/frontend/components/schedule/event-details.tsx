@@ -303,7 +303,6 @@ export default function EventDetails({
                 </div>
               </div>
             )}
-            )}
 
             {/* Silent Handoff Check-In */}
             {event.silent_handoff_enabled && (
@@ -472,21 +471,21 @@ export default function EventDetails({
           </div>
         </div>
       </Card>
-    </Card>
 
-      {/* Check-in Modal */ }
-  {
-    showCheckInModal && (
-      <EventSilentHandoffCheckIn
-        event={event}
-        onClose={() => setShowCheckInModal(false)}
-        onCheckInComplete={() => {
-          loadCheckIns();
-          // Optional: close modal automatically or let user close it
-        }}
-      />
-    )
-  }
+
+      {/* Check-in Modal */}
+      {
+        showCheckInModal && (
+          <EventSilentHandoffCheckIn
+            event={event}
+            onClose={() => setShowCheckInModal(false)}
+            onCheckInComplete={() => {
+              loadCheckIns();
+              // Optional: close modal automatically or let user close it
+            }}
+          />
+        )
+      }
     </div >
   );
 }
