@@ -20,11 +20,7 @@ export default function FeaturesPage() {
   const router = useRouter();
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      router.push('/dashboard');
-    }
-  }, [user, router]);
+
 
   const features = [
     {

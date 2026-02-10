@@ -17,6 +17,7 @@ const footerLinks = {
       { label: 'How It Works', href: '/how-it-works' },
       { label: 'Security', href: '/security' },
       { label: 'About ARIA', href: '/aria' },
+      { label: 'KidsCom', href: '/kids-com' },
     ],
   },
   solutions: {
