@@ -1353,11 +1353,12 @@ function DashboardContent() {
       </div>
     );
   }
+}
 
-  export default function DashboardPage() {
-    return (
-      <ProtectedRoute>
-        <DashboardContent />
-      </ProtectedRoute>
-    );
-  }
+export default function DashboardPage() {
+  return (
+    <ProtectedRoute>
+      <DashboardContent />
+    </ProtectedRoute>
+  );
+}
