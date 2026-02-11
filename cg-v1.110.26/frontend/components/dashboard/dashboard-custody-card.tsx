@@ -237,7 +237,7 @@ export function DashboardCustodyCard({
                             </span>
                         </div>
                         <span className="text-2xl font-bold text-[var(--portal-primary)]">
-                            {Math.round(myStats.actual_minutes / (60 * 24))} <span className="text-xs font-medium text-slate-400">days</span>
+                            {Math.round(myStats.minutes / (60 * 24))} <span className="text-xs font-medium text-slate-400">days</span>
                         </span>
                     </div>
                     <div className="flex items-center justify-between mt-2">
@@ -248,7 +248,7 @@ export function DashboardCustodyCard({
                             </span>
                         </div>
                         <span className="text-xl font-semibold text-slate-500">
-                            {Math.round(theirStats.actual_minutes / (60 * 24))} <span className="text-xs font-medium text-slate-400">days</span>
+                            {Math.round(theirStats.minutes / (60 * 24))} <span className="text-xs font-medium text-slate-400">days</span>
                         </span>
                     </div>
                 </div>
