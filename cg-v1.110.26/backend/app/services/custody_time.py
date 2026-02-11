@@ -858,6 +858,7 @@ class CustodyTimeService:
         past_exchange_result = await db.execute(
             select(CustodyExchangeInstance)
             .join(CustodyExchange)
+            .options(selectinload(CustodyExchangeInstance.exchange))
             .where(
                 and_(
                     or_(
@@ -877,6 +878,7 @@ class CustodyTimeService:
         period_exchange_result = await db.execute(
             select(CustodyExchangeInstance)
             .join(CustodyExchange)
+            .options(selectinload(CustodyExchangeInstance.exchange))
             .where(
                 and_(
                     or_(
@@ -914,7 +916,8 @@ class CustodyTimeService:
             # The parent receiving the child (to_parent) starts their session now
             # We need to load the exchange details to get parent IDs
             if not current_exchange.exchange:
-                 await db.refresh(current_exchange, ["exchange"])
+                 # This should now be loaded by selectinload above
+                 pass
             
             custodial_parent_id = current_exchange.exchange.to_parent_id
             session_start = current_exchange.completed_at.replace(tzinfo=timezone.utc)
