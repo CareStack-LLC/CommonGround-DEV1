@@ -184,6 +184,18 @@ class ProfessionalProfile(Base, UUIDMixin, TimestampMixin):
     professional_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     professional_phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
 
+    # Directory Profile Fields
+    headline: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    video_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    languages: Mapped[Optional[list]] = mapped_column(JSON, default=list)
+    hourly_rate: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    years_experience: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    education: Mapped[Optional[list]] = mapped_column(JSON, default=list)
+    awards: Mapped[Optional[list]] = mapped_column(JSON, default=list)
+    consultation_fee: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    accepted_payment_methods: Mapped[Optional[list]] = mapped_column(JSON, default=list)
+
     # Portal settings
     default_intake_template: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
     notification_preferences: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
@@ -256,6 +268,13 @@ class Firm(Base, UUIDMixin, TimestampMixin):
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     practice_areas: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
     # e.g., ["Family Law", "Custody", "Mediation", "Divorce"]
+
+    # Directory Firm Fields
+    headline: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    video_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    social_links: Mapped[Optional[dict]] = mapped_column(JSON, default=dict)
+    pricing_structure: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    safety_vetted: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Settings
     settings: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)

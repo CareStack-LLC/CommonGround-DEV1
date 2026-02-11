@@ -69,6 +69,19 @@ class ProfessionalProfileService:
             practice_areas=data.practice_areas or [],
             professional_email=data.professional_email,
             professional_phone=data.professional_phone,
+            
+            # Directory Fields
+            headline=data.headline,
+            bio=data.bio,
+            video_url=data.video_url,
+            languages=data.languages or [],
+            hourly_rate=data.hourly_rate,
+            years_experience=data.years_experience,
+            education=data.education or [],
+            awards=data.awards or [],
+            consultation_fee=data.consultation_fee,
+            accepted_payment_methods=data.accepted_payment_methods or [],
+
             notification_preferences={
                 "email_new_case": True,
                 "email_intake_complete": True,

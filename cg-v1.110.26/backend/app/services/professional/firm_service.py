@@ -88,6 +88,16 @@ class FirmService:
             zip_code=data.zip_code,
             is_public=data.is_public,
             settings=data.settings or {},
+            
+            # Directory fields
+            description=data.description,
+            practice_areas=data.practice_areas or [],
+            headline=data.headline,
+            video_url=data.video_url,
+            social_links=data.social_links or {},
+            pricing_structure=data.pricing_structure,
+            safety_vetted=data.safety_vetted or False,
+            
             created_by=user_id,
         )
 
@@ -140,7 +150,16 @@ class FirmService:
             Firm.phone,
             Firm.primary_color,
             Firm.is_public,
+            Firm.primary_color,
+            Firm.is_public,
             Firm.is_active,
+            Firm.description,
+            Firm.practice_areas,
+            Firm.headline,
+            Firm.video_url,
+            Firm.social_links,
+            Firm.pricing_structure,
+            Firm.safety_vetted,
         ).where(Firm.slug == slug)
 
         result = await self.db.execute(stmt)
@@ -163,8 +182,14 @@ class FirmService:
             'primary_color': row.primary_color,
             'is_public': row.is_public,
             'is_active': row.is_active,
-            'description': None,  # Column may not exist yet
-            'practice_areas': [],  # Column may not exist yet
+            'is_active': row.is_active,
+            'description': row.description,
+            'practice_areas': row.practice_areas or [],
+            'headline': row.headline,
+            'video_url': row.video_url,
+            'social_links': row.social_links or {},
+            'pricing_structure': row.pricing_structure,
+            'safety_vetted': row.safety_vetted,
         }
 
     async def update_firm(
@@ -312,6 +337,13 @@ class FirmService:
                 Firm.email,
                 Firm.phone,
                 Firm.primary_color,
+                Firm.description,
+                Firm.practice_areas,
+                Firm.headline,
+                Firm.video_url,
+                Firm.social_links,
+                Firm.pricing_structure,
+                Firm.safety_vetted,
                 func.count(FirmMembership.id).label('professional_count')
             )
             .outerjoin(
@@ -334,6 +366,13 @@ class FirmService:
                 Firm.email,
                 Firm.phone,
                 Firm.primary_color,
+                Firm.description,
+                Firm.practice_areas,
+                Firm.headline,
+                Firm.video_url,
+                Firm.social_links,
+                Firm.pricing_structure,
+                Firm.safety_vetted,
             )
             .order_by(Firm.name)
             .limit(limit)
@@ -359,8 +398,14 @@ class FirmService:
                 'phone': row.phone,
                 'primary_color': row.primary_color,
                 'professional_count': row.professional_count,
-                'description': None,  # Column may not exist yet
-                'practice_areas': [],  # Column may not exist yet
+                'professional_count': row.professional_count,
+                'description': row.description,
+                'practice_areas': row.practice_areas or [],
+                'headline': row.headline,
+                'video_url': row.video_url,
+                'social_links': row.social_links or {},
+                'pricing_structure': row.pricing_structure,
+                'safety_vetted': row.safety_vetted,
             })
 
         return firms, total

@@ -4911,6 +4911,12 @@ export interface FirmDirectoryEntry {
   primary_color?: string;
   practice_areas: string[];
   professional_count: number;
+  // Directory Fields
+  headline?: string;
+  video_url?: string;
+  social_links?: Record<string, string>;
+  pricing_structure?: Record<string, any>;
+  safety_vetted?: boolean;
 }
 
 export interface FirmPublicProfile extends FirmDirectoryEntry {
@@ -4920,10 +4926,21 @@ export interface FirmPublicProfile extends FirmDirectoryEntry {
   zip_code?: string;
   professionals: {
     id: string;
-    name: string;
+    user_first_name?: string;
+    user_last_name?: string;
     professional_type: string;
-    practice_areas: string[];
     license_verified: boolean;
+    headline?: string;
+    bio?: string;
+    video_url?: string;
+    languages?: string[];
+    hourly_rate?: string;
+    years_experience?: number;
+    education?: any[];
+    awards?: any[];
+    consultation_fee?: string;
+    accepted_payment_methods?: string[];
+    practice_areas: string[];
   }[];
 }
 

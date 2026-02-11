@@ -37,8 +37,11 @@ from app.schemas.professional import (
     FirmUpdate,
     FirmResponse,
     FirmPublicResponse,
+    FirmResponse,
+    FirmPublicResponse,
     FirmDirectoryResponse,
     FirmWithMembers,
+    ProfessionalPublicResponse,
     # Membership
     FirmMemberInvite,
     FirmMembershipUpdate,
@@ -720,8 +723,34 @@ async def get_directory_firm(
             detail="Firm not found.",
         )
 
-    # Get professional count
-    professional_count = await service.get_firm_member_count(firm['id'])
+    # Get professional count and list
+    firm_service = FirmService(db)
+    members = await firm_service.list_firm_members(firm['id'], include_invited=False)
+    
+    professionals_list = []
+    for m in members:
+        if m.professional and m.professional.is_active:
+            user = m.professional.user if hasattr(m.professional, 'user') else None
+            professionals_list.append(
+                ProfessionalPublicResponse(
+                    id=m.professional.id,
+                    user_first_name=user.first_name if user else None,
+                    user_last_name=user.last_name if user else None,
+                    professional_type=ProfessionalType(m.professional.professional_type),
+                    license_verified=m.professional.license_verified,
+                    headline=m.professional.headline,
+                    bio=m.professional.bio,
+                    video_url=m.professional.video_url,
+                    languages=m.professional.languages or [],
+                    hourly_rate=m.professional.hourly_rate,
+                    years_experience=m.professional.years_experience,
+                    education=m.professional.education or [],
+                    awards=m.professional.awards or [],
+                    consultation_fee=m.professional.consultation_fee,
+                    accepted_payment_methods=m.professional.accepted_payment_methods or [],
+                    practice_areas=m.professional.practice_areas or [],
+                )
+            )
 
     return FirmPublicResponse(
         id=firm['id'],
@@ -736,8 +765,14 @@ async def get_directory_firm(
         phone=firm['phone'],
         primary_color=firm['primary_color'],
         practice_areas=firm['practice_areas'] or [],
-        professional_count=professional_count,
+        professional_count=len(professionals_list),
         description=firm['description'],
+        headline=firm['headline'],
+        video_url=firm['video_url'],
+        social_links=firm['social_links'],
+        pricing_structure=firm['pricing_structure'],
+        safety_vetted=firm['safety_vetted'],
+        professionals=professionals_list,
     )
 
 

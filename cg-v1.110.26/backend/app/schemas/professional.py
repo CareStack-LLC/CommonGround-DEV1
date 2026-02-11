@@ -39,6 +39,18 @@ class ProfessionalProfileBase(BaseModel):
     professional_email: Optional[EmailStr] = None
     professional_phone: Optional[str] = None
 
+    # Directory Fields
+    headline: Optional[str] = Field(None, max_length=150)
+    bio: Optional[str] = None
+    video_url: Optional[str] = None
+    languages: Optional[list[str]] = None
+    hourly_rate: Optional[str] = None
+    years_experience: Optional[int] = None
+    education: Optional[list[dict]] = None
+    awards: Optional[list[dict]] = None
+    consultation_fee: Optional[str] = None
+    accepted_payment_methods: Optional[list[str]] = None
+
 
 class ProfessionalProfileCreate(ProfessionalProfileBase):
     """Schema for creating a professional profile (onboarding)."""
@@ -54,6 +66,19 @@ class ProfessionalProfileUpdate(BaseModel):
     practice_areas: Optional[list[str]] = None
     professional_email: Optional[EmailStr] = None
     professional_phone: Optional[str] = None
+    
+    # Directory Fields
+    headline: Optional[str] = None
+    bio: Optional[str] = None
+    video_url: Optional[str] = None
+    languages: Optional[list[str]] = None
+    hourly_rate: Optional[str] = None
+    years_experience: Optional[int] = None
+    education: Optional[list[dict]] = None
+    awards: Optional[list[dict]] = None
+    consultation_fee: Optional[str] = None
+    accepted_payment_methods: Optional[list[str]] = None
+
     default_intake_template: Optional[str] = None
     notification_preferences: Optional[dict] = None
 
@@ -102,6 +127,15 @@ class FirmBase(BaseModel):
     state: str = Field(default="CA", max_length=2)
     zip_code: Optional[str] = None
 
+    # Directory Fields
+    headline: Optional[str] = Field(None, max_length=150)
+    video_url: Optional[str] = None
+    social_links: Optional[dict] = None
+    pricing_structure: Optional[dict] = None
+    safety_vetted: bool = False
+    description: Optional[str] = None
+    practice_areas: Optional[list[str]] = None
+
 
 class FirmCreate(FirmBase):
     """Schema for creating a firm."""
@@ -127,6 +161,13 @@ class FirmUpdate(BaseModel):
     settings: Optional[dict] = None
     description: Optional[str] = None
     practice_areas: Optional[list[str]] = None
+    
+    # Directory Fields
+    headline: Optional[str] = None
+    video_url: Optional[str] = None
+    social_links: Optional[dict] = None
+    pricing_structure: Optional[dict] = None
+    safety_vetted: Optional[bool] = None
 
     @field_validator('primary_color')
     @classmethod
@@ -160,6 +201,29 @@ class FirmResponse(FirmBase):
         from_attributes = True
 
 
+class ProfessionalPublicResponse(BaseModel):
+    """Public professional profile info."""
+    id: str
+    user_first_name: Optional[str] = None
+    user_last_name: Optional[str] = None
+    professional_type: ProfessionalType
+    license_verified: bool = False
+    headline: Optional[str] = None
+    bio: Optional[str] = None
+    video_url: Optional[str] = None
+    languages: list[str] = []
+    hourly_rate: Optional[str] = None
+    years_experience: Optional[int] = None
+    education: list[dict] = []
+    awards: list[dict] = []
+    consultation_fee: Optional[str] = None
+    accepted_payment_methods: list[str] = []
+    practice_areas: list[str] = []
+
+    class Config:
+        from_attributes = True
+
+
 class FirmPublicResponse(BaseModel):
     """Public firm info for directory listing."""
     id: str
@@ -176,6 +240,18 @@ class FirmPublicResponse(BaseModel):
     practice_areas: list[str] = []
     professional_count: int = 0
     description: Optional[str] = None
+    
+    professional_count: int = 0
+    description: Optional[str] = None
+    
+    # Directory Fields
+    headline: Optional[str] = None
+    video_url: Optional[str] = None
+    social_links: Optional[dict] = None
+    pricing_structure: Optional[dict] = None
+    safety_vetted: bool = False
+
+    professionals: list[ProfessionalPublicResponse] = []
 
     class Config:
         from_attributes = True
