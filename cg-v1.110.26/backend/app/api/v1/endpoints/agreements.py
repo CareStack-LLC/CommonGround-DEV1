@@ -80,6 +80,7 @@ async def get_agreement(
             title=agreement.title,
             summary=agreement.summary,  # Include the summary field
             version=agreement.version,
+            agreement_type=agreement.agreement_type,  # FIX: Add required field
             agreement_version=agreement.agreement_version or "v2_standard",
             status=agreement.status,
             petitioner_approved=agreement.petitioner_approved,

@@ -7,9 +7,7 @@ import { childrenAPI, ChildProfile, getImageUrl, familyFilesAPI, FamilyFileDetai
 
 // ... existing imports ...
 
-// Inside component
-const [activeAgreement, setActiveAgreement] = useState<Agreement | null>(null);
-const [custodyPeriod, setCustodyPeriod] = useState<TimePeriod>('30_days');
+
 import { CustodyTimeline } from '@/components/schedule/custody-timeline';
 import { useAuth } from '@/lib/auth-context';
 import { Navigation } from '@/components/navigation';
