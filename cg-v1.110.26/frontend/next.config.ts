@@ -55,11 +55,20 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       // Handle PDF.js canvas dependency
       canvas: { browser: '' },
+      // Force React resolution to local instance to avoid duplicates from parent directory
+      react: './node_modules/react',
+      'react-dom': './node_modules/react-dom',
     },
   },
   // Keep webpack config for fallback
   webpack: (config) => {
     config.resolve.alias.canvas = false;
+
+    // Force React to resolve to local instance
+    const path = require('path');
+    config.resolve.alias['react'] = path.resolve(__dirname, 'node_modules/react');
+    config.resolve.alias['react-dom'] = path.resolve(__dirname, 'node_modules/react-dom');
+
     return config;
   },
 };
