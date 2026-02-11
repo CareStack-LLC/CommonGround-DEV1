@@ -107,7 +107,7 @@ export function DashboardCustodyCard({
                 {
                     event: '*',
                     schema: 'public',
-                    table: 'custody_time_entries',
+                    table: 'custody_day_records',
                     filter: `child_id=eq.${childId}`,
                 },
                 () => {
