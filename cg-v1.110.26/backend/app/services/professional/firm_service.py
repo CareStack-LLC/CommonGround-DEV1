@@ -354,27 +354,7 @@ class FirmService:
                 )
             )
             .where(and_(*filters))
-            .group_by(
-                Firm.id,
-                Firm.name,
-                Firm.slug,
-                Firm.firm_type,
-                Firm.city,
-                Firm.state,
-                Firm.zip_code,
-                Firm.logo_url,
-                Firm.website,
-                Firm.email,
-                Firm.phone,
-                Firm.primary_color,
-                Firm.description,
-                Firm.practice_areas,
-                Firm.headline,
-                Firm.video_url,
-                Firm.social_links,
-                Firm.pricing_structure,
-                Firm.safety_vetted,
-            )
+            .group_by(Firm.id)
             .order_by(Firm.name)
             .limit(limit)
             .offset(offset)
