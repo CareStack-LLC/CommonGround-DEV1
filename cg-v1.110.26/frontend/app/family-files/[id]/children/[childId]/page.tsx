@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { childrenAPI, ChildProfile, getImageUrl, familyFilesAPI, FamilyFileDetail, agreementsAPI, Agreement, custodyTimeAPI, TimePeriod } from '@/lib/api';
+import { childrenAPI, ChildProfile, getImageUrl, familyFilesAPI, FamilyFileDetail, agreementsAPI, Agreement, custodyTimeAPI, TimePeriod, ChildCustodyStats } from '@/lib/api';
 
 // ... existing imports ...
 
@@ -355,6 +355,7 @@ function ChildProfileContent() {
   const [familyFile, setFamilyFile] = useState<FamilyFileDetail | null>(null);
   const [activeAgreement, setActiveAgreement] = useState<Agreement | null>(null);
   const [custodyPeriod, setCustodyPeriod] = useState<TimePeriod>('30_days');
+  const [custodyStats, setCustodyStats] = useState<ChildCustodyStats | null>(null);
 
   // Form states
   const [basicForm, setBasicForm] = useState({
