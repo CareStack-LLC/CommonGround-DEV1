@@ -141,6 +141,9 @@ class CustodyTimeService:
                 determination_method=DeterminationMethod.SCHEDULED.value,
             )
             db.add(record)
+        else:
+            # Force update to trigger realtime events (Supabase listens to UPDATE)
+            record.updated_at = datetime.utcnow()
 
         return record
 
@@ -1024,7 +1027,7 @@ def get_period_dates(period: str) -> Tuple[date, date]:
     Returns:
         Tuple of (start_date, end_date)
     """
-    today = date.today()
+    today = datetime.utcnow().date()
 
     if period == "30_days":
         return today - timedelta(days=30), today
