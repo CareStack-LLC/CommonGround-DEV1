@@ -41,6 +41,7 @@ import {
 
 import { UpgradeBanner } from '@/components/upgrade-banner';
 import { useSubscription } from '@/contexts/subscription-context';
+import { CustodyTimeline } from '@/components/schedule/custody-timeline';
 
 
 /**
