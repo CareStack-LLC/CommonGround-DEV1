@@ -242,8 +242,6 @@ class FirmPublicResponse(BaseModel):
     professional_count: int = 0
     description: Optional[str] = None
     
-    professional_count: int = 0
-    description: Optional[str] = None
     
     # Directory Fields
     headline: Optional[str] = None
