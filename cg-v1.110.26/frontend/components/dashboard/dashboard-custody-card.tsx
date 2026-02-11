@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -70,7 +72,10 @@ export function DashboardCustodyCard({
 
     // Derive status from timeline data
     const currentSession = timelineData.sessions.find(s => s.is_current);
+    const hasCurrentSession = !!currentSession;
+
     // Default to user if no session (fallback) or check session parent_id
+    // If no current session, we don't know who it's with (Status: Unknown/Pending)
     const isWithYou = currentSession ? currentSession.parent_id === user?.id : false;
 
     // Calculate stats from real-time stats
@@ -80,25 +85,43 @@ export function DashboardCustodyCard({
     const theirStats = isParentA ? timelineData.stats.parent_b : timelineData.stats.parent_a;
 
     // Names
-    const coparentName = isParentA ? 'Co-parent' : 'Co-parent'; // Ideally we get this from family file or stats if available
-    // Actually, we can try to infer names if they were provided in stats, but currently stats only has simple fields.
-    // Let's use generic "Co-parent" if we can't find it, or pass it in as a prop if possible.
+    const coparentName = isParentA ? 'Co-parent' : 'Co-parent';
 
-    const statusColor = isWithYou ? 'bg-[var(--portal-primary)]' : 'bg-cg-slate';
-    const statusTextColor = isWithYou ? 'text-[var(--portal-primary)]' : 'text-cg-slate';
+    // Status Colors & Text
+    let statusColor = 'bg-cg-slate';
+    let statusTextColor = 'text-cg-slate';
+    let statusText = 'Unknown Status';
+
+    if (hasCurrentSession) {
+        if (isWithYou) {
+            statusColor = 'bg-[var(--portal-primary)]';
+            statusTextColor = 'text-[var(--portal-primary)]';
+            statusText = 'With You';
+        } else {
+            statusColor = 'bg-cg-slate';
+            statusTextColor = 'text-cg-slate';
+            statusText = `With ${coparentName}`;
+        }
+    } else {
+        // Needs Check-in State
+        statusColor = 'bg-cg-amber'; // Amber to signal attention
+        statusTextColor = 'text-cg-amber';
+        statusText = 'Pending Check-in';
+    }
 
     // We need "days with current parent" - this is effectively the current session duration roughly
     // The user screenshot showed "Day 5". 
     // We can calculate this from `currentSession.start_time`.
-    const getCurrentStreakDay = () => {
+    // Calculate streak in DAYS (1 decimal)
+    const getCurrentStreakDays = () => {
         if (!currentSession) return 0;
         const start = new Date(currentSession.start_time);
         const now = new Date();
         const diffTime = Math.abs(now.getTime() - start.getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays;
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        return Math.round(diffDays * 10) / 10; // 1 decimal place
     };
-    const currentStreakDay = getCurrentStreakDay();
+    const currentStreakDays = getCurrentStreakDays();
 
     // Next exchange logic
     // The timeline endpoint returns sessions. The *next* session after current tells us when exchange happens.
@@ -142,9 +165,15 @@ export function DashboardCustodyCard({
     };
     const progress = getProgress();
 
+    // Helper to format days (always show 1 decimal if not whole, or just whole number)
+    const formatDays = (minutes: number) => {
+        const days = minutes / (60 * 24);
+        return (Math.round(days * 10) / 10).toString();
+    };
+
 
     return (
-        <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-4">
+        <div className={`bg-white rounded-2xl border-2 ${!hasCurrentSession ? 'border-cg-amber/50' : 'border-slate-200'} shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-4`}>
             {/* Top accent bar */}
             <div className={`h-2 ${statusColor}`} />
 
@@ -171,12 +200,12 @@ export function DashboardCustodyCard({
                         </p>
                         <div className="flex items-center gap-2">
                             <p className={`text-sm font-medium ${statusTextColor}`}>
-                                {isWithYou ? 'With You' : `With ${currentSession ? 'Co-parent' : 'Co-parent'}`}
+                                {statusText}
                             </p>
-                            {/* Show days with current parent */}
-                            {currentStreakDay > 0 && (
+                            {/* Show days with current parent - ONLY if session active */}
+                            {hasCurrentSession && currentStreakDays > 0 && (
                                 <span className="text-sm font-semibold text-cg-amber">
-                                    • Day {currentStreakDay}
+                                    • {currentStreakDays} Days
                                 </span>
                             )}
                         </div>
@@ -189,9 +218,9 @@ export function DashboardCustodyCard({
                                 e.stopPropagation();
                                 onWithMe(childId);
                             }}
-                            className="px-4 py-2 text-xs font-bold bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0"
+                            className={`px-4 py-2 text-xs font-bold text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0 ${!hasCurrentSession ? 'bg-gradient-to-r from-cg-amber to-orange-500 animate-pulse' : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644]'}`}
                         >
-                            With Me
+                            {!hasCurrentSession ? 'Check In / Claim' : 'With Me'}
                         </button>
                     )}
                     {isWithYou && (
@@ -202,21 +231,25 @@ export function DashboardCustodyCard({
                 </div>
 
                 {/* Next exchange info */}
-                {hasNextExchange ? (
+                {hasCurrentSession && hasNextExchange ? (
                     <div className="mb-3">
                         <p className="text-sm text-foreground">
                             <span className="text-blue-600 font-medium">Next exchange:</span>{' '}
                             <span className="font-medium">{nextExchangeStr}</span>
                         </p>
                     </div>
-                ) : (
+                ) : hasCurrentSession ? (
                     <p className="text-sm text-muted-foreground mb-3 italic">
                         No exchanges scheduled
+                    </p>
+                ) : (
+                    <p className="text-sm text-cg-amber mb-3 font-medium">
+                        Waiting for parent check-in to start tracking.
                     </p>
                 )}
 
                 {/* Progress Bar - only show if exchange scheduled */}
-                {hasNextExchange && (
+                {hasCurrentSession && hasNextExchange && (
                     <div className="relative mb-2">
                         <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
                             <div
@@ -237,7 +270,7 @@ export function DashboardCustodyCard({
                             </span>
                         </div>
                         <span className="text-2xl font-bold text-[var(--portal-primary)]">
-                            {Math.round(myStats.minutes / (60 * 24))} <span className="text-xs font-medium text-slate-400">days</span>
+                            {formatDays(myStats.minutes)} <span className="text-xs font-medium text-slate-400">Days</span>
                         </span>
                     </div>
                     <div className="flex items-center justify-between mt-2">
@@ -248,7 +281,7 @@ export function DashboardCustodyCard({
                             </span>
                         </div>
                         <span className="text-xl font-semibold text-slate-500">
-                            {Math.round(theirStats.minutes / (60 * 24))} <span className="text-xs font-medium text-slate-400">days</span>
+                            {formatDays(theirStats.minutes)} <span className="text-xs font-medium text-slate-400">Days</span>
                         </span>
                     </div>
                 </div>

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { format, formatDistance, parseISO } from 'date-fns';
 import { Clock, CheckCircle2, AlertCircle } from 'lucide-react';
