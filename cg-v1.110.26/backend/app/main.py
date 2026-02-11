@@ -27,6 +27,8 @@ async def lifespan(app: FastAPI):
     """
     # Startup
     print(f"🚀 Starting {settings.APP_NAME} ({settings.ENVIRONMENT})")
+    print(f"🔓 CORS Allowed Origins: {settings.allowed_origins_list}")
+    print(f"🔓 CORS Origin Regex: {settings.CORS_ORIGIN_REGEX}")
     if settings.is_development:
         await init_db()  # Auto-create tables in dev
         print("✅ Database tables created")
@@ -46,6 +48,7 @@ app = FastAPI(
 
 # Middleware
 # Allow all Vercel preview URLs and configured origins
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,
@@ -54,7 +57,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 # Global exception handler to ensure CORS headers are always present

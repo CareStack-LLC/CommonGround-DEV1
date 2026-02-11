@@ -331,6 +331,7 @@ function DashboardContent() {
   const [familyFilesWithData, setFamilyFilesWithData] = useState<FamilyFileWithData[]>([]);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
   const activeFileIdsRef = useRef<string[]>([]);
 
   // Lightweight refresh - only updates summary data (for auto-refresh)
@@ -706,6 +707,7 @@ function DashboardContent() {
                         key={child.id}
                         childId={child.id}
                         childData={child}
+                        refreshTrigger={refreshKey}
                         onWithMe={async (id) => {
                           if (!user) return;
                           try {
@@ -716,14 +718,19 @@ function DashboardContent() {
                             const dd = String(today.getDate()).padStart(2, '0');
                             const dateStr = `${yyyy}-${mm}-${dd}`;
 
+                            console.log('Initiating check-in for child:', id);
                             await custodyTimeAPI.overrideCustody(data.familyFile.id, {
                               child_id: id,
                               parent_id: user.id,
                               record_date: dateStr,
                               reason: "Dashboard Check-in"
                             });
+                            console.log('Check-in successful, refreshing dashboard...');
 
-                            // Refresh dashboard data to show new status
+                            // Trigger refresh of all cards
+                            setRefreshKey(prev => prev + 1);
+
+                            // Also refresh dashboard data
                             await loadDashboardData();
                           } catch (error) {
                             console.error('Failed to check in:', error);

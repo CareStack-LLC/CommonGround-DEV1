@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth-context';
 import {
     getImageUrl,
@@ -14,18 +15,12 @@ import { Users } from 'lucide-react';
 // Format hours remaining into a human-readable string
 function formatHoursRemaining(hours: number | undefined): string {
     if (!hours) return 'Unknown';
-    if (hours < 1) {
-        return `${Math.round(hours * 60)} minutes`;
-    }
-    if (hours < 24) {
-        return `${Math.round(hours)} hours`;
-    }
-    const days = Math.floor(hours / 24);
-    const remainingHours = Math.round(hours % 24);
-    if (remainingHours === 0) {
-        return `${days} day${days > 1 ? 's' : ''}`;
-    }
-    return `${days} day${days > 1 ? 's' : ''}, ${remainingHours} hour${remainingHours > 1 ? 's' : ''}`;
+
+    // Strict "Days" formatting as requested
+    const totalDays = hours / 24;
+    // Format to 1 decimal place if needed, removing .0
+    const formatted = parseFloat(totalDays.toFixed(1));
+    return `${formatted} Day${formatted !== 1 ? 's' : ''}`;
 }
 
 
@@ -73,19 +68,25 @@ export function DashboardCustodyCard({
     childId,
     childData,
     onWithMe,
+    refreshTrigger = 0,
 }: {
     childId: string;
     childData?: FamilyFileChild;
     onWithMe?: (childId: string) => void | Promise<void>;
+    refreshTrigger?: number;
 }) {
     const { user, timezone } = useAuth();
     const [imageError, setImageError] = useState(false);
     const [loading, setLoading] = useState(true);
     const [timelineData, setTimelineData] = useState<CustodyTimelineResponse | null>(null);
 
+    // Fetch data on mount or when refreshTrigger changes
     useEffect(() => {
         async function loadData() {
             try {
+                // Don't set loading true on refresh to avoid flicker, only on initial mount if needed
+                if (!timelineData) setLoading(true);
+
                 const data = await custodyTimeAPI.getTimeline(childId, 30);
                 setTimelineData(data);
             } catch (err) {
@@ -95,7 +96,31 @@ export function DashboardCustodyCard({
             }
         }
         loadData();
-    }, [childId]);
+    }, [childId, refreshTrigger]);
+
+    // Subscribe to realtime changes
+    useEffect(() => {
+        const channel = supabase
+            .channel(`custody-updates-${childId}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'custody_time_entries',
+                    filter: `child_id=eq.${childId}`,
+                },
+                () => {
+                    // Refresh data on any change
+                    custodyTimeAPI.getTimeline(childId, 30).then(setTimelineData);
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [childId, supabase]);
 
     if (loading || !timelineData) {
         return (
