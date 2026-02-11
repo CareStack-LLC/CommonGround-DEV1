@@ -27,11 +27,13 @@ function formatHoursRemaining(hours: number | undefined): string {
 function CheckInButton({
     onClick,
     label,
-    className
+    className,
+    disabled = false
 }: {
     onClick: () => void | Promise<void>;
     label: string;
     className: string;
+    disabled?: boolean;
 }) {
     const [loading, setLoading] = useState(false);
 
@@ -51,7 +53,7 @@ function CheckInButton({
     return (
         <button
             onClick={handleClick}
-            disabled={loading}
+            disabled={loading || disabled}
             className={`px-4 py-2 text-xs font-bold text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0 flex items-center gap-2 ${className} ${loading ? 'opacity-80 cursor-wait' : ''}`}
         >
             {loading ? (
@@ -278,17 +280,20 @@ export function DashboardCustodyCard({
                     </div>
 
                     {/* With Me Button - Manual Override / Check-in */}
-                    {onWithMe && !isWithYou && (
+                    {onWithMe && (
                         <CheckInButton
-                            onClick={() => onWithMe(childId)}
-                            label={!hasCurrentSession ? 'Check In / Claim' : 'With Me'}
-                            className={!hasCurrentSession ? 'bg-gradient-to-r from-cg-amber to-orange-500 animate-pulse' : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644]'}
+                            onClick={isWithYou ? () => { } : () => onWithMe(childId)}
+                            label={isWithYou ? 'With Me' : (!hasCurrentSession ? 'Check In / Claim' : 'Check In / With Me')}
+                            disabled={isWithYou}
+                            className={`
+                                ${isWithYou
+                                    ? 'bg-[#1f4644] opacity-50 cursor-not-allowed shadow-none hover:scale-100 hover:shadow-none'
+                                    : (!hasCurrentSession
+                                        ? 'bg-gradient-to-r from-cg-amber to-orange-500 animate-pulse'
+                                        : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644]')
+                                }
+                            `}
                         />
-                    )}
-                    {isWithYou && (
-                        <div className="px-4 py-2 text-xs font-bold bg-[#1f4644] text-white rounded-xl flex-shrink-0 shadow-sm">
-                            With Me
-                        </div>
                     )}
                 </div>
 
