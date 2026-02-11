@@ -697,11 +697,17 @@ function DashboardContent() {
           ) : (
             <div className="space-y-6">
               {/* Custody Status Cards - One per child across all family files */}
-
-
-
-
-              {/* Action Stream */}
+              {familyFilesWithData.some(f => f.familyFile.children && f.familyFile.children.length > 0) && (
+                <div className="mb-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {familyFilesWithData.flatMap(f => f.familyFile.children).map(child => (
+                      <div key={child.id} className="w-full">
+                        <CustodyTimeline childId={child.id} compact={false} className="shadow-lg border-2 border-slate-200" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}              {/* Action Stream */}
               <section>
                 <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                   Action Stream
