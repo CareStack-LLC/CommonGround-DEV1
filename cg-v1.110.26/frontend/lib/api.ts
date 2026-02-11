@@ -4912,6 +4912,7 @@ export interface FirmDirectoryEntry {
   primary_color?: string;
   practice_areas: string[];
   professional_count: number;
+  description?: string;
   // Directory Fields
   headline?: string;
   video_url?: string;
@@ -4921,7 +4922,6 @@ export interface FirmDirectoryEntry {
 }
 
 export interface FirmPublicProfile extends FirmDirectoryEntry {
-  description?: string;
   address_line1?: string;
   address_line2?: string;
   professionals: {
