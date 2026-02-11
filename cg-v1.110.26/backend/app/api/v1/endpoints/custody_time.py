@@ -309,6 +309,71 @@ async def override_custody(
     # Parse date
     record_date = parse_date_or_none(data.record_date) if data.record_date else None
 
+    # Check if this is a Dashboard Check-in (Real-time)
+    if data.reason == "Dashboard Check-in":
+        from app.services.custody_exchange import CustodyExchangeService
+        
+        # Determine current custodial parent to set as "from_parent"
+        # If we can't determine, we assume it's the other parent in the family file
+        other_parent_id = family_file.parent_b_id if data.parent_id == family_file.parent_a_id else family_file.parent_a_id
+        
+        # Create an ad-hoc exchange
+        exchange = await CustodyExchangeService.create_exchange(
+            db=db,
+            case_id=family_file_id,
+            created_by=str(current_user.id),
+            exchange_type="pickup",
+            scheduled_time=datetime.utcnow(),
+            title="Manual Check-in",
+            from_parent_id=other_parent_id,
+            to_parent_id=data.parent_id,
+            child_ids=[data.child_id],
+            notes_visible_to_coparent=True,
+            items_to_bring="Manual Dashboard Check-in"
+        )
+        
+        # Get the instance (it's created automatically)
+        # We need to refresh to get instances if not loaded
+        # create_exchange usually returns with instances loaded
+        if exchange.instances:
+            instance = exchange.instances[0]
+            
+            # Auto-complete the exchange by checking in both parents
+            # We do this sequentially to ensure state updates
+            await CustodyExchangeService.check_in(
+                db=db,
+                instance_id=str(instance.id),
+                user_id=other_parent_id,
+                notes="Auto-completed via Dashboard Check-in"
+            )
+            
+            # Final check-in by the claiming parent
+            completed_instance = await CustodyExchangeService.check_in(
+                db=db,
+                instance_id=str(instance.id),
+                user_id=data.parent_id,
+                notes="Dashboard Check-in"
+            )
+            
+            if completed_instance:
+                # Return success response
+                # We need to fetch the day record that was created/updated internally
+                # asking for the record date
+                time_service_record = await CustodyTimeService.get_or_create_day_record(
+                    db, family_file_id, data.child_id, completed_instance.completed_at.date()
+                )
+                
+                await db.commit()
+                
+                return {
+                    "success": True,
+                    "record_id": time_service_record.id,
+                    "record_date": time_service_record.record_date.isoformat(),
+                    "custodial_parent_id": time_service_record.custodial_parent_id,
+                    "exchange_id": str(exchange.id)
+                }
+
+    # Standard manual day override (historical or specific date)
     # Set override
     record = await CustodyTimeService.set_manual_override(
         db=db,
