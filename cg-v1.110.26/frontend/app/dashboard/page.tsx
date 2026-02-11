@@ -41,6 +41,7 @@ import {
 
 import { UpgradeBanner } from '@/components/upgrade-banner';
 import { useSubscription } from '@/contexts/subscription-context';
+import { DashboardCustodyCard } from '@/components/dashboard/dashboard-custody-card';
 
 
 /**
@@ -696,9 +697,18 @@ function DashboardContent() {
           ) : (
             <div className="space-y-6">
               {/* Custody Status Cards - One per child across all family files */}
-
-
-
+              {familyFilesWithData.some(f => f.familyFile.children && f.familyFile.children.length > 0) && (
+                <div className="space-y-4 mb-6">
+                  {familyFilesWithData.flatMap(f => f.familyFile.children).map(child => (
+                    <DashboardCustodyCard
+                      key={child.id}
+                      childId={child.id}
+                      childData={child}
+                      onWithMe={(id) => console.log('Check-in clicked for', id)} // Placeholder for now or implement check-in
+                    />
+                  ))}
+                </div>
+              )}
 
               {/* Action Stream */}
               <section>
