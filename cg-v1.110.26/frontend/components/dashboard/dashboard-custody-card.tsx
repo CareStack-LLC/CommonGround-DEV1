@@ -28,6 +28,47 @@ function formatHoursRemaining(hours: number | undefined): string {
     return `${days} day${days > 1 ? 's' : ''}, ${remainingHours} hour${remainingHours > 1 ? 's' : ''}`;
 }
 
+
+function CheckInButton({
+    onClick,
+    label,
+    className
+}: {
+    onClick: () => void | Promise<void>;
+    label: string;
+    className: string;
+}) {
+    const [loading, setLoading] = useState(false);
+
+    const handleClick = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        // Prevent event bubbling to parent card
+        if (loading) return;
+
+        try {
+            setLoading(true);
+            await onClick();
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <button
+            onClick={handleClick}
+            disabled={loading}
+            className={`px-4 py-2 text-xs font-bold text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0 flex items-center gap-2 ${className} ${loading ? 'opacity-80 cursor-wait' : ''}`}
+        >
+            {loading ? (
+                <>
+                    <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                </>
+            ) : label}
+        </button>
+    );
+}
+
 export function DashboardCustodyCard({
     childId,
     childData,
@@ -35,7 +76,7 @@ export function DashboardCustodyCard({
 }: {
     childId: string;
     childData?: FamilyFileChild;
-    onWithMe?: (childId: string) => void;
+    onWithMe?: (childId: string) => void | Promise<void>;
 }) {
     const { user, timezone } = useAuth();
     const [imageError, setImageError] = useState(false);
@@ -213,15 +254,11 @@ export function DashboardCustodyCard({
 
                     {/* With Me Button - Manual Override / Check-in */}
                     {onWithMe && !isWithYou && (
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onWithMe(childId);
-                            }}
-                            className={`px-4 py-2 text-xs font-bold text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0 ${!hasCurrentSession ? 'bg-gradient-to-r from-cg-amber to-orange-500 animate-pulse' : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644]'}`}
-                        >
-                            {!hasCurrentSession ? 'Check In / Claim' : 'With Me'}
-                        </button>
+                        <CheckInButton
+                            onClick={() => onWithMe(childId)}
+                            label={!hasCurrentSession ? 'Check In / Claim' : 'With Me'}
+                            className={!hasCurrentSession ? 'bg-gradient-to-r from-cg-amber to-orange-500 animate-pulse' : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644]'}
+                        />
                     )}
                     {isWithYou && (
                         <div className="px-4 py-2 text-xs font-bold bg-[#1f4644] text-white rounded-xl flex-shrink-0 shadow-sm">

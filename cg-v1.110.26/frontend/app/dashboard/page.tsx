@@ -12,6 +12,7 @@ import {
   familyFilesAPI,
   agreementsAPI,
   dashboardAPI,
+  custodyTimeAPI,
   activitiesAPI,
 
   getImageUrl,
@@ -699,14 +700,38 @@ function DashboardContent() {
               {/* Custody Status Cards - One per child across all family files */}
               {familyFilesWithData.some(f => f.familyFile.children && f.familyFile.children.length > 0) && (
                 <div className="space-y-4 mb-6">
-                  {familyFilesWithData.flatMap(f => f.familyFile.children).map(child => (
-                    <DashboardCustodyCard
-                      key={child.id}
-                      childId={child.id}
-                      childData={child}
-                      onWithMe={(id) => console.log('Check-in clicked for', id)} // Placeholder for now or implement check-in
-                    />
-                  ))}
+                  {familyFilesWithData.map(data =>
+                    data.familyFile.children?.map(child => (
+                      <DashboardCustodyCard
+                        key={child.id}
+                        childId={child.id}
+                        childData={child}
+                        onWithMe={async (id) => {
+                          if (!user) return;
+                          try {
+                            // Use manual override for "Check In" (sets today to current user)
+                            const today = new Date();
+                            const yyyy = today.getFullYear();
+                            const mm = String(today.getMonth() + 1).padStart(2, '0');
+                            const dd = String(today.getDate()).padStart(2, '0');
+                            const dateStr = `${yyyy}-${mm}-${dd}`;
+
+                            await custodyTimeAPI.overrideCustody(data.familyFile.id, {
+                              child_id: id,
+                              parent_id: user.id,
+                              record_date: dateStr,
+                              reason: "Dashboard Check-in"
+                            });
+
+                            // Refresh dashboard data to show new status
+                            await loadDashboardData();
+                          } catch (error) {
+                            console.error('Failed to check in:', error);
+                          }
+                        }}
+                      />
+                    ))
+                  )}
                 </div>
               )}
 
