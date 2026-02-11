@@ -618,7 +618,9 @@ class FirmService:
         """List all members of a firm."""
         query = (
             select(FirmMembership)
-            .options(selectinload(FirmMembership.professional))
+            .options(
+                selectinload(FirmMembership.professional).selectinload(ProfessionalProfile.user)
+            )
             .where(FirmMembership.firm_id == firm_id)
         )
 
