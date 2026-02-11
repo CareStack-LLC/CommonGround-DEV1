@@ -232,6 +232,7 @@ class FirmPublicResponse(BaseModel):
     firm_type: FirmType
     city: Optional[str] = None
     state: Optional[str] = None
+    zip_code: Optional[str] = None
     logo_url: Optional[str] = None
     website: Optional[str] = None
     email: Optional[str] = None

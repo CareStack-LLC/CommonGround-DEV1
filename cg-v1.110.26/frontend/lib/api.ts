@@ -4907,6 +4907,7 @@ export interface FirmDirectoryEntry {
   website?: string;
   city?: string;
   state?: string;
+  zip_code?: string;
   logo_url?: string;
   primary_color?: string;
   practice_areas: string[];
@@ -4923,7 +4924,6 @@ export interface FirmPublicProfile extends FirmDirectoryEntry {
   description?: string;
   address_line1?: string;
   address_line2?: string;
-  zip_code?: string;
   professionals: {
     id: string;
     user_first_name?: string;
