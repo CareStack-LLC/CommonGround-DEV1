@@ -11,6 +11,7 @@ accordingly. It handles:
 import logging
 from fastapi import APIRouter, Request, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Optional, Union
 from sqlalchemy import select
 
 from app.core.database import get_db
@@ -357,7 +358,7 @@ async def _get_tier_from_price_id(db: AsyncSession, price_id: str) -> str:
     return plan.plan_code if plan else "starter"
 
 
-async def _get_profile_by_stripe_customer(db: AsyncSession, customer_id: str) -> UserProfile | None:
+async def _get_profile_by_stripe_customer(db: AsyncSession, customer_id: str) -> Optional[UserProfile]:
     """Find user profile by Stripe customer ID."""
     result = await db.execute(
         select(UserProfile).where(UserProfile.stripe_customer_id == customer_id)

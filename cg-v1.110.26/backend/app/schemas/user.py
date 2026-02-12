@@ -1,6 +1,7 @@
 """User schemas."""
 
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -11,16 +12,16 @@ class UserProfileResponse(BaseModel):
     user_id: str
     first_name: str
     last_name: str
-    preferred_name: str | None
+    preferred_name: Optional[str]
     email: str
-    phone: str | None
-    avatar_url: str | None
+    phone: Optional[str]
+    avatar_url: Optional[str]
     timezone: str
-    address_line1: str | None = None
-    address_line2: str | None = None
-    city: str | None = None
-    state: str | None = None
-    zip_code: str | None = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    zip_code: Optional[str] = None
     subscription_tier: str
     subscription_status: str
     created_at: datetime
@@ -33,16 +34,16 @@ class UserProfileResponse(BaseModel):
 class UserProfileUpdate(BaseModel):
     """User profile update request."""
 
-    first_name: str | None = None
-    last_name: str | None = None
-    preferred_name: str | None = None
-    phone: str | None = None
-    timezone: str | None = None
-    address_line1: str | None = None
-    address_line2: str | None = None
-    city: str | None = None
-    state: str | None = None
-    zip_code: str | None = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    preferred_name: Optional[str] = None
+    phone: Optional[str] = None
+    timezone: Optional[str] = None
+    address_line1: Optional[str] = None
+    address_line2: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    zip_code: Optional[str] = None
 
 
 class NotificationPreferences(BaseModel):

@@ -1,5 +1,6 @@
 """Authentication schemas."""
 
+from typing import Optional
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from app.utils.sanitize import sanitize_text, validate_phone
 
@@ -11,7 +12,7 @@ class RegisterRequest(BaseModel):
     password: str = Field(..., min_length=8, max_length=128)
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
-    phone: str | None = Field(None, max_length=20)
+    phone: Optional[str] = Field(None, max_length=20)
 
     @field_validator('password')
     @classmethod
@@ -49,7 +50,7 @@ class RegisterRequest(BaseModel):
 
     @field_validator('phone')
     @classmethod
-    def validate_phone_number(cls, v: str | None) -> str | None:
+    def validate_phone_number(cls, v: Optional[str]) -> Optional[str]:
         """Validate phone number format if provided."""
         if v is None or not v.strip():
             return None
@@ -132,7 +133,7 @@ class OAuthSyncRequest(BaseModel):
     email: EmailStr = Field(..., description="User's email from OAuth provider")
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(default="", max_length=100)
-    avatar_url: str | None = Field(None, max_length=500)
+    avatar_url: Optional[str] = Field(None, max_length=500)
 
     @field_validator('first_name', 'last_name')
     @classmethod

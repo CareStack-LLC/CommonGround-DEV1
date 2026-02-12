@@ -542,6 +542,7 @@ class QuickSummaryResponse(BaseModel):
     """Response model for quick agreement summary."""
     summary: str
     key_points: List[str]
+    shared_expenses_table: Optional[Dict[str, Any]] = None
     completion_percentage: int
     status: str
 

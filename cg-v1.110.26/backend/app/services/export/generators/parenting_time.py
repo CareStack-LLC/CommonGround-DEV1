@@ -5,6 +5,7 @@ Section 3: Exchange records, patterns, and timeliness analysis.
 """
 
 from datetime import datetime, timedelta
+from typing import Optional, List, Dict
 from sqlalchemy import select, func, and_, or_
 from sqlalchemy.orm import selectinload
 
@@ -318,7 +319,7 @@ class ParentingTimeGenerator(BaseSectionGenerator):
             scheduled = instance.scheduled_time
             
             # Helper to check a single parent's check-in
-            def check_parent(check_in_time: datetime | None, is_checked_in: bool):
+            def check_parent(check_in_time: Optional[datetime], is_checked_in: bool):
                 nonlocal total_valid_checkins, on_time_count, grace_period_count
                 
                 if is_checked_in and check_in_time:

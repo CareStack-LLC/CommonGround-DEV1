@@ -1,6 +1,7 @@
 """Case schemas."""
 
 from datetime import datetime
+from typing import Optional, Union, List, Dict
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from app.utils.sanitize import sanitize_case_name, sanitize_text
 
@@ -24,8 +25,8 @@ class CaseCreate(BaseModel):
     case_name: str = Field(..., min_length=3, max_length=200)
     other_parent_email: EmailStr
     state: str = Field(..., min_length=2, max_length=2)  # US state codes
-    county: str | None = Field(None, max_length=100)
-    children: list[dict] = Field(..., min_items=1, max_items=20)
+    county: Optional[str] = Field(None, max_length=100)
+    children: List[Dict] = Field(..., min_items=1, max_items=20)
 
     @field_validator('case_name')
     @classmethod
@@ -61,7 +62,7 @@ class CaseCreate(BaseModel):
 
     @field_validator('county')
     @classmethod
-    def sanitize_county(cls, v: str | None) -> str | None:
+    def sanitize_county(cls, v: Optional[str]) -> Optional[str]:
         """Sanitize county name if provided."""
         if v is None or not v.strip():
             return None
@@ -70,7 +71,7 @@ class CaseCreate(BaseModel):
 
     @field_validator('children')
     @classmethod
-    def validate_children(cls, v: list[dict]) -> list[dict]:
+    def validate_children(cls, v: List[Dict]) -> List[Dict]:
         """Validate children list."""
         if not v:
             raise ValueError('At least one child is required')
@@ -92,11 +93,11 @@ class CaseResponse(BaseModel):
 
     id: str
     case_name: str
-    case_number: str | None
-    state: str | None
+    case_number: Optional[str]
+    state: Optional[str]
     status: str
     created_at: datetime
-    participants: list[CaseParticipantResponse]
+    participants: List[CaseParticipantResponse]
 
     class Config:
         from_attributes = True
@@ -105,13 +106,13 @@ class CaseResponse(BaseModel):
 class CaseUpdate(BaseModel):
     """Update case request."""
 
-    case_name: str | None = Field(None, min_length=3, max_length=200)
-    county: str | None = Field(None, max_length=100)
-    court: str | None = Field(None, max_length=200)
+    case_name: Optional[str] = Field(None, min_length=3, max_length=200)
+    county: Optional[str] = Field(None, max_length=100)
+    court: Optional[str] = Field(None, max_length=200)
 
     @field_validator('case_name')
     @classmethod
-    def validate_case_name(cls, v: str | None) -> str | None:
+    def validate_case_name(cls, v: Optional[str]) -> Optional[str]:
         """Sanitize and validate case name if provided."""
         if v is None:
             return None
@@ -122,7 +123,7 @@ class CaseUpdate(BaseModel):
 
     @field_validator('county', 'court')
     @classmethod
-    def sanitize_text_fields(cls, v: str | None) -> str | None:
+    def sanitize_text_fields(cls, v: Optional[str]) -> Optional[str]:
         """Sanitize text fields if provided."""
         if v is None or not v.strip():
             return None
