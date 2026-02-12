@@ -9,10 +9,8 @@ import {
     AlertCircle,
     CheckCircle2,
     TrendingUp,
-    Eye,
     RefreshCw,
-    Clock,
-    ArrowRight,
+    Users,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
