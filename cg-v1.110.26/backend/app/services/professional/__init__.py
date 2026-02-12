@@ -16,6 +16,7 @@ from app.services.professional.messaging_service import ProfessionalMessagingSer
 from app.services.professional.intake_service import ProfessionalIntakeService
 from app.services.professional.communications_service import CommunicationsService
 from app.services.professional.compliance_service import ProfessionalComplianceService
+from app.services.professional.case_summary_service import ProfessionalCaseSummaryService
 
 __all__ = [
     "FirmService",
@@ -29,4 +30,5 @@ __all__ = [
     "ProfessionalIntakeService",
     "CommunicationsService",
     "ProfessionalComplianceService",
+    "ProfessionalCaseSummaryService",
 ]

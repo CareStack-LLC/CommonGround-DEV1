@@ -367,11 +367,10 @@ export default function IntakeCenterPage() {
       <div className="flex border-b border-slate-200">
         <button
           onClick={() => handleTabChange("intakes")}
-          className={`px-5 py-3 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${
-            activeTab === "intakes"
+          className={`px-5 py-3 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${activeTab === "intakes"
               ? "border-teal-600 text-teal-700 bg-teal-50/50"
               : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-          }`}
+            }`}
         >
           <Bot className="h-4 w-4" />
           ARIA Intakes
@@ -383,11 +382,10 @@ export default function IntakeCenterPage() {
         </button>
         <button
           onClick={() => handleTabChange("invitations")}
-          className={`px-5 py-3 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${
-            activeTab === "invitations"
+          className={`px-5 py-3 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${activeTab === "invitations"
               ? "border-teal-600 text-teal-700 bg-teal-50/50"
               : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
-          }`}
+            }`}
         >
           <Users className="h-4 w-4" />
           Case Invitations
@@ -680,11 +678,10 @@ function StatCard({
   return (
     <button
       onClick={onClick}
-      className={`p-4 rounded-xl border text-left transition-all duration-200 w-full ${
-        active
+      className={`p-4 rounded-xl border text-left transition-all duration-200 w-full ${active
           ? `${config?.activeBg || "bg-gradient-to-br from-slate-50 to-slate-100/50"} ${config?.activeBorder || "border-slate-300"} ring-2 ${config?.activeRing || "ring-slate-500/20"} shadow-sm`
           : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm"
-      }`}
+        }`}
     >
       <p className={`text-2xl font-bold ${config?.text || "text-slate-900"}`}>{value}</p>
       <p className="text-xs text-slate-500 mt-0.5 font-medium">{label}</p>
@@ -1196,13 +1193,12 @@ function FirmInvitationCard({
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 border-slate-200 hover:border-slate-300 overflow-hidden">
       {/* Top accent bar based on status */}
-      <div className={`h-1 ${
-        invitation.status === "pending"
+      <div className={`h-1 ${invitation.status === "pending"
           ? "bg-gradient-to-r from-amber-400 to-amber-500"
           : invitation.status === "approved"
-          ? "bg-gradient-to-r from-teal-400 to-teal-500"
-          : "bg-slate-300"
-      }`} />
+            ? "bg-gradient-to-r from-teal-400 to-teal-500"
+            : "bg-slate-300"
+        }`} />
 
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
@@ -1303,8 +1299,8 @@ function FirmInvitationCard({
                       {invitation.parent_a_approved && invitation.parent_b_approved
                         ? "Both Parents Approved"
                         : invitation.parent_a_approved
-                        ? `${invitation.parent_a_name?.split(" ")[0] || "Parent A"} Approved`
-                        : `${invitation.parent_b_name?.split(" ")[0] || "Parent B"} Approved`}
+                          ? `${invitation.parent_a_name?.split(" ")[0] || "Parent A"} Approved`
+                          : `${invitation.parent_b_name?.split(" ")[0] || "Parent B"} Approved`}
                     </span>
                   </div>
                 )}
@@ -1317,11 +1313,10 @@ function FirmInvitationCard({
                 )}
 
                 {expiryDays !== null && expiryDays <= 7 && (
-                  <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${
-                    expiryDays <= 2
+                  <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${expiryDays <= 2
                       ? "bg-red-50 text-red-600"
                       : "bg-amber-50 text-amber-600"
-                  }`}>
+                    }`}>
                     <AlertCircle className="h-3 w-3" />
                     <span>Expires in {expiryDays} {expiryDays === 1 ? "day" : "days"}</span>
                   </div>
@@ -1611,11 +1606,10 @@ function InvitationPreviewModal({
                         <div
                           className="h-full bg-gradient-to-r from-teal-400 to-teal-500 rounded-full transition-all"
                           style={{
-                            width: `${
-                              preview.agreement.total_sections > 0
+                            width: `${preview.agreement.total_sections > 0
                                 ? (preview.agreement.completed_sections / preview.agreement.total_sections) * 100
                                 : 0
-                            }%`,
+                              }%`,
                           }}
                         />
                       </div>
@@ -1690,19 +1684,17 @@ function InvitationPreviewModal({
                     <p className="text-xs text-slate-500">Total Messages</p>
                   </div>
                   <div>
-                    <p className={`text-xl font-bold ${
-                      preview.messages.flag_rate > 0.3 ? "text-red-600" :
-                      preview.messages.flag_rate > 0.15 ? "text-amber-600" : "text-teal-600"
-                    }`}>
+                    <p className={`text-xl font-bold ${preview.messages.flag_rate > 0.3 ? "text-red-600" :
+                        preview.messages.flag_rate > 0.15 ? "text-amber-600" : "text-teal-600"
+                      }`}>
                       {preview.messages.flagged_messages_30d}
                     </p>
                     <p className="text-xs text-slate-500">Flagged</p>
                   </div>
                   <div>
-                    <p className={`text-xl font-bold ${
-                      preview.messages.flag_rate > 0.3 ? "text-red-600" :
-                      preview.messages.flag_rate > 0.15 ? "text-amber-600" : "text-teal-600"
-                    }`}>
+                    <p className={`text-xl font-bold ${preview.messages.flag_rate > 0.3 ? "text-red-600" :
+                        preview.messages.flag_rate > 0.15 ? "text-amber-600" : "text-teal-600"
+                      }`}>
                       {Math.round(preview.messages.flag_rate * 100)}%
                     </p>
                     <p className="text-xs text-slate-500">Flag Rate</p>
@@ -1718,21 +1710,19 @@ function InvitationPreviewModal({
                       <div
                         className="bg-blue-400"
                         style={{
-                          width: `${
-                            preview.messages.total_messages_30d > 0
+                          width: `${preview.messages.total_messages_30d > 0
                               ? (preview.messages.parent_a_messages / preview.messages.total_messages_30d) * 100
                               : 50
-                          }%`,
+                            }%`,
                         }}
                       />
                       <div
                         className="bg-purple-400"
                         style={{
-                          width: `${
-                            preview.messages.total_messages_30d > 0
+                          width: `${preview.messages.total_messages_30d > 0
                               ? (preview.messages.parent_b_messages / preview.messages.total_messages_30d) * 100
                               : 50
-                          }%`,
+                            }%`,
                         }}
                       />
                     </div>
@@ -1857,7 +1847,7 @@ function InvitationPreviewModal({
 }
 
 // Assign Professional Dialog
-function AssignProfessionalDialog({
+export function AssignProfessionalDialog({
   token,
   firmId,
   invitationId,

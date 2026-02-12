@@ -65,6 +65,7 @@ class ProfessionalDashboardService:
 
         # Get pending firm invitations (parent-initiated requests to firms)
         pending_firm_invitations = await self._get_pending_firm_invitations_count(professional_id)
+        pending_firm_invitations_data = await self._get_pending_firm_invitations_data(professional_id)
 
         # Get unread messages
         unread_messages = await self._get_unread_message_count(professional_id)
@@ -83,6 +84,7 @@ class ProfessionalDashboardService:
             "pending_intakes": pending_intakes,
             "pending_approvals": pending_approvals,
             "pending_firm_invitations": pending_firm_invitations,
+            "pending_firm_invitations_data": pending_firm_invitations_data,
             "unread_messages": unread_messages,
             "upcoming_events": upcoming_events,
             "alerts": alerts,
@@ -446,6 +448,53 @@ class ProfessionalDashboardService:
             )
         )
         return result.scalar() or 0
+
+    async def _get_pending_firm_invitations_data(
+        self,
+        professional_id: str,
+    ) -> list[dict]:
+        """
+        Get pending firm invitations data.
+        """
+        # Get firm IDs where professional has admin-level access
+        admin_roles = ["OWNER", "ADMIN", "PARTNER"]
+        firm_result = await self.db.execute(
+            select(FirmMembership.firm_id).where(
+                and_(
+                    FirmMembership.professional_id == professional_id,
+                    FirmMembership.status == MembershipStatus.ACTIVE.value,
+                    FirmMembership.role.in_(admin_roles),
+                )
+            )
+        )
+        firm_ids = [row[0] for row in firm_result.fetchall()]
+
+        if not firm_ids:
+            return []
+
+        # Get pending invitations for those firms
+        result = await self.db.execute(
+            select(ProfessionalAccessRequest).where(
+                and_(
+                    ProfessionalAccessRequest.firm_id.in_(firm_ids),
+                    ProfessionalAccessRequest.status == AccessRequestStatus.PENDING.value,
+                    ProfessionalAccessRequest.requested_by == "parent",
+                )
+            ).order_by(ProfessionalAccessRequest.created_at.desc())
+        )
+        invitations = result.scalars().all()
+        
+        return [
+            {
+                "id": str(inv.id),
+                "family_file_id": str(inv.family_file_id),
+                "family_file_title": inv.family_file_title,
+                "requested_role": inv.requested_role,
+                "representing": inv.representing,
+                "created_at": inv.created_at.isoformat() if inv.created_at else None,
+            }
+            for inv in invitations
+        ]
 
     # -------------------------------------------------------------------------
     # Private Helpers - Queries

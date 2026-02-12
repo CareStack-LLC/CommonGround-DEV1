@@ -50,6 +50,7 @@ from app.schemas.professional import (
     AccessRequestCreate,
     AccessRequestResponse,
     InviteProfessionalRequest,
+    InvitationCasePreview,
 )
 from app.services.professional import (
     FirmService,
@@ -63,6 +64,7 @@ from app.services.professional import (
     ProfessionalIntakeService,
     CommunicationsService,
     ProfessionalComplianceService,
+    ProfessionalCaseSummaryService,
 )
 from app.schemas.professional import (
     # Case Assignment
@@ -933,15 +935,20 @@ async def accept_firm_invitation(
     try:
         invitation.professional_id = assigned_professional_id
 
-        # Only one parent needs to approve - professional represents one side
-        # The requesting parent has already approved when creating the invitation
-        if invitation.parent_a_approved or invitation.parent_b_approved:
-            invitation.status = AccessRequestStatus.APPROVED.value
-            invitation.approved_at = datetime.utcnow()
-
-            # Create case assignment
-            assignment = await access_service.create_assignment_from_request(invitation)
-            invitation.case_assignment_id = str(assignment.id)
+            else:
+                # If it's a representation role (Attorney), we can finalize if the representing parent approved
+                # This supports unilateral representation assignment
+                req_parent_id = invitation.requested_by_user_id
+                if (invitation.representing == "parent_a" and invitation.parent_a_approved) or \
+                   (invitation.representing == "parent_b" and invitation.parent_b_approved) or \
+                   (invitation.requested_role in [AssignmentRole.LEAD_ATTORNEY.value, AssignmentRole.ASSOCIATE.value]):
+                    
+                    invitation.status = AccessRequestStatus.APPROVED.value
+                    invitation.approved_at = datetime.utcnow()
+                    
+                    # Create case assignment
+                    assignment = await access_service.create_assignment_from_request(invitation)
+                    invitation.case_assignment_id = str(assignment.id)
 
         await db.commit()
         await db.refresh(invitation)
@@ -1033,6 +1040,7 @@ async def decline_firm_invitation(
 @router.get(
     "/firms/{firm_id}/invitations/{invitation_id}/preview",
     summary="Get case preview for invitation",
+    response_model=InvitationCasePreview,
 )
 async def get_invitation_case_preview(
     firm_id: str,
@@ -1043,16 +1051,9 @@ async def get_invitation_case_preview(
     """
     Get detailed case preview for an invitation before accepting.
 
-    Returns agreement summary, compliance metrics, message trends,
-    and ClearFund overview to help professional evaluate the case.
+    Uses ProfessionalCaseSummaryService to aggregate metrics, agreements,
+    and child information into a high-fidelity summary.
     """
-    from datetime import timedelta
-    from sqlalchemy import select, func, and_
-    from app.models.agreement import Agreement
-    from app.models.message import Message, MessageFlag
-    from app.models.clearfund import Obligation
-    from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
-
     # Verify firm membership
     firm_service = FirmService(db)
     membership = await firm_service.get_membership(profile.id, firm_id)
@@ -1062,280 +1063,44 @@ async def get_invitation_case_preview(
             detail="Not an active member of this firm",
         )
 
-    # Get invitation with family file and nested relationships
-    from sqlalchemy.orm import selectinload
-    from app.models.family_file import FamilyFile
-    from app.models.professional import ProfessionalAccessRequest
-
-    result = await db.execute(
-        select(ProfessionalAccessRequest)
-        .options(
-            selectinload(ProfessionalAccessRequest.family_file).options(
-                selectinload(FamilyFile.parent_a),
-                selectinload(FamilyFile.parent_b),
-                selectinload(FamilyFile.children),
-            )
-        )
-        .where(ProfessionalAccessRequest.id == invitation_id)
-    )
-    invitation = result.scalar_one_or_none()
-
+    summary_service = ProfessionalCaseSummaryService(db)
+    
+    # Get invitation to verify it's for this firm and find family_file_id
+    access_service = ProfessionalAccessService(db)
+    invitation = await access_service.get_request(invitation_id)
+    
     if not invitation:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Invitation not found",
         )
-
+        
     if str(invitation.firm_id) != firm_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invitation is not for this firm",
         )
 
-    # Get family file with relationships
-    ff = invitation.family_file
-    if not ff:
+    try:
+        preview = await summary_service.get_case_preview(
+            family_file_id=invitation.family_file_id,
+            access_request_id=invitation_id,
+            professional_id=profile.id
+        )
+        return preview
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Family file not found",
+            detail=str(e)
         )
-
-    parent_a = ff.parent_a
-    parent_b = ff.parent_b
-
-    # Build children preview
-    children_preview = []
-    if ff.children:
-        from datetime import date
-        for child in ff.children:
-            age = None
-            if child.date_of_birth:
-                today = date.today()
-                age = today.year - child.date_of_birth.year - (
-                    (today.month, today.day) < (child.date_of_birth.month, child.date_of_birth.day)
-                )
-            children_preview.append({
-                "id": str(child.id),
-                "first_name": child.first_name,
-                "age": age,
-                "has_special_needs": bool(child.has_special_needs),
-            })
-
-    # Get agreement info
-    agreement_preview = {
-        "has_active_agreement": False,
-        "agreement_title": None,
-        "total_sections": 0,
-        "completed_sections": 0,
-        "last_updated": None,
-        "key_sections": [],
-    }
-
-    try:
-        agreement_result = await db.execute(
-            select(Agreement)
-            .where(Agreement.family_file_id == ff.id)
-            .where(Agreement.status.in_(["active", "pending_approval", "draft"]))
-            .order_by(Agreement.updated_at.desc())
-            .limit(1)
+    except Exception as e:
+        import traceback
+        print(f"Error generating case preview: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate case preview"
         )
-        agreement = agreement_result.scalar_one_or_none()
-        if agreement:
-            agreement_preview["has_active_agreement"] = True
-            agreement_preview["agreement_title"] = agreement.title
-            agreement_preview["last_updated"] = agreement.updated_at
-
-            # Count sections from agreement_data
-            if agreement.agreement_data:
-                sections = agreement.agreement_data.get("sections", {})
-                total = 0
-                completed = 0
-                key_sections = []
-                for section_name, section_data in sections.items():
-                    total += 1
-                    if section_data and section_data.get("data"):
-                        completed += 1
-                        key_sections.append(section_name.replace("_", " ").title())
-                agreement_preview["total_sections"] = total
-                agreement_preview["completed_sections"] = completed
-                agreement_preview["key_sections"] = key_sections[:5]  # Top 5
-    except Exception:
-        pass  # Agreement data not critical
-
-    # Get message trends (last 30 days)
-    message_preview = {
-        "total_messages_30d": 0,
-        "flagged_messages_30d": 0,
-        "flag_rate": 0.0,
-        "parent_a_messages": 0,
-        "parent_b_messages": 0,
-        "last_message_at": None,
-    }
-
-    try:
-        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-
-        # Total messages
-        msg_count_result = await db.execute(
-            select(func.count(Message.id))
-            .where(Message.family_file_id == ff.id)
-            .where(Message.created_at >= thirty_days_ago)
-        )
-        message_preview["total_messages_30d"] = msg_count_result.scalar() or 0
-
-        # Flagged messages
-        flagged_result = await db.execute(
-            select(func.count(Message.id))
-            .where(Message.family_file_id == ff.id)
-            .where(Message.created_at >= thirty_days_ago)
-            .where(Message.was_flagged == True)
-        )
-        message_preview["flagged_messages_30d"] = flagged_result.scalar() or 0
-
-        if message_preview["total_messages_30d"] > 0:
-            message_preview["flag_rate"] = round(
-                message_preview["flagged_messages_30d"] / message_preview["total_messages_30d"], 3
-            )
-
-        # Messages by parent
-        if parent_a:
-            pa_result = await db.execute(
-                select(func.count(Message.id))
-                .where(Message.family_file_id == ff.id)
-                .where(Message.sender_id == str(parent_a.id))
-                .where(Message.created_at >= thirty_days_ago)
-            )
-            message_preview["parent_a_messages"] = pa_result.scalar() or 0
-
-        if parent_b:
-            pb_result = await db.execute(
-                select(func.count(Message.id))
-                .where(Message.family_file_id == ff.id)
-                .where(Message.sender_id == str(parent_b.id))
-                .where(Message.created_at >= thirty_days_ago)
-            )
-            message_preview["parent_b_messages"] = pb_result.scalar() or 0
-
-        # Last message
-        last_msg_result = await db.execute(
-            select(Message.created_at)
-            .where(Message.family_file_id == ff.id)
-            .order_by(Message.created_at.desc())
-            .limit(1)
-        )
-        last_msg = last_msg_result.scalar_one_or_none()
-        if last_msg:
-            message_preview["last_message_at"] = last_msg
-    except Exception:
-        pass  # Message data not critical
-
-    # Get compliance/exchange metrics
-    compliance_preview = {
-        "exchange_completion_rate": None,
-        "on_time_rate": None,
-        "total_exchanges_30d": 0,
-        "completed_exchanges_30d": 0,
-        "communication_flag_rate": message_preview["flag_rate"],
-        "overall_health": "unknown",
-    }
-
-    try:
-        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-
-        # Exchange instances in last 30 days (join through CustodyExchange for family_file_id)
-        exchange_result = await db.execute(
-            select(func.count(CustodyExchangeInstance.id))
-            .join(CustodyExchange, CustodyExchangeInstance.exchange_id == CustodyExchange.id)
-            .where(CustodyExchange.family_file_id == str(ff.id))
-            .where(CustodyExchangeInstance.scheduled_time >= thirty_days_ago)
-        )
-        compliance_preview["total_exchanges_30d"] = exchange_result.scalar() or 0
-
-        # Completed exchanges
-        completed_result = await db.execute(
-            select(func.count(CustodyExchangeInstance.id))
-            .join(CustodyExchange, CustodyExchangeInstance.exchange_id == CustodyExchange.id)
-            .where(CustodyExchange.family_file_id == str(ff.id))
-            .where(CustodyExchangeInstance.scheduled_time >= thirty_days_ago)
-            .where(CustodyExchangeInstance.status == "completed")
-        )
-        compliance_preview["completed_exchanges_30d"] = completed_result.scalar() or 0
-
-        if compliance_preview["total_exchanges_30d"] > 0:
-            compliance_preview["exchange_completion_rate"] = round(
-                compliance_preview["completed_exchanges_30d"] / compliance_preview["total_exchanges_30d"], 3
-            )
-
-            # Determine overall health (thresholds are now decimals: 0.9 = 90%, 0.1 = 10%)
-            rate = compliance_preview["exchange_completion_rate"]
-            flag_rate = compliance_preview["communication_flag_rate"]
-            if rate >= 0.9 and flag_rate <= 0.1:
-                compliance_preview["overall_health"] = "excellent"
-            elif rate >= 0.75 and flag_rate <= 0.2:
-                compliance_preview["overall_health"] = "good"
-            elif rate >= 0.5 and flag_rate <= 0.35:
-                compliance_preview["overall_health"] = "fair"
-            else:
-                compliance_preview["overall_health"] = "concerning"
-    except Exception:
-        pass  # Compliance data not critical
-
-    # Get ClearFund overview
-    clearfund_preview = {
-        "total_obligations": 0,
-        "pending_obligations": 0,
-        "total_amount": 0.0,
-        "paid_amount": 0.0,
-        "overdue_amount": 0.0,
-        "categories": [],
-    }
-
-    try:
-        # Get all obligations
-        obligations_result = await db.execute(
-            select(Obligation)
-            .where(Obligation.family_file_id == ff.id)
-        )
-        obligations = obligations_result.scalars().all()
-
-        categories_set = set()
-        for obl in obligations:
-            clearfund_preview["total_obligations"] += 1
-            clearfund_preview["total_amount"] += float(obl.amount or 0)
-
-            if obl.status == "pending":
-                clearfund_preview["pending_obligations"] += 1
-            elif obl.status == "funded" or obl.status == "completed":
-                clearfund_preview["paid_amount"] += float(obl.amount or 0)
-            elif obl.status == "overdue":
-                clearfund_preview["overdue_amount"] += float(obl.amount or 0)
-
-            if obl.category:
-                categories_set.add(obl.category)
-
-        clearfund_preview["categories"] = list(categories_set)[:5]
-    except Exception:
-        pass  # ClearFund data not critical
-
-    return {
-        "family_file_id": str(ff.id),
-        "family_file_number": ff.family_file_number,
-        "family_file_title": ff.title,
-        "state": ff.state,
-        "county": ff.county,
-        "created_at": ff.created_at,
-        "parent_a_name": f"{parent_a.first_name} {parent_a.last_name}" if parent_a else None,
-        "parent_b_name": f"{parent_b.first_name} {parent_b.last_name}" if parent_b else None,
-        "children": children_preview,
-        "agreement": agreement_preview,
-        "compliance": compliance_preview,
-        "messages": message_preview,
-        "clearfund": clearfund_preview,
-        "requested_role": invitation.requested_role,
-        "requested_scopes": invitation.requested_scopes or [],
-        "representing": invitation.representing,
-        "message": invitation.message,
-    }
 
 
 # =============================================================================

@@ -20,14 +20,54 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useProfessionalAuth } from "../layout";
+import { InvitationSummaryAlert } from "@/components/professional/invitation-summary-alert";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { AssignProfessionalDialog } from "../intake/page";
 
 export default function ProfessionalDashboardPage() {
-  const { profile, dashboardData, activeFirm, refreshDashboard } = useProfessionalAuth();
+  const { profile, dashboardData, activeFirm, refreshDashboard, token } = useProfessionalAuth();
 
   // Refresh dashboard on mount
   useEffect(() => {
     refreshDashboard();
   }, [activeFirm]);
+
+  const [selectedInvitation, setSelectedInvitation] = useState<any>(null);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+
+  const handleAccept = (invitation: any) => {
+    setSelectedInvitation(invitation);
+    // Some roles might require assignment, others (representation) are unilateral but still might need a professional assigned
+    setShowAssignDialog(true);
+  };
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  const handleAssign = async (professionalId: string) => {
+    if (!token || !selectedInvitation || !activeFirm) return;
+
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/v1/professional/firms/${activeFirm.id}/invitations/${selectedInvitation.id}/accept`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ assigned_professional_id: professionalId }),
+        }
+      );
+
+      if (response.ok) {
+        setShowAssignDialog(false);
+        setSelectedInvitation(null);
+        refreshDashboard();
+      }
+    } catch (error) {
+      console.error("Error accepting invitation:", error);
+    }
+  };
 
   if (!dashboardData) {
     return (
@@ -37,8 +77,55 @@ export default function ProfessionalDashboardPage() {
     );
   }
 
+  const pendingFirmInvitations = dashboardData?.pending_firm_invitations_data || [];
+
   return (
     <div className="space-y-6">
+      {/* Pending Invitations Banner - High Visibility */}
+      {pendingFirmInvitations.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <div className="h-1 w-8 bg-emerald-500 rounded-full" />
+              Pending Case Invitations ({pendingFirmInvitations.length})
+            </h2>
+            <Link href="/professional/intake?tab=invitations" className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
+              View All Invitations
+            </Link>
+          </div>
+          <div className="grid gap-4">
+            {pendingFirmInvitations.slice(0, 1).map((invitation: any) => (
+              <InvitationSummaryAlert
+                key={invitation.id}
+                invitationId={invitation.id}
+                firmId={activeFirm?.id || ""}
+                token={token}
+                onAccept={() => handleAccept(invitation)}
+                onDecline={() => refreshDashboard()}
+              />
+            ))}
+            {pendingFirmInvitations.length > 1 && (
+              <p className="text-center text-xs text-slate-400 font-medium">
+                + {pendingFirmInvitations.length - 1} other case{pendingFirmInvitations.length - 1 !== 1 ? "s" : ""} waiting for your review
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Assignment Dialog */}
+      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+        <DialogContent className="sm:max-w-md">
+          <AssignProfessionalDialog
+            token={token}
+            firmId={activeFirm?.id || ""}
+            invitationId={selectedInvitation?.id || ""}
+            onAccept={handleAssign}
+            isAccepting={false}
+            onCancel={() => setShowAssignDialog(false)}
+          />
+        </DialogContent>
+      </Dialog>
       {/* Welcome Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -309,9 +396,8 @@ function AlertItem({ alert }: { alert: any }) {
   return (
     <Link href={getAlertHref()}>
       <div
-        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:shadow-md transition-all ${
-          severityColors[alert.severity as keyof typeof severityColors] || severityColors.medium
-        }`}
+        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:shadow-md transition-all ${severityColors[alert.severity as keyof typeof severityColors] || severityColors.medium
+          }`}
       >
         <div className="mt-0.5">{typeIcons[alert.type] || <Bell className="h-4 w-4" />}</div>
         <div className="flex-1 min-w-0">
