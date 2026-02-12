@@ -26,6 +26,7 @@ from app.schemas.professional import (
 )
 from app.services.professional.compliance_service import ProfessionalComplianceService
 from app.services.exchange_compliance import ExchangeComplianceService
+from app.services.agreement import AgreementService
 
 class ProfessionalCaseSummaryService:
     """
@@ -129,6 +130,21 @@ class ProfessionalCaseSummaryService:
                 representing = access_req.representing
                 req_message = access_req.message
 
+        # Extract Quick Facts if agreement exists
+        quick_facts = []
+        if active_agreement and active_agreement.sections:
+            section_dict = {}
+            for section in active_agreement.sections:
+                if section.content:
+                    section_dict[section.section_type] = {
+                        "title": section.section_title,
+                        "content": section.content
+                    }
+            
+            agreement_service = AgreementService(self.db)
+            extracted = agreement_service.extract_key_points_from_sections(section_dict, active_agreement)
+            quick_facts = extracted.get("key_points", [])
+
         return InvitationCasePreview(
             family_file_id=family_file.id,
             family_file_number=family_file.family_file_number,
@@ -152,7 +168,8 @@ class ProfessionalCaseSummaryService:
                 total_sections=18 if active_agreement and active_agreement.agreement_version == "v1" else 7,
                 completed_sections=len(active_agreement.sections) if active_agreement and active_agreement.sections else 0,
                 last_updated=active_agreement.updated_at if active_agreement else None,
-                key_sections=[s.section_title for s in active_agreement.sections[:3]] if active_agreement and active_agreement.sections else []
+                key_sections=[s.section_title for s in active_agreement.sections[:3]] if active_agreement and active_agreement.sections else [],
+                quick_facts=quick_facts
             ),
             compliance=InvitationCompliancePreview(
                 exchange_completion_rate=exchange_metrics.get("geofence_compliance_rate"),
@@ -160,12 +177,14 @@ class ProfessionalCaseSummaryService:
                 total_exchanges_30d=exchange_metrics.get("total_exchanges", 0),
                 completed_exchanges_30d=exchange_metrics.get("completed", 0),
                 communication_flag_rate=comm_metrics.get("flag_rate"),
+                top_flagged_category=comm_metrics.get("top_flagged_category"),
                 overall_health=self.compliance_service._score_to_status(overall_score)
             ),
             messages=InvitationMessagePreview(
                 total_messages_30d=comm_metrics.get("total_messages", 0),
                 flagged_messages_30d=comm_metrics.get("flagged_messages", 0),
                 flag_rate=comm_metrics.get("flag_rate", 0.0),
+                top_flagged_category=comm_metrics.get("top_flagged_category"),
                 parent_a_messages=comm_metrics.get("parent_a_messages", 0), # This might need per-parent logic if comm_metrics supports it
                 parent_b_messages=comm_metrics.get("parent_b_messages", 0),
                 last_message_at=None

@@ -406,6 +406,32 @@ class ProfessionalComplianceService:
         )
         total_flags = total_flags_result.scalar() or 0
 
+        # Calculate top flagged category
+        flags_result = await self.db.execute(
+            select(MessageFlag.categories)
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(
+                and_(
+                    Message.family_file_id == family_file_id,
+                    MessageFlag.created_at >= start_date,
+                    MessageFlag.created_at <= end_date,
+                )
+            )
+        )
+        all_categories_lists = flags_result.scalars().all()
+        
+        from collections import Counter
+        category_counts = Counter()
+        for cat_list in all_categories_lists:
+            if cat_list:
+                # Handle both list and string cases (legacy data might be string)
+                if isinstance(cat_list, list):
+                    category_counts.update(cat_list)
+                elif isinstance(cat_list, str):
+                    category_counts.update([cat_list])
+
+        top_flagged_category = category_counts.most_common(1)[0][0] if category_counts else None
+
         # Calculate rates
         flag_rate = (flagged_messages / total_messages * 100) if total_messages > 0 else 0
         good_faith_rate = (accepted_suggestions / total_flags * 100) if total_flags > 0 else 100
@@ -417,6 +443,7 @@ class ProfessionalComplianceService:
             "aria_interventions": total_flags,
             "suggestions_accepted": accepted_suggestions,
             "good_faith_rate": round(good_faith_rate, 1),
+            "top_flagged_category": top_flagged_category,
         }
 
     async def _get_per_parent_communication(

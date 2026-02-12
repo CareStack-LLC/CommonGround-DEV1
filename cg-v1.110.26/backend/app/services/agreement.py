@@ -1153,8 +1153,8 @@ AGREEMENT SECTIONS:
             # 3. Combine parts
             summary_markdown = f"{summary_narrative}\n\n---\n\n{schedule_table}\n\n---\n\n{holiday_table}"
 
-            # 4. Extract key points for the compact view (Quick Facts)
-            key_points_data = self._extract_key_points_from_sections(section_dict, agreement)
+            # 4. Extract details for the summary
+            key_points_data = self.extract_key_points_from_sections(section_dict, agreement)
 
             return {
                 "summary": summary_markdown,
@@ -1170,7 +1170,7 @@ AGREEMENT SECTIONS:
                 agreement, section_dict, completion_percentage
             )
 
-    def _extract_key_points_from_sections(self, section_dict: Dict[str, Any], agreement: Agreement = None) -> Dict[str, Any]:
+    def extract_key_points_from_sections(self, section_dict: Dict[str, Any], agreement: Agreement = None) -> Dict[str, Any]:
         """
         Extract labeled Quick Facts for easy reference.
         Returns dict with key_points (list) and shared_expenses_table (dict).
@@ -1383,7 +1383,7 @@ AGREEMENT SECTIONS:
                         else:
                             summary_parts.append(f"* {line}\n")
         
-        key_points = self._extract_key_points_from_sections(section_dict)
+        key_points = self.extract_key_points_from_sections(section_dict)
         
         return {
             "summary": "".join(summary_parts),

@@ -1072,6 +1072,7 @@ class InvitationAgreementPreview(BaseModel):
     completed_sections: int = 0
     last_updated: Optional[datetime] = None
     key_sections: list[str] = []  # Names of filled sections
+    quick_facts: list[str] = []   # Extracted key points
 
 
 class InvitationCompliancePreview(BaseModel):
@@ -1081,6 +1082,7 @@ class InvitationCompliancePreview(BaseModel):
     total_exchanges_30d: int = 0
     completed_exchanges_30d: int = 0
     communication_flag_rate: Optional[float] = None
+    top_flagged_category: Optional[str] = None
     overall_health: str = "unknown"  # excellent, good, fair, concerning, unknown
 
 
@@ -1089,6 +1091,7 @@ class InvitationMessagePreview(BaseModel):
     total_messages_30d: int = 0
     flagged_messages_30d: int = 0
     flag_rate: float = 0.0
+    top_flagged_category: Optional[str] = None
     parent_a_messages: int = 0
     parent_b_messages: int = 0
     last_message_at: Optional[datetime] = None

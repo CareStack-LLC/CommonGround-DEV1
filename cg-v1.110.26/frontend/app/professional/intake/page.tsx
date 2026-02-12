@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 import {
   FileText,
   Search,
@@ -368,8 +369,8 @@ export default function IntakeCenterPage() {
         <button
           onClick={() => handleTabChange("intakes")}
           className={`px-5 py-3 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${activeTab === "intakes"
-              ? "border-teal-600 text-teal-700 bg-teal-50/50"
-              : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+            ? "border-teal-600 text-teal-700 bg-teal-50/50"
+            : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
             }`}
         >
           <Bot className="h-4 w-4" />
@@ -383,8 +384,8 @@ export default function IntakeCenterPage() {
         <button
           onClick={() => handleTabChange("invitations")}
           className={`px-5 py-3 font-medium text-sm border-b-2 transition-all flex items-center gap-2 ${activeTab === "invitations"
-              ? "border-teal-600 text-teal-700 bg-teal-50/50"
-              : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+            ? "border-teal-600 text-teal-700 bg-teal-50/50"
+            : "border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50"
             }`}
         >
           <Users className="h-4 w-4" />
@@ -679,8 +680,8 @@ function StatCard({
     <button
       onClick={onClick}
       className={`p-4 rounded-xl border text-left transition-all duration-200 w-full ${active
-          ? `${config?.activeBg || "bg-gradient-to-br from-slate-50 to-slate-100/50"} ${config?.activeBorder || "border-slate-300"} ring-2 ${config?.activeRing || "ring-slate-500/20"} shadow-sm`
-          : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm"
+        ? `${config?.activeBg || "bg-gradient-to-br from-slate-50 to-slate-100/50"} ${config?.activeBorder || "border-slate-300"} ring-2 ${config?.activeRing || "ring-slate-500/20"} shadow-sm`
+        : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm"
         }`}
     >
       <p className={`text-2xl font-bold ${config?.text || "text-slate-900"}`}>{value}</p>
@@ -1008,6 +1009,7 @@ interface CasePreview {
     completed_sections: number;
     last_updated: string | null;
     key_sections: string[];
+    quick_facts: string[];
   };
   compliance: {
     exchange_completion_rate: number | null;
@@ -1021,6 +1023,7 @@ interface CasePreview {
     total_messages_30d: number;
     flagged_messages_30d: number;
     flag_rate: number;
+    top_flagged_category: string | null;
     parent_a_messages: number;
     parent_b_messages: number;
     last_message_at: string | null;
@@ -1194,10 +1197,10 @@ function FirmInvitationCard({
     <Card className="group hover:shadow-lg transition-all duration-300 border-slate-200 hover:border-slate-300 overflow-hidden">
       {/* Top accent bar based on status */}
       <div className={`h-1 ${invitation.status === "pending"
-          ? "bg-gradient-to-r from-amber-400 to-amber-500"
-          : invitation.status === "approved"
-            ? "bg-gradient-to-r from-teal-400 to-teal-500"
-            : "bg-slate-300"
+        ? "bg-gradient-to-r from-amber-400 to-amber-500"
+        : invitation.status === "approved"
+          ? "bg-gradient-to-r from-teal-400 to-teal-500"
+          : "bg-slate-300"
         }`} />
 
       <CardContent className="p-5">
@@ -1314,8 +1317,8 @@ function FirmInvitationCard({
 
                 {expiryDays !== null && expiryDays <= 7 && (
                   <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full ${expiryDays <= 2
-                      ? "bg-red-50 text-red-600"
-                      : "bg-amber-50 text-amber-600"
+                    ? "bg-red-50 text-red-600"
+                    : "bg-amber-50 text-amber-600"
                     }`}>
                     <AlertCircle className="h-3 w-3" />
                     <span>Expires in {expiryDays} {expiryDays === 1 ? "day" : "days"}</span>
@@ -1607,8 +1610,8 @@ function InvitationPreviewModal({
                           className="h-full bg-gradient-to-r from-teal-400 to-teal-500 rounded-full transition-all"
                           style={{
                             width: `${preview.agreement.total_sections > 0
-                                ? (preview.agreement.completed_sections / preview.agreement.total_sections) * 100
-                                : 0
+                              ? (preview.agreement.completed_sections / preview.agreement.total_sections) * 100
+                              : 0
                               }%`,
                           }}
                         />
@@ -1617,19 +1620,31 @@ function InvitationPreviewModal({
                         {preview.agreement.completed_sections}/{preview.agreement.total_sections} sections
                       </span>
                     </div>
-                    {preview.agreement.key_sections.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {preview.agreement.key_sections.slice(0, 5).map((section) => (
-                          <Badge key={section} variant="outline" className="text-xs bg-white">
-                            {section}
-                          </Badge>
+                    {preview.agreement.quick_facts && preview.agreement.quick_facts.length > 0 ? (
+                      <div className="mt-4 space-y-2">
+                        {preview.agreement.quick_facts.map((fact, i) => (
+                          <div key={i} className="text-sm text-slate-700 bg-slate-50 p-2 rounded-md border border-slate-100">
+                            <ReactMarkdown className="prose prose-sm max-w-none prose-p:my-0 prose-strong:text-slate-900">
+                              {fact}
+                            </ReactMarkdown>
+                          </div>
                         ))}
-                        {preview.agreement.key_sections.length > 5 && (
-                          <Badge variant="outline" className="text-xs bg-white text-slate-500">
-                            +{preview.agreement.key_sections.length - 5} more
-                          </Badge>
-                        )}
                       </div>
+                    ) : (
+                      preview.agreement.key_sections.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {preview.agreement.key_sections.slice(0, 5).map((section) => (
+                            <Badge key={section} variant="outline" className="text-xs bg-white">
+                              {section}
+                            </Badge>
+                          ))}
+                          {preview.agreement.key_sections.length > 5 && (
+                            <Badge variant="outline" className="text-xs bg-white text-slate-500">
+                              +{preview.agreement.key_sections.length - 5} more
+                            </Badge>
+                          )}
+                        </div>
+                      )
                     )}
                   </div>
                 ) : (
@@ -1685,19 +1700,17 @@ function InvitationPreviewModal({
                   </div>
                   <div>
                     <p className={`text-xl font-bold ${preview.messages.flag_rate > 0.3 ? "text-red-600" :
-                        preview.messages.flag_rate > 0.15 ? "text-amber-600" : "text-teal-600"
+                      preview.messages.flag_rate > 0.15 ? "text-amber-600" : "text-teal-600"
                       }`}>
                       {preview.messages.flagged_messages_30d}
                     </p>
                     <p className="text-xs text-slate-500">Flagged</p>
                   </div>
                   <div>
-                    <p className={`text-xl font-bold ${preview.messages.flag_rate > 0.3 ? "text-red-600" :
-                        preview.messages.flag_rate > 0.15 ? "text-amber-600" : "text-teal-600"
-                      }`}>
-                      {Math.round(preview.messages.flag_rate * 100)}%
+                    <p className="text-xl font-bold text-slate-900 capitalize">
+                      {preview.messages.top_flagged_category || "N/A"}
                     </p>
-                    <p className="text-xs text-slate-500">Flag Rate</p>
+                    <p className="text-xs text-slate-500">Top Toxic Category</p>
                   </div>
                 </div>
                 {preview.messages.total_messages_30d > 0 && (
@@ -1711,8 +1724,8 @@ function InvitationPreviewModal({
                         className="bg-blue-400"
                         style={{
                           width: `${preview.messages.total_messages_30d > 0
-                              ? (preview.messages.parent_a_messages / preview.messages.total_messages_30d) * 100
-                              : 50
+                            ? (preview.messages.parent_a_messages / preview.messages.total_messages_30d) * 100
+                            : 50
                             }%`,
                         }}
                       />
@@ -1720,8 +1733,8 @@ function InvitationPreviewModal({
                         className="bg-purple-400"
                         style={{
                           width: `${preview.messages.total_messages_30d > 0
-                              ? (preview.messages.parent_b_messages / preview.messages.total_messages_30d) * 100
-                              : 50
+                            ? (preview.messages.parent_b_messages / preview.messages.total_messages_30d) * 100
+                            : 50
                             }%`,
                         }}
                       />
