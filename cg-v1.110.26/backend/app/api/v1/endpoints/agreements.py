@@ -2,7 +2,7 @@
 Agreement endpoints for custody agreement management.
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, Body, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
