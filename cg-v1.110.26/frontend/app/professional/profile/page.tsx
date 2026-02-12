@@ -295,6 +295,74 @@ function SocialLinksEditor({
   );
 }
 
+// New Directory Preview Components
+function MobileDirectoryCard({ profile, formData }: { profile: any; formData: ProfileFormData }) {
+  const displayName = `${profile.user_first_name || ""} ${profile.user_last_name || ""}`.trim();
+  const initials = displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
+
+  return (
+    <Card className="overflow-hidden shadow-xl border-slate-200 w-full max-w-[320px] mx-auto">
+      <div className="flex flex-col">
+        <div className="bg-slate-50 dark:bg-slate-800 flex flex-col items-center justify-center p-6 border-b border-slate-100">
+          <Avatar className="w-20 h-20 mb-3 border-2 border-white shadow-sm ring-4 ring-emerald-500/10">
+            <AvatarFallback className="bg-emerald-50 text-emerald-600 text-xl font-bold">
+              {initials || "?"}
+            </AvatarFallback>
+          </Avatar>
+          {profile.license_verified && (
+            <Badge variant="outline" className="bg-white text-emerald-600 border-emerald-200 text-[10px] gap-1 px-2">
+              <CheckCircle2 className="w-3 h-3" /> Licensed
+            </Badge>
+          )}
+        </div>
+        <div className="p-5 space-y-3">
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="font-bold text-base text-slate-900 leading-tight">
+                {displayName}
+              </h3>
+              <p className="text-xs text-emerald-600 font-semibold uppercase tracking-wider mt-1">
+                {formData.headline || profile.professional_type.replace('_', ' ')}
+              </p>
+            </div>
+            {formData.hourly_rate && (
+              <div className="text-right">
+                <div className="text-xs font-bold text-slate-900">{formData.hourly_rate}</div>
+                <div className="text-[10px] text-slate-500">per hour</div>
+              </div>
+            )}
+          </div>
+
+          <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+            {formData.bio || "No biography available."}
+          </p>
+
+          <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
+            {formData.years_experience && (
+              <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                {formData.years_experience} Years Exp.
+              </div>
+            )}
+            {formData.languages.length > 0 && (
+              <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                <Globe className="w-3.5 h-3.5 text-slate-400" />
+                {formData.languages.join(", ")}
+              </div>
+            )}
+            {formData.awards.length > 0 && (
+              <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                <Award className="w-3.5 h-3.5 text-amber-500" />
+                {formData.awards.length} Awards
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 export default function ProfilePage() {
   const { profile, firms, token, refreshProfile } = useProfessionalAuth();
   const [isEditing, setIsEditing] = useState(false);
@@ -468,681 +536,413 @@ export default function ProfilePage() {
 
   const typeInfo = PROFESSIONAL_TYPES[profile.professional_type];
   const displayName = `${profile.user_first_name || ""} ${profile.user_last_name || ""}`.trim();
-  const initials = displayName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Professional Profile</h1>
-        {!isEditing ? (
-          <Button onClick={() => setIsEditing(true)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit Profile
-          </Button>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => setIsEditing(false)}>
-              <X className="h-4 w-4 mr-2" />
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {isSaving ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Profile Header Card */}
-      <Card>
-        <CardContent className="pt-6 space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center gap-6">
-            <Avatar className="h-24 w-24">
-              <AvatarFallback className="bg-emerald-100 text-emerald-600 text-2xl">
-                {initials || "?"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-foreground">{displayName || "Professional"}</h2>
-              <div className="flex flex-wrap items-center gap-2 mt-2">
-                {typeInfo && (
-                  <Badge className={typeInfo.color}>{typeInfo.label}</Badge>
-                )}
-                {profile.license_verified ? (
-                  <Badge className="bg-emerald-100 text-emerald-800">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Verified
-                  </Badge>
-                ) : profile.license_number ? (
-                  <Badge variant="secondary">
-                    <Clock className="h-3 w-3 mr-1" />
-                    Pending Verification
-                  </Badge>
-                ) : null}
-              </div>
-              <p className="text-muted-foreground mt-2">{profile.user_email}</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2">
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* LEFT COLUMN: EDITOR */}
+        <div className="flex-1 space-y-8 min-w-0 pb-20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-0 bg-slate-50/95 backdrop-blur-sm z-30 py-4 border-b">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Directory Presence Manager</h1>
+              <p className="text-sm text-slate-500 mt-1 italic font-medium">Control how parents see you in the firm directory</p>
             </div>
-          </div>
-
-          <div className="border-t pt-6 space-y-4">
-            {isEditing ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="headline">Professional Headline</Label>
-                  <Input
-                    id="headline"
-                    value={formData.headline}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, headline: e.target.value }))
-                    }
-                    placeholder="e.g. Board Certified Family Law Specialist"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    A brief, impactful summary of your role or expertise (max 150 chars).
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Professional Bio</Label>
-                  <Textarea
-                    id="bio"
-                    value={formData.bio}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, bio: e.target.value }))
-                    }
-                    placeholder="Tell parents about your experience, approach, and why they should work with you..."
-                    className="min-h-[150px]"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                {profile.headline ? (
-                  <p className="text-lg font-medium text-foreground">{profile.headline}</p>
-                ) : (
-                  <p className="text-muted-foreground italic">No headline provided</p>
-                )}
-                {profile.bio ? (
-                  <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                    {profile.bio}
-                  </p>
-                ) : (
-                  <p className="text-muted-foreground italic">No bio provided</p>
-                )}
-              </>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* License Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Award className="h-5 w-5" />
-            License Information
-          </CardTitle>
-          <CardDescription>Your professional credentials</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isEditing ? (
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="license_number">License Number</Label>
-                <Input
-                  id="license_number"
-                  value={formData.license_number}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, license_number: e.target.value }))
-                  }
-                  placeholder="Enter license number"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="license_state">License State</Label>
-                <Select
-                  value={formData.license_state}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, license_state: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select state" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {US_STATES.map((state) => (
-                      <SelectItem key={state} value={state}>
-                        {state}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">License Number</p>
-                <p className="font-medium">{profile.license_number || "Not provided"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">License State</p>
-                <p className="font-medium">{profile.license_state || "Not provided"}</p>
-              </div>
-            </div>
-          )}
-
-          {!profile.license_verified && profile.license_number && (
-            <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-amber-800">Verification Pending</p>
-                <p className="text-sm text-amber-700 mt-0.5">
-                  Your license is being verified. This typically takes 1-2 business days.
-                </p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Expertise & Experience */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Briefcase className="h-5 w-5" />
-            Expertise & Experience
-          </CardTitle>
-          <CardDescription>How you present yourself to potential clients</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Practice Areas</Label>
-                {isEditing ? (
-                  <div className="flex flex-wrap gap-2">
-                    {PRACTICE_AREAS.map((area) => (
-                      <Button
-                        key={area}
-                        variant={formData.practice_areas.includes(area) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => togglePracticeArea(area)}
-                        className={
-                          formData.practice_areas.includes(area)
-                            ? "bg-emerald-600 hover:bg-emerald-700"
-                            : ""
-                        }
-                      >
-                        {area.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-                      </Button>
-                    ))}
-                  </div>
-                ) : formData.practice_areas.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {formData.practice_areas.map((area) => (
-                      <Badge key={area} variant="secondary" className="capitalize">
-                        {area.replace(/_/g, " ")}
-                      </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">No practice areas specified</p>
-                )}
-              </div>
-
-              {isEditing ? (
-                <ListEditor
-                  label="Languages Spoken"
-                  items={formData.languages}
-                  onAdd={(lang) =>
-                    setFormData((prev) => ({ ...prev, languages: [...prev.languages, lang] }))
-                  }
-                  onRemove={(idx) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      languages: prev.languages.filter((_, i) => i !== idx),
-                    }))
-                  }
-                  placeholder="e.g. Spanish, Mandarin..."
-                />
-              ) : (
-                <div className="space-y-2">
-                  <Label>Languages</Label>
-                  <p className="text-sm">
-                    {formData.languages.length > 0
-                      ? formData.languages.join(", ")
-                      : "English (Default)"}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              {isEditing ? (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="years_experience">Years of Experience</Label>
-                    <Input
-                      id="years_experience"
-                      type="number"
-                      value={formData.years_experience}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, years_experience: e.target.value }))
-                      }
-                      placeholder="e.g. 10"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="hourly_rate">Hourly Rate</Label>
-                    <Input
-                      id="hourly_rate"
-                      value={formData.hourly_rate}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, hourly_rate: e.target.value }))
-                      }
-                      placeholder="e.g. $350"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="consultation_fee">Consultation Fee</Label>
-                    <Input
-                      id="consultation_fee"
-                      value={formData.consultation_fee}
-                      onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, consultation_fee: e.target.value }))
-                      }
-                      placeholder="e.g. $150 (or Free)"
-                    />
-                  </div>
-                </>
-              ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                      Experience
-                    </p>
-                    <p className="text-sm font-medium">
-                      {formData.years_experience || "0"} Years
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                      Hourly Rate
-                    </p>
-                    <p className="text-sm font-medium">{formData.hourly_rate || "N/A"}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                      Consultation
-                    </p>
-                    <p className="text-sm font-medium">{formData.consultation_fee || "N/A"}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Education & Awards */}
-          <div className="grid md:grid-cols-2 gap-8 pt-6 border-t">
-            <ComplexListEditor
-              label="Education History"
-              items={formData.education}
-              isEditing={isEditing}
-              onAdd={(item) =>
-                setFormData((prev) => ({ ...prev, education: [...prev.education, item] }))
-              }
-              onRemove={(idx) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  education: prev.education.filter((_, i) => i !== idx),
-                }))
-              }
-              fields={[
-                { key: "institution", label: "Institution", placeholder: "e.g. Stanford Law" },
-                { key: "degree", label: "Degree", placeholder: "e.g. J.D." },
-                { key: "year", label: "Year", placeholder: "e.g. 2012" },
-              ]}
-            />
-            <ComplexListEditor
-              label="Awards & Recognition"
-              items={formData.awards}
-              isEditing={isEditing}
-              onAdd={(item) => setFormData((prev) => ({ ...prev, awards: [...prev.awards, item] }))}
-              onRemove={(idx) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  awards: prev.awards.filter((_, i) => i !== idx),
-                }))
-              }
-              fields={[
-                { key: "title", label: "Award Title", placeholder: "e.g. Super Lawyer" },
-                { key: "organization", label: "Organization", placeholder: "e.g. Bar Assoc." },
-                { key: "year", label: "Year", placeholder: "e.g. 2023" },
-              ]}
-            />
-          </div>
-
-          {/* Payment Methods */}
-          <div className="pt-6 border-t">
-            {isEditing ? (
-              <ListEditor
-                label="Accepted Payment Methods"
-                items={formData.accepted_payment_methods}
-                onAdd={(item) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    accepted_payment_methods: [...prev.accepted_payment_methods, item],
-                  }))
-                }
-                onRemove={(idx) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    accepted_payment_methods: prev.accepted_payment_methods.filter((_, i) => i !== idx),
-                  }))
-                }
-                placeholder="e.g. Credit Card, Wire, Zelle..."
-              />
-            ) : (
-              <div className="space-y-2">
-                <Label>Payment Methods</Label>
-                <p className="text-sm">
-                  {formData.accepted_payment_methods.length > 0
-                    ? formData.accepted_payment_methods.join(", ")
-                    : "Not specified"}
-                </p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Firm Memberships */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Building2 className="h-5 w-5" />
-            Firm Memberships
-          </CardTitle>
-          <CardDescription>Organizations you belong to</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {firms.length > 0 ? (
-            <div className="space-y-3">
-              {firms.map((firm) => (
-                <div
-                  key={firm.id}
-                  className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
-                      <Building2 className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{firm.name}</p>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {firm.firm_type.replace(/_/g, " ")}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="capitalize">
-                    {firm.role}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-6">
-              <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">No firm memberships</p>
-              <Button variant="outline" size="sm" className="mt-3">
-                Create or Join a Firm
+            {!isEditing ? (
+              <Button onClick={() => setIsEditing(true)} className="bg-emerald-600 hover:bg-emerald-700 shadow-md transition-all">
+                <Edit className="h-4 w-4 mr-2" />
+                Edit My Bio & Expertise
               </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={() => setIsEditing(false)} className="shadow-sm">
+                  <X className="h-4 w-4 mr-2" />
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="bg-emerald-600 hover:bg-emerald-700 shadow-md"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSaving ? "Saving..." : "Save My Profile"}
+                </Button>
+              </div>
+            )}
+          </div>
 
-      {/* Firm Profile - Directory Listing */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Firm Profile
-          </CardTitle>
-          <CardDescription>
-            This information appears in the directory and is visible to parents searching for professionals
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {firms.length === 0 ? (
-            <div className="text-center py-6">
-              <Building2 className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">Join a firm to edit its profile</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Create or join a firm in the Firm Memberships section above to edit firm details.
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* Firm selector if multiple firms */}
-              {firms.length > 1 && (
-                <div className="space-y-2">
-                  <Label>Select Firm to Edit</Label>
-                  <Select
-                    value={selectedFirmId || ""}
-                    onValueChange={setSelectedFirmId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a firm" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {firms.map((firm) => (
-                        <SelectItem key={firm.id} value={firm.id}>
-                          {firm.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            {/* Identity & Headline Section */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-2 font-semibold text-slate-800">
+                  <User className="h-5 w-5 text-emerald-600" />
+                  My Public Identity
                 </div>
-              )}
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-4">
+                <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-200">
+                  Visible to Public
+                </Badge>
+              </div>
+              <div className="p-6 space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="firm_headline">Firm Headline</Label>
-                    <Input
-                      id="firm_headline"
-                      value={firmFormData.headline}
-                      onChange={(e) =>
-                        setFirmFormData((prev) => ({ ...prev, headline: e.target.value }))
-                      }
-                      placeholder="e.g. Leading Family Law Firm in Southern California"
-                    />
+                    <Label htmlFor="headline" className="text-slate-700 font-semibold">Professional Headline</Label>
+                    {isEditing ? (
+                      <Input
+                        id="headline"
+                        value={formData.headline}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, headline: e.target.value }))}
+                        placeholder="e.g. Board Certified Family Law Specialist"
+                        className="border-slate-300 focus:ring-emerald-500"
+                        maxLength={150}
+                      />
+                    ) : (
+                      <p className="text-slate-900 font-medium p-2 bg-slate-50 rounded-lg min-h-[40px] border border-slate-100 italic">
+                        {formData.headline || "Not set - parents will see your professional type"}
+                      </p>
+                    )}
+                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Showcases your primary value proposition</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="firm_description">Firm Description</Label>
-                    <Textarea
-                      id="firm_description"
-                      value={firmFormData.description}
-                      onChange={(e) =>
-                        setFirmFormData((prev) => ({ ...prev, description: e.target.value }))
-                      }
-                      placeholder="Describe your firm's services, specialties, and what sets you apart..."
-                      className="min-h-[160px]"
-                    />
+                    <Label htmlFor="bio" className="text-slate-700 font-semibold">Short Biography</Label>
+                    {isEditing ? (
+                      <Textarea
+                        id="bio"
+                        value={formData.bio}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, bio: e.target.value }))}
+                        placeholder="Tell parents about your approach to high-conflict cases..."
+                        className="min-h-[120px] border-slate-300 focus:ring-emerald-500"
+                      />
+                    ) : (
+                      <p className="text-slate-600 text-sm p-3 bg-slate-50 rounded-lg border border-slate-100 line-clamp-4 leading-relaxed">
+                        {formData.bio || "No biography provided yet."}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="grid md:grid-cols-3 gap-6 pt-4 border-t border-slate-50">
                   <div className="space-y-2">
-                    <Label>Firm Practice Areas</Label>
-                    <div className="flex flex-wrap gap-2 max-h-[150px] overflow-y-auto p-2 border rounded-md">
-                      {FIRM_PRACTICE_AREAS.map((area) => (
+                    <Label htmlFor="hourly_rate" className="text-slate-700 font-semibold">Hourly Rate (Display)</Label>
+                    {isEditing ? (
+                      <Input
+                        id="hourly_rate"
+                        value={formData.hourly_rate}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, hourly_rate: e.target.value }))}
+                        placeholder="e.g. $350"
+                        className="border-slate-300 focus:ring-emerald-500"
+                      />
+                    ) : (
+                      <div className="p-2 bg-slate-50 rounded-lg border border-slate-100 text-slate-900 font-bold">
+                        {formData.hourly_rate || "N/A"} <span className="text-[10px] text-slate-400 font-normal">/ hour</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="years_experience" className="text-slate-700 font-semibold">Years of Experience</Label>
+                    {isEditing ? (
+                      <Input
+                        id="years_experience"
+                        type="number"
+                        value={formData.years_experience}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, years_experience: e.target.value }))}
+                        placeholder="e.g. 15"
+                        className="border-slate-300 focus:ring-emerald-500"
+                      />
+                    ) : (
+                      <div className="p-2 bg-slate-50 rounded-lg border border-slate-100 text-slate-900 font-bold">
+                        {formData.years_experience || "0"} <span className="text-[10px] text-slate-400 font-normal">Years</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-slate-700 font-semibold">Languages</Label>
+                    {isEditing ? (
+                      <ListEditor
+                        label=""
+                        items={formData.languages}
+                        onAdd={(l) => setFormData(p => ({ ...p, languages: [...p.languages, l] }))}
+                        onRemove={(i) => setFormData(p => ({ ...p, languages: p.languages.filter((_, idx) => idx !== i) }))}
+                        placeholder="Add language..."
+                      />
+                    ) : (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {formData.languages.length > 0 ? formData.languages.map(l => (
+                          <Badge key={l} variant="secondary" className="bg-slate-100 text-slate-600 text-[10px] uppercase">{l}</Badge>
+                        )) : <p className="text-slate-400 text-xs italic">English only</p>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Expertise Section */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="border-b border-slate-100 bg-slate-50/50 px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-2 font-semibold text-slate-800">
+                  <Briefcase className="h-5 w-5 text-emerald-600" />
+                  Expertise & Education
+                </div>
+                <Badge variant="outline" className="text-slate-500">Public Directory</Badge>
+              </div>
+              <div className="p-6 space-y-8">
+                <div className="space-y-3">
+                  <Label className="text-slate-700 font-semibold">Primary Practice Areas</Label>
+                  {isEditing ? (
+                    <div className="flex flex-wrap gap-2">
+                      {PRACTICE_AREAS.map((area) => (
                         <Button
                           key={area}
-                          variant={firmFormData.practice_areas.includes(area) ? "default" : "outline"}
+                          variant={formData.practice_areas.includes(area) ? "default" : "outline"}
                           size="sm"
-                          onClick={() => toggleFirmPracticeArea(area)}
-                          className={
-                            firmFormData.practice_areas.includes(area)
-                              ? "bg-emerald-600 hover:bg-emerald-700"
-                              : ""
-                          }
+                          onClick={() => togglePracticeArea(area)}
+                          className={formData.practice_areas.includes(area) ? "bg-emerald-600 hover:bg-emerald-700 ring-offset-2" : "text-slate-600 hover:bg-slate-50"}
                         >
-                          {area}
+                          {area.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                         </Button>
                       ))}
                     </div>
-                  </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.practice_areas.map((area) => (
+                        <Badge key={area} variant="secondary" className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors uppercase text-[10px] tracking-widest py-1 border-0">
+                          {area.replace(/_/g, " ")}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="firm_video">Video Introduction (URL)</Label>
-                    <Input
-                      id="firm_video"
-                      value={firmFormData.video_url}
-                      onChange={(e) =>
-                        setFirmFormData((prev) => ({ ...prev, video_url: e.target.value }))
-                      }
-                      placeholder="e.g. YouTube or Vimeo link"
-                    />
-                  </div>
-                  <SocialLinksEditor
-                    links={firmFormData.social_links}
-                    onChange={(social_links) =>
-                      setFirmFormData((prev) => ({ ...prev, social_links }))
-                    }
+                <div className="grid md:grid-cols-2 gap-8 pt-6 border-t border-slate-50">
+                  <ComplexListEditor
+                    label="Education History"
+                    items={formData.education}
+                    isEditing={isEditing}
+                    onAdd={(item) => setFormData(p => ({ ...p, education: [...p.education, item] }))}
+                    onRemove={(i) => setFormData(p => ({ ...p, education: p.education.filter((_, idx) => idx !== i) }))}
+                    fields={[
+                      { key: "institution", label: "Institution", placeholder: "Stanford Law" },
+                      { key: "degree", label: "Degree", placeholder: "J.D." },
+                      { key: "year", label: "Year", placeholder: "2012" },
+                    ]}
+                  />
+                  <ComplexListEditor
+                    label="Awards & Recognition"
+                    items={formData.awards}
+                    isEditing={isEditing}
+                    onAdd={(item) => setFormData(p => ({ ...p, awards: [...p.awards, item] }))}
+                    onRemove={(i) => setFormData(p => ({ ...p, awards: p.awards.filter((_, idx) => idx !== i) }))}
+                    fields={[
+                      { key: "title", label: "Title", placeholder: "Super Lawyer" },
+                      { key: "organization", label: "Org", placeholder: "Bar Assoc." },
+                      { key: "year", label: "Year", placeholder: "2023" },
+                    ]}
                   />
                 </div>
               </div>
+            </div>
 
-              {/* Pricing & Transparency */}
-              <div className="pt-4 border-t">
-                <Label className="text-base font-medium">Pricing & Transparency</Label>
-                <div className="grid md:grid-cols-3 gap-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firm_rate_range">Hourly Rate Range</Label>
-                    <Input
-                      id="firm_rate_range"
-                      value={firmFormData.pricing_structure?.rate_range || ""}
-                      onChange={(e) =>
-                        setFirmFormData((prev) => ({
-                          ...prev,
-                          pricing_structure: { ...prev.pricing_structure, rate_range: e.target.value },
-                        }))
-                      }
-                      placeholder="e.g. $250 - $500"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="firm_retainer">Typical Retainer</Label>
-                    <Input
-                      id="firm_retainer"
-                      value={firmFormData.pricing_structure?.typical_retainer || ""}
-                      onChange={(e) =>
-                        setFirmFormData((prev) => ({
-                          ...prev,
-                          pricing_structure: { ...prev.pricing_structure, typical_retainer: e.target.value },
-                        }))
-                      }
-                      placeholder="e.g. $3,500"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-end">
-                    <label className="flex items-center gap-2 text-sm cursor-pointer p-2 hover:bg-muted/50 rounded-md">
-                      <input
-                        type="checkbox"
-                        checked={firmFormData.safety_vetted}
-                        onChange={(e) =>
-                          setFirmFormData((prev) => ({ ...prev, safety_vetted: e.target.checked }))
-                        }
-                        className="rounded border-gray-300 text-emerald-600 focus:ring-emerald-600 h-4 w-4"
-                      />
-                      <span>Safety Vetted Personnel</span>
-                    </label>
-                  </div>
+            {/* Firm Presence Section */}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="border-b border-slate-100 bg-slate-900 px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-2 font-semibold text-white">
+                  <Building2 className="h-5 w-5 text-emerald-400" />
+                  Firm Directory Page
                 </div>
+                <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
+                  Visible to Public
+                </Badge>
               </div>
+              <div className="p-6 space-y-8 bg-gradient-to-br from-white to-slate-50/30">
+                {firms.length === 0 ? (
+                  <div className="text-center py-10">
+                    <Building2 className="h-12 w-12 mx-auto text-slate-300 mb-3" />
+                    <p className="text-slate-500 font-medium">Join a firm to manage your organization's directory presence</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex flex-col sm:flex-row gap-6 items-start">
+                      <div className="flex-1 space-y-6 w-full">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <Label className="text-slate-700 font-bold text-lg">Firm Details</Label>
+                            {firms.length > 1 && (
+                              <Select value={selectedFirmId || ""} onValueChange={setSelectedFirmId}>
+                                <SelectTrigger className="w-[180px] h-8 bg-white shadow-sm ring-1 ring-slate-200 border-0">
+                                  <SelectValue placeholder="Select Firm" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {firms.map(f => (
+                                    <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
+                          <div className="space-y-3">
+                            <Label htmlFor="firm_headline" className="text-slate-600 text-xs font-semibold uppercase tracking-wider">Firm Headline / Tagline</Label>
+                            <Input
+                              id="firm_headline"
+                              value={firmFormData.headline}
+                              onChange={e => setFirmFormData(p => ({ ...p, headline: e.target.value }))}
+                              placeholder="e.g. Versatile Family Law Team Serving San Bernardino..."
+                              className="border-slate-300"
+                            />
+                          </div>
+                          <div className="space-y-3">
+                            <Label htmlFor="firm_description" className="text-slate-600 text-xs font-semibold uppercase tracking-wider">Firm About Us</Label>
+                            <Textarea
+                              id="firm_description"
+                              value={firmFormData.description}
+                              onChange={e => setFirmFormData(p => ({ ...p, description: e.target.value }))}
+                              placeholder="Detailed description for the firm's landing page..."
+                              className="min-h-[160px] border-slate-300"
+                            />
+                          </div>
+                        </div>
+                      </div>
 
-              {/* Save Button */}
-              <div className="flex items-center gap-3 pt-2">
-                <Button
-                  onClick={handleSaveFirm}
-                  disabled={isSavingFirm}
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  {isSavingFirm ? "Saving..." : "Save Firm Profile"}
-                </Button>
-                {firmSaveSuccess && (
-                  <span className="text-sm text-emerald-600 flex items-center gap-1">
-                    <CheckCircle2 className="h-4 w-4" />
-                    Saved successfully!
-                  </span>
+                      <div className="w-full sm:w-80 space-y-6">
+                        <SocialLinksEditor
+                          links={firmFormData.social_links}
+                          onChange={links => setFirmFormData(p => ({ ...p, social_links: links }))}
+                        />
+                        <div className="space-y-3">
+                          <Label className="text-slate-600 text-xs font-semibold uppercase tracking-wider">Video Introduction</Label>
+                          <div className="relative group">
+                            <Input
+                              value={firmFormData.video_url}
+                              onChange={e => setFirmFormData(p => ({ ...p, video_url: e.target.value }))}
+                              placeholder="YouTube/Vimeo Link"
+                              className="pl-9 border-slate-300"
+                            />
+                            <Video className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-8 border-t border-slate-200">
+                      <div className="flex items-center gap-2 mb-6">
+                        <DollarSign className="h-5 w-5 text-slate-800" />
+                        <Label className="text-slate-800 font-bold text-lg">Services & Transparent Pricing</Label>
+                      </div>
+                      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[
+                          { id: 'consultation', label: 'Consultation', placeholder: 'e.g. $150 or Free' },
+                          { id: 'hourly', label: 'Hourly Rate', placeholder: 'e.g. $300-$500' },
+                          { id: 'retainer', label: 'Typical Retainer', placeholder: 'e.g. $3,500' },
+                          { id: 'mediation', label: 'Mediation (Flat)', placeholder: 'e.g. $1,500' },
+                        ].map(field => (
+                          <div key={field.id} className="space-y-2">
+                            <Label className="text-slate-600 text-[10px] font-bold uppercase tracking-widest">{field.label}</Label>
+                            <Input
+                              value={(firmFormData.pricing_structure as any)[field.id] || ""}
+                              onChange={e => setFirmFormData(p => ({
+                                ...p,
+                                pricing_structure: { ...p.pricing_structure, [field.id]: e.target.value }
+                              }))}
+                              placeholder={field.placeholder}
+                              className="bg-white border-slate-200 shadow-sm"
+                            />
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-8 flex items-center justify-between p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                        <div className="flex items-center gap-4">
+                          <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                            <ShieldCheck className="h-6 w-6 text-emerald-600" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-slate-900">Safety Vetted Personnel</p>
+                            <p className="text-xs text-slate-500">Highlight that your staff has undergone standard safety vetting</p>
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={firmFormData.safety_vetted}
+                          onChange={e => setFirmFormData(p => ({ ...p, safety_vetted: e.target.checked }))}
+                          className="h-6 w-6 rounded-lg border-slate-300 text-emerald-600 focus:ring-emerald-500 transition-all cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 pt-6">
+                      <Button
+                        onClick={handleSaveFirm}
+                        disabled={isSavingFirm}
+                        className="bg-slate-900 hover:bg-slate-800 text-white min-w-[200px] shadow-lg shadow-slate-200"
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        {isSavingFirm ? "Deploying Updates..." : "Sync Firm Profile"}
+                      </Button>
+                      {firmSaveSuccess && (
+                        <span className="text-sm font-semibold text-emerald-600 animate-in fade-in slide-in-from-left-2 flex items-center gap-1.5">
+                          <CheckCircle2 className="h-4 w-4" /> Published to Directory
+                        </span>
+                      )}
+                    </div>
+                  </>
                 )}
               </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Security */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Security & Privacy
-          </CardTitle>
-          <CardDescription>Account security settings</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
-                <Shield className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-medium">Two-Factor Authentication</p>
-                <p className="text-sm text-muted-foreground">
-                  Add an extra layer of security
-                </p>
-              </div>
             </div>
-            <Badge variant="outline">Enabled</Badge>
           </div>
+        </div>
 
-          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                <Clock className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="font-medium">Session Timeout</p>
-                <p className="text-sm text-muted-foreground">
-                  Auto-logout after inactivity
-                </p>
-              </div>
+        {/* RIGHT COLUMN: PREVIEW (STICKY) */}
+        <div className="hidden lg:block w-[360px] flex-shrink-0">
+          <div className="sticky top-8 space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-slate-900">Live Directory Preview</h3>
+              <Badge className="bg-emerald-50 text-emerald-600 border-0 uppercase text-[9px] tracking-widest font-bold">Real-time</Badge>
             </div>
-            <span className="text-sm text-muted-foreground">30 minutes</span>
-          </div>
 
-          <div className="pt-2">
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-              All actions are logged for compliance and audit purposes
-            </p>
+            <div className="space-y-8 bg-slate-100/50 p-6 rounded-3xl border border-dashed border-slate-300">
+              <div className="space-y-2">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Mobile Search Result Card</p>
+                <MobileDirectoryCard profile={profile} formData={formData} />
+              </div>
+
+              <div className="space-y-4 pt-4 border-t border-slate-200">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center">Firm Page Overview</p>
+                <Card className="p-4 shadow-sm border-slate-200 overflow-hidden relative">
+                  <div className="h-2 bg-emerald-600 absolute top-0 left-0 right-0" />
+                  <h4 className="font-bold text-sm text-slate-900 group">
+                    {firms.find(f => f.id === selectedFirmId)?.name || "Your Firm"}
+                    <Globe className="h-3 w-3 inline ml-2 text-slate-300" />
+                  </h4>
+                  <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-1 italic">{firmFormData.headline || "Headline placeholder..."}</p>
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {firmFormData.practice_areas.slice(0, 3).map(a => (
+                      <div key={a} className="text-[9px] px-1.5 py-0.5 bg-slate-50 border border-slate-100 rounded text-slate-500">{a}</div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+
+              <Card className="bg-blue-600 p-4 border-0 shadow-xl shadow-blue-200">
+                <div className="flex items-center gap-3 text-white">
+                  <div className="p-2 bg-blue-500 rounded-lg">
+                    <ShieldCheck className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold leading-tight">CommonGround Verified Profile</p>
+                    <p className="text-[10px] opacity-80 mt-1 uppercase tracking-wider font-semibold">Security Level: High</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 flex gap-3">
+              <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+              <p className="text-[11px] text-amber-800 leading-relaxed font-medium">
+                The information provided above will be indexed by search engines and visible to all CommonGround users. Review your bio and headline for clarity.
+              </p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }
