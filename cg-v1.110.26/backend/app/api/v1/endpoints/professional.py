@@ -137,6 +137,19 @@ def _profile_to_response(
         practice_areas=profile.practice_areas,
         professional_email=profile.professional_email,
         professional_phone=profile.professional_phone,
+        
+        # Directory fields
+        headline=profile.headline,
+        bio=profile.bio,
+        video_url=profile.video_url,
+        languages=profile.languages or [],
+        hourly_rate=profile.hourly_rate,
+        years_experience=profile.years_experience,
+        education=profile.education or [],
+        awards=profile.awards or [],
+        consultation_fee=profile.consultation_fee,
+        accepted_payment_methods=profile.accepted_payment_methods or [],
+
         default_intake_template=profile.default_intake_template,
         notification_preferences=profile.notification_preferences,
         is_active=profile.is_active,
@@ -179,6 +192,14 @@ def _firm_to_response(
         updated_at=firm.updated_at,
         description=firm.description,
         practice_areas=firm.practice_areas,
+        
+        # Directory fields
+        headline=firm.headline,
+        video_url=firm.video_url,
+        social_links=firm.social_links or {},
+        pricing_structure=firm.pricing_structure,
+        safety_vetted=firm.safety_vetted,
+
         member_count=member_count,
     )
 
