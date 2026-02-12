@@ -934,21 +934,30 @@ async def accept_firm_invitation(
     # Update invitation with assigned professional
     try:
         invitation.professional_id = assigned_professional_id
+        invitation.professional_accepted = True
+        invitation.professional_accepted_at = datetime.utcnow()
 
-            else:
-                # If it's a representation role (Attorney), we can finalize if the representing parent approved
-                # This supports unilateral representation assignment
-                req_parent_id = invitation.requested_by_user_id
-                if (invitation.representing == "parent_a" and invitation.parent_a_approved) or \
-                   (invitation.representing == "parent_b" and invitation.parent_b_approved) or \
-                   (invitation.requested_role in [AssignmentRole.LEAD_ATTORNEY.value, AssignmentRole.ASSOCIATE.value]):
-                    
-                    invitation.status = AccessRequestStatus.APPROVED.value
-                    invitation.approved_at = datetime.utcnow()
-                    
-                    # Create case assignment
-                    assignment = await access_service.create_assignment_from_request(invitation)
-                    invitation.case_assignment_id = str(assignment.id)
+        # If it's a representation role (Attorney), we can finalize if the representing parent approved
+        # This supports unilateral representation assignment
+        if (invitation.requested_role in [AssignmentRole.LEAD_ATTORNEY.value, AssignmentRole.ASSOCIATE.value]) or \
+           (invitation.representing in ["parent_a", "parent_b"] and \
+            ((invitation.representing == "parent_a" and invitation.parent_a_approved) or \
+             (invitation.representing == "parent_b" and invitation.parent_b_approved))):
+            
+            invitation.status = AccessRequestStatus.APPROVED.value
+            invitation.approved_at = datetime.utcnow()
+            
+            # Create case assignment
+            assignment = await access_service.create_assignment_from_request(invitation)
+            invitation.case_assignment_id = str(assignment.id)
+        else:
+            # For neutral roles, we still need both parents if professional-initiated
+            # or just wait for the other parent if it's dual-approval required
+            if invitation.parent_a_approved and invitation.parent_b_approved:
+                invitation.status = AccessRequestStatus.APPROVED.value
+                invitation.approved_at = datetime.utcnow()
+                assignment = await access_service.create_assignment_from_request(invitation)
+                invitation.case_assignment_id = str(assignment.id)
 
         await db.commit()
         await db.refresh(invitation)
