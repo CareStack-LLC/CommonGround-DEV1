@@ -131,40 +131,57 @@ class AuthService:
             HTTPException: If login fails
         """
         try:
+            print(f"Attempting login for email: {request.email}")
             # Authenticate with Supabase
-            auth_response = self.supabase.auth.sign_in_with_password({
-                "email": request.email,
-                "password": request.password,
-            })
+            try:
+                auth_response = self.supabase.auth.sign_in_with_password({
+                    "email": request.email,
+                    "password": request.password,
+                })
+                print("Supabase auth successful")
+            except Exception as supabase_error:
+                print(f"Supabase auth failed: {supabase_error}")
+                raise supabase_error
 
             if not auth_response.user:
+                print("No user in auth response")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid credentials"
                 )
 
             supabase_user = auth_response.user
+            print(f"Supabase user found: {supabase_user.id}")
 
             # First, try to get user by supabase_id
-            result = await self.db.execute(
-                select(User).where(User.supabase_id == supabase_user.id)
-            )
-            user = result.scalar_one_or_none()
+            try:
+                result = await self.db.execute(
+                    select(User).where(User.supabase_id == supabase_user.id)
+                )
+                user = result.scalar_one_or_none()
+                print(f"Local user by ID search result: {user}")
+            except Exception as db_error:
+                print(f"Database query by ID failed: {db_error}")
+                raise db_error
 
             # If not found by supabase_id, try by email
             if not user:
+                print("User not found by ID, trying email")
                 result = await self.db.execute(
                     select(User).where(User.email == supabase_user.email)
                 )
                 user = result.scalar_one_or_none()
+                print(f"Local user by email search result: {user}")
                 
                 # If found by email, sync the supabase_id
                 if user:
+                    print("Syncing supabase_id")
                     user.supabase_id = supabase_user.id
                     await self.db.commit()
                     await self.db.refresh(user)
 
             if not user:
+                print("User not found locally, auto-creating")
                 # Auto-create user if they exist in Supabase Auth but not locally
                 # This handles users created directly in Supabase or migrated databases
                 user_metadata = supabase_user.user_metadata or {}
@@ -199,8 +216,10 @@ class AuthService:
 
                 await self.db.commit()
                 await self.db.refresh(user)
+                print(f"User created: {user.id}")
 
             if not user.is_active:
+                print("User is inactive")
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="User account is inactive"
@@ -209,6 +228,7 @@ class AuthService:
             # Update last login timestamp
             user.last_login = datetime.utcnow()
             await self.db.commit()
+            print("Login flow completed successfully")
 
             # Create JWT tokens
             access_token = create_access_token(data={"sub": user.id})
@@ -219,6 +239,9 @@ class AuthService:
         except HTTPException:
             raise
         except Exception as e:
+            print(f"Login failed with exception: {str(e)}")
+            import traceback
+            traceback.print_exc()
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Login failed: {str(e)}"
