@@ -46,8 +46,15 @@ interface ProfessionalProfile {
   // Profile enhancements
   profile_photo_url?: string;
   bio?: string;
-  years_of_experience?: number;
+  headline?: string;
+  video_url?: string;
   languages?: string[];
+  hourly_rate?: string;
+  years_experience?: number;
+  education?: any[];
+  awards?: any[];
+  consultation_fee?: string;
+  accepted_payment_methods?: string[];
 }
 
 interface Firm {
@@ -496,11 +503,10 @@ function ProfessionalNavigation({
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  pathname.startsWith(item.href)
+                className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${pathname.startsWith(item.href)
                     ? "bg-[var(--portal-primary)]/5 text-[var(--portal-primary)] border border-[var(--portal-primary)]/20 shadow-sm"
                     : "text-slate-700 hover:bg-white hover:shadow-sm"
-                }`}
+                  }`}
               >
                 <span className="flex items-center gap-2.5">
                   {item.icon}
@@ -539,11 +545,10 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${
-        isActive
+      className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${isActive
           ? "border-[var(--portal-primary)] text-[var(--portal-primary)] bg-[var(--portal-primary)]/5"
           : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300"
-      }`}
+        }`}
     >
       {icon}
       {children}
