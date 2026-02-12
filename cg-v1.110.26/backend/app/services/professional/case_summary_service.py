@@ -145,6 +145,21 @@ class ProfessionalCaseSummaryService:
             extracted = agreement_service.extract_key_points_from_sections(section_dict, active_agreement)
             quick_facts = extracted.get("key_points", [])
 
+        # Get per-parent communication breakdown
+        comm_breakdown = await self.compliance_service._get_per_parent_communication(
+            family_file_id, start_date, end_date
+        )
+        
+        # Map breakdown to parents
+        parent_a_msgs = 0
+        parent_b_msgs = 0
+        
+        for item in comm_breakdown:
+            if item["user_id"] == family_file.parent_a_id:
+                parent_a_msgs = item["messages_sent"]
+            elif family_file.parent_b_id and item["user_id"] == family_file.parent_b_id:
+                parent_b_msgs = item["messages_sent"]
+
         return InvitationCasePreview(
             family_file_id=family_file.id,
             family_file_number=family_file.family_file_number,
@@ -169,7 +184,8 @@ class ProfessionalCaseSummaryService:
                 completed_sections=len(active_agreement.sections) if active_agreement and active_agreement.sections else 0,
                 last_updated=active_agreement.updated_at if active_agreement else None,
                 key_sections=[s.section_title for s in active_agreement.sections[:3]] if active_agreement and active_agreement.sections else [],
-                quick_facts=quick_facts
+                quick_facts=quick_facts,
+                activated_at=active_agreement.effective_date or active_agreement.updated_at if active_agreement else None
             ),
             compliance=InvitationCompliancePreview(
                 exchange_completion_rate=exchange_metrics.get("geofence_compliance_rate"),
@@ -185,8 +201,8 @@ class ProfessionalCaseSummaryService:
                 flagged_messages_30d=comm_metrics.get("flagged_messages", 0),
                 flag_rate=comm_metrics.get("flag_rate", 0.0),
                 top_flagged_category=comm_metrics.get("top_flagged_category"),
-                parent_a_messages=comm_metrics.get("parent_a_messages", 0), # This might need per-parent logic if comm_metrics supports it
-                parent_b_messages=comm_metrics.get("parent_b_messages", 0),
+                parent_a_messages=parent_a_msgs,
+                parent_b_messages=parent_b_msgs,
                 last_message_at=None
             ),
             clearfund=InvitationClearFundPreview(

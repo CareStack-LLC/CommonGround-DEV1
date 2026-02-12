@@ -1073,6 +1073,7 @@ class InvitationAgreementPreview(BaseModel):
     last_updated: Optional[datetime] = None
     key_sections: list[str] = []  # Names of filled sections
     quick_facts: list[str] = []   # Extracted key points
+    activated_at: Optional[datetime] = None  # Date agreement became active
 
 
 class InvitationCompliancePreview(BaseModel):

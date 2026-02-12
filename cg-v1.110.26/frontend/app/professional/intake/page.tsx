@@ -1008,6 +1008,7 @@ interface CasePreview {
     total_sections: number;
     completed_sections: number;
     last_updated: string | null;
+    activated_at: string | null;
     key_sections: string[];
     quick_facts: string[];
   };
@@ -1589,7 +1590,12 @@ function InvitationPreviewModal({
           <div className="space-y-3">
             <h4 className="font-semibold text-slate-900 flex items-center gap-2">
               <FileText className="h-4 w-4 text-blue-500" />
-              SharedCare Agreement
+              Agreement Keypoints
+              {preview.agreement.has_active_agreement && preview.agreement.activated_at && (
+                <span className="text-xs font-normal text-slate-500 ml-auto">
+                  Activated {new Date(preview.agreement.activated_at).toLocaleDateString()}
+                </span>
+              )}
             </h4>
             <Card className="border-slate-200">
               <CardContent className="p-4">
@@ -1716,8 +1722,8 @@ function InvitationPreviewModal({
                 {preview.messages.total_messages_30d > 0 && (
                   <div className="mt-4 pt-4 border-t border-slate-100">
                     <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span>Parent A: {preview.messages.parent_a_messages} msgs</span>
-                      <span>Parent B: {preview.messages.parent_b_messages} msgs</span>
+                      <span>{preview.parent_a_name || "Parent A"}: {preview.messages.parent_a_messages} msgs</span>
+                      <span>{preview.parent_b_name || "Parent B"}: {preview.messages.parent_b_messages} msgs</span>
                     </div>
                     <div className="flex h-2 mt-2 rounded-full overflow-hidden bg-slate-100">
                       <div
@@ -1810,43 +1816,6 @@ function InvitationPreviewModal({
             </Card>
           </div>
 
-          {/* Request Details */}
-          {(preview.requested_role || preview.representing || preview.message) && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-slate-900 flex items-center gap-2">
-                <UserPlus className="h-4 w-4 text-slate-500" />
-                Invitation Details
-              </h4>
-              <Card className="border-slate-200">
-                <CardContent className="p-4 space-y-3">
-                  {preview.requested_role && (
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Requested Role</span>
-                      <Badge variant="outline" className="capitalize">
-                        {preview.requested_role.replace(/_/g, " ")}
-                      </Badge>
-                    </div>
-                  )}
-                  {preview.representing && (
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Representing</span>
-                      <span className="text-sm font-medium text-slate-900 capitalize">
-                        {preview.representing.replace(/_/g, " ")}
-                      </span>
-                    </div>
-                  )}
-                  {preview.message && (
-                    <div className="pt-2 border-t border-slate-100">
-                      <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">
-                        Message from Parent
-                      </p>
-                      <p className="text-sm text-slate-700 italic">"{preview.message}"</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          )}
         </div>
       ) : null}
 
