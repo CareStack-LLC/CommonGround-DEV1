@@ -1624,9 +1624,9 @@ function InvitationPreviewModal({
                       <div className="mt-4 space-y-2">
                         {preview.agreement.quick_facts.map((fact, i) => (
                           <div key={i} className="text-sm text-slate-700 bg-slate-50 p-2 rounded-md border border-slate-100">
-                            <ReactMarkdown className="prose prose-sm max-w-none prose-p:my-0 prose-strong:text-slate-900">
-                              {fact}
-                            </ReactMarkdown>
+                            <div className="prose prose-sm max-w-none prose-p:my-0 prose-strong:text-slate-900">
+                              <ReactMarkdown>{fact}</ReactMarkdown>
+                            </div>
                           </div>
                         ))}
                       </div>
