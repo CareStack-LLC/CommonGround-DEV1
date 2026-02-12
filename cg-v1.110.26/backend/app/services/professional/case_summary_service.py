@@ -77,6 +77,9 @@ class ProfessionalCaseSummaryService:
                     Agreement.status == "active"
                 )
             )
+            .options(
+                selectinload(Agreement.sections)
+            )
             .order_by(Agreement.updated_at.desc())
         )
         active_agreement = agreement_result.scalar_one_or_none()
