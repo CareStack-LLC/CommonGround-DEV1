@@ -1191,12 +1191,19 @@ AGREEMENT SECTIONS:
         content = get_content(["custody", "physical_custody", "parenting_time"])
         if content:
             custody_parts = []
-            if "joint legal" in content.lower(): custody_parts.append("Joint legal")
-            elif "sole legal" in content.lower(): custody_parts.append("Sole legal")
-            if "joint physical" in content.lower(): custody_parts.append("joint physical custody")
-            elif "sole physical" in content.lower(): custody_parts.append("sole physical custody")
             if custody_parts:
                 key_points.append(f"**Custody Type:** {' + '.join(custody_parts)}")
+
+        # 1.5 CHILD SUPPORT (V1: financial, V2: financial)
+        content = get_content(["financial"])
+        if content:
+            # Detect amount
+            amount_match = re.search(r'\$(\d+(?:\.\d{2})?)', content)
+            if amount_match:
+                amount = amount_match.group(0)
+                key_points.append(f"**Child Support:** {amount}/mo")
+            elif "child support" in content.lower():
+                key_points.append("**Child Support:** As agreed per state guidelines")
 
         # 2. SCHEDULE (V1: schedule, V2: parenting_time)
         content = get_content(["schedule", "parenting_time"])

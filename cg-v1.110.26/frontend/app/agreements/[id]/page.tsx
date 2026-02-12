@@ -747,8 +747,36 @@ function AgreementDetailsContent() {
                     </div>
 
                     {/* Render comprehensive markdown summary */}
-                    <div className="prose prose-sm max-w-none px-2 md:pl-8 prose-headings:text-foreground prose-headings:font-semibold prose-h2:text-base md:prose-h2:text-lg prose-h2:mt-4 md:prose-h2:mt-6 prose-h2:mb-2 md:prose-h2:mb-3 prose-h3:text-sm md:prose-h3:text-base prose-h3:mt-3 md:prose-h3:mt-4 prose-h3:mb-2 prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-sm prose-ul:text-muted-foreground prose-ul:space-y-1 prose-ul:text-sm prose-li:text-muted-foreground prose-strong:text-foreground prose-table:text-xs md:prose-table:text-sm prose-table:w-full prose-th:bg-muted prose-th:p-1.5 md:prose-th:p-2 prose-td:p-1.5 md:prose-td:p-2 prose-td:border prose-hr:border-border">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {/* Render comprehensive markdown summary with custom components */}
+                    <div className="prose prose-sm max-w-none prose-headings:text-foreground prose-headings:font-semibold prose-h2:text-lg md:prose-h2:text-xl prose-h2:mt-6 md:prose-h2:mt-8 prose-h2:mb-3 md:prose-h2:mb-4 prose-h3:text-base md:prose-h3:text-lg prose-h3:mt-4 md:prose-h3:mt-5 prose-h3:mb-2 prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-sm md:prose-p:text-base prose-strong:text-foreground prose-strong:font-semibold">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          table: ({ node, ...props }) => (
+                            <div className="my-6 w-full overflow-x-auto rounded-xl border border-border shadow-sm">
+                              <table className="w-full text-sm text-left relative" {...props} />
+                            </div>
+                          ),
+                          thead: ({ node, ...props }) => (
+                            <thead className="bg-muted/50 text-xs uppercase tracking-wider font-semibold text-muted-foreground border-b border-border" {...props} />
+                          ),
+                          th: ({ node, ...props }) => (
+                            <th className="px-4 py-3 whitespace-nowrap" {...props} />
+                          ),
+                          td: ({ node, ...props }) => (
+                            <td className="px-4 py-3 border-b border-border/50 last:border-0 align-top" {...props} />
+                          ),
+                          tr: ({ node, ...props }) => (
+                            <tr className="hover:bg-muted/20 transition-colors" {...props} />
+                          ),
+                          h3: ({ node, ...props }) => (
+                            <h3 className="text-base font-semibold text-foreground mt-4 mb-2 flex items-center gap-2" {...props} />
+                          ),
+                          ul: ({ node, ...props }) => (
+                            <ul className="my-2 space-y-1 list-disc list-inside text-muted-foreground" {...props} />
+                          )
+                        }}
+                      >
                         {summary.summary}
                       </ReactMarkdown>
                     </div>
