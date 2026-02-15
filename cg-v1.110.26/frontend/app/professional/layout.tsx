@@ -20,6 +20,8 @@ import {
   Building2,
   User,
   ChevronDown,
+  FileText,
+  CreditCard,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,6 +57,9 @@ interface ProfessionalProfile {
   awards?: any[];
   consultation_fee?: string;
   accepted_payment_methods?: string[];
+  // Subscription & tier gating
+  subscription_tier?: string;
+  firm_id?: string;
 }
 
 interface Firm {
@@ -392,6 +397,16 @@ function ProfessionalNavigation({
       icon: <MessageSquare className="h-4 w-4" />,
       badge: dashboardData?.unread_messages > 0 ? dashboardData.unread_messages.toString() : undefined,
     },
+    {
+      href: "/professional/documents",
+      label: "Documents",
+      icon: <FileText className="h-4 w-4" />,
+    },
+    {
+      href: "/professional/directory",
+      label: "Directory",
+      icon: <Users className="h-4 w-4" />,
+    },
   ];
 
   const toolsNavItems: { href: string; label: string; icon: React.ReactNode; badge?: string }[] = [
@@ -399,6 +414,16 @@ function ProfessionalNavigation({
       href: "/professional/profile",
       label: "Profile",
       icon: <User className="h-4 w-4" />,
+    },
+    {
+      href: "/professional/settings/subscription",
+      label: "Subscription",
+      icon: <CreditCard className="h-4 w-4" />,
+    },
+    {
+      href: "/professional/firm/queue",
+      label: "Case Queue",
+      icon: <FolderOpen className="h-4 w-4" />,
     },
   ];
 
@@ -504,8 +529,8 @@ function ProfessionalNavigation({
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${pathname.startsWith(item.href)
-                    ? "bg-[var(--portal-primary)]/5 text-[var(--portal-primary)] border border-[var(--portal-primary)]/20 shadow-sm"
-                    : "text-slate-700 hover:bg-white hover:shadow-sm"
+                  ? "bg-[var(--portal-primary)]/5 text-[var(--portal-primary)] border border-[var(--portal-primary)]/20 shadow-sm"
+                  : "text-slate-700 hover:bg-white hover:shadow-sm"
                   }`}
               >
                 <span className="flex items-center gap-2.5">
@@ -546,8 +571,8 @@ function NavLink({
     <Link
       href={href}
       className={`px-4 py-3 text-sm font-medium border-b-2 flex items-center gap-2 transition-all whitespace-nowrap ${isActive
-          ? "border-[var(--portal-primary)] text-[var(--portal-primary)] bg-[var(--portal-primary)]/5"
-          : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300"
+        ? "border-[var(--portal-primary)] text-[var(--portal-primary)] bg-[var(--portal-primary)]/5"
+        : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50 hover:border-slate-300"
         }`}
     >
       {icon}

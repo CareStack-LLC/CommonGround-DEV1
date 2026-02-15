@@ -17,12 +17,21 @@ import {
   ChevronRight,
   AlertTriangle,
   CheckCircle2,
+  History,
+  Download,
+  DollarSign,
+  Files,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProfessionalAuth } from "../../layout";
+import { CaseTimelineTab } from "@/components/professional/case-view/case-timeline-tab";
+import { CaseCommunicationsTab } from "@/components/professional/case-view/case-communications-tab";
+import { CallsReportsTab } from "@/components/professional/case-view/calls-reports-tab";
+import { DocumentList } from "@/components/professional/document-list";
+import { toast } from "@/hooks/use-toast";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -195,123 +204,183 @@ export default function CaseDetailPage() {
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <QuickStat
-          label="Timeline Events"
-          value={timelineSummary?.total_events || 0}
-          icon={<Clock className="h-5 w-5" />}
-          href={`/professional/cases/${familyFileId}/timeline`}
-          color="blue"
-        />
-        <QuickStat
-          label="Messages"
-          value={timelineSummary?.messages || 0}
-          icon={<MessageSquare className="h-5 w-5" />}
-          href={`/professional/cases/${familyFileId}/timeline?types=message`}
-          color="purple"
-        />
-        <QuickStat
-          label="Exchanges"
-          value={timelineSummary?.exchanges || 0}
-          icon={<Calendar className="h-5 w-5" />}
-          href={`/professional/cases/${familyFileId}/timeline?types=exchange`}
-          color="amber"
-        />
-        <QuickStat
-          label="Court Events"
-          value={timelineSummary?.court_events || 0}
-          icon={<Scale className="h-5 w-5" />}
-          href={`/professional/cases/${familyFileId}/timeline?types=court`}
-          color="teal"
-        />
-      </div>
-
-      {/* Navigation Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <NavigationCard
-          title="Case Timeline"
-          description="Chronological view of all case events"
-          icon={<Clock className="h-6 w-6" />}
-          href={`/professional/cases/${familyFileId}/timeline`}
-          color="blue"
-        />
-
-        {caseData.access_scopes?.includes("messages") && (
-          <NavigationCard
-            title="Communications"
-            description="View parent-to-parent messages"
-            icon={<MessageSquare className="h-6 w-6" />}
-            href={`/professional/cases/${familyFileId}/communications`}
-            color="purple"
-          />
-        )}
-
-        <NavigationCard
-          title="ClearFund"
-          description="Shared expenses and financial tracking"
-          icon={<Scale className="h-6 w-6" />}
-          href={`/professional/cases/${familyFileId}/clearfund`}
-          color="teal"
-        />
-
-        {caseData.access_scopes?.includes("schedule") && (
-          <NavigationCard
-            title="Schedule"
-            description="Custody exchanges and check-ins"
-            icon={<Calendar className="h-6 w-6" />}
-            href={`/professional/cases/${familyFileId}/schedule`}
-            color="amber"
-          />
-        )}
-
-        {caseData.access_scopes?.includes("agreement") && (
-          <NavigationCard
-            title="Agreement"
-            description="View custody agreement and compliance"
-            icon={<FileText className="h-6 w-6" />}
-            href={`/professional/cases/${familyFileId}/agreement`}
-            color="slate"
-          />
-        )}
-
-        {caseData.can_message_client && (
-          <NavigationCard
-            title="Client Messages"
-            description="Direct communication with client"
-            icon={<Users className="h-6 w-6" />}
-            href={`/professional/cases/${familyFileId}/messages`}
-            color="cyan"
-          />
-        )}
-      </div>
-
-      {/* Access Scopes Info */}
-      <Card className="border-slate-200">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-slate-900">Your Access</CardTitle>
-          <CardDescription className="text-slate-500">Data you can view for this case</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {caseData.access_scopes?.map((scope) => (
-              <Badge key={scope} variant="outline" className="capitalize bg-slate-50 text-slate-700 border-slate-200">
-                {scope.replace("_", " ")}
-              </Badge>
-            ))}
-            {caseData.can_control_aria && (
-              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                ARIA Control
-              </Badge>
+      {/* Tabbed Case View */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <div className="sticky top-0 z-20 bg-slate-50/95 backdrop-blur-md pt-2 pb-4 -mx-4 px-4 sm:-mx-6 sm:px-6">
+          <TabsList className="bg-white border border-slate-200 p-1 h-12 w-full justify-start overflow-x-auto no-scrollbar">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="timeline" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
+              Timeline
+            </TabsTrigger>
+            {caseData.access_scopes?.includes("messages") && (
+              <TabsTrigger value="communications" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
+                Communications
+              </TabsTrigger>
             )}
-            {caseData.can_message_client && (
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                Client Messaging
-              </Badge>
-            )}
+            <TabsTrigger value="calls" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
+              Calls & Reports
+            </TabsTrigger>
+            <TabsTrigger value="documents" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
+              Documents
+            </TabsTrigger>
+            <TabsTrigger value="compliance" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
+              Sub-Portals
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6 m-0 outline-none">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <QuickStat
+              label="Timeline Events"
+              value={timelineSummary?.total_events || 0}
+              icon={<Clock className="h-5 w-5" />}
+              href="#"
+              color="blue"
+            />
+            <QuickStat
+              label="Messages"
+              value={timelineSummary?.messages || 0}
+              icon={<MessageSquare className="h-5 w-5" />}
+              href="#"
+              color="purple"
+            />
+            <QuickStat
+              label="Exchanges"
+              value={timelineSummary?.exchanges || 0}
+              icon={<Calendar className="h-5 w-5" />}
+              href="#"
+              color="amber"
+            />
+            <QuickStat
+              label="Court Events"
+              value={timelineSummary?.court_events || 0}
+              icon={<Scale className="h-5 w-5" />}
+              href="#"
+              color="teal"
+            />
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 space-y-6">
+              <Card className="border-slate-200">
+                <CardHeader>
+                  <CardTitle className="text-base font-bold flex items-center gap-2">
+                    <History className="h-4 w-4 text-indigo-500" />
+                    Recent Activity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <div className="divide-y divide-slate-100">
+                    {/* Placeholder for activity stream */}
+                    <div className="p-4 flex items-center justify-between text-sm text-slate-500 italic">
+                      Recent case activity will stream here...
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card className="border-slate-200 bg-indigo-50/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-bold text-slate-900 uppercase tracking-wider">Quick Actions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <Button variant="outline" className="w-full justify-start text-xs h-9 bg-white" asChild>
+                    <Link href={`/professional/cases/${familyFileId}/aria`}>
+                      <Bot className="h-3.5 w-3.5 mr-2 text-indigo-500" />
+                      Review ARIA Rules
+                    </Link>
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start text-xs h-9 bg-white" asChild>
+                    <Link href={`/professional/cases/${familyFileId}/exports`}>
+                      <Download className="h-3.5 w-3.5 mr-2 text-indigo-500" />
+                      Export Discovery File
+                    </Link>
+                  </Button>
+                  <Button variant="outline" className="w-full justify-start text-xs h-9 bg-white">
+                    <Scale className="h-3.5 w-3.5 mr-2 text-indigo-500" />
+                    Add Court Deadline
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="border-slate-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-bold text-slate-900 uppercase tracking-wider">Case Access</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                    {caseData.access_scopes?.map((scope) => (
+                      <Badge key={scope} variant="outline" className="capitalize bg-slate-50 text-slate-700 border-slate-200 text-[10px]">
+                        {scope.replace("_", " ")}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Timeline Tab */}
+        <TabsContent value="timeline" className="m-0 outline-none">
+          <CaseTimelineTab familyFileId={familyFileId} token={token || ""} />
+        </TabsContent>
+
+        {/* Communications Tab */}
+        <TabsContent value="communications" className="m-0 outline-none">
+          <CaseCommunicationsTab familyFileId={familyFileId} token={token || ""} />
+        </TabsContent>
+
+        {/* Calls & Reports Tab */}
+        <TabsContent value="calls" className="m-0 outline-none">
+          <CallsReportsTab familyFileId={familyFileId} token={token || ""} />
+        </TabsContent>
+
+        {/* Documents Tab */}
+        <TabsContent value="documents" className="m-0 outline-none">
+          <DocumentList familyFileId={familyFileId} token={token || ""} />
+        </TabsContent>
+
+        {/* Sub-Portals Tab */}
+        <TabsContent value="compliance" className="m-0 outline-none">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <NavigationCard
+              title="Compliance Dashboard"
+              description="Analysis of parenting plan adherence"
+              icon={<BarChart3 className="h-6 w-6" />}
+              href={`/professional/cases/${familyFileId}/compliance`}
+              color="teal"
+            />
+            <NavigationCard
+              title="ClearFund"
+              description="Financial obligations and payment tracking"
+              icon={<DollarSign className="h-6 w-6" />}
+              href={`/professional/cases/${familyFileId}/clearfund`}
+              color="blue"
+            />
+            <NavigationCard
+              title="Agreement Review"
+              description="Current version of the parenting agreement"
+              icon={<FileText className="h-6 w-6" />}
+              href={`/professional/cases/${familyFileId}/agreement`}
+              color="purple"
+            />
+            <NavigationCard
+              title="Exchange Schedule"
+              description="Detailed calendar of past and future swaps"
+              icon={<Calendar className="h-6 w-6" />}
+              href={`/professional/cases/${familyFileId}/schedule`}
+              color="amber"
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

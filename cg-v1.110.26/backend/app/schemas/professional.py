@@ -5,8 +5,8 @@ Pydantic schemas for professional profiles, firms, memberships,
 case assignments, and related features.
 """
 
-from datetime import datetime
-from typing import Optional
+from datetime import datetime, date
+from typing import Optional, Any
 from pydantic import BaseModel, EmailStr, Field, field_validator
 import re
 
@@ -757,6 +757,33 @@ class ARIAInterventionResponse(BaseModel):
 
 
 # =============================================================================
+# Document Schemas
+# =============================================================================
+
+class ProfessionalDocumentResponse(BaseModel):
+    """Schema for a professional document."""
+    id: str
+    title: str
+    type: str  # agreement, quick_accord, report, recording, attachment, court_order
+    status: str
+    created_at: datetime
+    family_file_id: str
+    file_url: Optional[str] = None
+    description: Optional[str] = None
+    size_bytes: Optional[int] = None
+    mime_type: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ProfessionalDocumentListResponse(BaseModel):
+    """Schema for a paginated list of professional documents."""
+    items: list[ProfessionalDocumentResponse]
+    total: int
+
+
+# =============================================================================
 # Compliance Schemas
 # =============================================================================
 
@@ -1150,3 +1177,83 @@ ProfessionalProfileWithFirms.model_rebuild()
 FirmWithMembers.model_rebuild()
 ARIAMetrics.model_rebuild()
 ComplianceOverview.model_rebuild()
+# =============================================================================
+# Call Log Schemas
+# =============================================================================
+
+class ProfessionalCallLogBase(BaseModel):
+    family_file_id: str
+    case_assignment_id: Optional[str] = None
+    call_type: str  # 'voice', 'video', 'conference'
+    participant_ids: list[str] = []
+    duration_seconds: int = 0
+    status: str = "completed"
+    notes: Optional[str] = None
+    recording_url: Optional[str] = None
+    started_at: Optional[datetime] = None
+    ended_at: Optional[datetime] = None
+
+class ProfessionalCallLogCreate(ProfessionalCallLogBase):
+    pass
+
+class ProfessionalCallLogResponse(ProfessionalCallLogBase):
+    id: str
+    professional_id: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class ProfessionalCallLogListResponse(BaseModel):
+    logs: list[ProfessionalCallLogResponse]
+    total: int
+
+
+# =============================================================================
+# Compliance Report Schemas
+# =============================================================================
+
+class ComplianceReportCreate(BaseModel):
+    family_file_id: str
+    case_assignment_id: Optional[str] = None
+    report_type: str
+    date_range_start: Optional[datetime] = None
+    date_range_end: Optional[datetime] = None
+    parameters: Optional[dict] = None
+
+class ComplianceReportResponse(BaseModel):
+    id: str
+    family_file_id: str
+    case_assignment_id: Optional[str] = None
+    generated_by_id: str
+    report_type: str
+    date_range_start: Optional[datetime] = None
+    date_range_end: Optional[datetime] = None
+    parameters: Optional[dict] = None
+    file_url: Optional[str] = None
+    file_size_bytes: Optional[int] = None
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class ComplianceReportListResponse(BaseModel):
+    reports: list[ComplianceReportResponse]
+    total: int
+
+# =============================================================================
+# Analytics Schemas
+# =============================================================================
+
+class FirmAnalytics(BaseModel):
+    """Schema for firm-wide analytics."""
+    firm_id: str
+    total_active_cases: int = 0
+    total_professionals: int = 0
+    high_conflict_cases: int = 0
+    aria_intervention_rate_30d: float = 0.0
+    total_aria_flags_30d: int = 0
+    generated_at: datetime

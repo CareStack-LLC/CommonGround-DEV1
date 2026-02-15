@@ -24,6 +24,7 @@ from app.models.professional import (
     AssignmentStatus,
     AccessRequestStatus,
 )
+from app.services.professional.case_summary_service import ProfessionalCaseSummaryService
 from app.models.family_file import FamilyFile
 from app.models.schedule import ScheduleEvent
 from app.models.intake import IntakeSession, IntakeStatus
@@ -79,6 +80,9 @@ class ProfessionalDashboardService:
         # Get recent activity
         recent_activity = await self.get_recent_activity(professional_id, limit=10)
 
+        # Get priority cases for case cards
+        priority_cases = await self.get_priority_cases(professional_id, limit=3)
+
         return {
             "case_count": case_count,
             "pending_intakes": pending_intakes,
@@ -89,6 +93,7 @@ class ProfessionalDashboardService:
             "upcoming_events": upcoming_events,
             "alerts": alerts,
             "recent_activity": recent_activity,
+            "priority_cases": priority_cases,
         }
 
     # -------------------------------------------------------------------------
@@ -281,6 +286,54 @@ class ProfessionalDashboardService:
         activity.sort(key=lambda x: x["timestamp"], reverse=True)
 
         return activity[:limit]
+
+    # -------------------------------------------------------------------------
+    # Priority Cases
+    # -------------------------------------------------------------------------
+
+    async def get_priority_cases(
+        self,
+        professional_id: str,
+        limit: int = 3,
+    ) -> list[dict]:
+        """
+        Get a list of priority cases with metrics for dashboard cards.
+        """
+        summary_service = ProfessionalCaseSummaryService(self.db)
+        
+        # Get active assignments
+        case_ids = await self._get_assigned_family_file_ids(professional_id)
+        if not case_ids:
+            return []
+            
+        priority_cases = []
+        for family_file_id in case_ids[:limit]:
+            try:
+                preview = await summary_service.get_case_preview(family_file_id)
+                
+                # Calculate basic urgency score (placeholder for now)
+                # 0-100 based on flag rate and upcoming events
+                flag_rate = preview.compliance.communication_flag_rate or 0
+                urgency = min(100, int(flag_rate * 100) + 10) # Base 10 urgency
+                
+                priority_cases.append({
+                    "id": family_file_id,
+                    "family_file_id": family_file_id,
+                    "parent1_name": preview.parent_a_name,
+                    "parent2_name": preview.parent_b_name or "Other Parent",
+                    "status": "Active",
+                    "urgency_score": urgency,
+                    "message_count": preview.messages.total_messages_30d,
+                    "flagged_count": preview.messages.flagged_messages_30d,
+                    "compliance_score": int((preview.compliance.exchange_completion_rate or 1.0) * 100),
+                    "next_event_title": preview.compliance.overall_health.upper() + " CASE HEALTH",
+                    "next_event_date": "Updated Daily"
+                })
+            except Exception as e:
+                print(f"Error getting preview for {family_file_id}: {e}")
+                continue
+                
+        return priority_cases
 
     # -------------------------------------------------------------------------
     # Case Summary
@@ -631,3 +684,95 @@ class ProfessionalDashboardService:
             .limit(limit)
         )
         return list(result.scalars().all())
+
+    # -------------------------------------------------------------------------
+    # Firm Analytics
+    # -------------------------------------------------------------------------
+
+    async def get_firm_analytics(self, firm_id: str) -> dict:
+        """
+        Get aggregated analytics for a firm.
+        """
+        from app.models.family_file import FamilyFile, ConflictLevel
+        from app.models.message import Message
+        from sqlalchemy import case
+
+        # 1. Basic Counts
+        # Active Cases
+        case_count_query = select(func.count(CaseAssignment.family_file_id.distinct())).where(
+            and_(
+                CaseAssignment.firm_id == firm_id,
+                CaseAssignment.status == AssignmentStatus.ACTIVE.value
+            )
+        )
+        case_count = (await self.db.execute(case_count_query)).scalar() or 0
+
+        # Professionals
+        prof_count_query = select(func.count(FirmMembership.id)).where(
+            and_(
+                FirmMembership.firm_id == firm_id,
+                FirmMembership.status == MembershipStatus.ACTIVE.value
+            )
+        )
+        prof_count = (await self.db.execute(prof_count_query)).scalar() or 0
+        
+        # 2. Conflict Stats
+        # First get the set of family_file_ids for this firm
+        family_ids_query = select(CaseAssignment.family_file_id.distinct()).where(
+            and_(
+                CaseAssignment.firm_id == firm_id,
+                CaseAssignment.status == AssignmentStatus.ACTIVE.value
+            )
+        )
+        family_ids_result = await self.db.execute(family_ids_query)
+        family_ids = [row[0] for row in family_ids_result.fetchall()]
+        
+        high_conflict_count = 0
+        aria_total_flags = 0
+        intervention_rate = 0.0
+        
+        if family_ids:
+            # High Conflict Cases
+            conflict_query = select(func.count(FamilyFile.id)).where(
+                and_(
+                    FamilyFile.id.in_(family_ids),
+                    FamilyFile.conflict_level == ConflictLevel.HIGH.value
+                )
+            )
+            high_conflict_count = (await self.db.execute(conflict_query)).scalar() or 0
+            
+            # ARIA Stats (Last 30 days)
+            thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+            
+            # Count messages and flags
+            msg_stats_query = select(
+                func.count(Message.id),
+                func.sum(case(
+                    (Message.was_flagged == True, 1),
+                    else_=0
+                ))
+            ).where(
+                and_(
+                    Message.family_file_id.in_(family_ids),
+                    Message.sent_at >= thirty_days_ago
+                )
+            )
+            
+            msg_result = (await self.db.execute(msg_stats_query)).one()
+            total_msgs = msg_result[0] or 0
+            total_flags = msg_result[1] or 0
+            
+            if total_msgs > 0:
+                intervention_rate = (total_flags / total_msgs) * 100
+                
+            aria_total_flags = int(total_flags)
+
+        return {
+            "firm_id": firm_id,
+            "total_active_cases": case_count,
+            "total_professionals": prof_count,
+            "high_conflict_cases": high_conflict_count,
+            "aria_intervention_rate_30d": round(intervention_rate, 1),
+            "total_aria_flags_30d": aria_total_flags,
+            "generated_at": datetime.utcnow().isoformat()
+        }

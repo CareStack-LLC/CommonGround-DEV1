@@ -23,6 +23,7 @@ import { useProfessionalAuth } from "../layout";
 import { InvitationSummaryAlert } from "@/components/professional/invitation-summary-alert";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AssignProfessionalDialog } from "../intake/page";
+import { CaseCard } from "@/components/professional/case-card";
 
 export default function ProfessionalDashboardPage() {
   const { profile, dashboardData, activeFirm, refreshDashboard, token } = useProfessionalAuth();
@@ -174,6 +175,29 @@ export default function ProfessionalDashboardPage() {
           color="purple"
           href="/professional/intake?tab=invitations&status=pending"
         />
+      </div>
+
+      {/* Priority Cases Section */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+          <div className="h-1 w-8 bg-[var(--portal-primary)] rounded-full" />
+          Priority Cases
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {dashboardData.priority_cases?.length > 0 ? (
+            dashboardData.priority_cases.map((caseData: any) => (
+              <CaseCard key={caseData.id} caseData={caseData} />
+            ))
+          ) : (
+            <div className="col-span-full py-12 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+              <FolderOpen className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+              <p className="text-slate-500 font-medium">No active cases yet.</p>
+              <Button variant="link" asChild className="text-[var(--portal-primary)]">
+                <Link href="/professional/intake?tab=invitations">View Pending Invitations</Link>
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Main Content Grid */}

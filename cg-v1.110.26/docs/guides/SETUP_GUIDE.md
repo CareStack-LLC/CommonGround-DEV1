@@ -1,7 +1,7 @@
-# CommonGround V1 - Local Development Setup Guide
+# CommonGround V1.110 - Local Development Setup Guide
 
-**Last Updated:** January 17, 2026
-**Version:** 1.5.0
+**Last Updated:** February 14, 2026
+**Version:** 1.110.26
 
 ---
 
@@ -121,7 +121,7 @@ npm run dev
 ### Step 1: Python Environment
 
 ```bash
-cd mvp/backend
+cd backend
 
 # Create virtual environment
 python3.11 -m venv venv
@@ -236,7 +236,7 @@ open http://localhost:8000/docs
 ### Step 1: Node.js Environment
 
 ```bash
-cd mvp/frontend
+cd frontend
 
 # Verify Node.js version
 node --version  # Should show v18.x or higher
@@ -355,7 +355,7 @@ docker logs commonground-postgres
 ### Database Migrations
 
 ```bash
-cd mvp/backend
+cd backend
 
 # Apply all migrations
 alembic upgrade head
@@ -431,7 +431,7 @@ REFRESH_TOKEN_EXPIRE_DAYS=7
 # ======================
 # Anthropic (Primary)
 ANTHROPIC_API_KEY=sk-ant-your-key
-ANTHROPIC_MODEL=claude-sonnet-4-20250514
+ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
 
 # OpenAI (Fallback)
 OPENAI_API_KEY=sk-your-key
@@ -507,14 +507,14 @@ NEXT_PUBLIC_SHOW_DEV_TOOLS=true
 
 **Terminal 1 - Backend:**
 ```bash
-cd mvp/backend
+cd backend
 source venv/bin/activate
 uvicorn app.main:app --reload
 ```
 
 **Terminal 2 - Frontend:**
 ```bash
-cd mvp/frontend
+cd frontend
 npm run dev
 ```
 
@@ -597,7 +597,7 @@ docker-compose down
 git pull origin main
 
 # 2. Activate backend environment
-cd mvp/backend
+cd backend
 source venv/bin/activate
 
 # 3. Update dependencies if needed
@@ -610,7 +610,7 @@ alembic upgrade head
 uvicorn app.main:app --reload
 
 # 6. In new terminal, start frontend
-cd mvp/frontend
+cd frontend
 npm install  # if package.json changed
 npm run dev
 ```
@@ -656,7 +656,7 @@ git push -u origin feature/your-feature
 ### Backend Tests
 
 ```bash
-cd mvp/backend
+cd backend
 
 # Run all tests
 pytest
@@ -680,7 +680,7 @@ pytest -m "not slow"
 ### Frontend Tests
 
 ```bash
-cd mvp/frontend
+cd frontend
 
 # Run all tests
 npm test

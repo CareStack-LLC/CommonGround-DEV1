@@ -112,6 +112,8 @@ class ProfessionalEventsService:
             color=event_data.color or self._get_default_color(event_data.event_type),
             notes=event_data.notes,
             timezone=event_data.timezone,
+            attendee_ids=event_data.attendee_ids or [],
+            attendee_emails=event_data.attendee_emails or [],
         )
 
         db.add(event)
@@ -284,6 +286,8 @@ class ProfessionalEventsService:
             elif field in ("start_time", "end_time"):
                 # Convert timezone-aware to naive for database
                 setattr(event, field, self._make_naive(value))
+            elif field in ("attendee_ids", "attendee_emails"):
+                setattr(event, field, value)
             elif hasattr(event, field):
                 setattr(event, field, value)
 
@@ -607,8 +611,8 @@ class ProfessionalEventsService:
             virtual_meeting_url=event.virtual_meeting_url,
             family_file_id=str(event.family_file_id) if event.family_file_id else None,
             family_file_title=family_file_title,
-            attendee_ids=[],  # Not stored in unified model
-            attendee_emails=[],  # Not stored in unified model
+            attendee_ids=event.attendee_ids or [],
+            attendee_emails=event.attendee_emails or [],
             parent_visibility=event.parent_visibility or "none",
             is_recurring=False,  # Not supported yet in unified model
             recurrence_rule=None,

@@ -8,6 +8,7 @@ import {
   Users,
   AlertTriangle,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,8 @@ interface EventFormData {
   reminder_minutes: number;
   notes: string;
   color: string;
+  attendee_ids: string[];
+  attendee_emails: string[];
 }
 
 interface EventConflict {
@@ -114,6 +117,8 @@ const defaultFormData: EventFormData = {
   reminder_minutes: 30,
   notes: "",
   color: "#3B82F6",
+  attendee_ids: [],
+  attendee_emails: [],
 };
 
 export function EventForm({
@@ -132,6 +137,7 @@ export function EventForm({
   const [checkingConflicts, setCheckingConflicts] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [caseParents, setCaseParents] = useState<{ id: string, name: string }[]>([]);
 
   // Check for conflicts when times change
   useEffect(() => {
@@ -165,6 +171,39 @@ export function EventForm({
     setFormData((prev) => ({ ...prev, [field]: value }));
     setError(null);
   };
+
+  const toggleAttendee = (id: string) => {
+    setFormData(prev => {
+      const ids = prev.attendee_ids.includes(id)
+        ? prev.attendee_ids.filter(i => i !== id)
+        : [...prev.attendee_ids, id];
+      return { ...prev, attendee_ids: ids };
+    });
+  };
+
+  // Fetch parents when case changes
+  useEffect(() => {
+    const fetchCaseParents = async () => {
+      if (!formData.family_file_id) {
+        setCaseParents([]);
+        return;
+      }
+      // Note: In real app, we'd use a dedicated endpoint or get this from cases metadata
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/family-files/${formData.family_file_id}`);
+        if (res.ok) {
+          const data = await res.json();
+          const parents = [];
+          if (data.parent_a_info) parents.push({ id: data.parent_a_info.id, name: `${data.parent_a_info.first_name} ${data.parent_a_info.last_name}` });
+          if (data.parent_b_info) parents.push({ id: data.parent_b_info.id, name: `${data.parent_b_info.first_name} ${data.parent_b_info.last_name}` });
+          setCaseParents(parents);
+        }
+      } catch (err) {
+        console.error("Failed to fetch case parents:", err);
+      }
+    };
+    fetchCaseParents();
+  }, [formData.family_file_id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -389,6 +428,42 @@ export function EventForm({
           Controls whether parents can see this event on their calendar
         </p>
       </div>
+
+      {/* Attendees */}
+      {caseParents.length > 0 && (
+        <div className="space-y-3">
+          <Label className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Invite Attendees
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {caseParents.map(parent => (
+              <button
+                key={parent.id}
+                type="button"
+                onClick={() => toggleAttendee(parent.id)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition-all ${formData.attendee_ids.includes(parent.id)
+                  ? "bg-indigo-50 border-indigo-200 text-indigo-700 font-bold shadow-sm"
+                  : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                  }`}
+              >
+                <div className="h-4 w-4 rounded-full bg-indigo-100 flex items-center justify-center text-[10px]">
+                  {parent.name[0]}
+                </div>
+                {parent.name}
+                {formData.attendee_ids.includes(parent.id) && (
+                  <div className="h-3 w-3 bg-indigo-600 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="h-2 w-2 text-white" />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+          <p className="text-[10px] text-slate-400">
+            Invitees will receive a notification and can RSVP.
+          </p>
+        </div>
+      )}
 
       {/* Reminder */}
       <div className="space-y-2">

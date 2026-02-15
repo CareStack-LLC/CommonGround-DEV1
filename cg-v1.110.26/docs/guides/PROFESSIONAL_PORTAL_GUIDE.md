@@ -1,7 +1,7 @@
 # Professional Portal - User Guide
 
-**Last Updated:** January 18, 2026
-**Version:** 1.6.0
+**Last Updated:** February 14, 2026
+**Version:** 1.110.26
 
 ---
 
@@ -494,8 +494,8 @@ All exports include:
 
 ### Support Resources
 
-- **Documentation**: `/docs/features/PROFESSIONAL_PORTAL.md`
-- **API Reference**: `/docs/api/API_REFERENCE.md`
+- **Documentation**: [PLATFORM_CAPABILITIES.md](../architecture/PLATFORM_CAPABILITIES.md)
+- **API Reference**: [API_SYSTEM_DESIGN.md](../architecture/API_SYSTEM_DESIGN.md)
 - **Email Support**: support@commonground.app
 - **Knowledge Base**: https://help.commonground.app
 
@@ -509,5 +509,5 @@ When reporting issues, include:
 
 ---
 
-*Last Updated: January 18, 2026*
-*Version: 1.6.0*
+*Last Updated: February 14, 2026*
+*Version: 1.110.26*

@@ -20,6 +20,10 @@ import {
   ArrowRightLeft,
   FileText,
   BarChart3,
+  Download,
+  Hash,
+  Loader2,
+  ShieldCheck,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -367,7 +371,7 @@ export default function CompliancePage() {
                   label="Outstanding"
                   value={formatCurrency(
                     dashboard.financial_compliance.total_amount_due -
-                      dashboard.financial_compliance.total_amount_paid
+                    dashboard.financial_compliance.total_amount_paid
                   )}
                   icon={<DollarSign className="h-5 w-5" />}
                   color={
@@ -585,10 +589,10 @@ export default function CompliancePage() {
                         <span className="font-medium">
                           {dashboard.communication_compliance.by_parent.parent_a.messages > 0
                             ? (
-                                (dashboard.communication_compliance.by_parent.parent_a.flagged /
-                                  dashboard.communication_compliance.by_parent.parent_a.messages) *
-                                100
-                              ).toFixed(1)
+                              (dashboard.communication_compliance.by_parent.parent_a.flagged /
+                                dashboard.communication_compliance.by_parent.parent_a.messages) *
+                              100
+                            ).toFixed(1)
                             : 0}
                           %
                         </span>
@@ -622,10 +626,10 @@ export default function CompliancePage() {
                         <span className="font-medium">
                           {dashboard.communication_compliance.by_parent.parent_b.messages > 0
                             ? (
-                                (dashboard.communication_compliance.by_parent.parent_b.flagged /
-                                  dashboard.communication_compliance.by_parent.parent_b.messages) *
-                                100
-                              ).toFixed(1)
+                              (dashboard.communication_compliance.by_parent.parent_b.flagged /
+                                dashboard.communication_compliance.by_parent.parent_b.messages) *
+                              100
+                            ).toFixed(1)
                             : 0}
                           %
                         </span>
@@ -636,6 +640,9 @@ export default function CompliancePage() {
               </div>
             </TabsContent>
           </Tabs>
+
+          {/* Report Generation & Export */}
+          <ReportGenerationSection familyFileId={familyFileId} token={token} periodDays={periodDays} />
         </>
       ) : (
         <Card>
@@ -737,3 +744,162 @@ function ParentComplianceCard({
     </Card>
   );
 }
+
+// Report Generation & Export Section
+function ReportGenerationSection({
+  familyFileId,
+  token,
+  periodDays,
+}: {
+  familyFileId: string;
+  token: string | null;
+  periodDays: string;
+}) {
+  const [exportFormat, setExportFormat] = useState("pdf");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedReportId, setGeneratedReportId] = useState<string | null>(null);
+  const [verificationHash, setVerificationHash] = useState<string | null>(null);
+  const [downloadCount, setDownloadCount] = useState(0);
+
+  const generateReport = async () => {
+    if (!token) return;
+    setIsGenerating(true);
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/v1/professional/cases/${familyFileId}/compliance/report`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ period_days: parseInt(periodDays), export_format: exportFormat }),
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setGeneratedReportId(data.id);
+        setVerificationHash(data.content_hash);
+      }
+    } catch (err) {
+      console.error("Error generating report:", err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const trackDownload = async () => {
+    if (!token || !generatedReportId) return;
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/v1/professional/reports/${generatedReportId}/download`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setDownloadCount(data.download_count || downloadCount + 1);
+      }
+    } catch (err) {
+      console.error("Error tracking download:", err);
+    }
+  };
+
+  const verifyReport = async () => {
+    if (!token || !generatedReportId) return;
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/v1/professional/reports/${generatedReportId}/verify`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setVerificationHash(data.content_hash);
+        setDownloadCount(data.download_count || 0);
+      }
+    } catch (err) {
+      console.error("Error verifying report:", err);
+    }
+  };
+
+  return (
+    <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50/30 to-teal-50/30">
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <FileText className="h-4 w-4 text-emerald-600" />
+          Generate Compliance Report
+        </CardTitle>
+        <CardDescription>
+          Export a court-ready compliance report with SHA-256 verification hash
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-wrap items-end gap-3">
+          <div>
+            <label className="text-xs font-medium text-slate-600 block mb-1.5">
+              Export Format
+            </label>
+            <Select value={exportFormat} onValueChange={setExportFormat}>
+              <SelectTrigger className="w-[140px] bg-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pdf">PDF Report</SelectItem>
+                <SelectItem value="csv">CSV Export</SelectItem>
+                <SelectItem value="json">JSON Data</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button
+            onClick={generateReport}
+            disabled={isGenerating}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          >
+            {isGenerating ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <BarChart3 className="h-4 w-4 mr-2" />
+            )}
+            {isGenerating ? "Generating..." : "Generate Report"}
+          </Button>
+
+          {generatedReportId && (
+            <>
+              <Button variant="outline" onClick={trackDownload} className="border-emerald-200">
+                <Download className="h-4 w-4 mr-2" />
+                Download ({downloadCount})
+              </Button>
+              <Button variant="outline" onClick={verifyReport} className="border-slate-200">
+                <ShieldCheck className="h-4 w-4 mr-2" />
+                Verify
+              </Button>
+            </>
+          )}
+        </div>
+
+        {/* Verification Hash */}
+        {verificationHash && (
+          <div className="mt-4 p-3 bg-white border border-emerald-100 rounded-lg">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Hash className="h-3.5 w-3.5 text-emerald-600" />
+              <span className="text-xs font-semibold text-slate-700">
+                SHA-256 Verification Hash
+              </span>
+              <Badge variant="outline" className="text-[10px]">
+                Tamper-proof
+              </Badge>
+            </div>
+            <code className="text-xs text-slate-500 font-mono break-all leading-relaxed">
+              {verificationHash}
+            </code>
+            {downloadCount > 0 && (
+              <p className="text-xs text-muted-foreground mt-2">
+                Downloaded {downloadCount} time{downloadCount !== 1 ? "s" : ""}
+              </p>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+

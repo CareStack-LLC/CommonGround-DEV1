@@ -40,6 +40,38 @@ class ProfessionalType(str, Enum):
     PARENTING_COORDINATOR = "parenting_coordinator"
 
 
+class ProfessionalTier(str, Enum):
+    """Subscription tiers for professional accounts.
+
+    Maps to the 5-tier pricing structure from the Professional Portal spec.
+    Each tier has different case limits, feature access, and team capabilities.
+    """
+    STARTER = "starter"         # Free — 3 active cases
+    SOLO = "solo"               # $99/mo — 15 active cases
+    SMALL_FIRM = "small_firm"   # $299/mo — 50 active cases, 3 team members
+    MID_SIZE = "mid_size"       # $799/mo — 150 active cases, 10 team members
+    ENTERPRISE = "enterprise"   # Custom — unlimited
+
+
+# Case limits per tier (used by entitlement checks)
+TIER_CASE_LIMITS = {
+    ProfessionalTier.STARTER: 3,
+    ProfessionalTier.SOLO: 15,
+    ProfessionalTier.SMALL_FIRM: 50,
+    ProfessionalTier.MID_SIZE: 150,
+    ProfessionalTier.ENTERPRISE: 999999,  # Effectively unlimited
+}
+
+# Team member limits per tier (firm-level)
+TIER_TEAM_LIMITS = {
+    ProfessionalTier.STARTER: 0,
+    ProfessionalTier.SOLO: 0,
+    ProfessionalTier.SMALL_FIRM: 3,
+    ProfessionalTier.MID_SIZE: 10,
+    ProfessionalTier.ENTERPRISE: 999999,
+}
+
+
 class FirmType(str, Enum):
     """Types of professional organizations."""
     LAW_FIRM = "law_firm"
@@ -49,13 +81,19 @@ class FirmType(str, Enum):
 
 
 class FirmRole(str, Enum):
-    """Roles within a firm."""
-    OWNER = "owner"           # Full admin, billing
-    ADMIN = "admin"           # Manage staff, settings
-    ATTORNEY = "attorney"     # Full case access
-    PARALEGAL = "paralegal"   # Limited case access
-    INTAKE = "intake"         # Intake only
-    READONLY = "readonly"     # View only
+    """Roles within a firm.
+
+    Matches spec roles: Owner, Dispatcher, Lead Attorney, Associate,
+    Paralegal, Admin. Legacy roles (intake, readonly) kept for compatibility.
+    """
+    OWNER = "owner"                 # Full admin, billing, case ownership
+    DISPATCHER = "dispatcher"       # Case queue management, assignment
+    LEAD_ATTORNEY = "lead_attorney" # Senior case handler
+    ADMIN = "admin"                 # Manage staff, settings
+    ATTORNEY = "attorney"           # Full case access (associate level)
+    PARALEGAL = "paralegal"         # Limited case access
+    INTAKE = "intake"               # Intake only
+    READONLY = "readonly"           # View only
 
 
 class AssignmentRole(str, Enum):
@@ -118,6 +156,26 @@ class EventVisibility(str, Enum):
     NONE = "none"                     # Only the professional
     REQUIRED_PARENT = "required_parent"  # Parent(s) required to attend
     BOTH_PARENTS = "both_parents"        # Both parents can see
+
+
+class OCRExtractionStatus(str, Enum):
+    """Status of the OCR document extraction pipeline.
+
+    Lifecycle: pending → processing → review → approved/rejected
+    """
+    PENDING = "pending"           # Uploaded, awaiting processing
+    PROCESSING = "processing"     # OCR engine running
+    REVIEW = "review"             # Extraction complete, awaiting professional review
+    APPROVED = "approved"         # Professional approved, agreement created
+    REJECTED = "rejected"         # Professional rejected extraction
+    FAILED = "failed"             # OCR processing failed
+
+
+class ReportExportFormat(str, Enum):
+    """Export formats for compliance reports."""
+    PDF = "pdf"       # Court-ready formatting (required for submission)
+    WORD = "word"     # Editable format for attorney notes
+    EXCEL = "excel"   # Raw data for analysis
 
 
 # =============================================================================
@@ -200,6 +258,41 @@ class ProfessionalProfile(Base, UUIDMixin, TimestampMixin):
     default_intake_template: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
     notification_preferences: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     # e.g., {"intake_completed": true, "deadline_reminder": true}
+
+    # =========================================================================
+    # Subscription & Tier Gating (Phase 1 Gap-Fill)
+    # =========================================================================
+    # Tier determines case limits and feature access per the spec's 5-tier model.
+    # This is the INDIVIDUAL professional's tier (separate from firm tier).
+    subscription_tier: Mapped[str] = mapped_column(
+        String(20), default=ProfessionalTier.STARTER.value
+    )
+    max_active_cases: Mapped[int] = mapped_column(Integer, default=3)
+    # Track count to enforce tier limits without expensive queries
+    active_case_count: Mapped[int] = mapped_column(Integer, default=0)
+
+    # Billing (Stripe integration for professional subscriptions)
+    stripe_customer_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    stripe_subscription_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    subscription_status: Mapped[str] = mapped_column(String(20), default="trial")
+    # Values: trial, active, past_due, cancelled
+    subscription_ends_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # =========================================================================
+    # Directory & Featured Placement (Phase 1 Gap-Fill)
+    # =========================================================================
+    # Controls whether this professional appears in the parent-facing directory.
+    # is_public = opt-in to standard listing (all tiers)
+    # is_featured = featured placement at top of results (mid_size+ tier, requires CG approval)
+    is_public: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
+    featured_approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Location & Jurisdiction (for directory search and case matching)
+    jurisdictions: Mapped[Optional[list]] = mapped_column(JSON, default=list)
+    # e.g., ["CA", "NY"] — states where licensed to practice
+    office_address: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    # e.g., {"line1": "123 Main St", "city": "Los Angeles", "state": "CA", "zip": "90001"}
 
     # Status
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -793,3 +886,305 @@ class ProfessionalEvent(Base, UUIDMixin, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<ProfessionalEvent {self.title} ({self.event_type})>"
+
+
+class ProfessionalCallLog(Base, UUIDMixin, TimestampMixin):
+    """
+    Log of voice/video calls involving professionals.
+    """
+
+    __tablename__ = "professional_call_logs"
+
+    # Context
+    case_assignment_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("case_assignments.id"), nullable=True, index=True
+    )
+    family_file_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("family_files.id"), index=True
+    )
+
+    # Participants
+    professional_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("professional_profiles.id"), index=True
+    )
+    participant_ids: Mapped[list] = mapped_column(JSON, default=list)
+    # List of user_ids (parents) involved
+
+    # Call Details
+    call_type: Mapped[str] = mapped_column(String(20))  # 'voice', 'video', 'conference'
+    duration_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(20), default="completed")
+    # 'completed', 'missed', 'cancelled'
+
+    # Content
+    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    recording_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+
+    # Timing
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    ended_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Relationships
+    professional: Mapped["ProfessionalProfile"] = relationship(
+        "ProfessionalProfile", backref="call_logs"
+    )
+    family_file: Mapped["FamilyFile"] = relationship(
+        "FamilyFile", backref="professional_call_logs"
+    )
+
+    def __repr__(self) -> str:
+        return f"<ProfessionalCallLog {self.id[:8]} ({self.call_type})>"
+
+
+class ComplianceReport(Base, UUIDMixin, TimestampMixin):
+    """
+    Generated compliance reports for court/legal use.
+
+    Per the spec: reports must be downloaded (no auto-send to court),
+    include both raw data and formatted summaries, and carry SHA-256
+    verification codes for authenticity.
+    """
+
+    __tablename__ = "compliance_reports"
+
+    # Context
+    case_assignment_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("case_assignments.id"), nullable=True, index=True
+    )
+    family_file_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("family_files.id"), index=True
+    )
+
+    # Generator
+    generated_by_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("professional_profiles.id"), index=True
+    )
+
+    # Report identity
+    title: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
+
+    # Report settings
+    report_type: Mapped[str] = mapped_column(String(50))
+    # Types per spec:
+    # 'exchange_compliance'  — On-time vs. missed exchanges
+    # 'communication_analysis' — ARIA interventions, message volume, hostility
+    # 'financial_disputes'  — Unresolved expense disputes
+    # 'full_timeline'       — Chronological event log
+    # 'custom'              — Select specific date ranges and data points
+    
+    date_range_start: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    date_range_end: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    parameters: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    # e.g., {"include_messages": true, "include_financials": false}
+
+    # =========================================================================
+    # Phase 1 Gap-Fill: Export & Verification
+    # =========================================================================
+    # Export format (spec requires PDF for court, Word for notes, Excel for data)
+    export_format: Mapped[str] = mapped_column(
+        String(10), default=ReportExportFormat.PDF.value
+    )
+
+    # SHA-256 verification code for authenticity (required by spec)
+    sha256_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+
+    # Attorney signature line (for court-ready documents)
+    signature_line: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
+
+    # Whether raw data appendix is included
+    raw_data_included: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    # Result
+    file_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    file_size_bytes: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(20), default="pending")
+    # 'pending', 'processing', 'completed', 'failed'
+
+    # Download tracking (reports are download-only per spec)
+    download_count: Mapped[int] = mapped_column(Integer, default=0)
+    last_downloaded_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Relationships
+    professional: Mapped["ProfessionalProfile"] = relationship(
+        "ProfessionalProfile", backref="generated_reports"
+    )
+    family_file: Mapped["FamilyFile"] = relationship(
+        "FamilyFile", backref="compliance_reports"
+    )
+
+    def __repr__(self) -> str:
+        return f"<ComplianceReport {self.id[:8]} ({self.report_type})>"
+
+
+# =============================================================================
+# New Models (Phase 1 Gap-Fill)
+# =============================================================================
+
+class OCRDocument(Base, UUIDMixin, TimestampMixin):
+    """
+    Tracks the OCR document processing pipeline.
+
+    Lifecycle per spec:
+    1. Professional uploads ONE court order PDF per case
+    2. System detects document type (FL-341, FL-311, FL-312, FL-150, FL-342)
+    3. OCR engine (PaddleOCR) extracts text and identifies data fields
+    4. AI validates extracted data for consistency
+    5. If confidence is LOW: System alerts professional to double-check
+    6. Professional reviews and approves/corrects fields
+    7. Upon approval: system creates NEW agreement with court order data
+    8. System locks populated fields from parent editing (→ FieldLock)
+
+    California forms only at launch.
+    """
+
+    __tablename__ = "ocr_documents"
+
+    # Context — which case and who uploaded
+    case_assignment_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("case_assignments.id"), nullable=True, index=True
+    )
+    family_file_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("family_files.id"), index=True
+    )
+    uploaded_by_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("professional_profiles.id"), index=True
+    )
+
+    # Source document
+    file_url: Mapped[str] = mapped_column(String(500))
+    original_filename: Mapped[str] = mapped_column(String(300))
+    file_size_bytes: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    mime_type: Mapped[str] = mapped_column(String(50), default="application/pdf")
+
+    # Detection — which California form type was identified
+    detected_form_type: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    # Values: FL-341, FL-311, FL-312, FL-150, FL-342 (California launch set)
+    detection_confidence: Mapped[Optional[float]] = mapped_column(nullable=True)
+
+    # Pipeline status
+    extraction_status: Mapped[str] = mapped_column(
+        String(20), default=OCRExtractionStatus.PENDING.value
+    )
+
+    # Extracted data (raw output from OCR + AI validation)
+    extracted_data: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    # Structure depends on form type, e.g.:
+    # {"custody_type": "joint", "primary_parent": "...", "schedule": {...}}
+
+    # Per-field confidence scores from OCR engine
+    confidence_scores: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    # e.g., {"custody_type": 0.95, "child_name": 0.87, "schedule_weekday": 0.62}
+
+    # Fields flagged for professional review (confidence < threshold)
+    low_confidence_fields: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    # e.g., ["schedule_weekday", "holiday_schedule"]
+
+    # Professional corrections made during review
+    professional_corrections: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    # e.g., {"schedule_weekday": {"original": "Mon-Thu", "corrected": "Mon-Wed"}}
+
+    # Processing metadata
+    processing_started_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    processing_completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    processing_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Approval
+    approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    approved_by_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("professional_profiles.id"), nullable=True
+    )
+    rejected_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    rejection_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Output — the new agreement created from approved extraction
+    # Per spec: OCR creates NEW agreements (doesn't update existing)
+    created_agreement_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("agreements.id"), nullable=True
+    )
+
+    # Relationships
+    professional: Mapped["ProfessionalProfile"] = relationship(
+        "ProfessionalProfile", backref="uploaded_ocr_documents",
+        foreign_keys=[uploaded_by_id]
+    )
+    family_file: Mapped["FamilyFile"] = relationship(
+        "FamilyFile", backref="ocr_documents"
+    )
+
+    def __repr__(self) -> str:
+        return f"<OCRDocument {self.id[:8]} ({self.detected_form_type or 'unknown'})>"
+
+
+class FieldLock(Base, UUIDMixin, TimestampMixin):
+    """
+    Court-order-locked fields that parents cannot edit.
+
+    Per spec:
+    - Locked fields display: 🔒 Locked by Case-[case-number]
+    - Parents can VIEW but cannot EDIT locked content
+    - Tooltip: "This field is set by court order. Contact your attorney to request changes."
+    - Professionals can unlock specific fields (requires confirmation)
+    - Unlock action is logged in case timeline with reason
+    - Unlocked fields remain unlocked until a new court order is filed
+
+    Field locking is triggered when an OCR-processed court order is approved.
+    """
+
+    __tablename__ = "field_locks"
+
+    # Which case and agreement the lock applies to
+    family_file_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("family_files.id"), index=True
+    )
+    agreement_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("agreements.id"), index=True
+    )
+
+    # Source OCR document that created this lock
+    ocr_document_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("ocr_documents.id"), nullable=True, index=True
+    )
+
+    # Who locked the field
+    locked_by_professional_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("professional_profiles.id"), index=True
+    )
+
+    # What is locked — JSONPath-style field identifier
+    field_path: Mapped[str] = mapped_column(String(300), index=True)
+    # e.g., "custody.schedule.weekday", "custody.primary_parent",
+    #        "financial.child_support.amount"
+
+    # Display value for the lock badge: "🔒 Locked by Case-[case_number]"
+    case_number: Mapped[str] = mapped_column(String(100))
+
+    # Lock timestamp
+    locked_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Unlock tracking (per spec: professionals can unlock with confirmation)
+    is_locked: Mapped[bool] = mapped_column(Boolean, default=True)
+    unlocked_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    unlocked_by_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("professional_profiles.id"), nullable=True
+    )
+    unlock_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    # Logged in case timeline per spec
+
+    # Relationships
+    family_file: Mapped["FamilyFile"] = relationship(
+        "FamilyFile", backref="field_locks"
+    )
+    locked_by: Mapped["ProfessionalProfile"] = relationship(
+        "ProfessionalProfile", backref="created_field_locks",
+        foreign_keys=[locked_by_professional_id]
+    )
+
+    # Unique constraint: one lock per field per agreement
+    __table_args__ = (
+        UniqueConstraint('agreement_id', 'field_path', name='uq_agreement_field_lock'),
+    )
+
+    def __repr__(self) -> str:
+        status = "🔒" if self.is_locked else "🔓"
+        return f"<FieldLock {status} {self.field_path} Case-{self.case_number}>"

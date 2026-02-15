@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { FirmAuditLog } from "@/components/professional/firm/audit-log";
 import { useProfessionalAuth } from "../layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,9 @@ import {
   Users,
   ArrowRight,
   FileText,
+  BarChart3,
+  Inbox,
+  Clock,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -239,6 +243,38 @@ export default function FirmSettingsPage() {
             </CardContent>
           </Card>
         </Link>
+        <Link href="/professional/firm/analytics">
+          <Card className="hover:shadow-md transition cursor-pointer">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <BarChart3 className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Analytics</p>
+                  <p className="text-sm text-gray-500">Firm performance & trends</p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5 text-gray-400" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/professional/firm/queue">
+          <Card className="hover:shadow-md transition cursor-pointer">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-100 rounded-lg">
+                  <Inbox className="h-5 w-5 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="font-medium">Case Queue</p>
+                  <p className="text-sm text-gray-500">Assign incoming cases</p>
+                </div>
+              </div>
+              <ArrowRight className="h-5 w-5 text-gray-400" />
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Basic Info */}
@@ -422,6 +458,20 @@ export default function FirmSettingsPage() {
               />
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Activity Log */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>
+            <Clock className="h-5 w-5 inline mr-2" />
+            Recent Activity
+          </CardTitle>
+          <CardDescription>Audit log of firm actions for compliance</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FirmAuditLog firmId={activeFirm.id} token={token || ""} />
         </CardContent>
       </Card>
 

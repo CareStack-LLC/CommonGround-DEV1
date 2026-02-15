@@ -28,6 +28,8 @@ import {
   Baby,
   Shield,
   UserPlus,
+  Link2,
+  MessageSquare as MessageSquareIcon,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -331,6 +333,18 @@ export default function IntakeCenterPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/professional/intake/questionnaires">
+            <Button variant="outline" size="sm" className="border-purple-200 text-purple-700 hover:bg-purple-50">
+              <MessageSquareIcon className="h-4 w-4 mr-1.5" />
+              Questionnaires
+            </Button>
+          </Link>
+          <Link href="/professional/intake/links">
+            <Button variant="outline" size="sm" className="border-indigo-200 text-indigo-700 hover:bg-indigo-50">
+              <Link2 className="h-4 w-4 mr-1.5" />
+              Link Tracking
+            </Button>
+          </Link>
           <Button
             variant="outline"
             size="sm"

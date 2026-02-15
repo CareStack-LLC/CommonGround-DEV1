@@ -13,9 +13,15 @@ CREATE TABLE IF NOT EXISTS aria_rules (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+-- @@@
 
 -- 2. ARIA Jobs (Async Inference Queue)
-CREATE TYPE aria_job_status AS ENUM ('pending', 'processing', 'completed', 'failed');
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'aria_job_status') THEN
+        CREATE TYPE aria_job_status AS ENUM ('pending', 'processing', 'completed', 'failed');
+    END IF;
+END $$;
+-- @@@
 
 CREATE TABLE IF NOT EXISTS aria_jobs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -29,6 +35,7 @@ CREATE TABLE IF NOT EXISTS aria_jobs (
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     processed_at TIMESTAMPTZ
 );
+-- @@@
 
 -- 3. ARIA Events (The "Truth" - Analysis Results)
 CREATE TABLE IF NOT EXISTS aria_events (
@@ -61,7 +68,10 @@ CREATE TABLE IF NOT EXISTS aria_events (
     
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+-- @@@
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_aria_jobs_status ON aria_jobs(status);
+-- @@@
 CREATE INDEX IF NOT EXISTS idx_aria_events_message_id ON aria_events(message_id);
+-- @@@

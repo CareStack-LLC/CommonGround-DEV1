@@ -1,8 +1,8 @@
-# CommonGround Mobile Multi-App Architecture Plan
+# CommonGround Mobile Architecture (Status & Roadmap)
 
-**Version:** 2.0
-**Date:** January 24, 2026
-**Status:** Planning
+**Version:** 2.1
+**Date:** February 14, 2026
+**Current Status:** **Unified PWA Implementation** (Roadmap for Native Multi-App Expansion)
 **Author:** Architecture Team
 
 ---
@@ -28,9 +28,14 @@
 
 ## 1. Executive Summary
 
-### 1.1 Overview
+### 1.1 Current State: The Unified PWA
+CommonGround currently operates as a **High-Fidelity Progressive Web App (PWA)**. This approach ensures:
+- **Instant Updates**: Version 1.110.26 is served globally without App Store delays.
+- **Shared Codebase**: 100% of the Next.js logic is shared between Desktop and Mobile.
+- **Service Worker (`sw.js`)**: Handles background notifications and offline capabilities for the "Sanctuary of Truth."
 
-This document outlines the architecture for splitting the CommonGround platform into three separate native mobile applications, each tailored to a specific user type:
+### 1.2 Roadmap: Native Multi-App Expansion
+The future strategy involves splitting the platform into specialized native apps:
 
 | App | Users | Platforms | Purpose |
 |-----|-------|-----------|---------|
@@ -51,7 +56,8 @@ This document outlines the architecture for splitting the CommonGround platform 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Mobile Framework | **Expo SDK 52+** | Managed workflow, OTA updates, easier builds |
-| Video Provider | **Daily.co** (keep existing) | Has React Native SDK, server-side recording |
+| Video Provider | **Daily.co** (Confirmed) | Has React Native SDK, server-side recording |
+| AI Integration | **Claude 3.5 Sonnet** | Advanced real-time mediation |
 | Recording | **Daily.co Cloud Recording** | Automatic, server-side, auditable |
 | Transcription | **Daily.co + Deepgram** | Real-time, 36+ languages, speaker diarization |
 | Storage | **Custom AWS S3** | Full control, no extra Daily.co storage fees |

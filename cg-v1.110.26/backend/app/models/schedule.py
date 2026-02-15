@@ -155,6 +155,8 @@ class ScheduleEvent(Base, UUIDMixin, TimestampMixin):
     color: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)  # Hex color for display
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Private notes (professional only)
     timezone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    attendee_ids: Mapped[Optional[list]] = mapped_column(JSON, default=list)
+    attendee_emails: Mapped[Optional[list]] = mapped_column(JSON, default=list)
 
     # Relationships
     case: Mapped["Case"] = relationship("Case", back_populates="schedule_events")

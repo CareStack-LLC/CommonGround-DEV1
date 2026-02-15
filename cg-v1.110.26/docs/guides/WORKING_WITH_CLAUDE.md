@@ -619,10 +619,10 @@ Why is [THING] doing [BEHAVIOR]? Find the cause.
 
 ```bash
 # Start backend
-cd mvp/backend && uvicorn app.main:app --reload
+cd backend && uvicorn app.main:app --reload
 
 # Start frontend
-cd mvp/frontend && npm run dev
+cd frontend && npm run dev
 
 # Check git status
 git status
@@ -631,10 +631,10 @@ git status
 git log --oneline -10
 
 # Run backend tests
-cd mvp/backend && pytest
+cd backend && pytest
 
 # Build frontend (check for errors)
-cd mvp/frontend && npm run build
+cd frontend && npm run build
 ```
 
 ---

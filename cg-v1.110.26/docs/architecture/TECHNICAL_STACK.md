@@ -1,7 +1,7 @@
-# CommonGround V1 - Technical Stack Breakdown
+# CommonGround V1.110 - Technical Stack Breakdown
 
-**Last Updated:** January 17, 2026
-**Version:** 1.5.0
+**Last Updated:** February 14, 2026
+**Version:** 1.110.26
 
 ---
 
@@ -25,8 +25,8 @@
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         PRESENTATION LAYER                          │
 │  ┌─────────────────────────────────────────────────────────────┐   │
-│  │  Next.js 14 (App Router) + React 18 + TypeScript 5          │   │
-│  │  Tailwind CSS 4 + shadcn/ui + Lucide Icons                  │   │
+│  │  Next.js 15 (App Router) + React 19 + TypeScript 5          │   │
+│  │  Tailwind CSS v4 + shadcn/ui + Lucide Icons                 │   │
 │  └─────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘
                                    │
@@ -136,7 +136,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 ```
 
-**File Location:** `mvp/backend/app/core/database.py`
+**File Location:** `backend/app/core/database.py`
 
 ### Validation: Pydantic 2.0
 
@@ -454,7 +454,7 @@ engine = create_async_engine(
 
 ### Primary AI: Anthropic Claude
 
-**Model:** claude-sonnet-4
+**Model:** Claude 3.5 Sonnet (claude-3-5-sonnet-20241022)
 
 **Usage Areas:**
 1. **ARIA Sentiment Analysis** - Message toxicity detection
@@ -477,7 +477,7 @@ response = client.messages.create(
 )
 ```
 
-**File Location:** `mvp/backend/app/services/aria.py`
+**File Location:** `backend/app/services/aria.py`
 
 ### Fallback AI: OpenAI
 

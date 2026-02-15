@@ -6,9 +6,11 @@ case assignments, and related features.
 """
 
 from datetime import datetime
+import io
 from typing import Optional
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -19,12 +21,17 @@ from app.models.professional import (
     Firm,
     FirmMembership,
     ProfessionalAccessRequest,
+    OCRDocument,
+    FieldLock,
     FirmRole,
     FirmType,
     MembershipStatus,
     ProfessionalType,
+    ProfessionalTier,
     AccessRequestStatus,
     AssignmentRole,
+    TemplateType,
+    OCRExtractionStatus,
 )
 from app.schemas.professional import (
     # Profile
@@ -52,19 +59,29 @@ from app.schemas.professional import (
     InviteProfessionalRequest,
     InvitationCasePreview,
 )
-from app.services.professional import (
-    FirmService,
-    ProfessionalProfileService,
-    ProfessionalAccessService,
-    CaseAssignmentService,
-    ProfessionalDashboardService,
-    CaseTimelineService,
-    ARIAControlService,
-    ProfessionalMessagingService,
-    ProfessionalIntakeService,
-    CommunicationsService,
-    ProfessionalComplianceService,
-    ProfessionalCaseSummaryService,
+from app.services.professional.profile_service import ProfessionalProfileService
+from app.services.professional.firm_service import FirmService
+from app.services.professional.access_service import ProfessionalAccessService
+from app.services.professional.assignment_service import CaseAssignmentService
+from app.services.professional.dashboard_service import ProfessionalDashboardService
+from app.services.professional.timeline_service import CaseTimelineService
+from app.services.professional.aria_control_service import ARIAControlService
+from app.services.professional.messaging_service import ProfessionalMessagingService
+from app.services.professional.intake_service import ProfessionalIntakeService
+from app.services.professional.communications_service import CommunicationsService
+from app.services.professional.compliance_service import ProfessionalComplianceService
+from app.services.professional.case_summary_service import ProfessionalCaseSummaryService
+from app.services.professional.call_log_service import ProfessionalCallLogService
+from app.services.professional.report_service import ComplianceReportService
+from app.services.professional.document_service import ProfessionalDocumentService, DocumentType
+from app.services.professional.template_service import FirmTemplateService
+from app.services.professional.ocr_service import OCRDocumentService, SUPPORTED_FORM_TYPES, CA_FORM_FIELD_MAPS
+from app.services.professional.field_lock_service import FieldLockService
+from app.services.professional.tier_gate import (
+    require_tier,
+    enforce_case_limit,
+    enforce_team_limit,
+    get_tier_features,
 )
 from app.schemas.professional import (
     # Case Assignment
@@ -91,6 +108,11 @@ from app.schemas.professional import (
     IntakeOutputsResponse,
     IntakeClarificationRequest,
     IntakeSessionListResponse,
+    ComplianceReportListResponse,
+    ProfessionalDocumentListResponse,
+    FirmTemplateCreate,
+    FirmTemplateResponse,
+    FirmAnalytics,
 )
 
 
@@ -453,6 +475,42 @@ async def get_firm(
         **firm_response.model_dump(),
         members=member_responses,
     )
+
+
+@router.get(
+    "/firms/{firm_id}/analytics",
+    response_model=FirmAnalytics,
+    summary="Get firm analytics",
+)
+async def get_firm_analytics(
+    firm_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Get aggregated analytics for the firm.
+
+    Requires OWNER, ADMIN, or PARTNER role.
+    """
+    firm_service = FirmService(db)
+    
+    # Check membership and role
+    membership = await firm_service.get_membership(profile.id, firm_id)
+    if not membership:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not a member of this firm.",
+        )
+    
+    allowed_roles = [FirmRole.OWNER.value, FirmRole.ADMIN.value, FirmRole.PARTNER.value]
+    if membership.role not in allowed_roles:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions to view firm analytics.",
+        )
+
+    dashboard_service = ProfessionalDashboardService(db)
+    return await dashboard_service.get_firm_analytics(firm_id)
 
 
 @router.patch(
@@ -2695,4 +2753,838 @@ async def get_intake_stats(
 ):
     """Get intake statistics for the professional."""
     service = ProfessionalIntakeService(db)
-    return await service.get_stats(profile.id, firm_id)
+    return await ProfessionalIntakeService(db).get_stats(profile.id, firm_id)
+
+
+# =============================================================================
+# CALL LOGS
+# =============================================================================
+
+@router.post(
+    "/cases/{family_file_id}/calls",
+    response_model=ProfessionalCallLogResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def log_call(
+    family_file_id: str,
+    data: ProfessionalCallLogCreate,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Log a voice/video call for a case.
+    """
+    # Ensure professional has access to the case
+    await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
+    
+    # Force the family_file_id to match the path
+    data.family_file_id = family_file_id
+    
+    return await ProfessionalCallLogService(db).log_call(profile.id, data)
+
+
+@router.get(
+    "/cases/{family_file_id}/calls",
+    response_model=ProfessionalCallLogListResponse,
+)
+async def list_case_calls(
+    family_file_id: str,
+    limit: int = Query(50, le=100),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    List all recorded calls for a specific case.
+    """
+    # Ensure professional has access to the case
+    await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
+    
+    logs, total = await ProfessionalCallLogService(db).get_call_logs(
+        professional_id=profile.id,
+        family_file_id=family_file_id,
+        limit=limit,
+        offset=offset
+    )
+    return ProfessionalCallLogListResponse(logs=logs, total=total)
+
+
+# =============================================================================
+# COMPLIANCE REPORTS
+# =============================================================================
+
+@router.post(
+    "/cases/{family_file_id}/reports",
+    response_model=ComplianceReportResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def generate_compliance_report(
+    family_file_id: str,
+    data: ComplianceReportCreate,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Trigger generation of a compliance report.
+    Initially creates a pending report record.
+    """
+    # Ensure professional has access to the case
+    await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
+    
+    # Force the family_file_id to match the path
+    data.family_file_id = family_file_id
+    
+    return await ComplianceReportService(db).create_report(profile.id, data)
+
+
+@router.get(
+    "/cases/{family_file_id}/reports",
+    response_model=ComplianceReportListResponse,
+)
+async def list_case_reports(
+    family_file_id: str,
+    limit: int = Query(20, le=50),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    List all generated reports for a specific case.
+    """
+    # Ensure professional has access to the case
+    await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
+    
+    reports, total = await ComplianceReportService(db).get_reports(
+        professional_id=profile.id,
+        family_file_id=family_file_id,
+        limit=limit,
+        offset=offset
+    )
+    return ComplianceReportListResponse(reports=reports, total=total)
+
+
+# =============================================================================
+# DOCUMENTS
+# =============================================================================
+
+@router.get(
+    "/documents",
+    response_model=ProfessionalDocumentListResponse,
+    summary="List professional documents",
+)
+async def list_professional_documents(
+    family_file_id: Optional[str] = Query(None),
+    doc_type: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, le=100),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    List documents across all assigned cases or for a specific case.
+    """
+    service = ProfessionalDocumentService(db)
+    items, total = await service.list_documents(
+        professional_id=profile.id,
+        family_file_id=family_file_id,
+        doc_type=doc_type,
+        search=search,
+        skip=skip,
+        limit=limit,
+    )
+    return ProfessionalDocumentListResponse(items=items, total=total)
+
+
+# =============================================================================
+# TEMPLATES
+# =============================================================================
+
+@router.get(
+    "/templates",
+    response_model=List[FirmTemplateResponse],
+    summary="List firm templates",
+)
+async def list_firm_templates(
+    firm_id: Optional[str] = Query(None),
+    template_type: Optional[TemplateType] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    List templates for the professional's firm.
+    If no firm_id is provided, use the first firm the professional belongs to.
+    """
+    # Get firm_id if not provided
+    target_firm_id = firm_id
+    if not target_firm_id:
+        if profile.firm_memberships:
+            target_firm_id = profile.firm_memberships[0].firm_id
+        else:
+            raise HTTPException(status_code=400, detail="Professional does not belong to any firm")
+
+    service = FirmTemplateService(db)
+    return await service.list_templates(firm_id=target_firm_id, template_type=template_type)
+
+
+@router.post(
+    "/templates",
+    response_model=FirmTemplateResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create firm template",
+)
+async def create_firm_template(
+    data: FirmTemplateCreate,
+    firm_id: str = Query(...),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Create a new template for a firm."""
+    service = FirmTemplateService(db)
+    return await service.create_template(
+        firm_id=firm_id,
+        user_id=profile.user_id,
+        name=data.name,
+        template_type=data.template_type,
+        content=data.content,
+        description=data.description
+    )
+
+
+@router.get(
+    "/templates/{template_id}/preview",
+    summary="Preview template with variable injection",
+)
+async def preview_template(
+    template_id: str,
+    family_file_id: str = Query(...),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Preview a template by injecting variables from a specific case.
+    """
+    service = FirmTemplateService(db)
+    try:
+        processed_content = await service.inject_variables(
+            template_id=template_id,
+            family_file_id=family_file_id
+        )
+        return processed_content
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+# =============================================================================
+# TIER FEATURES & GATING
+# =============================================================================
+
+@router.get(
+    "/tier/features",
+    summary="Get tier feature availability",
+)
+async def get_my_tier_features(
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Get feature availability for the current professional's tier.
+
+    Returns a map of features and whether they're enabled for this tier.
+    Frontend uses this to show/hide UI elements.
+    """
+    tier = ProfessionalTier(profile.subscription_tier)
+    return get_tier_features(tier)
+
+
+@router.get(
+    "/tier/usage",
+    summary="Get tier usage summary",
+)
+async def get_tier_usage(
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Get current usage vs tier limits."""
+    tier = ProfessionalTier(profile.subscription_tier)
+    features = get_tier_features(tier)
+    return {
+        "tier": tier.value,
+        "cases": {
+            "active": profile.active_case_count,
+            "max": features["max_cases"],
+            "remaining": max(0, features["max_cases"] - profile.active_case_count),
+        },
+        "team_members": {
+            "max": features["max_team_members"],
+        },
+        "subscription_status": profile.subscription_status,
+        "subscription_ends_at": (
+            profile.subscription_ends_at.isoformat()
+            if profile.subscription_ends_at else None
+        ),
+        "features": features["features"],
+    }
+
+
+# =============================================================================
+# OCR DOCUMENT PROCESSING
+# =============================================================================
+
+@router.get(
+    "/ocr/config",
+    summary="Get OCR configuration (field maps)",
+)
+async def get_ocr_config(
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Return the field configuration for supported court forms.
+    Used by the frontend to render field locking UI and tooltips.
+    """
+    return {
+        "supported_forms": SUPPORTED_FORM_TYPES,
+        "field_maps": CA_FORM_FIELD_MAPS,
+    }
+
+
+@router.post(
+    "/ocr/upload",
+    status_code=status.HTTP_201_CREATED,
+    summary="Upload document for OCR",
+)
+async def upload_ocr_document(
+    family_file_id: str = Body(...),
+    file_url: str = Body(...),
+    original_filename: str = Body(...),
+    file_size_bytes: Optional[int] = Body(None),
+    mime_type: str = Body("application/pdf"),
+    case_assignment_id: Optional[str] = Body(None),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Upload a court order document for OCR processing.
+
+    Requires Solo tier or higher. Creates the OCR document record
+    and queues it for processing.
+    """
+    # Tier gate: Solo+
+    await require_tier(ProfessionalTier.SOLO)(profile)
+
+    service = OCRDocumentService(db)
+    doc = await service.upload_document(
+        professional_id=profile.id,
+        family_file_id=family_file_id,
+        case_assignment_id=case_assignment_id,
+        file_url=file_url,
+        original_filename=original_filename,
+        file_size_bytes=file_size_bytes,
+        mime_type=mime_type,
+    )
+    await db.commit()
+
+    return {
+        "id": doc.id,
+        "extraction_status": doc.extraction_status,
+        "filename": doc.original_filename,
+        "created_at": doc.created_at.isoformat() if doc.created_at else None,
+        "supported_form_types": SUPPORTED_FORM_TYPES,
+    }
+
+
+@router.get(
+    "/ocr/documents",
+    summary="List OCR documents",
+)
+async def list_ocr_documents(
+    family_file_id: Optional[str] = Query(None),
+    status_filter: Optional[str] = Query(None, alias="status"),
+    limit: int = Query(50, le=100),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """List OCR documents. Optionally filter by case or status."""
+    service = OCRDocumentService(db)
+
+    if family_file_id:
+        docs = await service.list_documents_for_case(
+            family_file_id, status_filter
+        )
+    else:
+        docs = await service.list_documents_for_professional(
+            profile.id, status_filter, limit, offset
+        )
+
+    return {
+        "items": [
+            {
+                "id": d.id,
+                "family_file_id": d.family_file_id,
+                "original_filename": d.original_filename,
+                "detected_form_type": d.detected_form_type,
+                "extraction_status": d.extraction_status,
+                "created_at": d.created_at.isoformat() if d.created_at else None,
+            }
+            for d in docs
+        ],
+        "total": len(docs),
+    }
+
+
+@router.get(
+    "/ocr/documents/{document_id}",
+    summary="Get OCR document detail",
+)
+async def get_ocr_document(
+    document_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Get full details of an OCR document including extraction data."""
+    service = OCRDocumentService(db)
+    doc = await service.get_document(document_id)
+
+    if not doc:
+        raise HTTPException(status_code=404, detail="OCR document not found")
+
+    return {
+        "id": doc.id,
+        "family_file_id": doc.family_file_id,
+        "case_assignment_id": doc.case_assignment_id,
+        "file_url": doc.file_url,
+        "original_filename": doc.original_filename,
+        "file_size_bytes": doc.file_size_bytes,
+        "mime_type": doc.mime_type,
+        "detected_form_type": doc.detected_form_type,
+        "detection_confidence": doc.detection_confidence,
+        "extraction_status": doc.extraction_status,
+        "extracted_data": doc.extracted_data,
+        "confidence_scores": doc.confidence_scores,
+        "low_confidence_fields": doc.low_confidence_fields,
+        "professional_corrections": doc.professional_corrections,
+        "processing_started_at": (
+            doc.processing_started_at.isoformat()
+            if doc.processing_started_at else None
+        ),
+        "processing_completed_at": (
+            doc.processing_completed_at.isoformat()
+            if doc.processing_completed_at else None
+        ),
+        "processing_error": doc.processing_error,
+        "approved_at": doc.approved_at.isoformat() if doc.approved_at else None,
+        "rejected_at": doc.rejected_at.isoformat() if doc.rejected_at else None,
+        "rejection_reason": doc.rejection_reason,
+        "created_agreement_id": doc.created_agreement_id,
+        "created_at": doc.created_at.isoformat() if doc.created_at else None,
+    }
+
+
+@router.get(
+    "/ocr/documents/{document_id}/review",
+    summary="Get extraction for review",
+)
+async def get_ocr_review(
+    document_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Get extraction data formatted for professional review."""
+    service = OCRDocumentService(db)
+    try:
+        return await service.get_extraction_review(document_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post(
+    "/ocr/documents/{document_id}/corrections",
+    summary="Submit extraction corrections",
+)
+async def submit_ocr_corrections(
+    document_id: str,
+    corrections: dict = Body(...),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Submit professional corrections to extracted data."""
+    service = OCRDocumentService(db)
+    try:
+        doc = await service.submit_corrections(
+            document_id, corrections, profile.id
+        )
+        await db.commit()
+        return {"status": "corrections_saved", "document_id": doc.id}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post(
+    "/ocr/documents/{document_id}/approve",
+    summary="Approve OCR extraction",
+)
+async def approve_ocr_extraction(
+    document_id: str,
+    case_number: str = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Approve OCR extraction and create field locks.
+
+    Per spec: OCR creates NEW agreements. Populated fields are locked
+    from parent editing. Displays 🔒 Locked by Case-[number].
+    """
+    ocr_service = OCRDocumentService(db)
+    lock_service = FieldLockService(db)
+
+    try:
+        # 1. Approve extraction
+        doc = await ocr_service.approve_extraction(document_id, profile.id)
+
+        # 2. Create field locks for all populated fields
+        locks = []
+        if doc.extracted_data and doc.created_agreement_id:
+            locks = await lock_service.create_locks_from_ocr(
+                ocr_document_id=doc.id,
+                family_file_id=doc.family_file_id,
+                agreement_id=doc.created_agreement_id,
+                professional_id=profile.id,
+                case_number=case_number,
+                extracted_data=doc.extracted_data,
+            )
+
+        await db.commit()
+
+        return {
+            "status": "approved",
+            "document_id": doc.id,
+            "agreement_id": doc.created_agreement_id,
+            "locked_fields": len(locks),
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post(
+    "/ocr/documents/{document_id}/reject",
+    summary="Reject OCR extraction",
+)
+async def reject_ocr_extraction(
+    document_id: str,
+    reason: str = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Reject an OCR extraction with a reason."""
+    service = OCRDocumentService(db)
+    try:
+        doc = await service.reject_extraction(document_id, profile.id, reason)
+        await db.commit()
+        return {"status": "rejected", "document_id": doc.id}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+# =============================================================================
+# FIELD LOCKS
+# =============================================================================
+
+@router.get(
+    "/cases/{family_file_id}/locks",
+    summary="Get field locks for case",
+)
+async def get_case_field_locks(
+    family_file_id: str,
+    active_only: bool = Query(True),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """List all field locks for a case."""
+    service = FieldLockService(db)
+    locks = await service.get_locks_for_case(family_file_id, active_only)
+
+    return {
+        "items": [
+            {
+                "id": lock.id,
+                "field_path": lock.field_path,
+                "case_number": lock.case_number,
+                "display": f"🔒 Locked by Case-{lock.case_number}",
+                "is_locked": lock.is_locked,
+                "locked_at": lock.locked_at.isoformat() if lock.locked_at else None,
+                "agreement_id": lock.agreement_id,
+                "unlocked_at": lock.unlocked_at.isoformat() if lock.unlocked_at else None,
+                "unlock_reason": lock.unlock_reason,
+            }
+            for lock in locks
+        ],
+        "total": len(locks),
+    }
+
+
+@router.get(
+    "/agreements/{agreement_id}/locks",
+    summary="Get locked fields for agreement",
+)
+async def get_agreement_locked_fields(
+    agreement_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Get all locked field paths for an agreement.
+
+    Returns a list of field paths that cannot be edited by parents.
+    Frontend uses this to render lock icons on form fields.
+    """
+    service = FieldLockService(db)
+    paths = await service.get_locked_field_paths(agreement_id)
+    return {
+        "agreement_id": agreement_id,
+        "locked_fields": paths,
+        "total": len(paths),
+    }
+
+
+@router.post(
+    "/locks/{lock_id}/unlock",
+    summary="Unlock a field",
+)
+async def unlock_field(
+    lock_id: str,
+    reason: str = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Unlock a court-order locked field.
+
+    Requires a reason for audit trail. Only the professional
+    with case access can unlock fields.
+    """
+    service = FieldLockService(db)
+    try:
+        lock = await service.unlock_field(lock_id, profile.id, reason)
+        await db.commit()
+        return {
+            "status": "unlocked",
+            "field_path": lock.field_path,
+            "unlock_reason": reason,
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post(
+    "/agreements/{agreement_id}/unlock-all",
+    summary="Unlock all fields for agreement",
+)
+async def unlock_all_fields(
+    agreement_id: str,
+    reason: str = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Unlock ALL locked fields for an agreement.
+
+    Used when a new court order supersedes the previous one.
+    Requires a reason for the audit trail.
+    """
+    service = FieldLockService(db)
+    count = await service.bulk_unlock(agreement_id, profile.id, reason)
+    await db.commit()
+    return {
+        "status": "all_unlocked",
+        "agreement_id": agreement_id,
+        "unlocked_count": count,
+    }
+
+
+# =============================================================================
+# PROFESSIONAL DIRECTORY SEARCH
+# =============================================================================
+
+@router.get(
+    "/directory/professionals",
+    summary="Search professional directory",
+)
+async def search_professional_directory(
+    query: Optional[str] = Query(None, description="Search name, headline, bio"),
+    state: Optional[str] = Query(None, max_length=2, description="License state"),
+    practice_area: Optional[str] = Query(None, description="Practice area filter"),
+    language: Optional[str] = Query(None, description="Language filter"),
+    professional_type: Optional[str] = Query(None, description="Type filter"),
+    featured_only: bool = Query(False),
+    limit: int = Query(50, le=100),
+    skip: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Search public professional profiles in the directory.
+
+    Does not require authentication. Complements the existing
+    firm directory search endpoint.
+    """
+    from sqlalchemy import select, or_, func
+
+    q = select(ProfessionalProfile).where(
+        ProfessionalProfile.is_public == True,
+        ProfessionalProfile.is_active == True,
+        ProfessionalProfile.license_verified == True,
+    )
+
+    if query:
+        search = f"%{query}%"
+        q = q.where(
+            or_(
+                ProfessionalProfile.headline.ilike(search),
+                ProfessionalProfile.bio.ilike(search),
+            )
+        )
+
+    if state:
+        q = q.where(ProfessionalProfile.license_state == state.upper())
+
+    if professional_type:
+        q = q.where(ProfessionalProfile.professional_type == professional_type)
+
+    if featured_only:
+        q = q.where(ProfessionalProfile.is_featured == True)
+
+    # Order: featured first, then by creation date
+    q = q.order_by(
+        ProfessionalProfile.is_featured.desc(),
+        ProfessionalProfile.created_at.desc(),
+    ).offset(skip).limit(limit)
+
+    result = await db.execute(q)
+    profiles = result.scalars().all()
+
+    return {
+        "items": [
+            {
+                "id": p.id,
+                "professional_type": p.professional_type,
+                "headline": p.headline,
+                "bio": p.bio[:200] + "..." if p.bio and len(p.bio) > 200 else p.bio,
+                "license_state": p.license_state,
+                "license_verified": p.license_verified,
+                "practice_areas": p.practice_areas,
+                "languages": p.languages,
+                "hourly_rate": p.hourly_rate,
+                "years_experience": p.years_experience,
+                "consultation_fee": p.consultation_fee,
+                "is_featured": p.is_featured,
+                "office_address": p.office_address,
+                "jurisdictions": p.jurisdictions,
+            }
+            for p in profiles
+        ],
+        "total": len(profiles),
+    }
+
+
+# =============================================================================
+# REPORT DOWNLOAD TRACKING
+# =============================================================================
+
+@router.post(
+    "/reports/{report_id}/download",
+    summary="Track report download",
+)
+async def track_report_download(
+    report_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Increment download count for a compliance report."""
+    service = ComplianceReportService(db)
+    report = await service.track_download(report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    await db.commit()
+    return {
+        "report_id": report.id,
+        "download_count": report.download_count,
+        "sha256_hash": report.sha256_hash,
+    }
+
+
+@router.get(
+    "/reports/{report_id}/verify",
+    summary="Verify report integrity",
+)
+async def verify_report_integrity(
+    report_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Verify a report's SHA-256 hash for tamper-proof verification.
+
+    Returns the hash and metadata for court submission.
+    """
+    service = ComplianceReportService(db)
+    report = await service.get_report(report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    return {
+        "report_id": report.id,
+        "title": report.title,
+        "sha256_hash": report.sha256_hash,
+        "export_format": report.export_format,
+        "signature_line": report.signature_line,
+        "generated_at": report.created_at.isoformat() if report.created_at else None,
+        "download_count": report.download_count,
+        "status": report.status,
+    }
+
+
+@router.get(
+    "/reports/{report_id}/download",
+    summary="Download compliance report",
+)
+async def download_report(
+    report_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Generate and download the report file (PDF or Excel).
+    """
+    service = ComplianceReportService(db)
+    report = await service.get_report(report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    # Re-generate data just in time (or fetch from blob storage if we had it)
+    # For MVP we generate on the fly
+    data = await service.get_report_data(
+        family_file_id=report.family_file_id,
+        start_date=report.date_range_start,
+        end_date=report.date_range_end
+    )
+
+    if report.export_format == "excel":
+        file_bytes, sha = await service.generate_excel_bytes(report, data)
+        media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        filename = f"Compliance_Report_{report.family_file_id}.csv" 
+    else:
+        file_bytes, sha = await service.generate_pdf_bytes(report, data)
+        media_type = "application/pdf"
+        filename = f"Compliance_Report_{report.family_file_id}.pdf"
+
+    # Update hash/status if needed
+    await service.track_download(report_id)
+    await db.commit()
+
+    return StreamingResponse(
+        io.BytesIO(file_bytes),
+        media_type=media_type,
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+

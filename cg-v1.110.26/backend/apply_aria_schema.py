@@ -1,6 +1,7 @@
 import os
 import sys
 import asyncio
+import re
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import text
 
@@ -58,7 +59,7 @@ async def apply_schema():
             connect_args={"statement_cache_size": 0} 
         )
         
-        schema_path = os.path.join(os.getcwd(), 'backend/app/db/pro/aria_v3_schema.sql')
+        schema_path = os.path.join(os.path.dirname(__file__), 'app/db/pro/aria_v3_schema.sql')
         with open(schema_path, 'r') as f:
             sql_script = f.read()
 
@@ -66,7 +67,8 @@ async def apply_schema():
             # asyncpg requirement: cannot use multiple statements in one execute call
             # We split by semicolon, but need to be careful about real contents. 
             # Given the simple schema, splitting by ";\n" or just ";" should work well enough.
-            statements = sql_script.split(';')
+            # Split by unique delimiter to avoid breaking multi-line blocks
+            statements = sql_script.split('-- @@@')
             
             print(f"Found {len(statements)} statements to execute.")
             

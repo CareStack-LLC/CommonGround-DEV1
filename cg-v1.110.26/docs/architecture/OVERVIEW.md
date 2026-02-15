@@ -1,8 +1,8 @@
-# CommonGround V1 - Executive System Overview
+# CommonGround V1.110 - Executive System Overview
 
-**Last Updated:** January 18, 2026
-**Version:** 1.6.0
-**Status:** Production
+**Last Updated:** February 14, 2026
+**Version:** 1.110.26
+**Status:** Production (High-Integrity Suite)
 
 ---
 
@@ -42,12 +42,12 @@ CommonGround addresses the core challenges of co-parenting after separation:
 
 ### Key Statistics
 
-- **Backend:** 33 API endpoint modules, 30 models, 40 services, 27 schemas
-- **Frontend:** 123 pages, 109 components
-- **Database:** 80+ Alembic migrations, PostgreSQL + Redis
-- **API Endpoints:** 100+ REST endpoints across 33 modules
-- **AI Integration:** Anthropic Claude (primary) + OpenAI (fallback)
-- **Deployment:** Vercel (frontend), Render (backend), Supabase (database + auth)
+- **Backend:** 44 API endpoint modules, 35+ models, 53 services, 27+ schemas
+- **Frontend:** 120+ pages, 110+ components
+- **Database:** 100+ Alembic migrations, PostgreSQL (PostGIS) + Supabase
+- **API Endpoints:** 150+ REST endpoints across 44 modules
+- **AI Integration:** Anthropic Claude 3.5 Sonnet (Primary)
+- **Deployment:** Vercel (Frontend), Render/Railway (Backend), Supabase (Auth/DB/Storage)
 
 ---
 
@@ -350,8 +350,11 @@ This document is part of the comprehensive CommonGround V1 documentation suite:
 |----------|-------------|
 | **OVERVIEW.md** | This document - executive system overview |
 | [TECHNICAL_STACK.md](./TECHNICAL_STACK.md) | Detailed technology breakdown |
-| [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) | Component and data flow diagrams |
-| [FEATURES_BREAKDOWN.md](./FEATURES_BREAKDOWN.md) | Complete feature analysis with dependencies |
+| [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) | [NEW] Tiered architecture & AI Pipeline Encyclopedia |
+| [PLATFORM_CAPABILITIES.md](./PLATFORM_CAPABILITIES.md) | [NEW] Comprehensive Feature Encyclopedia |
+| [DATABASE_SCHEMA.md](./DATABASE_SCHEMA.md) | [NEW] Field-level Database Encyclopedia |
+| [FEATURES_BREAKDOWN.md](./FEATURES_BREAKDOWN.md) | Granular feature analysis with dependencies |
+| [MOBILE_MULTIAPP_ARCHITECTURE.md](./MOBILE_MULTIAPP_ARCHITECTURE.md) | Roadmap for native mobile expansion |
 
 ### API Documentation (/docs/api/)
 
@@ -392,10 +395,10 @@ This document is part of the comprehensive CommonGround V1 documentation suite:
 
 ## Quick Links
 
-- **Repository:** `/Users/tj/Desktop/CommonGround/mvp/`
-- **Backend:** `/Users/tj/Desktop/CommonGround/mvp/backend/`
-- **Frontend:** `/Users/tj/Desktop/CommonGround/mvp/frontend/`
-- **Existing Docs:** `/Users/tj/Desktop/CommonGround/mvp/docs/`
+- **Repository:** `/Users/tj/Desktop/CommonGround/cg-v1.110.26/`
+- **Backend:** `/Users/tj/Desktop/CommonGround/cg-v1.110.26/backend/`
+- **Frontend:** `/Users/tj/Desktop/CommonGround/cg-v1.110.26/frontend/`
+- **Encyclopedia:** `/Users/tj/Desktop/CommonGround/cg-v1.110.26/docs/architecture/PLATFORM_CAPABILITIES.md`
 - **API Docs (Auto):** `http://localhost:8000/docs`
 
 ---
