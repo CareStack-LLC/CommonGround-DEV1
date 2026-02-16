@@ -1188,3 +1188,47 @@ class FieldLock(Base, UUIDMixin, TimestampMixin):
     def __repr__(self) -> str:
         status = "🔒" if self.is_locked else "🔓"
         return f"<FieldLock {status} {self.field_path} Case-{self.case_number}>"
+
+
+class FirmAuditLog(Base, UUIDMixin, TimestampMixin):
+    """
+    Audit log for firm-level activities.
+    
+    Tracks:
+    - Member invites/removals
+    - Role changes
+    - Case assignments
+    - Settings updates
+    - Template changes
+    
+    Used for compliance and security auditing.
+    """
+
+    __tablename__ = "firm_audit_logs"
+
+    # Context
+    firm_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("firms.id"), index=True
+    )
+    actor_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("professional_profiles.id"), index=True
+    )
+    
+    # Event details
+    event_type: Mapped[str] = mapped_column(String(50), index=True)
+    # e.g., member_invited, member_joined, case_assigned, etc.
+    
+    description: Mapped[str] = mapped_column(Text)
+    # Human readable description: "Sarah assigned case X to John"
+    
+    event_metadata: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    # Structured data: { "case_number": "FF-123", "target_user": "John" }
+    
+    # Relationships
+    firm: Mapped["Firm"] = relationship("Firm", backref="audit_logs")
+    actor: Mapped["ProfessionalProfile"] = relationship(
+        "ProfessionalProfile", backref="audit_actions"
+    )
+
+    def __repr__(self) -> str:
+        return f"<FirmAuditLog {self.event_type} by {self.actor_id}>"

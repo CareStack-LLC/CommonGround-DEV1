@@ -267,7 +267,7 @@ export default function CaseQueuePage() {
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                 <Card>
                     <CardContent className="pt-4 flex items-center gap-3">
                         <div className="p-2 bg-indigo-100 rounded-lg">
@@ -306,8 +306,8 @@ export default function CaseQueuePage() {
             </div>
 
             {/* Filters */}
-            <div className="flex items-center gap-3 mb-4">
-                <div className="relative flex-1 max-w-sm">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
+                <div className="relative flex-1 max-w-full sm:max-w-sm">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         value={search}
@@ -317,7 +317,7 @@ export default function CaseQueuePage() {
                     />
                 </div>
                 <Select value={urgencyFilter} onValueChange={setUrgencyFilter}>
-                    <SelectTrigger className="w-[140px]">
+                    <SelectTrigger className="w-full sm:w-[140px]">
                         <Filter className="h-3.5 w-3.5 mr-1.5" />
                         <SelectValue placeholder="Urgency" />
                     </SelectTrigger>
@@ -367,14 +367,14 @@ export default function CaseQueuePage() {
                                 <Card
                                     key={item.id}
                                     className={`border-l-4 ${item.urgency === "urgent"
-                                            ? "border-l-red-500"
-                                            : item.urgency === "high"
-                                                ? "border-l-amber-400"
-                                                : "border-l-slate-200"
+                                        ? "border-l-red-500"
+                                        : item.urgency === "high"
+                                            ? "border-l-amber-400"
+                                            : "border-l-slate-200"
                                         }`}
                                 >
                                     <CardContent className="py-4">
-                                        <div className="flex items-start justify-between gap-4">
+                                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                                             {/* Case Info */}
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
@@ -431,14 +431,14 @@ export default function CaseQueuePage() {
                                             </div>
 
                                             {/* Assign Controls */}
-                                            <div className="flex items-center gap-2 flex-shrink-0">
+                                            <div className="flex items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
                                                 <Select
                                                     value={selectedMember[item.id] || ""}
                                                     onValueChange={(val) =>
                                                         setSelectedMember((prev) => ({ ...prev, [item.id]: val }))
                                                     }
                                                 >
-                                                    <SelectTrigger className="w-[180px] h-9 text-sm">
+                                                    <SelectTrigger className="flex-1 md:w-[180px] h-9 text-sm">
                                                         <UserPlus className="h-3.5 w-3.5 mr-1.5" />
                                                         <SelectValue placeholder="Assign to..." />
                                                     </SelectTrigger>

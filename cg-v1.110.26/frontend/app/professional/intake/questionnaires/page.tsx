@@ -601,7 +601,7 @@ export default function QuestionnaireBuilderPage() {
     return (
         <div className="p-6 max-w-5xl mx-auto">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
                     <Button variant="ghost" size="icon" onClick={() => setActiveView("list")}>
                         <ArrowLeft className="h-5 w-5" />
@@ -615,7 +615,7 @@ export default function QuestionnaireBuilderPage() {
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 self-end sm:self-auto">
                     <Button variant="outline" onClick={() => setActiveView("preview")}>
                         <Eye className="h-4 w-4 mr-2" />
                         Preview
@@ -697,9 +697,9 @@ export default function QuestionnaireBuilderPage() {
                             className="border-l-4 border-l-purple-400"
                         >
                             <CardHeader className="pb-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2 flex-1">
-                                        <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                                    <div className="flex items-center gap-2 flex-1 w-full">
+                                        <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab flex-shrink-0" />
                                         <Input
                                             value={section.title}
                                             onChange={(e) =>
@@ -709,7 +709,7 @@ export default function QuestionnaireBuilderPage() {
                                             className="font-medium border-0 shadow-none p-0 h-auto focus-visible:ring-0 text-base"
                                         />
                                     </div>
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-1 self-end sm:self-auto">
                                         <Button
                                             variant="ghost"
                                             size="icon"
@@ -767,7 +767,7 @@ export default function QuestionnaireBuilderPage() {
                                                     placeholder="Enter your question..."
                                                     className="bg-white"
                                                 />
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex flex-wrap items-center gap-2">
                                                     <Select
                                                         value={field.type}
                                                         onValueChange={(val) =>

@@ -32,6 +32,7 @@ from app.models.professional import (
     AssignmentRole,
     TemplateType,
     OCRExtractionStatus,
+    FirmAuditLog,
 )
 from app.schemas.professional import (
     # Profile
@@ -77,6 +78,7 @@ from app.services.professional.document_service import ProfessionalDocumentServi
 from app.services.professional.template_service import FirmTemplateService
 from app.services.professional.ocr_service import OCRDocumentService, SUPPORTED_FORM_TYPES, CA_FORM_FIELD_MAPS
 from app.services.professional.field_lock_service import FieldLockService
+from app.services.professional.firm_audit_service import FirmAuditLogService
 from app.services.professional.tier_gate import (
     require_tier,
     enforce_case_limit,
@@ -1016,6 +1018,21 @@ async def accept_firm_invitation(
                 invitation.approved_at = datetime.utcnow()
                 assignment = await access_service.create_assignment_from_request(invitation)
                 invitation.case_assignment_id = str(assignment.id)
+
+        # Log the event
+        audit_service = FirmAuditLogService(db)
+        await audit_service.log_event(
+            firm_id=firm_id,
+            actor_id=profile.id,
+            event_type="case_assigned",
+            description=f"Assigned case to professional {assigned_professional_id}",
+            metadata={
+                "invitation_id": invitation_id,
+                "assigned_professional_id": assigned_professional_id,
+                "case_assignment_id": invitation.case_assignment_id,
+                "family_file_id": invitation.family_file_id,
+            }
+        )
 
         await db.commit()
         await db.refresh(invitation)
@@ -3045,6 +3062,48 @@ async def get_ocr_config(
     return {
         "supported_forms": SUPPORTED_FORM_TYPES,
         "field_maps": CA_FORM_FIELD_MAPS,
+    }
+
+
+@router.get(
+    "/firms/{firm_id}/audit-log",
+    summary="Get firm audit log",
+)
+async def get_firm_audit_log(
+    firm_id: str,
+    limit: int = 100,
+    offset: int = 0,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Get audit log for a firm.
+    Requires firm membership.
+    """
+    firm_service = FirmService(db)
+    if not await firm_service.is_firm_member(profile.id, firm_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not a member of this firm",
+        )
+
+    service = FirmAuditLogService(db)
+    logs = await service.get_firm_audit_log(firm_id, limit, offset)
+    
+    # Transform for frontend
+    return {
+        "events": [
+            {
+                "id": str(log.id),
+                "event_type": log.event_type,
+                "actor_name": f"{log.actor.first_name} {log.actor.last_name}",
+                "actor_email": log.actor.user.email if log.actor.user else None,
+                "description": log.description,
+                "metadata": log.event_metadata,
+                "created_at": log.created_at,
+            }
+            for log in logs
+        ]
     }
 
 

@@ -189,10 +189,10 @@ export function FirmAuditLog({ firmId, token }: AuditLogProps) {
     return (
         <div className="space-y-4">
             {/* Controls */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                     <Select value={eventFilter} onValueChange={setEventFilter}>
-                        <SelectTrigger className="w-[160px] h-8 text-xs">
+                        <SelectTrigger className="flex-1 sm:w-[160px] h-8 text-xs">
                             <Filter className="h-3 w-3 mr-1" />
                             <SelectValue placeholder="Event type" />
                         </SelectTrigger>
@@ -207,7 +207,7 @@ export function FirmAuditLog({ firmId, token }: AuditLogProps) {
                         </SelectContent>
                     </Select>
                     <Select value={dateRange} onValueChange={setDateRange}>
-                        <SelectTrigger className="w-[120px] h-8 text-xs">
+                        <SelectTrigger className="flex-1 sm:w-[120px] h-8 text-xs">
                             <Clock className="h-3 w-3 mr-1" />
                             <SelectValue />
                         </SelectTrigger>
@@ -219,8 +219,8 @@ export function FirmAuditLog({ firmId, token }: AuditLogProps) {
                         </SelectContent>
                     </Select>
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={exportAuditLog} className="h-8 text-xs">
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <Button variant="outline" size="sm" onClick={exportAuditLog} className="h-8 text-xs flex-1 sm:flex-none">
                         <Download className="h-3.5 w-3.5 mr-1.5" />
                         Export CSV
                     </Button>
@@ -251,31 +251,33 @@ export function FirmAuditLog({ firmId, token }: AuditLogProps) {
                                     return (
                                         <div
                                             key={event.id}
-                                            className="flex items-start gap-3 py-2 px-3 rounded-lg hover:bg-slate-50/50 transition-colors"
+                                            className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 py-2 px-3 rounded-lg hover:bg-slate-50/50 transition-colors"
                                         >
-                                            <div className={`p-1.5 rounded-full ${cfg.color} flex-shrink-0 mt-0.5`}>
-                                                {cfg.icon}
+                                            <div className="flex items-start gap-3 flex-1">
+                                                <div className={`p-1.5 rounded-full ${cfg.color} flex-shrink-0 mt-0.5`}>
+                                                    {cfg.icon}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-sm">
+                                                        <span className="font-medium">{event.actor_name}</span>{" "}
+                                                        <span className="text-muted-foreground">{event.description}</span>
+                                                    </p>
+                                                    {event.metadata && Object.keys(event.metadata).length > 0 && (
+                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                            {Object.entries(event.metadata).map(([k, v]) => (
+                                                                <Badge
+                                                                    key={k}
+                                                                    variant="outline"
+                                                                    className="text-[10px] py-0"
+                                                                >
+                                                                    {k}: {String(v)}
+                                                                </Badge>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm">
-                                                    <span className="font-medium">{event.actor_name}</span>{" "}
-                                                    <span className="text-muted-foreground">{event.description}</span>
-                                                </p>
-                                                {event.metadata && Object.keys(event.metadata).length > 0 && (
-                                                    <div className="flex flex-wrap gap-1 mt-1">
-                                                        {Object.entries(event.metadata).map(([k, v]) => (
-                                                            <Badge
-                                                                key={k}
-                                                                variant="outline"
-                                                                className="text-[10px] py-0"
-                                                            >
-                                                                {k}: {String(v)}
-                                                            </Badge>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <span className="text-xs text-muted-foreground flex-shrink-0">
+                                            <span className="text-xs text-muted-foreground flex-shrink-0 ml-9 sm:ml-0">
                                                 {formatTime(event.created_at)}
                                             </span>
                                         </div>
