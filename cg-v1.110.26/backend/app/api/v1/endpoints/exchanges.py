@@ -260,6 +260,95 @@ async def get_upcoming_exchanges(
     return result
 
 
+@router.get(
+    "/case/{case_id}/history",
+    response_model=List[CustodyExchangeInstanceResponse],
+    summary="Get exchange history",
+    description="Get past and upcoming exchange instances for a case. Default includes past 30 days and upcoming 30 days."
+)
+async def get_exchange_history(
+    case_id: str,
+    days: int = Query(30, ge=1, le=365),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get exchange history (past and upcoming).
+    
+    Returns instances from [now - days] to [now + 30 days].
+    This ensures the user sees recent history AND upcoming scheduled events.
+    """
+    
+    # Calculate date range
+    now = datetime.utcnow()
+    start_date = now - timedelta(days=days)
+    end_date = now + timedelta(days=30)  # Always include next 30 days
+
+    # Strip timezone info
+    start_date_naive = strip_tz(start_date)
+    end_date_naive = strip_tz(end_date)
+
+    instances = await CustodyExchangeService.get_instances_in_range(
+        db=db,
+        case_id=case_id,
+        viewer_id=current_user.id,
+        start_date=start_date_naive,
+        end_date=end_date_naive
+    )
+
+    result = []
+    for instance in instances:
+        # Get other parent info for perspective-aware display
+        other_parent_name, other_parent_id = await CustodyExchangeService.get_other_parent_info(
+            db=db,
+            exchange=instance.exchange,
+            viewer_id=current_user.id
+        )
+
+        exchange_data = CustodyExchangeService.filter_for_viewer(
+            exchange=instance.exchange,
+            viewer_id=current_user.id,
+            other_parent_name=other_parent_name,
+            other_parent_id=other_parent_id
+        )
+
+        result.append(CustodyExchangeInstanceResponse(
+            id=instance.id,
+            exchange_id=instance.exchange_id,
+            scheduled_time=instance.scheduled_time,
+            status=instance.status,
+            from_parent_checked_in=instance.from_parent_checked_in,
+            from_parent_check_in_time=instance.from_parent_check_in_time,
+            to_parent_checked_in=instance.to_parent_checked_in,
+            to_parent_check_in_time=instance.to_parent_check_in_time,
+            completed_at=instance.completed_at,
+            notes=instance.notes,
+            override_location=instance.override_location,
+            override_time=instance.override_time,
+            # Silent Handoff GPS data
+            from_parent_check_in_lat=instance.from_parent_check_in_lat,
+            from_parent_check_in_lng=instance.from_parent_check_in_lng,
+            from_parent_device_accuracy=instance.from_parent_device_accuracy,
+            from_parent_distance_meters=instance.from_parent_distance_meters,
+            from_parent_in_geofence=instance.from_parent_in_geofence,
+            to_parent_check_in_lat=instance.to_parent_check_in_lat,
+            to_parent_check_in_lng=instance.to_parent_check_in_lng,
+            to_parent_device_accuracy=instance.to_parent_device_accuracy,
+            to_parent_distance_meters=instance.to_parent_distance_meters,
+            to_parent_in_geofence=instance.to_parent_in_geofence,
+            qr_confirmed_at=instance.qr_confirmed_at,
+            handoff_outcome=instance.handoff_outcome,
+            window_start=instance.window_start,
+            window_end=instance.window_end,
+            auto_closed=instance.auto_closed,
+            exchange=CustodyExchangeResponse(**exchange_data),
+            created_at=instance.created_at,
+            updated_at=instance.updated_at,
+        ))
+
+    return result
+
+
 @router.put(
     "/{exchange_id}",
     response_model=CustodyExchangeResponse,

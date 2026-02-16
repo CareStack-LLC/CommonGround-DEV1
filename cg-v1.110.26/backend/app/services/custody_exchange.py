@@ -533,6 +533,47 @@ class CustodyExchangeService:
         return list(result.scalars().all())
 
     @staticmethod
+    async def get_instances_in_range(
+        db: AsyncSession,
+        case_id: str,
+        viewer_id: str,
+        start_date: datetime,
+        end_date: datetime
+    ) -> List[CustodyExchangeInstance]:
+        """Get exchange instances within a date range."""
+
+        # Verify viewer has access (via case participant or family file)
+        has_access, effective_id, is_family_file = await _check_case_or_family_file_access(
+            db, case_id, viewer_id
+        )
+        if not has_access:
+            return []
+
+        # Build base conditions
+        base_conditions = [
+            CustodyExchange.status == "active",
+            CustodyExchangeInstance.scheduled_time >= start_date,
+            CustodyExchangeInstance.scheduled_time <= end_date
+        ]
+
+        # Add the appropriate ID filter
+        if is_family_file:
+            base_conditions.append(CustodyExchange.family_file_id == case_id)
+        else:
+            base_conditions.append(CustodyExchange.case_id == effective_id)
+
+        query = (
+            select(CustodyExchangeInstance)
+            .join(CustodyExchange)
+            .options(selectinload(CustodyExchangeInstance.exchange))
+            .where(and_(*base_conditions))
+            .order_by(CustodyExchangeInstance.scheduled_time.desc())
+        )
+
+        result = await db.execute(query)
+        return list(result.scalars().all())
+
+    @staticmethod
     async def get_upcoming_instances(
         db: AsyncSession,
         case_id: str,

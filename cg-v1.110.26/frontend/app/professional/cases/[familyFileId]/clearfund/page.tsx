@@ -116,7 +116,7 @@ export default function CaseClearFundPage() {
     try {
       // Build query params
       const params = new URLSearchParams();
-      params.append("family_file_id", familyFileId);
+      params.append("case_id", familyFileId);
       if (statusFilter !== "all") params.append("status", statusFilter);
       if (categoryFilter !== "all") params.append("category", categoryFilter);
 
