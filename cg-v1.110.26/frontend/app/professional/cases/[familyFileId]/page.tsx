@@ -353,6 +353,13 @@ export default function CaseDetailPage() {
               href={`/professional/cases/${familyFileId}/schedule`}
               color="amber"
             />
+            <NavigationCard
+              title="Parent Communications"
+              description="View message history between co-parents"
+              icon={<MessageSquare className="h-6 w-6" />}
+              href={`/professional/cases/${familyFileId}/communications`}
+              color="cyan"
+            />
           </div>
         </TabsContent>
       </Tabs>
