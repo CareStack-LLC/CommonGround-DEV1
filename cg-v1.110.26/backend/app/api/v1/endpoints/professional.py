@@ -7,7 +7,7 @@ case assignments, and related features.
 
 from datetime import datetime
 import io
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status, Query
 from fastapi.responses import StreamingResponse
