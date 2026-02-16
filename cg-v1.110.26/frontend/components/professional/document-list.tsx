@@ -14,12 +14,15 @@ import {
     ChevronRight,
     MoreVertical,
     Calendar,
-    Layers
+    Layers,
+    Upload,
+    Loader2
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -64,8 +67,54 @@ export function DocumentList({
 }) {
     const [documents, setDocuments] = useState<ProfessionalDocument[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isUploading, setIsUploading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [typeFilter, setTypeFilter] = useState("all");
+    const { toast } = useToast();
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !token || !familyFileId) return;
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("family_file_id", familyFileId);
+        formData.append("document_type", "court_order"); // Defaulting to court order based on button label
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/professional/ocr/upload`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                toast({
+                    title: "Upload Successful",
+                    description: "The court order has been uploaded and queued for processing.",
+                });
+                // Refresh list
+                fetchDocuments();
+            } else {
+                const error = await response.json();
+                throw new Error(error.detail || "Upload failed");
+            }
+        } catch (error) {
+            console.error("Upload error:", error);
+            toast({
+                title: "Upload Failed",
+                description: "There was an error uploading the document. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsUploading(false);
+            // Reset input
+            e.target.value = "";
+        }
+    };
 
     const fetchDocuments = async () => {
         if (!token) return;
@@ -141,6 +190,29 @@ export function DocumentList({
                         <SelectItem value="attachment">Evidence</SelectItem>
                     </SelectContent>
                 </Select>
+
+                <div className="flex items-center gap-2">
+                    <input
+                        type="file"
+                        id="court-order-upload"
+                        className="hidden"
+                        accept=".pdf,.png,.jpg,.jpeg"
+                        onChange={handleFileUpload}
+                        disabled={isUploading}
+                    />
+                    <Button
+                        onClick={() => document.getElementById('court-order-upload')?.click()}
+                        disabled={isUploading}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white whitespace-nowrap"
+                    >
+                        {isUploading ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                            <Upload className="h-4 w-4 mr-2" />
+                        )}
+                        {isUploading ? "Uploading..." : "Upload Court Order"}
+                    </Button>
+                </div>
             </div>
 
             {/* Grid view */}

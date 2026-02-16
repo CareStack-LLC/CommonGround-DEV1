@@ -17,7 +17,8 @@ from app.schemas.agreement import (
     AgreementSectionCreate,
     AgreementSectionUpdate,
     AgreementWithSections,
-    ApprovalRequest
+    ApprovalRequest,
+    AgreementVersionResponse
 )
 from app.services.agreement import AgreementService
 from app.services.aria_agreement import AriaAgreementService
@@ -38,6 +39,100 @@ class AriaChatResponse(BaseModel):
     is_finalized: bool
 
 # Note: Case-specific agreement endpoints (create, get by case_id) are in cases.py router
+
+
+
+class AgreementDetailedResponse(AgreementResponse):
+    """Agreement response with sections included (flat structure)."""
+    sections: List[AgreementSectionResponse]
+    completion_percentage: float
+
+
+@router.get("/family-file/{family_file_id}", response_model=List[AgreementDetailedResponse])
+async def get_agreements_by_family_file(
+    family_file_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get all agreements for a family file.
+
+    Args:
+        family_file_id: ID of the family file
+
+    Returns:
+        List of all agreements for the family file with sections
+    """
+    agreement_service = AgreementService(db)
+    agreements = await agreement_service.get_family_file_agreements(family_file_id, current_user)
+
+    response = []
+    for agreement in agreements:
+        # Calculate completion in-memory (sections are eager loaded)
+        completion = 0.0
+        if agreement.sections:
+            completed_count = sum(1 for s in agreement.sections if s.is_completed)
+            completion = (completed_count / len(agreement.sections)) * 100
+        
+        # Create response object
+        agreement_dict = AgreementResponse(
+            id=agreement.id,
+            case_id=agreement.case_id,
+            family_file_id=agreement.family_file_id,
+            title=agreement.title,
+            summary=agreement.summary,
+            version=agreement.version,
+            agreement_type=agreement.agreement_type,
+            agreement_version=agreement.agreement_version or "v2_standard",
+            status=agreement.status,
+            petitioner_approved=agreement.petitioner_approved,
+            respondent_approved=agreement.respondent_approved,
+            effective_date=agreement.effective_date,
+            pdf_url=agreement.pdf_url,
+            created_at=agreement.created_at,
+            updated_at=agreement.updated_at
+        ).model_dump()
+        
+        # Add sections and completion
+        agreement_dict["sections"] = [
+            AgreementSectionResponse(
+                id=s.id,
+                agreement_id=s.agreement_id,
+                section_number=s.section_number,
+                section_title=s.section_title,
+                section_type=s.section_type,
+                content=s.content,
+                structured_data=s.structured_data,
+                display_order=s.display_order,
+                is_required=s.is_required,
+                is_completed=s.is_completed
+            )
+            for s in sorted(agreement.sections, key=lambda x: x.display_order)
+        ]
+        agreement_dict["completion_percentage"] = completion
+        
+        response.append(agreement_dict)
+
+    return response
+
+
+@router.get("/{agreement_id}/versions", response_model=List[AgreementVersionResponse])
+async def get_agreement_versions(
+    agreement_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get version history for an agreement.
+
+    Args:
+        agreement_id: ID of the agreement
+
+    Returns:
+        List of agreement versions
+    """
+    agreement_service = AgreementService(db)
+    return await agreement_service.get_versions(agreement_id, current_user)
 
 
 @router.get("/{agreement_id}", response_model=AgreementWithSections)

@@ -903,6 +903,9 @@ function NewIntakeForm({
       );
 
       if (response.ok) {
+        const data = await response.json();
+        console.log("Intake session created:", data);
+        console.log("Intake link:", data.intake_link);
         onSuccess();
       }
     } catch (error) {

@@ -6,6 +6,7 @@ including session creation, transcript retrieval, and review workflows.
 """
 
 from datetime import datetime, timedelta
+import secrets
 from typing import Optional
 from uuid import uuid4
 
@@ -102,6 +103,9 @@ class ProfessionalIntakeService:
                 parent_id = str(uuid4())  # Placeholder
 
         # Create session
+        access_token = secrets.token_urlsafe(32)
+        expires_at = datetime.utcnow() + timedelta(days=7)
+
         session = IntakeSession(
             id=str(uuid4()),
             case_id=case_id or str(uuid4()),  # Required field
@@ -114,6 +118,8 @@ class ProfessionalIntakeService:
             custom_questions=custom_questions,
             status=IntakeStatus.PENDING.value,
             aria_provider="claude",
+            access_token=access_token,
+            access_link_expires_at=expires_at,
             messages=[
                 {
                     "role": "system",

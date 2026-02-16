@@ -99,6 +99,20 @@ class ApprovalRequest(BaseModel):
     notes: Optional[str] = None
 
 
+class AgreementVersionResponse(BaseModel):
+    """Agreement version history entry."""
+
+    id: str
+    agreement_id: str
+    version_number: int
+    created_at: datetime
+    created_by: Optional[str]
+    change_summary: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
 # Section templates - defines all 18 sections
 SECTION_TEMPLATES = [
     {

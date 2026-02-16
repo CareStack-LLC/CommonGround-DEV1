@@ -398,14 +398,10 @@ function ProfessionalNavigation({
       badge: dashboardData?.unread_messages > 0 ? dashboardData.unread_messages.toString() : undefined,
     },
     {
-      href: "/professional/documents",
-      label: "Documents",
-      icon: <FileText className="h-4 w-4" />,
-    },
-    {
-      href: "/professional/directory",
-      label: "Directory",
-      icon: <Users className="h-4 w-4" />,
+      href: "/professional/messages",
+      label: "Messages",
+      icon: <MessageSquare className="h-4 w-4" />,
+      badge: dashboardData?.unread_messages > 0 ? dashboardData.unread_messages.toString() : undefined,
     },
   ];
 

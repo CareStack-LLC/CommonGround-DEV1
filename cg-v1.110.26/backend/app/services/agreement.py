@@ -225,6 +225,56 @@ class AgreementService:
         )
         return result.scalars().first()
 
+    async def get_family_file_agreements(
+        self,
+        family_file_id: str,
+        user: User
+    ) -> List[Agreement]:
+        """
+        Get all agreements for a family file.
+
+        Args:
+            family_file_id: ID of the family file
+            user: User requesting the agreements
+
+        Returns:
+            List of agreements
+        """
+        # Verify access
+        await self.family_file_service.get_family_file(family_file_id, user)
+
+        result = await self.db.execute(
+            select(Agreement)
+            .options(
+                selectinload(Agreement.sections),
+                selectinload(Agreement.family_file)
+            )
+            .where(Agreement.family_file_id == family_file_id)
+            .order_by(Agreement.created_at.desc())
+        )
+        return result.scalars().all()
+
+    async def get_versions(self, agreement_id: str, user: User) -> List[AgreementVersion]:
+        """
+        Get version history for an agreement.
+
+        Args:
+            agreement_id: ID of the agreement
+            user: User requesting version history
+
+        Returns:
+            List of agreement versions
+        """
+        # Verify access via get_agreement
+        await self.get_agreement(agreement_id, user)
+
+        result = await self.db.execute(
+            select(AgreementVersion)
+            .where(AgreementVersion.agreement_id == agreement_id)
+            .order_by(AgreementVersion.version_number.desc())
+        )
+        return result.scalars().all()
+
     async def create_section(
         self,
         create_data,
