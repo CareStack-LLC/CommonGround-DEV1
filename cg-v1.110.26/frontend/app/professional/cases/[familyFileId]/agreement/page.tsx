@@ -17,7 +17,12 @@ import {
   Shield,
   Handshake,
   Download,
+  Sparkles,
+  LayoutList,
+  List,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -95,6 +100,18 @@ interface ComplianceMetrics {
   section_compliance: Record<string, number>;
 }
 
+interface QuickSummary {
+  summary: string;
+  key_points: string[];
+  shared_expenses_table?: {
+    split: string;
+    covered: string[];
+    not_covered: string[];
+  };
+  completion_percentage: number;
+  status: string;
+}
+
 export default function CaseAgreementPage() {
   const params = useParams();
   const { token } = useProfessionalAuth();
@@ -104,8 +121,11 @@ export default function CaseAgreementPage() {
   const [quickAccords, setQuickAccords] = useState<QuickAccord[]>([]);
   const [versions, setVersions] = useState<AgreementVersion[]>([]);
   const [compliance, setCompliance] = useState<ComplianceMetrics | null>(null);
+  const [summary, setSummary] = useState<QuickSummary | null>(null);
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("agreement");
+  const [viewMode, setViewMode] = useState<"sections" | "full">("sections");
 
   useEffect(() => {
     fetchAgreementData();
@@ -132,8 +152,18 @@ export default function CaseAgreementPage() {
           : data;
         setAgreement(activeAgreement);
 
-        // Fetch versions if we have an agreement
+        // Fetch AI Summary
         if (activeAgreement?.id) {
+          setIsSummaryLoading(true);
+          fetch(`${API_BASE}/api/v1/agreements/${activeAgreement.id}/quick-summary`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then(res => res.json())
+            .then(data => setSummary(data))
+            .catch(err => console.error("Error fetching summary:", err))
+            .finally(() => setIsSummaryLoading(false));
+
+          // Fetch versions
           const versionsResponse = await fetch(
             `${API_BASE}/api/v1/agreements/${activeAgreement.id}/versions`,
             {
@@ -374,69 +404,167 @@ export default function CaseAgreementPage() {
                 </CardContent>
               </Card>
 
-              {/* Agreement Sections */}
-              {agreement.sections && agreement.sections.length > 0 ? (
-                <Accordion type="multiple" className="space-y-2">
-                  {agreement.sections
-                    .sort((a, b) => a.section_number - b.section_number)
-                    .map((section) => (
-                      <AccordionItem
-                        key={section.id}
-                        value={section.id}
-                        className="border rounded-lg px-4"
-                      >
-                        <AccordionTrigger className="hover:no-underline">
-                          <div className="flex items-center gap-3 text-left">
-                            <span className="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-sm font-medium">
-                              {section.section_number}
-                            </span>
-                            <div>
-                              <p className="font-medium">{section.section_title}</p>
-                              <p className="text-xs text-muted-foreground capitalize">
-                                {section.section_type.replace("_", " ")}
-                              </p>
-                            </div>
-                            {section.is_completed ? (
-                              <Badge className="ml-auto mr-4 bg-emerald-100 text-emerald-800">
-                                Complete
-                              </Badge>
-                            ) : (
-                              <Badge className="ml-auto mr-4 bg-amber-100 text-amber-800">
-                                In Progress
-                              </Badge>
-                            )}
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="pt-4 pb-2">
-                            {section.compliance_score !== undefined && (
-                              <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="text-sm text-muted-foreground">
-                                    Section Compliance
-                                  </span>
-                                  <span className="text-sm font-medium">
-                                    {Math.round(section.compliance_score * 100)}%
-                                  </span>
-                                </div>
-                                <Progress value={section.compliance_score * 100} className="h-1.5" />
+              {/* AI Quick Summary */}
+              {(isSummaryLoading || summary) && (
+                <Card className="border-indigo-100 bg-indigo-50/30 overflow-hidden mt-6">
+                  <CardHeader className="pb-3 border-b border-indigo-100/50 bg-white/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 bg-indigo-100 text-indigo-600 rounded-md">
+                          <Sparkles className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-base">AI Agreement Summary</CardTitle>
+                          <CardDescription className="text-xs">Plain-English breakdown by ARIA</CardDescription>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-6 space-y-6">
+                    {isSummaryLoading ? (
+                      <div className="space-y-4 animate-pulse">
+                        <div className="h-4 bg-indigo-100 rounded w-3/4"></div>
+                        <div className="h-4 bg-indigo-100 rounded w-5/6"></div>
+                        <div className="h-4 bg-indigo-100 rounded w-1/2"></div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="prose prose-sm max-w-none text-slate-700 leading-relaxed">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {summary?.summary || ""}
+                          </ReactMarkdown>
+                        </div>
+
+                        {summary?.key_points && summary.key_points.length > 0 && (
+                          <div className="grid sm:grid-cols-2 gap-3 pt-4 border-t border-indigo-100/50">
+                            {summary.key_points.map((point, idx) => (
+                              <div key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{point}</ReactMarkdown>
                               </div>
-                            )}
-                            <div className="prose prose-sm max-w-none">
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Agreement Sections Header with Toggle */}
+              <div className="flex items-center justify-between pt-4">
+                <h3 className="text-lg font-bold text-slate-900">Agreement Provisions</h3>
+                <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
+                  <Button
+                    variant={viewMode === "sections" ? "secondary" : "ghost"}
+                    size="sm"
+                    className="h-8 px-3 text-xs gap-2"
+                    onClick={() => setViewMode("sections")}
+                  >
+                    <LayoutList className="h-3.5 w-3.5" />
+                    Explorer
+                  </Button>
+                  <Button
+                    variant={viewMode === "full" ? "secondary" : "ghost"}
+                    size="sm"
+                    className="h-8 px-3 text-xs gap-2"
+                    onClick={() => setViewMode("full")}
+                  >
+                    <List className="h-3.5 w-3.5" />
+                    Full Text
+                  </Button>
+                </div>
+              </div>
+
+              {/* Agreement Sections Content */}
+              {agreement.sections && agreement.sections.length > 0 ? (
+                viewMode === "sections" ? (
+                  <Accordion type="multiple" className="space-y-2">
+                    {agreement.sections
+                      .sort((a, b) => (Number(a.section_number) || 0) - (Number(b.section_number) || 0))
+                      .map((section) => (
+                        <AccordionItem
+                          key={section.id}
+                          value={section.id}
+                          className="border rounded-lg px-4 bg-white"
+                        >
+                          <AccordionTrigger className="hover:no-underline">
+                            <div className="flex items-center gap-3 text-left">
+                              <span className="w-8 h-8 flex items-center justify-center bg-slate-100 rounded-full text-sm font-medium">
+                                {section.section_number}
+                              </span>
+                              <div>
+                                <p className="font-medium text-slate-900">{section.section_title}</p>
+                                <p className="text-xs text-muted-foreground capitalize">
+                                  {section.section_type.replace("_", " ")}
+                                </p>
+                              </div>
+                              {section.is_completed ? (
+                                <Badge className="ml-auto mr-4 bg-emerald-50 text-emerald-700 border-emerald-100">
+                                  Complete
+                                </Badge>
+                              ) : (
+                                <Badge className="ml-auto mr-4 bg-amber-50 text-amber-700 border-amber-100">
+                                  In Progress
+                                </Badge>
+                              )}
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="pt-4 pb-2">
+                              {section.compliance_score !== undefined && (
+                                <div className="mb-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-xs text-muted-foreground">
+                                      Section Compliance
+                                    </span>
+                                    <span className="text-xs font-bold text-slate-700">
+                                      {Math.round(section.compliance_score * 100)}%
+                                    </span>
+                                  </div>
+                                  <Progress value={section.compliance_score * 100} className="h-1.5" />
+                                </div>
+                              )}
+                              <div className="prose prose-sm max-w-none text-slate-700 bg-slate-50/50 p-4 rounded-lg border border-slate-100 whitespace-pre-wrap">
+                                {section.content || "No content available for this section."}
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      )
+                      )}
+                  </Accordion>
+                ) : (
+                  <div className="space-y-4">
+                    {agreement.sections
+                      .sort((a, b) => (Number(a.section_number) || 0) - (Number(b.section_number) || 0))
+                      .map((section) => (
+                        <Card key={section.id} className="border-slate-200">
+                          <CardHeader className="py-4 bg-slate-50/50 border-b border-slate-100">
+                            <div className="flex items-center gap-3">
+                              <span className="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-full text-sm font-bold text-slate-700 shadow-sm">
+                                {section.section_number}
+                              </span>
+                              <CardTitle className="text-base font-semibold text-slate-900">
+                                {section.section_title}
+                              </CardTitle>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pt-6">
+                            <div className="prose prose-slate prose-sm max-w-none whitespace-pre-wrap">
                               {section.content || "No content available for this section."}
                             </div>
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                </Accordion>
+                          </CardContent>
+                        </Card>
+                      )
+                      )}
+                  </div>
+                )
               ) : (
                 <Card>
-                  <CardContent className="py-12 text-center">
-                    <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground">
-                      No sections available for this agreement.
-                    </p>
+                  <CardContent className="py-12 text-center text-slate-500">
+                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                    <p>No sections available for this agreement.</p>
                   </CardContent>
                 </Card>
               )}
@@ -483,9 +611,8 @@ export default function CaseAgreementPage() {
                       <div className="flex flex-col items-end gap-2">
                         <div className="flex items-center gap-4 text-sm">
                           <span
-                            className={`flex items-center gap-1 ${
-                              accord.parent_a_approved ? "text-emerald-600" : "text-amber-600"
-                            }`}
+                            className={`flex items-center gap-1 ${accord.parent_a_approved ? "text-emerald-600" : "text-amber-600"
+                              }`}
                           >
                             {accord.parent_a_approved ? (
                               <CheckCircle2 className="h-4 w-4" />
@@ -495,9 +622,8 @@ export default function CaseAgreementPage() {
                             Parent A
                           </span>
                           <span
-                            className={`flex items-center gap-1 ${
-                              accord.parent_b_approved ? "text-emerald-600" : "text-amber-600"
-                            }`}
+                            className={`flex items-center gap-1 ${accord.parent_b_approved ? "text-emerald-600" : "text-amber-600"
+                              }`}
                           >
                             {accord.parent_b_approved ? (
                               <CheckCircle2 className="h-4 w-4" />
@@ -554,11 +680,10 @@ export default function CaseAgreementPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            index === 0
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-slate-100 text-slate-600"
-                          }`}
+                          className={`w-10 h-10 rounded-full flex items-center justify-center ${index === 0
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-slate-100 text-slate-600"
+                            }`}
                         >
                           v{version.version_number}
                         </div>
@@ -577,9 +702,8 @@ export default function CaseAgreementPage() {
                       </div>
                       <div className="flex items-center gap-4 text-sm">
                         <span
-                          className={`flex items-center gap-1 ${
-                            version.petitioner_approved ? "text-emerald-600" : "text-muted-foreground"
-                          }`}
+                          className={`flex items-center gap-1 ${version.petitioner_approved ? "text-emerald-600" : "text-muted-foreground"
+                            }`}
                         >
                           {version.petitioner_approved ? (
                             <CheckCircle2 className="h-4 w-4" />
@@ -589,9 +713,8 @@ export default function CaseAgreementPage() {
                           Petitioner
                         </span>
                         <span
-                          className={`flex items-center gap-1 ${
-                            version.respondent_approved ? "text-emerald-600" : "text-muted-foreground"
-                          }`}
+                          className={`flex items-center gap-1 ${version.respondent_approved ? "text-emerald-600" : "text-muted-foreground"
+                            }`}
                         >
                           {version.respondent_approved ? (
                             <CheckCircle2 className="h-4 w-4" />
@@ -624,6 +747,6 @@ export default function CaseAgreementPage() {
           )}
         </TabsContent>
       </Tabs>
-    </div>
+    </div >
   );
 }
