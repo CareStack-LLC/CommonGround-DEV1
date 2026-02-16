@@ -268,21 +268,22 @@ async def get_upcoming_exchanges(
 )
 async def get_exchange_history(
     case_id: str,
-    days: int = Query(30, ge=1, le=365),
+    days: int = Query(30, ge=1, le=365, description="Number of past days to include"),
+    upcoming_days: int = Query(30, ge=0, le=365, description="Number of future days to include"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
     Get exchange history (past and upcoming).
     
-    Returns instances from [now - days] to [now + 30 days].
+    Returns instances from [now - days] to [now + upcoming_days].
     This ensures the user sees recent history AND upcoming scheduled events.
     """
     
     # Calculate date range
     now = datetime.utcnow()
     start_date = now - timedelta(days=days)
-    end_date = now + timedelta(days=30)  # Always include next 30 days
+    end_date = now + timedelta(days=upcoming_days)  # Use requested upcoming days
 
     # Strip timezone info
     start_date_naive = strip_tz(start_date)

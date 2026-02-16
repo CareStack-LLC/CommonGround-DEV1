@@ -43,13 +43,12 @@ import { useProfessionalAuth } from "../../../layout";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface MessageThread {
-  thread_id: string;
+  id: string;
   subject?: string;
-  participant_names: string[];
+  participant_ids?: string[];
   message_count: number;
-  first_message_at: string;
   last_message_at: string;
-  has_interventions: boolean;
+  has_interventions?: boolean;
 }
 
 interface ParentMessage {
@@ -138,10 +137,11 @@ export default function CommunicationsPage() {
 
       if (threadsRes.ok) {
         const threadsData = await threadsRes.json();
-        setThreads(threadsData.items || []);
+        const items = threadsData.threads || threadsData.items || [];
+        setThreads(items);
         // Auto-select first thread if available
-        if (threadsData.items?.length > 0) {
-          setSelectedThread(threadsData.items[0].thread_id);
+        if (items.length > 0) {
+          setSelectedThread(items[0].id);
         }
       }
 
@@ -292,8 +292,8 @@ export default function CommunicationsPage() {
                       <p className="text-xs text-muted-foreground">Flagged Messages</p>
                       <p className="text-2xl font-bold">
                         {stats.flag_rate != null ? `${stats.flag_rate}%` :
-                         stats.intervention_rate != null ? `${(stats.intervention_rate * 100).toFixed(1)}%` :
-                         `${stats.flagged_messages ?? 0}`}
+                          stats.intervention_rate != null ? `${(stats.intervention_rate * 100).toFixed(1)}%` :
+                            `${stats.flagged_messages ?? 0}`}
                       </p>
                     </div>
                     <Bot className="h-8 w-8 text-muted-foreground opacity-50" />
@@ -389,66 +389,7 @@ export default function CommunicationsPage() {
                 </Card>
               )}
 
-              {/* Good Faith Scores */}
-              {stats.good_faith_scores && (
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                      <TrendingUp className="h-4 w-4" />
-                      Good Faith Scores
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      ARIA-assessed communication quality
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Parent A</span>
-                          <span className={`font-medium ${
-                            stats.good_faith_scores.parent_a >= 0.7 ? "text-emerald-600" :
-                            stats.good_faith_scores.parent_a >= 0.4 ? "text-amber-600" : "text-red-600"
-                          }`}>
-                            {Math.round(stats.good_faith_scores.parent_a * 100)}%
-                          </span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${
-                              stats.good_faith_scores.parent_a >= 0.7 ? "bg-emerald-500" :
-                              stats.good_faith_scores.parent_a >= 0.4 ? "bg-amber-500" : "bg-red-500"
-                            }`}
-                            style={{ width: `${stats.good_faith_scores.parent_a * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Parent B</span>
-                          <span className={`font-medium ${
-                            stats.good_faith_scores.parent_b >= 0.7 ? "text-emerald-600" :
-                            stats.good_faith_scores.parent_b >= 0.4 ? "text-amber-600" : "text-red-600"
-                          }`}>
-                            {Math.round(stats.good_faith_scores.parent_b * 100)}%
-                          </span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${
-                              stats.good_faith_scores.parent_b >= 0.7 ? "bg-emerald-500" :
-                              stats.good_faith_scores.parent_b >= 0.4 ? "bg-amber-500" : "bg-red-500"
-                            }`}
-                            style={{ width: `${stats.good_faith_scores.parent_b * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* ARIA Flag Categories */}
+              {/* ARIA Flag Categories (Moved here) */}
               {stats.flag_categories && Object.keys(stats.flag_categories).length > 0 && (
                 <Card>
                   <CardHeader className="pb-2">
@@ -475,6 +416,61 @@ export default function CommunicationsPage() {
                             </Badge>
                           </div>
                         ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Good Faith Scores */}
+              {stats.good_faith_scores && (
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4" />
+                      Good Faith Scores
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      ARIA-assessed communication quality
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Parent A</span>
+                          <span className={`font-medium ${stats.good_faith_scores.parent_a >= 0.7 ? "text-emerald-600" :
+                            stats.good_faith_scores.parent_a >= 0.4 ? "text-amber-600" : "text-red-600"
+                            }`}>
+                            {Math.round(stats.good_faith_scores.parent_a * 100)}%
+                          </span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${stats.good_faith_scores.parent_a >= 0.7 ? "bg-emerald-500" :
+                              stats.good_faith_scores.parent_a >= 0.4 ? "bg-amber-500" : "bg-red-500"
+                              }`}
+                            style={{ width: `${stats.good_faith_scores.parent_a * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>Parent B</span>
+                          <span className={`font-medium ${stats.good_faith_scores.parent_b >= 0.7 ? "text-emerald-600" :
+                            stats.good_faith_scores.parent_b >= 0.4 ? "text-amber-600" : "text-red-600"
+                            }`}>
+                            {Math.round(stats.good_faith_scores.parent_b * 100)}%
+                          </span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${stats.good_faith_scores.parent_b >= 0.7 ? "bg-emerald-500" :
+                              stats.good_faith_scores.parent_b >= 0.4 ? "bg-amber-500" : "bg-red-500"
+                              }`}
+                            style={{ width: `${stats.good_faith_scores.parent_b * 100}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -567,7 +563,7 @@ export default function CommunicationsPage() {
             </div>
           )}
 
-          {/* Message View */}
+          {/* Message View - Need to fix the thread list rendering to use corrected fields */}
           <div className="grid lg:grid-cols-4 gap-4">
             {/* Thread List */}
             <Card className="lg:col-span-1">
@@ -584,13 +580,12 @@ export default function CommunicationsPage() {
                     ) : (
                       threads.map((thread) => (
                         <button
-                          key={thread.thread_id}
-                          onClick={() => setSelectedThread(thread.thread_id)}
-                          className={`w-full p-3 rounded-lg text-left transition-colors ${
-                            selectedThread === thread.thread_id
-                              ? "bg-purple-50 border border-purple-200"
-                              : "hover:bg-muted/50"
-                          }`}
+                          key={thread.id}
+                          onClick={() => setSelectedThread(thread.id)}
+                          className={`w-full p-3 rounded-lg text-left transition-colors ${selectedThread === thread.id
+                            ? "bg-purple-50 border border-purple-200"
+                            : "hover:bg-muted/50"
+                            }`}
                         >
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-sm font-medium truncate">
@@ -605,7 +600,7 @@ export default function CommunicationsPage() {
                               {thread.message_count} messages
                             </span>
                             <span className="text-xs text-muted-foreground">
-                              {formatTime(thread.last_message_at)}
+                              {thread.last_message_at ? formatTime(thread.last_message_at) : 'N/A'}
                             </span>
                           </div>
                         </button>
@@ -654,11 +649,10 @@ export default function CommunicationsPage() {
                       filteredMessages.map((message) => (
                         <div
                           key={message.id}
-                          className={`p-4 rounded-lg border ${
-                            message.sender_role === "parent_a"
-                              ? "border-l-4 border-l-blue-500 bg-blue-50/50"
-                              : "border-l-4 border-l-purple-500 bg-purple-50/50"
-                          }`}
+                          className={`p-4 rounded-lg border ${message.sender_role === "parent_a"
+                            ? "border-l-4 border-l-blue-500 bg-blue-50/50"
+                            : "border-l-4 border-l-purple-500 bg-purple-50/50"
+                            }`}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">

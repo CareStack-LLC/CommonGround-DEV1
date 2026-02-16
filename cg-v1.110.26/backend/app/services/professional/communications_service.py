@@ -17,7 +17,7 @@ from app.models.professional import (
     AssignmentStatus,
 )
 from app.models.family_file import FamilyFile
-from app.models.message import Message, MessageThread
+from app.models.message import Message, MessageThread, MessageFlag
 from app.models.user import User
 
 
@@ -230,6 +230,12 @@ class CommunicationsService:
             "decreasing" if last_week < prev_week else "stable"
         )
 
+        # Get extra analytics
+        flag_categories = await self._get_flag_categories(family_file_id, since)
+        good_faith = await self._get_good_faith_scores(family_file_id, since)
+        topic_categories = await self._get_topic_categories(family_file_id, since)
+        weekly_counts = await self._get_weekly_counts(family_file_id, days)
+
         return {
             "period_days": days,
             "total_messages": total,
@@ -239,6 +245,11 @@ class CommunicationsService:
             "recent_trend": trend,
             "last_7_days": last_week,
             "previous_7_days": prev_week,
+            # Enhanced stats
+            "flag_categories": flag_categories,
+            "good_faith_scores": good_faith,
+            "topic_categories": topic_categories,
+            "weekly_message_counts": weekly_counts,
         }
 
     async def get_message_detail(
@@ -396,3 +407,166 @@ class CommunicationsService:
 
         result = await self.db.execute(query)
         return {row[0]: row[1] for row in result.fetchall()}
+
+    async def _get_flag_categories(
+        self,
+        family_file_id: str,
+        since: Optional[datetime],
+    ) -> dict:
+        """Aggregate flag categories."""
+        query = (
+            select(MessageFlag.categories)
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(Message.family_file_id == family_file_id)
+        )
+        if since:
+            query = query.where(Message.created_at >= since)
+
+        result = await self.db.execute(query)
+        categories = {}
+        for row in result.scalars().all():
+            if row:
+                for cat in row:
+                    categories[cat] = categories.get(cat, 0) + 1
+        return categories
+
+    async def _get_good_faith_scores(
+        self,
+        family_file_id: str,
+        since: Optional[datetime],
+    ) -> dict:
+        """Calculate good faith scores based on toxicity."""
+        # Get family file to identify parents
+        ff = await self._get_family_file(family_file_id)
+        if not ff:
+            return {"parent_a": 0.8, "parent_b": 0.8}  # Default fallback
+
+        # Calculate for each parent
+        scores = {}
+        for parent_role, parent_id in [("parent_a", ff.parent_a_id), ("parent_b", ff.parent_b_id)]:
+            if not parent_id:
+                scores[parent_role] = 0.5
+                continue
+
+            # Get average toxicity of flagged messages
+            # Note: Unflagged messages effectively have 0 toxicity, but let's look at flagged ones first
+            # Or better: Good Faith = 1 - (Weighted Flag Count / Total Messages)
+            
+            total = await self._count_messages_by_sender(family_file_id, parent_id, since)
+            if total == 0:
+                scores[parent_role] = 1.0
+                continue
+
+            flagged_query = (
+                select(func.count(Message.id))
+                .where(
+                    and_(
+                        Message.family_file_id == family_file_id,
+                        Message.sender_id == parent_id,
+                        Message.was_flagged == True
+                    )
+                )
+            )
+            if since:
+                flagged_query = flagged_query.where(Message.created_at >= since)
+            
+            flagged_result = await self.db.execute(flagged_query)
+            flagged_count = flagged_result.scalar() or 0
+
+            # Simple formula: 100% - (Flagged % * 2 penalty)
+            # e.g. 10% flagged -> 80% good faith
+            # e.g. 50% flagged -> 0% good faith
+            penalty = (flagged_count / total) * 2
+            scores[parent_role] = max(0.0, min(1.0, 1.0 - penalty))
+
+        return scores
+
+    async def _get_topic_categories(
+        self,
+        family_file_id: str,
+        since: Optional[datetime],
+    ) -> dict:
+        """Aggregate thread types as topics."""
+        # Query messages joined with threads
+        query = (
+            select(MessageThread.thread_type, func.count(Message.id))
+            .join(MessageThread, Message.thread_id == MessageThread.id)
+            .where(Message.family_file_id == family_file_id)
+            .group_by(MessageThread.thread_type)
+        )
+        if since:
+            query = query.where(Message.created_at >= since)
+
+        result = await self.db.execute(query)
+        # If no threads or mostly general, maybe mock some data for demo if needed?
+        # But let's return actual data
+        data = {row[0]: row[1] for row in result.fetchall()}
+        
+        # If empty (likely due to no thread linking), try to infer from content keywords?
+        # Or just return empty
+        if not data:
+            # Fallback: Count based on keywords in content
+            # This is expensive, better to just return "General"
+            total = await self._count_messages(family_file_id, since)
+            if total > 0:
+                data["general"] = total
+        
+        return data
+
+    async def _get_weekly_counts(
+        self,
+        family_file_id: str,
+        days: int,
+    ) -> list:
+        """Get weekly message volume."""
+        # Generate last 4-8 weeks
+        weeks = []
+        now = datetime.utcnow()
+        for i in range(4):
+            start = now - timedelta(days=(i + 1) * 7)
+            end = now - timedelta(days=i * 7)
+            
+            count = await self._count_messages(family_file_id, start, end)
+            flagged = await self._count_flagged_messages(family_file_id, start) 
+            # Note: _count_flagged_messages doesn't accept end date in current impl, let's fix that or use approximation
+            # Actually _count_flagged_messages only takes `since`.
+            
+            # For simplicity, let's just use what we have or accept approximation
+            # I will modify _count_flagged_messages signature if I can, but let's just query directly here
+            
+            flagged_week = await self.db.execute(
+                select(func.count(Message.id)).where(
+                    and_(
+                        Message.family_file_id == family_file_id,
+                        Message.was_flagged == True,
+                        Message.created_at >= start,
+                        Message.created_at < end
+                    )
+                )
+            )
+            flagged_count = flagged_week.scalar() or 0
+
+            weeks.append({
+                "week": start.strftime("%b %d"),
+                "count": count,
+                "flagged": flagged_count
+            })
+        
+        return list(reversed(weeks))
+
+    async def _count_messages_by_sender(
+        self,
+        family_file_id: str,
+        sender_id: str,
+        since: Optional[datetime] = None,
+    ) -> int:
+        query = select(func.count(Message.id)).where(
+            and_(
+                Message.family_file_id == family_file_id,
+                Message.sender_id == sender_id
+            )
+        )
+        if since:
+            query = query.where(Message.created_at >= since)
+        result = await self.db.execute(query)
+        return result.scalar() or 0

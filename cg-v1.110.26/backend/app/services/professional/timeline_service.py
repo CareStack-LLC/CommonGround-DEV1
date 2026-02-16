@@ -614,10 +614,22 @@ class CaseTimelineService:
         family_file_id: str,
         since: datetime,
     ) -> int:
+        # Payment is linked to Case, not FamilyFile directly yet.
+        # We need to find the case_id associated with this family_file_id.
+        family_file_result = await self.db.execute(
+            select(FamilyFile).where(FamilyFile.id == family_file_id)
+        )
+        family_file = family_file_result.scalar_one_or_none()
+        
+        if not family_file or not family_file.legacy_case_id:
+            return 0
+            
+        case_id = str(family_file.legacy_case_id)
+        
         result = await self.db.execute(
             select(func.count(Payment.id)).where(
                 and_(
-                    Payment.family_file_id == family_file_id,
+                    Payment.case_id == case_id,
                     Payment.created_at >= since,
                 )
             )

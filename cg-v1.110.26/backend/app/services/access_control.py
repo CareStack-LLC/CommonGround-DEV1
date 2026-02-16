@@ -123,6 +123,47 @@ async def check_case_or_family_file_access(
             case=None
         )
 
+    # THIRD: Check CaseAssignment (Professional Access)
+    from app.models.professional import CaseAssignment, ProfessionalProfile
+    from app.models.user import User
+
+    # Check if user has a professional profile and active assignment
+    assignment_query = select(CaseAssignment).where(
+        and_(
+            CaseAssignment.family_file_id == case_id_str,
+            CaseAssignment.professional_id.in_(
+                select(ProfessionalProfile.id).join(User).where(User.id == user_id_str)
+            ),
+            CaseAssignment.status == "active"
+        )
+    )
+    
+    assignment_result = await db.execute(assignment_query)
+    assignment = assignment_result.scalar_one_or_none()
+        
+    if assignment:
+        # Access via Professional Assignment
+        # Access via Family File logic applies as professionals view Cases via FamilyFileID often
+        # But we need to know if it's a Case or FamilyFile.
+        # CaseAssignment links to FamilyFile.
+        
+        # Fetch FamilyFile to check for legacy_case_id
+        if not family_file:
+                ff_res = await db.execute(select(FamilyFile).where(FamilyFile.id == case_id_str))
+                family_file = ff_res.scalar_one_or_none()
+        
+        effective_id = case_id_str
+        if family_file and family_file.legacy_case_id:
+            effective_id = str(family_file.legacy_case_id)
+            
+        return AccessResult(
+            has_access=True,
+            effective_case_id=effective_id,
+            is_family_file=True, # Treat as family file access for professionals usually
+            family_file=family_file if load_family_file else None,
+            case=None
+        )
+
     # No access
     return AccessResult(
         has_access=False,

@@ -20,6 +20,7 @@ from app.services.geolocation import GeolocationService
 from app.services.custody_time import CustodyTimeService
 from app.services.realtime import realtime_service, RealtimeEventType
 from app.utils.timezone import strip_tz
+from app.services.access_control import check_case_or_family_file_access
 
 
 async def _check_case_or_family_file_access(
@@ -30,41 +31,16 @@ async def _check_case_or_family_file_access(
     """
     Check if user has access via Case Participant or Family File.
     Returns (has_access, effective_id, is_family_file).
-
-    - For Case participants: returns (True, case_id, False)
-    - For Family Files with legacy_case_id: returns (True, legacy_case_id, False)
-    - For Family Files without legacy_case_id: returns (True, family_file_id, True)
+    
+    Delegates to centralized access control service.
     """
-    # First check Case Participant
-    participant = await db.execute(
-        select(CaseParticipant).where(
-            and_(
-                CaseParticipant.case_id == case_id,
-                CaseParticipant.user_id == user_id,
-                CaseParticipant.is_active == True
-            )
-        )
-    )
-    if participant.scalar_one_or_none():
-        return True, case_id, False
-
-    # Check Family File
-    family_file_result = await db.execute(
-        select(FamilyFile).where(
-            FamilyFile.id == case_id,
-            or_(FamilyFile.parent_a_id == user_id, FamilyFile.parent_b_id == user_id)
-        )
-    )
-    family_file = family_file_result.scalar_one_or_none()
-    if family_file:
-        if family_file.legacy_case_id:
-            # Has a linked case - use legacy_case_id
-            return True, family_file.legacy_case_id, False
-        else:
-            # Pure Family File - no linked case
-            return True, case_id, True
-
-    return False, case_id, False
+    result = await check_case_or_family_file_access(db, case_id, user_id)
+    
+    # Map AccessResult to expected tuple format
+    effective_id = result.effective_case_id or case_id
+    # Note: access_control might return None for effective_id if no access, but usually returns case_id
+    
+    return result.has_access, effective_id, result.is_family_file
 
 
 class CustodyExchangeService:
