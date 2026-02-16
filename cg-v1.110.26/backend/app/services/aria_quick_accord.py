@@ -259,24 +259,10 @@ Return ONLY the JSON object, no other text."""
         Returns:
             dict with conversation_id and initial response
         """
-        # Get family file
-        result = await self.db.execute(
-            select(FamilyFile).where(FamilyFile.id == family_file_id)
-        )
-        family_file = result.scalar_one_or_none()
-
-        if not family_file:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Family File not found"
-            )
-
-        # Verify access
-        if family_file.parent_a_id != user.id and family_file.parent_b_id != user.id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have access to this Family File"
-            )
+        # Get family file with access verification
+        from app.services.family_file import FamilyFileService
+        family_file_service = FamilyFileService(self.db)
+        family_file = await family_file_service.get_family_file(family_file_id, user)
 
         # Get children
         children_result = await self.db.execute(

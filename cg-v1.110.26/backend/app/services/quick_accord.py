@@ -160,12 +160,7 @@ class QuickAccordService:
             )
 
         # Verify access through Family File
-        family_file = quick_accord.family_file
-        if not self._has_access(family_file, user):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have access to this QuickAccord"
-            )
+        await self.family_file_service.get_family_file(quick_accord.family_file_id, user)
 
         return quick_accord
 
@@ -474,12 +469,7 @@ class QuickAccordService:
         await self.db.delete(quick_accord)
         await self.db.commit()
 
-    def _has_access(self, family_file: FamilyFile, user: User) -> bool:
-        """Check if user has access to a Family File."""
-        return (
-            family_file.parent_a_id == user.id or
-            family_file.parent_b_id == user.id
-        )
+
 
     async def _handle_approval_side_effects(
         self,

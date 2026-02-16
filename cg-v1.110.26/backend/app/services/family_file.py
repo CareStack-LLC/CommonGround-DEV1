@@ -178,11 +178,42 @@ class FamilyFileService:
             )
 
         # Check access
+        # Check access
         if not self._has_access(family_file, user):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You don't have access to this Family File"
-            )
+            # Check for professional access
+            has_professional_access = False
+            try:
+                # Import here to avoid circular imports
+                from app.models.professional import ProfessionalProfile, CaseAssignment, AssignmentStatus
+
+                # Check if user has a professional profile
+                prof_result = await self.db.execute(
+                    select(ProfessionalProfile).where(ProfessionalProfile.user_id == user.id)
+                )
+                professional = prof_result.scalar_one_or_none()
+
+                if professional:
+                    # Check active assignment for this family file
+                    assign_result = await self.db.execute(
+                        select(CaseAssignment)
+                        .where(
+                            CaseAssignment.professional_id == professional.id,
+                            CaseAssignment.family_file_id == family_file_id,
+                            CaseAssignment.status == AssignmentStatus.ACTIVE.value
+                        )
+                    )
+                    assignment = assign_result.scalar_one_or_none()
+                    if assignment:
+                        has_professional_access = True
+            except Exception:
+                # If any error in checking professional access (e.g. table doesn't exist yet), fail safe
+                pass
+
+            if not has_professional_access:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="You don't have access to this Family File"
+                )
 
         return family_file
 

@@ -28,8 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProfessionalAuth } from "../../layout";
 import { CaseTimelineTab } from "@/components/professional/case-view/case-timeline-tab";
-import { CaseCommunicationsTab } from "@/components/professional/case-view/case-communications-tab";
-import { CallsReportsTab } from "@/components/professional/case-view/calls-reports-tab";
+import { ClientCommunicationTab } from "@/components/professional/case-view/client-communication-tab";
 import { DocumentList } from "@/components/professional/document-list";
 import { toast } from "@/hooks/use-toast";
 
@@ -185,22 +184,7 @@ export default function CaseDetailPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {caseData.can_control_aria && (
-            <Button asChild variant="outline" size="sm" className="whitespace-nowrap">
-              <Link href={`/professional/cases/${familyFileId}/aria`}>
-                <Bot className="h-4 w-4 mr-2" />
-                ARIA Controls
-              </Link>
-            </Button>
-          )}
-          {caseData.can_message_client && (
-            <Button asChild size="sm" className="bg-teal-600 hover:bg-teal-700 text-white whitespace-nowrap">
-              <Link href={`/professional/cases/${familyFileId}/messages`}>
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Message Client
-              </Link>
-            </Button>
-          )}
+          {/* Removed ARIA and Message Client buttons */}
         </div>
       </div>
 
@@ -214,13 +198,8 @@ export default function CaseDetailPage() {
             <TabsTrigger value="timeline" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
               Timeline
             </TabsTrigger>
-            {caseData.access_scopes?.includes("messages") && (
-              <TabsTrigger value="communications" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
-                Communications
-              </TabsTrigger>
-            )}
-            <TabsTrigger value="calls" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
-              Calls & Reports
+            <TabsTrigger value="communications" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
+              Client Communication
             </TabsTrigger>
             <TabsTrigger value="documents" className="data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 data-[state=active]:shadow-none h-10 px-6">
               Documents
@@ -332,14 +311,10 @@ export default function CaseDetailPage() {
           <CaseTimelineTab familyFileId={familyFileId} token={token || ""} />
         </TabsContent>
 
-        {/* Communications Tab */}
-        <TabsContent value="communications" className="m-0 outline-none">
-          <CaseCommunicationsTab familyFileId={familyFileId} token={token || ""} />
-        </TabsContent>
 
-        {/* Calls & Reports Tab */}
-        <TabsContent value="calls" className="m-0 outline-none">
-          <CallsReportsTab familyFileId={familyFileId} token={token || ""} />
+        {/* Client Communication Tab */}
+        <TabsContent value="communications" className="m-0 outline-none">
+          <ClientCommunicationTab familyFileId={familyFileId} token={token || ""} />
         </TabsContent>
 
         {/* Documents Tab */}
