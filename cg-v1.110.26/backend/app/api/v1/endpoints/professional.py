@@ -63,6 +63,9 @@ from app.schemas.professional import (
     # Call Logs
     ProfessionalCallLogCreate,
     ProfessionalCallLogResponse,
+    ProfessionalCallLogListResponse,
+)
+    ProfessionalCallLogResponse,
 )
 from app.services.professional.profile_service import ProfessionalProfileService
 from app.services.professional.firm_service import FirmService
