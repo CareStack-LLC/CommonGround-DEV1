@@ -72,7 +72,7 @@ class CommunicationsService:
             query = query.where(Message.created_at <= end_date)
         if sender_id:
             query = query.where(Message.sender_id == sender_id)
-        if thread_id:
+        if thread_id and thread_id != "all":
             query = query.where(Message.thread_id == thread_id)
         if flagged_only:
             query = query.where(Message.was_flagged == True)
@@ -87,7 +87,7 @@ class CommunicationsService:
             count_query = count_query.where(Message.created_at <= end_date)
         if sender_id:
             count_query = count_query.where(Message.sender_id == sender_id)
-        if thread_id:
+        if thread_id and thread_id != "all":
             count_query = count_query.where(Message.thread_id == thread_id)
         if flagged_only:
             count_query = count_query.where(Message.was_flagged == True)
