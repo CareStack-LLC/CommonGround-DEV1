@@ -210,14 +210,23 @@ async def list_intake_sessions(
                 "session_number": s.session_number,
                 "case_id": s.case_id,
                 "parent_id": s.parent_id,
+                "firm_id": s.firm_id,
+                "case_assignment_id": s.case_assignment_id,
+                "family_file_id": s.family_file_id,
                 "target_forms": s.target_forms,
                 "status": s.status,
                 "message_count": s.message_count,
                 "parent_confirmed": s.parent_confirmed,
                 "professional_reviewed": s.professional_reviewed,
                 "clarification_requested": s.clarification_requested,
-                "access_link_expires_at": s.access_link_expires_at,
+                "has_summary": bool(s.aria_summary),
                 "created_at": s.created_at,
+                "updated_at": s.updated_at,
+                "completed_at": s.completed_at,
+                # Try to extract client info from first message if available
+                "client_name": s.messages[0].get("content", "").split(".")[0].replace("Intake session for ", "") if s.messages and isinstance(s.messages[0], dict) else None,
+                "client_email": None, # Difficult to extract reliably without structured storage
+                "intake_type": "custody", # Default
             }
             for s in sessions
         ],
