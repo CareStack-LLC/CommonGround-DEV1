@@ -19,6 +19,8 @@ from app.models.professional import (
 from app.models.family_file import FamilyFile
 from app.models.message import Message, MessageThread, MessageFlag
 from app.models.user import User
+from app.core.config import settings
+from supabase import create_client, Client
 
 
 class CommunicationsService:
@@ -26,6 +28,10 @@ class CommunicationsService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
+        self.supabase: Client = create_client(
+            settings.SUPABASE_URL, 
+            settings.SUPABASE_SERVICE_KEY
+        )
 
     async def get_communications(
         self,
@@ -113,10 +119,12 @@ class CommunicationsService:
                         "filename": att.file_name,
                         "file_type": att.file_type,
                         "file_size": att.file_size,
-                        "url": att.storage_url,
+                        "url": self._get_signed_url(att.storage_path),
                     })
             # Also check JSON field for robustness
             elif msg.attachment_urls:
+                # If we have legacy URLs, they might be broken if not signed.
+                # Assuming new system uses attachments relation.
                 attachment_data = msg.attachment_urls
 
             messages.append({
@@ -294,7 +302,10 @@ class CommunicationsService:
 
         result = await self.db.execute(
             select(Message)
-            .options(selectinload(Message.flags))
+            .options(
+                selectinload(Message.flags),
+                selectinload(Message.attachments)
+            )
             .where(
                 and_(
                     Message.id == message_id,
@@ -325,8 +336,23 @@ class CommunicationsService:
             "read_at": msg.read_at,
             "was_flagged": msg.was_flagged,
             "thread_id": msg.thread_id,
+            "attachments": [],
             "flags": [],
         }
+
+        # Add attachments
+        if msg.attachments:
+            for att in msg.attachments:
+                detail["attachments"].append({
+                    "id": att.id,
+                    "filename": att.file_name,
+                    "file_type": att.file_type,
+                    "file_size": att.file_size,
+                    "url": self._get_signed_url(att.storage_path),
+                })
+        elif msg.attachment_urls:
+             # Legacy fallback
+            detail["attachments"] = msg.attachment_urls
 
         # Add flag details if present
         for flag in msg.flags:
@@ -345,6 +371,21 @@ class CommunicationsService:
     # -------------------------------------------------------------------------
     # Private Helpers
     # -------------------------------------------------------------------------
+
+    def _get_signed_url(self, storage_path: str) -> str:
+        """Generate signed URL for private storage."""
+        if not storage_path:
+            return ""
+        try:
+            # Create signed URL valid for 1 hour (3600 seconds)
+            res = self.supabase.storage.from_("message_attachments").create_signed_url(
+                storage_path, 3600
+            )
+            return res.get("signedURL", "")
+        except Exception as e:
+            # Fallback or log error
+            print(f"Error generating signed URL for {storage_path}: {e}")
+            return ""
 
     async def _verify_access(
         self,
