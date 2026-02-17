@@ -214,18 +214,24 @@ async def list_intake_sessions(
                 "firm_id": s.firm_id,
                 "case_assignment_id": s.case_assignment_id,
                 "family_file_id": s.family_file_id,
-                "target_forms": s.target_forms,
+                "target_forms": s.target_forms or [],
                 "status": s.status,
-                "message_count": s.message_count,
-                "parent_confirmed": s.parent_confirmed,
-                "professional_reviewed": s.professional_reviewed,
-                "clarification_requested": s.clarification_requested,
+                "message_count": s.message_count or 0,
+                "parent_confirmed": s.parent_confirmed or False,
+                "professional_reviewed": s.professional_reviewed or False,
+                "clarification_requested": s.clarification_requested or False,
+                "access_link_expires_at": s.access_link_expires_at,
                 "has_summary": bool(s.aria_summary),
                 "created_at": s.created_at,
                 "updated_at": s.updated_at,
                 "completed_at": s.completed_at,
                 # Try to extract client info from first message if available
-                "client_name": s.messages[0].get("content", "").split(".")[0].replace("Intake session for ", "") if s.messages and isinstance(s.messages[0], dict) else None,
+                "client_name": (
+                    s.messages[0].get("content", "").split(".")[0].replace("Intake session for ", "")
+                    # Check if messages is list, not empty, and first item is dict
+                    if isinstance(s.messages, list) and s.messages and isinstance(s.messages[0], dict)
+                    else "Unknown Client"
+                ),
                 "client_email": None, # Difficult to extract reliably without structured storage
                 "intake_type": "custody", # Default
             }
