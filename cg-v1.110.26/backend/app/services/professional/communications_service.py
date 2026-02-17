@@ -34,6 +34,7 @@ class CommunicationsService:
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
         sender_id: Optional[str] = None,
+        thread_id: Optional[str] = None,
         flagged_only: bool = False,
         limit: int = 50,
         offset: int = 0,
@@ -47,6 +48,7 @@ class CommunicationsService:
             start_date: Filter messages after this date
             end_date: Filter messages before this date
             sender_id: Filter by specific sender
+            thread_id: Filter by specific conversation thread
             flagged_only: Only return ARIA-flagged messages
             limit: Max results
             offset: Pagination offset
@@ -61,6 +63,7 @@ class CommunicationsService:
         query = (
             select(Message)
             .where(Message.family_file_id == family_file_id)
+            .options(selectinload(Message.attachments))  # Load attachments
         )
 
         if start_date:
@@ -69,6 +72,8 @@ class CommunicationsService:
             query = query.where(Message.created_at <= end_date)
         if sender_id:
             query = query.where(Message.sender_id == sender_id)
+        if thread_id:
+            query = query.where(Message.thread_id == thread_id)
         if flagged_only:
             query = query.where(Message.was_flagged == True)
 
@@ -82,6 +87,8 @@ class CommunicationsService:
             count_query = count_query.where(Message.created_at <= end_date)
         if sender_id:
             count_query = count_query.where(Message.sender_id == sender_id)
+        if thread_id:
+            count_query = count_query.where(Message.thread_id == thread_id)
         if flagged_only:
             count_query = count_query.where(Message.was_flagged == True)
 
@@ -89,11 +96,29 @@ class CommunicationsService:
         total_count = count_result.scalar() or 0
 
         # Get paginated results
+        # If looking at a thread, usually want oldest to newest, but timeline usually newest first.
+        # Let's keep desc for now as that's typical for "history" view, but chat might want asc.
+        # The frontend likely invalidates this order anyway if it's a chat interface.
+        # But for "Checking history", likely newest first is safer.
         query = query.order_by(desc(Message.created_at)).limit(limit).offset(offset)
         result = await self.db.execute(query)
 
         messages = []
         for msg in result.scalars().all():
+            attachment_data = []
+            if msg.attachments:
+                for att in msg.attachments:
+                    attachment_data.append({
+                        "id": att.id,
+                        "filename": att.file_name,
+                        "file_type": att.file_type,
+                        "file_size": att.file_size,
+                        "url": att.storage_url,
+                    })
+            # Also check JSON field for robustness
+            elif msg.attachment_urls:
+                attachment_data = msg.attachment_urls
+
             messages.append({
                 "id": msg.id,
                 "sender_id": msg.sender_id,
@@ -101,11 +126,13 @@ class CommunicationsService:
                 "content": msg.content,
                 "sent_at": msg.sent_at,
                 "created_at": msg.created_at,
-                "is_read": msg.is_read,
+                "is_read": bool(msg.read_at),
                 "read_at": msg.read_at,
                 "was_flagged": msg.was_flagged,
                 "original_content": msg.original_content,
                 "thread_id": msg.thread_id,
+                "attachments": attachment_data,
+                "has_attachments": msg.has_attachments or bool(attachment_data),
             })
 
         return {

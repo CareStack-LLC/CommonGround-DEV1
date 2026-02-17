@@ -20,6 +20,9 @@ import {
   Bot,
   Calendar,
   BarChart3,
+  Paperclip,
+  ImageIcon,
+  FileIcon,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,6 +64,13 @@ interface ParentMessage {
   flag_category?: string;
   was_rewritten: boolean;
   original_content?: string;
+  has_attachments: boolean;
+  attachments?: {
+    id: string;
+    filename: string;
+    file_type: string;
+    url: string;
+  }[];
 }
 
 interface CommunicationStats {
@@ -114,10 +124,22 @@ export default function CommunicationsPage() {
     fetchData();
   }, [familyFileId, token]);
 
+  // Initial load
   useEffect(() => {
     if (selectedThread) {
       fetchThreadMessages(selectedThread);
     }
+  }, [selectedThread, token]);
+
+  // Polling for updates
+  useEffect(() => {
+    if (!selectedThread) return;
+
+    const interval = setInterval(() => {
+      fetchThreadMessages(selectedThread, true); // silent refresh
+    }, 10000); // 10s
+
+    return () => clearInterval(interval);
   }, [selectedThread, token]);
 
   const fetchData = async () => {
@@ -140,7 +162,7 @@ export default function CommunicationsPage() {
         const items = threadsData.threads || threadsData.items || [];
         setThreads(items);
         // Auto-select first thread if available
-        if (items.length > 0) {
+        if (items.length > 0 && !selectedThread) {
           setSelectedThread(items[0].id);
         }
       }
@@ -156,12 +178,12 @@ export default function CommunicationsPage() {
     }
   };
 
-  const fetchThreadMessages = async (threadId: string) => {
+  const fetchThreadMessages = async (threadId: string, background = false) => {
     if (!token || !familyFileId) return;
 
     try {
       const response = await fetch(
-        `${API_BASE}/api/v1/professional/cases/${familyFileId}/communications?thread_id=${threadId}`,
+        `${API_BASE}/api/v1/professional/cases/${familyFileId}/communications?thread_id=${threadId}&limit=100`, // Increase limit for context
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -169,7 +191,8 @@ export default function CommunicationsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setMessages(data.items || []);
+        // Here we could diff messages if we wanted to be smarter, but full replace is fine for now
+        setMessages(data.messages || data.items || []);  // Handle both response formats
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -685,6 +708,35 @@ export default function CommunicationsPage() {
                           </div>
 
                           <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+
+                          {/* Attachments */}
+                          {message.has_attachments && message.attachments && message.attachments.length > 0 && (
+                            <div className="mt-3 grid grid-cols-2 gap-2">
+                              {message.attachments.map((att) => (
+                                <a
+                                  key={att.id}
+                                  href={att.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center p-2 bg-background/50 border rounded-md hover:bg-background transition-colors group"
+                                >
+                                  <div className="h-8 w-8 bg-muted rounded flex items-center justify-center mr-2 text-muted-foreground group-hover:text-primary">
+                                    {att.file_type.startsWith("image/") ? (
+                                      <ImageIcon className="h-4 w-4" />
+                                    ) : (
+                                      <FileIcon className="h-4 w-4" />
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium truncate">{att.filename}</p>
+                                    <span className="text-[10px] text-muted-foreground uppercase">
+                                      {att.file_type.split("/")[1] || "FILE"}
+                                    </span>
+                                  </div>
+                                </a>
+                              ))}
+                            </div>
+                          )}
 
                           {message.was_rewritten && message.original_content && (
                             <Collapsible
