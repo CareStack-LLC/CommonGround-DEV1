@@ -167,6 +167,8 @@ class CaseTimelineService:
         family_file_id: str,
         professional_id: str,
         days: int = 30,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
     ) -> dict:
         """
         Get a summary of timeline activity for a case.
@@ -177,7 +179,8 @@ class CaseTimelineService:
         if not assignment or not assignment.is_active:
             raise ValueError("Professional does not have access to this case")
 
-        start_date = datetime.utcnow() - timedelta(days=days)
+        if not start_date:
+            start_date = datetime.utcnow() - timedelta(days=days)
         scopes = assignment.access_scopes or []
 
         summary = {
