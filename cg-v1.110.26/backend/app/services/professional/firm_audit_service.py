@@ -59,7 +59,9 @@ class FirmAuditLogService:
         """
         stmt = (
             select(FirmAuditLog)
-            .options(selectinload(FirmAuditLog.actor))
+            .options(
+                selectinload(FirmAuditLog.actor).selectinload(ProfessionalProfile.user)
+            )
             .where(FirmAuditLog.firm_id == firm_id)
             .order_by(FirmAuditLog.created_at.desc())
             .limit(limit)

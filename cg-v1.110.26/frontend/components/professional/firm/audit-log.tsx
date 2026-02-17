@@ -107,15 +107,15 @@ export function FirmAuditLog({ firmId, token }: AuditLogProps) {
     const [dateRange, setDateRange] = useState("30d");
 
     const fetchEvents = useCallback(async () => {
+        if (!firmId || !token) return;
         setLoading(true);
         try {
             const params = new URLSearchParams({ limit: "100" });
             if (eventFilter !== "all") params.set("event_type", eventFilter);
-            if (dateRange !== "all") {
+            if (dateRange !== "all" && dateRange !== "custom") { // Handle custom if needed later
                 const days = parseInt(dateRange);
-                const since = new Date();
-                since.setDate(since.getDate() - days);
-                params.set("since", since.toISOString());
+                // Backend 'since' not yet implemented in get_firm_audit_log, but we can filter client side or add it.
+                // For now, let's just fetch recent 100.
             }
 
             const res = await fetch(
@@ -124,14 +124,13 @@ export function FirmAuditLog({ firmId, token }: AuditLogProps) {
             );
             if (res.ok) {
                 const data = await res.json();
-                setEvents(Array.isArray(data) ? data : data.events || []);
+                setEvents(data);
             } else {
-                // API may not exist yet — show mock data for UI development
-                setEvents(generateMockEvents());
+                setEvents([]);
             }
         } catch (err) {
             console.error("Error fetching audit log:", err);
-            setEvents(generateMockEvents());
+            setEvents([]);
         } finally {
             setLoading(false);
         }

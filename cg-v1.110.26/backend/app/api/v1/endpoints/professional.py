@@ -123,6 +123,7 @@ from app.schemas.professional import (
     FirmTemplateCreate,
     FirmTemplateResponse,
     FirmAnalytics,
+    FirmAuditLogResponse,
 )
 
 
@@ -3077,6 +3078,7 @@ async def get_ocr_config(
 
 @router.get(
     "/firms/{firm_id}/audit-log",
+    response_model=list[FirmAuditLogResponse],
     summary="Get firm audit log",
 )
 async def get_firm_audit_log(
@@ -3088,6 +3090,7 @@ async def get_firm_audit_log(
 ):
     """
     Get audit log for a firm.
+    
     Requires firm membership.
     """
     firm_service = FirmService(db)
@@ -3100,21 +3103,33 @@ async def get_firm_audit_log(
     service = FirmAuditLogService(db)
     logs = await service.get_firm_audit_log(firm_id, limit, offset)
     
-    # Transform for frontend
-    return {
-        "events": [
-            {
-                "id": str(log.id),
-                "event_type": log.event_type,
-                "actor_name": f"{log.actor.first_name} {log.actor.last_name}",
-                "actor_email": log.actor.user.email if log.actor.user else None,
-                "description": log.description,
-                "metadata": log.event_metadata,
-                "created_at": log.created_at,
-            }
-            for log in logs
-        ]
-    }
+    # Manually map to response to handle relationships safely
+    response = []
+    for log in logs:
+        actor_name = None
+        actor_email = None
+        if log.actor:
+            if hasattr(log.actor, 'user') and log.actor.user:
+                actor_name = f"{log.actor.user.first_name} {log.actor.user.last_name}"
+                actor_email = log.actor.user.email
+            else:
+                actor_email = log.actor.professional_email
+
+        response.append(
+            FirmAuditLogResponse(
+                id=log.id,
+                firm_id=log.firm_id,
+                actor_id=log.actor_id,
+                event_type=log.event_type,
+                description=log.description,
+                event_metadata=log.event_metadata,
+                created_at=log.created_at,
+                actor_name=actor_name,
+                actor_email=actor_email,
+            )
+        )
+
+    return response
 
 
 @router.post(

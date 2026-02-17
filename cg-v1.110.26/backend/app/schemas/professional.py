@@ -901,6 +901,14 @@ class IntakeSessionListItem(BaseModel):
     created_at: datetime
     updated_at: datetime
     completed_at: Optional[datetime] = None
+    started_at: Optional[datetime] = None
+    access_link_expires_at: Optional[datetime] = None
+
+    # Status flags
+    parent_confirmed: bool = False
+    professional_reviewed: bool = False
+    clarification_requested: bool = False
+    has_extracted_data: bool = False
 
 
 class IntakeSessionDetail(IntakeSessionListItem):
@@ -1260,3 +1268,29 @@ class FirmAnalytics(BaseModel):
     aria_intervention_rate_30d: float = 0.0
     total_aria_flags_30d: int = 0
     generated_at: datetime
+
+
+class FirmAuditLogResponse(BaseModel):
+    """Schema for firm audit log entry."""
+    id: str
+    firm_id: str
+    actor_id: str
+    event_type: str
+    description: str
+    event_metadata: Optional[dict] = None
+    created_at: datetime
+
+    # Actor details (flattened for convenience)
+    actor_name: Optional[str] = None
+    actor_email: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+    @field_validator('actor_name', mode='before')
+    @classmethod
+    def extract_actor_name(cls, v, info):
+        # This might not be triggered if 'actor' relationship is handled via root_validator or property
+        # Ideally we compute this from the 'actor' relationship object passed to from_attributes
+        return v
+    

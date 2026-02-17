@@ -77,16 +77,16 @@ const STATUS_COLORS: Record<string, string> = {
 
 interface Member {
   id: string;
-  professional_id: string;
+  professional_id: string | null;
   firm_id: string;
   role: string;
   status: string;
   invited_at: string | null;
   joined_at: string | null;
   invited_by: string | null;
-  user_email: string | null;
-  user_first_name: string | null;
-  user_last_name: string | null;
+  invite_email: string | null;
+  professional_name: string | null;
+  professional_email: string | null;
   professional_type: string | null;
 }
 
@@ -238,9 +238,13 @@ export default function TeamManagementPage() {
     }
   };
 
-  const getInitials = (firstName?: string | null, lastName?: string | null, email?: string | null) => {
-    if (firstName && lastName) {
-      return `${firstName[0]}${lastName[0]}`.toUpperCase();
+  const getInitials = (name?: string | null, email?: string | null) => {
+    if (name) {
+      const parts = name.split(" ");
+      if (parts.length >= 2) {
+        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+      }
+      return name[0].toUpperCase();
     }
     if (email) {
       return email[0].toUpperCase();
@@ -386,15 +390,13 @@ export default function TeamManagementPage() {
                   <div className="flex items-center gap-4">
                     <Avatar className="h-10 w-10">
                       <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
-                        {getInitials(member.user_first_name, member.user_last_name, member.user_email)}
+                        {getInitials(member.professional_name, member.professional_email || member.invite_email)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-medium">
-                          {member.user_first_name && member.user_last_name
-                            ? `${member.user_first_name} ${member.user_last_name}`
-                            : member.user_email || "Pending Invite"}
+                          {member.professional_name || member.invite_email || "Pending Invite"}
                         </p>
                         {member.status === "invited" && (
                           <Badge variant="outline" className="text-xs">
@@ -403,7 +405,9 @@ export default function TeamManagementPage() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500">{member.user_email}</p>
+                      <p className="text-sm text-gray-500">
+                        {member.professional_email || member.invite_email}
+                      </p>
                     </div>
                   </div>
 
