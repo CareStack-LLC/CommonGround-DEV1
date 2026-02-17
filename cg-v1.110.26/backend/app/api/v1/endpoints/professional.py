@@ -2489,6 +2489,7 @@ def _intake_session_to_list_item(session) -> IntakeSessionListItem:
         started_at=session.started_at,
         completed_at=session.completed_at,
         access_link_expires_at=session.access_link_expires_at,
+        target_forms=session.target_forms or [],
     )
 
 
