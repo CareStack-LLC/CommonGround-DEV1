@@ -130,7 +130,7 @@ export default function CaseClearFundPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setObligations(data.obligations || data || []);
+        setObligations(data.items || data.obligations || []);
       }
 
       // Fetch financial stats

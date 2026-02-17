@@ -17,6 +17,7 @@ from app.models.professional import CaseAssignment, AssignmentStatus
 from app.models.family_file import FamilyFile
 from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
 from app.models.payment import Payment, ExpenseRequest
+from app.models.clearfund import Obligation, ObligationFunding
 from app.models.message import Message, MessageFlag
 from app.models.case import CaseParticipant
 from app.models.user import User
@@ -159,11 +160,15 @@ class ProfessionalComplianceService:
             case_id
         ) if case_id else []
 
+        # Get obligation metrics
+        obligation_metrics = await self._get_obligation_metrics(family_file_id, case_id)
+
         return {
             "metrics": metrics,
             "payment_history": payments,
             "pending_expenses": pending_expenses,
             "period_days": days,
+            **obligation_metrics
         }
 
     async def get_communication_compliance(
@@ -624,3 +629,74 @@ class ProfessionalComplianceService:
             return "concerning"
         else:
             return "no_data"
+
+    async def _get_obligation_metrics(
+        self,
+        family_file_id: str,
+        case_id: Optional[str] = None
+    ) -> dict:
+        """Calculate ClearFund obligation metrics."""
+        # Query obligations (exclude cancelled)
+        filters = [Obligation.status.notin_(["cancelled"])]
+        if case_id:
+            filters.append(
+                or_(
+                    Obligation.family_file_id == family_file_id,
+                    Obligation.case_id == case_id
+                )
+            )
+        else:
+            filters.append(Obligation.family_file_id == family_file_id)
+            
+        query = select(Obligation).where(and_(*filters))
+        result = await self.db.execute(query)
+        obligations = result.scalars().all()
+
+        total_amount = sum(o.total_amount for o in obligations)
+        amount_funded = sum(o.amount_funded for o in obligations)
+        amount_verified = sum(o.amount_verified for o in obligations)
+        total_obligations = len(obligations)
+        pending_count = sum(1 for o in obligations if o.status in ["open", "partially_funded", "pending_verification"])
+
+        # Query funding by parent to calculate compliance
+        ff_result = await self.db.execute(select(FamilyFile).where(FamilyFile.id == family_file_id))
+        family_file = ff_result.scalar_one_or_none()
+        parent_a_id = str(family_file.parent_a_id) if family_file and family_file.parent_a_id else None
+        parent_b_id = str(family_file.parent_b_id) if family_file and family_file.parent_b_id else None
+
+        parent_a_contribution = 0
+        parent_b_contribution = 0
+        parent_a_required = 0
+        parent_b_required = 0
+
+        if obligations and (parent_a_id or parent_b_id):
+            # Get all funding records for these obligations
+            funding_query = select(ObligationFunding).where(
+                ObligationFunding.obligation_id.in_([o.id for o in obligations])
+            )
+            funding_result = await self.db.execute(funding_query)
+            fundings = funding_result.scalars().all()
+
+            for f in fundings:
+                pid = str(f.parent_id)
+                if pid == parent_a_id:
+                    parent_a_contribution += f.amount_funded
+                    parent_a_required += f.amount_required
+                elif pid == parent_b_id:
+                    parent_b_contribution += f.amount_funded
+                    parent_b_required += f.amount_required
+
+        parent_a_compliance = (parent_a_contribution / parent_a_required) if parent_a_required > 0 else 0
+        parent_b_compliance = (parent_b_contribution / parent_b_required) if parent_b_required > 0 else 0
+
+        return {
+            "total_obligations": total_obligations,
+            "total_amount": float(total_amount),
+            "amount_funded": float(amount_funded),
+            "amount_verified": float(amount_verified),
+            "pending_count": pending_count,
+            "parent_a_contribution": float(parent_a_contribution),
+            "parent_b_contribution": float(parent_b_contribution),
+            "parent_a_compliance": float(parent_a_compliance),
+            "parent_b_compliance": float(parent_b_compliance),
+        }
