@@ -108,10 +108,10 @@ class ProfessionalIntakeService:
 
         session = IntakeSession(
             id=str(uuid4()),
-            case_id=case_id or str(uuid4()),  # Required field
+            case_id=case_id,
             family_file_id=family_file_id,
             professional_id=court_professional_id or professional_id,
-            parent_id=parent_id or str(uuid4()),  # Required field
+            parent_id=parent_id,
             firm_id=firm_id,
             case_assignment_id=case_assignment_id,
             target_forms=target_forms or [],

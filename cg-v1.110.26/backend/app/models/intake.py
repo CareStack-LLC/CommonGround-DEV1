@@ -93,17 +93,24 @@ class IntakeSession(Base, UUIDMixin, TimestampMixin):
     )
 
     # Links
-    case_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("cases.id"), index=True
+    # Links
+    case_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("cases.id"), nullable=True, index=True
     )
     family_file_id: Mapped[Optional[str]] = mapped_column(
         String(36), ForeignKey("family_files.id"), nullable=True, index=True
     )
     professional_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("court_professionals.id"), index=True
+        String(36), index=True
     )
-    parent_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("users.id"), index=True
+    parent_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("users.id"), nullable=True, index=True
+    )
+    firm_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("firms.id"), nullable=True, index=True
+    )
+    case_assignment_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("case_assignments.id"), nullable=True, index=True
     )
 
     # Access
