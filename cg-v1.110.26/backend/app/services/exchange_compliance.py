@@ -45,20 +45,22 @@ class ExchangeComplianceService:
     @staticmethod
     async def get_exchange_instances(
         db: AsyncSession,
-        case_id: str,
+        case_id: Optional[str],
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
-        include_exchange: bool = True
+        include_exchange: bool = True,
+        family_file_id: Optional[str] = None
     ) -> List[CustodyExchangeInstance]:
         """
-        Get exchange instances for a case within date range.
+        Get exchange instances for a case or family file within date range.
 
         Args:
             db: Database session
-            case_id: Case ID
+            case_id: Case ID (optional if family_file_id provided)
             start_date: Start of date range (default: 30 days ago)
             end_date: End of date range (default: now)
             include_exchange: Include parent exchange relationship
+            family_file_id: Family File ID (optional)
 
         Returns:
             List of CustodyExchangeInstance objects
@@ -71,11 +73,18 @@ class ExchangeComplianceService:
         query = (
             select(CustodyExchangeInstance)
             .join(CustodyExchange)
-            .where(CustodyExchange.case_id == case_id)
             .where(CustodyExchangeInstance.scheduled_time >= start_date)
             .where(CustodyExchangeInstance.scheduled_time <= end_date)
             .order_by(CustodyExchangeInstance.scheduled_time.desc())
         )
+        
+        # Filter by case_id or family_file_id
+        if family_file_id:
+            query = query.where(CustodyExchange.family_file_id == family_file_id)
+        elif case_id:
+            query = query.where(CustodyExchange.case_id == case_id)
+        else:
+            return []
 
         if include_exchange:
             query = query.options(selectinload(CustodyExchangeInstance.exchange))
@@ -87,9 +96,10 @@ class ExchangeComplianceService:
     async def get_exchange_metrics(
         cls,
         db: AsyncSession,
-        case_id: str,
+        case_id: Optional[str],
         start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None
+        end_date: Optional[datetime] = None,
+        family_file_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Calculate exchange compliance metrics for a case.
@@ -99,6 +109,7 @@ class ExchangeComplianceService:
             case_id: Case ID
             start_date: Start of date range
             end_date: End of date range
+            family_file_id: Family File ID (optional)
 
         Returns:
             Dict containing:
@@ -114,14 +125,27 @@ class ExchangeComplianceService:
             - respondent_metrics: dict
         """
         instances = await cls.get_exchange_instances(
-            db, case_id, start_date, end_date
+            db, case_id, start_date, end_date, include_exchange=True, family_file_id=family_file_id
         )
 
         if not instances:
             return cls._empty_metrics()
 
         # Get participant roles
-        roles = await cls.get_participant_roles(db, case_id)
+        roles = {}
+        if case_id:
+            roles = await cls.get_participant_roles(db, case_id)
+        elif family_file_id:
+             # Try to get roles from family file (Parent A / Parent B)
+             # We map Parent A -> "petitioner" and Parent B -> "respondent" purely for classification
+             from app.models.family_file import FamilyFile
+             ff_result = await db.execute(select(FamilyFile).where(FamilyFile.id == family_file_id))
+             ff = ff_result.scalar_one_or_none()
+             if ff:
+                 if ff.parent_a_id:
+                     roles[str(ff.parent_a_id)] = "petitioner"
+                 if ff.parent_b_id:
+                     roles[str(ff.parent_b_id)] = "respondent"
 
         # Calculate totals
         total = len(instances)
@@ -309,9 +333,10 @@ class ExchangeComplianceService:
     async def get_exchange_details_for_export(
         cls,
         db: AsyncSession,
-        case_id: str,
+        case_id: Optional[str],
         start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None
+        end_date: Optional[datetime] = None,
+        family_file_id: Optional[str] = None
     ) -> List[Dict[str, Any]]:
         """
         Get detailed exchange data for court export/report.
@@ -319,10 +344,22 @@ class ExchangeComplianceService:
         Returns structured data suitable for PDF generation.
         """
         instances = await cls.get_exchange_instances(
-            db, case_id, start_date, end_date, include_exchange=True
+            db, case_id, start_date, end_date, include_exchange=True, family_file_id=family_file_id
         )
 
-        roles = await cls.get_participant_roles(db, case_id)
+        roles = {}
+        if case_id:
+            roles = await cls.get_participant_roles(db, case_id)
+        elif family_file_id:
+             # Try to get roles from family file
+             from app.models.family_file import FamilyFile
+             ff_result = await db.execute(select(FamilyFile).where(FamilyFile.id == family_file_id))
+             ff = ff_result.scalar_one_or_none()
+             if ff:
+                 if ff.parent_a_id:
+                     roles[str(ff.parent_a_id)] = "petitioner"
+                 if ff.parent_b_id:
+                     roles[str(ff.parent_b_id)] = "respondent"
 
         details = []
         for instance in instances:
@@ -391,20 +428,23 @@ class ExchangeComplianceService:
     async def get_compliance_summary(
         cls,
         db: AsyncSession,
-        case_id: str,
+        case_id: Optional[str],
         start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None
+        end_date: Optional[datetime] = None,
+        family_file_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Get a compliance summary suitable for court dashboard.
 
         Combines metrics with recent exchange details.
         """
-        metrics = await cls.get_exchange_metrics(db, case_id, start_date, end_date)
+        metrics = await cls.get_exchange_metrics(
+            db, case_id, start_date, end_date, family_file_id=family_file_id
+        )
 
         # Get last 5 exchanges for quick view
         recent_instances = await cls.get_exchange_instances(
-            db, case_id, start_date, end_date, include_exchange=True
+            db, case_id, start_date, end_date, include_exchange=True, family_file_id=family_file_id
         )
         recent = recent_instances[:5] if recent_instances else []
 

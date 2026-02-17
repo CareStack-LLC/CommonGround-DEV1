@@ -105,20 +105,28 @@ class ProfessionalComplianceService:
         await self._verify_access(professional_id, family_file_id, "compliance")
 
         family_file = await self._get_family_file(family_file_id)
-        if not family_file or not family_file.legacy_case_id:
-            return {"error": "No legacy case linked", "exchanges": []}
+        if not family_file:
+            return {"error": "Family file not found", "exchanges": []}
 
-        case_id = family_file.legacy_case_id
+        case_id = getattr(family_file, "legacy_case_id", None)
         start_date = datetime.utcnow() - timedelta(days=days)
         end_date = datetime.utcnow()
 
         # Get summary and details
         summary = await ExchangeComplianceService.get_compliance_summary(
-            self.db, case_id, start_date, end_date
+            self.db,
+            case_id=case_id,
+            start_date=start_date,
+            end_date=end_date,
+            family_file_id=family_file_id
         )
 
         details = await ExchangeComplianceService.get_exchange_details_for_export(
-            self.db, case_id, start_date, end_date
+            self.db,
+            case_id=case_id,
+            start_date=start_date,
+            end_date=end_date,
+            family_file_id=family_file_id
         )
 
         return {
