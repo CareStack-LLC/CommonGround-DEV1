@@ -97,10 +97,9 @@ class ProfessionalIntakeService:
             parent = parent_result.scalar_one_or_none()
             if parent:
                 parent_id = parent.id
-            else:
-                # For intake, we might need to create a placeholder user
-                # or handle this in the intake flow itself
-                parent_id = str(uuid4())  # Placeholder
+                # If user doesn't exist, we leave parent_id as None
+                # They will claim the session when they sign up/login
+                parent_id = None
 
         # Create session
         access_token = secrets.token_urlsafe(32)
