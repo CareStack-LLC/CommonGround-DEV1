@@ -59,15 +59,15 @@ class ProfessionalComplianceService:
         end_date = datetime.utcnow()
 
         # Get metrics from each domain
-        exchange_metrics = {}
-        if case_id:
-            exchange_metrics = await ExchangeComplianceService.get_exchange_metrics(
-                self.db, case_id, start_date, end_date
-            )
+        exchange_metrics = await ExchangeComplianceService.get_exchange_metrics(
+            self.db, case_id, start_date, end_date, family_file_id=family_file_id
+        )
 
         financial_metrics = await self._get_financial_metrics(
             family_file_id, case_id, start_date, end_date
         )
+
+        obligation_metrics = await self._get_obligation_metrics(family_file_id, case_id)
 
         communication_metrics = await self._get_communication_metrics(
             family_file_id, start_date, end_date
@@ -78,6 +78,30 @@ class ProfessionalComplianceService:
             exchange_metrics, financial_metrics, communication_metrics
         )
 
+        # Construct financial compliance object matching frontend expectation
+        # Frontend expects: total_obligations, paid_on_time, paid_late, outstanding, 
+        # total_amount_due, total_amount_paid, payment_rate, by_parent
+        financial_compliance = {
+            **financial_metrics,
+            "total_obligations": obligation_metrics.get("total_obligations", 0),
+            "paid_on_time": financial_metrics.get("payments_completed", 0), # Best proxy available
+            "paid_late": 0, # Not currently tracked
+            "outstanding": obligation_metrics.get("pending_count", 0),
+            "total_amount_due": obligation_metrics.get("total_amount", 0),
+            "total_amount_paid": obligation_metrics.get("amount_funded", 0),
+            "payment_rate": (obligation_metrics.get("child_support_paid_pct", 0) / 100),
+            "by_parent": {
+                "parent_a": {
+                    "paid": obligation_metrics.get("parent_a_contribution", 0),
+                    "outstanding": 0 # Not currently tracked per parent
+                },
+                "parent_b": {
+                    "paid": obligation_metrics.get("parent_b_contribution", 0),
+                    "outstanding": 0
+                }
+            }
+        }
+
         return {
             "family_file_id": family_file_id,
             "period_days": days,
@@ -85,8 +109,9 @@ class ProfessionalComplianceService:
             "end_date": end_date.isoformat(),
             "overall_compliance_score": overall_score,
             "overall_status": self._score_to_status(overall_score),
+            "overall_score": round(overall_score, 1), # Added for frontend compat
             "exchange_compliance": exchange_metrics,
-            "financial_compliance": financial_metrics,
+            "financial_compliance": financial_compliance,
             "communication_compliance": communication_metrics,
             "generated_at": datetime.utcnow().isoformat(),
         }
