@@ -689,14 +689,31 @@ class ProfessionalComplianceService:
         parent_a_compliance = (parent_a_contribution / parent_a_required) if parent_a_required > 0 else 0
         parent_b_compliance = (parent_b_contribution / parent_b_required) if parent_b_required > 0 else 0
 
+        # Calculate top category
+        category_counts = {}
+        for o in obligations:
+            category_counts[o.purpose_category] = category_counts.get(o.purpose_category, 0) + 1
+        
+        top_category = "None"
+        if category_counts:
+            top_category = max(category_counts, key=category_counts.get)
+
+        # Calculate child support specific stats
+        child_support_obligations = [o for o in obligations if o.purpose_category == "child_support"]
+        child_support_total = sum(o.total_amount for o in child_support_obligations)
+        child_support_funded = sum(o.amount_funded for o in child_support_obligations)
+        child_support_paid_pct = (float(child_support_funded) / float(child_support_total) * 100) if child_support_total > 0 else 0
+
         return {
             "total_obligations": total_obligations,
-            "total_amount": float(total_amount),
-            "amount_funded": float(amount_funded),
-            "amount_verified": float(amount_verified),
+            "total_amount": float(total_amount or 0),
+            "amount_funded": float(amount_funded or 0),
+            "amount_verified": float(amount_verified or 0),
             "pending_count": pending_count,
             "parent_a_contribution": float(parent_a_contribution),
             "parent_b_contribution": float(parent_b_contribution),
             "parent_a_compliance": float(parent_a_compliance),
             "parent_b_compliance": float(parent_b_compliance),
+            "top_category": top_category,
+            "child_support_paid_pct": round(child_support_paid_pct, 1)
         }

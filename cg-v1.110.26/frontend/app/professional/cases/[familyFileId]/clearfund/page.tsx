@@ -91,6 +91,8 @@ interface FinancialStats {
   parent_b_contribution: number;
   parent_a_compliance: number;
   parent_b_compliance: number;
+  top_category?: string;
+  child_support_paid_pct?: number;
 }
 
 export default function CaseClearFundPage() {
@@ -285,6 +287,42 @@ export default function CaseClearFundPage() {
                   <Clock className="h-5 w-5" />
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Insights */}
+      {stats && (
+        <div className="grid md:grid-cols-2 gap-4">
+          <Card>
+            <CardContent className="pt-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Top Category</p>
+                <p className="text-lg font-bold mt-1 capitalize">
+                  {(stats.top_category || "None").replace("_", " ")}
+                </p>
+              </div>
+              <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-4">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <p className="text-xs text-muted-foreground">Child Support Paid</p>
+                  <p className="text-lg font-bold mt-1">
+                    {stats.child_support_paid_pct != null ? `${stats.child_support_paid_pct}%` : "excess"}
+                  </p>
+                </div>
+                <div className="p-2 bg-pink-50 text-pink-600 rounded-lg">
+                  <Users className="h-5 w-5" />
+                </div>
+              </div>
+              <Progress value={stats.child_support_paid_pct || 0} className="h-2" />
             </CardContent>
           </Card>
         </div>
