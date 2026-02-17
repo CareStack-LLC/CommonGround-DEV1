@@ -128,8 +128,8 @@ class IntakeSessionListItem(BaseModel):
     """Summary item for intake session list."""
     id: str
     session_number: str
-    case_id: str
-    parent_id: str
+    case_id: Optional[str] = None
+    parent_id: Optional[str] = None
     target_forms: List[str]
     status: str
     message_count: int
@@ -138,6 +138,11 @@ class IntakeSessionListItem(BaseModel):
     clarification_requested: bool
     access_link_expires_at: datetime
     created_at: datetime
+    
+    # Computed fields for frontend
+    client_name: Optional[str] = None
+    client_email: Optional[str] = None
+    intake_type: Optional[str] = "custody"
 
     class Config:
         from_attributes = True
