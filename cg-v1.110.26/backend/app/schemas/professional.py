@@ -903,6 +903,7 @@ class IntakeSessionListItem(BaseModel):
     completed_at: Optional[datetime] = None
     started_at: Optional[datetime] = None
     access_link_expires_at: Optional[datetime] = None
+    target_forms: list[str] = []
 
     # Status flags
     parent_confirmed: bool = False
@@ -993,6 +994,7 @@ class IntakeSessionListResponse(BaseModel):
     total: int
     limit: int
     offset: int
+    stats: Optional[dict] = None
 
 
 # =============================================================================

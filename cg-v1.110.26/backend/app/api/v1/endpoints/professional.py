@@ -2547,6 +2547,8 @@ async def list_intake_sessions(
     return IntakeSessionListResponse(
         items=[_intake_session_to_list_item(s) for s in sessions],
         total=total,
+        limit=limit,
+        offset=skip,
         stats=stats,
     )
 
