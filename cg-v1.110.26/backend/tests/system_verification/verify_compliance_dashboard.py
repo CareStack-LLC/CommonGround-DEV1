@@ -107,6 +107,23 @@ async def verify_compliance_dashboard():
             if all_passed:
                 print("  [PASS] All financial fields present")
 
+            # 5. Verify Exchange by_parent
+            print("\nVerifying Exchange by_parent Structure:")
+            exc_parent = exc.get("by_parent", {})
+            if "parent_a" in exc_parent and "parent_b" in exc_parent:
+                 print("  [PASS] parent_a and parent_b present in exchange_compliance")
+            else:
+                 print(f"  [FAIL] Missing parent_a/b in exchange_compliance: {exc_parent.keys()}")
+
+            # 6. Verify Communication by_parent
+            print("\nVerifying Communication by_parent Structure:")
+            comm = dashboard.get("communication_compliance", {})
+            comm_parent = comm.get("by_parent", {})
+            if "parent_a" in comm_parent and "parent_b" in comm_parent:
+                 print("  [PASS] parent_a and parent_b present in communication_compliance")
+            else:
+                 print(f"  [FAIL] Missing parent_a/b in communication_compliance: {comm_parent.keys()}")
+
         except Exception as e:
             print(f"\n[ERROR] Failed to get dashboard: {e}")
             import traceback

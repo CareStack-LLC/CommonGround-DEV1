@@ -78,14 +78,67 @@ class ProfessionalComplianceService:
             exchange_metrics, financial_metrics, communication_metrics
         )
 
-        # Construct financial compliance object matching frontend expectation
-        # Frontend expects: total_obligations, paid_on_time, paid_late, outstanding, 
-        # total_amount_due, total_amount_paid, payment_rate, by_parent
+        # Get parent IDs for mapping
+        parent_a_id = str(family_file.parent_a_id) if family_file.parent_a_id else None
+        parent_b_id = str(family_file.parent_b_id) if family_file.parent_b_id else None
+
+        # --- Transform Exchange Metrics ---
+        # Backend returns petitioner/respondent, Frontend expects by_parent.parent_a/b
+        # Logic in ExchangeComplianceService maps Parent A -> Petitioner, Parent B -> Respondent
+        exc_by_parent = {
+            "parent_a": {
+                "on_time": exchange_metrics.get("petitioner_metrics", {}).get("on_time_rate", 0),
+                "late": 0, # Not currently split in these metrics
+                "missed": 0,
+                "check_ins": exchange_metrics.get("petitioner_metrics", {}).get("check_ins", 0)
+            },
+            "parent_b": {
+                "on_time": exchange_metrics.get("respondent_metrics", {}).get("on_time_rate", 0),
+                "late": 0,
+                "missed": 0,
+                "check_ins": exchange_metrics.get("respondent_metrics", {}).get("check_ins", 0)
+            }
+        }
+        exchange_compliance = {
+            **exchange_metrics,
+            "by_parent": exc_by_parent
+        }
+
+        # --- Transform Communication Metrics ---
+        # Backend returns list, Frontend expects by_parent object
+        comm_parent_a = {"messages": 0, "flagged": 0}
+        comm_parent_b = {"messages": 0, "flagged": 0}
+        
+        # parent_breakdown is a list of dicts with user_id
+        for p_data in communication_metrics.get("parent_breakdown", []):
+            uid = str(p_data.get("user_id"))
+            if uid == parent_a_id:
+                comm_parent_a = {
+                    "messages": p_data.get("messages_sent", 0),
+                    "flagged": p_data.get("messages_flagged", 0)
+                }
+            elif uid == parent_b_id:
+                comm_parent_b = {
+                    "messages": p_data.get("messages_sent", 0),
+                    "flagged": p_data.get("messages_flagged", 0)
+                }
+
+        comm_by_parent = {
+            "parent_a": comm_parent_a,
+            "parent_b": comm_parent_b
+        }
+        
+        communication_compliance = {
+            **communication_metrics,
+            "by_parent": comm_by_parent
+        }
+
+        # Construct financial compliance object (already done, but ensuring consistency)
         financial_compliance = {
             **financial_metrics,
             "total_obligations": obligation_metrics.get("total_obligations", 0),
-            "paid_on_time": financial_metrics.get("payments_completed", 0), # Best proxy available
-            "paid_late": 0, # Not currently tracked
+            "paid_on_time": financial_metrics.get("payments_completed", 0),
+            "paid_late": 0,
             "outstanding": obligation_metrics.get("pending_count", 0),
             "total_amount_due": obligation_metrics.get("total_amount", 0),
             "total_amount_paid": obligation_metrics.get("amount_funded", 0),
@@ -93,7 +146,7 @@ class ProfessionalComplianceService:
             "by_parent": {
                 "parent_a": {
                     "paid": obligation_metrics.get("parent_a_contribution", 0),
-                    "outstanding": 0 # Not currently tracked per parent
+                    "outstanding": 0 
                 },
                 "parent_b": {
                     "paid": obligation_metrics.get("parent_b_contribution", 0),
@@ -109,10 +162,10 @@ class ProfessionalComplianceService:
             "end_date": end_date.isoformat(),
             "overall_compliance_score": overall_score,
             "overall_status": self._score_to_status(overall_score),
-            "overall_score": round(overall_score, 1), # Added for frontend compat
-            "exchange_compliance": exchange_metrics,
+            "overall_score": round(overall_score, 1),
+            "exchange_compliance": exchange_compliance, # Use transformed version
             "financial_compliance": financial_compliance,
-            "communication_compliance": communication_metrics,
+            "communication_compliance": communication_compliance, # Use transformed version
             "generated_at": datetime.utcnow().isoformat(),
         }
 
