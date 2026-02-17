@@ -163,6 +163,34 @@ export function DocumentList({
         });
     };
 
+    const handleAction = (doc: ProfessionalDocument, action: 'view' | 'download') => {
+        if (!doc.file_url) {
+            toast({
+                title: "Unavailable",
+                description: "This document does not have a valid file URL.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        // Construct full URL if relative
+        const url = doc.file_url.startsWith("http")
+            ? doc.file_url
+            : `${process.env.NEXT_PUBLIC_API_URL}${doc.file_url}`;
+
+        if (action === 'view') {
+            window.open(url, '_blank');
+        } else {
+            // Force download by creating a temporary link
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${doc.title}.${doc.type === 'recording' ? 'mp4' : 'pdf'}`; // Simple extension guess
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
     return (
         <div className="space-y-6">
             {/* Filters */}
@@ -239,11 +267,11 @@ export function DocumentList({
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleAction(doc, 'view')}>
                                                     <Eye className="h-4 w-4 mr-2" />
                                                     View Document
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleAction(doc, 'download')}>
                                                     <Download className="h-4 w-4 mr-2" />
                                                     Download PDF
                                                 </DropdownMenuItem>
@@ -255,6 +283,7 @@ export function DocumentList({
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </div>
+
 
                                     <div>
                                         <h3 className="font-semibold text-slate-900 group-hover:text-teal-600 transition-colors line-clamp-1 mb-1" title={doc.title}>

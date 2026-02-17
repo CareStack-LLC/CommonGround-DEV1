@@ -149,7 +149,7 @@ class IntakeSession(Base, UUIDMixin, TimestampMixin):
         JSON, default=list
     )  # Full conversation history
     aria_provider: Mapped[str] = mapped_column(
-        String(20), default="claude"
+        String(20), default="openai"
     )  # claude | openai
     message_count: Mapped[int] = mapped_column(
         Integer, default=0

@@ -18,7 +18,7 @@ from app.models.agreement import Agreement
 from app.models.legal import CourtExport
 from app.models.recording import Recording
 from app.models.message_attachment import MessageAttachment
-from app.models.professional import CaseAssignment
+from app.models.professional import CaseAssignment, ComplianceReport
 
 class DocumentType(str, Enum):
     AGREEMENT = "agreement"
@@ -75,10 +75,13 @@ class ProfessionalDocumentService:
             accords = await self._get_quick_accords(target_ids)
             all_docs.extend(accords)
 
-        # Court Exports (Reports)
+        # Court Exports (Legacy Reports) & Compliance Reports (New)
         if not doc_type or doc_type == DocumentType.REPORT:
             reports = await self._get_reports(target_ids)
             all_docs.extend(reports)
+            
+            compliance_reports = await self._get_compliance_reports(target_ids)
+            all_docs.extend(compliance_reports)
 
         # Recordings
         if not doc_type or doc_type == DocumentType.RECORDING:
@@ -124,7 +127,7 @@ class ProfessionalDocumentService:
                 "status": a.status,
                 "created_at": a.created_at,
                 "family_file_id": str(a.family_file_id),
-                "file_url": f"/api/v1/agreements/{a.id}/pdf", # Placeholder
+                "file_url": f"/api/v1/agreements/{a.id}/pdf", 
                 "description": f"Version {a.version} - {a.agreement_type}"
             }
             for a in result.scalars().all()
@@ -162,6 +165,26 @@ class ProfessionalDocumentService:
                 "family_file_id": str(a.case_id),
                 "file_url": a.pdf_url,
                 "description": f"Generated for {a.generated_for}"
+            }
+            for a in result.scalars().all()
+        ]
+        
+    async def _get_compliance_reports(self, family_file_ids: List[str]) -> List[dict]:
+        result = await self.db.execute(
+            select(ComplianceReport).where(ComplianceReport.family_file_id.in_(family_file_ids))
+        )
+        return [
+            {
+                "id": str(a.id),
+                "title": a.title or "Compliance Report",
+                "type": DocumentType.REPORT,
+                "status": a.status,
+                "created_at": a.created_at,
+                "family_file_id": str(a.family_file_id),
+                # If file_url is stored (completed), use it. Else fall back to generation endpoint (future)
+                # For now using a placeholder endpoint that we might need to create or exposing the file_url
+                "file_url": a.file_url or f"/api/v1/professional/reports/{a.id}/download", 
+                "description": f"Professional Compliance Report ({a.export_format})"
             }
             for a in result.scalars().all()
         ]

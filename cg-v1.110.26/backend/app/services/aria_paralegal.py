@@ -203,6 +203,7 @@ Ready to begin? First, could you tell me a little about your children - their na
             "content": initial_message,
             "timestamp": datetime.utcnow().isoformat()
         }]
+        session.aria_provider = "openai"  # Force OpenAI for new sessions
         session.message_count = 1
         flag_modified(session, "messages")
 
@@ -331,7 +332,7 @@ Ready to begin? First, could you tell me a little about your children - their na
         ]
 
         response = self.anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-3-5-sonnet-20240620",
             max_tokens=1500,
             system=system_prompt,
             messages=claude_messages
@@ -353,7 +354,7 @@ Ready to begin? First, could you tell me a little about your children - their na
         ]
 
         response = self.openai_client.chat.completions.create(
-            model="gpt-4-turbo",
+            model="gpt-4o",
             max_tokens=1500,
             messages=openai_messages
         )
@@ -427,16 +428,16 @@ Keep each section brief and factual. Do not add opinions or recommendations."""
                 for m in session.messages
             ])
 
-            response = self.anthropic_client.messages.create(
-                model="claude-sonnet-4-20250514",
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4o",
                 max_tokens=2000,
-                messages=[{
-                    "role": "user",
-                    "content": f"{summary_prompt}\n\n---\n\nCONVERSATION:\n{conv_text}"
-                }]
+                messages=[
+                    {"role": "system", "content": summary_prompt},
+                    {"role": "user", "content": f"CONVERSATION:\n{conv_text}"}
+                ]
             )
 
-            summary = response.content[0].text
+            summary = response.choices[0].message.content
 
             # Save summary
             session.aria_summary = summary

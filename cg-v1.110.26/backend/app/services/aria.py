@@ -480,12 +480,9 @@ class ARIAService:
         case_context: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """
-        Deep AI-powered analysis using Claude for nuanced detection.
+        Deep AI-powered analysis using OpenAI (default) for nuanced detection.
 
-        This is more sophisticated than regex patterns and can detect:
-        - Context-dependent toxicity
-        - Subtle manipulation
-        - Cultural/situational inappropriateness
+        Delegates to analyze_with_openai to ensure consistency across the platform.
 
         Args:
             message: Message content to analyze
@@ -494,98 +491,8 @@ class ARIAService:
         Returns:
             AI analysis result with detailed feedback
         """
-        try:
-            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        return await self.analyze_with_openai(message, case_context)
 
-            # Build context
-            context_info = ""
-            if case_context and "children" in case_context:
-                children = case_context["children"]
-                if children:
-                    names = ", ".join([c.get("first_name", "") for c in children if c.get("first_name")])
-                    context_info = f"\n\nContext: Communication about co-parenting {names}."
-
-            # AI system prompt
-            system_prompt = """You are ARIA, an AI assistant for co-parenting communication in CommonGround.
-
-CRITICAL CONTEXT: All messages are COURT DOCUMENTATION that may be reviewed by judges, attorneys, and guardians ad litem. This is NOT private messaging - it's legal evidence.
-
-Your role is to ensure communication is appropriate for court review and focused on children's welfare.
-
-Analyze messages for COURT-INAPPROPRIATE content:
-- Physical threats or violence (CRITICAL - may have criminal implications)
-- Hostility, contempt, or hate speech (judges view very negatively)
-- Profanity or insults (unprofessional in legal context)
-- Blame, manipulation, or guilt-tripping (bad faith communication)
-- Dismissiveness or passive-aggression (non-collaborative)
-- All caps/shouting (appears aggressive)
-- Anything a judge would view as poor co-parenting
-
-Guidance for Suggestions:
-Use the **BIFF Method** (Brief, Informative, Friendly, Firm).
-- DO NOT just synonym-swap insults (e.g., "you are stupid" -> "you are confusing"). This is robotic and unhelpful.
-- DO REWRITE the ENTIRE message to focus on the business of co-parenting.
-- If the message is purely abuse ("fuck you"), suggest a template response like "I am feeling frustrated and will return to this later." rather than translating the insult.
-
-SAFETY PROTOCOL:
-If the message contains *physical threats* (killing, hurting, beating), mark as SEVERE [1.0] and include "THREATENING" in categories.
-
-Respond in JSON format:
-{
-    "toxicity_score": 0.0-1.0,
-    "categories": ["list of issues"],
-    "triggers": ["specific problematic phrases"],
-    "explanation": "why this is problematic for court",
-    "suggestions": ["Brief, Informative, Friendly, Firm alternative"]
-}"""
-
-            # Analysis prompt
-            prompt = f"""Analyze this co-parenting message:{context_info}
-
-MESSAGE: "{message}"
-
-Respond in JSON format."""
-
-            # Call Claude API
-            response = client.messages.create(
-                model="claude-sonnet-4-20250514",
-                max_tokens=1024,
-                system=system_prompt,
-                messages=[{"role": "user", "content": prompt}]
-            )
-
-            # Parse response
-            response_text = response.content[0].text
-            json_match = re.search(r'\{[\s\S]*\}', response_text)
-
-            if json_match:
-                analysis = json.loads(json_match.group())
-            else:
-                analysis = json.loads(response_text)
-
-            return {
-                "ai_powered": True,
-                "toxicity_score": float(analysis.get("toxicity_score", 0.0)),
-                "categories": analysis.get("categories", []),
-                "triggers": analysis.get("triggers", []),
-                "explanation": analysis.get("explanation", ""),
-                "suggestions": analysis.get("suggestions", []),
-                "model": "claude-sonnet-4"
-            }
-
-        except Exception as e:
-            # Fallback to regex analysis
-            print(f"AI analysis failed: {e}")
-            regex_analysis = self.analyze_message(message)
-            return {
-                "ai_powered": False,
-                "toxicity_score": regex_analysis.toxicity_score,
-                "categories": [cat.value for cat in regex_analysis.categories],
-                "triggers": regex_analysis.triggers,
-                "explanation": regex_analysis.explanation,
-                "suggestions": [regex_analysis.suggestion] if regex_analysis.suggestion else [],
-                "error": str(e)
-            }
 
     async def analyze_with_openai(
         self,

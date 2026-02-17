@@ -27,6 +27,7 @@ from app.models.intake import (
     generate_access_token,
 )
 from app.models.court import CourtProfessional, CourtAccessGrant
+from app.models.professional import ProfessionalProfile
 from app.models.case import Case
 from app.models.child import Child
 from app.schemas.intake import (
@@ -442,12 +443,45 @@ async def access_intake(
         }
 
     # Get professional info
+    # Try CourtProfessional (legacy)
     prof_result = await db.execute(
         select(CourtProfessional).where(
             CourtProfessional.id == session.professional_id
         )
     )
     professional = prof_result.scalar_one_or_none()
+    
+    professional_name = "Your Attorney"
+    professional_role = "Attorney"
+    
+    if professional:
+        professional_name = professional.full_name
+        professional_role = professional.role
+    else:
+        # Try ProfessionalProfile (native)
+        # Verify the ID is a valid profile ID
+        profile_result = await db.execute(
+            select(ProfessionalProfile).where(
+                ProfessionalProfile.id == session.professional_id
+            ).options(
+                selectinload(ProfessionalProfile.user)
+            )
+        )
+        profile = profile_result.scalar_one_or_none()
+        
+        if profile:
+            # Get name from user
+            if profile.user:
+                professional_name = f"{profile.user.first_name} {profile.user.last_name}"
+            
+            # Map role
+            role_map = {
+                "attorney": "Attorney",
+                "paralegal": "Paralegal",
+                "mediator": "Mediator",
+                "intake_coordinator": "Intake Coordinator"
+            }
+            professional_role = role_map.get(profile.professional_type, "Legal Professional")
 
     # Get case info
     case_result = await db.execute(
@@ -467,8 +501,8 @@ async def access_intake(
     return {
         "session_id": session.id,
         "session_number": session.session_number,
-        "professional_name": professional.full_name if professional else "Your Attorney",
-        "professional_role": professional.role if professional else "Attorney",
+        "professional_name": professional_name,
+        "professional_role": professional_role,
         "target_forms": session.target_forms,
         "status": session.status,
         "is_accessible": session.is_accessible,

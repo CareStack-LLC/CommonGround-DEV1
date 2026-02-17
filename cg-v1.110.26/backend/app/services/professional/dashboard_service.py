@@ -216,7 +216,7 @@ class ProfessionalDashboardService:
 
         Includes:
         - Court hearings
-        - Scheduled exchanges (if in scope)
+        - Scheduled exchanges
         - Important deadlines
         """
         events = []
@@ -230,13 +230,53 @@ class ProfessionalDashboardService:
         court_events = await self._get_upcoming_court_events(professional_id, days)
         events.extend(court_events)
 
-        # Get scheduled exchanges (if professional has schedule scope)
-        # This would query schedule_events table for the assigned cases
-        # For now, we'll skip this to keep the implementation simpler
+        # Get scheduled exchanges
+        exchanges = await self._get_upcoming_exchanges(professional_id, days)
+        events.extend(exchanges)
 
-        # Sort by date
-        events.sort(key=lambda x: x.get("event_date", datetime.max))
+        # Sort by date (using event_date which is a datetime object)
+        # Handle potential string dates if legacy code returns strings (though _get_upcoming_court_events uses datetime objects)
+        events.sort(key=lambda x: x.get("event_date") if isinstance(x.get("event_date"), datetime) else datetime.fromisoformat(str(x.get("event_date")).replace('Z', '+00:00')))
 
+        return events
+
+    async def _get_upcoming_exchanges(
+        self,
+        professional_id: str,
+        days: int = 7,
+    ) -> list[dict]:
+        """Get upcoming exchanges/events for assigned cases."""
+        case_ids = await self._get_assigned_family_file_ids(professional_id)
+        if not case_ids:
+            return []
+
+        cutoff = datetime.utcnow() + timedelta(days=days)
+
+        # Query ScheduleEvent
+        result = await self.db.execute(
+            select(ScheduleEvent).where(
+                and_(
+                    ScheduleEvent.family_file_id.in_(case_ids),
+                    ScheduleEvent.start_time <= cutoff,
+                    ScheduleEvent.start_time >= datetime.utcnow(),
+                )
+            )
+            .order_by(ScheduleEvent.start_time.asc())
+            .limit(20)
+        )
+
+        events = []
+        for event in result.scalars().all():
+            events.append({
+                "id": event.id,
+                "title": event.title,
+                "event_type": "exchange" if event.is_exchange else "calendar_event",
+                "event_date": event.start_time,
+                "start_time": event.start_time.strftime("%I:%M %p"),
+                "is_mandatory": True if event.is_exchange else False,
+                "family_file_id": event.family_file_id,
+            })
+        
         return events
 
     # -------------------------------------------------------------------------
