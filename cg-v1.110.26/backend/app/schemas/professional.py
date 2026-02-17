@@ -895,6 +895,9 @@ class IntakeSessionListItem(BaseModel):
     has_summary: bool = False
     family_file_id: Optional[str] = None
     case_assignment_id: Optional[str] = None
+    firm_id: Optional[str] = None
+    case_id: Optional[str] = None
+    parent_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     completed_at: Optional[datetime] = None
