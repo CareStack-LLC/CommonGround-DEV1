@@ -97,6 +97,7 @@ class ProfessionalIntakeService:
             parent = parent_result.scalar_one_or_none()
             if parent:
                 parent_id = parent.id
+            else:
                 # If user doesn't exist, we leave parent_id as None
                 # They will claim the session when they sign up/login
                 parent_id = None

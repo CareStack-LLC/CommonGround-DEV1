@@ -928,6 +928,13 @@ class IntakeSessionDetail(IntakeSessionListItem):
     started_at: Optional[datetime] = None
     parent_confirmed: bool = False
     parent_confirmed_at: Optional[datetime] = None
+    aria_provider: str = "openai"
+    aria_summary: Optional[str] = None
+    extracted_data: Optional[dict] = None
+    draft_form_url: Optional[str] = None
+    draft_form_generated_at: Optional[datetime] = None
+    parent_edits: Optional[list] = None
+    clarification_response: Optional[str] = None
 
 
 class IntakeMessageItem(BaseModel):
