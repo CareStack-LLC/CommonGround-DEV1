@@ -129,6 +129,50 @@ Professional: {professional_name} ({professional_role})
 Parent role: {parent_role}
 Children: {children_text}"""
 
+    async def _get_professional_context(self, professional_id: str) -> Dict[str, str]:
+        """Get professional name and role from either profile type."""
+        # Try CourtProfessional first
+        prof_result = await self.db.execute(
+            select(CourtProfessional).where(CourtProfessional.id == professional_id)
+        )
+        professional = prof_result.scalar_one_or_none()
+        
+        if professional:
+            return {
+                "name": professional.full_name,
+                "role": professional.role or "Legal Professional"
+            }
+            
+        # Try ProfessionalProfile
+        from app.models.professional import ProfessionalProfile
+        from app.models.user import User
+        
+        profile_result = await self.db.execute(
+            select(ProfessionalProfile).where(
+                ProfessionalProfile.id == professional_id
+            ).options(
+                selectinload(ProfessionalProfile.user)
+            )
+        )
+        profile = profile_result.scalar_one_or_none()
+        
+        if profile and profile.user:
+            role_map = {
+                "attorney": "Attorney",
+                "paralegal": "Paralegal",
+                "mediator": "Mediator",
+                "intake_coordinator": "Intake Coordinator"
+            }
+            return {
+                "name": f"{profile.user.first_name} {profile.user.last_name}",
+                "role": role_map.get(profile.professional_type, "Legal Professional")
+            }
+            
+        return {
+            "name": "Your Attorney",
+            "role": "Legal Professional"
+        }
+
     def _get_initial_message(
         self,
         professional_name: str,
@@ -162,17 +206,9 @@ Ready to begin? First, could you tell me a little about your children - their na
         Returns the initial ARIA message.
         """
         # Get professional info
-        prof_result = await self.db.execute(
-            select(CourtProfessional).where(
-                CourtProfessional.id == session.professional_id
-            )
-        )
-        professional = prof_result.scalar_one_or_none()
-        if not professional:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Professional not found"
-            )
+        prof_context = await self._get_professional_context(session.professional_id)
+        professional_name = prof_context["name"]
+        professional_role = prof_context["role"]
 
         # Get case info for context
         case_result = await self.db.execute(
@@ -191,7 +227,7 @@ Ready to begin? First, could you tell me a little about your children - their na
 
         # Generate initial message
         initial_message = self._get_initial_message(
-            professional.full_name,
+            professional_name,
             session.target_forms
         )
 
@@ -225,17 +261,9 @@ Ready to begin? First, could you tell me a little about your children - their na
         Process a parent's message and return ARIA's response.
         """
         # Get professional info
-        prof_result = await self.db.execute(
-            select(CourtProfessional).where(
-                CourtProfessional.id == session.professional_id
-            )
-        )
-        professional = prof_result.scalar_one_or_none()
-        if not professional:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Professional not found"
-            )
+        prof_context = await self._get_professional_context(session.professional_id)
+        professional_name = prof_context["name"]
+        professional_role = prof_context["role"]
 
         # Get case and parent info
         case_result = await self.db.execute(
