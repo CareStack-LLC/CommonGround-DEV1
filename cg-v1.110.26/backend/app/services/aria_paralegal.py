@@ -399,14 +399,15 @@ Ready to begin? First, could you tell me a little about your children - their na
         Simple heuristic - in production this could be more sophisticated.
         """
         # Need at least 10 exchanges for a thorough intake
-        if len(messages) < 20:
+        # Need at least 3 exchanges (6 messages) for a basic intake
+        if len(messages) < 6:
             return False
 
         # Look for summary/confirmation language in recent messages
         recent_assistant_msgs = [
             m["content"].lower()
-            for m in messages[-6:]
-            if m["role"] == "assistant"
+            for m in messages[-2:]
+            if m.get("role") == "assistant"
         ]
 
         completion_indicators = [
@@ -415,12 +416,32 @@ Ready to begin? First, could you tell me a little about your children - their na
             "before we finish",
             "is there anything else",
             "any other information",
-            "we've covered"
+            "we've covered",
+            "all set",
+            "thank you for sharing",
+            "take care",
+            "get in touch"
         ]
 
         for msg in recent_assistant_msgs:
             if any(indicator in msg for indicator in completion_indicators):
                 return True
+        
+        # Also check if user says "goodbye" or "that's it"
+        last_user_msg = next((m["content"].lower() for m in reversed(messages) if m.get("role") == "user"), "")
+        user_completion_indicators = [
+            "that's it",
+            "thats it",
+            "nothing else",
+            "all done",
+            "goodbye",
+            "bye",
+            "thank you",
+            "thanks"
+        ]
+        
+        if any(indicator == last_user_msg or indicator in last_user_msg for indicator in user_completion_indicators):
+           return True
 
         return False
 

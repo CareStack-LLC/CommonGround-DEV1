@@ -393,11 +393,10 @@ export default function IntakePage() {
               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                  message.role === "user"
+                className={`max-w-[80%] rounded-lg px-4 py-3 ${message.role === "user"
                     ? "bg-blue-600 text-white"
                     : "bg-white border shadow-sm"
-                }`}
+                  }`}
               >
                 <p className="whitespace-pre-wrap">{message.content}</p>
               </div>
@@ -433,6 +432,19 @@ export default function IntakePage() {
 
       {/* Input */}
       <div className="bg-white border-t px-4 py-4">
+        {messages.filter(m => m.role === "user").length >= 3 && !isComplete && (
+          <div className="max-w-3xl mx-auto mb-3 flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsComplete(true)}
+              className="text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700"
+            >
+              <CheckCircle className="h-3 w-3 mr-1" />
+              I'm done, review now
+            </Button>
+          </div>
+        )}
         <div className="max-w-3xl mx-auto flex gap-2">
           <Input
             value={inputValue}
