@@ -20,10 +20,12 @@ from openai import OpenAI
 from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlalchemy.orm.attributes import flag_modified
 
 from app.models.intake import IntakeSession, IntakeExtraction, IntakeStatus
 from app.models.court import CourtProfessional
+from app.models.professional import ProfessionalProfile
 from app.models.case import Case
 from app.models.child import Child
 from app.models.user import User
@@ -144,9 +146,6 @@ Children: {children_text}"""
             }
             
         # Try ProfessionalProfile
-        from app.models.professional import ProfessionalProfile
-        from app.models.user import User
-        
         profile_result = await self.db.execute(
             select(ProfessionalProfile).where(
                 ProfessionalProfile.id == professional_id
