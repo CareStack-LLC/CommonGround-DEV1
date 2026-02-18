@@ -43,6 +43,8 @@ export interface IntakeSession {
     intake_type: string;
     status: string;
     access_token: string;
+    intake_link: string;
+    session_number: string;
     created_at: string;
     updated_at: string;
     completed_at: string | null;

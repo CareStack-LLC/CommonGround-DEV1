@@ -903,6 +903,8 @@ class IntakeSessionListItem(BaseModel):
     completed_at: Optional[datetime] = None
     started_at: Optional[datetime] = None
     access_link_expires_at: Optional[datetime] = None
+    access_token: str = ""
+    intake_link: str = ""
     target_forms: list[str] = []
 
     # Status flags
@@ -915,9 +917,9 @@ class IntakeSessionListItem(BaseModel):
 class IntakeSessionDetail(IntakeSessionListItem):
     """Schema for detailed intake session view."""
     client_phone: Optional[str] = None
-    intake_link: str
     notes: Optional[str] = None
     target_forms: list[str] = []
+    custom_questions: Optional[list] = None
     professional_notes: Optional[str] = None
     professional_reviewed: bool = False
     professional_reviewed_at: Optional[datetime] = None
@@ -931,14 +933,15 @@ class IntakeSessionDetail(IntakeSessionListItem):
 class IntakeMessageItem(BaseModel):
     """Schema for intake conversation message."""
     id: str
-    role: str  # "assistant" or "user"
+    role: str
     content: str
-    created_at: datetime
+    timestamp: Optional[datetime] = None
 
 
 class IntakeTranscriptResponse(BaseModel):
     """Schema for intake transcript response."""
     session_id: str
+    session_number: str
     messages: list[IntakeMessageItem]
     total_messages: int
 
@@ -972,6 +975,10 @@ class IntakeExtractedData(BaseModel):
     financial_info: Optional[dict] = None
     schedule_preferences: Optional[dict] = None
     special_considerations: list[str] = []
+    sections: list[dict] = []
+    total_fields: int = 0
+    high_confidence_count: int = 0
+    needs_review_count: int = 0
 
 
 class IntakeOutputsResponse(BaseModel):

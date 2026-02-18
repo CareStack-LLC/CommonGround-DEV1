@@ -65,7 +65,13 @@ export default function IntakeLinkTrackingPage() {
             );
             if (res.ok) {
                 const data = await res.json();
-                setLinks(Array.isArray(data) ? data : data.items || []);
+                const items = Array.isArray(data) ? data : data.items || [];
+                // Map backend field names to what the table expects if necessary
+                const mappedItems = items.map((item: any) => ({
+                    ...item,
+                    expires_at: item.access_link_expires_at
+                }));
+                setLinks(mappedItems);
             }
         } catch (err) {
             console.error("Error fetching links:", err);

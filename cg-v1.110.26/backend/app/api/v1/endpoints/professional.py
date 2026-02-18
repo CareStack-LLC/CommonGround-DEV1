@@ -2489,6 +2489,8 @@ def _intake_session_to_list_item(session) -> IntakeSessionListItem:
         started_at=session.started_at,
         completed_at=session.completed_at,
         access_link_expires_at=session.access_link_expires_at,
+        access_token=session.access_token,
+        intake_link=session.intake_link,
         target_forms=session.target_forms or [],
     )
 
@@ -2670,7 +2672,7 @@ async def get_intake_outputs(
             detail="Intake session not found.",
         )
 
-    return IntakeOutputsResponse(**outputs)
+    return IntakeOutputsResponse(session_id=session_id, **outputs)
 
 
 @router.post(
