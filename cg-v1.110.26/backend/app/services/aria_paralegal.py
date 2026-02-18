@@ -302,8 +302,8 @@ Ready to begin? First, could you tell me a little about your children - their na
 
         # Generate system prompt
         system_prompt = self._get_system_prompt(
-            professional.full_name,
-            professional.role,
+            professional_name,
+            professional_role,
             session.target_forms,
             parent_role,
             children_names,
