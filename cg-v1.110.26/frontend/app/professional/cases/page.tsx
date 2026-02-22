@@ -89,7 +89,7 @@ const URGENCY_COLORS: Record<string, string> = {
   low: "text-slate-500 bg-slate-50 border-slate-200",
 };
 
-const RISK_ICONS: Record<string, JSX.Element> = {
+const RISK_ICONS: Record<string, React.JSX.Element> = {
   high: <AlertCircle className="h-4 w-4 text-red-500" />,
   medium: <Zap className="h-4 w-4 text-amber-500" />,
   low: <CheckCircle2 className="h-4 w-4 text-emerald-500" />,

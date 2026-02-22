@@ -67,6 +67,7 @@ from app.schemas.professional import (
     ComplianceReportCreate,
     ComplianceReportResponse,
     ComplianceReportListResponse,
+    ARIAThreadAnalysis,
 )
 from app.services.professional.profile_service import ProfessionalProfileService
 from app.services.professional.firm_service import FirmService
