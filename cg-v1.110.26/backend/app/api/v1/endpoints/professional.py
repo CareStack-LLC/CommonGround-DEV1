@@ -2545,6 +2545,8 @@ def _intake_session_to_detail(session) -> IntakeSessionDetail:
     list_item = _intake_session_to_list_item(session)
     return IntakeSessionDetail(
         **list_item.model_dump(),
+        client_phone=getattr(session, 'client_phone', None),
+        notes=getattr(session, 'client_notes', None),
         custom_questions=session.custom_questions,
         aria_provider=session.aria_provider,
         aria_summary=session.aria_summary,
