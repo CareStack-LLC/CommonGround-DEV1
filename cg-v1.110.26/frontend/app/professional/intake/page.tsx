@@ -1,26 +1,17 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
-    Link2,
     Plus,
     Loader2,
     RefreshCw,
     TrendingUp,
-    Send
+    Bot,
 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { useProfessionalAuth } from "../layout";
 import { CustodyIntakeTable, IntakeSession } from "@/components/professional/intake/custody-intake-table";
 
@@ -36,19 +27,13 @@ interface IntakeStats {
 }
 
 export default function IntakePage() {
+    const router = useRouter();
     const { token, profile, isLoading: authLoading } = useProfessionalAuth();
 
     const [links, setLinks] = useState<IntakeSession[]>([]);
     const [stats, setStats] = useState<IntakeStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState("all");
-
-    // New link form
-    const [showNewForm, setShowNewForm] = useState(false);
-    const [newClientName, setNewClientName] = useState("");
-    const [newClientEmail, setNewClientEmail] = useState("");
-    const [newIntakeType, setNewIntakeType] = useState("standard_custody");
-    const [creating, setCreating] = useState(false);
 
     const fetchLinks = useCallback(async () => {
         if (!token) return;
@@ -100,32 +85,7 @@ export default function IntakePage() {
         load();
     }, [fetchLinks, fetchStats]);
 
-    const createLink = async () => {
-        if (!token || !newClientName.trim() || !newClientEmail.trim()) return;
-        setCreating(true);
-        try {
-            const res = await fetch(`${API_BASE}/api/v1/professional/intake/sessions`, {
-                method: "POST",
-                headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    client_name: newClientName.trim(),
-                    client_email: newClientEmail.trim(),
-                    intake_type: newIntakeType,
-                }),
-            });
-            if (res.ok) {
-                setShowNewForm(false);
-                setNewClientName("");
-                setNewClientEmail("");
-                setNewIntakeType("standard_custody");
-                await Promise.all([fetchLinks(), fetchStats()]);
-            }
-        } catch (err) {
-            console.error("Error creating link:", err);
-        } finally {
-            setCreating(false);
-        }
-    };
+
 
     const completionRate = stats
         ? stats.total > 0
@@ -163,11 +123,11 @@ export default function IntakePage() {
                         <RefreshCw className="h-4 w-4" />
                     </Button>
                     <Button
-                        onClick={() => setShowNewForm(true)}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                        onClick={() => router.push("/professional/intake/new")}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
                     >
                         <Plus className="h-4 w-4 mr-2" />
-                        Generate Link
+                        New ARIA Intake
                     </Button>
                 </div>
             </div>
@@ -212,72 +172,6 @@ export default function IntakePage() {
                 </div>
             )}
 
-            {/* New Link Form */}
-            {showNewForm && (
-                <Card className="mb-6 border-indigo-200 bg-gradient-to-r from-indigo-50/30 to-purple-50/30">
-                    <CardHeader className="pb-3">
-                        <CardTitle className="text-base flex items-center gap-2">
-                            <Link2 className="h-4 w-4 text-indigo-600" />
-                            Generate New Intake Link
-                        </CardTitle>
-                        <CardDescription>
-                            Create a unique link to send to your client for their ARIA intake session
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <Label className="text-sm">Client Name</Label>
-                                <Input
-                                    value={newClientName}
-                                    onChange={(e) => setNewClientName(e.target.value)}
-                                    placeholder="Jane Smith"
-                                    className="mt-1.5 bg-white"
-                                />
-                            </div>
-                            <div>
-                                <Label className="text-sm">Client Email</Label>
-                                <Input
-                                    value={newClientEmail}
-                                    onChange={(e) => setNewClientEmail(e.target.value)}
-                                    placeholder="jane@example.com"
-                                    className="mt-1.5 bg-white"
-                                    type="email"
-                                />
-                            </div>
-                            <div>
-                                <Label className="text-sm">Intake Type</Label>
-                                <Select value={newIntakeType} onValueChange={setNewIntakeType}>
-                                    <SelectTrigger className="mt-1.5 bg-white">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="standard_custody">Standard 17-Section</SelectItem>
-                                        <SelectItem value="custom">Custom Questionnaire</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-2 mt-4">
-                            <Button
-                                onClick={createLink}
-                                disabled={creating || !newClientName.trim() || !newClientEmail.trim()}
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white"
-                            >
-                                {creating ? (
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                ) : (
-                                    <Send className="h-4 w-4 mr-2" />
-                                )}
-                                {creating ? "Creating..." : "Generate & Send"}
-                            </Button>
-                            <Button variant="ghost" onClick={() => setShowNewForm(false)}>
-                                Cancel
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
 
             {/* Filter Row */}
             <div className="flex items-center gap-2 mb-4">
