@@ -589,9 +589,4 @@ function CaseRow({
   );
 }
 
-const URGENCY_COLORS: Record<string, string> = {
-  urgent: "text-red-600 bg-red-50 border-red-200",
-  high: "text-orange-600 bg-orange-50 border-orange-200",
-  medium: "text-blue-600 bg-blue-50 border-blue-200",
-  low: "text-slate-500 bg-slate-50 border-slate-200",
-};
+
