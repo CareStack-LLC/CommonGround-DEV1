@@ -313,6 +313,7 @@ class ProfessionalIntakeService:
             summary = {
                 "client_info": extracted_data.get("client_info", {}),
                 "case_overview": session.aria_summary,
+                "current_situation": extracted_data.get("current_situation", ""),
                 "children": extracted_data.get("children", []),
                 "goals": extracted_data.get("goals", []),
                 "concerns": extracted_data.get("concerns", []),

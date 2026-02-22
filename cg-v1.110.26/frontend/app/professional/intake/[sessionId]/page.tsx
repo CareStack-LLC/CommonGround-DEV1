@@ -171,6 +171,36 @@ export default function IntakeDetailPage() {
     }
   };
 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const refreshSummary = async () => {
+    if (!token || !sessionId) return;
+
+    setIsRefreshing(true);
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/v1/professional/intake/sessions/${sessionId}/refresh-summary`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (res.ok) {
+        const outputsData = await res.json();
+        setSummary(outputsData.summary || null);
+        setExtractedData(outputsData.extracted_data || null);
+      }
+
+      // Also refresh session details
+      await fetchSessionData();
+    } catch (error) {
+      console.error("Error refreshing summary:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const markAsReviewed = async () => {
     if (!token || !sessionId) return;
 
@@ -266,9 +296,9 @@ export default function IntakeDetailPage() {
             <Copy className="h-4 w-4 mr-2" />
             Copy Link
           </Button>
-          <Button variant="outline" size="sm" onClick={fetchSessionData}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+          <Button variant="outline" size="sm" onClick={refreshSummary} disabled={isRefreshing}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Regenerating...' : 'Refresh'}
           </Button>
           {session.status === "completed" && (
             <Button
@@ -487,9 +517,8 @@ export default function IntakeDetailPage() {
                     {messages.map((message) => (
                       <div
                         key={message.id}
-                        className={`flex gap-3 ${
-                          message.role === "assistant" ? "" : "flex-row-reverse"
-                        }`}
+                        className={`flex gap-3 ${message.role === "assistant" ? "" : "flex-row-reverse"
+                          }`}
                       >
                         <Avatar className="h-8 w-8 shrink-0">
                           <AvatarFallback
@@ -507,16 +536,14 @@ export default function IntakeDetailPage() {
                           </AvatarFallback>
                         </Avatar>
                         <div
-                          className={`flex-1 ${
-                            message.role === "assistant" ? "pr-12" : "pl-12"
-                          }`}
+                          className={`flex-1 ${message.role === "assistant" ? "pr-12" : "pl-12"
+                            }`}
                         >
                           <div
-                            className={`p-3 rounded-lg ${
-                              message.role === "assistant"
-                                ? "bg-muted"
-                                : "bg-blue-50"
-                            }`}
+                            className={`p-3 rounded-lg ${message.role === "assistant"
+                              ? "bg-muted"
+                              : "bg-blue-50"
+                              }`}
                           >
                             <p className="text-sm whitespace-pre-wrap">
                               {message.content}

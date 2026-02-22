@@ -450,48 +450,90 @@ Ready to begin? First, could you tell me a little about your children - their na
         session: IntakeSession
     ) -> str:
         """
-        Generate a plain English summary of the intake conversation.
+        Generate a structured summary of the intake conversation.
+
+        Produces both a plain-text overview (saved as aria_summary) and
+        structured JSON sections (merged into extracted_data) so the
+        professional detail page can render Current Situation, Client
+        Goals, Key Concerns, and Recommended Next Steps.
         """
         if not session.messages or len(session.messages) < 2:
             return "Intake not yet started."
 
-        summary_prompt = """Based on this intake conversation, create a clear, organized summary
-of what the parent shared. Use plain English, not legal jargon.
+        summary_prompt = """You are ARIA, a paralegal AI that reviews intake conversations.
+Analyze the conversation below and return a JSON object with these exact keys:
 
-Structure the summary as:
-1. CHILDREN: Names, ages, current living situation
-2. CURRENT ARRANGEMENT: How custody/visitation currently works
-3. REQUESTED CHANGES: What the parent is asking for
-4. SCHEDULE PREFERENCES: Weekly, holidays, summer
-5. EXCHANGE LOGISTICS: Locations, times, transportation
-6. SPECIAL CONSIDERATIONS: Any concerns, special needs, activities
-7. OTHER NOTES: Anything else important
+{
+  "case_overview": "A 2-3 paragraph plain-English overview of the full case. Cover the family situation, current arrangements, what the parent is requesting, and any important context. Do not use legal jargon.",
+  "current_situation": "A clear description of the current custody/living arrangement, including who the children live with, the current visitation schedule, and any existing court orders or informal agreements.",
+  "children": [
+    {"name": "Child Name", "age": 5, "special_needs": "null or description"}
+  ],
+  "goals": [
+    "Each goal the parent expressed, as a clear one-sentence statement"
+  ],
+  "concerns": [
+    "Each concern or worry the parent raised, as a clear one-sentence statement"
+  ],
+  "recommended_actions": [
+    "Specific professional next steps based on the intake, e.g. 'File FL-300 motion for custody modification', 'Schedule mediation session', 'Request school records'"
+  ],
+  "client_info": {
+    "name": "Parent's name if mentioned",
+    "email": "Email if mentioned",
+    "phone": "Phone if mentioned",
+    "address": "Address if mentioned"
+  },
+  "confidence_score": 0.85
+}
 
-Keep each section brief and factual. Do not add opinions or recommendations."""
+Rules:
+- confidence_score: 0.0-1.0 reflecting how complete and clear the intake information is
+- goals: at least 2-3 items if the parent discussed what they want
+- concerns: at least 2-3 items if the parent mentioned worries
+- recommended_actions: at least 3-5 actionable professional next steps
+- Use null for any client_info fields not mentioned
+- Return ONLY valid JSON, no markdown fences or extra text"""
 
         try:
             # Prepare conversation for summary
             conv_text = "\n\n".join([
                 f"{'ARIA' if m['role'] == 'assistant' else 'PARENT'}: {m['content']}"
                 for m in session.messages
+                if m.get('role') in ('assistant', 'user')
             ])
 
             response = self.openai_client.chat.completions.create(
                 model="gpt-4o",
-                max_tokens=2000,
+                max_tokens=3000,
+                response_format={"type": "json_object"},
                 messages=[
                     {"role": "system", "content": summary_prompt},
                     {"role": "user", "content": f"CONVERSATION:\n{conv_text}"}
                 ]
             )
 
-            summary = response.choices[0].message.content
+            raw = response.choices[0].message.content
+            structured = json.loads(raw)
 
-            # Save summary
-            session.aria_summary = summary
+            # Save plain-text overview as aria_summary (backward compat)
+            session.aria_summary = structured.get("case_overview", raw)
+
+            # Merge structured fields into extracted_data
+            existing = session.extracted_data or {}
+            existing["current_situation"] = structured.get("current_situation", "")
+            existing["children"] = structured.get("children", [])
+            existing["goals"] = structured.get("goals", [])
+            existing["concerns"] = structured.get("concerns", [])
+            existing["recommended_actions"] = structured.get("recommended_actions", [])
+            existing["confidence_score"] = structured.get("confidence_score", 0.0)
+            existing["client_info"] = structured.get("client_info", {})
+            session.extracted_data = existing
+            flag_modified(session, "extracted_data")
+
             await self.db.commit()
 
-            return summary
+            return session.aria_summary
 
         except Exception as e:
             print(f"Summary generation error: {e}")

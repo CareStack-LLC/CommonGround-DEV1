@@ -2697,6 +2697,49 @@ async def mark_intake_reviewed(
 
 
 @router.post(
+    "/intake/sessions/{session_id}/refresh-summary",
+    response_model=IntakeOutputsResponse,
+    summary="Regenerate AI summary",
+)
+async def refresh_intake_summary(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Regenerate the AI summary for an intake session.
+
+    This re-runs ARIA's summary generation with the latest structured
+    format, populating Current Situation, Client Goals, Key Concerns,
+    and Recommended Next Steps even for sessions that were originally
+    summarized with the old plain-text generator.
+    """
+    service = ProfessionalIntakeService(db)
+    session = await service.get_session(session_id, profile.id)
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Intake session not found.",
+        )
+
+    if not session.messages or len(session.messages) < 2:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Not enough messages to generate a summary.",
+        )
+
+    # Re-generate the summary with structured output
+    from app.services.aria_paralegal import AriaParalegalService
+    aria = AriaParalegalService(db)
+    await aria.generate_summary(session)
+
+    # Return the refreshed outputs
+    outputs = await service.get_outputs(session_id, profile.id)
+    return IntakeOutputsResponse(session_id=session_id, **(outputs or {}))
+
+
+
+@router.post(
     "/intake/sessions/{session_id}/clarification",
     response_model=IntakeSessionDetail,
     summary="Request clarification",
