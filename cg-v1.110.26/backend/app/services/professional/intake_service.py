@@ -47,6 +47,7 @@ class ProfessionalIntakeService:
         client_email: str,
         client_phone: Optional[str] = None,
         intake_type: str = "custody",
+        template_id: str = "comprehensive-custody",
         notes: Optional[str] = None,
         target_forms: Optional[list[str]] = None,
         custom_questions: Optional[list[dict]] = None,
@@ -62,6 +63,12 @@ class ProfessionalIntakeService:
         If the professional is creating this via a case assignment,
         links are established to the firm and assignment.
         """
+        # Auto-populate target_forms from template if not explicitly provided
+        from app.services.intake_templates import get_intake_template
+        template = get_intake_template(template_id)
+        if not target_forms and template:
+            target_forms = template.form_targets
+
         # Get the professional profile to find the court_professional_id
         # Note: professional_id here is the ProfessionalProfile.id
         # The IntakeSession model references court_professionals.id
@@ -114,10 +121,11 @@ class ProfessionalIntakeService:
             parent_id=parent_id,
             firm_id=firm_id,
             case_assignment_id=case_assignment_id,
+            template_id=template_id,
             target_forms=target_forms or [],
             custom_questions=custom_questions,
             status=IntakeStatus.PENDING.value,
-            aria_provider="claude",
+            aria_provider="openai",
             access_token=access_token,
             access_link_expires_at=expires_at,
             messages=[
@@ -125,7 +133,7 @@ class ProfessionalIntakeService:
                     "role": "system",
                     "content": f"Intake session for {client_name}. Email: {client_email}. "
                                f"Phone: {client_phone or 'Not provided'}. "
-                               f"Type: {intake_type}. Notes: {notes or 'None'}."
+                               f"Type: {intake_type}. Template: {template_id}. Notes: {notes or 'None'}."
                 }
             ],
         )

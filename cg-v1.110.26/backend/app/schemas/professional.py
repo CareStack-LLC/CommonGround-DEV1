@@ -871,6 +871,7 @@ class IntakeSessionCreate(BaseModel):
     client_email: EmailStr
     client_phone: Optional[str] = None
     intake_type: str = "custody"
+    template_id: str = "comprehensive-custody"
     notes: Optional[str] = None
     target_forms: Optional[list[str]] = None
     custom_questions: Optional[list[dict]] = None
@@ -891,6 +892,7 @@ class IntakeSessionListItem(BaseModel):
     client_email: Optional[str] = None
     status: str
     intake_type: str = "custody"
+    template_id: str = "comprehensive-custody"
     message_count: int = 0
     has_summary: bool = False
     family_file_id: Optional[str] = None

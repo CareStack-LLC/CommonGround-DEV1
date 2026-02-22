@@ -2475,6 +2475,7 @@ def _intake_session_to_list_item(session) -> IntakeSessionListItem:
         client_email=client_email,
         status=session.status,
         intake_type=session.target_forms[0] if session.target_forms else "custody",
+        template_id=getattr(session, 'template_id', None) or "comprehensive-custody",
         message_count=session.message_count or len(session.messages or []),
         has_summary=session.aria_summary is not None,
         has_extracted_data=session.extracted_data is not None,
@@ -2575,6 +2576,7 @@ async def create_intake_session(
         client_email=data.client_email,
         client_phone=data.client_phone,
         intake_type=data.intake_type,
+        template_id=data.template_id,
         notes=data.notes,
         target_forms=data.target_forms,
         custom_questions=data.custom_questions,
@@ -2586,6 +2588,25 @@ async def create_intake_session(
     # TODO: Send intake link email to client
 
     return _intake_session_to_detail(session)
+
+
+@router.get(
+    "/intake/templates",
+    summary="List available intake templates",
+)
+async def list_intake_templates(
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Return all intake templates, marking which are available for this professional's tier."""
+    from app.services.intake_templates import get_all_templates
+    tier = getattr(profile, 'subscription_tier', 'starter') or 'starter'
+    is_paid = tier not in ('starter', '')
+    templates = []
+    for t in get_all_templates():
+        d = t.to_dict()
+        d["available"] = t.tier == "free" or (t.tier == "paid" and is_paid)
+        templates.append(d)
+    return {"templates": templates, "professional_tier": tier}
 
 
 @router.get(

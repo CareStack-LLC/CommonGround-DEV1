@@ -47,19 +47,31 @@ class AriaParalegalService:
         target_forms: List[str],
         parent_role: str,
         children_names: List[str],
-        custom_questions: Optional[List[str]] = None
+        custom_questions: Optional[List[str]] = None,
+        template_id: Optional[str] = None,
     ) -> str:
-        """Generate ARIA Paralegal system prompt."""
+        """Generate ARIA Paralegal system prompt, driven by intake template."""
+
+        from app.services.intake_templates import get_intake_template, build_sections_prompt
+
+        # Resolve template (fall back to comprehensive-custody)
+        template = get_intake_template(template_id or "comprehensive-custody")
 
         form_descriptions = {
             "FL-300": "Request for Order (initiating petition)",
             "FL-311": "Child Custody and Visitation Application",
-            "FL-320": "Responsive Declaration (responding to petition)"
+            "FL-312": "Child Support Information and Order Attachment",
+            "FL-320": "Responsive Declaration (responding to petition)",
+            "FL-341": "Child Custody and Visitation Stipulation",
+            "FL-150": "Income and Expense Declaration",
+            "FL-342": "Child Support Information",
+            "DV-100": "Request for Domestic Violence Restraining Order",
+            "DV-110": "Temporary Restraining Order",
         }
 
         forms_text = ", ".join([
             f"{f} ({form_descriptions.get(f, f)})" for f in target_forms
-        ])
+        ]) if target_forms else "no specific forms"
 
         children_text = ", ".join(children_names) if children_names else "your children"
 
@@ -71,9 +83,25 @@ CUSTOM QUESTIONS FROM {professional_name.upper()}:
 After covering the standard topics, also ask about:
 {chr(10).join(f'- {q}' for q in custom_questions)}"""
 
+        # Build sections from template
+        if template:
+            template_name = template.name
+            template_description = template.description
+            estimated_time = template.estimated_time
+            sections_text = build_sections_prompt(template)
+        else:
+            template_name = "General Intake"
+            template_description = "Standard intake conversation"
+            estimated_time = 30
+            sections_text = "1. Gather basic information\n2. Understand the current situation\n3. Determine needs and goals"
+
         return f"""You are ARIA Paralegal, an AI intake assistant helping gather information
 for a family law case. You are working on behalf of {professional_name}, {professional_role},
 who will review everything you collect.
+
+INTAKE TYPE: {template_name}
+PURPOSE: {template_description}
+ESTIMATED TIME: ~{estimated_time} minutes
 
 YOUR ROLE:
 - Ask questions in plain, conversational English
@@ -99,18 +127,16 @@ HOW TO HANDLE COMMON SITUATIONS:
 - If answer is off-topic: Acknowledge briefly, then guide back politely
 - If parent asks "what should I do?": "I can't advise you on that - that's {professional_name}'s role. What I can do is make sure they have all the information they need."
 
-CONVERSATION FLOW:
-1. Warm introduction - explain your role and limitations clearly
-2. Confirm children's information (names, ages, current living situation)
-3. Current custody arrangement - who do the children live with now?
-4. What changes are being requested (if petitioner) or what are you responding to (if respondent)?
-5. Weekly schedule preferences - weekdays, weekends
-6. Holiday and vacation preferences
-7. Exchange logistics - where, when, transportation
-8. Communication preferences between parents
-9. Any safety concerns (handle sensitively, don't probe deeply)
-10. Special considerations (special needs, school activities, etc.)
-11. Summary and confirmation{custom_q_text}
+SECTIONS TO COVER:
+{sections_text}{custom_q_text}
+
+PACING:
+- Ask ONE main question at a time
+- Cover REQUIRED sections thoroughly; OPTIONAL sections can be brief or skipped if the parent has no input
+- Don't rush through sections — let the parent share freely
+- If a section isn't relevant (e.g., "Relocation" when nobody is moving), acknowledge and move on
+- Periodically summarize what you've gathered so far
+- The estimated time is ~{estimated_time} min — pace accordingly
 
 CONVERSATION STYLE:
 - Use the parent's first name if known
@@ -120,11 +146,12 @@ CONVERSATION STYLE:
 - Use phrases like "I want to make sure I understand..." and "Let me confirm..."
 - End each response with a clear question or next step
 
-WHEN GATHERING SCHEDULE INFORMATION:
+WHEN GATHERING SPECIFIC INFORMATION:
 - Be specific: "What time on Friday?" not just "Friday"
 - Ask about regular school year vs. summer separately
 - Holidays are important - ask about major ones
 - Get details on exchange locations and transportation
+- For financial info, ask for monthly amounts
 
 Current form targets: {forms_text}
 Professional: {professional_name} ({professional_role})
@@ -175,15 +202,36 @@ Children: {children_text}"""
     def _get_initial_message(
         self,
         professional_name: str,
-        target_forms: List[str]
+        target_forms: List[str],
+        template_id: Optional[str] = None,
     ) -> str:
-        """Generate ARIA's opening message."""
+        """Generate ARIA's opening message based on the intake template."""
 
-        purpose_text = "gathering information about your custody situation"
-        if "FL-320" in target_forms:
-            purpose_text = "helping you respond to the custody petition you received"
-        elif "FL-300" in target_forms or "FL-311" in target_forms:
-            purpose_text = "gathering information about your custody preferences"
+        from app.services.intake_templates import get_intake_template
+
+        template = get_intake_template(template_id or "comprehensive-custody")
+
+        if template:
+            purpose_map = {
+                "comprehensive-custody": "gathering detailed information about your custody and co-parenting situation",
+                "custody-only": "gathering information about custody and visitation arrangements",
+                "child-support": "gathering information about child support",
+                "modification": "understanding what changes you need to your existing court order",
+                "visitation-only": "gathering information about visitation arrangements",
+                "domestic-violence-screening": "gathering information about your situation in a safe and supportive way",
+                "relocation": "gathering information about your planned relocation and how it affects custody",
+                "initial-consultation": "gathering some basic information before your consultation",
+            }
+            purpose_text = purpose_map.get(
+                template.id,
+                f"gathering information for {template.name.lower()}"
+            )
+        else:
+            purpose_text = "gathering information about your custody situation"
+            if "FL-320" in target_forms:
+                purpose_text = "helping you respond to the custody petition you received"
+            elif "FL-300" in target_forms or "FL-311" in target_forms:
+                purpose_text = "gathering information about your custody preferences"
 
         return f"""Hi! I'm ARIA, an AI assistant working with {professional_name}'s office. I'm here to help with {purpose_text}.
 
@@ -193,7 +241,7 @@ Before we start, I want to be clear: **I'm an AI assistant, not a lawyer.** I wo
 
 Everything you share will go directly to {professional_name} for review.
 
-Ready to begin? First, could you tell me a little about your children - their names and ages?"""
+Ready to begin? First, could you tell me a little about yourself and your situation?"""
 
     async def start_session(
         self,
@@ -227,7 +275,8 @@ Ready to begin? First, could you tell me a little about your children - their na
         # Generate initial message
         initial_message = self._get_initial_message(
             professional_name,
-            session.target_forms
+            session.target_forms,
+            template_id=getattr(session, 'template_id', None),
         )
 
         # Update session
@@ -307,7 +356,8 @@ Ready to begin? First, could you tell me a little about your children - their na
             session.target_forms,
             parent_role,
             children_names,
-            session.custom_questions
+            session.custom_questions,
+            template_id=getattr(session, 'template_id', None),
         )
 
         # Call AI

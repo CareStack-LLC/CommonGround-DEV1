@@ -124,6 +124,11 @@ class IntakeSession(Base, UUIDMixin, TimestampMixin):
         DateTime, nullable=True
     )
 
+    # Template
+    template_id: Mapped[Optional[str]] = mapped_column(
+        String(50), nullable=True, default="comprehensive-custody"
+    )  # Which intake template drives this session
+
     # Form targets
     target_forms: Mapped[list] = mapped_column(
         JSON, default=list
