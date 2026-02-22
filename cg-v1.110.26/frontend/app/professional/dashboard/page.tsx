@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useProfessionalAuth } from "../layout";
 import { InvitationSummaryAlert } from "@/components/professional/invitation-summary-alert";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { AssignProfessionalDialog } from "../intake/page";
+import { AssignProfessionalDialog } from "@/components/professional/assign-professional-dialog";
 import { CaseCard } from "@/components/professional/case-card";
 
 export default function ProfessionalDashboardPage() {
