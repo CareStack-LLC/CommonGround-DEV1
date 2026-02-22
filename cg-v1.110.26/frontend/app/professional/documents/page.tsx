@@ -195,8 +195,8 @@ export default function ProfessionalDocumentsPage() {
                         key={t.value}
                         onClick={() => setTypeFilter(t.value)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-all ${typeFilter === t.value
-                                ? "bg-indigo-600 text-white border-indigo-600"
-                                : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                            ? "bg-indigo-600 text-white border-indigo-600"
+                            : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
                             }`}
                     >
                         {t.icon}
@@ -433,12 +433,4 @@ export default function ProfessionalDocumentsPage() {
             </Dialog>
         </div>
     );
-
-    // formatBytes used inside JSX — need to hoist to outer scope
-    function formatBytes(b?: number) {
-        if (!b) return "-";
-        if (b < 1024) return `${b} B`;
-        if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`;
-        return `${(b / (1024 * 1024)).toFixed(1)} MB`;
-    }
 }

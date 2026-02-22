@@ -16,7 +16,7 @@ You are an expert full-stack developer building the CommonGround Professional Po
 
 ## Your Mission
 
-Build the Professional Portal systematically in 7 phases. Each phase must be complete, tested, and approved before moving to the next.
+Build the Professional Portal systematically in 10 phases. Each phase must be complete, tested, and approved before moving to the next.
 
 ---
 
@@ -240,7 +240,7 @@ components/professional/
 **Tab Structure:**
 - Overview
 - Timeline
-- Communication (sub-tabs: Messages, Calls, Compliance Reports, ARIA Controls)
+- Communication (sub-tabs: Messages, Calls, Compliance Reports, ARIA Controls, Thread Analysis)
 - Documents
 - Portals (sub-views: Compliance Dashboard, ClearFund, Agreement Review, Exchange Schedule, Parent Communications)
 
@@ -257,8 +257,10 @@ components/professional/
 - Date range selector
 - Load more pagination
 
-**Communication Tab:**
-See existing components but ensure they're integrated into tab structure
+**Communication Tab & ARIA Thread Analysis:**
+- Integrate existing ARIA message components.
+- **NEW:** `ARIAAnalyzerService` integration for multi-message synthesis.
+- Dashboard for summary, lag tracking, and resolution scoring.
 
 **Documents Tab:**
 - Document library with type filters
@@ -1431,6 +1433,45 @@ components/professional/
 
 ---
 
+## PHASE 8: Deep AI Analysis & Reporting (Weeks 15-16)
+
+### What to Build - *Status: COMPLETED*
+
+#### 8.1 ARIA Analyzer Service
+- **Logic:** `ARIAAnalyzerService` for multi-message synthesis.
+- **Features:** Narrative summarization, lag calculation, fact finding.
+- **Provider:** OpenAI GPT-4o optimized prompt for co-parenting tone.
+
+#### 8.2 Analysis Dashboard UI
+- **Sub-tab:** "Analysis Report" within ARIA Controls.
+- **Visuals:** Resolution Score Gauges, Lag Comparison Cards.
+- **Interactions:** "Generate New Report" triggers fresh AI analysis.
+
+---
+
+## PHASE 9: Connector Infrastructure (Weeks 17-18)
+
+### What to Build
+
+#### 9.1 MyCase & Silo Connectors
+- **Settings:** "Integrations" section in Firm Settings with "Coming Soon" indicators.
+- **Auth:** OAuth2 handshake logic for MyCase/Silo.
+- **Mapping:** Data mapping layer between CommonGround models and external CRM schemas.
+
+---
+
+## PHASE 10: Production Hardening & Handover (Week 20)
+
+### What to Build
+
+#### 10.1 Multi-Firm Audit
+- **Audit Logs:** Surface `ProfessionalAccessLog` to partners.
+- **Security:** Penetration test of RBAC models.
+- **Compliance:** Trust account (ClearFund) verification.
+- **Walkthroughs:** Final demo scripts for Jenesse Center/Interval House.
+
+---
+
 ## CROSS-CUTTING REQUIREMENTS (All Phases)
 
 ### Code Quality
@@ -1501,14 +1542,16 @@ The portal is complete when a firm can:
 4. ✅ Convert completed intake to case with one click
 5. ✅ Upload court order and auto-populate via OCR
 6. ✅ Monitor ARIA-controlled communication
-7. ✅ Track exchanges and expenses automatically
-8. ✅ Generate compliance reports with SHA-256 verification
-9. ✅ Export discovery packages (ZIP with all docs)
-10. ✅ Manage team with proper roles and permissions
-11. ✅ Route cases via queue or auto-assignment
-12. ✅ View firm-wide analytics
-13. ✅ Audit all actions in audit log
-14. ✅ Use on mobile without friction
+7. ✅ Generate Deep Thread Analysis reports with lag tracking (NEW)
+8. ✅ Track exchanges and expenses automatically
+9. ✅ Generate compliance reports with SHA-256 verification
+10. ✅ Export discovery packages (ZIP with all docs)
+11. ✅ Connect to MyCase/Silo for practice management (Connectors)
+12. ✅ Manage team with proper roles and permissions
+13. ✅ Route cases via queue or auto-assignment
+14. ✅ View firm-wide analytics
+15. ✅ Audit all actions in audit log
+16. ✅ Use on mobile without friction
 
 ---
 
