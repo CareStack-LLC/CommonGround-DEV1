@@ -2034,6 +2034,48 @@ async def get_aria_interventions(
 
 
 @router.get(
+    "/cases/{family_file_id}/aria/analysis",
+    response_model=ARIAThreadAnalysis,
+    summary="Get deep ARIA thread analysis",
+)
+async def get_aria_thread_analysis(
+    family_file_id: str,
+    thread_id: Optional[str] = Query(None),
+    days: int = Query(30, ge=7, le=365),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Get a deep AI-driven analysis of a message thread.
+    
+    Includes narrative summary, tone analysis, communication lags,
+    and facts for professional resolution discovery.
+    """
+    # Verify access
+    assignment_service = CaseAssignmentService(db)
+    if not await assignment_service.can_access_case(profile.id, family_file_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to access this case.",
+        )
+
+    from app.services.professional.aria_analyzer_service import ARIAAnalyzerService
+    analyzer = ARIAAnalyzerService(db)
+    
+    try:
+        return await analyzer.analyze_thread(
+            family_file_id=family_file_id,
+            thread_id=thread_id,
+            days=days,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Analysis failed: {str(e)}",
+        )
+
+
+@router.get(
     "/cases/{family_file_id}/aria/metrics",
     response_model=ARIAMetrics,
     summary="Get ARIA metrics",

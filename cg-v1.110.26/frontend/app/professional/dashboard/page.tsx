@@ -24,6 +24,8 @@ import { InvitationSummaryAlert } from "@/components/professional/invitation-sum
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AssignProfessionalDialog } from "@/components/professional/assign-professional-dialog";
 import { CaseCard } from "@/components/professional/case-card";
+import { TasksWidget } from "@/components/professional/dashboard/tasks-widget";
+import { QuickCreateMenu } from "@/components/professional/dashboard/quick-create-menu";
 
 export default function ProfessionalDashboardPage() {
   const { profile, dashboardData, activeFirm, refreshDashboard, token } = useProfessionalAuth();
@@ -35,6 +37,7 @@ export default function ProfessionalDashboardPage() {
 
   const [selectedInvitation, setSelectedInvitation] = useState<any>(null);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [openAddTask, setOpenAddTask] = useState(false);
 
   const handleAccept = (invitation: any) => {
     setSelectedInvitation(invitation);
@@ -137,12 +140,7 @@ export default function ProfessionalDashboardPage() {
             Here's what's happening with your cases today.
           </p>
         </div>
-        <Button asChild className="bg-[var(--portal-primary)] hover:bg-[var(--portal-primary-hover)] text-white shrink-0">
-          <Link href="/professional/cases">
-            View All Cases
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
+        <QuickCreateMenu onCreateTask={() => setOpenAddTask(true)} />
       </div>
 
       {/* Quick Stats */}
@@ -308,6 +306,9 @@ export default function ProfessionalDashboardPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Tasks Widget */}
+      <TasksWidget token={token} />
     </div>
   );
 }

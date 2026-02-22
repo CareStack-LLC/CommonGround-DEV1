@@ -801,6 +801,26 @@ class ComplianceOverview(BaseModel):
     overall_status: str  # excellent, good, fair, concerning
 
 
+# =============================================================================
+# ARIA Thread Analysis Schemas
+# =============================================================================
+
+class ARIAThreadAnalysis(BaseModel):
+    """Schema for deep thread analysis report."""
+    narrative_summary: str
+    tone_analysis: str
+    resolution_score: int
+    facts_for_professional: list[str]
+    conflict_points: list[str]
+    professional_recommendation: str
+    lags: dict[str, Any]
+    message_count: int
+    analyzed_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 class ExchangeComplianceSummary(BaseModel):
     """Schema for exchange compliance summary."""
     total_exchanges: int

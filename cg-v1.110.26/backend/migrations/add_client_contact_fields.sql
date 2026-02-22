@@ -13,6 +13,7 @@ ON intake_sessions (client_email);
 
 -- Backfill client_name and client_email from the system message for existing sessions
 -- The system message format is: "Intake session for {name}. Email: {email}."
+-- NOTE: uses json_ (not jsonb_) because the messages column is JSON type
 UPDATE intake_sessions
 SET
     client_name = NULLIF(TRIM(SUBSTRING(
@@ -31,6 +32,6 @@ SET
     )), '')
 WHERE
     messages IS NOT NULL
-    AND jsonb_array_length(messages) > 0
+    AND json_array_length(messages) > 0
     AND messages->0->>'role' = 'system'
     AND client_name IS NULL;

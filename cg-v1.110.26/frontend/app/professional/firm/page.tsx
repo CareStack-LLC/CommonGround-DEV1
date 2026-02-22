@@ -277,6 +277,51 @@ export default function FirmSettingsPage() {
         </Link>
       </div>
 
+      {/* Integrations (Coming Soon) */}
+      <div className="mb-6">
+        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 mb-4">
+          <div className="h-1 w-8 bg-blue-500 rounded-full" />
+          External Integrations
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="bg-slate-50/50 border-dashed border-2 opacity-80 overflow-hidden relative group">
+            <div className="absolute top-2 right-2 flex gap-1">
+              <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-none text-[10px]">COMING SOON</Badge>
+            </div>
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-white border flex items-center justify-center p-2">
+                <img src="/integrations/mycase.svg" alt="MyCase" className="w-full h-full grayscale opacity-50" onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML = '<span className="font-bold text-slate-300">MC</span>';
+                }} />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-400">MyCase</p>
+                <p className="text-xs text-slate-400">Sync cases, calendar, and contacts</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-50/50 border-dashed border-2 opacity-80 overflow-hidden relative group">
+            <div className="absolute top-2 right-2 flex gap-1">
+              <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-none text-[10px]">COMING SOON</Badge>
+            </div>
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-white border flex items-center justify-center p-2">
+                <img src="/integrations/silo.svg" alt="Silo" className="w-full h-full grayscale opacity-50" onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML = '<span className="font-bold text-slate-300">S</span>';
+                }} />
+              </div>
+              <div>
+                <p className="font-semibold text-slate-400">Silo</p>
+                <p className="text-xs text-slate-400">Export financial ledgers and compliance reports</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* Basic Info */}
       <Card className="mb-6">
         <CardHeader>

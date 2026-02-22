@@ -567,9 +567,15 @@ export default function FirmTemplatesPage() {
                           <Eye className="h-4 w-4 mr-2" />
                           Preview
                         </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/professional/firm/templates/${template.id}/edit`} className="flex items-center cursor-pointer">
+                            <Sparkles className="h-4 w-4 mr-2 text-purple-500" />
+                            Open Builder
+                          </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => openEditDialog(template)}>
                           <Edit className="h-4 w-4 mr-2" />
-                          Edit
+                          Quick Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleDuplicate(template)}>
                           <Copy className="h-4 w-4 mr-2" />
@@ -873,9 +879,8 @@ export default function FirmTemplatesPage() {
                 {versions.map((version) => (
                   <div
                     key={version.version}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${
-                      version.is_current ? "bg-green-50 border-green-200" : "bg-white"
-                    }`}
+                    className={`flex items-center justify-between p-3 rounded-lg border ${version.is_current ? "bg-green-50 border-green-200" : "bg-white"
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className="text-lg font-medium text-gray-700">v{version.version}</div>

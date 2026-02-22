@@ -34,6 +34,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useProfessionalAuth } from "../../layout";
+import { ConvertToCaseModal } from "@/components/professional/intake/convert-to-case-modal";
+import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -100,7 +102,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 
 export default function IntakeDetailPage() {
   const params = useParams();
-  const { token } = useProfessionalAuth();
+  const router = useRouter();
+  const { token, activeFirm } = useProfessionalAuth();
   const sessionId = params.sessionId as string;
 
   const [session, setSession] = useState<IntakeSession | null>(null);
@@ -109,6 +112,7 @@ export default function IntakeDetailPage() {
   const [extractedData, setExtractedData] = useState<ExtractedData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const [showConvertModal, setShowConvertModal] = useState(false);
 
   useEffect(() => {
     fetchSessionData();
@@ -292,7 +296,18 @@ export default function IntakeDetailPage() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Status-contextual primary action */}
+          {/* Convert to Case - primary CTA for completed/reviewed intakes */}
+          {(session.status === "completed" || session.status === "reviewed") && (
+            <Button
+              size="sm"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+              onClick={() => setShowConvertModal(true)}
+            >
+              <FolderOpen className="h-4 w-4" />
+              Convert to Case
+            </Button>
+          )}
+          {/* Status-contextual secondary action */}
           {session.status === "pending" && (
             <Button
               variant="outline"
@@ -305,9 +320,9 @@ export default function IntakeDetailPage() {
           )}
           {session.status === "completed" && (
             <Button
+              variant="outline"
               size="sm"
               onClick={markAsReviewed}
-              className="bg-emerald-600 hover:bg-emerald-700"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Mark Reviewed
@@ -331,6 +346,19 @@ export default function IntakeDetailPage() {
         </div>
       </div>
 
+      {/* Convert to Case Modal */}
+      <ConvertToCaseModal
+        open={showConvertModal}
+        onClose={() => setShowConvertModal(false)}
+        sessionId={sessionId}
+        clientName={session.client_name || "Client"}
+        token={token}
+        firmId={activeFirm?.id}
+        onSuccess={(caseId) => {
+          // The modal shows success + open case button — also refresh session status
+          fetchSessionData();
+        }}
+      />
 
       {/* Session Info */}
       <div className="grid md:grid-cols-4 gap-4">

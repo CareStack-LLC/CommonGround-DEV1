@@ -316,7 +316,7 @@ export default function ProfessionalPortalLayout({
 
         {/* Main Navigation */}
         {profile && !isOnboardingPage && (
-          <ProfessionalNavigation pathname={pathname} dashboardData={dashboardData} />
+          <ProfessionalNavigation pathname={pathname} dashboardData={dashboardData} activeFirm={activeFirm} />
         )}
 
         {/* Main Content */}
@@ -354,9 +354,11 @@ export default function ProfessionalPortalLayout({
 function ProfessionalNavigation({
   pathname,
   dashboardData,
+  activeFirm,
 }: {
   pathname: string;
   dashboardData: any;
+  activeFirm: any | null;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -367,6 +369,8 @@ function ProfessionalNavigation({
     const total = pendingIntakes + pendingFirmInvitations;
     return total > 0 ? total.toString() : undefined;
   })();
+
+  const isFirmOwner = !!(activeFirm && (activeFirm.role === "owner" || activeFirm.role === "admin"));
 
   const mainNavItems: { href: string; label: string; icon: React.ReactNode; badge?: string }[] = [
     {
@@ -398,10 +402,9 @@ function ProfessionalNavigation({
       badge: dashboardData?.unread_messages > 0 ? dashboardData.unread_messages.toString() : undefined,
     },
     {
-      href: "/professional/messages",
-      label: "Messages",
-      icon: <MessageSquare className="h-4 w-4" />,
-      badge: dashboardData?.unread_messages > 0 ? dashboardData.unread_messages.toString() : undefined,
+      href: "/professional/reports",
+      label: "Reports",
+      icon: <FileText className="h-4 w-4" />,
     },
   ];
 
@@ -416,10 +419,16 @@ function ProfessionalNavigation({
       label: "Subscription",
       icon: <CreditCard className="h-4 w-4" />,
     },
-    {
+    // Case Queue: only shown to firm owners/admins
+    ...(isFirmOwner ? [{
       href: "/professional/firm/queue",
       label: "Case Queue",
       icon: <FolderOpen className="h-4 w-4" />,
+    }] : []),
+    {
+      href: "/professional/help",
+      label: "Help",
+      icon: <Settings className="h-4 w-4" />,
     },
   ];
 
@@ -472,10 +481,9 @@ function ProfessionalNavigation({
                   {dashboardData.pending_intakes} pending intake{dashboardData.pending_intakes !== 1 ? "s" : ""}
                 </Badge>
               )}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 relative rounded-lg"
+              <Link
+                href="/professional/notifications"
+                className="relative p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
               >
                 <Bell className="h-4 w-4" />
                 {dashboardData?.alerts?.length > 0 && (
@@ -483,7 +491,7 @@ function ProfessionalNavigation({
                     {dashboardData.alerts.length}
                   </span>
                 )}
-              </Button>
+              </Link>
             </div>
           </div>
         </div>

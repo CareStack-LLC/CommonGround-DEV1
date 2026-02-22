@@ -42,6 +42,8 @@ from app.api.v1.endpoints import (
     parent_reports,
     professional,
     professional_events,
+    professional_tasks,
+    intake_convert,
     parent_calls,
     recording_webhooks,
     recordings,
@@ -133,6 +135,12 @@ api_router.include_router(professional.router, prefix="/professional", tags=["Pr
 
 # Professional Calendar Events
 api_router.include_router(professional_events.router, prefix="/professional/events", tags=["Professional Events"])
+
+# Professional Tasks - Phase 1 Dashboard CRUD
+api_router.include_router(professional_tasks.router, prefix="/api/v1", tags=["Professional Tasks"])
+
+# Intake-to-Case Conversion - Phase 3
+api_router.include_router(intake_convert.router, prefix="/api/v1", tags=["Intake Convert"])
 
 # Parent Communication - Video/Audio Calls
 api_router.include_router(parent_calls.router, prefix="/parent-calls", tags=["Parent Calls"])
