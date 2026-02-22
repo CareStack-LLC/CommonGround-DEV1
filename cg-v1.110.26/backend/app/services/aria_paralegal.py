@@ -609,6 +609,8 @@ Rules:
     ) -> IntakeSession:
         """
         Mark intake as completed by parent.
+        Summary generation and form extraction are best-effort — failures
+        are logged but never block the confirmation from being committed.
         """
         session.status = IntakeStatus.COMPLETED.value
         session.completed_at = datetime.utcnow()
@@ -619,18 +621,26 @@ Rules:
             session.parent_edits = parent_edits
             flag_modified(session, "parent_edits")
 
-        # Generate summary if not already done
-        if not session.aria_summary:
-            await self.generate_summary(session)
-
-        # Extract form data
-        for form_type in session.target_forms:
-            await self.extract_form_data(session, form_type)
-
+        # Commit confirmation status first — never let AI steps block this
         await self.db.commit()
-        await self.db.refresh(session)
 
+        # Generate summary if not already done (best-effort)
+        if not session.aria_summary:
+            try:
+                await self.generate_summary(session)
+            except Exception as e:
+                print(f"[complete_intake] Summary generation failed (non-fatal): {e}")
+
+        # Extract form data (best-effort)
+        for form_type in (session.target_forms or []):
+            try:
+                await self.extract_form_data(session, form_type)
+            except Exception as e:
+                print(f"[complete_intake] Form extraction failed for {form_type} (non-fatal): {e}")
+
+        await self.db.refresh(session)
         return session
+
 
     async def request_clarification(
         self,
