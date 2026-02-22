@@ -115,6 +115,11 @@ class ProfessionalIntakeService:
 
         session = IntakeSession(
             id=str(uuid4()),
+            # Client contact info stored directly on the row
+            client_name=client_name,
+            client_email=client_email,
+            client_phone=client_phone,
+            client_notes=notes,
             case_id=case_id,
             family_file_id=family_file_id,
             professional_id=court_professional_id or professional_id,

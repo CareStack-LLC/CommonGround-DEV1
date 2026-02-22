@@ -92,6 +92,13 @@ class IntakeSession(Base, UUIDMixin, TimestampMixin):
         String(20), unique=True, default=generate_session_number
     )
 
+    # Client contact info (stored directly for easy lookup)
+    client_name: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    client_email: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, index=True)
+    client_phone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    client_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # internal notes
+
+
     # Links
     # Links
     case_id: Mapped[Optional[str]] = mapped_column(

@@ -291,15 +291,18 @@ export default function IntakeDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={copyIntakeLink}>
-            <Copy className="h-4 w-4 mr-2" />
-            Copy Link
-          </Button>
-          <Button variant="outline" size="sm" onClick={refreshSummary} disabled={isRefreshing}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Regenerating...' : 'Refresh'}
-          </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Status-contextual primary action */}
+          {session.status === "pending" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(session.intake_link, "_blank")}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Open Intake Form
+            </Button>
+          )}
           {session.status === "completed" && (
             <Button
               size="sm"
@@ -310,8 +313,24 @@ export default function IntakeDetailPage() {
               Mark Reviewed
             </Button>
           )}
+          {session.status === "reviewed" && (
+            <div className="flex items-center gap-1.5 text-sm text-emerald-700 font-medium bg-emerald-50 border border-emerald-200 rounded-md px-3 py-1.5">
+              <CheckCircle2 className="h-4 w-4" />
+              Review Complete
+            </div>
+          )}
+
+          <Button variant="outline" size="sm" onClick={copyIntakeLink}>
+            <Copy className="h-4 w-4 mr-2" />
+            Copy Link
+          </Button>
+          <Button variant="outline" size="sm" onClick={refreshSummary} disabled={isRefreshing}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+            {isRefreshing ? "Regenerating..." : "Refresh"}
+          </Button>
         </div>
       </div>
+
 
       {/* Session Info */}
       <div className="grid md:grid-cols-4 gap-4">

@@ -2452,17 +2452,18 @@ async def mark_thread_read(
 
 def _intake_session_to_list_item(session) -> IntakeSessionListItem:
     """Convert an IntakeSession to list item response."""
-    # Extract client info from messages (first message usually has context)
-    client_name = None
-    client_email = None
-    if session.messages and len(session.messages) > 0:
+    # Read directly from model columns (new sessions)
+    client_name = getattr(session, 'client_name', None)
+    client_email = getattr(session, 'client_email', None)
+
+    # Fallback: parse from system message for old sessions that pre-date the columns
+    if not client_name and session.messages and len(session.messages) > 0:
         first_msg = session.messages[0]
         if isinstance(first_msg, dict) and first_msg.get("role") == "system":
             content = first_msg.get("content", "")
-            # Parse simple format: "Intake session for {name}. Email: {email}."
             import re
             name_match = re.search(r"Intake session for ([^.]+)", content)
-            email_match = re.search(r"Email: ([^.]+)", content)
+            email_match = re.search(r"Email: ([^.\s]+)", content)
             if name_match:
                 client_name = name_match.group(1).strip()
             if email_match:
@@ -2494,6 +2495,7 @@ def _intake_session_to_list_item(session) -> IntakeSessionListItem:
         intake_link=session.intake_link,
         target_forms=session.target_forms or [],
     )
+
 
 
 def _intake_session_to_detail(session) -> IntakeSessionDetail:
