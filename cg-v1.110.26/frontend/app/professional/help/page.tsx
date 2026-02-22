@@ -107,7 +107,7 @@ function renderMarkdown(md: string): string {
             const cells = row.split('|').filter(Boolean).map(c => `<td class="px-3 py-2 border border-slate-200 text-xs text-slate-600">${c.trim()}</td>`).join('');
             return `<tr>${cells}</tr>`;
         })
-        .replace(/<tr>(.+?)<\/tr>/gs, '<table class="w-full border-collapse border border-slate-200 rounded-lg overflow-hidden my-3 text-sm"><tbody>$&</tbody></table>')
+        .replace(/<tr>([\s\S]+?)<\/tr>/g, '<table class="w-full border-collapse border border-slate-200 rounded-lg overflow-hidden my-3 text-sm"><tbody>$&</tbody></table>')
         .replace(/^- (.+)$/gm, '<li class="text-sm text-slate-600 ml-4 list-disc">$1</li>')
         .replace(/^(\d+)\. (.+)$/gm, '<li class="text-sm text-slate-600 ml-4 list-decimal">$2</li>')
         .replace(/\n\n/g, '<br /><br />');
@@ -281,8 +281,8 @@ export default function HelpCenterPage() {
                         key={tab.id}
                         onClick={() => { setActiveCategory(tab.id); setSearch(""); }}
                         className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-all ${activeCategory === tab.id
-                                ? "bg-violet-600 text-white border-violet-600 shadow-sm"
-                                : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
+                            ? "bg-violet-600 text-white border-violet-600 shadow-sm"
+                            : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                             }`}
                     >
                         {tab.icon}
@@ -374,8 +374,8 @@ export default function HelpCenterPage() {
                                     <Button
                                         size="sm"
                                         className={`w-full mt-3 gap-1.5 text-xs ${isDone
-                                                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
-                                                : "bg-violet-600 hover:bg-violet-700 text-white"
+                                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                                            : "bg-violet-600 hover:bg-violet-700 text-white"
                                             }`}
                                         onClick={() => startTour(tour)}
                                     >
