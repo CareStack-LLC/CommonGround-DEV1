@@ -2500,10 +2500,7 @@ def _intake_session_to_detail(session) -> IntakeSessionDetail:
     list_item = _intake_session_to_list_item(session)
     return IntakeSessionDetail(
         **list_item.model_dump(),
-        target_forms=session.target_forms or [],
         custom_questions=session.custom_questions,
-        access_token=session.access_token,
-        intake_link=session.intake_link,
         aria_provider=session.aria_provider,
         aria_summary=session.aria_summary,
         extracted_data=session.extracted_data,
