@@ -47,6 +47,7 @@ interface ProfessionalProfile {
   credentials?: Record<string, unknown>;
   // Profile enhancements
   profile_photo_url?: string;
+  headshot_url?: string;
   bio?: string;
   headline?: string;
   video_url?: string;

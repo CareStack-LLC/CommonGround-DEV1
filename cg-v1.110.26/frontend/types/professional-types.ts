@@ -187,6 +187,7 @@ export interface ProfessionalProfile {
     // Directory profile
     headline?: string;
     bio?: string;
+    headshot_url?: string;
     video_url?: string;
     languages?: string[];
     hourly_rate?: string;
