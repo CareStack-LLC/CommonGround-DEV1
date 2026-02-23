@@ -13,7 +13,7 @@ from sqlalchemy.types import String
 
 # revision identifiers, used by Alembic.
 revision = '20260222_add_headshot_url'
-down_revision = '20260216_add_attendee_fields_to_schedule_events'
+down_revision = 'add_attendee_fields'
 branch_labels = None
 depends_on = None
 
