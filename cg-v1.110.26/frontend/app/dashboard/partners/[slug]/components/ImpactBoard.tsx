@@ -88,18 +88,26 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                             {partner.display_name} and CommonGround partnered to give fathers grant-funded access to a calmer co-parenting system. The result: more fathers engaged, more families supported, and measurable reductions in conflict patterns.
                         </p>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
                         {isStaff && (
-                            <Link href={`/dashboard/partners/${partner.partner_slug}/codes`}>
-                                <Button className="bg-white text-gray-900 font-bold hover:bg-amber-400 transition-colors">
-                                    <Settings className="mr-2 h-4 w-4" />
-                                    Manage Codes
+                            <>
+                                <Button
+                                    className="w-full sm:w-auto bg-gray-800 text-white font-bold hover:bg-gray-700 transition-colors border border-gray-700"
+                                    onClick={() => alert("CSV Export coming soon!")}
+                                >
+                                    Export to CSV
                                 </Button>
-                            </Link>
+                                <Link href={`/dashboard/partners/${partner.partner_slug}/codes`} className="w-full sm:w-auto">
+                                    <Button className="w-full bg-white text-gray-900 font-bold hover:bg-amber-400 transition-colors">
+                                        <Settings className="mr-2 h-4 w-4" />
+                                        Manage Codes
+                                    </Button>
+                                </Link>
+                            </>
                         )}
                         <Button
                             variant="outline"
-                            className="bg-white/5 hover:bg-white/10 text-white border border-white/10 backdrop-blur-sm"
+                            className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 backdrop-blur-sm"
                             onClick={() => window.print()}
                         >
                             <Share2 className="mr-2 h-4 w-4" />
@@ -108,8 +116,8 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                     </div>
                 </header>
 
-                {/* Metrics Grid (4 Cards) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
+                {/* Metrics Grid (5 Cards) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-24">
                     {/* Card 1: Fathers Enrolled */}
                     <Card className="bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 transition-colors group">
                         <CardContent className="p-6">
@@ -144,7 +152,24 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                         </CardContent>
                     </Card>
 
-                    {/* Card 3: Messages Kept Respectful */}
+                    {/* Card 3: Schedules Created */}
+                    <Card className="bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 transition-colors group">
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Calendar className="h-5 w-5 text-emerald-400" />
+                                </div>
+                                <span className="text-xs font-mono text-gray-500">Logistics</span>
+                            </div>
+                            <h3 className="text-4xl font-black text-white mb-1">{metrics.schedules_created}</h3>
+                            <p className="text-sm font-bold text-gray-300 uppercase tracking-wide mb-3">Schedules Built</p>
+                            <p className="text-xs text-gray-400 leading-relaxed border-t border-gray-700/50 pt-3">
+                                Clear expectations reduce anxiety. Structured time means quality time.
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    {/* Card 4: Messages Kept Respectful */}
                     <Card className="bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 transition-colors group">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
@@ -161,7 +186,7 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                         </CardContent>
                     </Card>
 
-                    {/* Card 4: Conflict Reduction Signal */}
+                    {/* Card 5: Conflict Reduction Signal */}
                     <Card className="bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 transition-colors group">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
@@ -173,7 +198,7 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                             <h3 className="text-4xl font-black text-white mb-1">
                                 {conflictReduction > 0 ? `-${conflictReduction}%` : 'Tracking'}
                             </h3>
-                            <p className="text-sm font-bold text-gray-300 uppercase tracking-wide mb-3">Conflict Reduction Signal</p>
+                            <p className="text-sm font-bold text-gray-300 uppercase tracking-wide mb-3">Conflict Reduction</p>
                             <p className="text-xs text-gray-400 leading-relaxed border-t border-gray-700/50 pt-3">
                                 The goal isn’t silence — it’s progress. Calmer patterns create safer homes.
                             </p>

@@ -243,56 +243,118 @@ async def get_public_impact_metrics(
     period_end = datetime.utcnow()
     period_start = period_end - timedelta(days=days)
     
-    # Get all grant codes for this partner to calculate activation rates
-    codes_result = await db.execute(
-        select(GrantCode).where(
-            GrantCode.partner_id == partner.id
+    # ==========================================
+    # 1. Historical Metrics Cache Check
+    # ==========================================
+    period_type = None
+    if days == 30:
+        period_type = "monthly"
+    elif days == 7:
+        period_type = "weekly"
+    elif days == 90:
+        period_type = "quarterly"
+
+    cached_metric = None
+    if period_type:
+        result = await db.execute(
+            select(PartnerMetric).where(
+                PartnerMetric.partner_id == partner.id,
+                PartnerMetric.period_type == period_type
+            ).order_by(PartnerMetric.period_end.desc()).limit(1)
         )
-    )
-    grant_codes = codes_result.scalars().all()
-    
-    # Build metrics
-    codes_distributed = len(grant_codes)
-    codes_activated = sum(1 for c in grant_codes if c.redemption_count > 0)
-    activation_rate = (codes_activated / codes_distributed * 100) if codes_distributed > 0 else 0
-    
-    # Get anonymized user IDs for message/aria counts
-    redemptions_result = await db.execute(
-        select(GrantRedemption.user_id).join(GrantCode).where(
-            GrantCode.partner_id == partner.id,
-            GrantRedemption.is_active == True
-        )
-    )
-    user_ids = [r[0] for r in redemptions_result.all()]
-    
-    total_messages = 0
-    aria_interventions = 0
-    if user_ids:
-        msg_result = await db.execute(
-            select(func.count(Message.id)).where(
-                Message.sender_id.in_(user_ids)
+        cached_metric = result.scalar_one_or_none()
+        
+        if cached_metric and cached_metric.calculated_at > (datetime.utcnow() - timedelta(hours=24)):
+            metrics_summary = PartnerMetricsSummary(
+                codes_distributed=cached_metric.codes_distributed,
+                codes_activated=cached_metric.codes_activated,
+                activation_rate=float(cached_metric.activation_rate) if cached_metric.activation_rate else 0.0,
+                active_users=cached_metric.active_users,
+                messages_sent=cached_metric.messages_sent,
+                aria_interventions=cached_metric.aria_interventions,
+                schedules_created=cached_metric.schedules_created,
+                conflict_reduction_pct=float(cached_metric.conflict_reduction_pct) if cached_metric.conflict_reduction_pct else None
+            )
+        else:
+            cached_metric = None
+
+    # ==========================================
+    # 2. Real-time Calculation (if no cache)
+    # ==========================================
+    if not cached_metric:
+        # Get all grant codes for this partner to calculate activation rates
+        codes_result = await db.execute(
+            select(GrantCode).where(
+                GrantCode.partner_id == partner.id
             )
         )
-        total_messages = msg_result.scalar() or 0
+        grant_codes = codes_result.scalars().all()
         
-        aria_result = await db.execute(
-            select(func.count(MessageFlag.id))
-            .join(Message, MessageFlag.message_id == Message.id)
-            .where(
-                Message.sender_id.in_(user_ids)
+        # Build metrics
+        codes_distributed = len(grant_codes)
+        codes_activated = sum(1 for c in grant_codes if c.redemption_count > 0)
+        activation_rate = (codes_activated / codes_distributed * 100) if codes_distributed > 0 else 0
+        
+        # Get anonymized user IDs for message/aria counts
+        redemptions_result = await db.execute(
+            select(GrantRedemption.user_id).join(GrantCode).where(
+                GrantCode.partner_id == partner.id,
+                GrantRedemption.is_active == True
             )
         )
-        aria_interventions = aria_result.scalar() or 0
+        user_ids = [r[0] for r in redemptions_result.all()]
         
-        # Also count blocked interventions
-        try:
-            blocked_stmt = text("SELECT COUNT(*) FROM aria_events WHERE user_id IN :user_ids")
-            blocked_stmt = blocked_stmt.bindparams(bindparam("user_ids", expanding=True))
-            blocked_result = await db.execute(blocked_stmt, {"user_ids": list(user_ids)})
-            aria_interventions += (blocked_result.scalar() or 0)
-        except Exception:
-            pass
-    
+        total_messages = 0
+        aria_interventions = 0
+        if user_ids:
+            msg_result = await db.execute(
+                select(func.count(Message.id)).where(
+                    Message.sender_id.in_(user_ids),
+                    Message.created_at >= period_start
+                )
+            )
+            total_messages = msg_result.scalar() or 0
+            
+            aria_result = await db.execute(
+                select(func.count(MessageFlag.id))
+                .join(Message, MessageFlag.message_id == Message.id)
+                .where(
+                    Message.sender_id.in_(user_ids),
+                    MessageFlag.created_at >= period_start
+                )
+            )
+            aria_interventions = aria_result.scalar() or 0
+            
+            # Also count blocked interventions
+            try:
+                blocked_stmt = text("SELECT COUNT(*) FROM aria_events WHERE user_id IN :user_ids AND created_at >= :period_start")
+                blocked_stmt = blocked_stmt.bindparams(bindparam("user_ids", expanding=True))
+                blocked_result = await db.execute(blocked_stmt, {"user_ids": list(user_ids), "period_start": period_start})
+                aria_interventions += (blocked_result.scalar() or 0)
+            except Exception:
+                pass
+        
+        # Get schedule count
+        schedules_created = 0
+        if user_ids:
+            sched_result = await db.execute(
+                select(func.count(ScheduleEvent.id)).where(
+                    ScheduleEvent.creator_id.in_(user_ids),
+                    ScheduleEvent.created_at >= period_start
+                )
+            )
+            schedules_created = sched_result.scalar() or 0
+            
+        metrics_summary = PartnerMetricsSummary(
+            codes_distributed=codes_distributed,
+            codes_activated=codes_activated,
+            activation_rate=round(activation_rate, 1),
+            active_users=len(user_ids),
+            messages_sent=total_messages,
+            aria_interventions=aria_interventions,
+            schedules_created=schedules_created
+        )
+
     # Count remaining codes
     rem_result = await db.execute(
         select(func.count(GrantCode.id)).where(
@@ -320,7 +382,7 @@ async def get_public_impact_metrics(
             active_users=len(user_ids),
             messages_sent=total_messages,
             aria_interventions=aria_interventions,
-            schedules_created=0 # Placeholder
+            schedules_created=schedules_created
         ),
         active_users=[], # Hide for public view
         grant_codes=[], # Hide for public view
@@ -380,6 +442,46 @@ async def get_partner_dashboard(
     period_end = datetime.utcnow()
     period_start = period_end - timedelta(days=days)
     
+    # ==========================================
+    # 1. Historical Metrics Cache Check
+    # ==========================================
+    # Check if we have pre-calculated metrics for this period type
+    # (assuming days corresponds to a period_type like 'weekly' or 'monthly')
+    period_type = None
+    if days == 30:
+        period_type = "monthly"
+    elif days == 7:
+        period_type = "weekly"
+    elif days == 90:
+        period_type = "quarterly"
+
+    # Only attempt to load cached metrics if it's a standard period and not today
+    cached_metric = None
+    if period_type:
+        # Approximate: Look for a metric calculated near period_end
+        result = await db.execute(
+            select(PartnerMetric).where(
+                PartnerMetric.partner_id == partner.id,
+                PartnerMetric.period_type == period_type
+            ).order_by(PartnerMetric.period_end.desc()).limit(1)
+        )
+        cached_metric = result.scalar_one_or_none()
+        
+        # If we have a cached metric and it's fresh enough (e.g., within the last 24 hours), use its values
+        if cached_metric and cached_metric.calculated_at > (datetime.utcnow() - timedelta(hours=24)):
+            metrics_summary = PartnerMetricsSummary(
+                codes_distributed=cached_metric.codes_distributed,
+                codes_activated=cached_metric.codes_activated,
+                activation_rate=float(cached_metric.activation_rate) if cached_metric.activation_rate else 0.0,
+                active_users=cached_metric.active_users,
+                messages_sent=cached_metric.messages_sent,
+                aria_interventions=cached_metric.aria_interventions,
+                schedules_created=cached_metric.schedules_created,
+                conflict_reduction_pct=float(cached_metric.conflict_reduction_pct) if cached_metric.conflict_reduction_pct else None
+            )
+        else:
+            cached_metric = None
+
     # Get all grant codes for this partner
     codes_result = await db.execute(
         select(GrantCode).where(
@@ -387,11 +489,6 @@ async def get_partner_dashboard(
         )
     )
     grant_codes = codes_result.scalars().all()
-    
-    # Build metrics
-    codes_distributed = len(grant_codes)
-    codes_activated = sum(1 for c in grant_codes if c.redemption_count > 0)
-    activation_rate = (codes_activated / codes_distributed * 100) if codes_distributed > 0 else 0
     
     # Get anonymized user data from redemptions
     redemptions_result = await db.execute(
@@ -407,6 +504,8 @@ async def get_partner_dashboard(
     
     active_users = []
     user_ids = []
+    
+    # Always process active users list for the dashboard table
     for redemption in redemptions:
         user_ids.append(redemption.user_id)
         
@@ -421,7 +520,7 @@ async def get_partner_dashboard(
         
         if not anon_map:
             # Generate new anonymous ID
-            prefix = partner.code_prefix[:2].upper() if partner.code_prefix else ""
+            prefix = partner.code_prefix[:2].upper() if partner.code_prefix else partner.partner_slug[:2].upper()
             anon_id = f"User-{prefix}{secrets.token_hex(2).upper()}"
             anon_map = UserAnonymizationMap(
                 real_user_id=redemption.user_id,
@@ -431,7 +530,7 @@ async def get_partner_dashboard(
             db.add(anon_map)
             await db.flush()
         
-        # Get message count for this user
+        # Get message count for this user (Always needed for the table)
         msg_result = await db.execute(
             select(func.count(Message.id)).where(
                 Message.sender_id == redemption.user_id
@@ -447,50 +546,74 @@ async def get_partner_dashboard(
             is_active=redemption.is_active
         ))
     
-    # Aggregate metrics
-    total_messages = 0
-    aria_interventions = 0
-    if user_ids:
-        msg_result = await db.execute(
-            select(func.count(Message.id)).where(
-                Message.sender_id.in_(user_ids)
-            )
-        )
-        total_messages = msg_result.scalar() or 0
+    # ==========================================
+    # 2. Real-time Calculation (if no cache)
+    # ==========================================
+    if not cached_metric:
+        codes_distributed = len(grant_codes)
+        codes_activated = sum(1 for c in grant_codes if c.redemption_count > 0)
+        activation_rate = (codes_activated / codes_distributed * 100) if codes_distributed > 0 else 0
         
-        # Count ALL ARIA interventions (flags) regardless of user action
-        aria_result = await db.execute(
-            select(func.count(MessageFlag.id))
-            .join(Message, MessageFlag.message_id == Message.id)
-            .where(
-                Message.sender_id.in_(user_ids)
-            )
-        )
-        aria_interventions = aria_result.scalar() or 0
-        
-        # ALSO count blocked interventions from aria_events table (raw SQL since no model)
-        # These are messages that were blocked (Severe/Hate/Threats) and never created a Message record
-        # Use ANY(:user_ids) for postgres array support
+        # Aggregate metrics
+        total_messages = 0
+        aria_interventions = 0
         if user_ids:
-            try:
-                blocked_stmt = text("SELECT COUNT(*) FROM aria_events WHERE user_id IN :user_ids")
-                blocked_stmt = blocked_stmt.bindparams(bindparam("user_ids", expanding=True))
-                
-                blocked_result = await db.execute(
-                    blocked_stmt,
-                    {"user_ids": list(user_ids)}
+            msg_result = await db.execute(
+                select(func.count(Message.id)).where(
+                    Message.sender_id.in_(user_ids),
+                    Message.created_at >= period_start
                 )
-                blocked_count = blocked_result.scalar() or 0
-                
-                aria_interventions += blocked_count
-            except Exception as e:
-                # If table doesn't exist yet (migration pending), log and skip to avoid crashing dashboard
-                logger.error(f"Failed to query blocked interventions from aria_events: {e}")
-                pass
-    
-    # Get schedule count
-    schedules_created = 0
-    # Would need to join through family_files to get accurate count
+            )
+            total_messages = msg_result.scalar() or 0
+            
+            # Count ALL ARIA interventions (flags) regardless of user action
+            aria_result = await db.execute(
+                select(func.count(MessageFlag.id))
+                .join(Message, MessageFlag.message_id == Message.id)
+                .where(
+                    Message.sender_id.in_(user_ids),
+                    MessageFlag.created_at >= period_start
+                )
+            )
+            aria_interventions = aria_result.scalar() or 0
+            
+            # ALSO count blocked interventions from aria_events table (raw SQL since no model)
+            if user_ids:
+                try:
+                    blocked_stmt = text("SELECT COUNT(*) FROM aria_events WHERE user_id IN :user_ids AND created_at >= :period_start")
+                    blocked_stmt = blocked_stmt.bindparams(bindparam("user_ids", expanding=True))
+                    
+                    blocked_result = await db.execute(
+                        blocked_stmt,
+                        {"user_ids": list(user_ids), "period_start": period_start}
+                    )
+                    blocked_count = blocked_result.scalar() or 0
+                    
+                    aria_interventions += blocked_count
+                except Exception as e:
+                    logger.error(f"Failed to query blocked interventions from aria_events: {e}")
+                    pass
+        
+        # Get schedule count
+        schedules_created = 0
+        if user_ids:
+            sched_result = await db.execute(
+                select(func.count(ScheduleEvent.id)).where(
+                    ScheduleEvent.creator_id.in_(user_ids),
+                    ScheduleEvent.created_at >= period_start
+                )
+            )
+            schedules_created = sched_result.scalar() or 0
+            
+        metrics_summary = PartnerMetricsSummary(
+            codes_distributed=codes_distributed,
+            codes_activated=codes_activated,
+            activation_rate=round(activation_rate, 1),
+            active_users=len(active_users),
+            messages_sent=total_messages,
+            aria_interventions=aria_interventions,
+            schedules_created=schedules_created
+        )
     
     await db.commit()
     
@@ -566,3 +689,148 @@ async def get_my_staff_access(
         role=staff.role,
         display_name=f"{current_user.first_name} {current_user.last_name}"
     )
+
+
+# ============================================================================
+# Admin Endpoints
+# ============================================================================
+
+def require_superadmin(current_user: User = Depends(get_current_user)):
+    """
+    Temporary check for superadmin access.
+    In the future, this should use a robust RBAC system.
+    """
+    # For MVP, restrict to known admin domains or emails
+    allowed_domains = ["@commonground.family", "@carestack.us"]
+    allowed_emails = ["thomas@carestack.us", "founders@commonground.family"]
+    
+    is_allowed = False
+    if current_user.email in allowed_emails:
+        is_allowed = True
+    else:
+        for domain in allowed_domains:
+            if current_user.email.endswith(domain):
+                is_allowed = True
+                break
+                
+    if not is_allowed:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Superadmin access required"
+        )
+    return current_user
+
+
+@router.post("/", response_model=PartnerCreateResponse, status_code=status.HTTP_201_CREATED)
+async def create_partner(
+    request: PartnerCreateRequest,
+    admin_user: User = Depends(require_superadmin),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Create a new partner organization (Admin only).
+    """
+    # Check if slug exists
+    result = await db.execute(select(Partner).where(Partner.partner_slug == request.partner_slug.lower()))
+    if result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Partner with slug '{request.partner_slug}' already exists."
+        )
+
+    partner = Partner(
+        partner_slug=request.partner_slug.lower(),
+        legal_name=request.legal_name,
+        display_name=request.display_name,
+        ein=request.ein,
+        mission_statement=request.mission_statement,
+        primary_contact_name=request.primary_contact_name,
+        primary_contact_email=request.primary_contact_email,
+        primary_contact_phone=request.primary_contact_phone,
+        branding_config=request.branding_config.model_dump() if request.branding_config else {},
+        landing_config=request.landing_config.model_dump() if request.landing_config else {},
+        code_prefix=request.code_prefix,
+        codes_allocated=request.codes_allocated,
+        status=PartnerStatus.ACTIVE,
+        activation_date=datetime.utcnow(),
+    )
+    db.add(partner)
+    await db.flush()
+
+    # Generate initial codes if requested
+    if request.codes_allocated > 0:
+        prefix = partner.code_prefix.upper() if partner.code_prefix else partner.partner_slug[:3].upper()
+        for _ in range(request.codes_allocated):
+            random_part = secrets.token_hex(4).upper()
+            code_string = f"{prefix}-{random_part[:4]}-{random_part[4:]}"
+            
+            grant_code = GrantCode(
+                code=code_string,
+                partner_id=partner.id,
+                nonprofit_name=partner.display_name,
+                granted_plan_code="family_plus",  # Defaulting to highest tier for MVP
+                is_active=True,
+                valid_from=datetime.utcnow(),
+                grant_duration_days=365,  # 1 year by default
+                max_redemptions=1,
+                redemption_count=0
+            )
+            db.add(grant_code)
+
+    await db.commit()
+    await db.refresh(partner)
+
+    return PartnerCreateResponse(
+        id=partner.id,
+        partner_slug=partner.partner_slug,
+        display_name=partner.display_name,
+        codes_allocated=partner.codes_allocated,
+        status=partner.status
+    )
+
+
+@router.post("/{partner_slug}/generate-codes", response_model=list[str])
+async def generate_partner_codes(
+    partner_slug: str,
+    request: GenerateCodesRequest,
+    admin_user: User = Depends(require_superadmin),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Generate grant codes for a partner (Admin only).
+    """
+    result = await db.execute(select(Partner).where(Partner.partner_slug == partner_slug.lower()))
+    partner = result.scalar_one_or_none()
+    
+    if not partner:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Partner not found"
+        )
+
+    prefix = partner.code_prefix.upper() if partner.code_prefix else partner.partner_slug[:3].upper()
+    generated_codes = []
+    
+    for _ in range(request.count):
+        random_part = secrets.token_hex(4).upper()
+        code_string = f"{prefix}-{random_part[:4]}-{random_part[4:]}"
+        
+        grant_code = GrantCode(
+            code=code_string,
+            partner_id=partner.id,
+            nonprofit_name=partner.display_name,
+            granted_plan_code=request.tier,
+            is_active=True,
+            valid_from=datetime.utcnow(),
+            grant_duration_days=request.duration_days,
+            max_redemptions=1,
+            redemption_count=0
+        )
+        db.add(grant_code)
+        generated_codes.append(code_string)
+
+    partner.codes_allocated += request.count
+    await db.commit()
+
+    return generated_codes
+
