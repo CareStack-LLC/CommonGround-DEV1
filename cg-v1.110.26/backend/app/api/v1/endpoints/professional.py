@@ -9,7 +9,7 @@ from datetime import datetime
 import io
 from typing import Optional, List
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, status, Query, File, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -93,6 +93,14 @@ from app.services.professional.tier_gate import (
     enforce_case_limit,
     enforce_team_limit,
     get_tier_features,
+)
+from app.services.storage import (
+    storage_service,
+    StorageBucket,
+    validate_attachment,
+    build_professional_headshot_path,
+    build_firm_logo_path,
+    build_firm_video_path,
 )
 from app.schemas.professional import (
     # Case Assignment
@@ -178,6 +186,7 @@ def _profile_to_response(
         headline=profile.headline,
         bio=profile.bio,
         video_url=profile.video_url,
+        headshot_url=profile.headshot_url,
         languages=profile.languages or [],
         hourly_rate=profile.hourly_rate,
         years_experience=profile.years_experience,
@@ -359,6 +368,41 @@ async def update_profile(
     """Update the current user's professional profile."""
     service = ProfessionalProfileService(db)
     updated = await service.update_profile(profile.id, data)
+    return _profile_to_response(updated, current_user)
+
+
+@router.post(
+    "/profile/headshot",
+    response_model=ProfessionalProfileResponse,
+    summary="Upload professional headshot",
+)
+async def upload_headshot(
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Upload a headshot for the professional profile."""
+    content = await file.read()
+    
+    is_valid, category, error = validate_attachment(file.content_type, len(content))
+    if not is_valid or category != "image":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error or "Invalid image file.",
+        )
+
+    path = build_professional_headshot_path(profile.id, file.filename)
+    url = await storage_service.upload_file(
+        bucket=StorageBucket.PROFESSIONAL_MEDIA,
+        path=path,
+        file_content=content,
+        content_type=file.content_type,
+    )
+
+    service = ProfessionalProfileService(db)
+    # Using raw string for headshot_url to avoid Pydantic issues if it's partly defined
+    updated = await service.update_profile(profile.id, ProfessionalProfileUpdate(headshot_url=url))
     return _profile_to_response(updated, current_user)
 
 
@@ -552,6 +596,86 @@ async def update_firm(
             detail="Firm not found.",
         )
 
+    member_count = await service.get_firm_member_count(firm_id)
+    return _firm_to_response(firm, member_count=member_count)
+
+
+@router.post(
+    "/firms/{firm_id}/logo",
+    response_model=FirmResponse,
+    summary="Upload firm logo",
+)
+async def upload_firm_logo(
+    firm_id: str,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Upload a logo for the firm. Requires owner or admin role."""
+    service = FirmService(db)
+    if not await service.can_manage_firm(profile.id, firm_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only owners and admins can upload firm logo.",
+        )
+
+    content = await file.read()
+    is_valid, category, error = validate_attachment(file.content_type, len(content))
+    if not is_valid or category != "image":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error or "Invalid image file.",
+        )
+
+    path = build_firm_logo_path(firm_id, file.filename)
+    url = await storage_service.upload_file(
+        bucket=StorageBucket.PROFESSIONAL_MEDIA,
+        path=path,
+        file_content=content,
+        content_type=file.content_type,
+    )
+
+    firm = await service.update_firm(firm_id, FirmUpdate(logo_url=url))
+    member_count = await service.get_firm_member_count(firm_id)
+    return _firm_to_response(firm, member_count=member_count)
+
+
+@router.post(
+    "/firms/{firm_id}/video",
+    response_model=FirmResponse,
+    summary="Upload firm video",
+)
+async def upload_firm_video(
+    firm_id: str,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Upload a video and intro for the firm. Requires owner or admin role."""
+    service = FirmService(db)
+    if not await service.can_manage_firm(profile.id, firm_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only owners and admins can upload firm video.",
+        )
+
+    content = await file.read()
+    is_valid, category, error = validate_attachment(file.content_type, len(content))
+    if not is_valid or category != "video":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=error or "Invalid video file.",
+        )
+
+    path = build_firm_video_path(firm_id, file.filename)
+    url = await storage_service.upload_file(
+        bucket=StorageBucket.PROFESSIONAL_MEDIA,
+        path=path,
+        file_content=content,
+        content_type=file.content_type,
+    )
+
+    firm = await service.update_firm(firm_id, FirmUpdate(video_url=url))
     member_count = await service.get_firm_member_count(firm_id)
     return _firm_to_response(firm, member_count=member_count)
 

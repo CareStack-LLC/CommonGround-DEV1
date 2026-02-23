@@ -245,6 +245,7 @@ class ProfessionalProfile(Base, UUIDMixin, TimestampMixin):
     # Directory Profile Fields
     headline: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     bio: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    headshot_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     video_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     languages: Mapped[Optional[list]] = mapped_column(JSON, default=list)
     hourly_rate: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)

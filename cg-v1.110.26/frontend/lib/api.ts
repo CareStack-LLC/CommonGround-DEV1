@@ -4930,6 +4930,7 @@ export interface FirmPublicProfile extends FirmDirectoryEntry {
     user_last_name?: string;
     professional_type: string;
     license_verified: boolean;
+    headshot_url?: string;
     headline?: string;
     bio?: string;
     video_url?: string;
@@ -7476,6 +7477,17 @@ export interface ProfessionalProfile {
   user_last_name?: string;
   user_email?: string;
   firms?: FirmMembership[];
+  headline?: string;
+  bio?: string;
+  headshot_url?: string;
+  video_url?: string;
+  languages?: string[];
+  hourly_rate?: string;
+  years_experience?: number;
+  education?: any[];
+  awards?: any[];
+  consultation_fee?: string;
+  accepted_payment_methods?: string[];
 }
 
 export interface Firm {
@@ -7487,6 +7499,15 @@ export interface Firm {
   phone?: string;
   website?: string;
   is_active: boolean;
+  logo_url?: string;
+  primary_color?: string;
+  description?: string;
+  practice_areas?: string[];
+  headline?: string;
+  video_url?: string;
+  social_links?: any;
+  pricing_structure?: any;
+  safety_vetted?: boolean;
 }
 
 export interface FirmMembership {
@@ -7608,6 +7629,24 @@ export const professionalAPI = {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
+  },
+
+  async uploadHeadshot(file: File): Promise<ProfessionalProfile> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = localStorage.getItem('access_token');
+    const response = await fetch(`${API_URL}/professional/profile/headshot`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(error.detail || 'Failed to upload headshot');
+    }
+    return response.json();
   },
 
   // Dashboard
@@ -7734,6 +7773,42 @@ export const professionalAPI = {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  },
+
+  async uploadFirmLogo(firmId: string, file: File): Promise<Firm> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = localStorage.getItem('access_token');
+    const response = await fetch(`${API_URL}/professional/firms/${firmId}/logo`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(error.detail || 'Failed to upload firm logo');
+    }
+    return response.json();
+  },
+
+  async uploadFirmVideo(firmId: string, file: File): Promise<Firm> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = localStorage.getItem('access_token');
+    const response = await fetch(`${API_URL}/professional/firms/${firmId}/video`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(error.detail || 'Failed to upload firm video');
+    }
+    return response.json();
   },
 
   // Access Requests

@@ -74,6 +74,7 @@ class ProfessionalProfileService:
             headline=data.headline,
             bio=data.bio,
             video_url=data.video_url,
+            headshot_url=data.headshot_url,
             languages=data.languages or [],
             hourly_rate=data.hourly_rate,
             years_experience=data.years_experience,

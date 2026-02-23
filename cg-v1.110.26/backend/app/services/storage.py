@@ -33,6 +33,7 @@ class StorageBucket:
     KIDCOMS = "kidcoms"  # Public bucket for Watch Together videos and books
     MESSAGE_ATTACHMENTS = "message_attachments"  # Private bucket for parent message attachments
     CALL_RECORDINGS = "call_recordings"  # Private bucket for parent call recordings
+    PROFESSIONAL_MEDIA = "professional-media"  # Public bucket for firm logos, videos, and professional headshots
 
 
 class SupabaseStorageService:
@@ -427,6 +428,22 @@ def validate_attachment(
         return True, "video", None
     else:
         return False, None, f"File type {content_type} is not allowed"
+
+
+def build_professional_headshot_path(professional_id: str, filename: str) -> str:
+    """Build path for professional headshot."""
+    ext = filename.split(".")[-1]
+    return f"professionals/{professional_id}/headshot.{ext}"
+
+def build_firm_logo_path(firm_id: str, filename: str) -> str:
+    """Build path for firm logo."""
+    ext = filename.split(".")[-1]
+    return f"firms/{firm_id}/logo.{ext}"
+
+def build_firm_video_path(firm_id: str, filename: str) -> str:
+    """Build path for firm video introduction."""
+    ext = filename.split(".")[-1]
+    return f"firms/{firm_id}/video.{ext}"
 
 
 # Global instance for convenience

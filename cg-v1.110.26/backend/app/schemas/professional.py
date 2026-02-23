@@ -42,6 +42,7 @@ class ProfessionalProfileBase(BaseModel):
     # Directory Fields
     headline: Optional[str] = Field(None, max_length=150)
     bio: Optional[str] = None
+    headshot_url: Optional[str] = None
     video_url: Optional[str] = None
     languages: Optional[list[str]] = None
     hourly_rate: Optional[str] = None
@@ -70,6 +71,7 @@ class ProfessionalProfileUpdate(BaseModel):
     # Directory Fields
     headline: Optional[str] = None
     bio: Optional[str] = None
+    headshot_url: Optional[str] = None
     video_url: Optional[str] = None
     languages: Optional[list[str]] = None
     hourly_rate: Optional[str] = None
@@ -165,6 +167,7 @@ class FirmUpdate(BaseModel):
     # Directory Fields
     headline: Optional[str] = None
     video_url: Optional[str] = None
+    headshot_url: Optional[str] = None
     social_links: Optional[dict] = None
     pricing_structure: Optional[dict] = None
     safety_vetted: Optional[bool] = None
@@ -210,6 +213,7 @@ class ProfessionalPublicResponse(BaseModel):
     license_verified: bool = False
     headline: Optional[str] = None
     bio: Optional[str] = None
+    headshot_url: Optional[str] = None
     video_url: Optional[str] = None
     languages: list[str] = []
     hourly_rate: Optional[str] = None

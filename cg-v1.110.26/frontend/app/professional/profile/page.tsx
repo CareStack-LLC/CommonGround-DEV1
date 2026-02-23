@@ -37,6 +37,8 @@ import {
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useProfessionalAuth } from "../layout";
+import { MediaUpload } from "@/components/ui/media-upload";
+import { professionalAPI } from "@/lib/api";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -59,6 +61,7 @@ interface ProfileFormData {
   practice_areas: string[];
   phone: string;
   headline: string;
+  headshot_url: string;
   video_url: string;
   languages: string[];
   hourly_rate: string;
@@ -73,6 +76,7 @@ interface FirmFormData {
   description: string;
   practice_areas: string[];
   headline: string;
+  logo_url: string;
   video_url: string;
   social_links: Record<string, string>;
   pricing_structure: Record<string, any>;
@@ -378,6 +382,7 @@ export default function ProfilePage() {
     practice_areas: [],
     phone: "",
     headline: "",
+    headshot_url: "",
     video_url: "",
     languages: [],
     hourly_rate: "",
@@ -394,6 +399,7 @@ export default function ProfilePage() {
     description: "",
     practice_areas: [],
     headline: "",
+    logo_url: "",
     video_url: "",
     social_links: {},
     pricing_structure: {},
@@ -411,6 +417,7 @@ export default function ProfilePage() {
         practice_areas: profile.practice_areas || [],
         phone: profile.professional_phone || "",
         headline: profile.headline || "",
+        headshot_url: profile.headshot_url || "",
         video_url: profile.video_url || "",
         languages: profile.languages || [],
         hourly_rate: profile.hourly_rate || "",
@@ -444,6 +451,7 @@ export default function ProfilePage() {
             description: firmData.description || "",
             practice_areas: firmData.practice_areas || [],
             headline: firmData.headline || "",
+            logo_url: firmData.logo_url || "",
             video_url: firmData.video_url || "",
             social_links: firmData.social_links || {},
             pricing_structure: firmData.pricing_structure || {},
@@ -587,6 +595,29 @@ export default function ProfilePage() {
                 </Badge>
               </div>
               <div className="p-6 space-y-6">
+                {isEditing ? (
+                  <div className="mb-2 max-w-xs">
+                    <MediaUpload
+                      label="Professional Headshot"
+                      value={formData.headshot_url}
+                      onChange={(url) => setFormData((prev) => ({ ...prev, headshot_url: url }))}
+                      onUpload={async (file) => {
+                        const updated = await professionalAPI.uploadHeadshot(file);
+                        return updated.headshot_url || "";
+                      }}
+                      aspectRatio="square"
+                      placeholder="Upload Headshot"
+                    />
+                  </div>
+                ) : formData.headshot_url ? (
+                  <div className="mb-2">
+                    <img
+                      src={formData.headshot_url.startsWith('http') ? formData.headshot_url : `${API_BASE}${formData.headshot_url}`}
+                      alt="Headshot"
+                      className="w-32 h-32 rounded-lg object-cover border"
+                    />
+                  </div>
+                ) : null}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="headline" className="text-slate-700 font-semibold">Professional Headline</Label>
@@ -783,6 +814,33 @@ export default function ProfilePage() {
                               </Select>
                             )}
                           </div>
+
+                          <div className="grid md:grid-cols-2 gap-6">
+                            <MediaUpload
+                              label="Firm Logo"
+                              value={firmFormData.logo_url}
+                              onChange={(url) => setFirmFormData((prev) => ({ ...prev, logo_url: url }))}
+                              onUpload={async (file) => {
+                                const updated = await professionalAPI.uploadFirmLogo(selectedFirmId!, file);
+                                return updated.logo_url || "";
+                              }}
+                              aspectRatio="square"
+                              placeholder="Upload Logo"
+                            />
+                            <MediaUpload
+                              label="Firm Video Presentation"
+                              value={firmFormData.video_url}
+                              onChange={(url) => setFirmFormData((prev) => ({ ...prev, video_url: url }))}
+                              onUpload={async (file) => {
+                                const updated = await professionalAPI.uploadFirmVideo(selectedFirmId!, file);
+                                return updated.video_url || "";
+                              }}
+                              mediaType="video"
+                              aspectRatio="video"
+                              placeholder="Upload Presentation"
+                            />
+                          </div>
+
                           <div className="space-y-3">
                             <Label htmlFor="firm_headline" className="text-slate-600 text-xs font-semibold uppercase tracking-wider">Firm Headline / Tagline</Label>
                             <Input
