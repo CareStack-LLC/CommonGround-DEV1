@@ -314,7 +314,7 @@ export default function ProfessionalProfilePage() {
                                                         {pro.headshot_url ? (
                                                             <AvatarImage src={pro.headshot_url} />
                                                         ) : null}
-                                                        <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">
+                                                        <AvatarFallback className="bg-[#E8F0EC] text-[#4A6C58] text-3xl font-bold font-serif">
                                                             {pro.user_first_name?.charAt(0)}{pro.user_last_name?.charAt(0)}
                                                         </AvatarFallback>
                                                     </Avatar>
