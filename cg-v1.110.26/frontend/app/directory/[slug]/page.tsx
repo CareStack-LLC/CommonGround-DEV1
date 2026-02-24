@@ -21,9 +21,39 @@ import {
     DollarSign,
     CreditCard,
     CheckCircle2,
+    CheckCircle2,
     ArrowLeft
 } from "lucide-react";
 import Image from "next/image";
+
+// Helper to safely format pricing values from the JSON structure
+const formatPrice = (value: any): string => {
+    if (value === null || value === undefined) return 'Contact Firm';
+    if (typeof value === 'boolean') return value ? 'Available' : 'No';
+    if (typeof value === 'string') {
+        const lower = value.toLowerCase();
+        if (lower === 'true' || lower === 'yes') return 'Available';
+        if (lower === 'false' || lower === 'no') return 'No';
+        if (value.startsWith('$')) return value;
+        if (!isNaN(Number(value))) return `$${value}`;
+        return value;
+    }
+    if (typeof value === 'number') return `$${value}`;
+    if (typeof value === 'object') {
+        if (Array.isArray(value)) return value.join(', ');
+
+        // Handle common object structures like { min: 100, max: 200 }
+        if (value.min && value.max) return `$${value.min} - $${value.max}`;
+        if (value.min) return `From $${value.min}`;
+        if (value.max) return `Up to $${value.max}`;
+
+        // Generic fallback for objects
+        return Object.entries(value)
+            .map(([k, v]) => `${k}: ${v}`)
+            .join(', ');
+    }
+    return String(value);
+};
 
 export default function ProfessionalProfilePage() {
     const params = useParams();
@@ -96,8 +126,8 @@ export default function ProfessionalProfilePage() {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
             {/* Hero Section */}
-            <div className="relative h-64 md:h-80 w-full overflow-hidden bg-gray-900">
-                {firm.video_url ? (
+            <div className="relative h-72 md:h-80 w-full overflow-hidden bg-gradient-to-br from-[#4A6C58] via-[#4A6C58]/95 to-[#1a4746]">
+                {firm.video_url && (
                     <div className="absolute inset-0">
                         {/* Use actual HTML5 video for autoplay background */}
                         <video
@@ -106,19 +136,17 @@ export default function ProfessionalProfilePage() {
                             loop
                             muted
                             playsInline
-                            className="absolute inset-0 w-full h-full object-cover"
+                            className="absolute inset-0 w-full h-full object-cover opacity-80"
                         />
-                        <div className="absolute inset-0 bg-black/60 z-10" />
+                        <div className="absolute inset-0 bg-black/40 z-10" />
                     </div>
-                ) : (
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-900 to-indigo-900 opacity-90" />
                 )}
 
                 {/* Back Button */}
                 <div className="absolute top-6 left-6 z-30">
                     <Button
                         variant="ghost"
-                        className="text-white hover:bg-white/10"
+                        className="text-white hover:bg-white/20 rounded-full"
                         onClick={() => router.back()}
                     >
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back
@@ -127,16 +155,16 @@ export default function ProfessionalProfilePage() {
 
                 <div className="absolute inset-0 z-20 flex flex-col justify-end p-6 md:p-12 container mx-auto">
                     <div className="flex flex-col md:flex-row gap-6 items-start md:items-end">
-                        <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-xl bg-white p-2 shadow-xl shrink-0 overflow-hidden">
+                        <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-2xl bg-white p-3 shadow-2xl shrink-0 overflow-hidden border-2 border-slate-100">
                             {firm.logo_url ? (
                                 <Image
                                     src={firm.logo_url}
                                     alt={firm.name}
                                     fill
-                                    className="object-contain p-2"
+                                    className="object-contain p-3"
                                 />
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gray-100 text-3xl font-bold text-gray-400">
+                                <div className="w-full h-full flex items-center justify-center bg-slate-50 text-4xl font-bold text-slate-300">
                                     {firm.name.charAt(0)}
                                 </div>
                             )}
@@ -144,7 +172,7 @@ export default function ProfessionalProfilePage() {
 
                         <div className="flex-1 text-white pb-2">
                             <div className="flex items-center gap-3 mb-2">
-                                <h1 className="text-3xl md:text-4xl font-bold">{firm.name}</h1>
+                                <h1 className="text-3xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{firm.name}</h1>
                                 {firm.safety_vetted && (
                                     <Badge className="bg-emerald-500 text-white border-0">
                                         <ShieldCheck className="w-3 h-3 mr-1" /> Vetted
@@ -175,19 +203,19 @@ export default function ProfessionalProfilePage() {
                             {familyFileId ? (
                                 <Button
                                     size="lg"
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 shadow-lg"
+                                    className="bg-[#4A6C58] hover:bg-[#3A5646] text-white border-2 border-white/20 shadow-xl rounded-full font-bold px-8"
                                     onClick={handleInviteKey}
                                     disabled={inviting}
                                 >
                                     {inviting ? "Sending Invite..." : "Invite to Case"}
                                 </Button>
                             ) : (
-                                <Button className="bg-white text-gray-900 hover:bg-gray-100">
+                                <Button className="bg-white text-slate-900 hover:bg-slate-100 rounded-full font-bold px-8 shadow-xl">
                                     Contact Firm
                                 </Button>
                             )}
                             {firm.website && (
-                                <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 bg-transparent" asChild>
+                                <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 bg-white/5 backdrop-blur-sm rounded-full font-bold px-6" asChild>
                                     <a href={firm.website} target="_blank" rel="noopener noreferrer">
                                         <Globe className="w-4 h-4 mr-2" /> Website
                                     </a>
@@ -225,9 +253,9 @@ export default function ProfessionalProfilePage() {
 
                         {/* OVERVIEW TAB */}
                         <TabsContent value="overview" className="space-y-6 animate-in fade-in-50 duration-300">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>About Us</CardTitle>
+                            <Card className="bg-white rounded-3xl border-2 border-slate-100 shadow-md">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-2xl text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>About Us</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <div className="prose dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
@@ -277,13 +305,13 @@ export default function ProfessionalProfilePage() {
 
                         {/* TEAM TAB */}
                         <TabsContent value="team" className="space-y-6 animate-in fade-in-50 duration-300">
-                            <div className="grid grid-cols-1 gap-4">
+                            <div className="grid grid-cols-1 gap-6">
                                 {firm.professionals && firm.professionals.length > 0 ? (
                                     firm.professionals.map((pro) => (
-                                        <Card key={pro.id} className="overflow-hidden">
+                                        <Card key={pro.id} className="overflow-hidden bg-white rounded-3xl border-2 border-slate-100 shadow-md group">
                                             <div className="flex flex-col sm:flex-row">
-                                                <div className="w-full sm:w-48 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-700">
-                                                    <Avatar className="w-20 h-20 mb-3 border-2 border-white shadow-sm">
+                                                <div className="w-full sm:w-56 bg-slate-50 flex flex-col items-center justify-center p-8 border-b sm:border-b-0 sm:border-r border-slate-100">
+                                                    <Avatar className="w-28 h-28 mb-4 border-4 border-white shadow-md">
                                                         {pro.headshot_url ? (
                                                             <AvatarImage src={pro.headshot_url} />
                                                         ) : null}
@@ -297,13 +325,13 @@ export default function ProfessionalProfilePage() {
                                                         </Badge>
                                                     )}
                                                 </div>
-                                                <div className="flex-1 p-6">
+                                                <div className="flex-1 p-8">
                                                     <div className="flex justify-between items-start mb-2">
                                                         <div>
-                                                            <h3 className="font-bold text-lg">
+                                                            <h3 className="font-bold text-2xl text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                                                                 {pro.user_first_name} {pro.user_last_name}
                                                             </h3>
-                                                            <p className="text-sm text-primary font-medium">{pro.headline || pro.professional_type.replace('_', ' ').toUpperCase()}</p>
+                                                            <p className="text-sm text-[#4A6C58] font-bold tracking-wide uppercase mt-1">{pro.headline || pro.professional_type.replace('_', ' ')}</p>
                                                         </div>
                                                         {pro.hourly_rate && (
                                                             <div className="text-right">
@@ -351,24 +379,24 @@ export default function ProfessionalProfilePage() {
 
                         {/* SERVICES & PRICING TAB */}
                         <TabsContent value="services" className="space-y-6 animate-in fade-in-50 duration-300">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Pricing & Payment</CardTitle>
+                            <Card className="bg-white rounded-3xl border-2 border-slate-100 shadow-md">
+                                <CardHeader className="pb-4">
+                                    <CardTitle className="text-2xl text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pricing & Payment</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    {firm.pricing_structure ? (
-                                        <div className="grid md:grid-cols-2 gap-4">
+                                    {firm.pricing_structure && Object.keys(firm.pricing_structure).length > 0 ? (
+                                        <div className="space-y-2">
                                             {Object.entries(firm.pricing_structure).map(([service, price]) => (
-                                                <div key={service} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-md border border-gray-100 dark:border-gray-700">
-                                                    <span className="font-medium capitalize">{service.replace(/_/g, ' ')}</span>
-                                                    <span className="font-bold text-primary">{typeof price === 'string' ? price : '$' + price}</span>
+                                                <div key={service} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 gap-2">
+                                                    <span className="font-bold text-slate-700 capitalize">{service.replace(/_/g, ' ')}</span>
+                                                    <span className="font-bold text-[#4A6C58]">{formatPrice(price)}</span>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="text-center py-6 border rounded-md border-dashed">
-                                            <DollarSign className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                                            <p className="text-gray-500">Contact firm for detailed pricing.</p>
+                                        <div className="text-center py-10 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                                            <DollarSign className="w-10 h-10 text-slate-300 mx-auto mb-3" />
+                                            <p className="text-slate-500 font-medium">Contact firm for detailed pricing.</p>
                                         </div>
                                     )}
 
@@ -390,9 +418,9 @@ export default function ProfessionalProfilePage() {
 
                 {/* Sidebar */}
                 <div className="w-full md:w-80 space-y-6 mt-8 md:mt-0 shrink-0">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-base">Contact Information</CardTitle>
+                    <Card className="bg-white rounded-3xl border-2 border-slate-100 shadow-md">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-xl text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Contact Information</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {firm.phone && (
@@ -425,17 +453,17 @@ export default function ProfessionalProfilePage() {
                                 </div>
                             )}
 
-                            <div className="pt-4 mt-2 border-t">
+                            <div className="pt-6 mt-2 border-t border-slate-100">
                                 {familyFileId ? (
                                     <Button
-                                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                                        className="w-full bg-[#4A6C58] hover:bg-[#3A5646] text-white rounded-full font-bold h-12 shadow-md"
                                         onClick={handleInviteKey}
                                         disabled={inviting}
                                     >
                                         {inviting ? "Sending..." : "Invite to Case"}
                                     </Button>
                                 ) : (
-                                    <Button className="w-full">
+                                    <Button className="w-full rounded-full font-bold h-12 shadow-md border-2 border-[#4A6C58] text-[#4A6C58] bg-transparent hover:bg-[#E8F0EC]">
                                         Send Message
                                     </Button>
                                 )}
@@ -443,18 +471,35 @@ export default function ProfessionalProfilePage() {
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900">
-                        <CardContent className="p-4 flex items-start gap-3">
-                            <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                    <Card className="bg-[#E8F0EC]/50 border-2 border-[#E8F0EC] rounded-3xl shadow-sm">
+                        <CardContent className="p-5 flex items-start gap-4">
+                            <ShieldCheck className="w-6 h-6 text-[#4A6C58] shrink-0 mt-0.5" />
                             <div className="text-sm">
-                                <h4 className="font-semibold text-blue-900 dark:text-blue-200 mb-1">Data Protection</h4>
-                                <p className="text-blue-700 dark:text-blue-300 text-xs leading-relaxed">
+                                <h4 className="font-bold text-[#2D3A35] mb-1">Data Protection</h4>
+                                <p className="text-[#4A6C58] font-medium text-xs leading-relaxed">
                                     This firm is bound by confidentiality agreements. Communications via CommonGround are encrypted.
                                 </p>
                             </div>
                         </CardContent>
                     </Card>
                 </div>
+            </div>
+
+            {/* Mobile Bottom Action Bar */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-slate-200 shadow-2xl z-40">
+                {familyFileId ? (
+                    <Button
+                        className="w-full bg-[#4A6C58] hover:bg-[#3A5646] text-white rounded-full font-bold h-12 shadow-lg"
+                        onClick={handleInviteKey}
+                        disabled={inviting}
+                    >
+                        {inviting ? "Sending..." : "Invite to Case"}
+                    </Button>
+                ) : (
+                    <Button className="w-full rounded-full font-bold h-12 shadow-lg bg-[#4A6C58] hover:bg-[#3A5646] text-white">
+                        Contact Firm
+                    </Button>
+                )}
             </div>
         </div>
     );
