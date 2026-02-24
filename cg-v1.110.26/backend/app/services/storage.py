@@ -108,7 +108,7 @@ class SupabaseStorageService:
 
         # Return the public URL for public buckets (avatars, kidcoms)
         # For private buckets, return a signed URL that lasts 1 year
-        if bucket in (StorageBucket.AVATARS, StorageBucket.KIDCOMS):
+        if bucket in (StorageBucket.AVATARS, StorageBucket.KIDCOMS, StorageBucket.PROFESSIONAL_MEDIA):
             return self._get_storage_url(bucket, path)
         else:
             # For private buckets, return a long-lived signed URL (1 year)

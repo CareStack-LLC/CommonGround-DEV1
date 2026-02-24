@@ -99,11 +99,16 @@ export default function ProfessionalProfilePage() {
             <div className="relative h-64 md:h-80 w-full overflow-hidden bg-gray-900">
                 {firm.video_url ? (
                     <div className="absolute inset-0">
-                        {/* In a real app, embed video or use thumbnail */}
+                        {/* Use actual HTML5 video for autoplay background */}
+                        <video
+                            src={firm.video_url}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="absolute inset-0 w-full h-full object-cover"
+                        />
                         <div className="absolute inset-0 bg-black/60 z-10" />
-                        <div className="absolute inset-0 flex items-center justify-center z-0 opacity-40">
-                            <Video className="w-24 h-24 text-white/20" />
-                        </div>
                     </div>
                 ) : (
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-900 to-indigo-900 opacity-90" />
