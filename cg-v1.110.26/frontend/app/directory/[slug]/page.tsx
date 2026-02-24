@@ -21,7 +21,6 @@ import {
     DollarSign,
     CreditCard,
     CheckCircle2,
-    CheckCircle2,
     ArrowLeft
 } from "lucide-react";
 import Image from "next/image";
