@@ -280,7 +280,7 @@ export default function ProfessionalProfilePage() {
                                                 <div className="w-full sm:w-48 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-gray-700">
                                                     <Avatar className="w-20 h-20 mb-3 border-2 border-white shadow-sm">
                                                         {pro.headshot_url ? (
-                                                            <AvatarImage src={pro.headshot_url.startsWith('http') ? pro.headshot_url : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'http://localhost:8000'}${pro.headshot_url}`} />
+                                                            <AvatarImage src={pro.headshot_url} />
                                                         ) : null}
                                                         <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">
                                                             {pro.user_first_name?.charAt(0)}{pro.user_last_name?.charAt(0)}
