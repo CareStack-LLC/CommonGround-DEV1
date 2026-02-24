@@ -1317,10 +1317,13 @@ function FamilyFileDetailContent() {
                         </div>
                         <div>
                           <div className="font-medium text-foreground text-sm">
-                            {request.professional_name || request.professional_email}
+                            {request.professional_name || request.professional_email || request.firm_name}
                           </div>
-                          {request.firm_name && (
+                          {(request.professional_name || request.professional_email) && request.firm_name && (
                             <div className="text-xs text-muted-foreground">{request.firm_name}</div>
+                          )}
+                          {!request.professional_name && !request.professional_email && request.firm_name && (
+                            <div className="text-xs text-muted-foreground">Firm Invitation</div>
                           )}
                         </div>
                       </div>
