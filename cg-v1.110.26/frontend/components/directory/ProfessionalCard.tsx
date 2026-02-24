@@ -26,41 +26,44 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
     };
 
     return (
-        <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 flex flex-col h-full">
+        <Card className="overflow-hidden bg-white rounded-3xl border-2 border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 group flex flex-col h-full">
             {/* Media Header */}
-            <div className="relative h-48 bg-gray-100 dark:bg-gray-900 overflow-hidden cursor-pointer" onClick={handleViewProfile}>
+            <div className="relative h-48 sm:h-52 bg-slate-50 overflow-hidden cursor-pointer" onClick={handleViewProfile}>
                 {firm.video_url ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/5 group-hover:bg-black/10 transition-colors">
-                        {/* Show video thumbnail if available, else usage placeholder overlay */}
-                        {/* Note: In real auth, use Mux thumbnail. For now, we use a placeholder or logo generic background */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-                        {/* Play Button Overlay */}
-                        <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center z-20 group-hover:scale-110 transition-transform duration-300 border border-white/40">
-                            <Video className="w-8 h-8 text-white fill-current" />
+                    <div className="absolute inset-0">
+                        {/* Autoplay preview video */}
+                        <video
+                            src={firm.video_url}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        {/* Premium Glass Overlay */}
+                        <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px] group-hover:bg-black/20 transition-colors duration-300 z-10" />
+
+                        {/* Play Icon Decorative Overlay */}
+                        <div className="absolute bottom-3 right-3 z-20 w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center border border-white/50 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                            <Video className="w-5 h-5 text-white fill-current" />
                         </div>
-                        {firm.logo_url && (
-                            <Image
-                                src={firm.logo_url}
-                                alt={firm.name}
-                                fill
-                                className="object-cover opacity-50 blur-sm"
-                            />
-                        )}
                     </div>
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-6">
                         {firm.logo_url ? (
-                            <div className="relative w-full h-full p-8">
+                            <div className="relative w-full h-full flex items-center justify-center">
                                 <Image
                                     src={firm.logo_url}
                                     alt={firm.name}
                                     fill
-                                    className="object-contain p-8"
+                                    className="object-contain hover:scale-105 transition-transform duration-500"
                                 />
                             </div>
                         ) : (
-                            <div className="text-4xl font-bold text-gray-300 dark:text-gray-700">
-                                {firm.name.charAt(0)}
+                            <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center shadow-inner">
+                                <span className="text-4xl font-bold text-slate-400" style={{ fontFamily: 'Crimson Text, serif' }}>
+                                    {firm.name.charAt(0)}
+                                </span>
                             </div>
                         )}
                     </div>
@@ -82,53 +85,56 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
                 </div>
             </div>
 
-            <CardContent className="flex-1 p-5 space-y-4">
+            <CardContent className="flex-1 p-6 space-y-4">
                 <div>
-                    <div className="flex justify-between items-start gap-2 mb-1">
-                        <h3 className="font-bold text-lg leading-tight group-hover:text-primary transition-colors cursor-pointer" onClick={handleViewProfile}>
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                        <h3 className="font-bold text-xl leading-tight group-hover:text-[var(--portal-primary)] transition-colors cursor-pointer text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
                             {firm.name}
                         </h3>
                     </div>
 
                     {firm.headline && (
-                        <p className="text-sm font-medium text-primary/90 mb-2">
+                        <p className="text-sm font-bold text-[var(--portal-primary)]/90 mb-3 tracking-wide uppercase">
                             {firm.headline}
                         </p>
                     )}
 
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
-                        <MapPin className="w-3 h-3" />
+                    <div className="flex items-center gap-2 text-xs text-slate-500 font-bold mb-4">
+                        <div className="w-5 h-5 rounded-full bg-cg-sage-subtle flex items-center justify-center">
+                            <MapPin className="w-3 h-3 text-cg-sage" />
+                        </div>
                         <span>{firm.city}, {firm.state}</span>
-                        {firm.zip_code && <span>• {firm.zip_code}</span>}
+                        {firm.zip_code && <span className="text-slate-300 text-[10px]">|</span>}
+                        {firm.zip_code && <span>{firm.zip_code}</span>}
                     </div>
 
                     {firm.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                        <p className="text-sm text-slate-600 line-clamp-3 leading-relaxed font-medium">
                             {firm.description}
                         </p>
                     )}
                 </div>
 
                 {firm.practice_areas && firm.practice_areas.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2 pt-2">
                         {firm.practice_areas.slice(0, 3).map((area) => (
-                            <span key={area} className="px-2 py-1 rounded-md bg-secondary/50 text-secondary-foreground text-[10px] font-medium border border-secondary">
+                            <span key={area} className="px-3 py-1 rounded-full bg-cg-sage-subtle text-cg-sage text-[10px] font-bold border border-cg-sage/10 tracking-tight">
                                 {area}
                             </span>
                         ))}
                         {firm.practice_areas.length > 3 && (
-                            <span className="px-2 py-1 rounded-md bg-secondary/30 text-muted-foreground text-[10px] font-medium">
-                                +{firm.practice_areas.length - 3} more
+                            <span className="px-3 py-1 rounded-full bg-cg-sand-dark text-slate-500 text-[10px] font-bold">
+                                +{firm.practice_areas.length - 3}
                             </span>
                         )}
                     </div>
                 )}
             </CardContent>
 
-            <CardFooter className="p-5 pt-0 flex gap-2">
+            <CardFooter className="p-5 pt-0 mt-auto flex flex-row gap-2">
                 <Button
                     variant="default"
-                    className="flex-1"
+                    className="flex-1 rounded-full bg-[#4A6C58] hover:bg-[#3A5646] text-white shadow-sm transition-all duration-300 font-bold h-11"
                     onClick={handleViewProfile}
                 >
                     View Profile
@@ -136,6 +142,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
                 {onInvite && (
                     <Button
                         variant="outline"
+                        className="flex-shrink-0 px-6 rounded-full border-2 border-[#4A6C58] text-[#4A6C58] hover:bg-[#E8F0EC] font-bold h-11"
                         onClick={(e) => { e.stopPropagation(); onInvite(firm); }}
                     >
                         Invite
