@@ -957,6 +957,7 @@ async def get_directory_firm(
                     license_verified=m.professional.license_verified,
                     headline=m.professional.headline,
                     bio=m.professional.bio,
+                    headshot_url=m.professional.headshot_url,
                     video_url=m.professional.video_url,
                     languages=m.professional.languages or [],
                     hourly_rate=m.professional.hourly_rate,

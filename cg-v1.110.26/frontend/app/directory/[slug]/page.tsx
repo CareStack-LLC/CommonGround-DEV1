@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { familyFilesAPI, FirmPublicProfile } from "@/lib/api";
+import { familyFilesAPI, FirmPublicProfile, getImageUrl } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -312,7 +312,7 @@ export default function ProfessionalProfilePage() {
                                                 <div className="w-full sm:w-56 bg-slate-50 flex flex-col items-center justify-center p-8 border-b sm:border-b-0 sm:border-r border-slate-100">
                                                     <Avatar className="w-28 h-28 mb-4 border-4 border-white shadow-md">
                                                         {pro.headshot_url ? (
-                                                            <AvatarImage src={pro.headshot_url} />
+                                                            <AvatarImage src={getImageUrl(pro.headshot_url) || undefined} />
                                                         ) : null}
                                                         <AvatarFallback className="bg-[#E8F0EC] text-[#4A6C58] text-3xl font-bold font-serif">
                                                             {pro.user_first_name?.charAt(0)}{pro.user_last_name?.charAt(0)}
