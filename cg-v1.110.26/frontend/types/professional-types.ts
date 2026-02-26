@@ -196,6 +196,7 @@ export interface ProfessionalProfile {
     awards?: string[];
     consultation_fee?: string;
     accepted_payment_methods?: string[];
+    service_location?: string;
 
     // Subscription & tier gating (Phase 1)
     subscription_tier: ProfessionalTier;
@@ -249,6 +250,12 @@ export interface Firm {
     // Directory
     headline?: string;
     is_public: boolean;
+
+    // Financials & Service
+    accepted_payment_methods?: string[];
+    payment_plans_available?: boolean;
+    works_with_nonprofits?: boolean;
+    service_location?: string;
 
     // Subscription
     subscription_tier: string;

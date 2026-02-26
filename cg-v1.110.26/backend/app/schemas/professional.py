@@ -51,6 +51,7 @@ class ProfessionalProfileBase(BaseModel):
     awards: Optional[list[dict]] = None
     consultation_fee: Optional[str] = None
     accepted_payment_methods: Optional[list[str]] = None
+    service_location: Optional[str] = None
 
 
 class ProfessionalProfileCreate(ProfessionalProfileBase):
@@ -80,6 +81,7 @@ class ProfessionalProfileUpdate(BaseModel):
     awards: Optional[list[dict]] = None
     consultation_fee: Optional[str] = None
     accepted_payment_methods: Optional[list[str]] = None
+    service_location: Optional[str] = None
 
     default_intake_template: Optional[str] = None
     notification_preferences: Optional[dict] = None
@@ -137,6 +139,11 @@ class FirmBase(BaseModel):
     safety_vetted: bool = False
     description: Optional[str] = None
     practice_areas: Optional[list[str]] = None
+    
+    accepted_payment_methods: Optional[list[str]] = None
+    payment_plans_available: bool = False
+    works_with_nonprofits: bool = False
+    service_location: Optional[str] = None
 
 
 class FirmCreate(FirmBase):
@@ -171,6 +178,11 @@ class FirmUpdate(BaseModel):
     social_links: Optional[dict] = None
     pricing_structure: Optional[dict] = None
     safety_vetted: Optional[bool] = None
+    
+    accepted_payment_methods: Optional[list[str]] = None
+    payment_plans_available: Optional[bool] = None
+    works_with_nonprofits: Optional[bool] = None
+    service_location: Optional[str] = None
 
     @field_validator('primary_color')
     @classmethod
@@ -223,6 +235,7 @@ class ProfessionalPublicResponse(BaseModel):
     consultation_fee: Optional[str] = None
     accepted_payment_methods: list[str] = []
     practice_areas: list[str] = []
+    service_location: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -253,6 +266,11 @@ class FirmPublicResponse(BaseModel):
     social_links: Optional[dict] = None
     pricing_structure: Optional[dict] = None
     safety_vetted: bool = False
+    
+    accepted_payment_methods: list[str] = []
+    payment_plans_available: bool = False
+    works_with_nonprofits: bool = False
+    service_location: Optional[str] = None
 
     professionals: list[ProfessionalPublicResponse] = []
 

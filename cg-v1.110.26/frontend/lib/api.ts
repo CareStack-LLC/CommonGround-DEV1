@@ -4919,6 +4919,10 @@ export interface FirmDirectoryEntry {
   social_links?: Record<string, string>;
   pricing_structure?: Record<string, any>;
   safety_vetted?: boolean;
+  accepted_payment_methods?: string[];
+  payment_plans_available?: boolean;
+  works_with_nonprofits?: boolean;
+  service_location?: string;
 }
 
 export interface FirmPublicProfile extends FirmDirectoryEntry {
@@ -4942,6 +4946,7 @@ export interface FirmPublicProfile extends FirmDirectoryEntry {
     consultation_fee?: string;
     accepted_payment_methods?: string[];
     practice_areas: string[];
+    service_location?: string;
   }[];
 }
 
@@ -7488,6 +7493,7 @@ export interface ProfessionalProfile {
   awards?: any[];
   consultation_fee?: string;
   accepted_payment_methods?: string[];
+  service_location?: string;
 }
 
 export interface Firm {

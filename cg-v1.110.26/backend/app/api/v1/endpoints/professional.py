@@ -914,6 +914,10 @@ async def search_directory(
             practice_areas=f['practice_areas'] or [],
             professional_count=f['professional_count'] or 0,
             description=f['description'],
+            accepted_payment_methods=f.get('accepted_payment_methods') or [],
+            payment_plans_available=f.get('payment_plans_available', False),
+            works_with_nonprofits=f.get('works_with_nonprofits', False),
+            service_location=f.get('service_location'),
         )
         for f in firms
     ]
@@ -970,6 +974,12 @@ async def get_directory_firm(
                 )
             )
 
+    # Aggregate practice areas from all active professionals
+    combined_practice_areas = set(firm.get('practice_areas') or [])
+    for p in professionals_list:
+        if p.practice_areas:
+            combined_practice_areas.update(p.practice_areas)
+
     return FirmPublicResponse(
         id=firm['id'],
         name=firm['name'],
@@ -982,7 +992,7 @@ async def get_directory_firm(
         email=firm['email'],
         phone=firm['phone'],
         primary_color=firm['primary_color'],
-        practice_areas=firm['practice_areas'] or [],
+        practice_areas=sorted(list(combined_practice_areas)),
         professional_count=len(professionals_list),
         description=firm['description'],
         headline=firm['headline'],
@@ -990,6 +1000,10 @@ async def get_directory_firm(
         social_links=firm['social_links'],
         pricing_structure=firm['pricing_structure'],
         safety_vetted=firm['safety_vetted'],
+        accepted_payment_methods=firm.get('accepted_payment_methods') or [],
+        payment_plans_available=firm.get('payment_plans_available', False),
+        works_with_nonprofits=firm.get('works_with_nonprofits', False),
+        service_location=firm.get('service_location'),
         professionals=professionals_list,
     )
 

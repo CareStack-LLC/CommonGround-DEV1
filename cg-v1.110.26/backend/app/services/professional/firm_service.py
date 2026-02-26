@@ -159,6 +159,10 @@ class FirmService:
             Firm.social_links,
             Firm.pricing_structure,
             Firm.safety_vetted,
+            Firm.accepted_payment_methods,
+            Firm.payment_plans_available,
+            Firm.works_with_nonprofits,
+            Firm.service_location,
         ).where(Firm.slug == slug)
 
         result = await self.db.execute(stmt)
@@ -189,6 +193,10 @@ class FirmService:
             'social_links': row.social_links or {},
             'pricing_structure': row.pricing_structure,
             'safety_vetted': row.safety_vetted,
+            'accepted_payment_methods': row.accepted_payment_methods or [],
+            'payment_plans_available': row.payment_plans_available,
+            'works_with_nonprofits': row.works_with_nonprofits,
+            'service_location': row.service_location,
         }
 
     async def update_firm(
@@ -344,6 +352,10 @@ class FirmService:
                 Firm.social_links,
                 Firm.pricing_structure,
                 Firm.safety_vetted,
+                Firm.accepted_payment_methods,
+                Firm.payment_plans_available,
+                Firm.works_with_nonprofits,
+                Firm.service_location,
                 func.count(FirmMembership.id).label('professional_count')
             )
             .outerjoin(
@@ -387,6 +399,10 @@ class FirmService:
                 'social_links': row.social_links or {},
                 'pricing_structure': row.pricing_structure,
                 'safety_vetted': row.safety_vetted,
+                'accepted_payment_methods': row.accepted_payment_methods or [],
+                'payment_plans_available': row.payment_plans_available,
+                'works_with_nonprofits': row.works_with_nonprofits,
+                'service_location': row.service_location,
             })
 
         return firms, total

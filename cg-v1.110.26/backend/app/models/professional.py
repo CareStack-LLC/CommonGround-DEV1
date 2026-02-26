@@ -254,6 +254,7 @@ class ProfessionalProfile(Base, UUIDMixin, TimestampMixin):
     awards: Mapped[Optional[list]] = mapped_column(JSON, default=list)
     consultation_fee: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     accepted_payment_methods: Mapped[Optional[list]] = mapped_column(JSON, default=list)
+    service_location: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
 
     # Portal settings
     default_intake_template: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
@@ -369,6 +370,12 @@ class Firm(Base, UUIDMixin, TimestampMixin):
     social_links: Mapped[Optional[dict]] = mapped_column(JSON, default=dict)
     pricing_structure: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     safety_vetted: Mapped[bool] = mapped_column(Boolean, default=False)
+    
+    # Financials & Service Delivery
+    accepted_payment_methods: Mapped[Optional[list]] = mapped_column(JSON, default=list)
+    payment_plans_available: Mapped[bool] = mapped_column(Boolean, default=False)
+    works_with_nonprofits: Mapped[bool] = mapped_column(Boolean, default=False)
+    service_location: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
 
     # Settings
     settings: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)

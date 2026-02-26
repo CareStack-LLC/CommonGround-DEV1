@@ -246,7 +246,7 @@ export default function ProfessionalProfilePage() {
                                 value="services"
                                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none px-0 py-3 font-medium bg-transparent"
                             >
-                                Services & Pricing
+                                Programs & Services
                             </TabsTrigger>
                         </TabsList>
 
@@ -376,37 +376,40 @@ export default function ProfessionalProfilePage() {
                             </div>
                         </TabsContent>
 
-                        {/* SERVICES & PRICING TAB */}
+                        {/* PROGRAMS & SERVICES TAB */}
                         <TabsContent value="services" className="space-y-6 animate-in fade-in-50 duration-300">
                             <Card className="bg-white rounded-3xl border-2 border-slate-100 shadow-md">
                                 <CardHeader className="pb-4">
-                                    <CardTitle className="text-2xl text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pricing & Payment</CardTitle>
+                                    <CardTitle className="text-2xl text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Programs & Financials</CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-6">
-                                    {firm.pricing_structure && Object.keys(firm.pricing_structure).length > 0 ? (
-                                        <div className="space-y-2">
-                                            {Object.entries(firm.pricing_structure).map(([service, price]) => (
-                                                <div key={service} className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 gap-2">
-                                                    <span className="font-bold text-slate-700 capitalize">{service.replace(/_/g, ' ')}</span>
-                                                    <span className="font-bold text-[#4A6C58]">{formatPrice(price)}</span>
-                                                </div>
-                                            ))}
+                                    <div className="grid sm:grid-cols-2 gap-4">
+                                        <div className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 flex flex-col gap-2">
+                                            <span className="font-bold text-slate-700">Payment Plans</span>
+                                            <span className="text-slate-600 font-medium">
+                                                {firm.payment_plans_available ? "Available upon request" : "Please inquire"}
+                                            </span>
                                         </div>
-                                    ) : (
-                                        <div className="text-center py-10 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                                            <DollarSign className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-                                            <p className="text-slate-500 font-medium">Contact firm for detailed pricing.</p>
+                                        <div className="p-4 bg-slate-50 rounded-2xl border-2 border-slate-100 flex flex-col gap-2">
+                                            <span className="font-bold text-slate-700">Nonprofit Collaborations</span>
+                                            <span className="text-slate-600 font-medium">
+                                                {firm.works_with_nonprofits ? "Active programs available" : "Not specified"}
+                                            </span>
                                         </div>
-                                    )}
+                                    </div>
 
                                     <div className="pt-4 mt-2">
                                         <h4 className="font-semibold mb-3 flex items-center gap-2">
                                             <CreditCard className="w-4 h-4 text-primary" /> Supported Payment Methods
                                         </h4>
                                         <div className="flex flex-wrap gap-2">
-                                            <Badge variant="outline" className="text-gray-600">Credit Card</Badge>
-                                            <Badge variant="outline" className="text-gray-600">Bank Transfer</Badge>
-                                            <Badge variant="outline" className="text-gray-600">CommonGround Payments</Badge>
+                                            {firm.accepted_payment_methods && firm.accepted_payment_methods.length > 0 ? (
+                                                firm.accepted_payment_methods.map(method => (
+                                                    <Badge key={method} variant="outline" className="text-gray-600">{method}</Badge>
+                                                ))
+                                            ) : (
+                                                <span className="text-slate-500 italic text-sm">Contact firm for options</span>
+                                            )}
                                         </div>
                                     </div>
                                 </CardContent>
