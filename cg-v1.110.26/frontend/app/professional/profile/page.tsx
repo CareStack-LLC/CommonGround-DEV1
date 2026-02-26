@@ -1108,9 +1108,9 @@ export default function ProfilePage() {
                   The information provided above will be indexed by search engines and visible to all CommonGround users. Review your bio and headline for clarity.
                 </p>
               </div>
-            </div>
           </div>
         </div>
       </div>
-      );
+    </div>
+  );
 }
