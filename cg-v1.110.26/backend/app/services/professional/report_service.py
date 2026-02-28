@@ -20,6 +20,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.professional import ComplianceReport, ReportExportFormat
 from app.schemas.professional import ComplianceReportCreate
+from app.services.professional.reports.full_compliance import FullComplianceReport
+from app.services.professional.reports.aria_analysis import ARIAAnalysisReport
+from app.services.professional.reports.exchange_compliance import ExchangeComplianceReport
+from app.services.professional.reports.financial_compliance import FinancialComplianceReport
 
 
 class ComplianceReportService:
@@ -140,6 +144,74 @@ class ComplianceReportService:
         await self.db.commit()
         await self.db.refresh(report)
         return report
+
+    async def generate_report_data_by_type(
+        self,
+        report_id: str,
+        professional_id: str
+    ) -> dict:
+        """
+        Generate structured report data using specialized report templates.
+
+        Dispatches to the appropriate report template based on report_type:
+        - 'full_compliance': Comprehensive evidence package
+        - 'aria_analysis': Communication pattern analysis
+        - 'exchange_compliance': Custody exchange violations
+        - 'financial_compliance': Support payment tracking
+
+        Returns court-ready structured JSON payload.
+        """
+        # Get the report record
+        report = await self.get_report(report_id)
+        if not report:
+            raise ValueError(f"Report {report_id} not found")
+
+        # Extract parameters
+        family_file_id = report.family_file_id
+        start_date = report.date_range_start or datetime.utcnow().replace(day=1)
+        end_date = report.date_range_end or datetime.utcnow()
+
+        # Dispatch to appropriate template
+        report_type = report.report_type
+
+        if report_type == "full_compliance":
+            template = FullComplianceReport(self.db)
+            return await template.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        elif report_type == "aria_analysis":
+            template = ARIAAnalysisReport(self.db)
+            return await template.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        elif report_type == "exchange_compliance":
+            template = ExchangeComplianceReport(self.db)
+            return await template.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        elif report_type == "financial_compliance":
+            template = FinancialComplianceReport(self.db)
+            return await template.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        else:
+            raise ValueError(f"Unsupported report type: {report_type}")
 
     async def get_report_data(
         self,

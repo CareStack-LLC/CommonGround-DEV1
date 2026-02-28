@@ -42,10 +42,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useProfessionalAuth } from "@/hooks/use-professional-auth";
-import { professionalAPI } from "@/lib/api/professional";
+import { useProfessionalAuth } from "../layout";
 import { MediaUpload } from "@/components/professional/media-upload";
-import { API_BASE } from "@/lib/api/config";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface EducationItem {
   institution: string;
@@ -536,7 +536,7 @@ export default function ProfilePage() {
         awards: profile.awards || [],
         consultation_fee: profile.consultation_fee || "",
         accepted_payment_methods: profile.accepted_payment_methods || [],
-        service_location: profile.service_location || "",
+        service_location: "",
       });
     }
   }, [profile]);
@@ -549,9 +549,12 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const loadFirmData = async () => {
-      if (selectedFirmId) {
+      if (selectedFirmId && token) {
         try {
-          const firmData = await professionalAPI.getFirm(selectedFirmId);
+          const response = await fetch(`${API_BASE}/api/v1/professional/firms/${selectedFirmId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const firmData = await response.json();
           if (firmData) {
             setFirmFormData({
               description: firmData.description || "",
@@ -578,12 +581,19 @@ export default function ProfilePage() {
   }, [selectedFirmId]);
 
   const handleSave = async () => {
-    if (!profile) return;
+    if (!profile || !token) return;
     setIsSaving(true);
     try {
-      await professionalAPI.updateProfile({
-        ...formData,
-        years_experience: parseInt(formData.years_experience) || 0,
+      await fetch(`${API_BASE}/api/v1/professional/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...formData,
+          years_experience: parseInt(formData.years_experience) || 0,
+        }),
       });
       setIsEditing(false);
       await refreshProfile();
@@ -721,9 +731,15 @@ export default function ProfilePage() {
                       onChange={(url) =>
                         setFormData((prev) => ({ ...prev, headshot_url: url }))
                       }
-                      onUpload={async (file) => {
-                        const updated =
-                          await professionalAPI.uploadHeadshot(file);
+                      onUpload={async (file: File) => {
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        const response = await fetch(`${API_BASE}/api/v1/professional/profile/headshot`, {
+                          method: "POST",
+                          headers: { Authorization: `Bearer ${token}` },
+                          body: formData,
+                        });
+                        const updated = await response.json();
                         return updated.headshot_url || "";
                       }}
                       aspectRatio="square"
@@ -968,12 +984,15 @@ export default function ProfilePage() {
                               logo_url: url,
                             }))
                           }
-                          onUpload={async (file) => {
-                            const updated =
-                              await professionalAPI.uploadFirmLogo(
-                                selectedFirmId!,
-                                file,
-                              );
+                          onUpload={async (file: File) => {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            const response = await fetch(`${API_BASE}/api/v1/professional/firms/${selectedFirmId}/logo`, {
+                              method: "POST",
+                              headers: { Authorization: `Bearer ${token}` },
+                              body: formData,
+                            });
+                            const updated = await response.json();
                             return updated.logo_url || "";
                           }}
                           aspectRatio="square"

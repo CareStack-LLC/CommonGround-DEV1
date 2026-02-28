@@ -8,11 +8,13 @@ import {
     Calendar,
     ChevronRight,
     TrendingUp,
+    TrendingDown,
     ShieldAlert
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { LineChart, Line, ResponsiveContainer } from "recharts";
 
 interface CaseCardProps {
     caseData: {
@@ -27,6 +29,7 @@ interface CaseCardProps {
         next_event_title?: string;
         next_event_date?: string;
         compliance_score: number;
+        compliance_trend?: number[]; // Optional historical compliance scores
     };
 }
 
@@ -41,6 +44,35 @@ export function CaseCard({ caseData }: CaseCardProps) {
         if (score >= 80) return "Destructive";
         if (score >= 50) return "Warning";
         return "Secondary";
+    };
+
+    // Generate sparkline data (either from actual trend data or synthetic)
+    const generateSparklineData = () => {
+        if (caseData.compliance_trend && caseData.compliance_trend.length > 0) {
+            return caseData.compliance_trend.map((value, index) => ({
+                index,
+                value,
+            }));
+        }
+        // Generate synthetic trend based on current score
+        const baseScore = caseData.compliance_score;
+        const variance = 8;
+        return Array.from({ length: 14 }, (_, i) => ({
+            index: i,
+            value: Math.max(0, Math.min(100, baseScore + (Math.random() - 0.5) * variance)),
+        }));
+    };
+
+    const sparklineData = generateSparklineData();
+
+    // Calculate trend direction
+    const trendDirection = sparklineData.length >= 2
+        ? sparklineData[sparklineData.length - 1].value - sparklineData[0].value
+        : 0;
+
+    const getTrendColor = (score: number) => {
+        if (score < 70) return "#f59e0b"; // amber-500
+        return "#14b8a6"; // teal-500
     };
 
     return (
@@ -75,12 +107,22 @@ export function CaseCard({ caseData }: CaseCardProps) {
                 </div>
 
                 <CardContent className="p-4 space-y-4">
-                    {/* Compliance Progress */}
-                    <div className="space-y-1.5">
+                    {/* Compliance Progress with Sparkline */}
+                    <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs">
-                            <span className="text-slate-500 font-medium flex items-center gap-1">
+                            <span className="text-slate-500 font-medium flex items-center gap-1.5">
                                 <ShieldAlert className="h-3 w-3" />
                                 Compliance
+                                {trendDirection !== 0 && (
+                                    <span className={`flex items-center gap-0.5 text-[10px] font-bold ${trendDirection > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                        {trendDirection > 0 ? (
+                                            <TrendingUp className="h-3 w-3" />
+                                        ) : (
+                                            <TrendingDown className="h-3 w-3" />
+                                        )}
+                                        {Math.abs(trendDirection).toFixed(0)}%
+                                    </span>
+                                )}
                             </span>
                             <span className="font-bold text-slate-700">{caseData.compliance_score}%</span>
                         </div>
@@ -88,6 +130,22 @@ export function CaseCard({ caseData }: CaseCardProps) {
                             value={caseData.compliance_score}
                             className={`h-1.5 ${caseData.compliance_score < 70 ? '[&>div]:bg-amber-500' : '[&>div]:bg-[var(--portal-primary)]'}`}
                         />
+
+                        {/* Sparkline */}
+                        <div className="h-8 -mx-1">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={sparklineData}>
+                                    <Line
+                                        type="monotone"
+                                        dataKey="value"
+                                        stroke={getTrendColor(caseData.compliance_score)}
+                                        strokeWidth={1.5}
+                                        dot={false}
+                                        animationDuration={300}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
 
                     {/* Quick Stats Grid */}

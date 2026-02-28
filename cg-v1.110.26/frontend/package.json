@@ -28,6 +28,7 @@
     "@stripe/stripe-js": "^4.10.0",
     "@supabase/supabase-js": "^2.90.1",
     "@tailwindcss/typography": "^0.5.19",
+    "@tremor/react": "^3.18.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -41,6 +42,7 @@
     "react-dom": "19.2.3",
     "react-markdown": "^10.1.0",
     "react-pdf": "^10.3.0",
+    "recharts": "^3.7.0",
     "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.4.0"
   },

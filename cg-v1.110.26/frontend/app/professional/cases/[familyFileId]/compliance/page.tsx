@@ -38,6 +38,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useProfessionalAuth } from "../../../layout";
+import { ExchangeBreakdownChart } from "@/components/professional/charts/exchange-breakdown-chart";
+import { CaseHealthGauge } from "@/components/professional/charts/case-health-gauge";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -193,7 +195,13 @@ export default function CompliancePage() {
         </div>
       ) : dashboard ? (
         <>
-          {/* Overall Score */}
+          {/* Health Gauge */}
+          <CaseHealthGauge
+            score={Math.round(dashboard.overall_score)}
+            trend={dashboard.overall_score >= 75 ? "up" : dashboard.overall_score >= 60 ? "stable" : "down"}
+          />
+
+          {/* Overall Score Card (keep for additional details) */}
           <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -241,6 +249,16 @@ export default function CompliancePage() {
 
             {/* Exchange Compliance */}
             <TabsContent value="exchanges" className="space-y-4">
+              {/* Exchange Breakdown Chart */}
+              <ExchangeBreakdownChart
+                data={{
+                  on_time: dashboard.exchange_compliance.completed_on_time,
+                  late: dashboard.exchange_compliance.completed_late,
+                  missed: dashboard.exchange_compliance.missed,
+                  total: dashboard.exchange_compliance.total_exchanges,
+                }}
+              />
+
               <div className="grid md:grid-cols-4 gap-4">
                 <MetricCard
                   label="On-Time Rate"

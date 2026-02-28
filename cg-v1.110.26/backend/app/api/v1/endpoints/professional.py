@@ -3881,6 +3881,45 @@ async def verify_report_integrity(
 
 
 @router.get(
+    "/reports/{report_id}/data",
+    summary="Get report structured data",
+)
+async def get_report_data(
+    report_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Get structured JSON data for a report.
+
+    Uses specialized report templates based on report_type:
+    - full_compliance: Comprehensive evidence package
+    - aria_analysis: Communication pattern analysis
+    - exchange_compliance: Custody exchange violations
+    - financial_compliance: Support payment tracking
+
+    Returns court-ready structured data for React-PDF rendering or backend PDF generation.
+    """
+    service = ComplianceReportService(db)
+    report = await service.get_report(report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    # Ensure professional has access to the case
+    await CaseAssignmentService(db).get_assignment(profile.id, report.family_file_id)
+
+    # Generate data using specialized templates
+    try:
+        data = await service.generate_report_data_by_type(
+            report_id=report_id,
+            professional_id=profile.id
+        )
+        return data
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get(
     "/reports/{report_id}/download",
     summary="Download compliance report",
 )
@@ -3897,12 +3936,13 @@ async def download_report(
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
 
-    # Re-generate data just in time (or fetch from blob storage if we had it)
-    # For MVP we generate on the fly
-    data = await service.get_report_data(
-        family_file_id=report.family_file_id,
-        start_date=report.date_range_start,
-        end_date=report.date_range_end
+    # Ensure professional has access
+    await CaseAssignmentService(db).get_assignment(profile.id, report.family_file_id)
+
+    # Generate data using specialized templates
+    data = await service.generate_report_data_by_type(
+        report_id=report_id,
+        professional_id=profile.id
     )
 
     if report.export_format == "excel":

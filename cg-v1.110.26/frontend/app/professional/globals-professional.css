@@ -1,0 +1,130 @@
+/* Professional Portal Micro-Interactions and Animations */
+
+/* Button Hover Lift */
+.btn-lift {
+  @apply transition-all duration-200;
+}
+
+.btn-lift:hover {
+  @apply -translate-y-0.5 shadow-lg;
+}
+
+/* Card Hover */
+.card-hover {
+  @apply transition-all duration-300;
+}
+
+.card-hover:hover {
+  @apply shadow-xl -translate-y-1;
+}
+
+/* Badge Pulse Animation */
+@keyframes badge-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.badge-pulse {
+  animation: badge-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth Fade In */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Skeleton Shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(to right, #f1f5f9 0%, #e2e8f0 20%, #f1f5f9 40%, #f1f5f9 100%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Icon Spin on Hover */
+.icon-spin-hover {
+  @apply transition-transform duration-300;
+}
+
+.icon-spin-hover:hover {
+  @apply rotate-180;
+}
+
+/* Scale on Hover */
+.scale-hover {
+  @apply transition-transform duration-200;
+}
+
+.scale-hover:hover {
+  @apply scale-105;
+}
+
+/* Smooth Color Transition */
+.color-transition {
+  @apply transition-colors duration-200;
+}
+
+/* Chart Container Fade */
+.chart-container {
+  @apply animate-fade-in;
+}
+
+/* Progress Bar Smooth Fill */
+.progress-bar-fill {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Notification Slide In */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Dropdown Slide Down */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-animation {
+  animation: slideDown 0.2s ease-out;
+}

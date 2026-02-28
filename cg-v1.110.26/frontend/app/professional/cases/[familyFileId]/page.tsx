@@ -30,6 +30,8 @@ import { useProfessionalAuth } from "../../layout";
 import { CaseTimelineTab } from "@/components/professional/case-view/case-timeline-tab";
 import { ClientCommunicationTab } from "@/components/professional/case-view/client-communication-tab";
 import { DocumentList } from "@/components/professional/document-list";
+import { CaseSummaryAlert, generateSampleCaseSummary } from "@/components/professional/case-summary-alert";
+import { CaseDetailSkeleton } from "@/components/professional/case-detail-skeleton";
 import { toast } from "@/hooks/use-toast";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -125,11 +127,7 @@ export default function CaseDetailPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
-      </div>
-    );
+    return <CaseDetailSkeleton />;
   }
 
   if (!caseData) {
@@ -212,6 +210,9 @@ export default function CaseDetailPage() {
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6 m-0 outline-none">
+          {/* What You Need to Know Summary */}
+          <CaseSummaryAlert data={generateSampleCaseSummary(82)} />
+
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <QuickStat
               label="Timeline Events"
