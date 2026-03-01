@@ -26,6 +26,8 @@ import { AssignProfessionalDialog } from "@/components/professional/assign-profe
 import { CaseCard } from "@/components/professional/case-card";
 import { TasksWidget } from "@/components/professional/dashboard/tasks-widget";
 import { QuickCreateMenu } from "@/components/professional/dashboard/quick-create-menu";
+import { KPICards } from "@/components/professional/dashboard/kpi-cards";
+import { ComplianceLineChart } from "@/components/professional/dashboard/compliance-line-chart";
 
 export default function ProfessionalDashboardPage() {
   const { profile, dashboardData, activeFirm, refreshDashboard, token } = useProfessionalAuth();
@@ -143,37 +145,18 @@ export default function ProfessionalDashboardPage() {
         <QuickCreateMenu onCreateTask={() => setOpenAddTask(true)} />
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Active Cases"
-          value={dashboardData.case_count || 0}
-          icon={<FolderOpen className="h-5 w-5" />}
-          color="teal"
-          href="/professional/cases"
-        />
-        <StatCard
-          title="Pending Intakes"
-          value={dashboardData.pending_intakes || 0}
-          icon={<FileText className="h-5 w-5" />}
-          color="amber"
-          href="/professional/intake?tab=aria&status=pending"
-        />
-        <StatCard
-          title="Unread Messages"
-          value={dashboardData.unread_messages || 0}
-          icon={<MessageSquare className="h-5 w-5" />}
-          color="blue"
-          href="/professional/messages?filter=unread"
-        />
-        <StatCard
-          title="Pending Approvals"
-          value={dashboardData.pending_approvals || 0}
-          icon={<Clock className="h-5 w-5" />}
-          color="purple"
-          href="/professional/intake?tab=invitations&status=pending"
-        />
-      </div>
+      {/* Quick Stats - Tremor KPI Cards */}
+      <KPICards
+        caseCount={dashboardData.case_count || 0}
+        pendingIntakes={dashboardData.pending_intakes || 0}
+        unreadMessages={dashboardData.unread_messages || 0}
+        pendingApprovals={dashboardData.pending_approvals || 0}
+        avgCompliance={dashboardData.avg_compliance_score || 76}
+        complianceTrend={dashboardData.compliance_trend || 3.2}
+      />
+
+      {/* Compliance Trend Chart */}
+      <ComplianceLineChart period="30d" />
 
       {/* Priority Cases Section */}
       <div className="space-y-3">

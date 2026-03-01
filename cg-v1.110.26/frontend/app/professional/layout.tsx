@@ -1,5 +1,6 @@
 "use client";
 
+import "./globals-professional.css";
 import { useState, useEffect, createContext, useContext } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -22,6 +23,9 @@ import {
   ChevronDown,
   FileText,
   CreditCard,
+  MoreHorizontal,
+  HelpCircle,
+  Puzzle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -373,6 +377,7 @@ function ProfessionalNavigation({
 
   const isFirmOwner = !!(activeFirm && (activeFirm.role === "owner" || activeFirm.role === "admin"));
 
+  // Primary navigation items (6 max for clean UX)
   const mainNavItems: { href: string; label: string; icon: React.ReactNode; badge?: string }[] = [
     {
       href: "/professional/dashboard",
@@ -386,15 +391,15 @@ function ProfessionalNavigation({
       badge: dashboardData?.case_count?.toString(),
     },
     {
-      href: "/professional/calendar",
-      label: "Calendar",
-      icon: <Calendar className="h-4 w-4" />,
-    },
-    {
       href: "/professional/intake",
       label: "Intake",
       icon: <Bot className="h-4 w-4" />,
       badge: intakeAndInvitationsBadge,
+    },
+    {
+      href: "/professional/calendar",
+      label: "Calendar",
+      icon: <Calendar className="h-4 w-4" />,
     },
     {
       href: "/professional/messages",
@@ -402,36 +407,50 @@ function ProfessionalNavigation({
       icon: <MessageSquare className="h-4 w-4" />,
       badge: dashboardData?.unread_messages > 0 ? dashboardData.unread_messages.toString() : undefined,
     },
+  ];
+
+  // Secondary items in overflow menu
+  const moreMenuItems: { href: string; label: string; icon: React.ReactNode; badge?: string; dividerAfter?: boolean }[] = [
     {
       href: "/professional/reports",
       label: "Reports",
       icon: <FileText className="h-4 w-4" />,
     },
-  ];
-
-  const toolsNavItems: { href: string; label: string; icon: React.ReactNode; badge?: string }[] = [
+    {
+      href: "/professional/integrations",
+      label: "Integrations",
+      icon: <Puzzle className="h-4 w-4" />,
+      dividerAfter: true,
+    },
     {
       href: "/professional/profile",
       label: "Profile",
       icon: <User className="h-4 w-4" />,
     },
-    {
-      href: "/professional/settings/subscription",
-      label: "Subscription",
-      icon: <CreditCard className="h-4 w-4" />,
-    },
-    // Case Queue: only shown to firm owners/admins
+    ...(activeFirm ? [{
+      href: "/professional/firm",
+      label: "Firm Settings",
+      icon: <Building2 className="h-4 w-4" />,
+    }] : []),
     ...(isFirmOwner ? [{
       href: "/professional/firm/queue",
       label: "Case Queue",
       icon: <FolderOpen className="h-4 w-4" />,
     }] : []),
     {
+      href: "/professional/settings/subscription",
+      label: "Subscription",
+      icon: <CreditCard className="h-4 w-4" />,
+      dividerAfter: true,
+    },
+    {
       href: "/professional/help",
-      label: "Help",
-      icon: <Settings className="h-4 w-4" />,
+      label: "Help & Support",
+      icon: <HelpCircle className="h-4 w-4" />,
     },
   ];
+
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   return (
     <>
@@ -452,20 +471,56 @@ function ProfessionalNavigation({
                 </NavLink>
               ))}
 
-              <div className="flex items-center">
-                <div className="h-6 w-px bg-slate-200 mx-3" />
-              </div>
-
-              {toolsNavItems.map((item) => (
-                <NavLink
-                  key={item.href}
-                  href={item.href}
-                  current={pathname}
-                  icon={item.icon}
+              {/* More Menu (Dropdown) */}
+              <div className="relative">
+                <button
+                  onClick={() => setMoreMenuOpen(!moreMenuOpen)}
+                  className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-slate-50 ${
+                    moreMenuItems.some((item) => pathname.startsWith(item.href))
+                      ? "text-[var(--portal-primary)] bg-[var(--portal-primary)]/5"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
                 >
-                  {item.label}
-                </NavLink>
-              ))}
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span>More</span>
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreMenuOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {moreMenuOpen && (
+                  <>
+                    {/* Backdrop */}
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setMoreMenuOpen(false)}
+                    />
+
+                    {/* Dropdown Menu */}
+                    <div className="absolute left-0 top-full mt-1 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-20 py-1.5">
+                      {moreMenuItems.map((item, index) => (
+                        <div key={item.href}>
+                          <Link
+                            href={item.href}
+                            onClick={() => setMoreMenuOpen(false)}
+                            className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
+                              pathname.startsWith(item.href)
+                                ? "text-[var(--portal-primary)] bg-[var(--portal-primary)]/5"
+                                : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                            }`}
+                          >
+                            <span className={pathname.startsWith(item.href) ? "text-[var(--portal-primary)]" : "text-slate-400"}>
+                              {item.icon}
+                            </span>
+                            {item.label}
+                          </Link>
+                          {item.dividerAfter && index < moreMenuItems.length - 1 && (
+                            <div className="my-1.5 h-px bg-slate-200" />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Quick Actions */}
@@ -528,7 +583,8 @@ function ProfessionalNavigation({
 
         {mobileMenuOpen && (
           <div className="border-t border-slate-200 bg-slate-50 px-4 py-3 space-y-1">
-            {[...mainNavItems, ...toolsNavItems].map((item) => (
+            {/* Main navigation items */}
+            {mainNavItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -549,6 +605,30 @@ function ProfessionalNavigation({
                 )}
               </Link>
             ))}
+
+            {/* Divider */}
+            <div className="my-3 h-px bg-slate-300" />
+
+            {/* More menu items */}
+            <div className="space-y-1">
+              <div className="px-3 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                More
+              </div>
+              {moreMenuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${pathname.startsWith(item.href)
+                    ? "bg-[var(--portal-primary)]/5 text-[var(--portal-primary)] border border-[var(--portal-primary)]/20 shadow-sm"
+                    : "text-slate-700 hover:bg-white hover:shadow-sm"
+                    }`}
+                >
+                  {item.icon}
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </div>
         )}
       </nav>

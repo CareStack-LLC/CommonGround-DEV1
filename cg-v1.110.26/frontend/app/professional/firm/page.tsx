@@ -187,14 +187,16 @@ export default function FirmSettingsPage() {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Building2 className="h-6 w-6" />
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+            <div className="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/20">
+              <Building2 className="h-6 w-6" />
+            </div>
             Firm Settings
           </h1>
-          <p className="text-gray-500 mt-1">Manage your firm profile and preferences</p>
+          <p className="text-slate-500 mt-1.5 ml-[60px]">Manage your firm profile and preferences</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="outline">
@@ -210,7 +212,7 @@ export default function FirmSettingsPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link href="/professional/firm/team">
           <Card className="hover:shadow-md transition cursor-pointer">
             <CardContent className="p-4 flex items-center justify-between">
