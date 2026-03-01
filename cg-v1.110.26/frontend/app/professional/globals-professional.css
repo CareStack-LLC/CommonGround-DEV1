@@ -22,9 +22,12 @@
 
 /* Badge Pulse Animation */
 @keyframes badge-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
@@ -40,6 +43,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -55,6 +59,7 @@
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -91,7 +96,7 @@
 
 /* Chart Container Fade */
 .chart-container {
-  @apply animate-fade-in;
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* Progress Bar Smooth Fill */
@@ -105,6 +110,7 @@
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -121,6 +127,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
