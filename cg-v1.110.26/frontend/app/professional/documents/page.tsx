@@ -154,37 +154,47 @@ export default function ProfessionalDocumentsPage() {
 
     return (
         <div className="space-y-6">
+            <link
+                href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+                rel="stylesheet"
+            />
+
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                        <div className="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/20">
-                            <FileText className="h-6 w-6" />
+            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="flex items-start gap-5">
+                        <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
+                            <FileText className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
                         </div>
-                        Document Library
-                    </h1>
-                    <p className="text-slate-500 mt-1">
-                        Central repository for all case documents — court orders, agreements, evidence.
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={fetchDocs}>
-                        <RefreshCw className="h-4 w-4" />
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleBatchExport}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Batch Export
-                    </Button>
-                    <Link href="/professional/documents/ocr">
-                        <Button variant="outline" size="sm" className="text-violet-700 border-violet-200 hover:bg-violet-50">
-                            <ScanLine className="h-4 w-4 mr-2" />
-                            OCR Court Order
+                        <div>
+                            <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
+                                Document Library
+                            </h1>
+                            <p className="sans text-sm text-amber-100 mt-2">
+                                Central repository for all case documents — court orders, agreements, evidence.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <Button variant="outline" size="sm" onClick={fetchDocs} className="border-2 border-white/30 text-white hover:bg-white/10 sans">
+                            <RefreshCw className="h-4 w-4" />
                         </Button>
-                    </Link>
-                    <Button onClick={() => setShowUpload(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2">
-                        <Upload className="h-4 w-4" />
-                        Upload
-                    </Button>
+                        <Button variant="outline" size="sm" onClick={handleBatchExport} className="border-2 border-white/30 text-white hover:bg-white/10 sans">
+                            <Download className="h-4 w-4 mr-2" />
+                            Batch Export
+                        </Button>
+                        <Link href="/professional/documents/ocr">
+                            <Button variant="outline" size="sm" className="border-2 border-white/30 text-white hover:bg-white/10 sans">
+                                <ScanLine className="h-4 w-4 mr-2" />
+                                OCR Court Order
+                            </Button>
+                        </Link>
+                        <Button onClick={() => setShowUpload(true)} className="bg-white text-amber-900 hover:bg-amber-50 border-2 border-amber-900/20 shadow-lg sans font-semibold">
+                            <Upload className="h-4 w-4 mr-2" />
+                            Upload
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -194,14 +204,14 @@ export default function ProfessionalDocumentsPage() {
                     <button
                         key={t.value}
                         onClick={() => setTypeFilter(t.value)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-all ${typeFilter === t.value
-                            ? "bg-indigo-600 text-white border-indigo-600"
-                            : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm sans text-sm border-2 transition-all ${typeFilter === t.value
+                            ? "bg-amber-900 text-white border-amber-900/40 shadow-md font-semibold"
+                            : "bg-gradient-to-br from-white via-amber-50/20 to-white text-slate-900 border-amber-900/20 hover:border-amber-900/40 hover:shadow-sm"
                             }`}
                     >
                         {t.icon}
                         {t.label}
-                        <span className={`text-xs font-bold ${typeFilter === t.value ? "text-indigo-200" : "text-slate-400"}`}>
+                        <span className={`serif text-xs font-bold ${typeFilter === t.value ? "text-amber-200" : "text-amber-900/70"}`}>
                             {typeCounts[t.value] ?? 0}
                         </span>
                     </button>
@@ -232,39 +242,40 @@ export default function ProfessionalDocumentsPage() {
             ) : filtered.length === 0 ? (
                 <Card className="border-dashed border-slate-200 bg-slate-50">
                     <CardContent className="py-16 text-center">
-                        <FilePlus className="h-10 w-10 mx-auto text-slate-300 mb-3" />
-                        <p className="text-slate-500 mb-2">
+                        <FilePlus className="h-10 w-10 mx-auto text-amber-900/40 mb-3" />
+                        <p className="sans text-slate-600 mb-2">
                             {searchQuery ? "No documents match your search." : "No documents yet."}
                         </p>
-                        <Button onClick={() => setShowUpload(true)} variant="outline">
+                        <Button onClick={() => setShowUpload(true)} className="bg-amber-900 hover:bg-amber-800 text-white border-2 border-amber-900/40 sans font-semibold">
                             <Upload className="h-4 w-4 mr-2" />
                             Upload your first document
                         </Button>
                     </CardContent>
                 </Card>
             ) : (
-                <Card className="border-slate-100 overflow-hidden">
+                <Card className="border-2 border-amber-900/30 overflow-hidden bg-gradient-to-br from-white via-amber-50/20 to-white shadow-lg relative">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                     <table className="w-full text-sm">
-                        <thead className="bg-slate-50 border-b border-slate-100">
+                        <thead className="bg-gradient-to-r from-amber-50 to-white border-b-2 border-amber-900/10">
                             <tr>
-                                <th className="text-left px-4 py-3 text-slate-500 font-semibold">Title</th>
-                                <th className="text-left px-4 py-3 text-slate-500 font-semibold hidden md:table-cell">Type</th>
-                                <th className="text-left px-4 py-3 text-slate-500 font-semibold hidden lg:table-cell">Case</th>
-                                <th className="text-left px-4 py-3 text-slate-500 font-semibold hidden lg:table-cell">Size</th>
-                                <th className="text-left px-4 py-3 text-slate-500 font-semibold hidden xl:table-cell">Date</th>
+                                <th className="text-left px-4 py-3 text-slate-900 serif font-bold">Title</th>
+                                <th className="text-left px-4 py-3 text-slate-900 serif font-bold hidden md:table-cell">Type</th>
+                                <th className="text-left px-4 py-3 text-slate-900 serif font-bold hidden lg:table-cell">Case</th>
+                                <th className="text-left px-4 py-3 text-slate-900 serif font-bold hidden lg:table-cell">Size</th>
+                                <th className="text-left px-4 py-3 text-slate-900 serif font-bold hidden xl:table-cell">Date</th>
                                 <th className="px-4 py-3" />
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-amber-900/10">
                             {filtered.map((doc) => (
                                 <tr key={doc.id} className="hover:bg-slate-50/50 transition-colors group">
                                     <td className="px-4 py-3">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-1.5 bg-slate-100 rounded-lg shrink-0">
-                                                <FileText className="h-4 w-4 text-slate-500" />
+                                            <div className="p-1.5 bg-amber-50 border-2 border-amber-900/20 rounded-sm shrink-0">
+                                                <FileText className="h-4 w-4 text-amber-900" />
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="font-medium text-slate-900 truncate">{doc.title || doc.filename}</p>
+                                                <p className="serif font-bold text-slate-900 truncate">{doc.title || doc.filename}</p>
                                                 {doc.sha256_hash && (
                                                     <div className="flex items-center gap-1 mt-0.5">
                                                         <Hash className="h-3 w-3 text-slate-300" />
@@ -431,6 +442,15 @@ export default function ProfessionalDocumentsPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <style jsx global>{`
+                .serif {
+                    font-family: "Crimson Pro", serif;
+                }
+                .sans {
+                    font-family: "Outfit", sans-serif;
+                }
+            `}</style>
         </div>
     );
 }

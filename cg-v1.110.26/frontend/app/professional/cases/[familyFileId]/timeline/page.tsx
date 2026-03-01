@@ -177,38 +177,48 @@ export default function CaseTimelinePage() {
 
   return (
     <div className="space-y-6">
+      <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+
       {/* Back Link */}
       <Link
         href={`/professional/cases/${familyFileId}`}
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-2 text-sm sans text-amber-900 hover:text-amber-800 font-semibold"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Case
       </Link>
 
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-            <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-              <Clock className="h-6 w-6" />
+      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex items-start gap-5">
+            <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
+              <Clock className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
             </div>
-            Case Timeline
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Chronological view of all case events
-          </p>
-        </div>
+            <div>
+              <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
+                Case Timeline
+              </h1>
+              <p className="sans text-sm text-amber-100 mt-2">
+                Chronological view of all case events
+              </p>
+            </div>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={fetchTimeline}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={fetchTimeline} className="border-2 border-white/30 text-white hover:bg-white/10 sans">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+            <Button variant="outline" size="sm" className="border-2 border-white/30 text-white hover:bg-white/10 sans">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -254,12 +264,12 @@ export default function CaseTimelinePage() {
       )}
 
       {/* Filters */}
-      <Card>
+      <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white shadow-sm">
         <CardContent className="py-3">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Filter by type:</span>
+              <Filter className="h-4 w-4 text-amber-900" />
+              <span className="sans text-sm font-semibold text-slate-900">Filter by type:</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {EVENT_TYPES.map((type) => (
@@ -268,7 +278,7 @@ export default function CaseTimelinePage() {
                   variant={selectedTypes.includes(type.value) ? "default" : "outline"}
                   size="sm"
                   onClick={() => toggleEventType(type.value)}
-                  className={selectedTypes.includes(type.value) ? "bg-emerald-600 hover:bg-emerald-700" : ""}
+                  className={selectedTypes.includes(type.value) ? "bg-amber-900 hover:bg-amber-800 text-white border-2 border-amber-900/40 sans font-semibold" : "border-2 border-slate-300 sans hover:border-amber-900/40 hover:bg-amber-50"}
                 >
                   <type.icon className="h-3.5 w-3.5 mr-1.5" />
                   {type.label}
@@ -279,7 +289,7 @@ export default function CaseTimelinePage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setSelectedTypes([])}
-                  className="text-muted-foreground"
+                  className="sans text-slate-600 hover:text-amber-900"
                 >
                   Clear filters
                 </Button>
@@ -298,8 +308,8 @@ export default function CaseTimelinePage() {
         <div className="space-y-6">
           {Object.entries(groupedEvents).map(([date, dateEvents]) => (
             <div key={date}>
-              <div className="sticky top-0 z-10 bg-background/95 backdrop-blur py-2 mb-3">
-                <h3 className="text-sm font-semibold text-muted-foreground">{date}</h3>
+              <div className="sticky top-0 z-10 bg-gradient-to-r from-amber-50 to-white/95 backdrop-blur py-2 mb-3 border-b-2 border-amber-900/20">
+                <h3 className="serif text-sm font-bold text-amber-900">{date}</h3>
               </div>
               <div className="space-y-3">
                 {dateEvents.map((event) => (
@@ -310,11 +320,11 @@ export default function CaseTimelinePage() {
           ))}
         </div>
       ) : (
-        <Card>
+        <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white shadow-sm">
           <CardContent className="py-12 text-center">
-            <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium text-foreground mb-2">No events found</h3>
-            <p className="text-muted-foreground">
+            <Clock className="h-12 w-12 mx-auto text-amber-900/40 mb-4" />
+            <h3 className="serif text-lg font-bold text-slate-900 mb-2">No events found</h3>
+            <p className="sans text-slate-600">
               {selectedTypes.length > 0
                 ? "Try adjusting your filters"
                 : "No timeline events recorded yet"}
@@ -322,6 +332,15 @@ export default function CaseTimelinePage() {
           </CardContent>
         </Card>
       )}
+
+      <style jsx global>{`
+        .serif {
+          font-family: "Crimson Pro", serif;
+        }
+        .sans {
+          font-family: "Outfit", sans-serif;
+        }
+      `}</style>
     </div>
   );
 }
@@ -343,19 +362,19 @@ function SummaryCard({
   return (
     <button
       onClick={onClick}
-      className={`p-3 rounded-lg border text-left transition-all ${
+      className={`p-3 rounded-sm border-2 text-left transition-all ${
         active
-          ? "bg-emerald-50 border-emerald-200 ring-2 ring-emerald-500/20"
-          : "bg-card border-border hover:bg-muted/50"
+          ? "bg-amber-50 border-amber-900/40 ring-2 ring-amber-500/20 shadow-md"
+          : "bg-gradient-to-br from-white via-amber-50/20 to-white border-amber-900/20 hover:border-amber-900/40 hover:shadow-sm"
       }`}
     >
       <div className="flex items-center justify-between mb-1">
-        <span className={active ? "text-emerald-600" : "text-muted-foreground"}>
+        <span className={active ? "text-amber-900" : "text-slate-600"}>
           {icon}
         </span>
-        <span className="text-xl font-bold">{value}</span>
+        <span className={`serif text-xl font-bold ${active ? "text-amber-900" : "text-slate-900"}`}>{value}</span>
       </div>
-      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={`sans text-xs ${active ? "text-amber-900/70" : "text-slate-600"}`}>{label}</p>
     </button>
   );
 }
@@ -375,13 +394,13 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
 
   const getEventColorClasses = (type: string) => {
     const colorMap: Record<string, string> = {
-      message: "bg-purple-100 text-purple-600",
-      exchange: "bg-amber-100 text-amber-600",
-      agreement: "bg-slate-100 text-slate-600",
-      court: "bg-blue-100 text-blue-600",
-      aria: "bg-emerald-100 text-emerald-600",
+      message: "bg-purple-50 text-purple-900 border-2 border-purple-900/20",
+      exchange: "bg-amber-50 text-amber-900 border-2 border-amber-900/20",
+      agreement: "bg-slate-50 text-slate-900 border-2 border-slate-900/20",
+      court: "bg-blue-50 text-blue-900 border-2 border-blue-900/20",
+      aria: "bg-emerald-50 text-emerald-900 border-2 border-emerald-900/20",
     };
-    return colorMap[type] || "bg-gray-100 text-gray-600";
+    return colorMap[type] || "bg-gray-50 text-gray-900 border-2 border-gray-900/20";
   };
 
   const getStatusBadge = (status?: string) => {
@@ -404,11 +423,11 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
   };
 
   return (
-    <Card className="hover:shadow-sm transition-shadow">
+    <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white hover:shadow-lg transition-shadow">
       <CardContent className="py-4">
         <div className="flex items-start gap-4">
           {/* Icon */}
-          <div className={`p-2.5 rounded-lg shrink-0 ${getEventColorClasses(event.event_type)}`}>
+          <div className={`p-2.5 rounded-sm shrink-0 shadow-sm ${getEventColorClasses(event.event_type)}`}>
             {getEventIcon(event.event_type)}
           </div>
 
@@ -416,16 +435,16 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <h4 className="font-medium text-foreground">{event.title}</h4>
+                <h4 className="serif font-bold text-slate-900">{event.title}</h4>
                 {event.description && (
-                  <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">
+                  <p className="sans text-sm text-slate-600 mt-0.5 line-clamp-2">
                     {event.description}
                   </p>
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {getStatusBadge(event.status)}
-                <span className="text-xs text-muted-foreground">
+                <span className="sans text-xs text-slate-600">
                   {formatTime(event.timestamp)}
                 </span>
               </div>
@@ -435,17 +454,17 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
             {event.metadata && Object.keys(event.metadata).length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {event.metadata.sender && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge className="sans text-xs bg-amber-50 text-amber-900 border-2 border-amber-900/30">
                     From: {event.metadata.sender}
                   </Badge>
                 )}
                 {event.metadata.location && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge className="sans text-xs bg-slate-50 text-slate-900 border-2 border-slate-900/30">
                     {event.metadata.location}
                   </Badge>
                 )}
                 {event.metadata.intervention_type && (
-                  <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700">
+                  <Badge className="sans text-xs bg-emerald-50 text-emerald-900 border-2 border-emerald-900/30">
                     {event.metadata.intervention_type}
                   </Badge>
                 )}

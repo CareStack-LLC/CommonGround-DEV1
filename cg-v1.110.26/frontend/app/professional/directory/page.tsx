@@ -15,6 +15,8 @@ import {
     Award,
     LayoutGrid,
     List as ListIcon,
+    Scale,
+    Gavel,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,12 +50,12 @@ interface DirectoryProfile {
 }
 
 const PROFESSIONAL_TYPE_INFO: Record<string, { label: string; color: string }> = {
-    attorney: { label: "Attorney", color: "bg-emerald-100 text-emerald-700" },
-    paralegal: { label: "Paralegal", color: "bg-blue-100 text-blue-700" },
-    mediator: { label: "Mediator", color: "bg-purple-100 text-purple-700" },
-    parenting_coordinator: { label: "Parenting Coordinator", color: "bg-amber-100 text-amber-700" },
-    intake_coordinator: { label: "Intake Coordinator", color: "bg-cyan-100 text-cyan-700" },
-    practice_admin: { label: "Practice Admin", color: "bg-slate-100 text-slate-700" },
+    attorney: { label: "Attorney", color: "bg-amber-50 text-amber-900 border-2 border-amber-900/30" },
+    paralegal: { label: "Paralegal", color: "bg-blue-50 text-blue-900 border-2 border-blue-900/30" },
+    mediator: { label: "Mediator", color: "bg-purple-50 text-purple-900 border-2 border-purple-900/30" },
+    parenting_coordinator: { label: "Parenting Coordinator", color: "bg-emerald-50 text-emerald-900 border-2 border-emerald-900/30" },
+    intake_coordinator: { label: "Intake Coordinator", color: "bg-cyan-50 text-cyan-900 border-2 border-cyan-900/30" },
+    practice_admin: { label: "Practice Admin", color: "bg-slate-50 text-slate-900 border-2 border-slate-900/30" },
 };
 
 const US_STATES = [
@@ -104,43 +106,54 @@ export default function ProfessionalDirectoryPage() {
 
     return (
         <div className="space-y-6">
+            <style jsx global>{`
+                @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+                .serif { font-family: 'Crimson Pro', serif; }
+                .sans { font-family: 'Outfit', sans-serif; }
+            `}</style>
+
             {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                    <div className="p-3 bg-gradient-to-br from-teal-500 to-emerald-600 text-white rounded-xl shadow-lg shadow-teal-500/20">
-                        <Users className="h-6 w-6" />
+            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+                <div className="flex items-start gap-5">
+                    <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
+                        <Scale className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
                     </div>
-                    Professional Directory
-                </h1>
-                <p className="text-slate-500 mt-1">
-                    Find verified family law professionals for your case
-                </p>
+                    <div>
+                        <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
+                            Professional Directory
+                        </h1>
+                        <p className="sans text-amber-100 mt-2 text-sm tracking-wide leading-relaxed">
+                            Verified Family Law Practitioners & Specialists
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* Search Bar */}
             <div className="flex gap-3">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-900/60" />
                     <Input
                         placeholder="Search by name, headline, or specialty..."
-                        className="pl-10 h-11"
+                        className="pl-10 h-11 border-2 border-slate-300 focus:border-amber-900 focus:ring-amber-900 sans"
                         value={searchQuery}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                     />
                 </div>
                 <Button
                     variant="outline"
-                    className={`border-slate-200 ${showFilters ? "bg-slate-100" : ""}`}
+                    className={`border-2 sans ${showFilters ? "bg-amber-50 border-amber-900/30" : "border-slate-300 hover:bg-amber-50"}`}
                     onClick={() => setShowFilters(!showFilters)}
                 >
                     <Filter className="h-4 w-4 mr-2" />
                     Filters {showFilters ? "▴" : "▾"}
                 </Button>
-                <div className="hidden sm:flex border rounded-lg overflow-hidden">
+                <div className="hidden sm:flex border-2 border-amber-900/20 rounded-sm overflow-hidden">
                     <Button
                         variant="ghost"
                         size="sm"
-                        className={`rounded-none px-3 ${viewMode === "grid" ? "bg-slate-100" : ""}`}
+                        className={`rounded-none px-3 ${viewMode === "grid" ? "bg-amber-50" : ""}`}
                         onClick={() => setViewMode("grid")}
                     >
                         <LayoutGrid className="h-4 w-4" />
@@ -148,7 +161,7 @@ export default function ProfessionalDirectoryPage() {
                     <Button
                         variant="ghost"
                         size="sm"
-                        className={`rounded-none px-3 ${viewMode === "list" ? "bg-slate-100" : ""}`}
+                        className={`rounded-none px-3 ${viewMode === "list" ? "bg-amber-50" : ""}`}
                         onClick={() => setViewMode("list")}
                     >
                         <ListIcon className="h-4 w-4" />
@@ -158,13 +171,13 @@ export default function ProfessionalDirectoryPage() {
 
             {/* Filters */}
             {showFilters && (
-                <Card className="bg-slate-50/50">
+                <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-md">
                     <CardContent className="pt-4 pb-4">
                         <div className="grid sm:grid-cols-4 gap-3">
                             <div>
-                                <label className="text-xs font-medium text-slate-600 block mb-1.5">License State</label>
+                                <label className="sans text-xs font-bold text-amber-900/60 block mb-1.5 tracking-[0.1em] uppercase">License State</label>
                                 <Select value={stateFilter} onValueChange={setStateFilter}>
-                                    <SelectTrigger className="bg-white"><SelectValue placeholder="All states" /></SelectTrigger>
+                                    <SelectTrigger className="bg-white border-2 border-slate-300 sans"><SelectValue placeholder="All states" /></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All States</SelectItem>
                                         {US_STATES.map((s) => (
@@ -174,9 +187,9 @@ export default function ProfessionalDirectoryPage() {
                                 </Select>
                             </div>
                             <div>
-                                <label className="text-xs font-medium text-slate-600 block mb-1.5">Professional Type</label>
+                                <label className="sans text-xs font-bold text-amber-900/60 block mb-1.5 tracking-[0.1em] uppercase">Professional Type</label>
                                 <Select value={typeFilter} onValueChange={setTypeFilter}>
-                                    <SelectTrigger className="bg-white"><SelectValue placeholder="All types" /></SelectTrigger>
+                                    <SelectTrigger className="bg-white border-2 border-slate-300 sans"><SelectValue placeholder="All types" /></SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="all">All Types</SelectItem>
                                         {Object.entries(PROFESSIONAL_TYPE_INFO).map(([k, v]) => (
@@ -189,10 +202,10 @@ export default function ProfessionalDirectoryPage() {
                                 <Button
                                     variant={featuredOnly ? "default" : "outline"}
                                     size="sm"
-                                    className={featuredOnly ? "bg-amber-500 hover:bg-amber-600 text-white" : ""}
+                                    className={featuredOnly ? "bg-amber-900 hover:bg-amber-950 text-amber-50 border-2 border-amber-900/40 shadow-md sans" : "border-2 border-slate-300 hover:bg-amber-50 sans"}
                                     onClick={() => setFeaturedOnly(!featuredOnly)}
                                 >
-                                    <Star className="h-3.5 w-3.5 mr-1.5" />
+                                    <Star className="h-3.5 w-3.5 mr-1.5" strokeWidth={2} />
                                     Featured Only
                                 </Button>
                             </div>

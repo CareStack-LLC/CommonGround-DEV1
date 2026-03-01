@@ -314,71 +314,85 @@ export default function ProfessionalCalendarPage() {
 
   return (
     <div className="space-y-6">
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+        .serif { font-family: 'Crimson Pro', serif; }
+        .sans { font-family: 'Outfit', sans-serif; }
+      `}</style>
+
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <CalendarIcon className="h-6 w-6 text-teal-600" />
-            Professional Calendar
-          </h1>
-          <p className="text-muted-foreground">
-            Schedule meetings, court hearings, and case-related events.
-          </p>
+      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-start gap-5">
+            <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
+              <CalendarIcon className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
+                Calendar
+              </h1>
+              <p className="sans text-amber-100 mt-2 text-sm tracking-wide leading-relaxed">
+                Hearings, Meetings & Case Deadlines
+              </p>
+            </div>
+          </div>
+          <Button onClick={() => setShowEventForm(true)} className="bg-white hover:bg-amber-50 text-amber-900 border-2 border-white/20 shadow-lg sans">
+            <Plus className="h-4 w-4 mr-2" />
+            New Event
+          </Button>
         </div>
-        <Button onClick={() => setShowEventForm(true)} className="bg-teal-600 hover:bg-teal-700">
-          <Plus className="h-4 w-4 mr-2" />
-          New Event
-        </Button>
       </div>
 
       {/* Calendar Summary Cards */}
       {summary && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card>
+          <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-md">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-teal-600">{summary.active_events}</div>
-              <div className="text-sm text-muted-foreground">Events This Month</div>
+              <div className="serif text-2xl font-bold text-amber-900">{summary.active_events}</div>
+              <div className="sans text-xs text-slate-600 tracking-[0.1em] uppercase font-bold">Events This Month</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-2 border-red-900/30 bg-gradient-to-br from-red-50 to-red-100/50 shadow-md">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-red-600">
+              <div className="serif text-2xl font-bold text-red-900">
                 {summary.events_by_type?.court_hearing || 0}
               </div>
-              <div className="text-sm text-muted-foreground">Court Hearings</div>
+              <div className="sans text-xs text-red-900/60 tracking-[0.1em] uppercase font-bold">Court Hearings</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-2 border-blue-900/30 bg-gradient-to-br from-blue-50 to-blue-100/50 shadow-md">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="serif text-2xl font-bold text-blue-900">
                 {summary.events_by_type?.meeting || 0}
               </div>
-              <div className="text-sm text-muted-foreground">Meetings</div>
+              <div className="sans text-xs text-blue-900/60 tracking-[0.1em] uppercase font-bold">Meetings</div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-amber-50 to-amber-100/50 shadow-md">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-amber-600">
+              <div className="serif text-2xl font-bold text-amber-900">
                 {summary.events_by_type?.document_deadline || 0}
               </div>
-              <div className="text-sm text-muted-foreground">Deadlines</div>
+              <div className="sans text-xs text-amber-900/60 tracking-[0.1em] uppercase font-bold">Deadlines</div>
             </CardContent>
           </Card>
         </div>
       )}
 
       {/* Calendar Navigation */}
-      <Card>
+      <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="icon" onClick={prevMonth}>
+              <Button variant="outline" size="icon" onClick={prevMonth} className="border-2 border-amber-900/20 hover:bg-amber-50">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="text-xl font-semibold">
+              <h2 className="serif text-xl font-bold text-slate-900">
                 {monthName} {year}
               </h2>
-              <Button variant="outline" size="icon" onClick={nextMonth}>
+              <Button variant="outline" size="icon" onClick={nextMonth} className="border-2 border-amber-900/20 hover:bg-amber-50">
                 <ChevronRight className="h-4 w-4" />
               </Button>
               <Input
@@ -390,9 +404,9 @@ export default function ProfessionalCalendarPage() {
                     setCurrentDate(new Date(y, m - 1, d));
                   }
                 }}
-                className="w-auto"
+                className="w-auto border-2 border-slate-300 sans"
               />
-              <Button variant="outline" onClick={goToToday}>
+              <Button variant="outline" onClick={goToToday} className="border-2 border-amber-900/20 hover:bg-amber-50 sans">
                 Today
               </Button>
             </div>
@@ -401,6 +415,7 @@ export default function ProfessionalCalendarPage() {
                 variant={view === "month" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setView("month")}
+                className={view === "month" ? "bg-amber-900 hover:bg-amber-950 text-amber-50 border-2 border-amber-900/40 shadow-md sans" : "border-2 border-slate-300 hover:bg-amber-50 sans"}
               >
                 Month
               </Button>
@@ -408,6 +423,7 @@ export default function ProfessionalCalendarPage() {
                 variant={view === "week" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setView("week")}
+                className={view === "week" ? "bg-amber-900 hover:bg-amber-950 text-amber-50 border-2 border-amber-900/40 shadow-md sans" : "border-2 border-slate-300 hover:bg-amber-50 sans"}
               >
                 Week
               </Button>
@@ -415,6 +431,7 @@ export default function ProfessionalCalendarPage() {
                 variant={view === "day" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setView("day")}
+                className={view === "day" ? "bg-amber-900 hover:bg-amber-950 text-amber-50 border-2 border-amber-900/40 shadow-md sans" : "border-2 border-slate-300 hover:bg-amber-50 sans"}
               >
                 Day
               </Button>
@@ -425,15 +442,15 @@ export default function ProfessionalCalendarPage() {
         <CardContent>
           {loading ? (
             <div className="flex items-center justify-center h-96">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-900" />
             </div>
           ) : (
-            <div className="grid grid-cols-7 gap-px bg-border rounded-lg overflow-hidden">
+            <div className="grid grid-cols-7 gap-px bg-amber-900/20 rounded-sm overflow-hidden">
               {/* Week day headers */}
               {weekDays.map((day) => (
                 <div
                   key={day}
-                  className="bg-muted p-2 text-center text-sm font-medium text-muted-foreground"
+                  className="bg-amber-50 p-2 text-center sans text-xs font-bold text-amber-900/60 tracking-[0.1em] uppercase border-b-2 border-amber-900/20"
                 >
                   {day}
                 </div>
@@ -450,9 +467,9 @@ export default function ProfessionalCalendarPage() {
                   <div
                     key={index}
                     className={`
-                      min-h-[100px] bg-background p-1 cursor-pointer hover:bg-muted/50 transition-colors
-                      ${!day ? "bg-muted/30" : ""}
-                      ${isSelected ? "ring-2 ring-teal-500 ring-inset" : ""}
+                      min-h-[100px] bg-white p-1 cursor-pointer hover:bg-amber-50/50 transition-colors
+                      ${!day ? "bg-amber-50/30" : ""}
+                      ${isSelected ? "ring-2 ring-amber-900 ring-inset" : ""}
                     `}
                     onClick={() => day && setSelectedDate(new Date(year, month, day))}
                   >
@@ -460,8 +477,8 @@ export default function ProfessionalCalendarPage() {
                       <>
                         <div
                           className={`
-                            text-sm font-medium p-1 w-7 h-7 flex items-center justify-center rounded-full
-                            ${isToday ? "bg-teal-600 text-white" : "text-foreground"}
+                            serif text-sm font-bold p-1 w-7 h-7 flex items-center justify-center rounded-sm
+                            ${isToday ? "bg-amber-900 text-amber-50" : "text-slate-900"}
                           `}
                         >
                           {day}

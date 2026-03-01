@@ -103,31 +103,31 @@ function NotificationItem({
 
     return (
         <div
-            className={`group flex items-start gap-3 p-4 rounded-xl border transition-all cursor-pointer hover:shadow-sm ${notification.is_read
-                    ? "bg-white border-slate-100"
-                    : "bg-blue-50/40 border-blue-100 hover:border-blue-200"
+            className={`group flex items-start gap-3 p-4 rounded-sm border-2 transition-all cursor-pointer ${notification.is_read
+                    ? "bg-gradient-to-br from-white via-amber-50/20 to-white border-amber-900/20 hover:shadow-sm"
+                    : "bg-amber-50 border-amber-900/40 hover:border-amber-900/60 shadow-md"
                 }`}
             onClick={handleClick}
         >
             {/* Unread dot */}
             <div className="mt-1 shrink-0 relative">
-                <div className="p-2 bg-white border border-slate-100 rounded-xl shadow-sm">
+                <div className="p-2 bg-white border-2 border-amber-900/20 rounded-sm shadow-sm">
                     {TYPE_ICONS[notification.type] || TYPE_ICONS.system}
                 </div>
                 {!notification.is_read && (
-                    <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${SEVERITY_DOT[notification.severity] || "bg-blue-500"}`} />
+                    <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${SEVERITY_DOT[notification.severity] || "bg-amber-500"}`} />
                 )}
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-                <p className={`text-sm leading-snug ${notification.is_read ? "text-slate-700 font-medium" : "text-slate-900 font-semibold"}`}>
+                <p className={`sans text-sm leading-snug ${notification.is_read ? "text-slate-700 font-medium" : "text-slate-900 font-bold"}`}>
                     {notification.title}
                 </p>
                 {notification.body && (
-                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{notification.body}</p>
+                    <p className="sans text-xs text-slate-600 mt-0.5 line-clamp-2">{notification.body}</p>
                 )}
-                <p className="text-xs text-slate-400 mt-1">{timeAgo(notification.created_at)}</p>
+                <p className="sans text-xs text-slate-500 mt-1">{timeAgo(notification.created_at)}</p>
             </div>
 
             {/* Actions */}
@@ -136,7 +136,7 @@ function NotificationItem({
                     <button
                         onClick={(e) => { e.stopPropagation(); onMarkRead(notification.id); }}
                         title="Mark read"
-                        className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"
+                        className="p-1.5 text-slate-400 hover:text-emerald-900 hover:bg-emerald-50 rounded-sm transition-all border-2 border-transparent hover:border-emerald-900/20"
                     >
                         <Check className="h-3.5 w-3.5" />
                     </button>
@@ -144,12 +144,12 @@ function NotificationItem({
                 <button
                     onClick={(e) => { e.stopPropagation(); onDismiss(notification.id); }}
                     title="Dismiss"
-                    className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                    className="p-1.5 text-slate-400 hover:text-red-900 hover:bg-red-50 rounded-sm transition-all border-2 border-transparent hover:border-red-900/20"
                 >
                     <Trash2 className="h-3.5 w-3.5" />
                 </button>
                 {notification.action_url && (
-                    <div className="p-1.5 text-slate-300">
+                    <div className="p-1.5 text-amber-900/40">
                         <ChevronRight className="h-3.5 w-3.5" />
                     </div>
                 )}
@@ -242,43 +242,53 @@ export default function NotificationsPage() {
 
     return (
         <div className="max-w-3xl mx-auto space-y-5">
+            <link
+                href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+                rel="stylesheet"
+            />
+
             {/* Header */}
-            <div className="flex items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                        <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl shadow-lg shadow-blue-500/20">
-                            <Bell className="h-6 w-6" />
+            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+                <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-start gap-5">
+                        <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
+                            <Bell className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
                         </div>
-                        Notifications
+                        <div>
+                            <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight flex items-center gap-3">
+                                Notifications
+                                {unreadCount > 0 && (
+                                    <Badge className="bg-white text-amber-900 border-2 border-amber-900/20 sans text-xs font-bold">{unreadCount} new</Badge>
+                                )}
+                            </h1>
+                            <p className="sans text-sm text-amber-100 mt-2">Your activity history and alerts</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-2">
                         {unreadCount > 0 && (
-                            <Badge className="bg-blue-600 text-white text-xs">{unreadCount} new</Badge>
+                            <Button variant="outline" size="sm" onClick={markAllRead} className="gap-1.5 text-xs border-2 border-white/30 text-white hover:bg-white/10 sans">
+                                <CheckCheck className="h-3.5 w-3.5" />
+                                Mark All Read
+                            </Button>
                         )}
-                    </h1>
-                    <p className="text-slate-500 mt-1">Your activity history and alerts</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    {unreadCount > 0 && (
-                        <Button variant="outline" size="sm" onClick={markAllRead} className="gap-1.5 text-xs border-slate-200">
-                            <CheckCheck className="h-3.5 w-3.5" />
-                            Mark All Read
-                        </Button>
-                    )}
-                    <Link href="/professional/notifications/preferences">
-                        <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-200">
-                            <Settings className="h-3.5 w-3.5" />
-                            Preferences
-                        </Button>
-                    </Link>
+                        <Link href="/professional/notifications/preferences">
+                            <Button variant="outline" size="sm" className="gap-1.5 text-xs border-2 border-white/30 text-white hover:bg-white/10 sans">
+                                <Settings className="h-3.5 w-3.5" />
+                                Preferences
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </div>
 
             {/* Filters */}
-            <Card className="border-slate-200">
+            <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white shadow-sm">
                 <CardContent className="py-3">
                     <div className="flex gap-3 flex-wrap">
                         <Select value={typeFilter} onValueChange={setTypeFilter}>
-                            <SelectTrigger className="w-44 h-8 text-xs border-slate-200">
-                                <Filter className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
+                            <SelectTrigger className="w-44 h-8 sans text-xs border-2 border-slate-300">
+                                <Filter className="h-3.5 w-3.5 mr-1.5 text-amber-900" />
                                 <SelectValue placeholder="All Types" />
                             </SelectTrigger>
                             <SelectContent>
@@ -292,7 +302,7 @@ export default function NotificationsPage() {
                             </SelectContent>
                         </Select>
                         <Select value={readFilter} onValueChange={setReadFilter}>
-                            <SelectTrigger className="w-36 h-8 text-xs border-slate-200">
+                            <SelectTrigger className="w-36 h-8 sans text-xs border-2 border-slate-300">
                                 <SelectValue placeholder="All" />
                             </SelectTrigger>
                             <SelectContent>
@@ -313,18 +323,18 @@ export default function NotificationsPage() {
                     ))}
                 </div>
             ) : notifications.length === 0 ? (
-                <Card className="border-dashed border-slate-200 bg-slate-50/50">
+                <Card className="border-dashed border-2 border-amber-900/30 bg-gradient-to-br from-amber-50/30 to-white shadow-sm">
                     <CardContent className="py-16 text-center">
-                        <Bell className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-                        <p className="text-slate-500 font-medium">No notifications</p>
-                        <p className="text-xs text-slate-400 mt-1">You're all caught up!</p>
+                        <Bell className="h-12 w-12 mx-auto mb-3 text-amber-900/40" />
+                        <p className="serif text-slate-900 font-bold">No notifications</p>
+                        <p className="sans text-xs text-slate-600 mt-1">You're all caught up!</p>
                     </CardContent>
                 </Card>
             ) : (
                 <div className="space-y-6">
                     {GROUP_ORDER.filter(g => grouped[g]?.length > 0).map(group => (
                         <div key={group}>
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">{group}</h3>
+                            <h3 className="sans text-xs font-bold text-amber-900/60 uppercase tracking-widest mb-2 px-1">{group}</h3>
                             <div className="space-y-2">
                                 {grouped[group].map(n => (
                                     <NotificationItem
@@ -339,6 +349,15 @@ export default function NotificationsPage() {
                     ))}
                 </div>
             )}
+
+            <style jsx global>{`
+                .serif {
+                    font-family: "Crimson Pro", serif;
+                }
+                .sans {
+                    font-family: "Outfit", sans-serif;
+                }
+            `}</style>
         </div>
     );
 }

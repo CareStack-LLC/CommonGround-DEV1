@@ -23,6 +23,8 @@ import {
   Users,
   Inbox,
   Send,
+  FileText,
+  Scale,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -205,24 +207,35 @@ export default function MessagesPage() {
 
   return (
     <div className="space-y-6">
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+        .serif { font-family: 'Crimson Pro', serif; }
+        .sans { font-family: 'Outfit', sans-serif; }
+      `}</style>
+
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl shadow-lg shadow-blue-500/20">
-              <MessageSquare className="h-6 w-6" />
+      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-5">
+            <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
+              <FileText className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
             </div>
-            Messages
-          </h1>
-          <p className="text-slate-500 mt-1">
-            Secure communication with clients and co-parents
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={fetchMessages} className="border-slate-200 hover:bg-slate-50">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
+            <div>
+              <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
+                Correspondence
+              </h1>
+              <p className="sans text-amber-100 mt-2 text-sm tracking-wide leading-relaxed">
+                Secure Client Communications & Case Management
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={fetchMessages} className="border-2 border-white/20 hover:bg-white/10 text-white sans">
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -254,21 +267,21 @@ export default function MessagesPage() {
       </div>
 
       {/* Search and Filters */}
-      <Card className="border-slate-200">
+      <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
         <CardContent className="py-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-900/60" />
               <Input
-                placeholder="Search messages..."
+                placeholder="Search correspondence..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 border-slate-200 focus:border-teal-500 focus:ring-teal-500"
+                className="pl-9 border-2 border-slate-300 focus:border-amber-900 focus:ring-amber-900 sans"
               />
             </div>
             <Select value={readFilter} onValueChange={setReadFilter}>
-              <SelectTrigger className="w-full sm:w-40 border-slate-200">
-                <Filter className="h-4 w-4 mr-2 text-slate-400" />
+              <SelectTrigger className="w-full sm:w-40 border-2 border-slate-300 sans">
+                <Filter className="h-4 w-4 mr-2 text-amber-900/60" />
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>
@@ -284,7 +297,7 @@ export default function MessagesPage() {
       {/* Message List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-900" />
         </div>
       ) : filteredMessages.length > 0 ? (
         <div className="space-y-3">
@@ -297,16 +310,16 @@ export default function MessagesPage() {
           ))}
         </div>
       ) : (
-        <Card className="border-slate-200 border-dashed bg-slate-50/50">
+        <Card className="border-2 border-dashed border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
           <CardContent className="py-16 text-center">
-            <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl w-fit mx-auto mb-6">
-              <MessageSquare className="h-10 w-10 text-blue-600" />
+            <div className="p-4 bg-amber-900/10 border-2 border-amber-900/20 rounded-sm w-fit mx-auto mb-6">
+              <MessageSquare className="h-10 w-10 text-amber-900" strokeWidth={1.5} />
             </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">No messages</h3>
-            <p className="text-slate-500 max-w-sm mx-auto">
+            <h3 className="serif text-lg font-bold text-slate-900 mb-2">No Messages</h3>
+            <p className="sans text-slate-600 max-w-sm mx-auto">
               {searchQuery || readFilter !== "all"
                 ? "Try adjusting your filters to find what you're looking for"
-                : "Messages from your cases will appear here"}
+                : "Correspondence from your cases will appear here"}
             </p>
           </CardContent>
         </Card>
@@ -333,47 +346,47 @@ function StatCard({
 }) {
   const colorConfig = {
     blue: {
-      text: "text-blue-600",
-      activeBg: "bg-gradient-to-br from-blue-50 to-blue-100/50",
-      iconBg: "bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20",
-      ring: "ring-blue-500/30 border-blue-200",
+      text: "text-slate-900",
+      activeBg: "bg-gradient-to-br from-white to-amber-50/50",
+      iconBg: "bg-gradient-to-br from-amber-900 to-amber-800 border-2 border-amber-900/40 text-amber-50 shadow-lg",
+      ring: "border-2 border-amber-900/40 shadow-xl",
     },
     teal: {
-      text: "text-teal-600",
-      activeBg: "bg-gradient-to-br from-teal-50 to-teal-100/50",
-      iconBg: "bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-lg shadow-teal-500/20",
-      ring: "ring-teal-500/30 border-teal-200",
+      text: "text-emerald-900",
+      activeBg: "bg-gradient-to-br from-emerald-50 to-emerald-100/50",
+      iconBg: "bg-gradient-to-br from-emerald-900 to-emerald-800 border-2 border-emerald-900/40 text-emerald-50 shadow-lg",
+      ring: "border-2 border-emerald-900/30 shadow-md",
     },
     amber: {
-      text: "text-amber-600",
+      text: "text-amber-900",
       activeBg: "bg-gradient-to-br from-amber-50 to-amber-100/50",
-      iconBg: "bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/20",
-      ring: "ring-amber-500/30 border-amber-200",
+      iconBg: "bg-gradient-to-br from-amber-900 to-amber-800 border-2 border-amber-900/40 text-amber-50 shadow-lg",
+      ring: "border-2 border-amber-900/30 shadow-md",
     },
   };
 
   const config = color ? colorConfig[color] : {
-    text: "text-slate-600",
-    activeBg: "bg-gradient-to-br from-slate-50 to-slate-100/50",
-    iconBg: "bg-slate-100 text-slate-600",
-    ring: "ring-slate-500/30 border-slate-200",
+    text: "text-slate-900",
+    activeBg: "bg-gradient-to-br from-white to-amber-50/50",
+    iconBg: "bg-amber-900/10 border-2 border-amber-900/20 text-amber-900",
+    ring: "border-2 border-amber-900/40 shadow-xl",
   };
 
   return (
     <button
       onClick={onClick}
-      className={`p-4 rounded-xl border text-left transition-all duration-200 ${
+      className={`p-4 rounded-sm text-left transition-all duration-200 ${
         active
-          ? `${config.activeBg} ${config.ring} ring-2`
-          : "bg-white border-slate-200 hover:bg-slate-50 hover:border-slate-300"
+          ? `${config.activeBg} ${config.ring}`
+          : "bg-white border-2 border-slate-300 hover:bg-amber-50 hover:border-amber-900/20"
       }`}
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className={`text-2xl font-bold ${config.text}`}>{value}</p>
-          <p className="text-xs text-slate-500 mt-0.5">{label}</p>
+          <p className={`serif text-2xl font-bold ${config.text}`}>{value}</p>
+          <p className="sans text-xs text-slate-600 mt-0.5 tracking-[0.1em] uppercase font-bold">{label}</p>
         </div>
-        <div className={`p-2.5 rounded-xl ${active ? config.iconBg : "bg-slate-100 text-slate-500"}`}>
+        <div className={`p-2.5 rounded-sm ${active ? config.iconBg : "bg-amber-900/10 border border-amber-900/20 text-amber-900"}`}>
           {icon}
         </div>
       </div>
@@ -442,17 +455,17 @@ function MessageCard({
 
   return (
     <Card
-      className={`group hover:shadow-lg transition-all duration-300 cursor-pointer border-slate-200 hover:border-slate-300 overflow-hidden ${!message.is_read && !isSentByMe ? "bg-gradient-to-r from-blue-50/50 to-white" : ""}`}
+      className={`group hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden ${!message.is_read && !isSentByMe ? "border-2 border-amber-900/40 bg-gradient-to-r from-amber-50/50 to-white shadow-md" : "border-2 border-slate-300 bg-white hover:border-amber-900/30"}`}
       onClick={handleCardClick}
     >
       {/* Top accent bar for unread received messages */}
       {!message.is_read && !isSentByMe && (
-        <div className="h-1 bg-gradient-to-r from-blue-400 to-blue-500" />
+        <div className="h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900" />
       )}
       <CardContent className="p-4">
         <div className="flex items-start gap-4">
-          <Avatar className="h-11 w-11 shrink-0 ring-2 ring-white shadow-md">
-            <AvatarFallback className={`font-semibold ${!message.is_read && !isSentByMe ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white" : "bg-slate-100 text-slate-600"}`}>
+          <Avatar className="h-11 w-11 shrink-0 ring-2 ring-white shadow-md border-2 border-amber-900/20">
+            <AvatarFallback className={`serif font-bold ${!message.is_read && !isSentByMe ? "bg-gradient-to-br from-amber-900 to-amber-800 text-amber-50" : "bg-amber-900/10 text-amber-900"}`}>
               {contactInitials}
             </AvatarFallback>
           </Avatar>
@@ -460,40 +473,40 @@ function MessageCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
-                <h3 className={`font-semibold truncate ${!message.is_read && !isSentByMe ? "text-slate-900" : "text-slate-600"}`}>
+                <h3 className={`serif font-bold truncate ${!message.is_read && !isSentByMe ? "text-slate-900" : "text-slate-700"}`}>
                   {contactName || "Unknown"}
                 </h3>
                 {isSentByMe ? (
-                  <Badge className="bg-teal-50 text-teal-700 border border-teal-200 shrink-0">
-                    <Send className="h-3 w-3 mr-1" />
+                  <Badge className="bg-emerald-50 text-emerald-900 border-2 border-emerald-200 shrink-0 sans">
+                    <Send className="h-3 w-3 mr-1" strokeWidth={2} />
                     Sent
                   </Badge>
                 ) : !message.is_read ? (
-                  <Badge className="bg-blue-100 text-blue-700 border border-blue-200 shrink-0">
+                  <Badge className="bg-amber-100 text-amber-900 border-2 border-amber-200 shrink-0 sans">
                     New
                   </Badge>
                 ) : null}
               </div>
-              <span className="text-xs text-slate-400 shrink-0">
+              <span className="sans text-xs text-slate-500 shrink-0">
                 {formatRelativeTime(message.sent_at || message.created_at)}
               </span>
             </div>
 
             {message.subject && (
-              <p className={`text-sm mt-0.5 ${!message.is_read && !isSentByMe ? "font-medium text-slate-800" : "text-slate-500"}`}>
+              <p className={`sans text-sm mt-0.5 ${!message.is_read && !isSentByMe ? "font-bold text-slate-800" : "text-slate-600"}`}>
                 {message.subject}
               </p>
             )}
 
-            <p className="text-sm text-slate-500 mt-1.5 line-clamp-2">
-              {isSentByMe && <span className="text-slate-400">You: </span>}
+            <p className="sans text-sm text-slate-600 mt-1.5 line-clamp-2">
+              {isSentByMe && <span className="text-slate-500">You: </span>}
               {truncateContent(message.content)}
             </p>
 
             {message.family_file_id && (
               <div className="flex items-center gap-2 mt-3">
-                <Badge variant="outline" className="text-xs bg-slate-50 border-slate-200 text-slate-600">
-                  <Users className="h-3 w-3 mr-1" />
+                <Badge variant="outline" className="text-xs bg-amber-50 border-2 border-amber-900/20 text-amber-900 sans">
+                  <Scale className="h-3 w-3 mr-1" strokeWidth={2} />
                   Case {message.family_file_id.slice(0, 8)}...
                 </Badge>
               </div>

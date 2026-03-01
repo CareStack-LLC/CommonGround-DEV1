@@ -222,33 +222,46 @@ export default function AccessRequestsPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
+      <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
+
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <UserPlus className="h-6 w-6" />
-          Access Requests
-        </h1>
-        <p className="text-gray-500 mt-1">
-          Review and respond to case access invitations from parents
-        </p>
+      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40 mb-6">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+        <div className="flex items-start gap-5">
+          <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
+            <UserPlus className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+          </div>
+          <div>
+            <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
+              Access Requests
+            </h1>
+            <p className="sans text-sm text-amber-100 mt-2">
+              Review and respond to case access invitations from parents
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Pending Requests */}
       <div className="mb-8">
-        <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
-          <Clock className="h-5 w-5 text-amber-500" />
+        <h2 className="serif text-lg font-bold flex items-center gap-2 mb-4 text-slate-900">
+          <Clock className="h-5 w-5 text-amber-900" />
           Pending Invitations
           {pendingRequests.length > 0 && (
-            <Badge className="bg-amber-100 text-amber-800">{pendingRequests.length}</Badge>
+            <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 sans font-semibold">{pendingRequests.length}</Badge>
           )}
         </h2>
 
         {pendingRequests.length === 0 ? (
-          <Card>
+          <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white shadow-sm relative">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
             <CardContent className="p-8 text-center">
-              <Check className="h-12 w-12 mx-auto text-green-500 mb-4" />
-              <h3 className="text-lg font-medium mb-2">All Caught Up</h3>
-              <p className="text-gray-500">You have no pending invitations to review.</p>
+              <Check className="h-12 w-12 mx-auto text-emerald-900 mb-4" />
+              <h3 className="serif text-lg font-bold mb-2 text-slate-900">All Caught Up</h3>
+              <p className="sans text-slate-600">You have no pending invitations to review.</p>
             </CardContent>
           </Card>
         ) : (
@@ -256,21 +269,22 @@ export default function AccessRequestsPage() {
             {pendingRequests.map((request) => (
               <Card
                 key={request.id}
-                className={`border-l-4 ${
+                className={`border-2 border-l-4 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg relative ${
                   isExpiringSoon(request.expires_at)
-                    ? "border-l-amber-500"
-                    : "border-l-blue-500"
+                    ? "border-l-amber-500 border-amber-900/40"
+                    : "border-l-blue-500 border-amber-900/30"
                 }`}
               >
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-lg">
+                        <h3 className="serif font-bold text-lg text-slate-900">
                           {request.family_name || "Family Case"}
                         </h3>
                         {isExpiringSoon(request.expires_at) && (
-                          <Badge className="bg-amber-100 text-amber-800">
+                          <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 sans">
                             <AlertCircle className="h-3 w-3 mr-1" />
                             Expires soon
                           </Badge>

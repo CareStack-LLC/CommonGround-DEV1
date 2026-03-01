@@ -14,6 +14,9 @@ import {
   TrendingUp,
   Bell,
   Gavel,
+  Briefcase,
+  Scale,
+  FolderOpen,
 } from "lucide-react";
 import {
   Card,
@@ -80,7 +83,7 @@ export default function ProfessionalDashboardPage() {
   if (!dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--portal-primary)]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-900" />
       </div>
     );
   }
@@ -105,244 +108,329 @@ export default function ProfessionalDashboardPage() {
     weekday: "long",
     month: "long",
     day: "numeric",
+    year: "numeric",
   });
 
   return (
-    <div className="space-y-7">
-      {/* Pending Invitations Banner */}
-      {pendingFirmInvitations.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-              <div className="h-1 w-8 bg-emerald-500 rounded-full" />
-              Pending Case Invitations ({pendingFirmInvitations.length})
-            </h2>
-            <Link
-              href="/professional/intake?tab=invitations"
-              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
-            >
-              View All
-            </Link>
-          </div>
-          <div className="grid gap-4">
-            {pendingFirmInvitations.slice(0, 1).map((invitation: any) => (
-              <InvitationSummaryAlert
-                key={invitation.id}
-                invitationId={invitation.id}
-                firmId={activeFirm?.id || ""}
-                token={token}
-                onAccept={() => handleAccept(invitation)}
-                onDecline={() => refreshDashboard()}
-              />
-            ))}
-            {pendingFirmInvitations.length > 1 && (
-              <p className="text-center text-xs text-slate-400 font-medium">
-                +{pendingFirmInvitations.length - 1} other case
-                {pendingFirmInvitations.length - 1 !== 1 ? "s" : ""} waiting
-              </p>
-            )}
-          </div>
-        </div>
-      )}
+    <div className="min-h-screen" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
-      {/* Assignment Dialog */}
-      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-        <DialogContent className="sm:max-w-md">
-          <AssignProfessionalDialog
-            token={token}
-            firmId={activeFirm?.id || ""}
-            invitationId={selectedInvitation?.id || ""}
-            onAccept={handleAssign}
-            isAccepting={false}
-            onCancel={() => setShowAssignDialog(false)}
-          />
-        </DialogContent>
-      </Dialog>
+        .dashboard-wrapper {
+          background: linear-gradient(135deg, #fef9f3 0%, #faf5ed 100%);
+          min-height: 100vh;
+        }
 
-      {/* ─── ZONE 1: Command Header ─────────────────────────────────────── */}
-      <div className="relative rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-5 shadow-xl border border-slate-700/40">
-        {/* Decorative orbs */}
-        <div className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-[var(--portal-primary)]/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-blue-500/10 blur-2xl" />
+        .serif { font-family: 'Crimson Pro', Georgia, serif; }
+        .sans { font-family: 'Outfit', system-ui, sans-serif; }
 
-        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
-                {dateLabel}
-              </p>
-              {pendingFirmInvitations.length > 0 && (
-                <span className="flex items-center gap-1.5 text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
-                  {pendingFirmInvitations.length} New Lead
-                  {pendingFirmInvitations.length !== 1 ? "s" : ""}
-                </span>
-              )}
-            </div>
-            <h1 className="text-2xl font-bold text-white">
-              {activeFirm?.name
-                ? `${activeFirm.name}`
-                : `Welcome, ${profile?.user_first_name || "Professional"}`}
-            </h1>
-            <p className="text-sm text-slate-400 mt-0.5">
-              {allCases.length} active case{allCases.length !== 1 ? "s" : ""} ·{" "}
-              {courtEventCount} upcoming court date
-              {courtEventCount !== 1 ? "s" : ""}
-            </p>
-          </div>
+        .legal-header-seal {
+          position: absolute;
+          top: -2rem;
+          right: -2rem;
+          width: 10rem;
+          height: 10rem;
+          border-radius: 50%;
+          border: 2px solid rgba(146, 64, 14, 0.1);
+          background: radial-gradient(circle, rgba(217, 119, 6, 0.05) 0%, transparent 70%);
+          animation: seal-pulse 3s ease-in-out infinite;
+        }
 
-          {/* Quick Create lives inside the header — z-[100] so its dropdown clears the card */}
-          <div className="relative z-[100]">
-            <QuickCreateMenu onCreateTask={() => { }} />
-          </div>
-        </div>
-      </div>
+        @keyframes seal-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.5; }
+          50% { transform: scale(1.1); opacity: 0.8; }
+        }
 
-      {/* Lead Tracking Chart — sits just below command header */}
-      <LeadTrackingChart />
+        .metric-card {
+          position: relative;
+          overflow: hidden;
+        }
 
-      {/* ─── ZONE 2: KPI Cards ──────────────────────────────────────────── */}
-      <KPICards
-        caseCount={dashboardData.case_count || 0}
-        pendingIntakes={dashboardData.pending_intakes || 0}
-        unreadMessages={dashboardData.unread_messages || 0}
-        pendingApprovals={dashboardData.pending_approvals || 0}
-        upcomingCourtDates={courtEventCount}
-      />
+        .metric-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: linear-gradient(90deg, #92400e, #d97706);
+        }
 
-      {/* ─── ZONE 3: Lead Pipeline + Alerts ─────────────────────────────── */}
-      <div className="space-y-6">
-        {/* Lead Pipeline */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-              <div className="h-1 w-8 bg-[var(--portal-primary)] rounded-full" />
-              Lead Pipeline
-            </h2>
-            <Link
-              href="/professional/cases"
-              className="text-xs font-semibold text-[var(--portal-primary)] hover:underline flex items-center gap-1"
-            >
-              All Cases
-              <ArrowRight className="h-3 w-3" />
-            </Link>
-          </div>
-          <LeadPipeline cases={allCases} />
-        </section>
+        .legal-divider {
+          height: 2px;
+          background: linear-gradient(90deg, #92400e 0%, #d97706 20%, transparent 100%);
+        }
 
-        {/* Active Alerts */}
-        <Card className="border-slate-200/60 shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <div>
-              <CardTitle className="text-base flex items-center gap-2">
-                <AlertTriangle className="h-4.5 w-4.5 text-amber-500" />
-                Active Alerts
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Items requiring your attention
-              </CardDescription>
-            </div>
-            {dashboardData.alerts?.length > 0 && (
-              <Badge variant="warning">
-                {dashboardData.alerts.length}
-              </Badge>
-            )}
-          </CardHeader>
-          <CardContent>
-            {dashboardData.alerts?.length > 0 ? (
-              <div className="space-y-2.5">
-                {dashboardData.alerts.slice(0, 5).map((alert: any, index: number) => (
-                  <AlertItem key={index} alert={alert} />
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+      `}</style>
+
+      <div className="dashboard-wrapper">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+          {/* Pending Invitations Banner */}
+          {pendingFirmInvitations.length > 0 && (
+            <div className="space-y-3 animate-fade-in">
+              <div className="flex items-center justify-between">
+                <h2 className="sans text-xs font-bold text-amber-900 uppercase tracking-[0.15em] flex items-center gap-3">
+                  <div className="h-px w-8 bg-amber-900 rounded-full" />
+                  Pending Case Invitations ({pendingFirmInvitations.length})
+                </h2>
+                <Link
+                  href="/professional/intake?tab=invitations"
+                  className="sans text-xs font-bold text-amber-900 hover:text-amber-950 transition-colors border-b border-amber-900/20 hover:border-amber-900/40"
+                >
+                  View All
+                </Link>
+              </div>
+              <div className="grid gap-4">
+                {pendingFirmInvitations.slice(0, 1).map((invitation: any) => (
+                  <InvitationSummaryAlert
+                    key={invitation.id}
+                    invitationId={invitation.id}
+                    firmId={activeFirm?.id || ""}
+                    token={token}
+                    onAccept={() => handleAccept(invitation)}
+                    onDecline={() => refreshDashboard()}
+                  />
                 ))}
-                {dashboardData.alerts.length > 5 && (
-                  <Button variant="ghost" className="w-full text-xs text-muted-foreground">
-                    View {dashboardData.alerts.length - 5} more alerts
-                  </Button>
+                {pendingFirmInvitations.length > 1 && (
+                  <p className="text-center sans text-xs text-slate-500 font-medium">
+                    +{pendingFirmInvitations.length - 1} additional case
+                    {pendingFirmInvitations.length - 1 !== 1 ? "s" : ""} awaiting review
+                  </p>
                 )}
               </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <CheckCircle2 className="h-10 w-10 mx-auto mb-2 text-[var(--portal-primary)]" />
-                <p className="text-sm">All clear — no active alerts</p>
+            </div>
+          )}
+
+          {/* Assignment Dialog */}
+          <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+            <DialogContent className="sm:max-w-md border-2 border-amber-900/20">
+              <AssignProfessionalDialog
+                token={token}
+                firmId={activeFirm?.id || ""}
+                invitationId={selectedInvitation?.id || ""}
+                onAccept={handleAssign}
+                isAccepting={false}
+                onCancel={() => setShowAssignDialog(false)}
+              />
+            </DialogContent>
+          </Dialog>
+
+          {/* Distinguished Header */}
+          <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
+            <div className="legal-header-seal" />
+
+            {/* Decorative legal elements */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-950/20 rounded-full -mb-16 -ml-16 blur-2xl" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-amber-700/10 rounded-full -mt-20 -mr-20 blur-3xl" />
+
+            <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+              <div className="flex items-start gap-5">
+                <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
+                  <Scale className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="sans text-[10px] font-bold text-amber-200 uppercase tracking-[0.2em]">
+                      {dateLabel}
+                    </span>
+                    {pendingFirmInvitations.length > 0 && (
+                      <span className="flex items-center gap-1.5 sans text-[10px] font-bold bg-red-500/20 text-red-200 border border-red-400/30 px-2 py-1 rounded-sm">
+                        <span className="h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
+                        {pendingFirmInvitations.length} New Lead
+                        {pendingFirmInvitations.length !== 1 ? "s" : ""}
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight">
+                    {activeFirm?.name || `${profile?.user_first_name || "Professional"}'s Practice`}
+                  </h1>
+                  <div className="flex items-center gap-3 mt-2 text-sm text-amber-100">
+                    <span className="sans flex items-center gap-1.5">
+                      <FolderOpen className="h-4 w-4" strokeWidth={2} />
+                      {allCases.length} active case{allCases.length !== 1 ? "s" : ""}
+                    </span>
+                    <span className="text-amber-300">•</span>
+                    <span className="sans flex items-center gap-1.5">
+                      <Gavel className="h-4 w-4" strokeWidth={2} />
+                      {courtEventCount} upcoming court date{courtEventCount !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
 
+              <div className="relative z-10">
+                <QuickCreateMenu onCreateTask={() => {}} />
+              </div>
+            </div>
+          </div>
 
-      {/* ─── ZONE 5: Court Events · My Tasks · Activity (3-col) ──────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        {/* Court Events */}
-        <Card className="border-slate-200/60 shadow-sm">
-          <CardHeader className="pb-2">
+          {/* Lead Tracking Chart */}
+          <LeadTrackingChart />
+
+          {/* KPI Cards */}
+          <KPICards
+            caseCount={dashboardData.case_count || 0}
+            pendingIntakes={dashboardData.pending_intakes || 0}
+            unreadMessages={dashboardData.unread_messages || 0}
+            pendingApprovals={dashboardData.pending_approvals || 0}
+            upcomingCourtDates={courtEventCount}
+          />
+
+          {/* Lead Pipeline Section */}
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Gavel className="h-4 w-4 text-slate-700" />
-                Court Events
-              </CardTitle>
-              {courtEventCount > 0 && (
-                <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200">
-                  {courtEventCount}
+              <h2 className="sans text-xs font-bold text-amber-900 uppercase tracking-[0.15em] flex items-center gap-3">
+                <div className="h-px w-8 bg-amber-900" />
+                Lead Pipeline
+              </h2>
+              <Link
+                href="/professional/cases"
+                className="sans text-xs font-bold text-amber-900 hover:text-amber-950 transition-colors flex items-center gap-1.5 border-b border-amber-900/20 hover:border-amber-900/40"
+              >
+                All Cases
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <LeadPipeline cases={allCases} />
+          </div>
+
+          {/* Active Alerts */}
+          <Card className="border-2 border-red-900/30 bg-white shadow-lg metric-card">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <div>
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="sans text-[10px] font-bold text-red-900/60 tracking-[0.2em] uppercase">
+                    Urgent Matters
+                  </span>
+                </div>
+                <CardTitle className="serif text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-red-900" strokeWidth={2} />
+                  Active Alerts
+                </CardTitle>
+                <CardDescription className="sans text-xs text-slate-600">
+                  Items requiring immediate attention
+                </CardDescription>
+              </div>
+              {dashboardData.alerts?.length > 0 && (
+                <Badge className="bg-red-50 text-red-900 border-2 border-red-900/30 sans font-bold">
+                  {dashboardData.alerts.length}
                 </Badge>
               )}
-            </div>
-            <CardDescription className="text-xs">Next 30 days</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-1">
-            <CourtDatesWidget events={allEvents} />
-          </CardContent>
-        </Card>
-
-        {/* My Tasks */}
-        <TasksWidget token={token} />
-
-        {/* Recent Activity */}
-        <Card className="border-slate-200/60 shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-[var(--portal-primary)]" />
-              Recent Activity
-            </CardTitle>
-            <CardDescription className="text-xs">Latest case updates</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {dashboardData.recent_activity?.length > 0 ? (
-              <div className="space-y-1">
-                {dashboardData.recent_activity
-                  .slice(0, 8)
-                  .map((activity: any, index: number) => (
-                    <CompactActivityItem key={index} activity={activity} />
+            </CardHeader>
+            <CardContent>
+              {dashboardData.alerts?.length > 0 ? (
+                <div className="space-y-3">
+                  {dashboardData.alerts.slice(0, 5).map((alert: any, index: number) => (
+                    <AlertItem key={index} alert={alert} />
                   ))}
-              </div>
-            ) : (
-              <div className="text-center py-6 text-muted-foreground">
-                <Clock className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                <p className="text-sm">No recent activity</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  {dashboardData.alerts.length > 5 && (
+                    <Button variant="ghost" className="w-full sans text-xs text-slate-600 hover:text-slate-900 font-medium">
+                      View {dashboardData.alerts.length - 5} more alerts
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-10">
+                  <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-emerald-200" strokeWidth={1.5} />
+                  <p className="serif text-sm italic text-slate-400">All matters current — no alerts pending</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Three Column: Court Events · Tasks · Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            {/* Court Events */}
+            <Card className="border-2 border-slate-900/30 bg-white shadow-lg metric-card">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-baseline gap-2">
+                    <span className="sans text-[10px] font-bold text-slate-900/60 tracking-[0.2em] uppercase">
+                      Docket
+                    </span>
+                  </div>
+                  {courtEventCount > 0 && (
+                    <Badge className="bg-slate-50 text-slate-900 border-2 border-slate-900/30 sans font-bold text-xs">
+                      {courtEventCount}
+                    </Badge>
+                  )}
+                </div>
+                <CardTitle className="serif text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <Gavel className="h-5 w-5 text-slate-900" strokeWidth={2} />
+                  Court Events
+                </CardTitle>
+                <CardDescription className="sans text-xs text-slate-600">Next 30 days</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-1">
+                <CourtDatesWidget events={allEvents} />
+              </CardContent>
+            </Card>
+
+            {/* Tasks */}
+            <TasksWidget token={token} />
+
+            {/* Recent Activity */}
+            <Card className="border-2 border-slate-300 bg-white shadow-lg metric-card">
+              <CardHeader className="pb-3">
+                <div className="flex items-baseline gap-2 mb-1">
+                  <span className="sans text-[10px] font-bold text-slate-900/60 tracking-[0.2em] uppercase">
+                    Activity Log
+                  </span>
+                </div>
+                <CardTitle className="serif text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-amber-900" strokeWidth={2} />
+                  Recent Activity
+                </CardTitle>
+                <CardDescription className="sans text-xs text-slate-600">Latest case updates</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {dashboardData.recent_activity?.length > 0 ? (
+                  <div className="space-y-1">
+                    {dashboardData.recent_activity
+                      .slice(0, 8)
+                      .map((activity: any, index: number) => (
+                        <CompactActivityItem key={index} activity={activity} />
+                      ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Clock className="h-10 w-10 mx-auto mb-3 text-slate-200" strokeWidth={1.5} />
+                    <p className="serif text-sm italic text-slate-400">No recent activity recorded</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-// ─── Alert Item ─────────────────────────────────────────────────────────────
+// Alert Item - Editorial Style
 function AlertItem({ alert }: { alert: any }) {
   const severityColors: Record<string, string> = {
-    high: "bg-red-50 text-red-800 border-red-200",
-    medium: "bg-amber-50 text-amber-800 border-amber-200",
-    low: "bg-blue-50 text-blue-800 border-blue-200",
+    high: "bg-red-50 text-red-900 border-2 border-red-900/30",
+    medium: "bg-amber-50 text-amber-900 border-2 border-amber-900/30",
+    low: "bg-blue-50 text-blue-900 border-2 border-blue-900/30",
   };
 
   const typeIcons: Record<string, React.ReactNode> = {
-    intake_pending: <FileText className="h-4 w-4" />,
-    access_request: <Users className="h-4 w-4" />,
-    court_event: <Calendar className="h-4 w-4" />,
-    message_received: <MessageSquare className="h-4 w-4" />,
-    exchange_reminder: <Clock className="h-4 w-4" />,
-    compliance_alert: <AlertTriangle className="h-4 w-4" />,
+    intake_pending: <FileText className="h-4 w-4" strokeWidth={2} />,
+    access_request: <Users className="h-4 w-4" strokeWidth={2} />,
+    court_event: <Calendar className="h-4 w-4" strokeWidth={2} />,
+    message_received: <MessageSquare className="h-4 w-4" strokeWidth={2} />,
+    exchange_reminder: <Clock className="h-4 w-4" strokeWidth={2} />,
+    compliance_alert: <AlertTriangle className="h-4 w-4" strokeWidth={2} />,
   };
 
   const getAlertHref = () => {
@@ -371,48 +459,42 @@ function AlertItem({ alert }: { alert: any }) {
   return (
     <Link href={getAlertHref()}>
       <div
-        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:shadow-md transition-all ${severityColors[alert.severity] || severityColors.medium
-          }`}
+        className={`flex items-start gap-4 p-4 rounded-sm border cursor-pointer hover:shadow-md transition-all ${
+          severityColors[alert.severity] || severityColors.medium
+        }`}
       >
         <div className="mt-0.5 shrink-0">
-          {typeIcons[alert.type] || <Bell className="h-4 w-4" />}
+          {typeIcons[alert.type] || <Bell className="h-4 w-4" strokeWidth={2} />}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm leading-snug">{alert.title}</p>
-          <p className="text-xs opacity-70 mt-0.5 line-clamp-1">{alert.message}</p>
+          <p className="sans font-bold text-sm leading-snug">{alert.title}</p>
+          <p className="sans text-xs opacity-80 mt-1 line-clamp-1">{alert.message}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Badge
             variant={alert.severity === "high" ? "error" : "secondary"}
-            className="text-[10px]"
+            className="sans text-[10px] font-bold uppercase tracking-wider"
           >
             {alert.severity}
           </Badge>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-6 px-2 text-[10px] font-semibold opacity-60 hover:opacity-100"
-            asChild
-          >
-            <span>Review →</span>
-          </Button>
+          <ArrowRight className="h-4 w-4 opacity-60" strokeWidth={2} />
         </div>
       </div>
     </Link>
   );
 }
 
-// ─── Compact Activity Item ───────────────────────────────────────────────────
+// Compact Activity Item - Editorial Style
 function CompactActivityItem({ activity }: { activity: any }) {
   const typeIcons: Record<string, React.ReactNode> = {
-    intake_completed: <CheckCircle2 className="h-3.5 w-3.5 text-[var(--portal-primary)]" />,
-    intake_updated: <FileText className="h-3.5 w-3.5 text-blue-500" />,
-    message_received: <MessageSquare className="h-3.5 w-3.5 text-purple-500" />,
-    agreement_update: <FileText className="h-3.5 w-3.5 text-amber-500" />,
-    exchange_completed: <CheckCircle2 className="h-3.5 w-3.5 text-[var(--portal-primary)]" />,
-    exchange_missed: <AlertTriangle className="h-3.5 w-3.5 text-red-500" />,
-    compliance_change: <TrendingUp className="h-3.5 w-3.5 text-[var(--portal-primary)]" />,
-    court_event_created: <Calendar className="h-3.5 w-3.5 text-purple-500" />,
+    intake_completed: <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700" strokeWidth={2} />,
+    intake_updated: <FileText className="h-3.5 w-3.5 text-blue-700" strokeWidth={2} />,
+    message_received: <MessageSquare className="h-3.5 w-3.5 text-purple-700" strokeWidth={2} />,
+    agreement_update: <FileText className="h-3.5 w-3.5 text-amber-700" strokeWidth={2} />,
+    exchange_completed: <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700" strokeWidth={2} />,
+    exchange_missed: <AlertTriangle className="h-3.5 w-3.5 text-red-700" strokeWidth={2} />,
+    compliance_change: <TrendingUp className="h-3.5 w-3.5 text-amber-700" strokeWidth={2} />,
+    court_event_created: <Calendar className="h-3.5 w-3.5 text-purple-700" strokeWidth={2} />,
   };
 
   const formatTime = (ts: string) => {
@@ -441,16 +523,16 @@ function CompactActivityItem({ activity }: { activity: any }) {
 
   return (
     <Link href={getHref()}>
-      <div className="flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+      <div className="flex items-center gap-3 py-2.5 px-3 -mx-3 rounded-sm hover:bg-amber-50/40 transition-colors cursor-pointer border border-transparent hover:border-amber-900/10">
         <div className="shrink-0">
           {typeIcons[activity.activity_type] || (
-            <Clock className="h-3.5 w-3.5 text-slate-400" />
+            <Clock className="h-3.5 w-3.5 text-slate-400" strokeWidth={2} />
           )}
         </div>
-        <p className="text-xs text-slate-700 flex-1 min-w-0 truncate">
+        <p className="sans text-xs text-slate-700 flex-1 min-w-0 truncate font-medium">
           {activity.title}
         </p>
-        <span className="text-[10px] text-slate-400 shrink-0">
+        <span className="sans text-[10px] text-slate-400 shrink-0 font-semibold">
           {formatTime(activity.timestamp)}
         </span>
       </div>

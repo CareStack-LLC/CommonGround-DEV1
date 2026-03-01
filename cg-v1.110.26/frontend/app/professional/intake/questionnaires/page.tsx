@@ -317,28 +317,34 @@ export default function QuestionnaireBuilderPage() {
     if (isFreeUser) {
         return (
             <div className="p-6 max-w-4xl mx-auto">
+                <style jsx global>{`
+                    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+                    .serif { font-family: 'Crimson Pro', serif; }
+                    .sans { font-family: 'Outfit', sans-serif; }
+                `}</style>
+
                 <div className="flex items-center gap-3 mb-6">
                     <Link href="/professional/intake">
-                        <Button variant="ghost" size="icon">
-                            <ArrowLeft className="h-5 w-5" />
+                        <Button variant="ghost" size="icon" className="hover:bg-amber-50">
+                            <ArrowLeft className="h-5 w-5" strokeWidth={2} />
                         </Button>
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold">Custom Questionnaires</h1>
-                        <p className="text-muted-foreground">Build custom ARIA intake questionnaires</p>
+                        <h1 className="serif text-2xl font-bold text-slate-900">Custom Questionnaires</h1>
+                        <p className="sans text-slate-600">Build custom ARIA intake questionnaires</p>
                     </div>
                 </div>
 
-                <Card className="border-amber-200 bg-gradient-to-br from-amber-50/50 to-orange-50/50">
+                <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-amber-50/50 to-amber-100/50 shadow-lg">
                     <CardContent className="py-12 text-center">
-                        <Lock className="h-12 w-12 mx-auto text-amber-500 mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Solo Tier Required</h3>
-                        <p className="text-muted-foreground mb-4 max-w-md mx-auto">
+                        <Lock className="h-12 w-12 mx-auto text-amber-900 mb-4" />
+                        <h3 className="serif text-lg font-bold text-slate-900 mb-2">Solo Tier Required</h3>
+                        <p className="sans text-slate-600 mb-4 max-w-md mx-auto">
                             Custom intake questionnaires are available on Solo tier ($99/month) and above.
                             The standard 17-section ARIA intake is available on all tiers.
                         </p>
                         <Link href="/professional/settings/subscription">
-                            <Button className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                            <Button className="bg-amber-900 hover:bg-amber-950 text-amber-50 border-2 border-amber-900/40 shadow-lg">
                                 Upgrade to Solo
                             </Button>
                         </Link>
@@ -352,42 +358,48 @@ export default function QuestionnaireBuilderPage() {
     if (activeView === "list") {
         return (
             <div className="p-6 max-w-5xl mx-auto">
+                <style jsx global>{`
+                    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+                    .serif { font-family: 'Crimson Pro', serif; }
+                    .sans { font-family: 'Outfit', sans-serif; }
+                `}</style>
+
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                         <Link href="/professional/intake">
-                            <Button variant="ghost" size="icon">
-                                <ArrowLeft className="h-5 w-5" />
+                            <Button variant="ghost" size="icon" className="hover:bg-amber-50">
+                                <ArrowLeft className="h-5 w-5" strokeWidth={2} />
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-2xl font-bold">Custom Questionnaires</h1>
-                            <p className="text-muted-foreground">
+                            <h1 className="serif text-2xl font-bold text-slate-900">Custom Questionnaires</h1>
+                            <p className="sans text-slate-600">
                                 Build custom ARIA intake questionnaires for your practice
                             </p>
                         </div>
                     </div>
-                    <Button onClick={startNew} className="bg-purple-600 hover:bg-purple-700 text-white">
+                    <Button onClick={startNew} className="bg-amber-900 hover:bg-amber-950 text-amber-50 border-2 border-amber-900/40 shadow-lg sans">
                         <Plus className="h-4 w-4 mr-2" />
                         New Questionnaire
                     </Button>
                 </div>
 
                 {/* Standard intake callout */}
-                <Card className="mb-6 border-blue-200 bg-gradient-to-r from-blue-50/50 to-indigo-50/50">
+                <Card className="mb-6 border-2 border-amber-900/30 bg-gradient-to-r from-amber-50/50 to-amber-100/50 shadow-md">
                     <CardContent className="py-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                                <Sparkles className="h-5 w-5 text-blue-600" />
+                            <div className="p-2 bg-amber-900/10 border border-amber-900/20 rounded-sm">
+                                <Sparkles className="h-5 w-5 text-amber-900" strokeWidth={2} />
                             </div>
                             <div className="flex-1">
-                                <p className="text-sm font-medium text-blue-900">
+                                <p className="sans text-sm font-bold text-amber-900">
                                     Standard 17-Section Custody Intake
                                 </p>
-                                <p className="text-xs text-blue-600">
+                                <p className="sans text-xs text-slate-700">
                                     The standard ARIA intake is always available alongside your custom questionnaires
                                 </p>
                             </div>
-                            <Badge variant="outline" className="border-blue-200 text-blue-700">
+                            <Badge variant="outline" className="border-2 border-amber-900/30 text-amber-900 bg-white sans">
                                 Always Active
                             </Badge>
                         </div>
@@ -396,17 +408,17 @@ export default function QuestionnaireBuilderPage() {
 
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                        <Loader2 className="h-6 w-6 animate-spin text-amber-900" />
                     </div>
                 ) : questionnaires.length === 0 ? (
-                    <Card>
+                    <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
                         <CardContent className="py-12 text-center">
-                            <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                            <h3 className="text-lg font-medium mb-2">No custom questionnaires yet</h3>
-                            <p className="text-muted-foreground mb-4">
+                            <MessageSquare className="h-12 w-12 mx-auto text-amber-900/30 mb-4" />
+                            <h3 className="serif text-lg font-bold text-slate-900 mb-2">No custom questionnaires yet</h3>
+                            <p className="sans text-slate-600 mb-4">
                                 Create a custom questionnaire to gather practice-specific information from clients.
                             </p>
-                            <Button onClick={startNew} variant="outline">
+                            <Button onClick={startNew} variant="outline" className="border-2 border-amber-900/30 hover:bg-amber-50 sans">
                                 <Plus className="h-4 w-4 mr-2" />
                                 Create Your First Questionnaire
                             </Button>
@@ -417,21 +429,21 @@ export default function QuestionnaireBuilderPage() {
                         {questionnaires.map((q) => (
                             <Card
                                 key={q.id}
-                                className="hover:shadow-md transition-shadow cursor-pointer"
+                                className="border-2 border-slate-300 hover:shadow-lg hover:border-amber-900/30 transition-all cursor-pointer bg-white"
                                 onClick={() => startEdit(q)}
                             >
                                 <CardContent className="py-4">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-purple-100 rounded-lg">
-                                                <FileText className="h-5 w-5 text-purple-600" />
+                                            <div className="p-3 bg-gradient-to-br from-amber-900 to-amber-800 border-2 border-amber-900/40 rounded-sm shadow-md">
+                                                <FileText className="h-5 w-5 text-amber-50" strokeWidth={1.5} />
                                             </div>
                                             <div>
-                                                <h3 className="font-medium">{q.name}</h3>
+                                                <h3 className="serif font-bold text-slate-900">{q.name}</h3>
                                                 {q.description && (
-                                                    <p className="text-sm text-muted-foreground">{q.description}</p>
+                                                    <p className="sans text-sm text-slate-600">{q.description}</p>
                                                 )}
-                                                <p className="text-xs text-muted-foreground mt-0.5">
+                                                <p className="sans text-xs text-slate-500 mt-0.5">
                                                     {q.content?.sections?.length || 0} sections · v{q.version} ·
                                                     Updated {new Date(q.updated_at).toLocaleDateString()}
                                                 </p>
@@ -442,8 +454,8 @@ export default function QuestionnaireBuilderPage() {
                                                 variant={q.is_active ? "default" : "outline"}
                                                 className={
                                                     q.is_active
-                                                        ? "bg-green-100 text-green-700 border-green-200"
-                                                        : "text-slate-500"
+                                                        ? "bg-emerald-50 text-emerald-900 border-2 border-emerald-200 sans"
+                                                        : "border-2 border-slate-300 text-slate-600 sans"
                                                 }
                                             >
                                                 {q.is_active ? "Published" : "Draft"}
@@ -455,6 +467,7 @@ export default function QuestionnaireBuilderPage() {
                                                     e.stopPropagation();
                                                     startEdit(q);
                                                 }}
+                                                className="hover:bg-amber-50"
                                             >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
@@ -473,23 +486,29 @@ export default function QuestionnaireBuilderPage() {
     if (activeView === "preview") {
         return (
             <div className="p-6 max-w-3xl mx-auto">
+                <style jsx global>{`
+                    @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+                    .serif { font-family: 'Crimson Pro', serif; }
+                    .sans { font-family: 'Outfit', sans-serif; }
+                `}</style>
+
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <Button variant="ghost" size="icon" onClick={() => setActiveView("editor")}>
-                            <ArrowLeft className="h-5 w-5" />
+                        <Button variant="ghost" size="icon" onClick={() => setActiveView("editor")} className="hover:bg-amber-50">
+                            <ArrowLeft className="h-5 w-5" strokeWidth={2} />
                         </Button>
                         <div>
-                            <h1 className="text-xl font-bold">Preview: {name || "Untitled"}</h1>
-                            <p className="text-sm text-muted-foreground">
+                            <h1 className="serif text-xl font-bold text-slate-900">Preview: {name || "Untitled"}</h1>
+                            <p className="sans text-sm text-slate-600">
                                 How ARIA will present these questions to clients
                             </p>
                         </div>
                     </div>
-                    <Badge variant="outline">Preview Mode</Badge>
+                    <Badge variant="outline" className="border-2 border-amber-900/30 text-amber-900 bg-white sans">Preview Mode</Badge>
                 </div>
 
                 {/* ARIA conversation preview */}
-                <Card className="border-purple-200">
+                <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
                     <CardContent className="py-6">
                         <div className="space-y-6">
                             {/* ARIA greeting */}
@@ -600,30 +619,36 @@ export default function QuestionnaireBuilderPage() {
     // ─── Editor View ─────────────────────────────────────────────
     return (
         <div className="p-6 max-w-5xl mx-auto">
+            <style jsx global>{`
+                @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+                .serif { font-family: 'Crimson Pro', serif; }
+                .sans { font-family: 'Outfit', sans-serif; }
+            `}</style>
+
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-3">
-                    <Button variant="ghost" size="icon" onClick={() => setActiveView("list")}>
-                        <ArrowLeft className="h-5 w-5" />
+                    <Button variant="ghost" size="icon" onClick={() => setActiveView("list")} className="hover:bg-amber-50">
+                        <ArrowLeft className="h-5 w-5" strokeWidth={2} />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold">
+                        <h1 className="serif text-2xl font-bold text-slate-900">
                             {editingId ? "Edit Questionnaire" : "New Questionnaire"}
                         </h1>
-                        <p className="text-muted-foreground">
+                        <p className="sans text-slate-600">
                             Design custom questions for ARIA intake sessions
                         </p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 self-end sm:self-auto">
-                    <Button variant="outline" onClick={() => setActiveView("preview")}>
+                    <Button variant="outline" onClick={() => setActiveView("preview")} className="border-2 border-slate-300 hover:bg-amber-50 sans">
                         <Eye className="h-4 w-4 mr-2" />
                         Preview
                     </Button>
                     <Button
                         onClick={handleSave}
                         disabled={saving || !name.trim()}
-                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                        className="bg-amber-900 hover:bg-amber-950 text-amber-50 border-2 border-amber-900/40 shadow-lg sans"
                     >
                         {saving ? (
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -639,7 +664,8 @@ export default function QuestionnaireBuilderPage() {
                 {/* Main Editor */}
                 <div className="space-y-6">
                     {/* Metadata */}
-                    <Card>
+                    <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                         <CardContent className="py-4 space-y-4">
                             <div>
                                 <Label htmlFor="q-name" className="text-sm font-medium">
@@ -694,7 +720,7 @@ export default function QuestionnaireBuilderPage() {
                     {sections.map((section, sectionIndex) => (
                         <Card
                             key={section.id}
-                            className="border-l-4 border-l-purple-400"
+                            className="border-2 border-l-4 border-amber-900/30 border-l-amber-900 bg-white shadow-lg"
                         >
                             <CardHeader className="pb-3">
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -897,13 +923,13 @@ export default function QuestionnaireBuilderPage() {
 
                 {/* Sidebar */}
                 <div className="space-y-4">
-                    <Card>
+                    <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-md">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm flex items-center gap-2">
-                                <Settings2 className="h-4 w-4" />
+                            <CardTitle className="serif text-sm font-bold text-slate-900 flex items-center gap-2">
+                                <Settings2 className="h-4 w-4" strokeWidth={2} />
                                 Quick Add Sections
                             </CardTitle>
-                            <CardDescription className="text-xs">
+                            <CardDescription className="sans text-xs text-slate-600">
                                 Click to add pre-titled sections
                             </CardDescription>
                         </CardHeader>
@@ -925,14 +951,14 @@ export default function QuestionnaireBuilderPage() {
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-md">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm flex items-center gap-2">
-                                <FileText className="h-4 w-4" />
+                            <CardTitle className="serif text-sm font-bold text-slate-900 flex items-center gap-2">
+                                <FileText className="h-4 w-4" strokeWidth={2} />
                                 Summary
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="text-xs text-muted-foreground space-y-1">
+                        <CardContent className="sans text-xs text-slate-600 space-y-1">
                             <p>{sections.length} section{sections.length !== 1 ? "s" : ""}</p>
                             <p>
                                 {sections.reduce((sum, s) => sum + s.fields.length, 0)} total question
@@ -948,13 +974,13 @@ export default function QuestionnaireBuilderPage() {
                         </CardContent>
                     </Card>
 
-                    <Card className="border-purple-200 bg-purple-50/50">
+                    <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-amber-50 to-amber-100/50 shadow-md">
                         <CardContent className="py-3">
                             <div className="flex items-start gap-2">
-                                <Sparkles className="h-4 w-4 text-purple-600 mt-0.5" />
+                                <Sparkles className="h-4 w-4 text-amber-900 mt-0.5" strokeWidth={2} />
                                 <div>
-                                    <p className="text-xs font-medium text-purple-900">ARIA Integration</p>
-                                    <p className="text-xs text-purple-600 mt-0.5">
+                                    <p className="sans text-xs font-bold text-amber-900">ARIA Integration</p>
+                                    <p className="sans text-xs text-slate-700 mt-0.5">
                                         ARIA will use your sections and questions as a guide, adapting the conversation
                                         naturally while ensuring all required questions are covered.
                                     </p>

@@ -26,6 +26,8 @@ import {
   FileCheck,
   Sparkles,
   FolderOpen,
+  Scale,
+  Gavel,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -257,36 +259,43 @@ export default function IntakeDetailPage() {
 
   return (
     <div className="space-y-6">
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
+        .serif { font-family: 'Crimson Pro', serif; }
+        .sans { font-family: 'Outfit', sans-serif; }
+      `}</style>
+
       {/* Back Link */}
       <Link
         href="/professional/intake"
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-2 text-sm text-amber-900 hover:text-amber-950 font-medium border-b-2 border-transparent hover:border-amber-900 transition-colors"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Intake Center
+        <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+        <span className="sans tracking-wide">Return to Intake Center</span>
       </Link>
 
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-xl rounded-sm p-6">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-purple-100 text-purple-600 rounded-xl">
-            <Bot className="h-8 w-8" />
+          <div className="p-4 bg-gradient-to-br from-amber-900 to-amber-800 text-amber-50 rounded-sm shadow-lg border-2 border-amber-900/40">
+            <Gavel className="h-8 w-8" strokeWidth={1.5} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">
+            <h1 className="serif text-3xl font-bold text-slate-900 tracking-tight">
               {session.client_name || "Unnamed Client"}
             </h1>
-            <div className="flex flex-wrap items-center gap-2 mt-1">
-              <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
-              <span className="text-muted-foreground">|</span>
-              <span className="text-sm text-muted-foreground flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <Badge className={`${statusConfig.color} border-2 sans tracking-wide`}>{statusConfig.label}</Badge>
+              <span className="text-amber-900/30">|</span>
+              <span className="sans text-sm text-slate-600 flex items-center gap-1">
                 <Mail className="h-3.5 w-3.5" />
                 {session.client_email}
               </span>
               {session.client_phone && (
                 <>
-                  <span className="text-muted-foreground">|</span>
-                  <span className="text-sm text-muted-foreground flex items-center gap-1">
+                  <span className="text-amber-900/30">|</span>
+                  <span className="sans text-sm text-slate-600 flex items-center gap-1">
                     <Phone className="h-3.5 w-3.5" />
                     {session.client_phone}
                   </span>
@@ -301,10 +310,10 @@ export default function IntakeDetailPage() {
           {(session.status === "completed" || session.status === "reviewed") && (
             <Button
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+              className="bg-amber-900 hover:bg-amber-950 text-amber-50 border-2 border-amber-900/40 shadow-lg gap-2 sans"
               onClick={() => setShowConvertModal(true)}
             >
-              <FolderOpen className="h-4 w-4" />
+              <Scale className="h-4 w-4" strokeWidth={1.5} />
               Convert to Case
             </Button>
           )}
@@ -314,6 +323,7 @@ export default function IntakeDetailPage() {
               variant="outline"
               size="sm"
               onClick={() => window.open(session.intake_link, "_blank")}
+              className="border-2 border-amber-900/20 hover:bg-amber-50 sans"
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               Open Intake Form
@@ -324,23 +334,24 @@ export default function IntakeDetailPage() {
               variant="outline"
               size="sm"
               onClick={markAsReviewed}
+              className="border-2 border-emerald-900/20 hover:bg-emerald-50 text-emerald-900 sans"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Mark Reviewed
             </Button>
           )}
           {session.status === "reviewed" && (
-            <div className="flex items-center gap-1.5 text-sm text-emerald-700 font-medium bg-emerald-50 border border-emerald-200 rounded-md px-3 py-1.5">
+            <div className="flex items-center gap-1.5 text-sm text-emerald-900 font-medium bg-emerald-50 border-2 border-emerald-200 rounded-sm px-3 py-1.5 sans">
               <CheckCircle2 className="h-4 w-4" />
               Review Complete
             </div>
           )}
 
-          <Button variant="outline" size="sm" onClick={copyIntakeLink}>
+          <Button variant="outline" size="sm" onClick={copyIntakeLink} className="border-2 border-slate-300 hover:bg-amber-50 sans">
             <Copy className="h-4 w-4 mr-2" />
             Copy Link
           </Button>
-          <Button variant="outline" size="sm" onClick={refreshSummary} disabled={isRefreshing}>
+          <Button variant="outline" size="sm" onClick={refreshSummary} disabled={isRefreshing} className="border-2 border-slate-300 hover:bg-amber-50 sans">
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
             {isRefreshing ? "Regenerating..." : "Refresh"}
           </Button>
@@ -387,17 +398,26 @@ export default function IntakeDetailPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="overview">
-            <Sparkles className="h-4 w-4 mr-2" />
+        <TabsList className="bg-amber-50/50 border-2 border-amber-900/10 p-1">
+          <TabsTrigger
+            value="overview"
+            className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-amber-900/20 data-[state=active]:text-amber-900"
+          >
+            <Sparkles className="h-4 w-4 mr-2" strokeWidth={1.5} />
             AI Summary
           </TabsTrigger>
-          <TabsTrigger value="transcript">
-            <MessageSquare className="h-4 w-4 mr-2" />
+          <TabsTrigger
+            value="transcript"
+            className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-amber-900/20 data-[state=active]:text-amber-900"
+          >
+            <MessageSquare className="h-4 w-4 mr-2" strokeWidth={1.5} />
             Transcript
           </TabsTrigger>
-          <TabsTrigger value="extracted">
-            <FileCheck className="h-4 w-4 mr-2" />
+          <TabsTrigger
+            value="extracted"
+            className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-amber-900/20 data-[state=active]:text-amber-900"
+          >
+            <FileCheck className="h-4 w-4 mr-2" strokeWidth={1.5} />
             Extracted Data
           </TabsTrigger>
         </TabsList>
@@ -407,31 +427,34 @@ export default function IntakeDetailPage() {
           {summary ? (
             <div className="grid lg:grid-cols-2 gap-4">
               {/* Case Overview */}
-              <Card>
+              <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                 <CardHeader>
-                  <CardTitle className="text-base">Case Overview</CardTitle>
+                  <CardTitle className="serif text-lg font-bold text-slate-900">Case Overview</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm">{summary.case_overview}</p>
+                  <p className="sans text-sm text-slate-700 leading-relaxed">{summary.case_overview}</p>
                 </CardContent>
               </Card>
 
               {/* Current Situation */}
-              <Card>
+              <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                 <CardHeader>
-                  <CardTitle className="text-base">Current Situation</CardTitle>
+                  <CardTitle className="serif text-lg font-bold text-slate-900">Current Situation</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm">{summary.current_situation}</p>
+                  <p className="sans text-sm text-slate-700 leading-relaxed">{summary.current_situation}</p>
                 </CardContent>
               </Card>
 
               {/* Children */}
               {summary.children && summary.children.length > 0 && (
-                <Card>
+                <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                   <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                      <Users className="h-4 w-4" />
+                    <CardTitle className="serif text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <Users className="h-5 w-5" strokeWidth={1.5} />
                       Children
                     </CardTitle>
                   </CardHeader>
@@ -440,10 +463,10 @@ export default function IntakeDetailPage() {
                       {summary.children.map((child, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-2 bg-muted/50 rounded-lg"
+                          className="flex items-center justify-between p-3 bg-amber-50/50 border border-amber-900/10 rounded-sm"
                         >
-                          <span className="font-medium">{child.name}</span>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="serif font-bold text-slate-900">{child.name}</span>
+                          <span className="sans text-sm text-slate-600">
                             Age {child.age}
                           </span>
                         </div>
@@ -454,15 +477,16 @@ export default function IntakeDetailPage() {
               )}
 
               {/* Goals */}
-              <Card>
+              <Card className="border-2 border-emerald-900/30 bg-gradient-to-br from-white via-emerald-50/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-900 via-emerald-600 to-emerald-900"></div>
                 <CardHeader>
-                  <CardTitle className="text-base text-emerald-600">Client Goals</CardTitle>
+                  <CardTitle className="serif text-lg font-bold text-emerald-900">Client Goals</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
                     {summary.goals.map((goal, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                      <li key={index} className="flex items-start gap-2 sans text-sm text-slate-700">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" strokeWidth={2} />
                         {goal}
                       </li>
                     ))}
@@ -471,15 +495,16 @@ export default function IntakeDetailPage() {
               </Card>
 
               {/* Concerns */}
-              <Card>
+              <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                 <CardHeader>
-                  <CardTitle className="text-base text-amber-600">Key Concerns</CardTitle>
+                  <CardTitle className="serif text-lg font-bold text-amber-900">Key Concerns</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
                     {summary.concerns.map((concern, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm">
-                        <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                      <li key={index} className="flex items-start gap-2 sans text-sm text-slate-700">
+                        <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" strokeWidth={2} />
                         {concern}
                       </li>
                     ))}
@@ -488,20 +513,21 @@ export default function IntakeDetailPage() {
               </Card>
 
               {/* Recommended Actions */}
-              <Card className="lg:col-span-2">
+              <Card className="lg:col-span-2 border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                 <CardHeader>
-                  <CardTitle className="text-base text-purple-600">
+                  <CardTitle className="serif text-lg font-bold text-amber-900">
                     Recommended Next Steps
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-2">
+                  <div className="grid md:grid-cols-2 gap-3">
                     {summary.recommended_actions.map((action, index) => (
                       <div
                         key={index}
-                        className="flex items-start gap-2 p-2 bg-purple-50 rounded-lg text-sm"
+                        className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-900/20 rounded-sm sans text-sm text-slate-700"
                       >
-                        <span className="font-medium text-purple-600">{index + 1}.</span>
+                        <span className="serif font-bold text-amber-900 min-w-[24px]">{index + 1}.</span>
                         {action}
                       </div>
                     ))}
@@ -510,21 +536,21 @@ export default function IntakeDetailPage() {
               </Card>
 
               {/* Confidence Score */}
-              <Card className="lg:col-span-2">
+              <Card className="lg:col-span-2 border-2 border-amber-900/30 bg-gradient-to-br from-amber-50 to-amber-100/50 shadow-md">
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-purple-500" />
-                      <span className="text-sm font-medium">AI Confidence Score</span>
+                      <Sparkles className="h-5 w-5 text-amber-900" strokeWidth={2} />
+                      <span className="sans text-sm font-bold text-amber-900 tracking-[0.1em] uppercase">AI Confidence Score</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="flex items-center gap-3">
+                      <div className="w-32 h-2 bg-amber-900/20 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-purple-500 rounded-full"
+                          className="h-full bg-amber-900 rounded-full"
                           style={{ width: `${summary.confidence_score * 100}%` }}
                         />
                       </div>
-                      <span className="text-sm font-medium">
+                      <span className="serif text-sm font-bold text-amber-900">
                         {Math.round(summary.confidence_score * 100)}%
                       </span>
                     </div>
@@ -533,13 +559,13 @@ export default function IntakeDetailPage() {
               </Card>
             </div>
           ) : (
-            <Card>
+            <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
               <CardContent className="py-12 text-center">
-                <Sparkles className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">
+                <Sparkles className="h-12 w-12 mx-auto text-amber-900/30 mb-4" />
+                <h3 className="serif text-lg font-bold text-slate-900 mb-2">
                   Summary Not Available
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="sans text-slate-600">
                   {session.status === "completed"
                     ? "The AI summary is being generated..."
                     : "Summary will be available once the intake is completed."}
@@ -551,10 +577,11 @@ export default function IntakeDetailPage() {
 
         {/* Transcript Tab */}
         <TabsContent value="transcript" className="mt-4">
-          <Card>
+          <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
             <CardHeader>
-              <CardTitle className="text-base">Conversation Transcript</CardTitle>
-              <CardDescription>
+              <CardTitle className="serif text-lg font-bold text-slate-900">Conversation Transcript</CardTitle>
+              <CardDescription className="sans text-slate-600">
                 Full conversation between ARIA and the client
               </CardDescription>
             </CardHeader>
@@ -621,12 +648,13 @@ export default function IntakeDetailPage() {
             <div className="space-y-4">
               {/* Parties */}
               {extractedData.parties && (
-                <Card>
+                <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                   <CardHeader>
-                    <CardTitle className="text-base">Party Information</CardTitle>
+                    <CardTitle className="serif text-lg font-bold text-slate-900">Party Information</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="text-xs bg-muted p-3 rounded-lg overflow-auto">
+                    <pre className="text-xs bg-amber-50/50 border border-amber-900/10 p-3 rounded-sm overflow-auto sans">
                       {JSON.stringify(extractedData.parties, null, 2)}
                     </pre>
                   </CardContent>
@@ -635,12 +663,13 @@ export default function IntakeDetailPage() {
 
               {/* Children */}
               {extractedData.children && extractedData.children.length > 0 && (
-                <Card>
+                <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                   <CardHeader>
-                    <CardTitle className="text-base">Children</CardTitle>
+                    <CardTitle className="serif text-lg font-bold text-slate-900">Children</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="text-xs bg-muted p-3 rounded-lg overflow-auto">
+                    <pre className="text-xs bg-amber-50/50 border border-amber-900/10 p-3 rounded-sm overflow-auto sans">
                       {JSON.stringify(extractedData.children, null, 2)}
                     </pre>
                   </CardContent>
@@ -649,12 +678,13 @@ export default function IntakeDetailPage() {
 
               {/* Custody Preferences */}
               {extractedData.custody_preferences && (
-                <Card>
+                <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                   <CardHeader>
-                    <CardTitle className="text-base">Custody Preferences</CardTitle>
+                    <CardTitle className="serif text-lg font-bold text-slate-900">Custody Preferences</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="text-xs bg-muted p-3 rounded-lg overflow-auto">
+                    <pre className="text-xs bg-amber-50/50 border border-amber-900/10 p-3 rounded-sm overflow-auto sans">
                       {JSON.stringify(extractedData.custody_preferences, null, 2)}
                     </pre>
                   </CardContent>
@@ -663,12 +693,13 @@ export default function IntakeDetailPage() {
 
               {/* Schedule Preferences */}
               {extractedData.schedule_preferences && (
-                <Card>
+                <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                   <CardHeader>
-                    <CardTitle className="text-base">Schedule Preferences</CardTitle>
+                    <CardTitle className="serif text-lg font-bold text-slate-900">Schedule Preferences</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="text-xs bg-muted p-3 rounded-lg overflow-auto">
+                    <pre className="text-xs bg-amber-50/50 border border-amber-900/10 p-3 rounded-sm overflow-auto sans">
                       {JSON.stringify(extractedData.schedule_preferences, null, 2)}
                     </pre>
                   </CardContent>
@@ -678,18 +709,19 @@ export default function IntakeDetailPage() {
               {/* Special Considerations */}
               {extractedData.special_considerations &&
                 extractedData.special_considerations.length > 0 && (
-                  <Card>
+                  <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
                     <CardHeader>
-                      <CardTitle className="text-base">Special Considerations</CardTitle>
+                      <CardTitle className="serif text-lg font-bold text-slate-900">Special Considerations</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <ul className="space-y-2">
                         {extractedData.special_considerations.map((item, index) => (
                           <li
                             key={index}
-                            className="flex items-start gap-2 text-sm p-2 bg-amber-50 rounded-lg"
+                            className="flex items-start gap-2 sans text-sm p-3 bg-amber-50 border border-amber-900/20 rounded-sm"
                           >
-                            <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5" />
+                            <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" strokeWidth={2} />
                             {item}
                           </li>
                         ))}
@@ -699,19 +731,19 @@ export default function IntakeDetailPage() {
                 )}
 
               {/* Download Button */}
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full border-2 border-amber-900/30 hover:bg-amber-50 sans">
                 <Download className="h-4 w-4 mr-2" />
                 Export Extracted Data (JSON)
               </Button>
             </div>
           ) : (
-            <Card>
+            <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg">
               <CardContent className="py-12 text-center">
-                <FileCheck className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">
+                <FileCheck className="h-12 w-12 mx-auto text-amber-900/30 mb-4" />
+                <h3 className="serif text-lg font-bold text-slate-900 mb-2">
                   No Extracted Data
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="sans text-slate-600">
                   Structured data will be extracted once the intake is completed.
                 </p>
               </CardContent>
@@ -734,13 +766,13 @@ function InfoCard({
   icon: React.ReactNode;
 }) {
   return (
-    <Card>
+    <Card className="border-2 border-slate-300 bg-white shadow-sm">
       <CardContent className="pt-4">
-        <div className="flex items-center gap-2 text-muted-foreground mb-1">
+        <div className="flex items-center gap-2 text-amber-900/60 mb-1">
           {icon}
-          <span className="text-xs">{label}</span>
+          <span className="sans text-xs font-bold tracking-[0.1em] uppercase">{label}</span>
         </div>
-        <p className="font-medium">{value}</p>
+        <p className="serif font-bold text-slate-900">{value}</p>
       </CardContent>
     </Card>
   );
