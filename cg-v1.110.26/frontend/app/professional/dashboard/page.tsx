@@ -33,7 +33,7 @@ import { AssignProfessionalDialog } from "@/components/professional/assign-profe
 import { TasksWidget } from "@/components/professional/dashboard/tasks-widget";
 import { QuickCreateMenu } from "@/components/professional/dashboard/quick-create-menu";
 import { KPICards } from "@/components/professional/dashboard/kpi-cards";
-import { ComplianceLineChart } from "@/components/professional/dashboard/compliance-line-chart";
+import { LeadTrackingChart } from "@/components/professional/dashboard/lead-tracking-chart";
 import { LeadPipeline } from "@/components/professional/dashboard/lead-pipeline";
 import { CourtDatesWidget } from "@/components/professional/dashboard/court-dates-widget";
 
@@ -47,7 +47,6 @@ export default function ProfessionalDashboardPage() {
 
   const [selectedInvitation, setSelectedInvitation] = useState<any>(null);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
-  const [openAddTask, setOpenAddTask] = useState(false);
 
   const handleAccept = (invitation: any) => {
     setSelectedInvitation(invitation);
@@ -163,8 +162,8 @@ export default function ProfessionalDashboardPage() {
       </Dialog>
 
       {/* ─── ZONE 1: Command Header ─────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-5 shadow-xl border border-slate-700/40">
-        {/* Decorative orb */}
+      <div className="relative rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-5 shadow-xl border border-slate-700/40">
+        {/* Decorative orbs */}
         <div className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-[var(--portal-primary)]/10 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-blue-500/10 blur-2xl" />
 
@@ -224,11 +223,13 @@ export default function ProfessionalDashboardPage() {
                 Calendar
               </Button>
             </Link>
-            <div className="hidden sm:block">
-              <QuickCreateMenu onCreateTask={() => setOpenAddTask(true)} />
-            </div>
           </div>
         </div>
+      </div>
+
+      {/* Quick Create floats outside the dark card so its dropdown isn't clipped */}
+      <div className="flex justify-end -mt-4">
+        <QuickCreateMenu onCreateTask={() => { }} />
       </div>
 
       {/* ─── ZONE 2: KPI Cards ──────────────────────────────────────────── */}
@@ -242,137 +243,134 @@ export default function ProfessionalDashboardPage() {
         upcomingCourtDates={courtEventCount}
       />
 
-      {/* ─── ZONE 3: Two-column Intel Grid ──────────────────────────────── */}
-      <div className="grid lg:grid-cols-3 gap-6 items-start">
-        {/* Left column — Lead Pipeline + Alerts */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Lead Pipeline */}
-          <section>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                <div className="h-1 w-8 bg-[var(--portal-primary)] rounded-full" />
-                Lead Pipeline
-              </h2>
-              <Link
-                href="/professional/cases"
-                className="text-xs font-semibold text-[var(--portal-primary)] hover:underline flex items-center gap-1"
-              >
-                All Cases
-                <ArrowRight className="h-3 w-3" />
-              </Link>
+      {/* ─── ZONE 3: Lead Pipeline + Alerts ─────────────────────────────── */}
+      <div className="space-y-6">
+        {/* Lead Pipeline */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <div className="h-1 w-8 bg-[var(--portal-primary)] rounded-full" />
+              Lead Pipeline
+            </h2>
+            <Link
+              href="/professional/cases"
+              className="text-xs font-semibold text-[var(--portal-primary)] hover:underline flex items-center gap-1"
+            >
+              All Cases
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          <LeadPipeline cases={allCases} />
+        </section>
+
+        {/* Active Alerts */}
+        <Card className="border-slate-200/60 shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <AlertTriangle className="h-4.5 w-4.5 text-amber-500" />
+                Active Alerts
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Items requiring your attention
+              </CardDescription>
             </div>
-            <LeadPipeline cases={allCases} />
-          </section>
-
-          {/* Active Alerts */}
-          <Card className="border-slate-200/60 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <div>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <AlertTriangle className="h-4.5 w-4.5 text-amber-500" />
-                  Active Alerts
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  Items requiring your attention
-                </CardDescription>
-              </div>
-              {dashboardData.alerts?.length > 0 && (
-                <Badge variant="warning">
-                  {dashboardData.alerts.length}
-                </Badge>
-              )}
-            </CardHeader>
-            <CardContent>
-              {dashboardData.alerts?.length > 0 ? (
-                <div className="space-y-2.5">
-                  {dashboardData.alerts.slice(0, 5).map((alert: any, index: number) => (
-                    <AlertItem key={index} alert={alert} />
-                  ))}
-                  {dashboardData.alerts.length > 5 && (
-                    <Button variant="ghost" className="w-full text-xs text-muted-foreground">
-                      View {dashboardData.alerts.length - 5} more alerts
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <CheckCircle2 className="h-10 w-10 mx-auto mb-2 text-[var(--portal-primary)]" />
-                  <p className="text-sm">All clear — no active alerts</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right column — Court Dates + Activity Feed */}
-        <div className="space-y-6">
-          {/* Court Dates */}
-          <Card className="border-slate-200/60 shadow-sm">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Gavel className="h-4 w-4 text-slate-700" />
-                  Court Dates
-                </CardTitle>
-                {courtEventCount > 0 && (
-                  <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200">
-                    {courtEventCount} upcoming
-                  </Badge>
+            {dashboardData.alerts?.length > 0 && (
+              <Badge variant="warning">
+                {dashboardData.alerts.length}
+              </Badge>
+            )}
+          </CardHeader>
+          <CardContent>
+            {dashboardData.alerts?.length > 0 ? (
+              <div className="space-y-2.5">
+                {dashboardData.alerts.slice(0, 5).map((alert: any, index: number) => (
+                  <AlertItem key={index} alert={alert} />
+                ))}
+                {dashboardData.alerts.length > 5 && (
+                  <Button variant="ghost" className="w-full text-xs text-muted-foreground">
+                    View {dashboardData.alerts.length - 5} more alerts
+                  </Button>
                 )}
               </div>
-              <CardDescription className="text-xs">Next 30 days</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-1">
-              <CourtDatesWidget events={allEvents} />
-            </CardContent>
-          </Card>
-
-          {/* Compact Activity Feed */}
-          <Card className="border-slate-200/60 shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-[var(--portal-primary)]" />
-                Recent Activity
-              </CardTitle>
-              <CardDescription className="text-xs">Latest case updates</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {dashboardData.recent_activity?.length > 0 ? (
-                <div className="space-y-1">
-                  {dashboardData.recent_activity
-                    .slice(0, 7)
-                    .map((activity: any, index: number) => (
-                      <CompactActivityItem key={index} activity={activity} />
-                    ))}
-                </div>
-              ) : (
-                <div className="text-center py-6 text-muted-foreground">
-                  <Clock className="h-8 w-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">No recent activity</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <CheckCircle2 className="h-10 w-10 mx-auto mb-2 text-[var(--portal-primary)]" />
+                <p className="text-sm">All clear — no active alerts</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* ─── ZONE 4: Analytics Strip ────────────────────────────────────── */}
+      {/* ─── ZONE 4: Lead Tracking Chart ─────────────────────────────── */}
       <section>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-            <div className="h-1 w-8 bg-blue-400 rounded-full" />
-            Compliance Analytics
+            <div className="h-1 w-8 bg-amber-400 rounded-full" />
+            Lead Volume
           </h2>
           <Link href="/professional/reports" className="text-xs font-semibold text-[var(--portal-primary)] hover:underline flex items-center gap-1">
             Full Reports
             <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
-        <ComplianceLineChart period="30d" />
+        <LeadTrackingChart />
       </section>
 
-      {/* ─── Tasks Widget ────────────────────────────────────────────────── */}
-      <TasksWidget token={token} />
+      {/* ─── ZONE 5: Court Events · My Tasks · Activity (3-col) ──────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        {/* Court Events */}
+        <Card className="border-slate-200/60 shadow-sm">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Gavel className="h-4 w-4 text-slate-700" />
+                Court Events
+              </CardTitle>
+              {courtEventCount > 0 && (
+                <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                  {courtEventCount}
+                </Badge>
+              )}
+            </div>
+            <CardDescription className="text-xs">Next 30 days</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-1">
+            <CourtDatesWidget events={allEvents} />
+          </CardContent>
+        </Card>
+
+        {/* My Tasks */}
+        <TasksWidget token={token} />
+
+        {/* Recent Activity */}
+        <Card className="border-slate-200/60 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-[var(--portal-primary)]" />
+              Recent Activity
+            </CardTitle>
+            <CardDescription className="text-xs">Latest case updates</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {dashboardData.recent_activity?.length > 0 ? (
+              <div className="space-y-1">
+                {dashboardData.recent_activity
+                  .slice(0, 8)
+                  .map((activity: any, index: number) => (
+                    <CompactActivityItem key={index} activity={activity} />
+                  ))}
+              </div>
+            ) : (
+              <div className="text-center py-6 text-muted-foreground">
+                <Clock className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                <p className="text-sm">No recent activity</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
