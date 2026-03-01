@@ -29,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useProfessionalAuth } from "../../layout";
 import { CaseTimelineTab } from "@/components/professional/case-view/case-timeline-tab";
 import { ClientCommunicationTab } from "@/components/professional/case-view/client-communication-tab";
+import { CaseOverviewTab } from "@/components/professional/case-view/case-overview-tab";
 import { DocumentList } from "@/components/professional/document-list";
 import { CaseSummaryAlert, generateSampleCaseSummary } from "@/components/professional/case-summary-alert";
 import { CaseDetailSkeleton } from "@/components/professional/case-detail-skeleton";
@@ -210,101 +211,7 @@ export default function CaseDetailPage() {
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6 m-0 outline-none">
-          {/* What You Need to Know Summary */}
-          <CaseSummaryAlert data={generateSampleCaseSummary(82)} />
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <QuickStat
-              label="Timeline Events"
-              value={timelineSummary?.total_events || 0}
-              icon={<Clock className="h-5 w-5" />}
-              href="#"
-              color="blue"
-            />
-            <QuickStat
-              label="Messages"
-              value={timelineSummary?.messages || 0}
-              icon={<MessageSquare className="h-5 w-5" />}
-              href="#"
-              color="purple"
-            />
-            <QuickStat
-              label="Exchanges"
-              value={timelineSummary?.exchanges || 0}
-              icon={<Calendar className="h-5 w-5" />}
-              href="#"
-              color="amber"
-            />
-            <QuickStat
-              label="Court Events"
-              value={timelineSummary?.court_events || 0}
-              icon={<Scale className="h-5 w-5" />}
-              href="#"
-              color="teal"
-            />
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 space-y-6">
-              <Card className="border-slate-200">
-                <CardHeader>
-                  <CardTitle className="text-base font-bold flex items-center gap-2">
-                    <History className="h-4 w-4 text-indigo-500" />
-                    Recent Activity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="divide-y divide-slate-100">
-                    {/* Placeholder for activity stream */}
-                    <div className="p-4 flex items-center justify-between text-sm text-slate-500 italic">
-                      Recent case activity will stream here...
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="space-y-6">
-              <Card className="border-slate-200 bg-indigo-50/30">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-bold text-slate-900 uppercase tracking-wider">Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <Button variant="outline" className="w-full justify-start text-xs h-9 bg-white" asChild>
-                    <Link href={`/professional/cases/${familyFileId}/aria`}>
-                      <Bot className="h-3.5 w-3.5 mr-2 text-indigo-500" />
-                      Review ARIA Rules
-                    </Link>
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start text-xs h-9 bg-white" asChild>
-                    <Link href={`/professional/cases/${familyFileId}/exports`}>
-                      <Download className="h-3.5 w-3.5 mr-2 text-indigo-500" />
-                      Export Discovery File
-                    </Link>
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start text-xs h-9 bg-white">
-                    <Scale className="h-3.5 w-3.5 mr-2 text-indigo-500" />
-                    Add Court Deadline
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="border-slate-200">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-bold text-slate-900 uppercase tracking-wider">Case Access</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {caseData.access_scopes?.map((scope) => (
-                      <Badge key={scope} variant="outline" className="capitalize bg-slate-50 text-slate-700 border-slate-200 text-[10px]">
-                        {scope.replace("_", " ")}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+          <CaseOverviewTab familyFileId={familyFileId} token={token || ""} />
         </TabsContent>
 
         {/* Timeline Tab */}

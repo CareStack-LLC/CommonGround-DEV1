@@ -38,12 +38,19 @@ class TaskUpdateBody(BaseModel):
 async def list_tasks(
     completed: Optional[bool] = Query(None),
     priority: Optional[str] = Query(None),
+    case_id: Optional[str] = Query(None),
     limit: int = Query(50, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
     profile: ProfessionalProfile = Depends(get_current_professional),
 ):
     svc = ProfessionalTaskService(db)
-    return await svc.list_tasks(str(profile.id), completed=completed, priority=priority, limit=limit)
+    return await svc.list_tasks(
+        str(profile.id), 
+        completed=completed, 
+        priority=priority, 
+        case_id=case_id,
+        limit=limit
+    )
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, summary="Create a professional task")

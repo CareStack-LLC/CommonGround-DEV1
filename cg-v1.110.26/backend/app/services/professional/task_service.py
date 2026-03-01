@@ -18,6 +18,7 @@ class ProfessionalTaskService:
         professional_id: str,
         completed: Optional[bool] = None,
         priority: Optional[str] = None,
+        case_id: Optional[str] = None,
         limit: int = 50,
     ) -> list[dict]:
         base = """
@@ -33,6 +34,9 @@ class ProfessionalTaskService:
         if priority:
             base += " AND priority = :priority"
             params["priority"] = priority
+        if case_id:
+            base += " AND case_id = :case_id"
+            params["case_id"] = case_id
         base += " ORDER BY CASE WHEN due_date IS NULL THEN 1 ELSE 0 END, due_date ASC, created_at DESC LIMIT :limit"
         result = await self.db.execute(text(base), params)
         return [dict(r._mapping) for r in result.fetchall()]
