@@ -270,20 +270,6 @@ export default function ProfessionalDashboardPage() {
         </Card>
       </div>
 
-      {/* ─── ZONE 4: Lead Tracking Chart ─────────────────────────────── */}
-      <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-            <div className="h-1 w-8 bg-amber-400 rounded-full" />
-            Lead Volume
-          </h2>
-          <Link href="/professional/reports" className="text-xs font-semibold text-[var(--portal-primary)] hover:underline flex items-center gap-1">
-            Full Reports
-            <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
-        <LeadTrackingChart />
-      </section>
 
       {/* ─── ZONE 5: Court Events · My Tasks · Activity (3-col) ──────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
