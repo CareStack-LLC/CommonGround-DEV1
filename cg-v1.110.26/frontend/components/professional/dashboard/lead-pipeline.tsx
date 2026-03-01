@@ -188,7 +188,7 @@ export function LeadPipeline({ cases }: LeadPipelineProps) {
                                                 {config.icon}
                                                 {config.label}
                                             </Badge>
-                                            {c.unread_messages > 0 && (
+                                            {(c.unread_messages ?? 0) > 0 && (
                                                 <span className="flex items-center gap-1 text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded-full">
                                                     <MessageSquare className="h-2.5 w-2.5" />
                                                     {c.unread_messages}
