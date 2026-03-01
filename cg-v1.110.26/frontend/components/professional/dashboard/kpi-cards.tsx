@@ -8,19 +8,21 @@ import {
   Shield,
   TrendingUp,
   TrendingDown,
-  AlertTriangle,
+  UserPlus,
+  Gavel,
 } from "lucide-react";
 import Link from "next/link";
 
 interface KPIData {
   title: string;
-  metric: number;
+  metric: number | string;
   delta?: number;
   deltaType?: "increase" | "decrease" | "unchanged";
   target?: number;
   icon: React.ReactNode;
   href: string;
   color: "teal" | "amber" | "blue" | "purple" | "emerald";
+  suffix?: string;
 }
 
 interface KPICardsProps {
@@ -30,6 +32,7 @@ interface KPICardsProps {
   pendingApprovals: number;
   avgCompliance?: number;
   complianceTrend?: number;
+  upcomingCourtDates?: number;
 }
 
 export function KPICards({
@@ -39,6 +42,7 @@ export function KPICards({
   pendingApprovals,
   avgCompliance = 0,
   complianceTrend = 0,
+  upcomingCourtDates = 0,
 }: KPICardsProps) {
   const kpiData: KPIData[] = [
     {
@@ -51,21 +55,18 @@ export function KPICards({
       color: "teal",
     },
     {
-      title: "Avg Compliance",
-      metric: avgCompliance,
-      delta: complianceTrend,
-      deltaType: complianceTrend >= 0 ? "increase" : "decrease",
-      target: 80,
-      icon: <Shield className="h-5 w-5" />,
-      href: "/professional/cases?sort=compliance",
-      color: "emerald",
-    },
-    {
-      title: "Pending Intakes",
+      title: "New Leads",
       metric: pendingIntakes,
-      icon: <AlertTriangle className="h-5 w-5" />,
+      icon: <UserPlus className="h-5 w-5" />,
       href: "/professional/intake?tab=aria&status=pending",
       color: "amber",
+    },
+    {
+      title: "Court Dates",
+      metric: upcomingCourtDates,
+      icon: <Gavel className="h-5 w-5" />,
+      href: "/professional/calendar",
+      color: "purple",
     },
     {
       title: "Unread Messages",
@@ -75,11 +76,15 @@ export function KPICards({
       color: "blue",
     },
     {
-      title: "Pending Approvals",
-      metric: pendingApprovals,
-      icon: <Clock className="h-5 w-5" />,
-      href: "/professional/intake?tab=invitations&status=pending",
-      color: "purple",
+      title: "Avg Compliance",
+      metric: avgCompliance,
+      delta: complianceTrend,
+      deltaType: complianceTrend >= 0 ? "increase" : "decrease",
+      target: 80,
+      icon: <Shield className="h-5 w-5" />,
+      href: "/professional/cases?sort=compliance",
+      color: "emerald",
+      suffix: "%",
     },
   ];
 
@@ -102,9 +107,15 @@ export function KPICards({
                 <Text className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider truncate">
                   {item.title}
                 </Text>
-                <Flex justifyContent="start" alignItems="baseline" className="space-x-2 truncate">
+                <Flex
+                  justifyContent="start"
+                  alignItems="baseline"
+                  className="space-x-2 truncate"
+                >
                   <Metric className="text-slate-900 dark:text-slate-50 truncate">
-                    {item.title.includes("Compliance") ? `${item.metric}%` : item.metric}
+                    {item.suffix
+                      ? `${item.metric}${item.suffix}`
+                      : item.metric}
                   </Metric>
                   {item.delta !== undefined && item.delta !== 0 && (
                     <BadgeDelta
@@ -118,7 +129,7 @@ export function KPICards({
                         <TrendingDown className="h-3 w-3" />
                       )}
                       {Math.abs(item.delta)}
-                      {item.title.includes("Compliance") ? "%" : ""}
+                      {item.suffix || ""}
                     </BadgeDelta>
                   )}
                 </Flex>
@@ -137,12 +148,12 @@ export function KPICards({
 }
 
 function getGradient(color: string): string {
-  const gradients = {
+  const gradients: Record<string, string> = {
     teal: "from-teal-500 to-cyan-600",
     amber: "from-amber-500 to-orange-600",
     blue: "from-blue-500 to-indigo-600",
     purple: "from-purple-500 to-pink-600",
     emerald: "from-emerald-500 to-teal-600",
   };
-  return gradients[color as keyof typeof gradients] || gradients.teal;
+  return gradients[color] || gradients.teal;
 }

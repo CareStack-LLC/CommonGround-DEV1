@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  FolderOpen,
   MessageSquare,
   Clock,
   AlertTriangle,
@@ -14,25 +13,34 @@ import {
   Users,
   TrendingUp,
   Bell,
-  Bot,
+  Plus,
+  Gavel,
+  FileBarChart2,
 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useProfessionalAuth } from "../layout";
 import { InvitationSummaryAlert } from "@/components/professional/invitation-summary-alert";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { AssignProfessionalDialog } from "@/components/professional/assign-professional-dialog";
-import { CaseCard } from "@/components/professional/case-card";
 import { TasksWidget } from "@/components/professional/dashboard/tasks-widget";
 import { QuickCreateMenu } from "@/components/professional/dashboard/quick-create-menu";
 import { KPICards } from "@/components/professional/dashboard/kpi-cards";
 import { ComplianceLineChart } from "@/components/professional/dashboard/compliance-line-chart";
+import { LeadPipeline } from "@/components/professional/dashboard/lead-pipeline";
+import { CourtDatesWidget } from "@/components/professional/dashboard/court-dates-widget";
 
 export default function ProfessionalDashboardPage() {
-  const { profile, dashboardData, activeFirm, refreshDashboard, token } = useProfessionalAuth();
+  const { profile, dashboardData, activeFirm, refreshDashboard, token } =
+    useProfessionalAuth();
 
-  // Refresh dashboard on mount
   useEffect(() => {
     refreshDashboard();
   }, [activeFirm]);
@@ -43,7 +51,6 @@ export default function ProfessionalDashboardPage() {
 
   const handleAccept = (invitation: any) => {
     setSelectedInvitation(invitation);
-    // Some roles might require assignment, others (representation) are unilateral but still might need a professional assigned
     setShowAssignDialog(true);
   };
 
@@ -51,7 +58,6 @@ export default function ProfessionalDashboardPage() {
 
   const handleAssign = async (professionalId: string) => {
     if (!token || !selectedInvitation || !activeFirm) return;
-
     try {
       const response = await fetch(
         `${API_BASE}/api/v1/professional/firms/${activeFirm.id}/invitations/${selectedInvitation.id}/accept`,
@@ -64,7 +70,6 @@ export default function ProfessionalDashboardPage() {
           body: JSON.stringify({ assigned_professional_id: professionalId }),
         }
       );
-
       if (response.ok) {
         setShowAssignDialog(false);
         setSelectedInvitation(null);
@@ -84,10 +89,30 @@ export default function ProfessionalDashboardPage() {
   }
 
   const pendingFirmInvitations = dashboardData?.pending_firm_invitations_data || [];
+  const allCases = dashboardData.priority_cases || [];
+  const allEvents = dashboardData.upcoming_events || [];
+  const courtEventCount = allEvents.filter((e: any) => {
+    const type = (e.event_type || "").toLowerCase();
+    return (
+      type.includes("court") ||
+      type.includes("hearing") ||
+      type.includes("trial") ||
+      type.includes("mediation") ||
+      type.includes("judgment") ||
+      e.is_mandatory
+    );
+  }).length;
+
+  const today = new Date();
+  const dateLabel = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
-    <div className="space-y-6">
-      {/* Pending Invitations Banner - High Visibility */}
+    <div className="space-y-7">
+      {/* Pending Invitations Banner */}
       {pendingFirmInvitations.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -95,8 +120,11 @@ export default function ProfessionalDashboardPage() {
               <div className="h-1 w-8 bg-emerald-500 rounded-full" />
               Pending Case Invitations ({pendingFirmInvitations.length})
             </h2>
-            <Link href="/professional/intake?tab=invitations" className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
-              View All Invitations
+            <Link
+              href="/professional/intake?tab=invitations"
+              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 transition-colors"
+            >
+              View All
             </Link>
           </div>
           <div className="grid gap-4">
@@ -112,7 +140,8 @@ export default function ProfessionalDashboardPage() {
             ))}
             {pendingFirmInvitations.length > 1 && (
               <p className="text-center text-xs text-slate-400 font-medium">
-                + {pendingFirmInvitations.length - 1} other case{pendingFirmInvitations.length - 1 !== 1 ? "s" : ""} waiting for your review
+                +{pendingFirmInvitations.length - 1} other case
+                {pendingFirmInvitations.length - 1 !== 1 ? "s" : ""} waiting
               </p>
             )}
           </div>
@@ -132,232 +161,228 @@ export default function ProfessionalDashboardPage() {
           />
         </DialogContent>
       </Dialog>
-      {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            Welcome back, {profile?.user_first_name || "Professional"}
-          </h1>
-          <p className="text-slate-500">
-            Here's what's happening with your cases today.
-          </p>
+
+      {/* ─── ZONE 1: Command Header ─────────────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-5 shadow-xl border border-slate-700/40">
+        {/* Decorative orb */}
+        <div className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-[var(--portal-primary)]/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-blue-500/10 blur-2xl" />
+
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+                {dateLabel}
+              </p>
+              {pendingFirmInvitations.length > 0 && (
+                <span className="flex items-center gap-1.5 text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+                  {pendingFirmInvitations.length} New Lead
+                  {pendingFirmInvitations.length !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+            <h1 className="text-2xl font-bold text-white">
+              {activeFirm?.name
+                ? `${activeFirm.name}`
+                : `Welcome, ${profile?.user_first_name || "Professional"}`}
+            </h1>
+            <p className="text-sm text-slate-400 mt-0.5">
+              {allCases.length} active case{allCases.length !== 1 ? "s" : ""} ·{" "}
+              {courtEventCount} upcoming court date
+              {courtEventCount !== 1 ? "s" : ""}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link href="/professional/intake?tab=invitations">
+              <Button
+                size="sm"
+                className="bg-[var(--portal-primary)] hover:bg-[var(--portal-primary-hover)] text-white shadow-lg shadow-[var(--portal-primary)]/30 gap-1.5 text-xs"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                New Lead
+              </Button>
+            </Link>
+            <Link href="/professional/reports">
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-slate-600 text-slate-200 hover:bg-slate-700 hover:text-white gap-1.5 text-xs"
+              >
+                <FileBarChart2 className="h-3.5 w-3.5" />
+                Reports
+              </Button>
+            </Link>
+            <Link href="/professional/calendar">
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-slate-600 text-slate-200 hover:bg-slate-700 hover:text-white gap-1.5 text-xs"
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                Calendar
+              </Button>
+            </Link>
+            <div className="hidden sm:block">
+              <QuickCreateMenu onCreateTask={() => setOpenAddTask(true)} />
+            </div>
+          </div>
         </div>
-        <QuickCreateMenu onCreateTask={() => setOpenAddTask(true)} />
       </div>
 
-      {/* Quick Stats - Tremor KPI Cards */}
+      {/* ─── ZONE 2: KPI Cards ──────────────────────────────────────────── */}
       <KPICards
         caseCount={dashboardData.case_count || 0}
         pendingIntakes={dashboardData.pending_intakes || 0}
         unreadMessages={dashboardData.unread_messages || 0}
         pendingApprovals={dashboardData.pending_approvals || 0}
-        avgCompliance={dashboardData.avg_compliance_score || 76}
-        complianceTrend={dashboardData.compliance_trend || 3.2}
+        avgCompliance={dashboardData.avg_compliance_score || 0}
+        complianceTrend={dashboardData.compliance_trend || 0}
+        upcomingCourtDates={courtEventCount}
       />
 
-      {/* Compliance Trend Chart */}
-      <ComplianceLineChart period="30d" />
-
-      {/* Priority Cases Section */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-          <div className="h-1 w-8 bg-[var(--portal-primary)] rounded-full" />
-          Priority Cases
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {dashboardData.priority_cases?.length > 0 ? (
-            dashboardData.priority_cases.map((caseData: any) => (
-              <CaseCard key={caseData.id} caseData={caseData} />
-            ))
-          ) : (
-            <div className="col-span-full py-12 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
-              <FolderOpen className="h-12 w-12 mx-auto mb-3 text-slate-300" />
-              <p className="text-slate-500 font-medium">No active cases yet.</p>
-              <Button variant="link" asChild className="text-[var(--portal-primary)]">
-                <Link href="/professional/intake?tab=invitations">View Pending Invitations</Link>
-              </Button>
+      {/* ─── ZONE 3: Two-column Intel Grid ──────────────────────────────── */}
+      <div className="grid lg:grid-cols-3 gap-6 items-start">
+        {/* Left column — Lead Pipeline + Alerts */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Lead Pipeline */}
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                <div className="h-1 w-8 bg-[var(--portal-primary)] rounded-full" />
+                Lead Pipeline
+              </h2>
+              <Link
+                href="/professional/cases"
+                className="text-xs font-semibold text-[var(--portal-primary)] hover:underline flex items-center gap-1"
+              >
+                All Cases
+                <ArrowRight className="h-3 w-3" />
+              </Link>
             </div>
-          )}
+            <LeadPipeline cases={allCases} />
+          </section>
+
+          {/* Active Alerts */}
+          <Card className="border-slate-200/60 shadow-sm">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <div>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <AlertTriangle className="h-4.5 w-4.5 text-amber-500" />
+                  Active Alerts
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Items requiring your attention
+                </CardDescription>
+              </div>
+              {dashboardData.alerts?.length > 0 && (
+                <Badge variant="warning">
+                  {dashboardData.alerts.length}
+                </Badge>
+              )}
+            </CardHeader>
+            <CardContent>
+              {dashboardData.alerts?.length > 0 ? (
+                <div className="space-y-2.5">
+                  {dashboardData.alerts.slice(0, 5).map((alert: any, index: number) => (
+                    <AlertItem key={index} alert={alert} />
+                  ))}
+                  {dashboardData.alerts.length > 5 && (
+                    <Button variant="ghost" className="w-full text-xs text-muted-foreground">
+                      View {dashboardData.alerts.length - 5} more alerts
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <CheckCircle2 className="h-10 w-10 mx-auto mb-2 text-[var(--portal-primary)]" />
+                  <p className="text-sm">All clear — no active alerts</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right column — Court Dates + Activity Feed */}
+        <div className="space-y-6">
+          {/* Court Dates */}
+          <Card className="border-slate-200/60 shadow-sm">
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Gavel className="h-4 w-4 text-slate-700" />
+                  Court Dates
+                </CardTitle>
+                {courtEventCount > 0 && (
+                  <Badge className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                    {courtEventCount} upcoming
+                  </Badge>
+                )}
+              </div>
+              <CardDescription className="text-xs">Next 30 days</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-1">
+              <CourtDatesWidget events={allEvents} />
+            </CardContent>
+          </Card>
+
+          {/* Compact Activity Feed */}
+          <Card className="border-slate-200/60 shadow-sm">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-[var(--portal-primary)]" />
+                Recent Activity
+              </CardTitle>
+              <CardDescription className="text-xs">Latest case updates</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {dashboardData.recent_activity?.length > 0 ? (
+                <div className="space-y-1">
+                  {dashboardData.recent_activity
+                    .slice(0, 7)
+                    .map((activity: any, index: number) => (
+                      <CompactActivityItem key={index} activity={activity} />
+                    ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-muted-foreground">
+                  <Clock className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm">No recent activity</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Alerts Section */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <div>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-amber-500" />
-                Active Alerts
-              </CardTitle>
-              <CardDescription>Items requiring your attention</CardDescription>
-            </div>
-            {dashboardData.alerts?.length > 0 && (
-              <Badge variant="warning">{dashboardData.alerts.length} alerts</Badge>
-            )}
-          </CardHeader>
-          <CardContent>
-            {dashboardData.alerts?.length > 0 ? (
-              <div className="space-y-3">
-                {dashboardData.alerts.slice(0, 5).map((alert: any, index: number) => (
-                  <AlertItem key={index} alert={alert} />
-                ))}
-                {dashboardData.alerts.length > 5 && (
-                  <Button variant="ghost" className="w-full text-muted-foreground">
-                    View {dashboardData.alerts.length - 5} more alerts
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-[var(--portal-primary)]" />
-                <p>No active alerts. You're all caught up!</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {/* ─── ZONE 4: Analytics Strip ────────────────────────────────────── */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+            <div className="h-1 w-8 bg-blue-400 rounded-full" />
+            Compliance Analytics
+          </h2>
+          <Link href="/professional/reports" className="text-xs font-semibold text-[var(--portal-primary)] hover:underline flex items-center gap-1">
+            Full Reports
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+        <ComplianceLineChart period="30d" />
+      </section>
 
-        {/* Upcoming Events */}
-        <Card>
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-500" />
-                  Upcoming Events
-                </CardTitle>
-                <CardDescription>Next 7 days</CardDescription>
-              </div>
-              <Link href="/professional/calendar">
-                <Button variant="outline" size="sm" className="text-xs">
-                  View Calendar
-                </Button>
-              </Link>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {dashboardData.upcoming_events?.length > 0 ? (
-              <div className="space-y-3">
-                {dashboardData.upcoming_events.slice(0, 5).map((event: any, index: number) => (
-                  <EventItem key={index} event={event} />
-                ))}
-                <Link href="/professional/calendar" className="block">
-                  <Button variant="ghost" className="w-full text-slate-500 hover:text-slate-700">
-                    View all events
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p className="mb-4">No upcoming events</p>
-                <Link href="/professional/calendar">
-                  <Button variant="outline" size="sm">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Open Calendar
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-[var(--portal-primary)]" />
-            Recent Activity
-          </CardTitle>
-          <CardDescription>Latest updates across your cases</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {dashboardData.recent_activity?.length > 0 ? (
-            <div className="space-y-3">
-              {dashboardData.recent_activity.slice(0, 10).map((activity: any, index: number) => (
-                <ActivityItem key={index} activity={activity} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>No recent activity</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Tasks Widget */}
+      {/* ─── Tasks Widget ────────────────────────────────────────────────── */}
       <TasksWidget token={token} />
     </div>
   );
 }
 
-// Stat Card Component
-function StatCard({
-  title,
-  value,
-  icon,
-  color,
-  href,
-}: {
-  title: string;
-  value: number;
-  icon: React.ReactNode;
-  color: "teal" | "amber" | "blue" | "purple";
-  href: string;
-}) {
-  const colorClasses = {
-    teal: {
-      card: "bg-gradient-to-br from-[var(--portal-primary)]/5 to-white border-[var(--portal-primary)]/20 hover:border-[var(--portal-primary)]/40",
-      icon: "bg-[var(--portal-primary)]/10 text-[var(--portal-primary)]",
-      value: "text-slate-900",
-    },
-    amber: {
-      card: "bg-gradient-to-br from-amber-50 to-white border-amber-200/70 hover:border-amber-300",
-      icon: "bg-amber-100 text-amber-600",
-      value: "text-slate-900",
-    },
-    blue: {
-      card: "bg-gradient-to-br from-blue-50 to-white border-blue-200/70 hover:border-blue-300",
-      icon: "bg-blue-100 text-blue-600",
-      value: "text-slate-900",
-    },
-    purple: {
-      card: "bg-gradient-to-br from-purple-50 to-white border-purple-200/70 hover:border-purple-300",
-      icon: "bg-purple-100 text-purple-600",
-      value: "text-slate-900",
-    },
-  };
-
-  const styles = colorClasses[color];
-
-  return (
-    <Link href={href}>
-      <Card className={`hover:shadow-lg transition-all duration-200 cursor-pointer border ${styles.card}`}>
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-500">{title}</p>
-              <p className={`text-3xl font-bold mt-1 ${styles.value}`}>{value}</p>
-            </div>
-            <div className={`p-3 rounded-xl shadow-sm ${styles.icon}`}>{icon}</div>
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
-// Alert Item Component
+// ─── Alert Item ─────────────────────────────────────────────────────────────
 function AlertItem({ alert }: { alert: any }) {
-  const severityColors = {
-    high: "bg-red-100 text-red-800 border-red-200",
-    medium: "bg-amber-100 text-amber-800 border-amber-200",
-    low: "bg-blue-100 text-blue-800 border-blue-200",
+  const severityColors: Record<string, string> = {
+    high: "bg-red-50 text-red-800 border-red-200",
+    medium: "bg-amber-50 text-amber-800 border-amber-200",
+    low: "bg-blue-50 text-blue-800 border-blue-200",
   };
 
   const typeIcons: Record<string, React.ReactNode> = {
@@ -369,7 +394,6 @@ function AlertItem({ alert }: { alert: any }) {
     compliance_alert: <AlertTriangle className="h-4 w-4" />,
   };
 
-  // Determine the navigation URL based on alert type and data
   const getAlertHref = () => {
     switch (alert.type) {
       case "intake_pending":
@@ -386,14 +410,6 @@ function AlertItem({ alert }: { alert: any }) {
         return alert.family_file_id
           ? `/professional/cases/${alert.family_file_id}/messages`
           : "/professional/messages?filter=unread";
-      case "exchange_reminder":
-        return alert.family_file_id
-          ? `/professional/cases/${alert.family_file_id}/schedule`
-          : "/professional/cases";
-      case "compliance_alert":
-        return alert.family_file_id
-          ? `/professional/cases/${alert.family_file_id}/compliance`
-          : "/professional/cases";
       default:
         return alert.family_file_id
           ? `/professional/cases/${alert.family_file_id}`
@@ -404,105 +420,61 @@ function AlertItem({ alert }: { alert: any }) {
   return (
     <Link href={getAlertHref()}>
       <div
-        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:shadow-md transition-all ${severityColors[alert.severity as keyof typeof severityColors] || severityColors.medium
+        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer hover:shadow-md transition-all ${severityColors[alert.severity] || severityColors.medium
           }`}
       >
-        <div className="mt-0.5">{typeIcons[alert.type] || <Bell className="h-4 w-4" />}</div>
+        <div className="mt-0.5 shrink-0">
+          {typeIcons[alert.type] || <Bell className="h-4 w-4" />}
+        </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm">{alert.title}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{alert.message}</p>
+          <p className="font-semibold text-sm leading-snug">{alert.title}</p>
+          <p className="text-xs opacity-70 mt-0.5 line-clamp-1">{alert.message}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <Badge variant={alert.severity === "high" ? "error" : "secondary"} className="text-xs">
+          <Badge
+            variant={alert.severity === "high" ? "error" : "secondary"}
+            className="text-[10px]"
+          >
             {alert.severity}
           </Badge>
-          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 px-2 text-[10px] font-semibold opacity-60 hover:opacity-100"
+            asChild
+          >
+            <span>Review →</span>
+          </Button>
         </div>
       </div>
     </Link>
   );
 }
 
-// Event Item Component
-function EventItem({ event }: { event: any }) {
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  // Determine the navigation URL based on event type and data
-  const getEventHref = () => {
-    if (event.family_file_id) {
-      // If it's a case-related event, go to that case's timeline
-      return `/professional/cases/${event.family_file_id}/timeline`;
-    }
-    // Otherwise, go to the professional calendar (to be created)
-    return "/professional/calendar";
-  };
-
-  return (
-    <Link href={getEventHref()}>
-      <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 hover:shadow-sm cursor-pointer transition-all">
-        <div className="flex flex-col items-center justify-center w-12 h-12 bg-blue-100 text-blue-700 rounded-lg">
-          <span className="text-xs font-medium">
-            {new Date(event.event_date).toLocaleDateString("en-US", { month: "short" })}
-          </span>
-          <span className="text-lg font-bold leading-none">
-            {new Date(event.event_date).getDate()}
-          </span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm truncate">{event.title}</p>
-          <p className="text-xs text-muted-foreground">
-            {event.event_type} {event.start_time && `at ${event.start_time}`}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {event.is_mandatory && (
-            <Badge variant="warning" className="text-xs">
-              Required
-            </Badge>
-          )}
-          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-// Activity Item Component
-function ActivityItem({ activity }: { activity: any }) {
+// ─── Compact Activity Item ───────────────────────────────────────────────────
+function CompactActivityItem({ activity }: { activity: any }) {
   const typeIcons: Record<string, React.ReactNode> = {
-    intake_completed: <CheckCircle2 className="h-4 w-4 text-[var(--portal-primary)]" />,
-    intake_updated: <FileText className="h-4 w-4 text-blue-500" />,
-    message_received: <MessageSquare className="h-4 w-4 text-purple-500" />,
-    agreement_update: <FileText className="h-4 w-4 text-amber-500" />,
-    exchange_completed: <CheckCircle2 className="h-4 w-4 text-[var(--portal-primary)]" />,
-    exchange_missed: <AlertTriangle className="h-4 w-4 text-red-500" />,
-    compliance_change: <TrendingUp className="h-4 w-4 text-[var(--portal-primary)]" />,
-    court_event_created: <Calendar className="h-4 w-4 text-purple-500" />,
+    intake_completed: <CheckCircle2 className="h-3.5 w-3.5 text-[var(--portal-primary)]" />,
+    intake_updated: <FileText className="h-3.5 w-3.5 text-blue-500" />,
+    message_received: <MessageSquare className="h-3.5 w-3.5 text-purple-500" />,
+    agreement_update: <FileText className="h-3.5 w-3.5 text-amber-500" />,
+    exchange_completed: <CheckCircle2 className="h-3.5 w-3.5 text-[var(--portal-primary)]" />,
+    exchange_missed: <AlertTriangle className="h-3.5 w-3.5 text-red-500" />,
+    compliance_change: <TrendingUp className="h-3.5 w-3.5 text-[var(--portal-primary)]" />,
+    court_event_created: <Calendar className="h-3.5 w-3.5 text-purple-500" />,
   };
 
-  const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(hours / 24);
-
-    if (days > 0) return `${days}d ago`;
-    if (hours > 0) return `${hours}h ago`;
-    return "Just now";
+  const formatTime = (ts: string) => {
+    const diff = Date.now() - new Date(ts).getTime();
+    const h = Math.floor(diff / 3600000);
+    const d = Math.floor(h / 24);
+    if (d > 0) return `${d}d`;
+    if (h > 0) return `${h}h`;
+    return "now";
   };
 
-  // Determine navigation URL based on activity type
-  const getActivityHref = () => {
-    const familyFileId = activity.family_file_id;
-
+  const getHref = () => {
+    const fid = activity.family_file_id;
     switch (activity.activity_type) {
       case "intake_completed":
       case "intake_updated":
@@ -510,45 +482,26 @@ function ActivityItem({ activity }: { activity: any }) {
           ? `/professional/intake/${activity.session_id}`
           : "/professional/intake";
       case "message_received":
-        return familyFileId
-          ? `/professional/cases/${familyFileId}/messages`
-          : "/professional/messages";
-      case "agreement_update":
-        return familyFileId
-          ? `/professional/cases/${familyFileId}/agreement`
-          : "/professional/cases";
-      case "exchange_completed":
-      case "exchange_missed":
-        return familyFileId
-          ? `/professional/cases/${familyFileId}/schedule`
-          : "/professional/cases";
-      case "compliance_change":
-        return familyFileId
-          ? `/professional/cases/${familyFileId}/compliance`
-          : "/professional/cases";
-      case "court_event_created":
-        return familyFileId
-          ? `/professional/cases/${familyFileId}/timeline`
-          : "/professional/cases";
+        return fid ? `/professional/cases/${fid}/messages` : "/professional/messages";
       default:
-        return familyFileId
-          ? `/professional/cases/${familyFileId}`
-          : "/professional/cases";
+        return fid ? `/professional/cases/${fid}` : "/professional/cases";
     }
   };
 
   return (
-    <Link href={getActivityHref()}>
-      <div className="flex items-center gap-3 py-2 border-b border-border last:border-0 cursor-pointer hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors">
-        <div className="shrink-0">{typeIcons[activity.activity_type] || <Clock className="h-4 w-4" />}</div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{activity.title}</p>
-          <p className="text-xs text-muted-foreground">{activity.description}</p>
+    <Link href={getHref()}>
+      <div className="flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
+        <div className="shrink-0">
+          {typeIcons[activity.activity_type] || (
+            <Clock className="h-3.5 w-3.5 text-slate-400" />
+          )}
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-muted-foreground">{formatTime(activity.timestamp)}</span>
-          <ArrowRight className="h-4 w-4 text-muted-foreground" />
-        </div>
+        <p className="text-xs text-slate-700 flex-1 min-w-0 truncate">
+          {activity.title}
+        </p>
+        <span className="text-[10px] text-slate-400 shrink-0">
+          {formatTime(activity.timestamp)}
+        </span>
       </div>
     </Link>
   );
