@@ -6,16 +6,13 @@ import {
   MessageSquare,
   Clock,
   AlertTriangle,
-  Calendar,
   CheckCircle2,
   ArrowRight,
   FileText,
   Users,
   TrendingUp,
   Bell,
-  Plus,
   Gavel,
-  FileBarChart2,
 } from "lucide-react";
 import {
   Card,
@@ -193,44 +190,15 @@ export default function ProfessionalDashboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <Link href="/professional/intake?tab=invitations">
-              <Button
-                size="sm"
-                className="bg-[var(--portal-primary)] hover:bg-[var(--portal-primary-hover)] text-white shadow-lg shadow-[var(--portal-primary)]/30 gap-1.5 text-xs"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                New Lead
-              </Button>
-            </Link>
-            <Link href="/professional/reports">
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-slate-600 text-slate-200 hover:bg-slate-700 hover:text-white gap-1.5 text-xs"
-              >
-                <FileBarChart2 className="h-3.5 w-3.5" />
-                Reports
-              </Button>
-            </Link>
-            <Link href="/professional/calendar">
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-slate-600 text-slate-200 hover:bg-slate-700 hover:text-white gap-1.5 text-xs"
-              >
-                <Calendar className="h-3.5 w-3.5" />
-                Calendar
-              </Button>
-            </Link>
+          {/* Quick Create lives inside the header — z-[100] so its dropdown clears the card */}
+          <div className="relative z-[100]">
+            <QuickCreateMenu onCreateTask={() => { }} />
           </div>
         </div>
       </div>
 
-      {/* Quick Create floats outside the dark card so its dropdown isn't clipped */}
-      <div className="flex justify-end -mt-4">
-        <QuickCreateMenu onCreateTask={() => { }} />
-      </div>
+      {/* Lead Tracking Chart — sits just below command header */}
+      <LeadTrackingChart />
 
       {/* ─── ZONE 2: KPI Cards ──────────────────────────────────────────── */}
       <KPICards
@@ -238,8 +206,6 @@ export default function ProfessionalDashboardPage() {
         pendingIntakes={dashboardData.pending_intakes || 0}
         unreadMessages={dashboardData.unread_messages || 0}
         pendingApprovals={dashboardData.pending_approvals || 0}
-        avgCompliance={dashboardData.avg_compliance_score || 0}
-        complianceTrend={dashboardData.compliance_trend || 0}
         upcomingCourtDates={courtEventCount}
       />
 

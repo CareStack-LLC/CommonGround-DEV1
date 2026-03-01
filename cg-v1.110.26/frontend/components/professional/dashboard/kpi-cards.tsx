@@ -4,12 +4,11 @@ import { Card, Metric, Text, Flex, BadgeDelta, Grid } from "@tremor/react";
 import {
   FolderOpen,
   MessageSquare,
-  Clock,
-  Shield,
   TrendingUp,
   TrendingDown,
   UserPlus,
   Gavel,
+  Clock,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -18,7 +17,6 @@ interface KPIData {
   metric: number | string;
   delta?: number;
   deltaType?: "increase" | "decrease" | "unchanged";
-  target?: number;
   icon: React.ReactNode;
   href: string;
   color: "teal" | "amber" | "blue" | "purple" | "emerald";
@@ -30,8 +28,6 @@ interface KPICardsProps {
   pendingIntakes: number;
   unreadMessages: number;
   pendingApprovals: number;
-  avgCompliance?: number;
-  complianceTrend?: number;
   upcomingCourtDates?: number;
 }
 
@@ -40,16 +36,12 @@ export function KPICards({
   pendingIntakes,
   unreadMessages,
   pendingApprovals,
-  avgCompliance = 0,
-  complianceTrend = 0,
   upcomingCourtDates = 0,
 }: KPICardsProps) {
   const kpiData: KPIData[] = [
     {
       title: "Active Cases",
       metric: caseCount,
-      delta: 2,
-      deltaType: "increase",
       icon: <FolderOpen className="h-5 w-5" />,
       href: "/professional/cases",
       color: "teal",
@@ -76,15 +68,11 @@ export function KPICards({
       color: "blue",
     },
     {
-      title: "Avg Compliance",
-      metric: avgCompliance,
-      delta: complianceTrend,
-      deltaType: complianceTrend >= 0 ? "increase" : "decrease",
-      target: 80,
-      icon: <Shield className="h-5 w-5" />,
-      href: "/professional/cases?sort=compliance",
+      title: "Pending Approvals",
+      metric: pendingApprovals,
+      icon: <Clock className="h-5 w-5" />,
+      href: "/professional/intake?tab=invitations&status=pending",
       color: "emerald",
-      suffix: "%",
     },
   ];
 
@@ -113,31 +101,9 @@ export function KPICards({
                   className="space-x-2 truncate"
                 >
                   <Metric className="text-slate-900 dark:text-slate-50 truncate">
-                    {item.suffix
-                      ? `${item.metric}${item.suffix}`
-                      : item.metric}
+                    {item.suffix ? `${item.metric}${item.suffix}` : item.metric}
                   </Metric>
-                  {item.delta !== undefined && item.delta !== 0 && (
-                    <BadgeDelta
-                      deltaType={item.deltaType}
-                      size="xs"
-                      className="flex items-center gap-0.5"
-                    >
-                      {item.deltaType === "increase" ? (
-                        <TrendingUp className="h-3 w-3" />
-                      ) : (
-                        <TrendingDown className="h-3 w-3" />
-                      )}
-                      {Math.abs(item.delta)}
-                      {item.suffix || ""}
-                    </BadgeDelta>
-                  )}
                 </Flex>
-                {item.target && (
-                  <Text className="text-[10px] text-slate-400 mt-0.5">
-                    Target: {item.target}%
-                  </Text>
-                )}
               </div>
             </Flex>
           </Card>
