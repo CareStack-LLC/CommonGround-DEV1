@@ -7980,6 +7980,199 @@ export const professionalIntakeAPI = {
 };
 
 // ============================================================================
+// Circle Calls API (Circle Contact <-> Child Video/Audio Calls)
+// ============================================================================
+
+export interface CircleCallSession {
+  id: string;
+  family_file_id: string;
+  room_id: string;
+  circle_contact_id: string;
+  circle_contact_name: string;
+  child_id: string;
+  child_name: string;
+  call_type: 'video' | 'audio';
+  status: 'ringing' | 'active' | 'completed' | 'missed' | 'terminated';
+  initiated_by_id: string;
+  initiated_by_type: 'circle_contact' | 'child';
+  daily_room_name: string;
+  daily_room_url: string;
+  initiated_at: string;
+  joined_at?: string;
+  started_at?: string;
+  ended_at?: string;
+  duration_seconds?: number;
+  recording_url?: string;
+  transcript_storage_path?: string;
+  aria_active: boolean;
+  aria_intervention_count: number;
+  aria_terminated_call: boolean;
+  aria_threshold: number;
+  overall_safety_score?: number;
+  permission_snapshot?: Record<string, unknown>;
+}
+
+export interface CircleCallJoinResponse {
+  session_id: string;
+  room_url: string;
+  token: string;
+  call_type: 'video' | 'audio';
+  status: string;
+}
+
+export interface CircleCallFlag {
+  id: string;
+  session_id: string;
+  transcript_chunk_id?: string;
+  flag_type: string;
+  toxicity_score: number;
+  severity: 'low' | 'medium' | 'high' | 'severe';
+  categories: string[];
+  triggers: string[];
+  intervention_taken: boolean;
+  intervention_type?: 'warning' | 'mute' | 'terminate';
+  intervention_message: string;
+  flagged_at: string;
+  call_time_seconds?: number;
+  offending_speaker_id?: string;
+  offending_speaker_type?: string;
+}
+
+export interface CircleCallReport {
+  session_id: string;
+  circle_contact_name: string;
+  child_name: string;
+  call_type: 'video' | 'audio';
+  duration_seconds: number;
+  initiated_by_type: 'circle_contact' | 'child';
+  total_transcript_chunks: number;
+  flags_count: number;
+  safety_rating: 'safe' | 'minor_concerns' | 'concerning' | 'unsafe';
+  category_counts: Record<string, number>;
+  severe_count: number;
+  high_count: number;
+  flags: CircleCallFlag[];
+  permission_snapshot: Record<string, unknown>;
+  generated_at: string;
+}
+
+export interface CircleCallHistoryItem {
+  id: string;
+  circle_contact_name: string;
+  child_name: string;
+  call_type: 'video' | 'audio';
+  status: string;
+  initiated_by_type: 'circle_contact' | 'child';
+  initiated_at: string;
+  duration_seconds?: number;
+  aria_intervention_count: number;
+  aria_terminated_call: boolean;
+  has_recording: boolean;
+}
+
+export const circleCallsAPI = {
+  /**
+   * Initiate a circle call (bidirectional - can be called by circle contact OR child)
+   */
+  async initiateCall(data: {
+    circle_contact_id: string;
+    child_id: string;
+    call_type?: 'video' | 'audio';
+  }): Promise<CircleCallJoinResponse> {
+    return fetchAPI<CircleCallJoinResponse>('/circle-calls/initiate', {
+      method: 'POST',
+      body: JSON.stringify({
+        circle_contact_id: data.circle_contact_id,
+        child_id: data.child_id,
+        call_type: data.call_type || 'video',
+      }),
+    });
+  },
+
+  /**
+   * Join a ringing circle call
+   */
+  async joinCall(sessionId: string, data: {
+    user_name: string;
+  }): Promise<CircleCallJoinResponse> {
+    return fetchAPI<CircleCallJoinResponse>(`/circle-calls/${sessionId}/join`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Decline an incoming circle call
+   */
+  async declineCall(sessionId: string): Promise<{ success: boolean; message: string }> {
+    return fetchAPI(`/circle-calls/${sessionId}/decline`, {
+      method: 'POST',
+    });
+  },
+
+  /**
+   * End an active circle call
+   */
+  async endCall(sessionId: string): Promise<CircleCallSession> {
+    return fetchAPI<CircleCallSession>(`/circle-calls/${sessionId}/end`, {
+      method: 'POST',
+    });
+  },
+
+  /**
+   * Upload client-side recording
+   */
+  async uploadRecording(sessionId: string, file: File): Promise<{ success: boolean; storage_path: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = getAuthToken();
+    const response = await fetch(`${API_URL}/circle-calls/${sessionId}/upload-recording`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new APIError(errorData.detail || 'Upload failed', response.status, errorData);
+    }
+
+    return response.json();
+  },
+
+  /**
+   * Get call history for a family file (parents only)
+   */
+  async getCallHistory(familyFileId: string, params?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<CircleCallHistoryItem[]> {
+    const searchParams = new URLSearchParams();
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
+    if (params?.offset) searchParams.append('offset', params.offset.toString());
+    const query = searchParams.toString() ? `?${searchParams.toString()}` : '';
+    return fetchAPI<CircleCallHistoryItem[]>(`/circle-calls/family/${familyFileId}/history${query}`);
+  },
+
+  /**
+   * Get court-ready call report with transcript and ARIA analysis
+   */
+  async getCallReport(sessionId: string): Promise<CircleCallReport> {
+    return fetchAPI<CircleCallReport>(`/circle-calls/${sessionId}/report`);
+  },
+
+  /**
+   * Get session details
+   */
+  async getSession(sessionId: string): Promise<CircleCallSession> {
+    return fetchAPI<CircleCallSession>(`/circle-calls/${sessionId}`);
+  },
+};
+
+// ============================================================================
 // Smart Analytics API (V3 Custody Insights)
 // ============================================================================
 

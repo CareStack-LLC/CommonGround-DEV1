@@ -190,6 +190,16 @@ class Child(Base, UUIDMixin, TimestampMixin):
         "KidComsSession", back_populates="child"
     )
 
+    # Circle calls - Permanent call rooms (1 per circle contact)
+    circle_call_rooms: Mapped[list["CircleCallRoom"]] = relationship(
+        "CircleCallRoom", back_populates="child", cascade="all, delete-orphan"
+    )
+
+    # Circle calls - Call sessions
+    circle_call_sessions: Mapped[list["CircleCallSession"]] = relationship(
+        "CircleCallSession", back_populates="child", cascade="all, delete-orphan"
+    )
+
     # My Circle - Child login account
     user_account: Mapped[Optional["ChildUser"]] = relationship(
         "ChildUser", back_populates="child", uselist=False

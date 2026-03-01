@@ -45,6 +45,7 @@ from app.api.v1.endpoints import (
     professional_tasks,
     intake_convert,
     parent_calls,
+    circle_calls,
     recording_webhooks,
     recordings,
     recording_audit,
@@ -144,6 +145,9 @@ api_router.include_router(intake_convert.router, prefix="/api/v1", tags=["Intake
 
 # Parent Communication - Video/Audio Calls
 api_router.include_router(parent_calls.router, prefix="/parent-calls", tags=["Parent Calls"])
+
+# Circle Communication - Video/Audio Calls between Circle Contacts and Children
+api_router.include_router(circle_calls.router, prefix="/circle-calls", tags=["Circle Calls"])
 
 # Recording Webhooks - Daily.co recording/transcription events
 api_router.include_router(recording_webhooks.router, prefix="/webhooks", tags=["Recording Webhooks"])

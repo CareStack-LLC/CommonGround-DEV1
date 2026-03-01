@@ -265,6 +265,16 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
         "ParentCallSession", back_populates="family_file", cascade="all, delete-orphan"
     )
 
+    # Circle calls - Permanent call rooms (1 per circle contact-child pair)
+    circle_call_rooms: Mapped[list["CircleCallRoom"]] = relationship(
+        "CircleCallRoom", back_populates="family_file", cascade="all, delete-orphan"
+    )
+
+    # Circle calls - Call sessions
+    circle_call_sessions: Mapped[list["CircleCallSession"]] = relationship(
+        "CircleCallSession", back_populates="family_file", cascade="all, delete-orphan"
+    )
+
     # Recordings (video/audio from KidComs and parent calls)
     recordings: Mapped[list["Recording"]] = relationship(
         "Recording", back_populates="family_file", cascade="all, delete-orphan"

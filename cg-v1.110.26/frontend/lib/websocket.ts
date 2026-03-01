@@ -290,6 +290,78 @@ export interface ARIAInterventionEvent {
   timestamp: string;
 }
 
+// Circle Call Notifications (Circle Contact <-> Child)
+export interface CircleCallIncomingEvent {
+  type: 'circle_call_incoming';
+  session_id: string;
+  family_file_id: string;
+  caller_id: string;
+  caller_name: string;
+  caller_type: 'circle_contact' | 'child';
+  recipient_id: string;
+  recipient_name: string;
+  recipient_type: 'circle_contact' | 'child';
+  call_type: 'video' | 'audio';
+  circle_contact_id: string;
+  circle_contact_name: string;
+  child_id: string;
+  child_name: string;
+  timestamp: string;
+}
+
+export interface CircleCallStartedEvent {
+  type: 'circle_call_started';
+  session_id: string;
+  family_file_id: string;
+  circle_contact_id: string;
+  circle_contact_name: string;
+  child_id: string;
+  child_name: string;
+  call_type: 'video' | 'audio';
+  initiated_by_type: 'circle_contact' | 'child';
+  timestamp: string;
+}
+
+export interface CircleCallEndedEvent {
+  type: 'circle_call_ended';
+  session_id: string;
+  family_file_id: string;
+  circle_contact_id: string;
+  circle_contact_name: string;
+  child_id: string;
+  child_name: string;
+  call_type: 'video' | 'audio';
+  duration_seconds: number;
+  duration_display: string;
+  aria_flags_count: number;
+  recording_available: boolean;
+  timestamp: string;
+}
+
+export interface CircleCallDeclinedEvent {
+  type: 'circle_call_declined';
+  session_id: string;
+  family_file_id: string;
+  declined_by_id: string;
+  declined_by_name: string;
+  declined_by_type: 'circle_contact' | 'child';
+  caller_id: string;
+  caller_name: string;
+  timestamp: string;
+}
+
+export interface CircleCallAriaAlertEvent {
+  type: 'circle_call_aria_alert';
+  session_id: string;
+  family_file_id: string;
+  severity: 'low' | 'medium' | 'high' | 'severe';
+  category: string;
+  categories: string[];
+  message: string;
+  call_terminated: boolean;
+  timestamp: string;
+}
+
 export type WebSocketEventType =
   | 'new_message'
   | 'typing'
@@ -314,6 +386,11 @@ export type WebSocketEventType =
   | 'call_declined'
   | 'call_timeout'
   | 'aria_intervention'
+  | 'circle_call_incoming'
+  | 'circle_call_started'
+  | 'circle_call_ended'
+  | 'circle_call_declined'
+  | 'circle_call_aria_alert'
   | 'status'
   | 'error'
   | 'pong';

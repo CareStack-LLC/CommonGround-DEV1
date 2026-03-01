@@ -22,7 +22,7 @@ import {
   Eye,
   HandHeart,
 } from 'lucide-react';
-import { myCircleAPI, kidcomsAPI, CirclePermission, IncomingCall } from '@/lib/api';
+import { myCircleAPI, circleCallsAPI, CirclePermission, IncomingCall } from '@/lib/api';
 import IncomingCallAlert from '@/components/my-circle/incoming-call-alert';
 import { CGCard, CGBadge, CGButton, CGEmptyState } from '@/components/cg';
 import { cn } from '@/lib/utils';
@@ -197,14 +197,22 @@ export default function CircleContactDashboardPage() {
       return;
     }
 
+    if (!userData?.contactId) {
+      setError('User data not loaded properly');
+      return;
+    }
+
     setIsStartingCall(true);
     setError(null);
 
     try {
-      const sessionType = type === 'video' ? 'video_call' : 'voice_call';
-      const response = await kidcomsAPI.createCircleContactSession({
+      const callType = type === 'video' ? 'video' : 'audio';
+
+      // Use new circle calls API (bidirectional)
+      const response = await circleCallsAPI.initiateCall({
+        circle_contact_id: userData.contactId,
         child_id: child.child_id,
-        session_type: sessionType,
+        call_type: callType,
       });
 
       localStorage.setItem('circle_call_session', JSON.stringify({
@@ -213,11 +221,12 @@ export default function CircleContactDashboardPage() {
         sessionId: response.session_id,
         childName: child.child_name,
         childAvatar: child.avatar_id,
-        sessionType: sessionType,
-        contactName: userData?.contactName,
+        callType: response.call_type,
+        status: response.status,
+        contactName: userData.contactName,
       }));
 
-      router.push('/my-circle/contact/call');
+      router.push(`/my-circle/contact/circle-call/${response.session_id}`);
     } catch (err: any) {
       console.error('Error starting call:', err);
       setError(err?.message || 'Failed to start call. Please try again.');

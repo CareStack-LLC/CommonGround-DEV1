@@ -89,6 +89,16 @@ class CircleContact(Base, UUIDMixin, TimestampMixin):
     user_account = relationship("CircleUser", back_populates="circle_contact", uselist=False)
     permissions = relationship("CirclePermission", back_populates="circle_contact")
 
+    # Circle calls - Permanent call rooms (1 per child)
+    circle_call_rooms = relationship(
+        "CircleCallRoom", back_populates="circle_contact", cascade="all, delete-orphan"
+    )
+
+    # Circle calls - Call sessions
+    circle_call_sessions = relationship(
+        "CircleCallSession", back_populates="circle_contact", cascade="all, delete-orphan"
+    )
+
     # Indexes
     __table_args__ = (
         Index("ix_circle_contacts_family_child", "family_file_id", "child_id"),
