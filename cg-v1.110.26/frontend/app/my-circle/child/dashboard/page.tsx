@@ -426,9 +426,6 @@ export default function ChildDashboardPage() {
               <p className="text-cyan-400 text-xs font-semibold uppercase tracking-widest mb-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
                 Featured Author
               </p>
-              <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                Ayanna S Clark
-              </h2>
             </div>
             <button
               onClick={() => router.push('/my-circle/child/library')}
@@ -445,12 +442,14 @@ export default function ChildDashboardPage() {
                 <span className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>A</span>
               </div>
               <div>
-                <p className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ayanna S Clark</p>
+                <p className="text-white font-bold text-base" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ayanna S Clark</p>
                 <div className="flex items-center gap-1 mt-0.5">
                   {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
                   <span className="text-amber-400 text-xs ml-1" style={{ fontFamily: 'Inter, sans-serif' }}>Top Author</span>
                 </div>
-                <p className="text-slate-400 text-xs mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>Children's book author · 2 books</p>
+                <p className="text-slate-300 text-xs mt-2 leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Ayanna S. Clark is a Compton-born illustrator and author who creates magical stories that inspire confidence, imagination, and empowerment in young readers. Through vibrant art and heartfelt storytelling, she brings characters to life in ways that encourage children to see the magic within themselves. ✨
+                </p>
               </div>
             </div>
           </div>
@@ -501,6 +500,47 @@ export default function ChildDashboardPage() {
                 <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-amber-400 transition-colors flex-shrink-0" />
               </button>
             ))}
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────
+            6. FEATURED PROMO — Luna and Midnight
+        ───────────────────────────────────────────── */}
+        <section className="px-4 pb-12">
+          <div className="bg-slate-900/50 rounded-3xl overflow-hidden border border-slate-800/60 shadow-2xl">
+            <div className="relative aspect-[16/9] w-full">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/kidsComms/posters/featuredartistpromo.png"
+                alt="Luna and Midnight Promo"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
+            </div>
+
+            <div className="p-6">
+              <h3 className="text-2xl font-black text-white mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                Luna has found a glowing key… and it unlocks the stars. ✨
+              </h3>
+
+              <div className="space-y-4">
+                <p className="text-slate-300 text-base leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  When the sky begins to whisper secrets, Luna and her brave cat Midnight step into a magical adventure filled with constellations, courage, and a little bit of mystery.
+                </p>
+
+                <p className="text-cyan-400 font-bold text-base italic" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  If you love magic, friendship, and nighttime adventures, this is your next favorite story.
+                </p>
+
+                <button
+                  onClick={() => router.push('/my-circle/child/library/luna-midnight')}
+                  className="w-full sm:w-auto mt-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-2xl text-white font-black text-lg shadow-xl shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+                >
+                  READ NOW
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 
