@@ -93,7 +93,7 @@ function ContactCircleCallContent() {
     if (!sessionId) return;
 
     const handleAriaAlert = (data: WebSocketMessage) => {
-      const alertData = data as CircleCallAriaAlertEvent;
+      const alertData = data as unknown as CircleCallAriaAlertEvent;
       if (alertData.session_id !== sessionId) return;
 
       setAriaAlert({
