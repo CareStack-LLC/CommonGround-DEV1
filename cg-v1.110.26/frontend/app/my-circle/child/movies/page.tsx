@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidMovieCard } from '@/components/kidcoms/kid-movie-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
-import { theaterContent } from '@/lib/theater-content';
-import { Film } from 'lucide-react';
+import { theaterContent, VideoCategory, videoCategories } from '@/lib/theater-content';
+import { getWatchProgress, getContinueWatching, isFavorite, getVideoStats } from '@/lib/watch-progress';
+import { Film, Search, Heart, TrendingUp, Clock } from 'lucide-react';
 
 interface ChildUserData {
   userId: string;
@@ -21,6 +20,8 @@ export default function MoviesPage() {
   const router = useRouter();
   const [userData, setUserData] = useState<ChildUserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<VideoCategory | 'all' | 'favorites' | 'continue'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     validateAndLoadUser();
@@ -59,113 +60,170 @@ export default function MoviesPage() {
   }
 
   const videos = theaterContent.videos;
-  const featuredVideo = videos[0];
+  const stats = getVideoStats();
+  const continueWatching = getContinueWatching();
+
+  // Filter videos
+  const filteredVideos = videos.filter(video => {
+    // Category filter
+    if (selectedCategory === 'favorites') {
+      if (!isFavorite(video.id)) return false;
+    } else if (selectedCategory === 'continue') {
+      if (!continueWatching.find(p => p.videoId === video.id)) return false;
+    } else if (selectedCategory !== 'all' && video.category !== selectedCategory) {
+      return false;
+    }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      return (
+        video.title.toLowerCase().includes(query) ||
+        video.description?.toLowerCase().includes(query)
+      );
+    }
+
+    return true;
+  });
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center">
         <div className="text-center">
-          <ARIAMascot state="loading" greeting="Loading movies..." />
-        </div>
-      </div>
-    );
-  }
-
-  if (videos.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] pb-24">
-        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-6 py-6">
-            <KidComsLogo size="sm" className="mb-3" />
-            <div className="flex items-center gap-3">
-              <Film className="w-10 h-10 text-[#2C5F5D]" />
-              <h1 className="text-2xl font-bold text-[#2C3E50]">MOVIES</h1>
-            </div>
-            <p className="text-gray-600 mt-1">Watch fun videos</p>
-          </div>
-        </header>
-
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center px-6">
-            <ARIAMascot
-              state="idle"
-              greeting="No movies available right now. Check back soon!"
-            />
+          <div className="text-2xl font-bold text-slate-700" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            Loading...
           </div>
         </div>
-
-        <KidBottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative pb-24 bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
-      {/* Subtle decorative lines */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
-        <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
-        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
-      </div>
-
-      <div className="relative z-10">
-        {/* Header */}
-        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-6 py-6">
-            <KidComsLogo size="sm" className="mb-3" />
-            <div className="flex items-center gap-3">
-              <Film className="w-10 h-10 text-[#2C5F5D]" />
-              <div>
-                <h1 className="text-3xl font-bold text-[#2C3E50]">Movies</h1>
-                <p className="text-gray-600 text-sm">Watch and enjoy</p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white pb-20">
+      {/* Header */}
+      <header className="sticky top-0 z-40 backdrop-blur-lg bg-white/80 border-b border-slate-200">
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
+              <Film className="w-6 h-6 text-white" strokeWidth={2} />
+            </div>
+            <div>
+              <h1 className="font-bold text-slate-900 text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                Movies
+              </h1>
+              <p className="text-xs text-slate-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {stats.totalWatched} watched · {stats.totalCompleted} completed
+              </p>
             </div>
           </div>
-        </header>
 
-        {/* Main Content */}
-        <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
-          {/* Featured Movie Section */}
-          {featuredVideo && (
-            <section>
-              <h2 className="text-xl font-bold text-[#2C3E50] mb-4 flex items-center gap-2">
-                <span className="w-1 h-6 bg-[#D97757] rounded-full"></span>
-                Featured Movie
-              </h2>
-              <div className="max-w-2xl mx-auto">
-                <div className="group transform hover:scale-[1.02] transition-all duration-200">
-                  <KidMovieCard
-                    video={featuredVideo}
-                    onClick={() => handleVideoSelect(featuredVideo)}
-                    className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
-                  />
-                </div>
-              </div>
-            </section>
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search movies..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            />
+          </div>
+        </div>
+      </header>
+
+      {/* Category Tabs */}
+      <div className="px-4 py-3 bg-white border-b border-slate-200 overflow-x-auto">
+        <div className="flex gap-2 min-w-max">
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+              selectedCategory === 'all'
+                ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            All
+          </button>
+
+          {continueWatching.length > 0 && (
+            <button
+              onClick={() => setSelectedCategory('continue')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
+                selectedCategory === 'continue'
+                  ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              Continue
+            </button>
           )}
 
-          {/* All Movies Grid */}
-          <section>
-            <h2 className="text-xl font-bold text-[#2C3E50] mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-[#2C5F5D] rounded-full"></span>
-              All Movies
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {videos.map((video) => (
-                <div
-                  key={video.id}
-                  className="group transform hover:scale-[1.02] transition-all duration-200"
-                >
+          <button
+            onClick={() => setSelectedCategory('favorites')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
+              selectedCategory === 'favorites'
+                ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            <Heart className="w-3.5 h-3.5" />
+            Favorites
+          </button>
+
+          {(Object.keys(videoCategories) as VideoCategory[]).map((cat) => {
+            const category = videoCategories[cat];
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                  selectedCategory === cat
+                    ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {category.emoji} {category.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="p-4">
+        {filteredVideos.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">🎬</div>
+            <p className="text-slate-600 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+              {searchQuery ? 'No movies found' : 'No movies in this category'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filteredVideos.map((video) => {
+              const progress = getWatchProgress(video.id);
+              const favorite = isFavorite(video.id);
+
+              return (
+                <div key={video.id} className="relative">
                   <KidMovieCard
                     video={video}
                     onClick={() => handleVideoSelect(video)}
-                    className="border border-gray-200 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
+                    progress={progress?.progress}
+                    isFavorite={favorite}
                   />
                 </div>
-              ))}
-            </div>
-          </section>
-        </main>
-      </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
 
       <KidBottomNav />
     </div>

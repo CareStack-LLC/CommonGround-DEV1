@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidBookCard } from '@/components/kidcoms/kid-book-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
-import { theaterContent } from '@/lib/theater-content';
-import { BookOpen } from 'lucide-react';
+import { theaterContent, BookCategory, bookCategories } from '@/lib/theater-content';
+import { getReadingProgress, getCurrentlyReading, getReadingStats } from '@/lib/reading-progress';
+import { BookOpen, Search, Trophy, Target, Zap } from 'lucide-react';
 
 interface ChildUserData {
   userId: string;
@@ -21,6 +20,8 @@ export default function LibraryPage() {
   const router = useRouter();
   const [userData, setUserData] = useState<ChildUserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<BookCategory | 'all' | 'reading'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     validateAndLoadUser();
@@ -59,113 +60,199 @@ export default function LibraryPage() {
   }
 
   const books = theaterContent.storybooks;
-  const featuredBook = books[0];
+  const stats = getReadingStats();
+  const currentlyReading = getCurrentlyReading();
+
+  // Filter books
+  const filteredBooks = books.filter(book => {
+    // Category filter
+    if (selectedCategory === 'reading') {
+      if (!currentlyReading.find(p => p.bookId === book.id)) return false;
+    } else if (selectedCategory !== 'all' && book.category !== selectedCategory) {
+      return false;
+    }
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      return (
+        book.title.toLowerCase().includes(query) ||
+        book.author?.toLowerCase().includes(query)
+      );
+    }
+
+    return true;
+  });
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center">
         <div className="text-center">
-          <ARIAMascot state="loading" greeting="Loading library..." />
-        </div>
-      </div>
-    );
-  }
-
-  if (books.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] pb-24">
-        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-6 py-6">
-            <KidComsLogo size="sm" className="mb-3" />
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-10 h-10 text-[#2C5F5D]" />
-              <h1 className="text-2xl font-bold text-[#2C3E50]">LIBRARY</h1>
-            </div>
-            <p className="text-gray-600 mt-1">Read amazing stories</p>
-          </div>
-        </header>
-
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center px-6">
-            <ARIAMascot
-              state="idle"
-              greeting="No stories available right now. Check back soon!"
-            />
+          <div className="text-2xl font-bold text-slate-700" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            Loading...
           </div>
         </div>
-
-        <KidBottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative pb-24 bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
-      {/* Subtle decorative lines */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
-        <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
-        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white pb-20">
+      {/* Header */}
+      <header className="sticky top-0 z-40 backdrop-blur-lg bg-white/80 border-b border-slate-200">
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+              <BookOpen className="w-6 h-6 text-white" strokeWidth={2} />
+            </div>
+            <div>
+              <h1 className="font-bold text-slate-900 text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                Library
+              </h1>
+              <p className="text-xs text-slate-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {stats.booksRead} books · {stats.pagesRead} pages
+              </p>
+            </div>
+          </div>
 
-      <div className="relative z-10">
-        {/* Header */}
-        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-6 py-6">
-            <KidComsLogo size="sm" className="mb-3" />
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-10 h-10 text-[#2C5F5D]" />
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search books..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            />
+          </div>
+        </div>
+      </header>
+
+      {/* Reading Stats Widget */}
+      {stats.booksRead > 0 && (
+        <div className="px-4 py-3">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border border-amber-200">
+            <h3 className="font-semibold text-amber-900 mb-3 text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              📖 Your Reading Stats
+            </h3>
+            <div className="grid grid-cols-3 gap-3 text-center">
               <div>
-                <h1 className="text-3xl font-bold text-[#2C3E50]">Library</h1>
-                <p className="text-gray-600 text-sm">Read and learn</p>
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Trophy className="w-4 h-4 text-amber-600" />
+                  <div className="text-2xl font-bold text-amber-600" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    {stats.booksCompleted}
+                  </div>
+                </div>
+                <div className="text-xs text-amber-700" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Completed
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Target className="w-4 h-4 text-amber-600" />
+                  <div className="text-2xl font-bold text-amber-600" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    {stats.pagesRead}
+                  </div>
+                </div>
+                <div className="text-xs text-amber-700" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Pages
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Zap className="w-4 h-4 text-amber-600" />
+                  <div className="text-2xl font-bold text-amber-600" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    {stats.streak}
+                  </div>
+                </div>
+                <div className="text-xs text-amber-700" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Day Streak
+                </div>
               </div>
             </div>
           </div>
-        </header>
+        </div>
+      )}
 
-        {/* Main Content */}
-        <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
-          {/* Featured Story Section */}
-          {featuredBook && (
-            <section>
-              <h2 className="text-xl font-bold text-[#2C3E50] mb-4 flex items-center gap-2">
-                <span className="w-1 h-6 bg-[#D97757] rounded-full"></span>
-                Featured Story
-              </h2>
-              <div className="max-w-2xl mx-auto">
-                <div className="group transform hover:scale-[1.02] transition-all duration-200">
-                  <KidBookCard
-                    book={featuredBook}
-                    onClick={() => handleBookSelect(featuredBook)}
-                    className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
-                  />
-                </div>
-              </div>
-            </section>
+      {/* Category Tabs */}
+      <div className="px-4 py-3 bg-white border-b border-slate-200 overflow-x-auto">
+        <div className="flex gap-2 min-w-max">
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+              selectedCategory === 'all'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            All
+          </button>
+
+          {currentlyReading.length > 0 && (
+            <button
+              onClick={() => setSelectedCategory('reading')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
+                selectedCategory === 'reading'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              Reading
+            </button>
           )}
 
-          {/* All Stories Grid */}
-          <section>
-            <h2 className="text-xl font-bold text-[#2C3E50] mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-[#2C5F5D] rounded-full"></span>
-              All Stories
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {books.map((book) => (
-                <div
-                  key={book.id}
-                  className="group transform hover:scale-[1.02] transition-all duration-200"
-                >
+          {(Object.keys(bookCategories) as BookCategory[]).map((cat) => {
+            const category = bookCategories[cat];
+            return (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
+                  selectedCategory === cat
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                {category.emoji} {category.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="p-4">
+        {filteredBooks.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">📚</div>
+            <p className="text-slate-600 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+              {searchQuery ? 'No books found' : 'No books in this category'}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {filteredBooks.map((book) => {
+              const progress = getReadingProgress(book.id);
+
+              return (
+                <div key={book.id} className="relative">
                   <KidBookCard
                     book={book}
                     onClick={() => handleBookSelect(book)}
-                    className="border border-gray-200 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
+                    progress={progress}
                   />
                 </div>
-              ))}
-            </div>
-          </section>
-        </main>
-      </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
 
       <KidBottomNav />
     </div>
