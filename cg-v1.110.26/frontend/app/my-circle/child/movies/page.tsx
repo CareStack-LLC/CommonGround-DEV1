@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { KidMovieCard } from '@/components/kidcoms/kid-movie-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
 import { theaterContent, VideoCategory, videoCategories } from '@/lib/theater-content';
-import { getWatchProgress, getContinueWatching, isFavorite, getVideoStats } from '@/lib/watch-progress';
 import { Film, Search, Heart, TrendingUp, Clock } from 'lucide-react';
+
+import type { WatchProgress, VideoStats } from '@/lib/watch-progress';
 
 interface ChildUserData {
   userId: string;
@@ -22,6 +23,10 @@ export default function MoviesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<VideoCategory | 'all' | 'favorites' | 'continue'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [stats, setStats] = useState<VideoStats>({ totalWatched: 0, totalCompleted: 0, totalMinutes: 0, favorites: [] });
+  const [continueWatching, setContinueWatching] = useState<WatchProgress[]>([]);
+  const [progressMap, setProgressMap] = useState<Record<string, WatchProgress | null>>({});
+  const [favoritesSet, setFavoritesSet] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     validateAndLoadUser();
@@ -47,10 +52,24 @@ export default function MoviesPage() {
       }
 
       setUserData(user);
+
+      // Load watch state only on client after auth passes
+      const { getVideoStats, getContinueWatching, getWatchProgress, isFavorite, getFavorites } = require('@/lib/watch-progress');
+      setStats(getVideoStats());
+      setContinueWatching(getContinueWatching());
+
+      const videos = theaterContent.videos;
+      const map: Record<string, WatchProgress | null> = {};
+      videos.forEach(v => { map[v.id] = getWatchProgress(v.id); });
+      setProgressMap(map);
+
+      const favIds: string[] = getFavorites();
+      setFavoritesSet(new Set(favIds));
+
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to load user:', error);
-      localStorage.clear();
+      if (typeof localStorage !== 'undefined') localStorage.clear();
       router.push('/my-circle/child');
     }
   }
@@ -60,14 +79,12 @@ export default function MoviesPage() {
   }
 
   const videos = theaterContent.videos;
-  const stats = getVideoStats();
-  const continueWatching = getContinueWatching();
 
   // Filter videos
   const filteredVideos = videos.filter(video => {
     // Category filter
     if (selectedCategory === 'favorites') {
-      if (!isFavorite(video.id)) return false;
+      if (!favoritesSet.has(video.id)) return false;
     } else if (selectedCategory === 'continue') {
       if (!continueWatching.find(p => p.videoId === video.id)) return false;
     } else if (selectedCategory !== 'all' && video.category !== selectedCategory) {
@@ -137,11 +154,10 @@ export default function MoviesPage() {
         <div className="flex gap-2 min-w-max">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-              selectedCategory === 'all'
-                ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${selectedCategory === 'all'
+              ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             All
@@ -150,11 +166,10 @@ export default function MoviesPage() {
           {continueWatching.length > 0 && (
             <button
               onClick={() => setSelectedCategory('continue')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
-                selectedCategory === 'continue'
-                  ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${selectedCategory === 'continue'
+                ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <Clock className="w-3.5 h-3.5" />
@@ -164,11 +179,10 @@ export default function MoviesPage() {
 
           <button
             onClick={() => setSelectedCategory('favorites')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
-              selectedCategory === 'favorites'
-                ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${selectedCategory === 'favorites'
+              ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             <Heart className="w-3.5 h-3.5" />
@@ -181,11 +195,10 @@ export default function MoviesPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  selectedCategory === cat
-                    ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${selectedCategory === cat
+                  ? 'bg-gradient-to-r from-teal-500 to-violet-500 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {category.emoji} {category.name}
@@ -207,8 +220,8 @@ export default function MoviesPage() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredVideos.map((video) => {
-              const progress = getWatchProgress(video.id);
-              const favorite = isFavorite(video.id);
+              const progress = progressMap[video.id] ?? null;
+              const favorite = favoritesSet.has(video.id);
 
               return (
                 <div key={video.id} className="relative">
