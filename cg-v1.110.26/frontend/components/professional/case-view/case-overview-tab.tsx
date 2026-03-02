@@ -114,8 +114,8 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
             });
             if (ariaAnalysisRes.ok) setAriaAnalysis(await ariaAnalysisRes.json());
 
-            // 4. Exchanges
-            const exchangesRes = await fetch(`${API_BASE}/api/v1/exchanges/case/${familyFileId}/history?days=30&limit=3`, {
+            // 4. Exchanges (past 14 days + upcoming 14 days)
+            const exchangesRes = await fetch(`${API_BASE}/api/v1/exchanges/case/${familyFileId}/history?days=14&upcoming_days=14`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (exchangesRes.ok) {
@@ -429,7 +429,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                                         Custody Exchanges
                                     </CardTitle>
                                     <CardDescription className="sans text-slate-600 mt-1">
-                                        Recent and upcoming parental transitions
+                                        Past 14 days and next 14 days
                                     </CardDescription>
                                 </div>
                                 <Button variant="ghost" size="sm" className="sans font-medium" asChild>
