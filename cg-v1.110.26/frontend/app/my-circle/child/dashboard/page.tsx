@@ -17,6 +17,8 @@ import {
   Clock,
   Star,
   Sparkles,
+  Video,
+  Phone,
 } from 'lucide-react';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
 import { StreamingBookCard } from '@/components/kidcoms/streaming-book-card';
