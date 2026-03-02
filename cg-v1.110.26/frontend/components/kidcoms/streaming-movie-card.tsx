@@ -21,6 +21,7 @@ interface StreamingMovieCardProps {
   className?: string;
   progress?: number; // 0-100 percentage
   isFavorite?: boolean;
+  onWatchTogether?: () => void;
 }
 
 export function StreamingMovieCard({
@@ -29,7 +30,8 @@ export function StreamingMovieCard({
   onFavoriteToggle,
   className,
   progress,
-  isFavorite: initialFavorite
+  isFavorite: initialFavorite,
+  onWatchTogether
 }: StreamingMovieCardProps) {
   const [isFavorite, setIsFavorite] = useState(initialFavorite ?? false);
   const [isHovered, setIsHovered] = useState(false);
@@ -100,6 +102,21 @@ export function StreamingMovieCard({
             <div className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center shadow-xl transform transition-transform duration-300 group-hover:scale-110">
               <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
             </div>
+
+            {/* Watch Together Button */}
+            {onWatchTogether && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onWatchTogether();
+                }}
+                className="px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold hover:bg-white/40 transition-all flex items-center gap-1.5"
+                style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+              >
+                <Users className="w-3.5 h-3.5" />
+                Watch Together
+              </button>
+            )}
 
             {/* Quick Info */}
             <div className="text-center px-4">

@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, Users, Phone, Video, X } from 'lucide-react';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
 import { FeaturedHeroBanner } from '@/components/kidcoms/featured-hero-banner';
 import { HorizontalScrollRow } from '@/components/kidcoms/horizontal-scroll-row';
 import { StreamingMovieCard } from '@/components/kidcoms/streaming-movie-card';
+import { kidcomsAPI } from '@/lib/api';
 import { theaterContent, VideoCategory, videoCategories } from '@/lib/theater-content';
 import type { WatchProgress, VideoStats } from '@/lib/watch-progress';
 
@@ -16,6 +17,15 @@ interface ChildUserData {
   childName: string;
   avatarId?: string;
   familyFileId: string;
+}
+
+interface ChildContact {
+  contact_id: string;
+  display_name: string;
+  contact_type: 'parent_a' | 'parent_b' | 'circle';
+  relationship?: string;
+  can_video_call: boolean;
+  can_voice_call: boolean;
 }
 
 export default function MoviesPage() {
@@ -30,6 +40,11 @@ export default function MoviesPage() {
   const [progressMap, setProgressMap] = useState<Record<string, WatchProgress | null>>({});
   const [favoritesSet, setFavoritesSet] = useState<Set<string>>(new Set());
   const [featuredIndex, setFeaturedIndex] = useState(0);
+
+  // Watch Together state
+  const [contacts, setContacts] = useState<ChildContact[]>([]);
+  const [watchTogetherMovie, setWatchTogetherMovie] = useState<any | null>(null);
+  const [isStartingCall, setIsStartingCall] = useState(false);
 
   // Auto-rotate featured banner
   useEffect(() => {
@@ -62,6 +77,12 @@ export default function MoviesPage() {
 
       setUserData(user);
 
+      // Load contacts
+      const contactsStr = localStorage.getItem('child_contacts');
+      if (contactsStr) {
+        try { setContacts(JSON.parse(contactsStr) as ChildContact[]); } catch { setContacts([]); }
+      }
+
       const { getVideoStats, getContinueWatching, getWatchProgress, getFavorites } = require('@/lib/watch-progress');
       setStats(getVideoStats());
       setContinueWatching(getContinueWatching());
@@ -91,6 +112,38 @@ export default function MoviesPage() {
     }
     return true;
   });
+
+  async function handleWatchTogetherCall(contact: ChildContact, movie: any) {
+    if (isStartingCall) return;
+    setIsStartingCall(true);
+    try {
+      const response = await kidcomsAPI.createChildSession({
+        contact_type: contact.contact_type,
+        contact_id: contact.contact_id,
+        session_type: 'video_call', // Default to video for watch together
+      });
+
+      localStorage.setItem('child_call_session', JSON.stringify({
+        sessionId: response.session_id,
+        roomUrl: response.room_url,
+        token: response.token,
+        participantName: response.participant_name,
+        contactName: contact.display_name,
+        callType: 'video',
+        autoPlayMedia: {
+          type: 'video',
+          id: movie.id,
+          title: movie.title
+        }
+      }));
+
+      router.push(`/my-circle/child/call?session=${response.session_id}`);
+    } catch (error) {
+      console.error('Failed to start watch together call:', error);
+      alert('Could not start call. Please try again!');
+      setIsStartingCall(false);
+    }
+  }
 
   const userInitial = userData?.childName?.charAt(0).toUpperCase() || 'K';
 
@@ -195,6 +248,7 @@ export default function MoviesPage() {
               onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
               onFavorite={() => { }}
               isFavorite={favoritesSet.has(featuredVideo.id)}
+              onWatchTogether={() => setWatchTogetherMovie(featuredVideo)}
             />
 
             {/* Dots indicator */}
@@ -228,6 +282,7 @@ export default function MoviesPage() {
                     onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
                     progress={wp.progress}
                     isFavorite={favoritesSet.has(video.id)}
+                    onWatchTogether={() => setWatchTogetherMovie(video)}
                   />
                 );
               }}
@@ -263,6 +318,7 @@ export default function MoviesPage() {
                   onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
                   progress={progressMap[video.id]?.progress}
                   isFavorite={favoritesSet.has(video.id)}
+                  onWatchTogether={() => setWatchTogetherMovie(video)}
                 />
               ))}
             </div>
@@ -271,6 +327,107 @@ export default function MoviesPage() {
       </main>
 
       <KidBottomNav />
+
+      {/* ── Watch Together Contact Picker Modal ── */}
+      {watchTogetherMovie && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4"
+          onClick={() => setWatchTogetherMovie(null)}
+        >
+          <div
+            className="w-full max-w-lg bg-slate-900 rounded-t-3xl sm:rounded-3xl border-t sm:border border-slate-700 shadow-2xl overflow-hidden"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                  Watch Together 🎬
+                </h3>
+                <p className="text-slate-400 text-xs truncate max-w-[240px]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  Invite someone to watch <span className="text-cyan-400 font-bold">{watchTogetherMovie.title}</span>
+                </p>
+              </div>
+              <button
+                onClick={() => setWatchTogetherMovie(null)}
+                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Contacts List */}
+            <div className="p-4 max-h-[60vh] overflow-y-auto scrollbar-hide space-y-3">
+              {contacts.length === 0 ? (
+                <div className="text-center py-10 px-6">
+                  <p className="text-slate-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    No contacts found. Ask a parent to add someone to your circle!
+                  </p>
+                </div>
+              ) : (
+                contacts.map(contact => {
+                  const avatarColor = ['from-teal-500 to-emerald-500', 'from-cyan-500 to-teal-500', 'from-amber-500 to-orange-400', 'from-red-500 to-orange-500', 'from-pink-500 to-rose-500', 'from-violet-500 to-purple-500'][contact.display_name.length % 6];
+
+                  return (
+                    <button
+                      key={contact.contact_id}
+                      onClick={() => handleWatchTogetherCall(contact, watchTogetherMovie)}
+                      disabled={!contact.can_video_call}
+                      className="w-full flex items-center gap-4 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-2xl p-4 transition-all group disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <div className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br ${avatarColor} shadow-lg flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                        <span className="text-white font-bold text-lg">{contact.display_name.charAt(0).toUpperCase()}</span>
+                      </div>
+                      <div className="flex-1 text-left min-w-0">
+                        <h4 className="text-white font-bold text-sm truncate" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                          {contact.display_name}
+                        </h4>
+                        <p className="text-slate-500 text-xs capitalize" style={{ fontFamily: 'Inter, sans-serif' }}>
+                          {contact.relationship?.replace('_', ' ') || 'Circle Member'}
+                        </p>
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-500 group-hover:text-white transition-colors">
+                        <Video className="w-5 h-5" />
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 bg-slate-950/30 border-t border-slate-800">
+              <button
+                onClick={() => setWatchTogetherMovie(null)}
+                className="w-full py-4 rounded-2xl bg-slate-800 text-slate-300 font-bold hover:bg-slate-700 transition-colors"
+                style={{ fontFamily: 'Inter, sans-serif' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Calling overlay */}
+      {isStartingCall && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[60]">
+          <div className="text-center space-y-6">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center mx-auto animate-pulse shadow-2xl shadow-cyan-500/20">
+              <Video className="w-12 h-12 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                Connecting...
+              </h2>
+              <p className="text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
+                Getting ready to watch together! 🎬
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

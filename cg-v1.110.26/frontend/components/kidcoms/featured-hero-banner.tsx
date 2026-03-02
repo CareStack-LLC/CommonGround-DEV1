@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Play, Heart, Info } from 'lucide-react';
+import { Play, Heart, Info, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StarRating } from './star-rating';
 import { useState } from 'react';
@@ -25,15 +25,16 @@ interface FeaturedHeroBannerProps {
   onPlay: () => void;
   onFavorite?: () => void;
   isFavorite?: boolean;
+  onWatchTogether?: () => void;
   className?: string;
 }
 
 export function FeaturedHeroBanner({
   content,
   badge = 'Featured',
-  onPlay,
   onFavorite,
   isFavorite: initialFavorite = false,
+  onWatchTogether,
   className
 }: FeaturedHeroBannerProps) {
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
@@ -167,6 +168,25 @@ export function FeaturedHeroBanner({
               <Play className="w-5 h-5 fill-current" />
               <span>{content.type === 'video' ? 'Watch Now' : 'Read Now'}</span>
             </button>
+
+            {/* Watch Together CTA */}
+            {onWatchTogether && content.type === 'video' && (
+              <button
+                onClick={onWatchTogether}
+                className={cn(
+                  'flex items-center gap-2 px-6 py-3 rounded-full',
+                  'bg-cyan-500 text-white font-bold',
+                  'hover:bg-cyan-400 active:scale-95',
+                  'transition-all duration-200',
+                  'shadow-xl hover:shadow-cyan-500/20',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+                )}
+                style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+              >
+                <Users className="w-5 h-5" />
+                <span>Watch Together</span>
+              </button>
+            )}
 
             {/* Info Button */}
             <button
