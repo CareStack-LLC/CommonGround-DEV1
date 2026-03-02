@@ -135,15 +135,45 @@ export default function ChildDashboardPage() {
     }
   }
 
-  // Always show Continue Watching — fallback to all videos if none in progress
-  const continueVideos = recentVideos.filter(v => v.progress > 0 && v.progress < 90);
-  // Demo fallback: show first 2 videos when no watch history exists
-  const displayContinue = continueVideos.length > 0
-    ? continueVideos.map(wp => ({
-      video: theaterContent.videos.find(v => v.id === wp.videoId)!,
+  // Combined "Pick Back Up" — Video + Books progress
+  const pickBackUp = [
+    ...recentVideos.filter(v => v.progress > 0 && v.progress < 90).map(wp => ({
+      type: 'video' as const,
+      id: wp.videoId,
+      item: theaterContent.videos.find(v => v.id === wp.videoId)!,
       progress: wp.progress,
-    })).filter(x => x.video)
-    : theaterContent.videos.slice(0, 2).map(v => ({ video: v, progress: 0 }));
+      lastAction: wp.lastWatched || '',
+      withWho: 'Mom' // Mock data as per request
+    })),
+    ...Object.entries(bookProgressMap)
+      .filter(([_, p]) => p && p.progress > 0 && p.progress < 100)
+      .map(([id, p]) => ({
+        type: 'book' as const,
+        id,
+        item: theaterContent.storybooks.find(b => b.id === id)!,
+        progress: p!.progress,
+        lastAction: p!.lastRead || '',
+        withWho: 'Dad' // Mock data
+      }))
+  ].sort((a, b) => b.lastAction.localeCompare(a.lastAction));
+
+  // Fallback if empty
+  const displayPickBackUp = pickBackUp.length > 0
+    ? pickBackUp
+    : [
+      { type: 'video' as const, id: 'crunch', item: theaterContent.videos[0], progress: 45, withWho: 'Mom' },
+      { type: 'book' as const, id: 'luna-midnight', item: theaterContent.storybooks[0], progress: 30, withWho: 'Dad' }
+    ];
+
+  const [featuredIndex, setFeaturedIndex] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFeaturedIndex(i => (i + 1) % theaterContent.videos.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const featuredVideo = theaterContent.videos[featuredIndex];
 
   const userInitial = userData?.childName?.charAt(0).toUpperCase() || 'K';
   const avatarGradient = AVATAR_COLORS[(userData?.childName?.length || 0) % AVATAR_COLORS.length];
@@ -164,7 +194,7 @@ export default function ChildDashboardPage() {
   return (
     <div className="min-h-screen bg-slate-950 pb-24">
       {/* ── Header ── */}
-      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60">
+      <header className="bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60">
         <div className="px-4 py-3 flex items-center justify-between">
           <div>
             <h1
@@ -174,7 +204,7 @@ export default function ChildDashboardPage() {
               Hey {userData?.childName || 'friend'} 👋
             </h1>
             <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
-              What are you watching today?
+              What are we doing today?
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -191,99 +221,117 @@ export default function ChildDashboardPage() {
         </div>
       </header>
 
-      <main className="space-y-8 pt-5 pb-6">
+      <main className="space-y-8 pb-6">
+        {/* Featured Hero Banner — align with Movies page */}
+        <div className="px-4">
+          <FeaturedHeroBanner
+            content={{
+              id: featuredVideo.id,
+              title: featuredVideo.title,
+              cover: featuredVideo.thumbnail,
+              description: featuredVideo.description,
+              duration: featuredVideo.duration ? parseInt(featuredVideo.duration) : undefined,
+              type: 'video',
+              category: featuredVideo.category,
+              rating: 4.5,
+              ratingCount: 2400,
+            }}
+            badge="✨ Featured"
+            onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
+            onFavorite={() => { }}
+            isFavorite={false}
+          />
+          {/* Dots indicator */}
+          <div className="flex gap-1.5 justify-center mt-3">
+            {theaterContent.videos.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setFeaturedIndex(i)}
+                className={`rounded-full transition-all duration-300 ${i === featuredIndex ? 'w-6 h-1.5 bg-cyan-500' : 'w-1.5 h-1.5 bg-slate-600 hover:bg-slate-500'}`}
+              />
+            ))}
+          </div>
+        </div>
 
         {/* ─────────────────────────────────────────────
-            1. CONTINUE WATCHING — TOP, large 16:9
+            1. PICK BACK UP — Combined Video & Books
         ───────────────────────────────────────────── */}
         <section className="px-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              Continue Watching
+              Pick Back Up
             </h2>
-            <button
-              onClick={() => router.push('/my-circle/child/movies')}
-              className="flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
-            >
-              See All <ChevronRight className="w-4 h-4" />
-            </button>
           </div>
 
           <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
             <div className="flex gap-4 min-w-max pb-2">
-              {displayContinue.map(({ video, progress }) => {
-                const progressPct = Math.round(progress);
+              {displayPickBackUp.map((entry) => {
+                const progressPct = Math.round(entry.progress);
+                const isVideo = entry.type === 'video';
+                const item = entry.item;
+                if (!item) return null;
+
                 return (
                   <button
-                    key={video.id}
-                    onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
+                    key={`${entry.type}-${entry.id}`}
+                    onClick={() => router.push(isVideo ? `/my-circle/child/movies/${entry.id}` : `/my-circle/child/library/${entry.id}`)}
                     className="relative flex-shrink-0 w-[340px] rounded-2xl overflow-hidden bg-slate-800 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-xl shadow-black/30"
                   >
                     {/* 16:9 poster */}
                     <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                      {video.thumbnail ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={video.thumbnail}
-                          alt={video.title}
-                          className="absolute inset-0 w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 bg-gradient-to-br from-red-900 to-slate-900 flex items-center justify-center">
-                          <Film className="w-12 h-12 text-slate-600" />
-                        </div>
-                      )}
+                      <img
+                        src={isVideo ? (item as any).thumbnail : (item as any).cover}
+                        alt={item.title}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
                       {/* Gradient overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
-                      {/* Play button (visible on hover) */}
+                      {/* Play/Open icon */}
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-xl">
-                          <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
+                          {isVideo ? <Play className="w-8 h-8 text-white ml-1" fill="currentColor" /> : <BookOpen className="w-8 h-8 text-white" />}
                         </div>
                       </div>
 
                       {/* Progress bar */}
-                      {progressPct > 0 && (
-                        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/20">
-                          <div
-                            className="h-full bg-cyan-500 rounded-r-full"
-                            style={{ width: `${progressPct}%` }}
-                          />
-                        </div>
-                      )}
+                      <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/20">
+                        <div
+                          className={`h-full ${isVideo ? 'bg-cyan-500' : 'bg-amber-500'} rounded-r-full`}
+                          style={{ width: `${progressPct}%` }}
+                        />
+                      </div>
                     </div>
 
                     {/* Card info row */}
                     <div className="px-4 py-3 flex items-center gap-3">
-                      {/* "With Mom" avatar */}
+                      {/* Person avatar */}
                       <div className="flex-shrink-0 flex items-center gap-1.5">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center ring-2 ring-slate-800 shadow">
-                          <span className="text-white font-bold text-xs" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>M</span>
+                        <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${entry.withWho === 'Mom' ? 'from-pink-400 to-rose-500' : 'from-blue-400 to-indigo-500'} flex items-center justify-center ring-2 ring-slate-800 shadow`}>
+                          <span className="text-white font-bold text-xs" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                            {entry.withWho === 'Mom' ? 'M' : 'D'}
+                          </span>
                         </div>
                       </div>
 
                       <div className="flex-1 min-w-0 text-left">
                         <h3 className="font-bold text-white text-sm leading-tight line-clamp-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                          {video.title}
+                          {item.title}
                         </h3>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-pink-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>with Mom</span>
-                          {video.duration && (
-                            <>
-                              <span className="text-slate-600">·</span>
-                              <Clock className="w-3 h-3 text-slate-500" />
-                              <span className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>{video.duration}</span>
-                            </>
-                          )}
+                          <span className={`${entry.withWho === 'Mom' ? 'text-pink-400' : 'text-blue-400'} text-xs`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                            with {entry.withWho}
+                          </span>
+                          <span className="text-slate-600">·</span>
+                          <span className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+                            {isVideo ? 'Movie' : 'Book'}
+                          </span>
                         </div>
                       </div>
 
-                      {progressPct > 0 && (
-                        <span className="text-cyan-400 text-xs font-bold flex-shrink-0" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                          {progressPct}%
-                        </span>
-                      )}
+                      <span className={`${isVideo ? 'text-cyan-400' : 'text-amber-400'} text-xs font-bold flex-shrink-0`} style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                        {progressPct}%
+                      </span>
                     </div>
                   </button>
                 );
@@ -322,7 +370,41 @@ export default function ChildDashboardPage() {
         </section>
 
         {/* ─────────────────────────────────────────────
-            3. UPCOMING EVENTS WIDGET
+            3. CALL HISTORY — Recent 5
+        ───────────────────────────────────────────── */}
+        <section className="px-4">
+          <h2 className="text-xl font-bold text-white mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            Recent Calls
+          </h2>
+          <div className="bg-slate-800/40 rounded-3xl overflow-hidden border border-slate-800/60 divide-y divide-slate-800/60">
+            {[
+              { name: 'Mom', type: 'video', time: '10 min ago', color: 'from-pink-400 to-rose-500', initial: 'M' },
+              { name: 'Dad', type: 'voice', time: '2 hours ago', color: 'from-blue-400 to-indigo-500', initial: 'D' },
+              { name: 'Grandma', type: 'video', time: 'Yesterday', color: 'from-emerald-400 to-teal-500', initial: 'G' },
+              { name: 'Mom', type: 'video', time: '2 days ago', color: 'from-pink-400 to-rose-500', initial: 'M' },
+              { name: 'Alice', type: 'voice', time: '3 days ago', color: 'from-amber-400 to-orange-500', initial: 'A' },
+            ].map((call, idx) => (
+              <div key={idx} className="flex items-center gap-4 p-4 hover:bg-slate-800/40 transition-colors group">
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${call.color} flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform`}>
+                  <span className="text-white font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{call.initial}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{call.name}</h3>
+                  <p className="text-slate-500 text-xs flex items-center gap-1.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    {call.type === 'video' ? <Video className="w-3 h-3" /> : <Phone className="w-3 h-3" />}
+                    {call.type === 'video' ? 'Video Call' : 'Voice Call'} · {call.time}
+                  </p>
+                </div>
+                <button className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:bg-slate-700 transition-all">
+                  {call.type === 'video' ? <Video className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────
+            4. UPCOMING EVENTS WIDGET
         ───────────────────────────────────────────── */}
         <section className="px-4">
           <div className="flex items-center justify-between mb-3">
