@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import type { DailyCall, DailyParticipant } from '@daily-co/daily-js';
 import { circleCallsAPI } from '@/lib/api';
-import { wsClient, CircleCallAriaAlertEvent } from '@/lib/websocket';
+import { wsClient, WebSocketMessage, CircleCallAriaAlertEvent } from '@/lib/websocket';
 import {
   PhoneOff,
   Video,
@@ -92,17 +92,18 @@ function CircleCallContent() {
   useEffect(() => {
     if (!sessionId) return;
 
-    const handleAriaAlert = (data: CircleCallAriaAlertEvent) => {
-      if (data.session_id !== sessionId) return;
+    const handleAriaAlert = (data: WebSocketMessage) => {
+      const alertData = data as CircleCallAriaAlertEvent;
+      if (alertData.session_id !== sessionId) return;
 
       setAriaAlert({
-        severity: data.severity,
-        message: data.message,
-        callTerminated: data.call_terminated,
+        severity: alertData.severity,
+        message: alertData.message,
+        callTerminated: alertData.call_terminated,
       });
 
       // If call terminated, end the call
-      if (data.call_terminated) {
+      if (alertData.call_terminated) {
         setTimeout(() => {
           handleLeaveCall();
         }, 3000);
