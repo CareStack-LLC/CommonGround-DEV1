@@ -28,14 +28,24 @@ const AVATAR_COLORS = [
 
 // Derive unique authors from books
 function getAuthors(books: typeof theaterContent.storybooks) {
-  const authorMap = new Map<string, { name: string; bookCount: number }>();
-  books.forEach(b => {
-    if (b.author) {
-      const existing = authorMap.get(b.author);
-      authorMap.set(b.author, { name: b.author, bookCount: (existing?.bookCount || 0) + 1 });
+  // Hardcoded popular authors as requested
+  return [
+    {
+      name: 'Ayanna S Clark',
+      avatar: '/kidsComms/posters/authors/ayaanasclark.jpg',
+      bookCount: books.filter(b => b.author?.includes('Ayanna')).length || 1
+    },
+    {
+      name: 'Alice Fayes',
+      avatar: '/kidsComms/posters/authors/alicefayes.jpg',
+      bookCount: 1
+    },
+    {
+      name: 'Trevor Smith',
+      avatar: '/kidsComms/posters/authors/trevorsmith.jpg',
+      bookCount: 1
     }
-  });
-  return Array.from(authorMap.values());
+  ];
 }
 
 export default function LibraryPage() {
@@ -231,6 +241,7 @@ export default function LibraryPage() {
               renderCard={(author) => (
                 <AuthorAvatar
                   name={author.name}
+                  avatar={author.avatar}
                   size="md"
                   onClick={() => setSearchQuery(author.name)}
                 />

@@ -319,24 +319,24 @@ export default function MyCirclePage() {
                     onClick={() => handleCall(contact, 'voice')}
                     disabled={!contact.can_voice_call}
                     className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${contact.can_voice_call
-                        ? 'bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 hover:scale-110 active:scale-95'
-                        : 'bg-slate-700 opacity-40 cursor-not-allowed'
+                      ? 'bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 hover:scale-110 active:scale-95'
+                      : 'bg-slate-700 opacity-40 cursor-not-allowed'
                       }`}
                     aria-label={`Call ${displayName}`}
                   >
-                    <Phone className="w-5 h-5 text-white" />
+                    <Phone className="w-5 h-5 text-white" strokeWidth={2.5} />
                   </button>
 
                   <button
                     onClick={() => handleCall(contact, 'video')}
                     disabled={!contact.can_video_call}
                     className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${contact.can_video_call
-                        ? 'bg-cyan-500 hover:bg-cyan-400 shadow-lg shadow-cyan-500/30 hover:scale-110 active:scale-95'
-                        : 'bg-slate-700 opacity-40 cursor-not-allowed'
+                      ? 'bg-cyan-500 hover:bg-cyan-400 shadow-lg shadow-cyan-500/30 hover:scale-110 active:scale-95'
+                      : 'bg-slate-700 opacity-40 cursor-not-allowed'
                       }`}
                     aria-label={`Video call ${displayName}`}
                   >
-                    <Video className="w-5 h-5 text-white" />
+                    <Video className="w-5 h-5 text-white" strokeWidth={2.5} />
                   </button>
                 </div>
               </div>

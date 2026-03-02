@@ -438,8 +438,12 @@ export default function ChildDashboardPage() {
           {/* Author bio */}
           <div className="bg-gradient-to-br from-amber-950/40 to-slate-800/60 rounded-2xl p-4 mb-4 border border-amber-800/30">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
-                <span className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>A</span>
+              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-500/30 flex-shrink-0 shadow-lg shadow-amber-500/20">
+                <img
+                  src="/kidsComms/posters/authors/ayaanasclark.jpg"
+                  alt="Ayanna S Clark"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div>
                 <p className="text-white font-bold text-base" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ayanna S Clark</p>

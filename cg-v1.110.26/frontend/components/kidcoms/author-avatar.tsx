@@ -107,7 +107,7 @@ export function AuthorAvatar({
         <p
           className={cn(
             sizeConfig.text,
-            'font-semibold text-slate-800 truncate'
+            'font-semibold text-white truncate'
           )}
           style={{ fontFamily: 'Inter, sans-serif' }}
           title={name}
