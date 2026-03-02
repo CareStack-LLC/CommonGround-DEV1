@@ -111,7 +111,7 @@ export default function MyCirclePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FFF8F3] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <ARIAMascot state="loading" greeting="Loading your circle..." />
         </div>
@@ -121,19 +121,19 @@ export default function MyCirclePage() {
 
   if (contacts.length === 0) {
     return (
-      <div className="min-h-screen bg-[#FFF8F3] pb-24">
-        <header className="bg-white/90 backdrop-blur-sm border-b border-teal-100/60 shadow-sm px-4 py-3">
+      <div className="min-h-screen bg-slate-950 pb-24">
+        <header className="bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60 px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-teal-500/25">
                 <Users className="w-5 h-5 text-white" strokeWidth={2} />
               </div>
               <div>
-                <h1 className="font-black text-slate-900 text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>My Circle</h1>
-                <p className="text-slate-500 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>Your people</p>
+                <h1 className="font-black text-white text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>My Circle</h1>
+                <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>Your people</p>
               </div>
             </div>
-            <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-offset-white ring-teal-400/50`}>
+            <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-offset-slate-950 ring-teal-500/50`}>
               <span className="text-white font-bold text-sm">{userInitial}</span>
             </div>
           </div>
@@ -151,25 +151,25 @@ export default function MyCirclePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF8F3] pb-24">
-      {/* Light warm header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-teal-100/60 shadow-sm">
+    <div className="min-h-screen bg-slate-950 pb-24">
+      {/* Dark header */}
+      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60">
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-teal-500/25">
               <Users className="w-5 h-5 text-white" strokeWidth={2} />
             </div>
             <div>
-              <h1 className="font-black text-slate-900 text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              <h1 className="font-black text-white text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 My Circle
               </h1>
-              <p className="text-slate-500 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {contacts.length} {contacts.length === 1 ? 'person' : 'people'} to call
               </p>
             </div>
           </div>
 
-          <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-offset-white ring-teal-400/50`}>
+          <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-offset-slate-950 ring-teal-500/50`}>
             <span className="text-white font-bold text-sm">{userInitial}</span>
           </div>
         </div>

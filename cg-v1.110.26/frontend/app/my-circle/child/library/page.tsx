@@ -108,10 +108,10 @@ export default function LibraryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FFF8F3] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <div className="text-xl font-bold text-slate-800" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <div className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             Loading Library...
           </div>
         </div>
@@ -120,9 +120,9 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF8F3] pb-24">
-      {/* Light Header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-amber-100/60 shadow-sm">
+    <div className="min-h-screen bg-slate-950 pb-24">
+      {/* Dark Header */}
+      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60">
         <div className="px-4 py-3">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
@@ -130,10 +130,10 @@ export default function LibraryPage() {
                 <BookOpen className="w-5 h-5 text-white" strokeWidth={2.5} />
               </div>
               <div>
-                <h1 className="font-black text-slate-900 text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                <h1 className="font-black text-white text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                   Library
                 </h1>
-                <p className="text-slate-500 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
                   {books.length} books to explore
                 </p>
               </div>
@@ -141,7 +141,7 @@ export default function LibraryPage() {
 
             {/* Profile Avatar */}
             <div
-              className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center flex-shrink-0 ring-2 ring-offset-2 ring-offset-white ring-amber-400/50`}
+              className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center flex-shrink-0 ring-2 ring-offset-2 ring-offset-slate-950 ring-cyan-500/50`}
             >
               <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 {userInitial}
@@ -149,15 +149,15 @@ export default function LibraryPage() {
             </div>
           </div>
 
-          {/* Search Bar — Light */}
+          {/* Search Bar — Dark */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
               type="text"
               placeholder="Search books or authors..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
           </div>
@@ -175,8 +175,8 @@ export default function LibraryPage() {
                 key={key}
                 onClick={() => setSelectedCategory(key as any)}
                 className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${selectedCategory === key
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-400 text-white shadow-lg shadow-amber-400/30'
-                  : 'bg-amber-50 text-slate-600 hover:bg-amber-100 border border-amber-200/60'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-400 text-white shadow-lg shadow-amber-500/30'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 border border-slate-700/50'
                   }`}
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
@@ -188,30 +188,30 @@ export default function LibraryPage() {
       </header>
 
       <main className="space-y-6 pt-4 pb-4">
-        {/* Reading Stats — warm card */}
+        {/* Reading Stats — dark card */}
         {stats.booksRead > 0 && (
           <div className="px-4">
-            <div className="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm">
+            <div className="bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50">
               <h3
-                className="font-bold text-amber-700 mb-3 text-sm flex items-center gap-2"
+                className="font-bold text-amber-400 mb-3 text-sm flex items-center gap-2"
                 style={{ fontFamily: 'Space Grotesk, sans-serif' }}
               >
                 <Trophy className="w-4 h-4" /> Your Reading Journey
               </h3>
               <div className="grid grid-cols-3 gap-3 text-center">
                 {[
-                  { icon: <Trophy className="w-4 h-4 text-amber-500" />, value: stats.booksCompleted, label: 'Completed' },
-                  { icon: <Target className="w-4 h-4 text-amber-500" />, value: stats.pagesRead, label: 'Pages' },
-                  { icon: <Zap className="w-4 h-4 text-amber-500" />, value: stats.streak, label: 'Day Streak' },
+                  { icon: <Trophy className="w-4 h-4 text-amber-400" />, value: stats.booksCompleted, label: 'Completed' },
+                  { icon: <Target className="w-4 h-4 text-amber-400" />, value: stats.pagesRead, label: 'Pages' },
+                  { icon: <Zap className="w-4 h-4 text-amber-400" />, value: stats.streak, label: 'Day Streak' },
                 ].map(({ icon, value, label }) => (
                   <div key={label}>
                     <div className="flex items-center justify-center gap-1 mb-1">
                       {icon}
-                      <div className="text-2xl font-bold text-amber-600" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                      <div className="text-2xl font-bold text-amber-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                         {value}
                       </div>
                     </div>
-                    <div className="text-xs text-slate-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    <div className="text-xs text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
                       {label}
                     </div>
                   </div>
@@ -228,8 +228,6 @@ export default function LibraryPage() {
               title="Popular Authors"
               items={authors}
               cardClassName="w-20"
-              titleClassName="text-slate-900"
-              viewAllClassName="text-amber-500 hover:text-amber-600"
               renderCard={(author) => (
                 <AuthorAvatar
                   name={author.name}
@@ -249,8 +247,6 @@ export default function LibraryPage() {
               items={books.slice(0, 6)}
               onViewAll={() => { }}
               cardClassName="w-32"
-              titleClassName="text-slate-900"
-              viewAllClassName="text-amber-500 hover:text-amber-600"
               renderCard={(book) => (
                 <StreamingBookCard
                   book={book}
@@ -265,7 +261,7 @@ export default function LibraryPage() {
         {/* All Books Grid */}
         <section className="px-4">
           <h2
-            className="text-xl font-bold text-slate-900 mb-4"
+            className="text-xl font-bold text-white mb-4"
             style={{ fontFamily: 'Space Grotesk, sans-serif' }}
           >
             {selectedCategory === 'all' && !searchQuery
@@ -280,7 +276,7 @@ export default function LibraryPage() {
           {filteredBooks.length === 0 ? (
             <div className="text-center py-20">
               <div className="text-6xl mb-4">📚</div>
-              <p className="text-slate-500 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-slate-400 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {searchQuery ? 'No books found' : 'No books in this category'}
               </p>
             </div>
