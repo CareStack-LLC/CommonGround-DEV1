@@ -19,7 +19,7 @@ const games = [
     title: 'Tic-Tac-Toe',
     description: 'Get three in a row!',
     difficulty: 'Medium',
-    poster: '/kidsComms/posters/video game poster/IMG_2307.jpg',
+    poster: '/kidsComms/posters/videogame-posters/IMG_2307.jpg',
     difficultyColor: 'text-yellow-400',
     badge: '⭐ Featured',
     badgeBg: 'bg-cyan-500',
@@ -29,7 +29,7 @@ const games = [
     title: 'Memory Match',
     description: 'Flip and match the cards!',
     difficulty: 'Easy',
-    poster: '/kidsComms/posters/video game poster/IMG_2308.jpg',
+    poster: '/kidsComms/posters/videogame-posters/IMG_2308.jpg',
     difficultyColor: 'text-green-400',
     badge: null,
     badgeBg: '',
@@ -39,7 +39,7 @@ const games = [
     title: 'Drawing Pad',
     description: 'Draw and create anything!',
     difficulty: 'Easy',
-    poster: '/kidsComms/posters/video game poster/IMG_2309.jpg',
+    poster: '/kidsComms/posters/videogame-posters/IMG_2309.jpg',
     difficultyColor: 'text-green-400',
     badge: null,
     badgeBg: '',
@@ -138,7 +138,20 @@ export default function ArcadePage() {
 
       <main className="space-y-8 pt-6 pb-4 px-4">
 
-        {/* ── Featured Game — Tic-Tac-Toe ── */}
+        {/* ── Your Scores — TOP ── */}
+        <section>
+          <div className="bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
+              <Trophy className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-white text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Your Scores</h3>
+              <p className="text-slate-400 text-xs mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+                Play games to see your best scores here!
+              </p>
+            </div>
+          </div>
+        </section>
         <section>
           <h2
             className="text-xl font-bold text-white mb-4 flex items-center gap-2"
@@ -250,21 +263,6 @@ export default function ArcadePage() {
                 </div>
               </button>
             ))}
-          </div>
-        </section>
-
-        {/* ── High Scores ── */}
-        <section>
-          <div className="bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
-              <Trophy className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="font-bold text-white text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Your Scores</h3>
-              <p className="text-slate-400 text-xs mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
-                Play games to see your best scores here!
-              </p>
-            </div>
           </div>
         </section>
 

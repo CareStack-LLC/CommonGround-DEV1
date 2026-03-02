@@ -43,15 +43,15 @@ const AVATAR_COLORS = [
 const COMING_SOON = [
   {
     id: 'cs-1',
-    poster: '/kidsComms/posters/4D7C4F13-F90D-4EB2-A9E2-4E5DBFB68CE4.PNG',
+    poster: '/kidsComms/posters/4D7C4F13-F90D-4EB2-A9E2-4E5DBFB68CE4.png',
   },
   {
     id: 'cs-2',
-    poster: '/kidsComms/posters/91AC0B05-5FE6-436C-A85E-05A48ED20E71.PNG',
+    poster: '/kidsComms/posters/91AC0B05-5FE6-436C-A85E-05A48ED20E71.png',
   },
   {
     id: 'cs-3',
-    poster: '/kidsComms/posters/C7668A38-5A1C-4D9B-9F83-2366C14A2CD7.PNG',
+    poster: '/kidsComms/posters/C7668A38-5A1C-4D9B-9F83-2366C14A2CD7.png',
   },
 ];
 
