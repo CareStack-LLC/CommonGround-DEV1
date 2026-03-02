@@ -19,7 +19,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { HorizontalScrollRow } from '@/components/kidcoms/horizontal-scroll-row';
 import { StreamingBookCard } from '@/components/kidcoms/streaming-book-card';
 import { theaterContent } from '@/lib/theater-content';
 import type { WatchProgress } from '@/lib/watch-progress';
@@ -40,47 +39,40 @@ const AVATAR_COLORS = [
   'from-emerald-500 to-teal-500',
 ];
 
-// Coming Soon — horizontal poster cards using new wide-format posters
+// Coming Soon — horizontal wide-format posters from /posters folder
 const COMING_SOON = [
   {
     id: 'cs-1',
-    title: 'New Adventure',
     poster: '/kidsComms/posters/4D7C4F13-F90D-4EB2-A9E2-4E5DBFB68CE4.PNG',
-    badge: 'Coming Soon',
   },
   {
     id: 'cs-2',
-    title: 'Epic Quest',
     poster: '/kidsComms/posters/91AC0B05-5FE6-436C-A85E-05A48ED20E71.PNG',
-    badge: 'Coming Soon',
   },
   {
     id: 'cs-3',
-    title: 'Mystery World',
     poster: '/kidsComms/posters/C7668A38-5A1C-4D9B-9F83-2366C14A2CD7.PNG',
-    badge: 'Coming Soon',
   },
 ];
 
-// Ayanna S Clark books only
-const AYANNA_BOOKS = theaterContent.storybooks
-  .filter(b => b.id === 'luna-midnight')
-  .concat(
-    // add a "Midnight" book pointing to the same Luna and Midnight PDF as a companion
-    [{
-      id: 'midnight',
-      title: 'Midnight',
-      url: '/kidsComms/Luna and Midnight.pdf',
-      cover: '/kidsComms/covers/luna-midnight-cover.jpg',
-      pages: 24,
-      author: 'Ayanna S Clark',
-      category: 'fantasy' as const,
-      ageRange: '6-10',
-    }]
-  )
-  .map(b => ({ ...b, author: 'Ayanna S Clark' }));
+// Ayanna S Clark books — Luna and Midnight (2 entries, single-column)
+const AYANNA_BOOKS = [
+  {
+    ...theaterContent.storybooks.find(b => b.id === 'luna-midnight')!,
+    author: 'Ayanna S Clark',
+  },
+  {
+    id: 'midnight',
+    title: 'Midnight',
+    url: '/kidsComms/Luna and Midnight.pdf',
+    cover: '/kidsComms/covers/luna-midnight-cover.jpg',
+    pages: 24,
+    author: 'Ayanna S Clark',
+    category: 'fantasy' as const,
+    ageRange: '6-10',
+  },
+];
 
-// Mock upcoming events
 const MOCK_EVENTS = [
   {
     id: 'e1',
@@ -153,7 +145,15 @@ export default function ChildDashboardPage() {
     }
   }
 
+  // Always show Continue Watching — fallback to all videos if none in progress
   const continueVideos = recentVideos.filter(v => v.progress > 0 && v.progress < 90);
+  // Demo fallback: show first 2 videos when no watch history exists
+  const displayContinue = continueVideos.length > 0
+    ? continueVideos.map(wp => ({
+      video: theaterContent.videos.find(v => v.id === wp.videoId)!,
+      progress: wp.progress,
+    })).filter(x => x.video)
+    : theaterContent.videos.slice(0, 2).map(v => ({ video: v, progress: 0 }));
 
   const userInitial = userData?.childName?.charAt(0).toUpperCase() || 'K';
   const avatarGradient = AVATAR_COLORS[(userData?.childName?.length || 0) % AVATAR_COLORS.length];
@@ -173,7 +173,7 @@ export default function ChildDashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 pb-24">
-      {/* Dark Header */}
+      {/* ── Header ── */}
       <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60">
         <div className="px-4 py-3 flex items-center justify-between">
           <div>
@@ -187,26 +187,15 @@ export default function ChildDashboardPage() {
               What are you watching today?
             </p>
           </div>
-
           <div className="flex items-center gap-3">
-            <button
-              className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
-              aria-label="Search"
-            >
+            <button className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors" aria-label="Search">
               <Search className="w-4 h-4" />
             </button>
-            <button
-              className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
-              aria-label="Notifications"
-            >
+            <button className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors" aria-label="Notifications">
               <Bell className="w-4 h-4" />
             </button>
-            <div
-              className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center flex-shrink-0 ring-2 ring-offset-2 ring-offset-slate-950 ring-cyan-500/50`}
-            >
-              <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                {userInitial}
-              </span>
+            <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center flex-shrink-0 ring-2 ring-offset-2 ring-offset-slate-950 ring-cyan-500/50`}>
+              <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{userInitial}</span>
             </div>
           </div>
         </div>
@@ -214,155 +203,137 @@ export default function ChildDashboardPage() {
 
       <main className="space-y-8 pt-5 pb-6">
 
-        {/* ── Continue Watching — LARGE horizontal 16:9 cards ── */}
-        {continueVideos.length > 0 && (
-          <section className="px-4">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                Continue Watching
-              </h2>
-              <button
-                onClick={() => router.push('/my-circle/child/movies')}
-                className="flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
-              >
-                See All <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
+        {/* ─────────────────────────────────────────────
+            1. CONTINUE WATCHING — TOP, large 16:9
+        ───────────────────────────────────────────── */}
+        <section className="px-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              Continue Watching
+            </h2>
+            <button
+              onClick={() => router.push('/my-circle/child/movies')}
+              className="flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
+              See All <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
 
-            <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-              <div className="flex gap-4 min-w-max">
-                {continueVideos.map(wp => {
-                  const video = theaterContent.videos.find(v => v.id === wp.videoId);
-                  if (!video) return null;
-                  const progressPct = Math.round(wp.progress);
-                  return (
-                    <button
-                      key={wp.videoId}
-                      onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
-                      className="relative flex-shrink-0 w-72 rounded-2xl overflow-hidden bg-slate-800 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                    >
-                      {/* 16:9 poster */}
-                      <div className="relative aspect-video bg-slate-700">
-                        {video.thumbnail ? (
-                          <Image
-                            src={video.thumbnail}
-                            alt={video.title}
-                            fill
-                            className="object-cover"
-                            sizes="288px"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 bg-gradient-to-br from-red-900 to-slate-900 flex items-center justify-center">
-                            <Film className="w-12 h-12 text-slate-600" />
-                          </div>
-                        )}
-                        {/* Gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-                        {/* Play button */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                            <Play className="w-7 h-7 text-white ml-1" fill="currentColor" />
-                          </div>
+          <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+            <div className="flex gap-4 min-w-max pb-2">
+              {displayContinue.map(({ video, progress }) => {
+                const progressPct = Math.round(progress);
+                return (
+                  <button
+                    key={video.id}
+                    onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
+                    className="relative flex-shrink-0 w-80 rounded-2xl overflow-hidden bg-slate-800 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-xl shadow-black/30"
+                  >
+                    {/* 16:9 poster */}
+                    <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                      {video.thumbnail ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={video.thumbnail}
+                          alt={video.title}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-red-900 to-slate-900 flex items-center justify-center">
+                          <Film className="w-12 h-12 text-slate-600" />
                         </div>
+                      )}
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
-                        {/* Progress bar */}
-                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+                      {/* Play button (visible on hover) */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-xl">
+                          <Play className="w-8 h-8 text-white ml-1" fill="currentColor" />
+                        </div>
+                      </div>
+
+                      {/* Progress bar */}
+                      {progressPct > 0 && (
+                        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/20">
                           <div
-                            className="h-full bg-cyan-500 transition-all"
+                            className="h-full bg-cyan-500 rounded-r-full"
                             style={{ width: `${progressPct}%` }}
                           />
                         </div>
-                      </div>
+                      )}
+                    </div>
 
-                      {/* Card info */}
-                      <div className="p-3 text-left">
-                        <h3 className="font-bold text-white text-sm line-clamp-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                          {video.title}
-                        </h3>
-                        <div className="flex items-center justify-between mt-1">
-                          <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                            <Clock className="w-3 h-3" />
-                            <span style={{ fontFamily: 'Inter, sans-serif' }}>{video.duration}</span>
-                            {/* Watched with — placeholder family */}
-                            <span className="text-slate-600">·</span>
-                            <Users className="w-3 h-3 text-cyan-400" />
-                            <span className="text-cyan-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-                              with Mom
-                            </span>
-                          </div>
-                          <span
-                            className="text-cyan-400 text-xs font-bold"
-                            style={{ fontFamily: 'JetBrains Mono, monospace' }}
-                          >
-                            {progressPct}%
-                          </span>
+                    {/* Card info row */}
+                    <div className="px-4 py-3 flex items-center gap-3">
+                      {/* "With Mom" avatar */}
+                      <div className="flex-shrink-0 flex items-center gap-1.5">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center ring-2 ring-slate-800 shadow">
+                          <span className="text-white font-bold text-xs" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>M</span>
                         </div>
                       </div>
-                    </button>
-                  );
-                })}
-              </div>
+
+                      <div className="flex-1 min-w-0 text-left">
+                        <h3 className="font-bold text-white text-sm leading-tight line-clamp-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                          {video.title}
+                        </h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-pink-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>with Mom</span>
+                          {video.duration && (
+                            <>
+                              <span className="text-slate-600">·</span>
+                              <Clock className="w-3 h-3 text-slate-500" />
+                              <span className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>{video.duration}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {progressPct > 0 && (
+                        <span className="text-cyan-400 text-xs font-bold flex-shrink-0" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                          {progressPct}%
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-          </section>
-        )}
-
-        {/* ── Quick Actions — 2×2 Grid ── */}
-        <section className="px-4">
-          <h2
-            className="text-xl font-bold text-white mb-4"
-            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
-          >
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => router.push('/my-circle/child/movies')}
-              className="group relative h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-red-600 to-red-500 shadow-lg shadow-red-500/20 hover:shadow-red-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-            >
-              <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-              <div className="relative h-full flex flex-col items-center justify-center gap-2">
-                <Film className="w-10 h-10 text-white/90" strokeWidth={1.5} />
-                <span className="text-white font-bold text-base" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>MOVIES</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => router.push('/my-circle/child/library')}
-              className="group relative h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-amber-500 to-orange-400 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-            >
-              <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-              <div className="relative h-full flex flex-col items-center justify-center gap-2">
-                <BookOpen className="w-10 h-10 text-white/90" strokeWidth={1.5} />
-                <span className="text-white font-bold text-base" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>BOOKS</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => router.push('/my-circle/child/arcade')}
-              className="group relative h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-cyan-500 to-teal-500 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-            >
-              <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-              <div className="relative h-full flex flex-col items-center justify-center gap-2">
-                <Gamepad2 className="w-10 h-10 text-white/90" strokeWidth={1.5} />
-                <span className="text-white font-bold text-base" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>GAMES</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => router.push('/my-circle/child/my-circle-page')}
-              className="group relative h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-            >
-              <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-              <div className="relative h-full flex flex-col items-center justify-center gap-2">
-                <Users className="w-10 h-10 text-white/90" strokeWidth={1.5} />
-                <span className="text-white font-bold text-base" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>MY CIRCLE</span>
-              </div>
-            </button>
           </div>
         </section>
 
-        {/* ── Upcoming Events Widget ── */}
+        {/* ─────────────────────────────────────────────
+            2. QUICK ACTIONS — 2×2 Grid
+        ───────────────────────────────────────────── */}
+        <section className="px-4">
+          <h2 className="text-xl font-bold text-white mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: 'MOVIES', icon: Film, color: 'from-red-600 to-red-500', shadow: 'shadow-red-500/20', href: '/my-circle/child/movies' },
+              { label: 'BOOKS', icon: BookOpen, color: 'from-amber-500 to-orange-400', shadow: 'shadow-amber-500/20', href: '/my-circle/child/library' },
+              { label: 'GAMES', icon: Gamepad2, color: 'from-cyan-500 to-teal-500', shadow: 'shadow-cyan-500/20', href: '/my-circle/child/arcade' },
+              { label: 'MY CIRCLE', icon: Users, color: 'from-emerald-500 to-teal-500', shadow: 'shadow-emerald-500/20', href: '/my-circle/child/my-circle-page' },
+            ].map(({ label, icon: Icon, color, shadow, href }) => (
+              <button
+                key={label}
+                onClick={() => router.push(href)}
+                className={`group relative h-32 rounded-2xl overflow-hidden bg-gradient-to-br ${color} shadow-lg ${shadow} hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200`}
+              >
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                <div className="relative h-full flex flex-col items-center justify-center gap-2">
+                  <Icon className="w-10 h-10 text-white/90" strokeWidth={1.5} />
+                  <span className="text-white font-bold text-base" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{label}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────
+            3. UPCOMING EVENTS WIDGET
+        ───────────────────────────────────────────── */}
         <section className="px-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
@@ -381,7 +352,7 @@ export default function ChildDashboardPage() {
             {MOCK_EVENTS.map(event => (
               <div
                 key={event.id}
-                className="flex items-center gap-4 bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50 hover:border-slate-600 transition-colors"
+                className="flex items-center gap-4 bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50 hover:border-slate-600 transition-colors cursor-pointer"
               >
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${event.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
                   <span className="text-2xl">{event.emoji}</span>
@@ -400,22 +371,22 @@ export default function ChildDashboardPage() {
                 <ChevronRight className="w-4 h-4 text-slate-600 flex-shrink-0" />
               </div>
             ))}
-
-            {/* Add event CTA if empty or expand */}
             <button
               onClick={() => setShowAddEvent(true)}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed border-slate-700 text-slate-500 hover:border-cyan-500/50 hover:text-cyan-400 transition-all duration-200"
               style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px' }}
             >
-              <Plus className="w-4 h-4" />
-              Add new event
+              <Plus className="w-4 h-4" /> Add new event
             </button>
           </div>
         </section>
 
-        {/* ── Coming Soon — horizontal 16:9 poster cards ── */}
-        <section className="px-4">
-          <div className="flex items-center justify-between mb-3">
+        {/* ─────────────────────────────────────────────
+            4. COMING SOON — larger horizontal posters
+               Uses <img> tag to bypass Next.js domain config
+        ───────────────────────────────────────────── */}
+        <section>
+          <div className="px-4 flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
               Coming Soon
             </h2>
@@ -427,36 +398,33 @@ export default function ChildDashboardPage() {
             </button>
           </div>
 
-          <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-            <div className="flex gap-4 min-w-max">
+          <div className="overflow-x-auto scrollbar-hide px-4">
+            <div className="flex gap-4 min-w-max pb-2">
               {COMING_SOON.map(item => (
                 <div
                   key={item.id}
-                  className="relative flex-shrink-0 w-64 rounded-2xl overflow-hidden bg-slate-800 group hover:scale-[1.02] transition-transform duration-200"
+                  className="relative flex-shrink-0 w-72 rounded-2xl overflow-hidden bg-slate-800 hover:scale-[1.02] transition-transform duration-200 shadow-xl shadow-black/30 group"
                 >
-                  {/* Horizontal 16:9 poster */}
-                  <div className="relative aspect-video bg-slate-700">
-                    <Image
+                  {/* True 16:9 aspect using padding trick, <img> bypasses Next.js domain restriction */}
+                  <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={item.poster}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                      sizes="256px"
+                      alt="Coming soon"
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
-                    {/* Coming Soon badge overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                    {/* Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    {/* Badge */}
                     <div className="absolute top-3 left-3">
-                      <span className="px-2.5 py-1 rounded-full bg-cyan-500/90 text-white text-[10px] font-bold uppercase tracking-wide backdrop-blur-sm">
+                      <span className="px-3 py-1 rounded-full bg-cyan-500 text-white text-[10px] font-bold uppercase tracking-wide shadow-lg">
                         Coming Soon
                       </span>
                     </div>
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <div className="flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-                        <span className="text-white/80 text-xs font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
-                          Watch for it!
-                        </span>
-                      </div>
+                    {/* Bottom label */}
+                    <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+                      <span className="text-white/80 text-xs font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>Watch for it!</span>
                     </div>
                   </div>
                 </div>
@@ -465,9 +433,11 @@ export default function ChildDashboardPage() {
           </div>
         </section>
 
-        {/* ── Featured Author — Ayanna S Clark ── */}
+        {/* ─────────────────────────────────────────────
+            5. FEATURED AUTHOR — Ayanna S Clark
+               Single-column portrait book list
+        ───────────────────────────────────────────── */}
         <section className="px-4">
-          {/* Author Header */}
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-cyan-400 text-xs font-semibold uppercase tracking-widest mb-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -485,38 +455,68 @@ export default function ChildDashboardPage() {
             </button>
           </div>
 
-          {/* Author bio card */}
+          {/* Author bio */}
           <div className="bg-gradient-to-br from-amber-950/40 to-slate-800/60 rounded-2xl p-4 mb-4 border border-amber-800/30">
             <div className="flex items-center gap-3">
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
                 <span className="text-2xl font-black text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>A</span>
               </div>
               <div>
-                <p className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                  Ayanna S Clark
-                </p>
+                <p className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Ayanna S Clark</p>
                 <div className="flex items-center gap-1 mt-0.5">
-                  {[1, 2, 3, 4, 5].map(i => (
-                    <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                  ))}
+                  {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
                   <span className="text-amber-400 text-xs ml-1" style={{ fontFamily: 'Inter, sans-serif' }}>Top Author</span>
                 </div>
-                <p className="text-slate-400 text-xs mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Children's book author · 2 books available
-                </p>
+                <p className="text-slate-400 text-xs mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>Children's book author · 2 books</p>
               </div>
             </div>
           </div>
 
-          {/* 2-column full book cover grid */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Single-column book list */}
+          <div className="space-y-4">
             {AYANNA_BOOKS.map(book => (
-              <StreamingBookCard
+              <button
                 key={book.id}
-                book={book}
                 onClick={() => router.push(`/my-circle/child/library/${book.id === 'midnight' ? 'luna-midnight' : book.id}`)}
-                progress={bookProgressMap[book.id] ?? null}
-              />
+                className="w-full flex items-center gap-4 bg-slate-800/60 rounded-2xl p-3 border border-slate-700/50 hover:border-amber-500/40 hover:bg-slate-800 active:scale-[0.98] transition-all duration-200 text-left group"
+              >
+                {/* Portrait cover */}
+                <div className="relative flex-shrink-0 w-20 rounded-xl overflow-hidden" style={{ aspectRatio: '2/3' }}>
+                  {book.cover ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={book.cover}
+                      alt={book.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
+                      <BookOpen className="w-8 h-8 text-amber-500" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-white text-base leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                    {book.title}
+                  </h3>
+                  <p className="text-slate-400 text-xs mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    {book.author}
+                  </p>
+                  {book.pages && (
+                    <p className="text-slate-500 text-xs mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {book.pages} pages · Ages {book.ageRange}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-1 mt-2">
+                    {[1, 2, 3, 4].map(i => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
+                    <Star className="w-3 h-3 text-amber-400" />
+                  </div>
+                </div>
+
+                <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-amber-400 transition-colors flex-shrink-0" />
+              </button>
             ))}
           </div>
         </section>
@@ -525,7 +525,7 @@ export default function ChildDashboardPage() {
 
       <KidBottomNav />
 
-      {/* Add Event Modal */}
+      {/* ── Add Event Bottom Sheet ── */}
       {showAddEvent && (
         <div
           className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-end"
@@ -552,15 +552,13 @@ export default function ChildDashboardPage() {
                   className={`w-full flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r ${type.color} hover:opacity-90 active:scale-[0.98] transition-all`}
                 >
                   <span className="text-2xl">{type.emoji}</span>
-                  <span className="text-white font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                    {type.label}
-                  </span>
+                  <span className="text-white font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{type.label}</span>
                 </button>
               ))}
             </div>
             <button
               onClick={() => setShowAddEvent(false)}
-              className="w-full mt-4 py-3 text-slate-400 text-sm font-medium hover:text-slate-300 transition-colors"
+              className="w-full mt-4 py-3 text-slate-400 text-sm hover:text-slate-300 transition-colors"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               Cancel
