@@ -32,6 +32,7 @@ interface FeaturedHeroBannerProps {
 export function FeaturedHeroBanner({
   content,
   badge = 'Featured',
+  onPlay,
   onFavorite,
   isFavorite: initialFavorite = false,
   onWatchTogether,
