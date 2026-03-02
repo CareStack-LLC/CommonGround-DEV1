@@ -417,7 +417,7 @@ export default function LawyersLandingPage() {
         </div>
       </section>
 
-      <style jsx>{`
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap');
 
         .font-serif {

@@ -206,7 +206,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
 
     return (
         <div className="space-y-8">
-            <style jsx>{`
+            <style>{`
                 .legal-section-number {
                     font-family: 'Crimson Pro', Georgia, serif;
                     font-weight: 700;

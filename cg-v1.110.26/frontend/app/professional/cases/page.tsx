@@ -23,6 +23,7 @@ import {
   CheckCircle2,
   Briefcase,
   Scale,
+  FileText,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -247,7 +248,7 @@ export default function CasesListPage() {
 
   return (
     <div className="min-h-screen" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      <style jsx global>{`
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
         .cases-wrapper {
@@ -545,9 +546,8 @@ function CaseRow({
 
   return (
     <div
-      className={`group flex items-center gap-4 p-5 bg-white rounded-sm border-2 border-slate-300 border-l-4 transition-all hover:shadow-xl ${
-        statusAccent[caseItem.status] || "border-l-slate-300"
-      } ${selected ? "ring-2 ring-amber-900/30 border-amber-900/40" : ""}`}
+      className={`group flex items-center gap-4 p-5 bg-white rounded-sm border-2 border-slate-300 border-l-4 transition-all hover:shadow-xl ${statusAccent[caseItem.status] || "border-l-slate-300"
+        } ${selected ? "ring-2 ring-amber-900/30 border-amber-900/40" : ""}`}
     >
       <button
         onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleSelect(); }}

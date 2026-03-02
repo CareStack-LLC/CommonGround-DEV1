@@ -259,7 +259,7 @@ export default function IntakeDetailPage() {
 
   return (
     <div className="space-y-6">
-      <style jsx global>{`
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
         .serif { font-family: 'Crimson Pro', serif; }
         .sans { font-family: 'Outfit', sans-serif; }

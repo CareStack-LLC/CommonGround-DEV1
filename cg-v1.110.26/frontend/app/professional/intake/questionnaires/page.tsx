@@ -317,7 +317,7 @@ export default function QuestionnaireBuilderPage() {
     if (isFreeUser) {
         return (
             <div className="p-6 max-w-4xl mx-auto">
-                <style jsx global>{`
+                <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
                     .serif { font-family: 'Crimson Pro', serif; }
                     .sans { font-family: 'Outfit', sans-serif; }
@@ -358,7 +358,7 @@ export default function QuestionnaireBuilderPage() {
     if (activeView === "list") {
         return (
             <div className="p-6 max-w-5xl mx-auto">
-                <style jsx global>{`
+                <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
                     .serif { font-family: 'Crimson Pro', serif; }
                     .sans { font-family: 'Outfit', sans-serif; }
@@ -486,7 +486,7 @@ export default function QuestionnaireBuilderPage() {
     if (activeView === "preview") {
         return (
             <div className="p-6 max-w-3xl mx-auto">
-                <style jsx global>{`
+                <style>{`
                     @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
                     .serif { font-family: 'Crimson Pro', serif; }
                     .sans { font-family: 'Outfit', sans-serif; }
@@ -619,7 +619,7 @@ export default function QuestionnaireBuilderPage() {
     // ─── Editor View ─────────────────────────────────────────────
     return (
         <div className="p-6 max-w-5xl mx-auto">
-            <style jsx global>{`
+            <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
                 .serif { font-family: 'Crimson Pro', serif; }
                 .sans { font-family: 'Outfit', sans-serif; }

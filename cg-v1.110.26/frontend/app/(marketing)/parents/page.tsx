@@ -338,7 +338,7 @@ export default function ParentsLandingPage() {
         </div>
       </section>
 
-      <style jsx>{`
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&display=swap');
 
         .font-serif {

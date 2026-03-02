@@ -132,7 +132,7 @@ export function ARIAMascot({
       />
 
       {/* Hidden style tag for custom animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes aria-float {
           0%, 100% {
             transform: translateY(0px);

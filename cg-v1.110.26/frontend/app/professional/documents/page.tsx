@@ -443,7 +443,7 @@ export default function ProfessionalDocumentsPage() {
                 </DialogContent>
             </Dialog>
 
-            <style jsx global>{`
+            <style>{`
                 .serif {
                     font-family: "Crimson Pro", serif;
                 }

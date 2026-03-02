@@ -333,7 +333,7 @@ export default function CaseTimelinePage() {
         </Card>
       )}
 
-      <style jsx global>{`
+      <style>{`
         .serif {
           font-family: "Crimson Pro", serif;
         }

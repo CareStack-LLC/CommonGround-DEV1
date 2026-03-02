@@ -350,7 +350,7 @@ export default function NotificationsPage() {
                 </div>
             )}
 
-            <style jsx global>{`
+            <style>{`
                 .serif {
                     font-family: "Crimson Pro", serif;
                 }

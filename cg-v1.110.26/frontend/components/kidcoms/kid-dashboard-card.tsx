@@ -150,7 +150,7 @@ export function KidDashboardCard({
       )} />
 
       {/* Hidden style tag for custom animations */}
-      <style jsx>{`
+      <style>{`
         @keyframes bounce-subtle {
           0%, 100% {
             transform: translateY(0);

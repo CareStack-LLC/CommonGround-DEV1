@@ -547,7 +547,7 @@ export default function FirmSettingsPage() {
         </Button>
       </div>
 
-      <style jsx global>{`
+      <style>{`
         .serif {
           font-family: "Crimson Pro", serif;
         }
