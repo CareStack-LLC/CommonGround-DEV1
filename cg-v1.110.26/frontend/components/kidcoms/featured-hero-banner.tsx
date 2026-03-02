@@ -58,9 +58,9 @@ export function FeaturedHeroBanner({
       className={cn(
         'relative w-full rounded-2xl overflow-hidden',
         'bg-slate-900 shadow-2xl',
+        'aspect-[3/4] sm:aspect-[16/9]',
         className
       )}
-      style={{ aspectRatio: '16/9' }}
     >
       {/* Background Image */}
       {content.cover && (
@@ -79,7 +79,7 @@ export function FeaturedHeroBanner({
       )}
 
       {/* Content Overlay - Bottom Left */}
-      <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-8 lg:p-10">
+      <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-8 lg:p-10">
         <div className="max-w-2xl">
           {/* Badge */}
           <div className="flex items-center gap-2 mb-2">

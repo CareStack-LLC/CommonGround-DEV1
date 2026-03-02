@@ -178,25 +178,25 @@ export default function MoviesPage() {
         {/* Featured Hero Banner — auto-rotates */}
         {!searchQuery && selectedCategory === 'all' && (
           <div className="px-4">
-            <div className="min-h-[300px] sm:min-h-[380px]">
-              <FeaturedHeroBanner
-                content={{
-                  id: featuredVideo.id,
-                  title: featuredVideo.title,
-                  cover: featuredVideo.thumbnail,
-                  description: featuredVideo.description,
-                  duration: featuredVideo.duration ? parseInt(featuredVideo.duration) : undefined,
-                  type: 'video',
-                  category: featuredVideo.category,
-                  rating: 4.5 - (featuredIndex * 0.1),
-                  ratingCount: 2400 - (featuredIndex * 200),
-                }}
-                badge={featuredIndex === 0 ? '🔥 Trending' : featuredIndex === 1 ? '⭐ Popular' : '✨ Featured'}
-                onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
-                onFavorite={() => { }}
-                isFavorite={favoritesSet.has(featuredVideo.id)}
-              />
-            </div>
+
+            <FeaturedHeroBanner
+              content={{
+                id: featuredVideo.id,
+                title: featuredVideo.title,
+                cover: featuredVideo.thumbnail,
+                description: featuredVideo.description,
+                duration: featuredVideo.duration ? parseInt(featuredVideo.duration) : undefined,
+                type: 'video',
+                category: featuredVideo.category,
+                rating: 4.5 - (featuredIndex * 0.1),
+                ratingCount: 2400 - (featuredIndex * 200),
+              }}
+              badge={featuredIndex === 0 ? '🔥 Trending' : featuredIndex === 1 ? '⭐ Popular' : '✨ Featured'}
+              onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
+              onFavorite={() => { }}
+              isFavorite={favoritesSet.has(featuredVideo.id)}
+            />
+
             {/* Dots indicator */}
             <div className="flex gap-1.5 justify-center mt-3">
               {theaterContent.videos.map((_, i) => (

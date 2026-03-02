@@ -454,53 +454,6 @@ export default function ChildDashboardPage() {
             </div>
           </div>
 
-          {/* Single-column book list */}
-          <div className="space-y-4">
-            {AYANNA_BOOKS.map(book => (
-              <button
-                key={book.id}
-                onClick={() => router.push(`/my-circle/child/library/${book.id === 'midnight' ? 'luna-midnight' : book.id}`)}
-                className="w-full flex items-center gap-4 bg-slate-800/60 rounded-2xl p-3 border border-slate-700/50 hover:border-amber-500/40 hover:bg-slate-800 active:scale-[0.98] transition-all duration-200 text-left group"
-              >
-                {/* Portrait cover */}
-                <div className="relative flex-shrink-0 w-20 rounded-xl overflow-hidden" style={{ aspectRatio: '2/3' }}>
-                  {book.cover ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={book.cover}
-                      alt={book.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
-                      <BookOpen className="w-8 h-8 text-amber-500" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-white text-base leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                    {book.title}
-                  </h3>
-                  <p className="text-slate-400 text-xs mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    {book.author}
-                  </p>
-                  {book.pages && (
-                    <p className="text-slate-500 text-xs mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
-                      {book.pages} pages · Ages {book.ageRange}
-                    </p>
-                  )}
-                  <div className="flex items-center gap-1 mt-2">
-                    {[1, 2, 3, 4].map(i => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
-                    <Star className="w-3 h-3 text-amber-400" />
-                  </div>
-                </div>
-
-                <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-amber-400 transition-colors flex-shrink-0" />
-              </button>
-            ))}
-          </div>
         </section>
 
         {/* ─────────────────────────────────────────────
