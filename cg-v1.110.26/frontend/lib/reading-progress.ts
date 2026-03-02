@@ -10,6 +10,7 @@ export interface ReadingProgress {
   lastRead: Date;
   completed: boolean;
   bookmarks: number[]; // Array of page numbers
+  readWith?: string; // Contact name or 'alone'
 }
 
 export interface ReadingStats {
@@ -30,11 +31,12 @@ const STATS_KEY = 'kidcom_reading_stats';
 export function saveReadingProgress(
   bookId: string,
   currentPage: number,
-  totalPages: number
+  totalPages: number,
+  readWith?: string
 ): void {
   const completed = currentPage >= totalPages;
 
-  // Get existing bookmarks
+  // Get existing bookmarks and readWith
   const existingProgress = getReadingProgress(bookId);
   const bookmarks = existingProgress?.bookmarks ?? [];
 
@@ -45,6 +47,7 @@ export function saveReadingProgress(
     lastRead: new Date(),
     completed,
     bookmarks,
+    readWith: readWith || existingProgress?.readWith || 'alone',
   };
 
   localStorage.setItem(

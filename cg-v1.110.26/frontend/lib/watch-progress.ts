@@ -10,6 +10,7 @@ export interface WatchProgress {
   duration: number; // total seconds
   lastWatched: Date;
   completed: boolean;
+  watchedWith?: string; // Contact name or 'alone'
 }
 
 export interface VideoStats {
@@ -29,10 +30,14 @@ const STATS_KEY = 'kidcom_video_stats';
 export function saveWatchProgress(
   videoId: string,
   currentTime: number,
-  duration: number
+  duration: number,
+  watchedWith?: string
 ): void {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const completed = progress >= 90; // Consider 90%+ as completed
+
+  // Get existing progress to preserve watchedWith if not provided
+  const existingProgress = getWatchProgress(videoId);
 
   const watchProgress: WatchProgress = {
     videoId,
@@ -41,6 +46,7 @@ export function saveWatchProgress(
     duration,
     lastWatched: new Date(),
     completed,
+    watchedWith: watchedWith || existingProgress?.watchedWith || 'alone',
   };
 
   localStorage.setItem(
