@@ -23,7 +23,7 @@ export default function LibraryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<BookCategory | 'all' | 'reading'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [stats, setStats] = useState<ReadingStats>({ booksRead: 0, booksCompleted: 0, pagesRead: 0, streak: 0 });
+  const [stats, setStats] = useState<ReadingStats>({ booksRead: 0, booksCompleted: 0, pagesRead: 0, streak: 0, lastReadDate: null });
   const [currentlyReading, setCurrentlyReading] = useState<ReadingProgress[]>([]);
   const [progressMap, setProgressMap] = useState<Record<string, ReadingProgress | null>>({});
 
