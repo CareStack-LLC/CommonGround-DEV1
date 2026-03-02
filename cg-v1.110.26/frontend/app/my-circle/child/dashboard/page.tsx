@@ -142,20 +142,20 @@ export default function ChildDashboardPage() {
       id: wp.videoId,
       item: theaterContent.videos.find(v => v.id === wp.videoId)!,
       progress: wp.progress,
-      lastAction: wp.lastWatched || '',
+      lastAction: wp.lastWatched ? new Date(wp.lastWatched).getTime() : 0,
       withWho: 'Mom' // Mock data as per request
     })),
     ...Object.entries(bookProgressMap)
-      .filter(([_, p]) => p && p.progress > 0 && p.progress < 100)
+      .filter(([_, p]) => p && p.currentPage > 0 && !p.completed)
       .map(([id, p]) => ({
         type: 'book' as const,
         id,
         item: theaterContent.storybooks.find(b => b.id === id)!,
-        progress: p!.progress,
-        lastAction: p!.lastRead || '',
+        progress: p!.totalPages > 0 ? (p!.currentPage / p!.totalPages) * 100 : 0,
+        lastAction: p!.lastRead ? new Date(p!.lastRead).getTime() : 0,
         withWho: 'Dad' // Mock data
       }))
-  ].sort((a, b) => b.lastAction.localeCompare(a.lastAction));
+  ].sort((a, b) => b.lastAction - a.lastAction);
 
   // Fallback if empty
   const displayPickBackUp = pickBackUp.length > 0
