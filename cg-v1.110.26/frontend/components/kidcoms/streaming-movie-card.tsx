@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Play, Heart, Clock, Info } from 'lucide-react';
+import { Play, Heart, Clock, Info, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 
