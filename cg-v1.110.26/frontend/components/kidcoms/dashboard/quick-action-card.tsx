@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 interface QuickActionCardProps {
   title: string;
   icon: React.ReactNode;
-  color: 'teal' | 'red' | 'amber' | 'purple';
+  color: 'teal' | 'red' | 'amber' | 'cyan';
   onClick: () => void;
   className?: string;
 }
@@ -23,9 +23,9 @@ const colorStyles = {
     bg: 'bg-gradient-to-br from-amber-500 to-orange-500',
     shadow: 'shadow-amber-500/20',
   },
-  purple: {
-    bg: 'bg-gradient-to-br from-violet-500 to-purple-500',
-    shadow: 'shadow-purple-500/20',
+  cyan: {
+    bg: 'bg-gradient-to-br from-cyan-500 to-teal-500',
+    shadow: 'shadow-cyan-500/20',
   },
 };
 

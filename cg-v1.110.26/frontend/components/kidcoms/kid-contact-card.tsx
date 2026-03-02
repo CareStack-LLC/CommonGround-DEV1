@@ -56,7 +56,7 @@ export function KidContactCard({
     >
       {/* Contact Photo/Emoji */}
       <div className="flex-shrink-0">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center shadow-md">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-400 to-teal-400 flex items-center justify-center shadow-md">
           <span className="text-3xl" role="img" aria-label={contact.display_name}>
             {emoji}
           </span>
@@ -106,10 +106,10 @@ export function KidContactCard({
           className={cn(
             'w-12 h-12 rounded-full flex items-center justify-center',
             'transition-all duration-200',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-300 focus-visible:ring-offset-2',
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cyan-300 focus-visible:ring-offset-2',
             contact.can_video_call
               ? [
-                  'bg-purple-500 hover:bg-purple-600',
+                  'bg-cyan-500 hover:bg-cyan-600',
                   'shadow-lg hover:shadow-xl',
                   'hover:scale-110 active:scale-95',
                 ]

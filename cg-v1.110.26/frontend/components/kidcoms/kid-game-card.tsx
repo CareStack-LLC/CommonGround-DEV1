@@ -7,7 +7,7 @@ interface KidGameCardProps {
     id: string;
     title: string;
     emoji: string;
-    color: 'purple' | 'green' | 'blue' | 'pink' | 'amber' | 'red';
+    color: 'cyan' | 'green' | 'blue' | 'pink' | 'amber' | 'red';
     difficulty?: 'easy' | 'medium' | 'hard';
     description?: string;
   };
@@ -16,7 +16,7 @@ interface KidGameCardProps {
 }
 
 const COLOR_GRADIENTS = {
-  purple: 'from-purple-300 to-purple-500',
+  cyan: 'from-cyan-300 to-cyan-500',
   green: 'from-green-300 to-green-500',
   blue: 'from-blue-300 to-blue-500',
   pink: 'from-pink-300 to-pink-500',

@@ -56,7 +56,7 @@ export const videoCategories: Record<VideoCategory, CategoryMetadata> = {
   },
   animation: {
     name: 'Animation',
-    color: 'purple-500',
+    color: 'cyan-500',
     emoji: '✨',
     description: 'Beautiful animated stories'
   },
@@ -71,7 +71,7 @@ export const videoCategories: Record<VideoCategory, CategoryMetadata> = {
 export const bookCategories: Record<BookCategory, CategoryMetadata> = {
   fiction: {
     name: 'Stories',
-    color: 'purple-500',
+    color: 'cyan-500',
     emoji: '📚',
     description: 'Imaginative tales and stories'
   },

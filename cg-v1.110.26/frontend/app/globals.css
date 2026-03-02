@@ -376,10 +376,13 @@
   --portal-text-heading: #0F172A; /* Slate-900 */
 
   /* Feature-specific colors */
+  --kid-cyan: #06B6D4; /* Cyan-500 - replaces purple everywhere */
+  --kid-teal: #14B8A6; /* Teal-500 - secondary accent */
   --kid-movies: #EF4444; /* Red-500 - Netflix vibe */
   --kid-books: #F59E0B; /* Amber-500 - warm, inviting */
-  --kid-games: #8B5CF6; /* Violet-500 - playful tech */
+  --kid-games: #06B6D4; /* Cyan-500 - playful tech (was Violet-500) */
   --kid-calls: #10B981; /* Emerald-500 - communication */
+  --kid-people: #14B8A6; /* Teal-500 - social */
   --kid-calendar: #3B82F6; /* Blue-500 - organization */
 
   /* Shadows - Subtle, modern */

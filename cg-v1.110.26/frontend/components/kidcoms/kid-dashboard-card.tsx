@@ -8,7 +8,7 @@ interface KidDashboardCardProps {
   subtitle?: string;
   illustration?: string;
   icon?: React.ReactNode;
-  color?: 'purple' | 'green' | 'blue' | 'pink' | 'amber' | 'teal' | 'red';
+  color?: 'cyan' | 'green' | 'blue' | 'pink' | 'amber' | 'teal' | 'red';
   badge?: number;
   onClick: () => void;
   disabled?: boolean;
@@ -17,12 +17,12 @@ interface KidDashboardCardProps {
 
 // Modern color palette for pre-teens (cooler, more sophisticated)
 const colorStyles = {
-  purple: {
-    border: 'hover:border-violet-500',
-    shadow: 'hover:shadow-violet-500/20',
-    text: 'text-violet-600',
-    bg: 'bg-gradient-to-br from-violet-50 to-purple-50',
-    accent: 'bg-violet-500'
+  cyan: {
+    border: 'hover:border-cyan-500',
+    shadow: 'hover:shadow-cyan-500/20',
+    text: 'text-cyan-600',
+    bg: 'bg-gradient-to-br from-cyan-50 to-teal-50',
+    accent: 'bg-cyan-500'
   },
   green: {
     border: 'hover:border-emerald-500',
@@ -73,7 +73,7 @@ export function KidDashboardCard({
   subtitle,
   illustration,
   icon,
-  color = 'purple',
+  color = 'cyan',
   badge,
   onClick,
   disabled = false,
