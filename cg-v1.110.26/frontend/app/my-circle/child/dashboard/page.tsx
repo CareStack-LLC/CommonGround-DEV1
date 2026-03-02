@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, BookOpen, Gamepad2, Film } from 'lucide-react';
-import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidDashboardCard } from '@/components/kidcoms/kid-dashboard-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
 import { theaterContent } from '@/lib/theater-content';
 
 interface ChildUserData {
@@ -83,105 +81,74 @@ export default function ChildDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white flex items-center justify-center">
         <div className="text-center">
-          <ARIAMascot state="loading" greeting="Loading your space..." />
+          <div className="text-2xl font-bold text-slate-700" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            Loading...
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative pb-24 bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
-      {/* Subtle decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
-        <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
-        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
-        <div className="absolute bottom-64 left-0 w-2/3 h-px bg-[#2C5F5D]" />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10">
-        {/* Header with Greeting */}
-        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-4xl mx-auto px-6 py-6">
-            <div className="flex items-center justify-between mb-4">
-              <KidComsLogo size="md" />
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#2C3E50] tracking-tight">
-              Welcome back, {userData?.childName || 'friend'}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white pb-20">
+      {/* Header - Minimal, modern */}
+      <header className="sticky top-0 z-40 backdrop-blur-lg bg-white/80 border-b border-slate-200">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div>
+            <h1 className="font-bold text-slate-900 text-xl" style={{ fontFamily: 'Space Grotesk, DM Sans, sans-serif' }}>
+              Hey {userData?.childName || 'friend'} 👋
             </h1>
-            <p className="text-lg text-gray-600 mt-2">
-              What would you like to do today?
+            <p className="text-sm text-slate-500" style={{ fontFamily: 'Inter, DM Sans, sans-serif' }}>
+              What do you want to do today?
             </p>
           </div>
-        </header>
-
-        {/* ARIA Mascot Section */}
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="flex justify-center">
-            <div className="relative">
-              {/* Subtle glow */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-[#2C5F5D]/10 to-[#D97757]/10 rounded-full blur-xl"></div>
-              <ARIAMascot
-                state="greeting"
-                greeting="Choose an activity below"
-              />
-            </div>
-          </div>
         </div>
+      </header>
 
-        {/* Dashboard Cards */}
-        <main className="w-full mx-auto px-6 pb-8">
-          <div className="grid grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {/* MY CIRCLE Card */}
-            <div className="group transform hover:scale-[1.02] transition-all duration-200 w-full">
-              <KidDashboardCard
-                title="MY CIRCLE"
-                icon={<Users className="w-full h-full" />}
-                color="purple"
-                badge={contacts.length > 0 ? contacts.length : undefined}
-                onClick={() => router.push('/my-circle/child/my-circle-page')}
-                className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all w-full h-[220px]"
-              />
-            </div>
+      {/* Main Content - Card Grid */}
+      <main className="p-4 pb-8">
+        <div className="grid grid-cols-2 gap-4 max-w-3xl mx-auto">
+            {/* MOVIES Card - Red (Netflix vibe) */}
+            <KidDashboardCard
+              title="MOVIES"
+              subtitle={featuredMovie?.title || 'Watch something fun!'}
+              icon={<Film className="w-full h-full" />}
+              color="red"
+              onClick={() => router.push('/my-circle/child/movies')}
+              className="w-full h-[200px]"
+            />
 
-            {/* READ WITH ME LIBRARY Card */}
-            <div className="group transform hover:scale-[1.02] transition-all duration-200 w-full">
-              <KidDashboardCard
-                title="READ WITH ME LIBRARY"
-                icon={<BookOpen className="w-full h-full" />}
-                color="blue"
-                onClick={() => router.push('/my-circle/child/library')}
-                className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all w-full h-[220px]"
-              />
-            </div>
+            {/* BOOKS Card - Amber (warm, inviting) */}
+            <KidDashboardCard
+              title="BOOKS"
+              icon={<BookOpen className="w-full h-full" />}
+              color="amber"
+              onClick={() => router.push('/my-circle/child/library')}
+              className="w-full h-[200px]"
+            />
 
-            {/* ARCADE Card */}
-            <div className="group transform hover:scale-[1.02] transition-all duration-200 w-full">
-              <KidDashboardCard
-                title="ARCADE"
-                icon={<Gamepad2 className="w-full h-full" />}
-                color="pink"
-                onClick={() => router.push('/my-circle/child/arcade')}
-                className="border border-[#D97757]/20 hover:border-[#D97757]/40 hover:shadow-lg transition-all w-full h-[220px]"
-              />
-            </div>
+            {/* GAMES Card - Purple (playful tech) */}
+            <KidDashboardCard
+              title="GAMES"
+              icon={<Gamepad2 className="w-full h-full" />}
+              color="purple"
+              onClick={() => router.push('/my-circle/child/arcade')}
+              className="w-full h-[200px]"
+            />
 
-            {/* NEW MOVIE Card */}
-            <div className="group transform hover:scale-[1.02] transition-all duration-200 w-full">
-              <KidDashboardCard
-                title="NEW MOVIE"
-                subtitle={featuredMovie?.title || 'Watch something fun!'}
-                icon={<Film className="w-full h-full" />}
-                color="green"
-                onClick={() => router.push('/my-circle/child/movies')}
-                className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all w-full h-[220px]"
-              />
-            </div>
-          </div>
-        </main>
-      </div>
+            {/* MY CIRCLE Card - Teal (communication) */}
+            <KidDashboardCard
+              title="MY CIRCLE"
+              icon={<Users className="w-full h-full" />}
+              color="teal"
+              badge={contacts.length > 0 ? contacts.length : undefined}
+              onClick={() => router.push('/my-circle/child/my-circle-page')}
+              className="w-full h-[200px]"
+            />
+        </div>
+      </main>
 
       {/* Bottom Navigation */}
       <KidBottomNav />

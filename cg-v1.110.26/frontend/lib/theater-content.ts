@@ -3,6 +3,9 @@
  * Static configuration for available videos and storybooks
  */
 
+export type VideoCategory = 'comedy' | 'adventure' | 'educational' | 'animation' | 'action';
+export type BookCategory = 'fiction' | 'educational' | 'fantasy' | 'adventure';
+
 export interface VideoContent {
   id: string;
   title: string;
@@ -10,6 +13,8 @@ export interface VideoContent {
   thumbnail?: string;
   duration?: string;
   description?: string;
+  category: VideoCategory;
+  ageRange?: string;
 }
 
 export interface StorybookContent {
@@ -19,7 +24,76 @@ export interface StorybookContent {
   cover?: string;
   pages?: number;
   author?: string;
+  category: BookCategory;
+  ageRange?: string;
 }
+
+export interface CategoryMetadata {
+  name: string;
+  color: string;
+  emoji: string;
+  description: string;
+}
+
+export const videoCategories: Record<VideoCategory, CategoryMetadata> = {
+  comedy: {
+    name: 'Comedy',
+    color: 'red-500',
+    emoji: '😂',
+    description: 'Funny and entertaining videos'
+  },
+  adventure: {
+    name: 'Adventure',
+    color: 'blue-500',
+    emoji: '🚀',
+    description: 'Exciting journeys and quests'
+  },
+  educational: {
+    name: 'Educational',
+    color: 'green-500',
+    emoji: '🎓',
+    description: 'Learn something new'
+  },
+  animation: {
+    name: 'Animation',
+    color: 'purple-500',
+    emoji: '✨',
+    description: 'Beautiful animated stories'
+  },
+  action: {
+    name: 'Action',
+    color: 'orange-500',
+    emoji: '⚡',
+    description: 'Fast-paced and exciting'
+  }
+};
+
+export const bookCategories: Record<BookCategory, CategoryMetadata> = {
+  fiction: {
+    name: 'Stories',
+    color: 'purple-500',
+    emoji: '📚',
+    description: 'Imaginative tales and stories'
+  },
+  educational: {
+    name: 'Learn',
+    color: 'blue-500',
+    emoji: '🔬',
+    description: 'Educational and informative'
+  },
+  fantasy: {
+    name: 'Fantasy',
+    color: 'pink-500',
+    emoji: '🦄',
+    description: 'Magical worlds and creatures'
+  },
+  adventure: {
+    name: 'Adventure',
+    color: 'green-500',
+    emoji: '🗺️',
+    description: 'Exciting adventures and exploration'
+  }
+};
 
 export interface TheaterContentLibrary {
   videos: VideoContent[];
@@ -35,6 +109,8 @@ export const theaterContent: TheaterContentLibrary = {
       thumbnail: '/kidsComms/posters/crunch-poster.jpg',
       duration: '4:30',
       description: 'Animated short film about an alien who loves cereal',
+      category: 'comedy',
+      ageRange: '6-12'
     },
     {
       id: 'johnny-express',
@@ -43,6 +119,8 @@ export const theaterContent: TheaterContentLibrary = {
       thumbnail: '/kidsComms/posters/johnny-express-poster.jpg',
       duration: '5:15',
       description: 'Funny space delivery adventure',
+      category: 'adventure',
+      ageRange: '8-12'
     },
     {
       id: 'the-bread',
@@ -51,6 +129,8 @@ export const theaterContent: TheaterContentLibrary = {
       thumbnail: '/kidsComms/posters/the-bread-poster.jpg',
       duration: '2:45',
       description: 'Charming animated story about bread',
+      category: 'animation',
+      ageRange: '5-10'
     },
     {
       id: 'minions',
@@ -59,6 +139,8 @@ export const theaterContent: TheaterContentLibrary = {
       thumbnail: '/kidsComms/posters/minions-poster.jpg',
       duration: '3:24',
       description: 'Fun minions adventure clip',
+      category: 'comedy',
+      ageRange: '6-12'
     },
     {
       id: 'sonic',
@@ -67,6 +149,8 @@ export const theaterContent: TheaterContentLibrary = {
       thumbnail: '/kidsComms/posters/sonic-poster.jpg',
       duration: '4:15',
       description: 'Sonic movie clip',
+      category: 'action',
+      ageRange: '8-14'
     },
     {
       id: 'mario',
@@ -75,6 +159,8 @@ export const theaterContent: TheaterContentLibrary = {
       thumbnail: '/kidsComms/posters/mario-poster.jpg',
       duration: '5:02',
       description: 'Super Mario Bros movie clip',
+      category: 'action',
+      ageRange: '8-14'
     },
   ],
   storybooks: [
@@ -85,6 +171,8 @@ export const theaterContent: TheaterContentLibrary = {
       cover: '/kidsComms/covers/luna-midnight-cover.jpg',
       pages: 24,
       author: 'Children\'s Book',
+      category: 'fantasy',
+      ageRange: '6-10'
     },
     {
       id: 'my-family',
@@ -93,6 +181,8 @@ export const theaterContent: TheaterContentLibrary = {
       cover: '/kidsComms/covers/my-family-cover.jpg',
       pages: 12,
       author: 'Starfall',
+      category: 'educational',
+      ageRange: '5-8'
     },
     {
       id: 'peg',
@@ -101,6 +191,8 @@ export const theaterContent: TheaterContentLibrary = {
       cover: '/kidsComms/covers/peg-cover.jpg',
       pages: 8,
       author: 'Starfall',
+      category: 'fiction',
+      ageRange: '5-7'
     },
     {
       id: 'sky-ride',
@@ -109,6 +201,8 @@ export const theaterContent: TheaterContentLibrary = {
       cover: '/kidsComms/covers/sky-ride-cover.jpg',
       pages: 10,
       author: 'Starfall',
+      category: 'adventure',
+      ageRange: '6-9'
     },
     {
       id: 'reach-stars',
@@ -117,6 +211,8 @@ export const theaterContent: TheaterContentLibrary = {
       cover: '/kidsComms/covers/reach-stars-cover.jpg',
       pages: 14,
       author: 'Starfall',
+      category: 'educational',
+      ageRange: '7-10'
     },
     {
       id: 'backpack-bears',
@@ -125,6 +221,8 @@ export const theaterContent: TheaterContentLibrary = {
       cover: '/kidsComms/covers/backpack-bears-cover.jpg',
       pages: 16,
       author: 'Starfall',
+      category: 'educational',
+      ageRange: '6-9'
     },
     {
       id: 'soap-boat',
@@ -132,6 +230,8 @@ export const theaterContent: TheaterContentLibrary = {
       url: '/kidsComms/Soap Boat.pdf',
       cover: '/kidsComms/covers/soap-boat-cover.jpg',
       pages: 8,
+      category: 'fiction',
+      ageRange: '5-8'
     },
   ],
 };
