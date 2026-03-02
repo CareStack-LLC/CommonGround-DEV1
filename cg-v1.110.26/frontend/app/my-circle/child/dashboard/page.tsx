@@ -91,7 +91,7 @@ export default function ChildDashboardPage() {
   // recentVideos and recentBooks are loaded from state after auth
 
   // Combine and sort by last watched/read
-  const recentMedia = [
+  let recentMedia = [
     ...recentVideos.map(v => ({
       ...v,
       type: 'video' as const,
@@ -110,6 +110,36 @@ export default function ChildDashboardPage() {
       return dateB.getTime() - dateA.getTime();
     })
     .slice(0, 4); // Show top 4
+
+  // Mock recently watched data if no real data (for demo purposes)
+  if (recentMedia.length === 0 && theaterContent.videos.length > 0) {
+    const mockRecentMedia = [
+      {
+        videoId: theaterContent.videos[0]?.id || 'brave',
+        type: 'video' as const,
+        progress: 45,
+        currentTime: 180,
+        duration: 400,
+        lastWatched: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+        completed: false,
+        watchedWith: contacts[0]?.display_name || 'Uncle TJ',
+        content: theaterContent.videos[0]
+      },
+      {
+        videoId: theaterContent.videos[1]?.id || 'piper',
+        type: 'video' as const,
+        progress: 78,
+        currentTime: 280,
+        duration: 360,
+        lastWatched: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+        completed: false,
+        watchedWith: 'alone',
+        content: theaterContent.videos[1]
+      }
+    ].filter(item => item.content);
+
+    recentMedia = mockRecentMedia as any;
+  }
 
   // Mock call history (TODO: integrate with real call history API)
   const mockCallHistory = [
