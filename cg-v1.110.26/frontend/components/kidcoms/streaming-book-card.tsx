@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { BookOpen, Bookmark, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { StarRating } from '@/components/kidcoms/star-rating';
 
 interface StreamingBookCardProps {
   book: {
@@ -15,6 +16,8 @@ interface StreamingBookCardProps {
     author?: string;
     category?: string;
     ageRange?: string;
+    rating?: number;
+    ratingCount?: number;
   };
   onClick: () => void;
   onBookmarkToggle?: () => void;
@@ -48,6 +51,8 @@ export function StreamingBookCard({
     ? (progress.currentPage / book.pages) * 100
     : 0;
 
+  const rating = book.rating ?? 4.2;
+
   return (
     <div
       className={cn('group relative', className)}
@@ -58,14 +63,14 @@ export function StreamingBookCard({
       <button
         onClick={onClick}
         className={cn(
-          'relative w-full bg-slate-900 rounded-lg overflow-hidden',
+          'relative w-full bg-white rounded-xl overflow-hidden shadow-sm border border-amber-100/70',
           'transition-all duration-300 ease-out',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2',
-          'group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-amber-500/20'
+          'group-hover:scale-[1.03] group-hover:shadow-xl group-hover:shadow-amber-300/20 group-hover:border-amber-200'
         )}
       >
         {/* Book Cover - Portrait 2:3 ratio */}
-        <div className="relative aspect-[2/3] bg-slate-800">
+        <div className="relative aspect-[2/3] bg-amber-50">
           {book.cover ? (
             <Image
               src={book.cover}
@@ -76,34 +81,34 @@ export function StreamingBookCard({
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-amber-100 to-orange-100">
-              <BookOpen className="w-16 h-16 text-amber-500" />
+              <BookOpen className="w-16 h-16 text-amber-400" />
             </div>
           )}
 
-          {/* Gradient Overlay - intensifies on hover */}
-          <div className={cn(
-            'absolute inset-0 bg-gradient-to-t transition-opacity duration-300',
-            isHovered
-              ? 'from-black via-black/60 to-transparent opacity-90'
-              : 'from-black/80 via-black/20 to-transparent opacity-60'
-          )} />
+          {/* Star Rating — top right */}
+          <div className="absolute top-2 left-2 z-20 bg-black/50 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1">
+            <span className="text-yellow-400 text-xs">★</span>
+            <span className="text-white text-xs font-bold" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+              {rating.toFixed(1)}
+            </span>
+          </div>
 
           {/* Bookmark Button - Top Right */}
           <button
             onClick={handleBookmarkClick}
             className={cn(
-              'absolute top-2 right-2 z-20 w-9 h-9 rounded-full',
+              'absolute top-2 right-2 z-20 w-8 h-8 rounded-full',
               'backdrop-blur-md border transition-all duration-200',
               'flex items-center justify-center',
               isBookmarked
                 ? 'bg-amber-500/90 border-amber-400'
-                : 'bg-black/40 border-white/20 hover:bg-black/60'
+                : 'bg-black/30 border-white/20 hover:bg-black/50'
             )}
             aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
           >
             <Bookmark
               className={cn(
-                'w-4.5 h-4.5 transition-all duration-200',
+                'w-4 h-4 transition-all duration-200',
                 isBookmarked ? 'fill-white text-white scale-110' : 'text-white'
               )}
             />
@@ -111,7 +116,7 @@ export function StreamingBookCard({
 
           {/* Progress Bar - Bottom */}
           {progress && progress.currentPage > 0 && (
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+            <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/20">
               <div
                 className="h-full bg-amber-500 transition-all duration-300"
                 style={{ width: `${Math.min(progressPercentage, 100)}%` }}
@@ -119,73 +124,40 @@ export function StreamingBookCard({
             </div>
           )}
 
-          {/* Hover Overlay - Read Button & Info */}
+          {/* Hover Overlay */}
           <div className={cn(
-            'absolute inset-0 flex flex-col items-center justify-center gap-3',
+            'absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40 backdrop-blur-[2px]',
             'transition-all duration-300',
             isHovered ? 'opacity-100' : 'opacity-0'
           )}>
-            {/* Large Read Button */}
-            <div className="w-16 h-16 rounded-full bg-amber-500 flex items-center justify-center shadow-xl transform transition-transform duration-300 group-hover:scale-110">
-              <BookOpen className="w-8 h-8 text-white" strokeWidth={2.5} />
+            <div className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center shadow-xl transform transition-transform duration-300 group-hover:scale-110">
+              <BookOpen className="w-7 h-7 text-white" strokeWidth={2.5} />
             </div>
-
-            {/* Quick Info */}
-            <div className="text-center px-4">
-              <div className="text-white font-bold text-sm mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                {book.title}
+            {book.pages && (
+              <div className="text-white/90 text-xs font-medium" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                {book.pages} pages
               </div>
-              {book.pages && (
-                <div className="flex items-center justify-center gap-1.5 text-white/90 text-xs">
-                  <BookOpen className="w-3 h-3" />
-                  <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{book.pages} pages</span>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Info Section - Below Cover */}
-        <div className="p-3 bg-slate-900">
-          {/* Title */}
-          <h3 className="font-bold text-white text-sm line-clamp-1 mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        {/* Info Section — Light */}
+        <div className="p-2.5 bg-white">
+          <h3 className="font-bold text-slate-800 text-xs line-clamp-1 mb-0.5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             {book.title}
           </h3>
 
-          {/* Metadata Row */}
-          <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
-            {book.author && (
-              <div className="flex items-center gap-1">
-                <User className="w-3 h-3" />
-                <span className="line-clamp-1">{book.author}</span>
-              </div>
-            )}
-            {book.author && book.ageRange && <span>•</span>}
-            {book.ageRange && (
-              <span className="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300 font-medium">
-                {book.ageRange}
-              </span>
-            )}
-          </div>
-
-          {/* Pages Info */}
-          {book.pages && (
-            <div className="text-xs text-slate-500 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {book.pages} {book.pages === 1 ? 'page' : 'pages'}
+          {book.author && (
+            <div className="flex items-center gap-1 text-[10px] text-slate-500 mb-1.5">
+              <User className="w-2.5 h-2.5" />
+              <span className="line-clamp-1">{book.author}</span>
             </div>
           )}
 
-          {/* Progress Indicator Text */}
+          {/* Progress Indicator */}
           {progress && progress.currentPage > 0 && (
-            <div className="mt-2 pt-2 border-t border-slate-800">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {progress.completed ? 'Finished' : `Page ${progress.currentPage} of ${book.pages}`}
-                </span>
-                <span className="text-amber-400 font-bold font-mono">
-                  {Math.round(progressPercentage)}%
-                </span>
-              </div>
+            <div className="text-[10px] text-amber-600 font-semibold">
+              {progress.completed ? '✓ Finished' : `${Math.round(progressPercentage)}% read`}
             </div>
           )}
         </div>

@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidGameCard } from '@/components/kidcoms/kid-game-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
-import { Gamepad2 } from 'lucide-react';
+import { Gamepad2, Trophy, Search } from 'lucide-react';
 
 interface ChildUserData {
   userId: string;
@@ -21,7 +19,7 @@ const games = [
     id: 'memory',
     title: 'Memory Match',
     emoji: '🧩',
-    color: 'purple' as const,
+    color: 'cyan' as const,
     difficulty: 'easy' as const,
     description: 'Match the cards!',
   },
@@ -41,6 +39,13 @@ const games = [
     difficulty: 'easy' as const,
     description: 'Draw and create!',
   },
+];
+
+const AVATAR_COLORS = [
+  'from-cyan-500 to-teal-500',
+  'from-red-500 to-orange-500',
+  'from-amber-500 to-orange-400',
+  'from-emerald-500 to-teal-500',
 ];
 
 export default function ArcadePage() {
@@ -63,9 +68,7 @@ export default function ArcadePage() {
       }
 
       const user = JSON.parse(userStr) as ChildUserData;
-
       if (!user.familyFileId) {
-        console.error('Missing family file ID');
         localStorage.clear();
         router.push('/my-circle/child');
         return;
@@ -84,113 +87,105 @@ export default function ArcadePage() {
     alert(`Coming soon: ${game.title}!`);
   }
 
-  const featuredGame = games[0];
+  const userInitial = userData?.childName?.charAt(0).toUpperCase() || 'K';
+  const avatarGradient = AVATAR_COLORS[(userData?.childName?.length || 0) % AVATAR_COLORS.length];
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
-        <div className="text-center">
-          <ARIAMascot state="loading" greeting="Loading arcade..." />
-        </div>
-      </div>
-    );
-  }
-
-  if (games.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] pb-24">
-        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-6 py-6">
-            <KidComsLogo size="sm" className="mb-3" />
-            <div className="flex items-center gap-3">
-              <Gamepad2 className="w-10 h-10 text-[#2C5F5D]" />
-              <h1 className="text-2xl font-bold text-[#2C3E50]">ARCADE</h1>
-            </div>
-            <p className="text-gray-600 mt-1">Play fun games</p>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center mx-auto animate-pulse">
+            <Gamepad2 className="w-8 h-8 text-white" strokeWidth={1.5} />
           </div>
-        </header>
-
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center px-6">
-            <ARIAMascot
-              state="idle"
-              greeting="No games available right now. Check back soon!"
-            />
-          </div>
+          <p className="text-slate-400 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>Loading arcade...</p>
         </div>
-
-        <KidBottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative pb-24 bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
-      {/* Subtle decorative lines */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
-        <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
-        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
-      </div>
-
-      <div className="relative z-10">
-        {/* Header */}
-        <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
-          <div className="max-w-5xl mx-auto px-6 py-6">
-            <KidComsLogo size="sm" className="mb-3" />
-            <div className="flex items-center gap-3">
-              <Gamepad2 className="w-10 h-10 text-[#2C5F5D]" />
-              <div>
-                <h1 className="text-3xl font-bold text-[#2C3E50]">Arcade</h1>
-                <p className="text-gray-600 text-sm">Play and have fun</p>
-              </div>
+    <div className="min-h-screen bg-slate-950 pb-24">
+      {/* Dark Header — matches Movies/Dashboard style */}
+      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+              <Gamepad2 className="w-5 h-5 text-white" strokeWidth={2} />
+            </div>
+            <div>
+              <h1 className="font-black text-white text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Arcade</h1>
+              <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {games.length} games ready to play
+              </p>
             </div>
           </div>
-        </header>
 
-        {/* Main Content */}
-        <main className="max-w-5xl mx-auto px-6 py-8 space-y-8">
-          {/* Featured Game Section */}
-          {featuredGame && (
-            <section>
-              <h2 className="text-xl font-bold text-[#2C3E50] mb-4 flex items-center gap-2">
-                <span className="w-1 h-6 bg-[#D97757] rounded-full"></span>
-                Featured Game
-              </h2>
-              <div className="max-w-2xl mx-auto">
-                <div className="group transform hover:scale-[1.02] transition-all duration-200">
-                  <KidGameCard
-                    game={featuredGame}
-                    onClick={() => handleGameSelect(featuredGame)}
-                    className="border border-[#2C5F5D]/20 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
-                  />
-                </div>
-              </div>
-            </section>
-          )}
+          <div
+            className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-offset-slate-950 ring-cyan-500/50`}
+          >
+            <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              {userInitial}
+            </span>
+          </div>
+        </div>
+      </header>
 
-          {/* All Games Grid */}
-          <section>
-            <h2 className="text-xl font-bold text-[#2C3E50] mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-[#2C5F5D] rounded-full"></span>
-              All Games
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {games.map((game) => (
-                <div
-                  key={game.id}
-                  className="group transform hover:scale-[1.02] transition-all duration-200"
-                >
-                  <KidGameCard
-                    game={game}
-                    onClick={() => handleGameSelect(game)}
-                    className="border border-gray-200 hover:border-[#2C5F5D]/40 hover:shadow-lg transition-all"
-                  />
-                </div>
-              ))}
+      <main className="space-y-6 pt-6 pb-4 px-4">
+        {/* Featured Game */}
+        <section>
+          <h2
+            className="text-xl font-bold text-white mb-4 flex items-center gap-2"
+            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+          >
+            <span className="w-1 h-5 bg-cyan-500 rounded-full" />
+            Featured Game
+          </h2>
+          <div className="max-w-sm">
+            <KidGameCard
+              game={games[0]}
+              onClick={() => handleGameSelect(games[0])}
+              className="shadow-2xl shadow-cyan-500/10"
+            />
+          </div>
+        </section>
+
+        {/* All Games Grid */}
+        <section>
+          <h2
+            className="text-xl font-bold text-white mb-4 flex items-center gap-2"
+            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+          >
+            <span className="w-1 h-5 bg-teal-500 rounded-full" />
+            All Games
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {games.map(game => (
+              <KidGameCard
+                key={game.id}
+                game={game}
+                onClick={() => handleGameSelect(game)}
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* High Scores teaser */}
+        <section>
+          <div className="bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
+              <Trophy className="w-6 h-6 text-white" />
             </div>
-          </section>
-        </main>
-      </div>
+            <div>
+              <h3 className="font-bold text-white text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                Your Scores
+              </h3>
+              <p className="text-slate-400 text-xs mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+                Play games to see your best scores here!
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <KidBottomNav />
     </div>

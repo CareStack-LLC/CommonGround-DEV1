@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { StreamingBookCard } from '@/components/kidcoms/streaming-book-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
+import { AuthorAvatar } from '@/components/kidcoms/author-avatar';
+import { HorizontalScrollRow } from '@/components/kidcoms/horizontal-scroll-row';
 import { theaterContent, BookCategory, bookCategories } from '@/lib/theater-content';
-import { BookOpen, Search, Trophy, Target, Zap, Bookmark } from 'lucide-react';
+import { BookOpen, Search, Trophy, Target, Zap } from 'lucide-react';
 
 import type { ReadingProgress, ReadingStats } from '@/lib/reading-progress';
 
@@ -15,6 +17,25 @@ interface ChildUserData {
   childName: string;
   avatarId?: string;
   familyFileId: string;
+}
+
+const AVATAR_COLORS = [
+  'from-cyan-500 to-teal-500',
+  'from-red-500 to-orange-500',
+  'from-amber-500 to-orange-400',
+  'from-emerald-500 to-teal-500',
+];
+
+// Derive unique authors from books
+function getAuthors(books: typeof theaterContent.storybooks) {
+  const authorMap = new Map<string, { name: string; bookCount: number }>();
+  books.forEach(b => {
+    if (b.author) {
+      const existing = authorMap.get(b.author);
+      authorMap.set(b.author, { name: b.author, bookCount: (existing?.bookCount || 0) + 1 });
+    }
+  });
+  return Array.from(authorMap.values());
 }
 
 export default function LibraryPage() {
@@ -42,9 +63,7 @@ export default function LibraryPage() {
       }
 
       const user = JSON.parse(userStr) as ChildUserData;
-
       if (!user.familyFileId) {
-        console.error('Missing family file ID');
         localStorage.clear();
         router.push('/my-circle/child');
         return;
@@ -52,17 +71,12 @@ export default function LibraryPage() {
 
       setUserData(user);
 
-      // Load reading state only on client after auth passes
       const { getReadingStats, getCurrentlyReading, getReadingProgress } = require('@/lib/reading-progress');
-      const loadedStats = getReadingStats();
-      const loadedCurrentlyReading = getCurrentlyReading();
-      setStats(loadedStats);
-      setCurrentlyReading(loadedCurrentlyReading);
+      setStats(getReadingStats());
+      setCurrentlyReading(getCurrentlyReading());
 
-      // Pre-load progress for all books
-      const books = theaterContent.storybooks;
       const map: Record<string, ReadingProgress | null> = {};
-      books.forEach(book => { map[book.id] = getReadingProgress(book.id); });
+      theaterContent.storybooks.forEach(b => { map[b.id] = getReadingProgress(b.id); });
       setProgressMap(map);
 
       setIsLoading(false);
@@ -73,39 +87,31 @@ export default function LibraryPage() {
     }
   }
 
-  function handleBookSelect(book: typeof theaterContent.storybooks[0]) {
-    router.push(`/my-circle/child/library/${book.id}`);
-  }
-
   const books = theaterContent.storybooks;
+  const authors = getAuthors(books);
 
-  // Filter books
   const filteredBooks = books.filter(book => {
-    // Category filter
     if (selectedCategory === 'reading') {
       if (!currentlyReading.find(p => p.bookId === book.id)) return false;
     } else if (selectedCategory !== 'all' && book.category !== selectedCategory) {
       return false;
     }
-
-    // Search filter
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      return (
-        book.title.toLowerCase().includes(query) ||
-        book.author?.toLowerCase().includes(query)
-      );
+      const q = searchQuery.toLowerCase();
+      return book.title.toLowerCase().includes(q) || book.author?.toLowerCase().includes(q);
     }
-
     return true;
   });
 
+  const userInitial = userData?.childName?.charAt(0).toUpperCase() || 'K';
+  const avatarGradient = AVATAR_COLORS[(userData?.childName?.length || 0) % AVATAR_COLORS.length];
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FFF8F3] flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <div className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <div className="text-xl font-bold text-slate-800" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             Loading Library...
           </div>
         </div>
@@ -114,200 +120,191 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-24">
-      {/* Header - Dark theme like streaming platforms */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-slate-950/90 border-b border-slate-800">
-        <div className="px-4 py-4">
-          {/* Title Section */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
-              <BookOpen className="w-7 h-7 text-white" strokeWidth={2.5} />
-            </div>
-            <div className="flex-1">
-              <h1 className="font-bold text-white text-2xl mb-0.5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                Library
-              </h1>
-              <div className="flex items-center gap-3 text-sm text-slate-400">
-                <span className="flex items-center gap-1.5">
-                  <BookOpen className="w-4 h-4" />
-                  {books.length} books
-                </span>
-                {stats.booksRead > 0 && (
-                  <>
-                    <span>•</span>
-                    <span>{stats.pagesRead} pages read</span>
-                  </>
-                )}
+    <div className="min-h-screen bg-[#FFF8F3] pb-24">
+      {/* Light Header */}
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-amber-100/60 shadow-sm">
+        <div className="px-4 py-3">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                <BookOpen className="w-5 h-5 text-white" strokeWidth={2.5} />
               </div>
+              <div>
+                <h1 className="font-black text-slate-900 text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                  Library
+                </h1>
+                <p className="text-slate-500 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  {books.length} books to explore
+                </p>
+              </div>
+            </div>
+
+            {/* Profile Avatar */}
+            <div
+              className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center flex-shrink-0 ring-2 ring-offset-2 ring-offset-white ring-amber-400/50`}
+            >
+              <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                {userInitial}
+              </span>
             </div>
           </div>
 
-          {/* Search Bar */}
+          {/* Search Bar — Light */}
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400" />
             <input
               type="text"
-              placeholder="Search for books..."
+              placeholder="Search books or authors..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
           </div>
         </div>
-      </header>
 
-      {/* Reading Stats Widget */}
-      {stats.booksRead > 0 && (
-        <div className="px-4 py-4 border-b border-slate-800 bg-slate-900/50">
-          <div className="bg-gradient-to-br from-amber-950/50 to-orange-950/50 rounded-xl p-4 border border-amber-900/30">
-            <h3 className="font-semibold text-amber-400 mb-3 text-sm flex items-center gap-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              <Trophy className="w-4 h-4" />
-              Your Reading Stats
-            </h3>
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div>
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Trophy className="w-4 h-4 text-amber-500" />
-                  <div className="text-2xl font-bold text-amber-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                    {stats.booksCompleted}
-                  </div>
-                </div>
-                <div className="text-xs text-amber-300/70" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Completed
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Target className="w-4 h-4 text-amber-500" />
-                  <div className="text-2xl font-bold text-amber-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                    {stats.pagesRead}
-                  </div>
-                </div>
-                <div className="text-xs text-amber-300/70" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Pages
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Zap className="w-4 h-4 text-amber-500" />
-                  <div className="text-2xl font-bold text-amber-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-                    {stats.streak}
-                  </div>
-                </div>
-                <div className="text-xs text-amber-300/70" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  Day Streak
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Category Tabs - Dark theme */}
-      <div className="sticky top-[132px] z-30 px-4 py-3 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800 overflow-x-auto">
-        <div className="flex gap-2 min-w-max">
-          <button
-            onClick={() => setSelectedCategory('all')}
-            className={cn(
-              'px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200',
-              selectedCategory === 'all'
-                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg shadow-amber-500/30'
-                : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-800'
-            )}
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          >
-            All Books
-          </button>
-
-          {currentlyReading.length > 0 && (
-            <button
-              onClick={() => setSelectedCategory('reading')}
-              className={cn(
-                'px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2',
-                selectedCategory === 'reading'
-                  ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg shadow-amber-500/30'
-                  : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-800'
-              )}
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
-              <Bookmark className="w-4 h-4" />
-              Currently Reading
-            </button>
-          )}
-
-          {(Object.keys(bookCategories) as BookCategory[]).map((cat) => {
-            const category = bookCategories[cat];
-            return (
+        {/* Genre Pills */}
+        <div className="px-4 pb-3 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 min-w-max">
+            {[
+              { key: 'all', label: 'All Books' },
+              ...(currentlyReading.length > 0 ? [{ key: 'reading', label: '📖 Reading' }] : []),
+              ...Object.entries(bookCategories).map(([key, cat]) => ({ key, label: `${cat.emoji} ${cat.name}` })),
+            ].map(({ key, label }) => (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={cn(
-                  'px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200',
-                  selectedCategory === cat
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg shadow-amber-500/30'
-                    : 'bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-800'
-                )}
+                key={key}
+                onClick={() => setSelectedCategory(key as any)}
+                className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${selectedCategory === key
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-400 text-white shadow-lg shadow-amber-400/30'
+                  : 'bg-amber-50 text-slate-600 hover:bg-amber-100 border border-amber-200/60'
+                  }`}
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
-                {category.emoji} {category.name}
+                {label}
               </button>
-            );
-          })}
+            ))}
+          </div>
         </div>
-      </div>
+      </header>
 
-      {/* Main Content */}
-      <main className="p-4 pt-6">
-        {/* Category Title */}
-        {selectedCategory !== 'all' && (
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              {selectedCategory === 'reading' && 'Currently Reading'}
-              {selectedCategory !== 'reading' && bookCategories[selectedCategory as BookCategory]?.name}
-            </h2>
-            <p className="text-slate-400 text-sm mt-1">
-              {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
-            </p>
+      <main className="space-y-6 pt-4 pb-4">
+        {/* Reading Stats — warm card */}
+        {stats.booksRead > 0 && (
+          <div className="px-4">
+            <div className="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm">
+              <h3
+                className="font-bold text-amber-700 mb-3 text-sm flex items-center gap-2"
+                style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+              >
+                <Trophy className="w-4 h-4" /> Your Reading Journey
+              </h3>
+              <div className="grid grid-cols-3 gap-3 text-center">
+                {[
+                  { icon: <Trophy className="w-4 h-4 text-amber-500" />, value: stats.booksCompleted, label: 'Completed' },
+                  { icon: <Target className="w-4 h-4 text-amber-500" />, value: stats.pagesRead, label: 'Pages' },
+                  { icon: <Zap className="w-4 h-4 text-amber-500" />, value: stats.streak, label: 'Day Streak' },
+                ].map(({ icon, value, label }) => (
+                  <div key={label}>
+                    <div className="flex items-center justify-center gap-1 mb-1">
+                      {icon}
+                      <div className="text-2xl font-bold text-amber-600" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                        {value}
+                      </div>
+                    </div>
+                    <div className="text-xs text-slate-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Books Grid - Portrait layout */}
-        {filteredBooks.length === 0 ? (
-          <div className="text-center py-24">
-            <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-6">
-              <BookOpen className="w-10 h-10 text-slate-600" />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              {searchQuery ? 'No books found' : 'No books here yet'}
-            </h3>
-            <p className="text-slate-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {searchQuery ? 'Try searching for something else' : 'Check back later for more books'}
-            </p>
+        {/* Popular Authors */}
+        {selectedCategory === 'all' && !searchQuery && authors.length > 0 && (
+          <div className="px-4">
+            <HorizontalScrollRow
+              title="Popular Authors"
+              items={authors}
+              cardClassName="w-20"
+              titleClassName="text-slate-900"
+              viewAllClassName="text-amber-500 hover:text-amber-600"
+              renderCard={(author) => (
+                <AuthorAvatar
+                  name={author.name}
+                  size="md"
+                  onClick={() => setSearchQuery(author.name)}
+                />
+              )}
+            />
           </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {filteredBooks.map((book) => {
-              const progress = progressMap[book.id] ?? null;
+        )}
 
-              return (
+        {/* New Books — first 6 in a horizontal row */}
+        {selectedCategory === 'all' && !searchQuery && (
+          <div className="px-4">
+            <HorizontalScrollRow
+              title="New &amp; Featured"
+              items={books.slice(0, 6)}
+              onViewAll={() => { }}
+              cardClassName="w-32"
+              titleClassName="text-slate-900"
+              viewAllClassName="text-amber-500 hover:text-amber-600"
+              renderCard={(book) => (
+                <StreamingBookCard
+                  book={book}
+                  onClick={() => router.push(`/my-circle/child/library/${book.id}`)}
+                  progress={progressMap[book.id]}
+                />
+              )}
+            />
+          </div>
+        )}
+
+        {/* All Books Grid */}
+        <section className="px-4">
+          <h2
+            className="text-xl font-bold text-slate-900 mb-4"
+            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+          >
+            {selectedCategory === 'all' && !searchQuery
+              ? 'All Books'
+              : selectedCategory === 'reading'
+                ? 'Currently Reading'
+                : searchQuery
+                  ? `${filteredBooks.length} Results`
+                  : bookCategories[selectedCategory as BookCategory]?.name || 'Books'}
+          </h2>
+
+          {filteredBooks.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-6xl mb-4">📚</div>
+              <p className="text-slate-500 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+                {searchQuery ? 'No books found' : 'No books in this category'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {filteredBooks.map(book => (
                 <StreamingBookCard
                   key={book.id}
                   book={book}
-                  onClick={() => handleBookSelect(book)}
-                  progress={progress}
+                  onClick={() => router.push(`/my-circle/child/library/${book.id}`)}
+                  progress={progressMap[book.id]}
                 />
-              );
-            })}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </section>
       </main>
 
       <KidBottomNav />
+
+      <style>{`
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+      `}</style>
     </div>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
 }
