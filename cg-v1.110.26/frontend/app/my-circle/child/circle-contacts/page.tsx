@@ -70,7 +70,7 @@ export default function CircleContactsPage() {
       setUserData(user);
 
       // Load circle contacts for this child
-      await loadCircleContacts(user.childId);
+      await loadCircleContacts(user.familyFileId, user.childId);
     } catch (error) {
       console.error('Failed to load user:', error);
       setError('Failed to load your contacts');
@@ -78,10 +78,10 @@ export default function CircleContactsPage() {
     }
   }
 
-  async function loadCircleContacts(childId: string) {
+  async function loadCircleContacts(familyFileId: string, childId: string) {
     try {
-      const response = await circleAPI.getCircleContacts(childId);
-      setContacts(response);
+      const response = await circleAPI.list(familyFileId, { childId });
+      setContacts(response.items as any);
       setIsLoading(false);
     } catch (err) {
       console.error('Failed to load circle contacts:', err);
