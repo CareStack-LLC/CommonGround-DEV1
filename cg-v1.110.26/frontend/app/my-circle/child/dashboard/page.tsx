@@ -10,8 +10,8 @@ import { RecentMediaCard } from '@/components/kidcoms/dashboard/recent-media-car
 import { CallHistoryWidget } from '@/components/kidcoms/dashboard/call-history-widget';
 import { CalendarWidget } from '@/components/kidcoms/dashboard/calendar-widget';
 import { theaterContent } from '@/lib/theater-content';
-import { getRecentlyWatched } from '@/lib/watch-progress';
-import { getRecentlyRead } from '@/lib/reading-progress';
+import type { WatchProgress } from '@/lib/watch-progress';
+import type { ReadingProgress } from '@/lib/reading-progress';
 
 interface ChildUserData {
   userId: string;
@@ -35,6 +35,8 @@ export default function ChildDashboardPage() {
   const [userData, setUserData] = useState<ChildUserData | null>(null);
   const [contacts, setContacts] = useState<ChildContact[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [recentVideos, setRecentVideos] = useState<WatchProgress[]>([]);
+  const [recentBooks, setRecentBooks] = useState<ReadingProgress[]>([]);
 
   useEffect(() => {
     validateAndLoadUser();
@@ -72,17 +74,21 @@ export default function ChildDashboardPage() {
         }
       }
 
+      // Load media history safely on client only
+      const { getRecentlyWatched } = require('@/lib/watch-progress');
+      const { getRecentlyRead } = require('@/lib/reading-progress');
+      setRecentVideos(getRecentlyWatched());
+      setRecentBooks(getRecentlyRead());
+
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to load user:', error);
-      localStorage.clear();
+      if (typeof localStorage !== 'undefined') localStorage.clear();
       router.push('/my-circle/child');
     }
   }
 
-  // Get recently watched videos and books
-  const recentVideos = getRecentlyWatched();
-  const recentBooks = getRecentlyRead();
+  // recentVideos and recentBooks are loaded from state after auth
 
   // Combine and sort by last watched/read
   const recentMedia = [
