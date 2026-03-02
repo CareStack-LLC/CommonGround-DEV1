@@ -55,21 +55,11 @@ const COMING_SOON = [
   },
 ];
 
-// Ayanna S Clark books — Luna and Midnight (2 entries, single-column)
+// Ayanna S Clark — Luna and Midnight ONLY (single book)
 const AYANNA_BOOKS = [
   {
     ...theaterContent.storybooks.find(b => b.id === 'luna-midnight')!,
     author: 'Ayanna S Clark',
-  },
-  {
-    id: 'midnight',
-    title: 'Midnight',
-    url: '/kidsComms/Luna and Midnight.pdf',
-    cover: '/kidsComms/covers/luna-midnight-cover.jpg',
-    pages: 24,
-    author: 'Ayanna S Clark',
-    category: 'fantasy' as const,
-    ageRange: '6-10',
   },
 ];
 
@@ -227,7 +217,7 @@ export default function ChildDashboardPage() {
                   <button
                     key={video.id}
                     onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
-                    className="relative flex-shrink-0 w-80 rounded-2xl overflow-hidden bg-slate-800 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-xl shadow-black/30"
+                    className="relative flex-shrink-0 w-80 sm:w-96 rounded-2xl overflow-hidden bg-slate-800 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-xl shadow-black/30"
                   >
                     {/* 16:9 poster */}
                     <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
@@ -355,7 +345,7 @@ export default function ChildDashboardPage() {
                 className="flex items-center gap-4 bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50 hover:border-slate-600 transition-colors cursor-pointer"
               >
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${event.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
-                  <span className="text-2xl">{event.emoji}</span>
+                  <span className="text-2xl leading-none">{event.emoji}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-white text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>

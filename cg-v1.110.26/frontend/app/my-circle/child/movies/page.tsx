@@ -162,8 +162,8 @@ export default function MoviesPage() {
                 key={key}
                 onClick={() => setSelectedCategory(key as any)}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 ${selectedCategory === key
-                    ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/30'
-                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/30'
+                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
                   }`}
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
@@ -178,23 +178,25 @@ export default function MoviesPage() {
         {/* Featured Hero Banner — auto-rotates */}
         {!searchQuery && selectedCategory === 'all' && (
           <div className="px-4">
-            <FeaturedHeroBanner
-              content={{
-                id: featuredVideo.id,
-                title: featuredVideo.title,
-                cover: featuredVideo.thumbnail,
-                description: featuredVideo.description,
-                duration: featuredVideo.duration ? parseInt(featuredVideo.duration) : undefined,
-                type: 'video',
-                category: featuredVideo.category,
-                rating: 4.5 - (featuredIndex * 0.1),
-                ratingCount: 2400 - (featuredIndex * 200),
-              }}
-              badge={featuredIndex === 0 ? '🔥 Trending' : featuredIndex === 1 ? '⭐ Popular' : '✨ Featured'}
-              onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
-              onFavorite={() => { }}
-              isFavorite={favoritesSet.has(featuredVideo.id)}
-            />
+            <div className="min-h-[300px] sm:min-h-[380px]">
+              <FeaturedHeroBanner
+                content={{
+                  id: featuredVideo.id,
+                  title: featuredVideo.title,
+                  cover: featuredVideo.thumbnail,
+                  description: featuredVideo.description,
+                  duration: featuredVideo.duration ? parseInt(featuredVideo.duration) : undefined,
+                  type: 'video',
+                  category: featuredVideo.category,
+                  rating: 4.5 - (featuredIndex * 0.1),
+                  ratingCount: 2400 - (featuredIndex * 200),
+                }}
+                badge={featuredIndex === 0 ? '🔥 Trending' : featuredIndex === 1 ? '⭐ Popular' : '✨ Featured'}
+                onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
+                onFavorite={() => { }}
+                isFavorite={favoritesSet.has(featuredVideo.id)}
+              />
+            </div>
             {/* Dots indicator */}
             <div className="flex gap-1.5 justify-center mt-3">
               {theaterContent.videos.map((_, i) => (

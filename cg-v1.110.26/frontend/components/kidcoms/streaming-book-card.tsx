@@ -63,14 +63,14 @@ export function StreamingBookCard({
       <button
         onClick={onClick}
         className={cn(
-          'relative w-full bg-white rounded-xl overflow-hidden shadow-sm border border-amber-100/70',
+          'relative w-full bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-700/50',
           'transition-all duration-300 ease-out',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2',
-          'group-hover:scale-[1.03] group-hover:shadow-xl group-hover:shadow-amber-300/20 group-hover:border-amber-200'
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
+          'group-hover:scale-[1.03] group-hover:shadow-xl group-hover:shadow-cyan-500/10 group-hover:border-slate-600'
         )}
       >
         {/* Book Cover - Portrait 2:3 ratio */}
-        <div className="relative aspect-[2/3] bg-amber-50">
+        <div className="relative aspect-[2/3] bg-slate-700">
           {book.cover ? (
             <Image
               src={book.cover}
@@ -80,8 +80,8 @@ export function StreamingBookCard({
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
             />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-amber-100 to-orange-100">
-              <BookOpen className="w-16 h-16 text-amber-400" />
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-800">
+              <BookOpen className="w-16 h-16 text-slate-500" />
             </div>
           )}
 
@@ -141,14 +141,14 @@ export function StreamingBookCard({
           </div>
         </div>
 
-        {/* Info Section — Light */}
-        <div className="p-2.5 bg-white">
-          <h3 className="font-bold text-slate-800 text-xs line-clamp-1 mb-0.5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        {/* Info Section — Dark */}
+        <div className="p-2.5 bg-slate-800">
+          <h3 className="font-bold text-white text-xs line-clamp-1 mb-0.5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             {book.title}
           </h3>
 
           {book.author && (
-            <div className="flex items-center gap-1 text-[10px] text-slate-500 mb-1.5">
+            <div className="flex items-center gap-1 text-[10px] text-slate-400 mb-1.5">
               <User className="w-2.5 h-2.5" />
               <span className="line-clamp-1">{book.author}</span>
             </div>
@@ -156,7 +156,7 @@ export function StreamingBookCard({
 
           {/* Progress Indicator */}
           {progress && progress.currentPage > 0 && (
-            <div className="text-[10px] text-amber-600 font-semibold">
+            <div className="text-[10px] text-cyan-400 font-semibold">
               {progress.completed ? '✓ Finished' : `${Math.round(progressPercentage)}% read`}
             </div>
           )}
