@@ -80,27 +80,6 @@ export function StreamingMovieCard({
               : 'from-black/80 via-black/20 to-transparent opacity-60'
           )} />
 
-          {/* Favorite Button - Top Right */}
-          <button
-            onClick={handleFavoriteClick}
-            className={cn(
-              'absolute top-2 right-2 z-20 w-9 h-9 rounded-full',
-              'backdrop-blur-md border transition-all duration-200',
-              'flex items-center justify-center',
-              isFavorite
-                ? 'bg-red-500/90 border-red-400'
-                : 'bg-black/40 border-white/20 hover:bg-black/60'
-            )}
-            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-          >
-            <Heart
-              className={cn(
-                'w-4.5 h-4.5 transition-all duration-200',
-                isFavorite ? 'fill-white text-white scale-110' : 'text-white'
-              )}
-            />
-          </button>
-
           {/* Progress Bar - Bottom */}
           {progress !== undefined && progress > 0 && (
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">

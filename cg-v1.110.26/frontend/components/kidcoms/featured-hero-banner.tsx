@@ -60,7 +60,7 @@ export function FeaturedHeroBanner({
         'bg-slate-900 shadow-2xl',
         className
       )}
-      style={{ aspectRatio: '21/9' }}
+      style={{ aspectRatio: '16/9' }}
     >
       {/* Background Image */}
       {content.cover && (
@@ -79,10 +79,10 @@ export function FeaturedHeroBanner({
       )}
 
       {/* Content Overlay - Bottom Left */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 lg:p-10">
+      <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-8 lg:p-10">
         <div className="max-w-2xl">
           {/* Badge */}
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-2">
             <div className="px-3 py-1 bg-cyan-500 rounded-full flex items-center gap-1.5">
               <span className="text-white font-bold text-xs" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 {badge}
@@ -100,14 +100,14 @@ export function FeaturedHeroBanner({
 
           {/* Title */}
           <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-3 drop-shadow-2xl"
+            className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-2 drop-shadow-2xl"
             style={{ fontFamily: 'Space Grotesk, sans-serif' }}
           >
             {content.title}
           </h2>
 
           {/* Metadata Row */}
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4 mb-3">
             {/* Rating */}
             {content.rating !== undefined && (
               <StarRating
@@ -142,7 +142,7 @@ export function FeaturedHeroBanner({
           {/* Description */}
           {content.description && (
             <p
-              className="text-white/90 text-sm md:text-base mb-6 line-clamp-2 max-w-xl"
+              className="text-white/90 text-sm md:text-base mb-4 line-clamp-2 max-w-xl"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               {content.description}
@@ -185,31 +185,6 @@ export function FeaturedHeroBanner({
           </div>
         </div>
       </div>
-
-      {/* Favorite Heart Button - Top Right */}
-      {onFavorite && (
-        <button
-          onClick={handleFavoriteClick}
-          className={cn(
-            'absolute top-4 right-4 md:top-6 md:right-6',
-            'w-12 h-12 rounded-full',
-            'backdrop-blur-md border transition-all duration-200',
-            'flex items-center justify-center',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
-            isFavorite
-              ? 'bg-red-500/90 border-red-400 hover:bg-red-600/90'
-              : 'bg-black/40 border-white/20 hover:bg-black/60'
-          )}
-          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-        >
-          <Heart
-            className={cn(
-              'w-6 h-6 transition-all duration-200',
-              isFavorite ? 'fill-white text-white scale-110' : 'text-white'
-            )}
-          />
-        </button>
-      )}
     </div>
   );
 }

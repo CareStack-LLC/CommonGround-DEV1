@@ -93,27 +93,6 @@ export function StreamingBookCard({
             </span>
           </div>
 
-          {/* Bookmark Button - Top Right */}
-          <button
-            onClick={handleBookmarkClick}
-            className={cn(
-              'absolute top-2 right-2 z-20 w-8 h-8 rounded-full',
-              'backdrop-blur-md border transition-all duration-200',
-              'flex items-center justify-center',
-              isBookmarked
-                ? 'bg-amber-500/90 border-amber-400'
-                : 'bg-black/30 border-white/20 hover:bg-black/50'
-            )}
-            aria-label={isBookmarked ? 'Remove bookmark' : 'Add bookmark'}
-          >
-            <Bookmark
-              className={cn(
-                'w-4 h-4 transition-all duration-200',
-                isBookmarked ? 'fill-white text-white scale-110' : 'text-white'
-              )}
-            />
-          </button>
-
           {/* Progress Bar - Bottom */}
           {progress && progress.currentPage > 0 && (
             <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/20">

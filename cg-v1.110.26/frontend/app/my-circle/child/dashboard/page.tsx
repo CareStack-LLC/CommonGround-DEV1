@@ -217,7 +217,7 @@ export default function ChildDashboardPage() {
                   <button
                     key={video.id}
                     onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
-                    className="relative flex-shrink-0 w-80 sm:w-96 rounded-2xl overflow-hidden bg-slate-800 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-xl shadow-black/30"
+                    className="relative flex-shrink-0 w-[340px] rounded-2xl overflow-hidden bg-slate-800 group hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-xl shadow-black/30"
                   >
                     {/* 16:9 poster */}
                     <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
@@ -329,13 +329,6 @@ export default function ChildDashboardPage() {
             <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
               Upcoming Events
             </h2>
-            <button
-              onClick={() => setShowAddEvent(true)}
-              className="w-8 h-8 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 flex items-center justify-center text-cyan-400 transition-colors"
-              aria-label="Add event"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
           </div>
 
           <div className="space-y-3">
