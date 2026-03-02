@@ -720,481 +720,482 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
+          </div>
 
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-              {/* Attorney Identity Section */}
-              <div className="bg-gradient-to-br from-white via-amber-50/30 to-white rounded-sm shadow-lg border-2 border-amber-900/30 overflow-hidden relative">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-                <div className="border-b-2 border-amber-900/10 bg-gradient-to-r from-amber-50 to-white px-6 py-4 flex items-center justify-between">
-                  <div className="flex items-center gap-2 serif font-bold text-slate-900">
-                    <User className="h-5 w-5 text-amber-900" strokeWidth={2} />
-                    Individual Attorney Details
-                  </div>
-                  <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 sans">
-                    Private & Public Mix
-                  </Badge>
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            {/* Attorney Identity Section */}
+            <div className="bg-gradient-to-br from-white via-amber-50/30 to-white rounded-sm shadow-lg border-2 border-amber-900/30 overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
+              <div className="border-b-2 border-amber-900/10 bg-gradient-to-r from-amber-50 to-white px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-2 serif font-bold text-slate-900">
+                  <User className="h-5 w-5 text-amber-900" strokeWidth={2} />
+                  Individual Attorney Details
                 </div>
-                <div className="p-6 space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <Label className="text-slate-700 font-semibold">
-                        Professional Headshot
-                      </Label>
-                      <MediaUpload
-                        label=""
-                        value={formData.headshot_url}
-                        onChange={(url) =>
-                          setFormData((prev) => ({ ...prev, headshot_url: url }))
-                        }
-                        onUpload={async (file: File) => {
-                          const formData = new FormData();
-                          formData.append("file", file);
-                          const response = await fetch(`${API_BASE}/api/v1/professional/profile/headshot`, {
-                            method: "POST",
-                            headers: { Authorization: `Bearer ${token}` },
-                            body: formData,
-                          });
-                          const updated = await response.json();
-                          return updated.headshot_url || "";
-                        }}
-                        aspectRatio="square"
-                        placeholder="Upload Headshot"
-                      />
-                    </div>
-                    <div className="space-y-4">
-                      <Label
-                        htmlFor="headline"
-                        className="text-slate-700 font-semibold"
-                      >
-                        Professional Headline
-                      </Label>
-                      <Input
-                        id="headline"
-                        value={formData.headline}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            headline: e.target.value,
-                          }))
-                        }
-                        placeholder="e.g. Board Certified Family Law Specialist"
-                        className="border-slate-300 focus:ring-emerald-500"
-                        maxLength={150}
-                      />
-                      <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-                        Visible on search result cards
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="bio" className="text-slate-700 font-semibold">
-                      Short Biography
+                <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 sans">
+                  Private & Public Mix
+                </Badge>
+              </div>
+              <div className="p-6 space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <Label className="text-slate-700 font-semibold">
+                      Professional Headshot
                     </Label>
-                    <Textarea
-                      id="bio"
-                      value={formData.bio}
+                    <MediaUpload
+                      label=""
+                      value={formData.headshot_url}
+                      onChange={(url) =>
+                        setFormData((prev) => ({ ...prev, headshot_url: url }))
+                      }
+                      onUpload={async (file: File) => {
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        const response = await fetch(`${API_BASE}/api/v1/professional/profile/headshot`, {
+                          method: "POST",
+                          headers: { Authorization: `Bearer ${token}` },
+                          body: formData,
+                        });
+                        const updated = await response.json();
+                        return updated.headshot_url || "";
+                      }}
+                      aspectRatio="square"
+                      placeholder="Upload Headshot"
+                    />
+                  </div>
+                  <div className="space-y-4">
+                    <Label
+                      htmlFor="headline"
+                      className="text-slate-700 font-semibold"
+                    >
+                      Professional Headline
+                    </Label>
+                    <Input
+                      id="headline"
+                      value={formData.headline}
                       onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, bio: e.target.value }))
+                        setFormData((prev) => ({
+                          ...prev,
+                          headline: e.target.value,
+                        }))
                       }
-                      placeholder="Tell parents about your approach to high-conflict cases..."
-                      className="min-h-[120px] border-slate-300 focus:ring-emerald-500"
+                      placeholder="e.g. Board Certified Family Law Specialist"
+                      className="border-slate-300 focus:ring-emerald-500"
+                      maxLength={150}
                     />
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-6 pt-4 border-t border-slate-50">
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="service_location"
-                        className="text-slate-700 font-semibold"
-                      >
-                        Service Location
-                      </Label>
-                      <Input
-                        id="service_location"
-                        value={formData.service_location}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            service_location: e.target.value,
-                          }))
-                        }
-                        placeholder="e.g. San Francisco Area"
-                        className="border-slate-300 focus:ring-emerald-500"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="years_experience"
-                        className="text-slate-700 font-semibold"
-                      >
-                        Years of Experience
-                      </Label>
-                      <Input
-                        id="years_experience"
-                        type="number"
-                        value={formData.years_experience}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            years_experience: e.target.value,
-                          }))
-                        }
-                        className="border-slate-300"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-slate-700 font-semibold">
-                        Languages
-                      </Label>
-                      <ListEditor
-                        label=""
-                        items={formData.languages}
-                        onAdd={(l) =>
-                          setFormData((p) => ({
-                            ...p,
-                            languages: [...p.languages, l],
-                          }))
-                        }
-                        onRemove={(i) =>
-                          setFormData((p) => ({
-                            ...p,
-                            languages: p.languages.filter((_, idx) => idx !== i),
-                          }))
-                        }
-                        placeholder="Add language..."
-                      />
-                    </div>
+                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+                      Visible on search result cards
+                    </p>
                   </div>
                 </div>
-              </div>
 
-              {/* Expertise Section */}
-              <div className="bg-gradient-to-br from-white via-amber-50/30 to-white rounded-sm shadow-lg border-2 border-amber-900/30 overflow-hidden relative">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-                <div className="border-b-2 border-amber-900/10 bg-gradient-to-r from-amber-50 to-white px-6 py-4">
-                  <div className="flex items-center gap-2 serif font-bold text-slate-900">
-                    <Gavel className="h-5 w-5 text-amber-900" strokeWidth={2} />
-                    Expertise & Academic Background
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bio" className="text-slate-700 font-semibold">
+                    Short Biography
+                  </Label>
+                  <Textarea
+                    id="bio"
+                    value={formData.bio}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, bio: e.target.value }))
+                    }
+                    placeholder="Tell parents about your approach to high-conflict cases..."
+                    className="min-h-[120px] border-slate-300 focus:ring-emerald-500"
+                  />
                 </div>
-                <div className="p-6 space-y-8">
-                  <div className="space-y-3">
-                    <Label className="serif text-slate-900 font-bold">
-                      Practice Areas
+
+                <div className="grid md:grid-cols-3 gap-6 pt-4 border-t border-slate-50">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="service_location"
+                      className="text-slate-700 font-semibold"
+                    >
+                      Service Location
                     </Label>
-                    <div className="flex flex-wrap gap-2">
-                      {PRACTICE_AREAS.map((area) => (
-                        <Button
-                          key={area}
-                          variant={
-                            formData.practice_areas.includes(area)
-                              ? "default"
-                              : "outline"
-                          }
-                          size="sm"
-                          onClick={() => togglePracticeArea(area)}
-                          className={
-                            formData.practice_areas.includes(area)
-                              ? "bg-amber-900 hover:bg-amber-800 text-white border-2 border-amber-900/40 sans font-semibold"
-                              : "border-2 border-slate-300 sans hover:border-amber-900/40 hover:bg-amber-50"
-                          }
-                        >
-                          {area.replace(/_/g, " ")}
-                        </Button>
-                      ))}
-                    </div>
+                    <Input
+                      id="service_location"
+                      value={formData.service_location}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          service_location: e.target.value,
+                        }))
+                      }
+                      placeholder="e.g. San Francisco Area"
+                      className="border-slate-300 focus:ring-emerald-500"
+                    />
                   </div>
-
-                  <div className="grid md:grid-cols-2 gap-8 pt-6 border-t border-slate-50">
-                    <ComplexListEditor
-                      label="Education History"
-                      items={formData.education}
-                      isEditing={true}
-                      onAdd={(item) =>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="years_experience"
+                      className="text-slate-700 font-semibold"
+                    >
+                      Years of Experience
+                    </Label>
+                    <Input
+                      id="years_experience"
+                      type="number"
+                      value={formData.years_experience}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          years_experience: e.target.value,
+                        }))
+                      }
+                      className="border-slate-300"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-slate-700 font-semibold">
+                      Languages
+                    </Label>
+                    <ListEditor
+                      label=""
+                      items={formData.languages}
+                      onAdd={(l) =>
                         setFormData((p) => ({
                           ...p,
-                          education: [...p.education, item],
+                          languages: [...p.languages, l],
                         }))
                       }
                       onRemove={(i) =>
                         setFormData((p) => ({
                           ...p,
-                          education: p.education.filter((_, idx) => idx !== i),
+                          languages: p.languages.filter((_, idx) => idx !== i),
                         }))
                       }
-                      fields={[
-                        {
-                          key: "institution",
-                          label: "Institution",
-                          placeholder: "University Name",
-                        },
-                        {
-                          key: "degree",
-                          label: "Degree",
-                          placeholder: "Juris Doctor",
-                        },
-                        { key: "year", label: "Year", placeholder: "2010" },
-                      ]}
-                    />
-                    <ComplexListEditor
-                      label="Awards & Honors"
-                      items={formData.awards}
-                      isEditing={true}
-                      onAdd={(item) =>
-                        setFormData((p) => ({
-                          ...p,
-                          awards: [...p.awards, item],
-                        }))
-                      }
-                      onRemove={(i) =>
-                        setFormData((p) => ({
-                          ...p,
-                          awards: p.awards.filter((_, idx) => idx !== i),
-                        }))
-                      }
-                      fields={[
-                        {
-                          key: "title",
-                          label: "Award Title",
-                          placeholder: "Super Lawyer",
-                        },
-                        {
-                          key: "organization",
-                          label: "Organization",
-                          placeholder: "State Bar",
-                        },
-                        { key: "year", label: "Year", placeholder: "2023" },
-                      ]}
+                      placeholder="Add language..."
                     />
                   </div>
-                </div>
-              </div>
-
-              {/* Firm Presence Section */}
-              <div className="bg-gradient-to-br from-white via-amber-50/30 to-white rounded-sm shadow-lg border-2 border-amber-900/30 overflow-hidden relative">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-                <div className="border-b-2 border-amber-900/10 bg-gradient-to-r from-amber-900 via-amber-800 to-amber-950 px-6 py-4">
-                  <div className="flex items-center gap-2 serif font-bold text-white">
-                    <Building2 className="h-5 w-5 text-amber-50" strokeWidth={2} />
-                    Firm-Wide Identity
-                  </div>
-                </div>
-                <div className="p-6 space-y-8">
-                  {firms.length === 0 ? (
-                    <div className="text-center py-10">
-                      <p className="text-slate-500">No firm association found.</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <Label className="text-slate-700 font-semibold">
-                            Firm Logo
-                          </Label>
-                          <MediaUpload
-                            label=""
-                            value={firmFormData.logo_url}
-                            onChange={(url) =>
-                              setFirmFormData((prev) => ({
-                                ...prev,
-                                logo_url: url,
-                              }))
-                            }
-                            onUpload={async (file: File) => {
-                              const formData = new FormData();
-                              formData.append("file", file);
-                              const response = await fetch(`${API_BASE}/api/v1/professional/firms/${selectedFirmId}/logo`, {
-                                method: "POST",
-                                headers: { Authorization: `Bearer ${token}` },
-                                body: formData,
-                              });
-                              const updated = await response.json();
-                              return updated.logo_url || "";
-                            }}
-                            aspectRatio="square"
-                          />
-                        </div>
-                        <div className="space-y-4">
-                          <Label
-                            htmlFor="firm_headline"
-                            className="text-slate-700 font-semibold"
-                          >
-                            Firm Headline
-                          </Label>
-                          <Input
-                            id="firm_headline"
-                            value={firmFormData.headline}
-                            onChange={(e) =>
-                              setFirmFormData((p) => ({
-                                ...p,
-                                headline: e.target.value,
-                              }))
-                            }
-                            placeholder="e.g. Leading Family Law Firm in California"
-                            className="border-slate-300"
-                          />
-                          <Label
-                            htmlFor="firm_service_location"
-                            className="text-slate-700 font-semibold mt-4"
-                          >
-                            Firm Service Location
-                          </Label>
-                          <Input
-                            id="firm_service_location"
-                            value={firmFormData.service_location}
-                            onChange={(e) =>
-                              setFirmFormData((p) => ({
-                                ...p,
-                                service_location: e.target.value,
-                              }))
-                            }
-                            placeholder="Greater Los Angeles Area"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-4 pt-6 border-t border-slate-50">
-                        <Label className="text-slate-700 font-bold text-lg">
-                          Programs & Financials
-                        </Label>
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <Label className="font-bold text-slate-700">
-                              Payment Plans Available
-                            </Label>
-                            <input
-                              type="checkbox"
-                              checked={firmFormData.payment_plans_available}
-                              onChange={(e) =>
-                                setFirmFormData((p) => ({
-                                  ...p,
-                                  payment_plans_available: e.target.checked,
-                                }))
-                              }
-                              className="h-6 w-6 rounded-lg"
-                            />
-                          </div>
-                          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <Label className="font-bold text-slate-700">
-                              Works with Nonprofits
-                            </Label>
-                            <input
-                              type="checkbox"
-                              checked={firmFormData.works_with_nonprofits}
-                              onChange={(e) =>
-                                setFirmFormData((p) => ({
-                                  ...p,
-                                  works_with_nonprofits: e.target.checked,
-                                }))
-                              }
-                              className="h-6 w-6 rounded-lg"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4 pt-6">
-                        <Button
-                          onClick={handleSaveFirm}
-                          disabled={isSavingFirm}
-                          className="bg-amber-900 hover:bg-amber-800 text-white min-w-[200px] shadow-lg border-2 border-amber-900/40 sans font-semibold"
-                        >
-                          <Save className="h-4 w-4 mr-2" />
-                          {isSavingFirm
-                            ? "Saving..."
-                            : "Save Firm Profile"}
-                        </Button>
-                        {firmSaveSuccess && (
-                          <span className="sans text-sm font-semibold text-amber-900 flex items-center gap-1.5 animate-in fade-in">
-                            <CheckCircle2 className="h-4 w-4" /> Published
-                          </span>
-                        )}
-                      </div>
-                    </>
-                  )}
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* RIGHT COLUMN: PREVIEW (STICKY) */}
-          <div className="hidden lg:block w-[360px] flex-shrink-0">
-            <div className="sticky top-8 space-y-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="serif text-xl font-bold text-slate-900">
-                  Live Directory Preview
-                </h3>
-                <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 uppercase text-[9px] tracking-widest sans font-bold">
-                  Real-time
-                </Badge>
+            {/* Expertise Section */}
+            <div className="bg-gradient-to-br from-white via-amber-50/30 to-white rounded-sm shadow-lg border-2 border-amber-900/30 overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
+              <div className="border-b-2 border-amber-900/10 bg-gradient-to-r from-amber-50 to-white px-6 py-4">
+                <div className="flex items-center gap-2 serif font-bold text-slate-900">
+                  <Gavel className="h-5 w-5 text-amber-900" strokeWidth={2} />
+                  Expertise & Academic Background
+                </div>
               </div>
-
-              <div className="space-y-8 bg-gradient-to-br from-amber-50/30 to-white p-6 rounded-sm border-2 border-dashed border-amber-900/20 shadow-inner">
-                <div className="space-y-2">
-                  <p className="sans text-[10px] font-bold text-amber-900/60 uppercase tracking-widest text-center">
-                    Mobile Search Result Card
-                  </p>
-                  <MobileDirectoryCard profile={profile} formData={formData} />
-                </div>
-
-                <div className="space-y-4 pt-4 border-t-2 border-amber-900/20">
-                  <p className="sans text-[10px] font-bold text-amber-900/60 uppercase tracking-widest text-center">
-                    Firm Page Overview
-                  </p>
-                  <Card className="p-4 shadow-lg border-2 border-amber-900/30 overflow-hidden relative bg-gradient-to-br from-white via-amber-50/20 to-white">
-                    <div className="h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900 absolute top-0 left-0 right-0" />
-                    <h4 className="serif font-bold text-sm text-slate-900 group">
-                      {firms.find((f) => f.id === selectedFirmId)?.name ||
-                        "Your Firm"}
-                      <Globe className="h-3 w-3 inline ml-2 text-amber-900/40" />
-                    </h4>
-                    <p className="sans text-[10px] text-slate-600 mt-0.5 line-clamp-1 italic">
-                      {firmFormData.headline || "Headline placeholder..."}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-1">
-                      {firmFormData.practice_areas.slice(0, 3).map((a) => (
-                        <div
-                          key={a}
-                          className="sans text-[9px] px-1.5 py-0.5 bg-amber-50 border-2 border-amber-900/20 rounded-sm text-amber-900"
-                        >
-                          {a}
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                </div>
-
-                <Card className="bg-gradient-to-br from-blue-900 to-blue-800 p-4 border-2 border-blue-900/40 shadow-xl">
-                  <div className="flex items-center gap-3 text-white">
-                    <div className="p-2 bg-blue-50 rounded-sm border-2 border-blue-900/20">
-                      <ShieldCheck className="h-5 w-5 text-blue-900" />
-                    </div>
-                    <div>
-                      <p className="serif text-xs font-bold leading-tight">
-                        CommonGround Verified Profile
-                      </p>
-                      <p className="sans text-[10px] opacity-80 mt-1 uppercase tracking-wider font-semibold">
-                        Security Level: High
-                      </p>
-                    </div>
+              <div className="p-6 space-y-8">
+                <div className="space-y-3">
+                  <Label className="serif text-slate-900 font-bold">
+                    Practice Areas
+                  </Label>
+                  <div className="flex flex-wrap gap-2">
+                    {PRACTICE_AREAS.map((area) => (
+                      <Button
+                        key={area}
+                        variant={
+                          formData.practice_areas.includes(area)
+                            ? "default"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={() => togglePracticeArea(area)}
+                        className={
+                          formData.practice_areas.includes(area)
+                            ? "bg-amber-900 hover:bg-amber-800 text-white border-2 border-amber-900/40 sans font-semibold"
+                            : "border-2 border-slate-300 sans hover:border-amber-900/40 hover:bg-amber-50"
+                        }
+                      >
+                        {area.replace(/_/g, " ")}
+                      </Button>
+                    ))}
                   </div>
-                </Card>
-              </div>
+                </div>
 
-              <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-sm border-2 border-amber-900/30 flex gap-3 shadow-sm">
-                <AlertTriangle className="h-4 w-4 text-amber-900 shrink-0 mt-0.5" />
-                <p className="sans text-[11px] text-amber-900 leading-relaxed font-medium">
-                  The information provided above will be indexed by search engines
-                  and visible to all CommonGround users. Review your bio and
-                  headline for clarity.
-                </p>
+                <div className="grid md:grid-cols-2 gap-8 pt-6 border-t border-slate-50">
+                  <ComplexListEditor
+                    label="Education History"
+                    items={formData.education}
+                    isEditing={true}
+                    onAdd={(item) =>
+                      setFormData((p) => ({
+                        ...p,
+                        education: [...p.education, item],
+                      }))
+                    }
+                    onRemove={(i) =>
+                      setFormData((p) => ({
+                        ...p,
+                        education: p.education.filter((_, idx) => idx !== i),
+                      }))
+                    }
+                    fields={[
+                      {
+                        key: "institution",
+                        label: "Institution",
+                        placeholder: "University Name",
+                      },
+                      {
+                        key: "degree",
+                        label: "Degree",
+                        placeholder: "Juris Doctor",
+                      },
+                      { key: "year", label: "Year", placeholder: "2010" },
+                    ]}
+                  />
+                  <ComplexListEditor
+                    label="Awards & Honors"
+                    items={formData.awards}
+                    isEditing={true}
+                    onAdd={(item) =>
+                      setFormData((p) => ({
+                        ...p,
+                        awards: [...p.awards, item],
+                      }))
+                    }
+                    onRemove={(i) =>
+                      setFormData((p) => ({
+                        ...p,
+                        awards: p.awards.filter((_, idx) => idx !== i),
+                      }))
+                    }
+                    fields={[
+                      {
+                        key: "title",
+                        label: "Award Title",
+                        placeholder: "Super Lawyer",
+                      },
+                      {
+                        key: "organization",
+                        label: "Organization",
+                        placeholder: "State Bar",
+                      },
+                      { key: "year", label: "Year", placeholder: "2023" },
+                    ]}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Firm Presence Section */}
+            <div className="bg-gradient-to-br from-white via-amber-50/30 to-white rounded-sm shadow-lg border-2 border-amber-900/30 overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
+              <div className="border-b-2 border-amber-900/10 bg-gradient-to-r from-amber-900 via-amber-800 to-amber-950 px-6 py-4">
+                <div className="flex items-center gap-2 serif font-bold text-white">
+                  <Building2 className="h-5 w-5 text-amber-50" strokeWidth={2} />
+                  Firm-Wide Identity
+                </div>
+              </div>
+              <div className="p-6 space-y-8">
+                {firms.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-slate-500">No firm association found.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <Label className="text-slate-700 font-semibold">
+                          Firm Logo
+                        </Label>
+                        <MediaUpload
+                          label=""
+                          value={firmFormData.logo_url}
+                          onChange={(url) =>
+                            setFirmFormData((prev) => ({
+                              ...prev,
+                              logo_url: url,
+                            }))
+                          }
+                          onUpload={async (file: File) => {
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            const response = await fetch(`${API_BASE}/api/v1/professional/firms/${selectedFirmId}/logo`, {
+                              method: "POST",
+                              headers: { Authorization: `Bearer ${token}` },
+                              body: formData,
+                            });
+                            const updated = await response.json();
+                            return updated.logo_url || "";
+                          }}
+                          aspectRatio="square"
+                        />
+                      </div>
+                      <div className="space-y-4">
+                        <Label
+                          htmlFor="firm_headline"
+                          className="text-slate-700 font-semibold"
+                        >
+                          Firm Headline
+                        </Label>
+                        <Input
+                          id="firm_headline"
+                          value={firmFormData.headline}
+                          onChange={(e) =>
+                            setFirmFormData((p) => ({
+                              ...p,
+                              headline: e.target.value,
+                            }))
+                          }
+                          placeholder="e.g. Leading Family Law Firm in California"
+                          className="border-slate-300"
+                        />
+                        <Label
+                          htmlFor="firm_service_location"
+                          className="text-slate-700 font-semibold mt-4"
+                        >
+                          Firm Service Location
+                        </Label>
+                        <Input
+                          id="firm_service_location"
+                          value={firmFormData.service_location}
+                          onChange={(e) =>
+                            setFirmFormData((p) => ({
+                              ...p,
+                              service_location: e.target.value,
+                            }))
+                          }
+                          placeholder="Greater Los Angeles Area"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 pt-6 border-t border-slate-50">
+                      <Label className="text-slate-700 font-bold text-lg">
+                        Programs & Financials
+                      </Label>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                          <Label className="font-bold text-slate-700">
+                            Payment Plans Available
+                          </Label>
+                          <input
+                            type="checkbox"
+                            checked={firmFormData.payment_plans_available}
+                            onChange={(e) =>
+                              setFirmFormData((p) => ({
+                                ...p,
+                                payment_plans_available: e.target.checked,
+                              }))
+                            }
+                            className="h-6 w-6 rounded-lg"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                          <Label className="font-bold text-slate-700">
+                            Works with Nonprofits
+                          </Label>
+                          <input
+                            type="checkbox"
+                            checked={firmFormData.works_with_nonprofits}
+                            onChange={(e) =>
+                              setFirmFormData((p) => ({
+                                ...p,
+                                works_with_nonprofits: e.target.checked,
+                              }))
+                            }
+                            className="h-6 w-6 rounded-lg"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 pt-6">
+                      <Button
+                        onClick={handleSaveFirm}
+                        disabled={isSavingFirm}
+                        className="bg-amber-900 hover:bg-amber-800 text-white min-w-[200px] shadow-lg border-2 border-amber-900/40 sans font-semibold"
+                      >
+                        <Save className="h-4 w-4 mr-2" />
+                        {isSavingFirm
+                          ? "Saving..."
+                          : "Save Firm Profile"}
+                      </Button>
+                      {firmSaveSuccess && (
+                        <span className="sans text-sm font-semibold text-amber-900 flex items-center gap-1.5 animate-in fade-in">
+                          <CheckCircle2 className="h-4 w-4" /> Published
+                        </span>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        <style>{`
+        {/* RIGHT COLUMN: PREVIEW (STICKY) */}
+        <div className="hidden lg:block w-[360px] flex-shrink-0">
+          <div className="sticky top-8 space-y-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="serif text-xl font-bold text-slate-900">
+                Live Directory Preview
+              </h3>
+              <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 uppercase text-[9px] tracking-widest sans font-bold">
+                Real-time
+              </Badge>
+            </div>
+
+            <div className="space-y-8 bg-gradient-to-br from-amber-50/30 to-white p-6 rounded-sm border-2 border-dashed border-amber-900/20 shadow-inner">
+              <div className="space-y-2">
+                <p className="sans text-[10px] font-bold text-amber-900/60 uppercase tracking-widest text-center">
+                  Mobile Search Result Card
+                </p>
+                <MobileDirectoryCard profile={profile} formData={formData} />
+              </div>
+
+              <div className="space-y-4 pt-4 border-t-2 border-amber-900/20">
+                <p className="sans text-[10px] font-bold text-amber-900/60 uppercase tracking-widest text-center">
+                  Firm Page Overview
+                </p>
+                <Card className="p-4 shadow-lg border-2 border-amber-900/30 overflow-hidden relative bg-gradient-to-br from-white via-amber-50/20 to-white">
+                  <div className="h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900 absolute top-0 left-0 right-0" />
+                  <h4 className="serif font-bold text-sm text-slate-900 group">
+                    {firms.find((f) => f.id === selectedFirmId)?.name ||
+                      "Your Firm"}
+                    <Globe className="h-3 w-3 inline ml-2 text-amber-900/40" />
+                  </h4>
+                  <p className="sans text-[10px] text-slate-600 mt-0.5 line-clamp-1 italic">
+                    {firmFormData.headline || "Headline placeholder..."}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-1">
+                    {firmFormData.practice_areas.slice(0, 3).map((a) => (
+                      <div
+                        key={a}
+                        className="sans text-[9px] px-1.5 py-0.5 bg-amber-50 border-2 border-amber-900/20 rounded-sm text-amber-900"
+                      >
+                        {a}
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+
+              <Card className="bg-gradient-to-br from-blue-900 to-blue-800 p-4 border-2 border-blue-900/40 shadow-xl">
+                <div className="flex items-center gap-3 text-white">
+                  <div className="p-2 bg-blue-50 rounded-sm border-2 border-blue-900/20">
+                    <ShieldCheck className="h-5 w-5 text-blue-900" />
+                  </div>
+                  <div>
+                    <p className="serif text-xs font-bold leading-tight">
+                      CommonGround Verified Profile
+                    </p>
+                    <p className="sans text-[10px] opacity-80 mt-1 uppercase tracking-wider font-semibold">
+                      Security Level: High
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-sm border-2 border-amber-900/30 flex gap-3 shadow-sm">
+              <AlertTriangle className="h-4 w-4 text-amber-900 shrink-0 mt-0.5" />
+              <p className="sans text-[11px] text-amber-900 leading-relaxed font-medium">
+                The information provided above will be indexed by search engines
+                and visible to all CommonGround users. Review your bio and
+                headline for clarity.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
         .serif {
           font-family: "Crimson Pro", serif;
         }
@@ -1202,6 +1203,7 @@ export default function ProfilePage() {
           font-family: "Outfit", sans-serif;
         }
       `}</style>
-      </div>
-      );
+    </div>
+    </div>
+  );
 }
