@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { KidBookCard } from '@/components/kidcoms/kid-book-card';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
 import { theaterContent, BookCategory, bookCategories } from '@/lib/theater-content';
-import { getReadingProgress, getCurrentlyReading, getReadingStats } from '@/lib/reading-progress';
 import { BookOpen, Search, Trophy, Target, Zap } from 'lucide-react';
+
+import type { ReadingProgress, ReadingStats } from '@/lib/reading-progress';
 
 interface ChildUserData {
   userId: string;
@@ -22,6 +23,9 @@ export default function LibraryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<BookCategory | 'all' | 'reading'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [stats, setStats] = useState<ReadingStats>({ booksRead: 0, booksCompleted: 0, pagesRead: 0, streak: 0 });
+  const [currentlyReading, setCurrentlyReading] = useState<ReadingProgress[]>([]);
+  const [progressMap, setProgressMap] = useState<Record<string, ReadingProgress | null>>({});
 
   useEffect(() => {
     validateAndLoadUser();
@@ -47,10 +51,24 @@ export default function LibraryPage() {
       }
 
       setUserData(user);
+
+      // Load reading state only on client after auth passes
+      const { getReadingStats, getCurrentlyReading, getReadingProgress } = require('@/lib/reading-progress');
+      const loadedStats = getReadingStats();
+      const loadedCurrentlyReading = getCurrentlyReading();
+      setStats(loadedStats);
+      setCurrentlyReading(loadedCurrentlyReading);
+
+      // Pre-load progress for all books
+      const books = theaterContent.storybooks;
+      const map: Record<string, ReadingProgress | null> = {};
+      books.forEach(book => { map[book.id] = getReadingProgress(book.id); });
+      setProgressMap(map);
+
       setIsLoading(false);
     } catch (error) {
       console.error('Failed to load user:', error);
-      localStorage.clear();
+      if (typeof localStorage !== 'undefined') localStorage.clear();
       router.push('/my-circle/child');
     }
   }
@@ -60,8 +78,6 @@ export default function LibraryPage() {
   }
 
   const books = theaterContent.storybooks;
-  const stats = getReadingStats();
-  const currentlyReading = getCurrentlyReading();
 
   // Filter books
   const filteredBooks = books.filter(book => {
@@ -181,11 +197,10 @@ export default function LibraryPage() {
         <div className="flex gap-2 min-w-max">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-              selectedCategory === 'all'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${selectedCategory === 'all'
+              ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             All
@@ -194,11 +209,10 @@ export default function LibraryPage() {
           {currentlyReading.length > 0 && (
             <button
               onClick={() => setSelectedCategory('reading')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
-                selectedCategory === 'reading'
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${selectedCategory === 'reading'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <BookOpen className="w-3.5 h-3.5" />
@@ -212,11 +226,10 @@ export default function LibraryPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
-                  selectedCategory === cat
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${selectedCategory === cat
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 {category.emoji} {category.name}
@@ -238,7 +251,7 @@ export default function LibraryPage() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredBooks.map((book) => {
-              const progress = getReadingProgress(book.id);
+              const progress = progressMap[book.id] ?? null;
 
               return (
                 <div key={book.id} className="relative">
