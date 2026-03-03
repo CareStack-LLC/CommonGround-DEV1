@@ -79,9 +79,8 @@ export function AuthorAvatar({
           <Image
             src={avatar}
             alt={name}
-            width={128}
-            height={128}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         ) : (
           // Show initials fallback

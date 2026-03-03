@@ -15,8 +15,8 @@ const navItems: NavItem[] = [
   { href: '/my-circle/child/library', icon: BookOpen, label: 'Books' },
   { href: '/my-circle/child/my-circle-page', icon: Users, label: 'People' },
   { href: '/my-circle/child/dashboard', icon: Home, label: 'Home' },
-  { href: '/my-circle/child/movies', icon: Film, label: 'Movies' },
   { href: '/my-circle/child/arcade', icon: Gamepad2, label: 'Games' },
+  { href: '/my-circle/child/movies', icon: Film, label: 'Movies' },
 ];
 
 export function KidBottomNav() {
