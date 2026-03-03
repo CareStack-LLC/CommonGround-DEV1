@@ -23,6 +23,7 @@ import {
 
 import GenericPartnerLanding from './components/GenericPartnerLanding';
 import ForeverForwardLanding from './components/ForeverForwardLanding';
+import LeftRight4ULanding from './components/LeftRight4ULanding';
 
 interface PartnerBranding {
     logo_url: string;
@@ -153,6 +154,11 @@ export default function PartnerLandingPage() {
     // Check if this is Forever Forward for custom content
     if (partnerSlug.toLowerCase() === 'foreverforward') {
         return <ForeverForwardLanding partnerSlug={partnerSlug} />;
+    }
+
+    // Check if this is Left Right 4 U for custom content
+    if (partnerSlug.toLowerCase() === 'leftright4u') {
+        return <LeftRight4ULanding partnerSlug={partnerSlug} />;
     }
 
     // Apply partner branding as CSS variables

@@ -205,6 +205,17 @@ export default function PartnersDirectoryPage() {
                         logoUrl="/assets/marketing/jenesse-hero.jpg"
                     />
 
+                    {/* Left Right 4 U Foundation Card */}
+                    <PartnerCard
+                        slug="leftright4u"
+                        name="Left Right 4 U Foundation"
+                        description="LeftRight 4 U Foundation assist children of low-income single Mother's who are fighting Breast Cancer and/or Domestic Violence."
+                        website="leftright4u.org"
+                        contact="info@leftright4u.org"
+                        location="San Bernardino, CA"
+                        logoUrl="/assets/marketing/demo-partner-logo.png"
+                    />
+
                     {/* Interval House Long Beach Card */}
                     <PartnerCard
                         slug="interval-house-lb"
