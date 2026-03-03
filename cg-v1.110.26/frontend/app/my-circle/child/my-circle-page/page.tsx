@@ -324,7 +324,7 @@ export default function MyCirclePage() {
                       }`}
                     aria-label={`Call ${displayName}`}
                   >
-                    <Phone className="w-8 h-8 text-white" strokeWidth={2.5} />
+                    <Phone color="white" size={32} strokeWidth={3} className="relative z-10" />
                   </button>
 
                   <button
@@ -336,7 +336,7 @@ export default function MyCirclePage() {
                       }`}
                     aria-label={`Video call ${displayName}`}
                   >
-                    <Video className="w-8 h-8 text-white" strokeWidth={2.5} />
+                    <Video color="white" size={32} strokeWidth={3} className="relative z-10" />
                   </button>
                 </div>
               </div>
