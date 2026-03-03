@@ -63,8 +63,8 @@ export function AuthorAvatar({
         onClick={onClick}
         className={cn(
           sizeConfig.container,
-          'rounded-full overflow-hidden border-2 border-slate-700/50',
-          'shadow-lg relative',
+          'rounded-full overflow-hidden border-2 border-slate-700/50 aspect-square',
+          'shadow-lg relative flex items-center justify-center',
           onClick && [
             'transition-all duration-200',
             'hover:scale-110 hover:shadow-xl hover:border-amber-500/50',
@@ -91,7 +91,6 @@ export function AuthorAvatar({
           )}>
             <span
               className={cn(
-                sizeConfig.text,
                 'font-black text-white drop-shadow-md'
               )}
               style={{ fontFamily: 'Space Grotesk, sans-serif' }}
