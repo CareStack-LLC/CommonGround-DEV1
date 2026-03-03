@@ -27,7 +27,16 @@ export default function IncomingCallAlert({
     try {
       let response;
       if (call.is_circle_call) {
-        response = await circleCallsAPI.joinCall(call.session_id, userType);
+        let userName = 'User';
+        if (userType === 'child') {
+          const childUserStr = localStorage.getItem('child_user');
+          if (childUserStr) userName = JSON.parse(childUserStr).childName || 'Child';
+        } else if (userType === 'circle') {
+          const circleUserStr = localStorage.getItem('circle_user');
+          if (circleUserStr) userName = JSON.parse(circleUserStr).contactName || 'Contact';
+        }
+
+        response = await circleCallsAPI.joinCall(call.session_id, { user_name: userName }, userType);
       } else {
         if (userType === 'child') {
           response = await myCircleAPI.acceptIncomingCallAsChild(call.session_id);

@@ -6473,7 +6473,7 @@ export interface CommunicationLog {
 export interface IncomingCall {
   session_id: string;
   caller_name: string;
-  caller_type: 'circle_contact' | 'child';
+  caller_type: 'circle_contact' | 'child' | 'parent';
   session_type: 'video_call' | 'voice_call';
   room_url: string;
   started_ringing_at?: string;

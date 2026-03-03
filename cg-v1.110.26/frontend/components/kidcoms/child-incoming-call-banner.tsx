@@ -94,7 +94,9 @@ export function ChildIncomingCallBanner({
     setIsJoining(true);
     try {
       if (incomingCall.caller_type === 'circle_contact') {
-        const joinData = await circleCallsAPI.joinCall(incomingCall.session_id, 'child');
+        const childUserStr = localStorage.getItem('child_user');
+        const childName = childUserStr ? JSON.parse(childUserStr).childName || 'Child' : 'Child';
+        const joinData = await circleCallsAPI.joinCall(incomingCall.session_id, { user_name: childName }, 'child');
 
         // Store session info for the circle call page
         localStorage.setItem('circle_call_session', JSON.stringify({
