@@ -237,12 +237,12 @@ export default function LibraryPage() {
             <HorizontalScrollRow
               title="Popular Authors"
               items={authors}
-              cardClassName="w-20"
+              cardClassName="w-24"
               renderCard={(author) => (
                 <AuthorAvatar
                   name={author.name}
                   avatar={author.avatar}
-                  size="md"
+                  size="lg"
                   onClick={() => setSearchQuery(author.name)}
                 />
               )}

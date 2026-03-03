@@ -63,11 +63,11 @@ export function AuthorAvatar({
         onClick={onClick}
         className={cn(
           sizeConfig.container,
-          'rounded-full overflow-hidden',
-          'shadow-lg',
+          'rounded-full overflow-hidden border-2 border-slate-700/50',
+          'shadow-lg relative',
           onClick && [
             'transition-all duration-200',
-            'hover:scale-110 hover:shadow-xl',
+            'hover:scale-110 hover:shadow-xl hover:border-amber-500/50',
             'active:scale-105',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2'
           ]
@@ -115,6 +115,6 @@ export function AuthorAvatar({
           {name}
         </p>
       </div>
-    </div>
+    </div >
   );
 }
