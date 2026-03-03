@@ -262,7 +262,7 @@ export default function CircleContactDashboardPage() {
       isIncoming: true,
     }));
     setIncomingCall(null);
-    router.push('/my-circle/contact/call');
+    router.push(`/my-circle/contact/circle-call/${joinData.sessionId}`);
   }
 
   if (isLoading) {

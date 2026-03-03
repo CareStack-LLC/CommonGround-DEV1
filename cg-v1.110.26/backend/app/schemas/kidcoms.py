@@ -282,6 +282,7 @@ class IncomingCallResponse(BaseModel):
     session_type: str  # "video_call" or "voice_call"
     room_url: str
     started_ringing_at: Optional[datetime] = None
+    is_circle_call: bool = False
     # Include child info if caller is circle_contact
     child_id: Optional[str] = None
     child_name: Optional[str] = None

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Video, Phone, X, Loader2 } from 'lucide-react';
-import { IncomingCall, myCircleAPI } from '@/lib/api';
+import { IncomingCall, myCircleAPI, circleCallsAPI } from '@/lib/api';
 
 interface IncomingCallAlertProps {
   call: IncomingCall;
@@ -26,10 +26,14 @@ export default function IncomingCallAlert({
     setIsAccepting(true);
     try {
       let response;
-      if (userType === 'child') {
-        response = await myCircleAPI.acceptIncomingCallAsChild(call.session_id);
+      if (call.is_circle_call) {
+        response = await circleCallsAPI.joinCall(call.session_id, userType);
       } else {
-        response = await myCircleAPI.acceptIncomingCallAsCircle(call.session_id);
+        if (userType === 'child') {
+          response = await myCircleAPI.acceptIncomingCallAsChild(call.session_id);
+        } else {
+          response = await myCircleAPI.acceptIncomingCallAsCircle(call.session_id);
+        }
       }
 
       onAccept({
@@ -46,7 +50,9 @@ export default function IncomingCallAlert({
   async function handleReject() {
     setIsRejecting(true);
     try {
-      if (userType === 'child') {
+      if (call.is_circle_call) {
+        await circleCallsAPI.declineCall(call.session_id, userType);
+      } else if (userType === 'child') {
         await myCircleAPI.rejectIncomingCallAsChild(call.session_id);
       }
       onReject();

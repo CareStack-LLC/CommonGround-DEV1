@@ -228,16 +228,32 @@ async def initiate_circle_call(
     }
 
     # Send to recipient (if they have a user account)
-    if recipient_type == "child" and child_user:
-        await manager.send_personal_message(
-            message=notification_payload,
-            user_id=str(child_user.user_id)
-        )
-    elif recipient_type == "circle_contact" and circle_user:
-        await manager.send_personal_message(
-            message=notification_payload,
-            user_id=str(circle_user.user_id)
-        )
+    from app.models.kidcoms import ChildUser
+    from app.models.circle import CircleUser
+    
+    if recipient_type == "child":
+        # We need the child_user to get the websocket user_id
+        if not child_user:
+            cu_result = await db.execute(select(ChildUser).where(ChildUser.child_id == call_create.child_id))
+            child_user = cu_result.scalar_one_or_none()
+            
+        if child_user:
+            await manager.send_personal_message(
+                message=notification_payload,
+                user_id=str(child_user.id) # user is the child user id itself for WS auth
+            )
+            
+    elif recipient_type == "circle_contact":
+        # We need the circle_user to get the websocket user_id
+        if not circle_user:
+            cu_result = await db.execute(select(CircleUser).where(CircleUser.circle_contact_id == call_create.circle_contact_id))
+            circle_user = cu_result.scalar_one_or_none()
+            
+        if circle_user:
+            await manager.send_personal_message(
+                message=notification_payload,
+                user_id=str(circle_user.id) # user is the circle user id itself for WS auth
+            )
 
     # Send to parents (always notify parents)
     if family_file:

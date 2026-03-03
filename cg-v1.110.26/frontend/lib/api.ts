@@ -6477,6 +6477,7 @@ export interface IncomingCall {
   session_type: 'video_call' | 'voice_call';
   room_url: string;
   started_ringing_at?: string;
+  is_circle_call?: boolean;
   child_id?: string;
   child_name?: string;
   circle_contact_id?: string;

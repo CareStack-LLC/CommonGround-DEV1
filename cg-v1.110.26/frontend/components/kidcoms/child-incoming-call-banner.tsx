@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Phone, PhoneIncoming, X, Video, Loader2 } from 'lucide-react';
-import { myCircleAPI, IncomingCall } from '@/lib/api';
+import { myCircleAPI, circleCallsAPI, IncomingCall } from '@/lib/api';
 
 interface ChildIncomingCallBannerProps {
   pollInterval?: number; // ms, default 3000
@@ -14,6 +14,8 @@ export function ChildIncomingCallBanner({
 }: ChildIncomingCallBannerProps) {
   const router = useRouter();
   const [incomingCall, setIncomingCall] = useState<IncomingCall | null>(null);
+  const [callerImage, setCallerImage] = useState<string | null>(null);
+  const [callerEmoji, setCallerEmoji] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [dismissedSessionIds, setDismissedSessionIds] = useState<Set<string>>(new Set());
@@ -55,26 +57,76 @@ export function ChildIncomingCallBanner({
     return () => clearInterval(interval);
   }, [checkForIncomingCalls, pollInterval]);
 
+  // Lookup caller image when a call comes in
+  useEffect(() => {
+    if (incomingCall && incomingCall.circle_contact_id) {
+      try {
+        const storedStr = localStorage.getItem('child_contacts');
+        if (storedStr) {
+          const contacts = JSON.parse(storedStr);
+          const contact = contacts.find((c: any) => c.contact_id === incomingCall.circle_contact_id || c.id === incomingCall.circle_contact_id);
+
+          if (contact) {
+            setCallerImage(contact.profile_picture || null);
+
+            // Map common relationship types to emojis
+            const typeLower = (contact.contact_type || contact.relationship || '').toLowerCase();
+            const emojiMap: Record<string, string> = {
+              parent_a: '👩', parent_b: '👨', grandparent: '👴', grandma: '👵',
+              aunt: '👩‍🦰', uncle: '👨‍🦱', cousin: '🧒', family_friend: '🤗',
+              godparent: '💝', step_parent: '💕', sibling: '👦', therapist: '🧠',
+              tutor: '📚', coach: '⚽', other: '💜'
+            };
+            setCallerEmoji(emojiMap[typeLower] || '👋');
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse child contacts:', e);
+      }
+    } else if (incomingCall?.caller_type === 'parent') {
+      setCallerEmoji('👩'); // Generic parent fallback
+    }
+  }, [incomingCall]);
+
   const handleJoin = async () => {
     if (!incomingCall) return;
 
     setIsJoining(true);
     try {
-      const joinData = await myCircleAPI.acceptIncomingCallAsChild(incomingCall.session_id);
+      if (incomingCall.caller_type === 'circle_contact') {
+        const joinData = await circleCallsAPI.joinCall(incomingCall.session_id, 'child');
 
-      // Store session info for the call page
-      localStorage.setItem('child_call_session', JSON.stringify({
-        sessionId: joinData.session_id,
-        roomUrl: joinData.room_url,
-        token: joinData.token,
-        participantName: joinData.participant_name,
-        contactName: incomingCall.caller_name,
-        callType: incomingCall.session_type === 'voice_call' ? 'voice' : 'video',
-        isIncoming: true,
-      }));
+        // Store session info for the circle call page
+        localStorage.setItem('circle_call_session', JSON.stringify({
+          sessionId: joinData.session_id,
+          roomUrl: joinData.room_url,
+          token: joinData.token,
+          contactName: incomingCall.caller_name,
+          callType: incomingCall.session_type === 'voice_call' ? 'voice' : 'video',
+          status: joinData.status,
+          childName: incomingCall.child_name || 'Me',
+          isIncoming: true,
+        }));
 
-      setIncomingCall(null);
-      router.push(`/my-circle/child/call?session=${joinData.session_id}`);
+        setIncomingCall(null);
+        router.push(`/my-circle/child/circle-call/${joinData.session_id}`);
+      } else {
+        const joinData = await myCircleAPI.acceptIncomingCallAsChild(incomingCall.session_id);
+
+        // Store session info for the call page
+        localStorage.setItem('child_call_session', JSON.stringify({
+          sessionId: joinData.session_id,
+          roomUrl: joinData.room_url,
+          token: joinData.token,
+          participantName: joinData.participant_name,
+          contactName: incomingCall.caller_name,
+          callType: incomingCall.session_type === 'voice_call' ? 'voice' : 'video',
+          isIncoming: true,
+        }));
+
+        setIncomingCall(null);
+        router.push(`/my-circle/child/call?session=${joinData.session_id}`);
+      }
     } catch (error) {
       console.error('Error joining call:', error);
       setIsJoining(false);
@@ -86,7 +138,11 @@ export function ChildIncomingCallBanner({
 
     setIsRejecting(true);
     try {
-      await myCircleAPI.rejectIncomingCallAsChild(incomingCall.session_id);
+      if (incomingCall.caller_type === 'circle_contact') {
+        await circleCallsAPI.declineCall(incomingCall.session_id, 'child');
+      } else {
+        await myCircleAPI.rejectIncomingCallAsChild(incomingCall.session_id);
+      }
       setDismissedSessionIds((prev) => new Set(prev).add(incomingCall.session_id));
       setIncomingCall(null);
     } catch (error) {
@@ -119,8 +175,14 @@ export function ChildIncomingCallBanner({
         <div className="relative mx-auto w-28 h-28 mb-6">
           <div className="absolute inset-0 rounded-full bg-teal-100 animate-ping opacity-75" />
           <div className="absolute inset-0 rounded-full bg-emerald-200 animate-pulse" />
-          <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center shadow-lg">
-            <CallIcon className="h-12 w-12 text-white" />
+          <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 overflow-hidden flex items-center justify-center shadow-lg border-4 border-white">
+            {callerImage ? (
+              <img src={callerImage} alt={callerName} className="w-full h-full object-cover" />
+            ) : callerEmoji ? (
+              <span className="text-5xl">{callerEmoji}</span>
+            ) : (
+              <CallIcon className="h-12 w-12 text-white" />
+            )}
           </div>
         </div>
 

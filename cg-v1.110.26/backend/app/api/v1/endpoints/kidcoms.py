@@ -36,6 +36,7 @@ from app.models.kidcoms import (
     CircleUser,
     CirclePermission,
 )
+from app.models.circle_call import CircleCallSession, CircleCallStatus
 from app.schemas.kidcoms import (
     KidComsSettingsCreate,
     KidComsSettingsUpdate,
@@ -1335,6 +1336,51 @@ async def get_incoming_calls_for_child(
             circle_contact_id=session.circle_contact_id,
             contact_name=caller_name,
         ))
+    # Also check CircleCallSession (My Circle calls from contacts)
+    circle_call_result = await db.execute(
+        select(CircleCallSession)
+        .where(
+            and_(
+                CircleCallSession.child_id == current_child.child_id,
+                CircleCallSession.status == CircleCallStatus.RINGING.value,
+                CircleCallSession.initiated_by_type == ParticipantType.CIRCLE_CONTACT.value
+            )
+        )
+        .order_by(CircleCallSession.initiated_at.desc())
+    )
+    circle_sessions = circle_call_result.scalars().all()
+
+    for session in circle_sessions:
+        ring_time = session.initiated_at
+
+        # Mark as missed if timed out
+        if ring_time and ring_time < timeout_threshold:
+            session.status = CircleCallStatus.MISSED.value
+            await db.commit()
+            continue
+
+        # Get caller info
+        contact_result = await db.execute(select(CircleContact).where(CircleContact.id == session.circle_contact_id))
+        contact = contact_result.scalar_one_or_none()
+        caller_name = contact.contact_name if contact else "Circle Contact"
+        
+        # Get child info for display
+        child_result = await db.execute(select(Child).where(Child.id == session.child_id))
+        child = child_result.scalar_one_or_none()
+
+        incoming_calls.append(IncomingCallResponse(
+            session_id=session.id,
+            caller_name=caller_name,
+            caller_type="circle_contact",
+            session_type=f"{session.call_type}_call",
+            room_url=session.daily_room_url,
+            started_ringing_at=ring_time,
+            is_circle_call=True,
+            child_id=session.child_id,
+            child_name=child.display_name if child else None,
+            circle_contact_id=session.circle_contact_id,
+            contact_name=caller_name,
+        ))
 
     return IncomingCallListResponse(
         items=incoming_calls,
@@ -1429,6 +1475,46 @@ async def get_incoming_calls_for_circle(
             session_type=session.session_type,
             room_url=session.daily_room_url,
             started_ringing_at=session.ringing_started_at,
+            child_id=session.child_id,
+            child_name=caller_name,
+            circle_contact_id=contact.id,
+            contact_name=contact.contact_name,
+        ))
+
+    # Also check CircleCallSession (My Circle calls initiated by child)
+    circle_call_result = await db.execute(
+        select(CircleCallSession)
+        .where(
+            and_(
+                CircleCallSession.circle_contact_id == contact.id,
+                CircleCallSession.status == CircleCallStatus.RINGING.value,
+                CircleCallSession.initiated_by_type == ParticipantType.CHILD.value
+            )
+        )
+        .order_by(CircleCallSession.initiated_at.desc())
+    )
+    circle_sessions = circle_call_result.scalars().all()
+
+    for session in circle_sessions:
+        ring_time = session.initiated_at
+
+        if ring_time and ring_time < timeout_threshold:
+            session.status = CircleCallStatus.MISSED.value
+            await db.commit()
+            continue
+
+        child_result = await db.execute(select(Child).where(Child.id == session.child_id))
+        child = child_result.scalar_one_or_none()
+        caller_name = child.display_name if child else "Child"
+
+        incoming_calls.append(IncomingCallResponse(
+            session_id=session.id,
+            caller_name=caller_name,
+            caller_type="child",
+            session_type=f"{session.call_type}_call",
+            room_url=session.daily_room_url,
+            started_ringing_at=ring_time,
+            is_circle_call=True,
             child_id=session.child_id,
             child_name=caller_name,
             circle_contact_id=contact.id,
