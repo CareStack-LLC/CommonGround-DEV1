@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user, get_current_participant_user
 from app.models.user import User
 from app.models.family_file import FamilyFile
 from app.models.circle import CircleContact
@@ -62,7 +62,7 @@ router = APIRouter()
 async def initiate_circle_call(
     call_create: CircleCallCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    participant: dict = Depends(get_current_participant_user)
 ):
     """
     Initiate a new circle call (bidirectional).
@@ -106,31 +106,35 @@ async def initiate_circle_call(
         )
 
     # Determine who is initiating (circle contact or child)
-    # Check if current_user is the circle contact (via CircleUser)
-    circle_user_result = await db.execute(
-        select(CircleUser).where(CircleUser.user_id == current_user.id)
-    )
-    circle_user = circle_user_result.scalar_one_or_none()
-
-    # Check if current_user is the child (via ChildUser)
-    child_user_result = await db.execute(
-        select(ChildUser).where(ChildUser.user_id == current_user.id)
-    )
-    child_user = child_user_result.scalar_one_or_none()
-
-    # Determine initiator type
-    if circle_user and str(circle_user.circle_contact_id) == call_create.circle_contact_id:
+    child_user = None
+    circle_user = None
+    
+    if participant.get("type") == "circle_contact":
+        circle_user = participant.get("user")
+        if str(circle_user.circle_contact_id) != call_create.circle_contact_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You are not authorized to initiate a call for this contact"
+            )
         initiated_by_type = "circle_contact"
         initiated_by_id = call_create.circle_contact_id
         initiator_name = contact.contact_name
-    elif child_user and str(child_user.child_id) == call_create.child_id:
+        
+    elif participant.get("type") == "child":
+        child_user = participant.get("user")
+        if str(child_user.child_id) != call_create.child_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You are not authorized to initiate a call for this child"
+            )
         initiated_by_type = "child"
         initiated_by_id = call_create.child_id
         initiator_name = child.display_name
+        
     else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not authorized to initiate this call"
+            detail="Parents cannot initiate circle calls directly"
         )
 
     # Validate call type
@@ -170,7 +174,7 @@ async def initiate_circle_call(
         join_data = await circle_call_service.join_call(
             db=db,
             session_id=session.id,
-            user_id=current_user.id,
+            user_id=participant["user"].id,
             user_name=initiator_name,
             user_type=initiated_by_type
         )
@@ -254,7 +258,7 @@ async def join_circle_call(
     session_id: str,
     join_data: CircleCallJoin,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    participant: dict = Depends(get_current_participant_user)
 ):
     """
     Join an existing circle call session.
@@ -286,21 +290,12 @@ async def join_circle_call(
         )
 
     # Verify user is authorized to join (circle contact or child)
-    circle_user_result = await db.execute(
-        select(CircleUser).where(CircleUser.user_id == current_user.id)
-    )
-    circle_user = circle_user_result.scalar_one_or_none()
-
-    child_user_result = await db.execute(
-        select(ChildUser).where(ChildUser.user_id == current_user.id)
-    )
-    child_user = child_user_result.scalar_one_or_none()
-
-    # Determine user type
     user_type = None
-    if circle_user and str(circle_user.circle_contact_id) == str(session.circle_contact_id):
+    participant_user = participant.get("user")
+    
+    if participant.get("type") == "circle_contact" and str(participant_user.circle_contact_id) == str(session.circle_contact_id):
         user_type = "circle_contact"
-    elif child_user and str(child_user.child_id) == str(session.child_id):
+    elif participant.get("type") == "child" and str(participant_user.child_id) == str(session.child_id):
         user_type = "child"
     else:
         raise HTTPException(
@@ -313,7 +308,7 @@ async def join_circle_call(
         join_response = await circle_call_service.join_call(
             db=db,
             session_id=session_id,
-            user_id=current_user.id,
+            user_id=participant_user.id,
             user_name=join_data.user_name,
             user_type=user_type
         )
@@ -392,7 +387,7 @@ async def join_circle_call(
                         user_id=str(parent_id)
                     )
 
-    logger.info(f"User {current_user.id} joined circle call session {session_id}")
+    logger.info(f"User {participant['user'].id} joined circle call session {session_id}")
 
     return join_response
 
@@ -401,7 +396,7 @@ async def join_circle_call(
 async def decline_circle_call(
     session_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    participant: dict = Depends(get_current_participant_user)
 ):
     """
     Decline an incoming circle call.
@@ -432,22 +427,13 @@ async def decline_circle_call(
         )
 
     # Verify user is the recipient (not the initiator)
-    circle_user_result = await db.execute(
-        select(CircleUser).where(CircleUser.user_id == current_user.id)
-    )
-    circle_user = circle_user_result.scalar_one_or_none()
-
-    child_user_result = await db.execute(
-        select(ChildUser).where(ChildUser.user_id == current_user.id)
-    )
-    child_user = child_user_result.scalar_one_or_none()
-
-    # Determine if user is the recipient
     is_recipient = False
-    if circle_user and str(circle_user.circle_contact_id) == str(session.circle_contact_id):
+    participant_user = participant.get("user")
+    
+    if participant.get("type") == "circle_contact" and str(participant_user.circle_contact_id) == str(session.circle_contact_id):
         if session.initiated_by_type != "circle_contact":
             is_recipient = True
-    elif child_user and str(child_user.child_id) == str(session.child_id):
+    elif participant.get("type") == "child" and str(participant_user.child_id) == str(session.child_id):
         if session.initiated_by_type != "child":
             is_recipient = True
 
@@ -479,12 +465,12 @@ async def decline_circle_call(
         initiator_user_id = str(initiator_user.user_id) if initiator_user else None
 
     if initiator_user_id:
-        user_name = current_user.profile.display_name if current_user.profile else current_user.email
+        user_name = getattr(participant_user, "username", getattr(participant_user, "email", "User"))
 
         decline_notification = {
             "type": "circle_call_declined",
             "session_id": session_id,
-            "declined_by_id": str(current_user.id),
+            "declined_by_id": str(participant_user.id),
             "declined_by_name": user_name,
         }
 
@@ -493,7 +479,7 @@ async def decline_circle_call(
             user_id=initiator_user_id
         )
 
-    logger.info(f"Circle call session {session_id} declined by {current_user.id}")
+    logger.info(f"Circle call session {session_id} declined by {participant_user.id}")
 
     return {
         "message": "Call declined successfully",
@@ -506,7 +492,7 @@ async def end_circle_call(
     session_id: str,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    participant: dict = Depends(get_current_participant_user)
 ):
     """
     End an active circle call session.
@@ -536,21 +522,21 @@ async def end_circle_call(
         )
 
     # Verify user is a participant
-    circle_user_result = await db.execute(
-        select(CircleUser).where(CircleUser.user_id == current_user.id)
-    )
-    circle_user = circle_user_result.scalar_one_or_none()
-
-    child_user_result = await db.execute(
-        select(ChildUser).where(ChildUser.user_id == current_user.id)
-    )
-    child_user = child_user_result.scalar_one_or_none()
-
     is_participant = False
-    if circle_user and str(circle_user.circle_contact_id) == str(session.circle_contact_id):
+    participant_user = participant.get("user")
+    
+    if participant.get("type") == "circle_contact" and str(participant_user.circle_contact_id) == str(session.circle_contact_id):
         is_participant = True
-    elif child_user and str(child_user.child_id) == str(session.child_id):
+    elif participant.get("type") == "child" and str(participant_user.child_id) == str(session.child_id):
         is_participant = True
+        
+    # Allow parents to end calls? The original logic didn't, but let's keep it safe.
+    if participant.get("type") == "parent":
+        # Check if parent has access to the family file
+        ff_result = await db.execute(select(FamilyFile).where(FamilyFile.id == session.family_file_id))
+        ff = ff_result.scalar_one_or_none()
+        if ff and participant_user.id in [ff.parent_a_id, ff.parent_b_id]:
+            is_participant = True
 
     if not is_participant:
         raise HTTPException(
@@ -632,7 +618,7 @@ async def end_circle_call(
         family_file_id=str(session.family_file_id)
     )
 
-    logger.info(f"Circle call session {session_id} ended by {current_user.id}")
+    logger.info(f"Circle call session {session_id} ended by {participant['user'].id}")
 
     return {
         "message": "Call ended successfully",
@@ -753,7 +739,7 @@ async def upload_circle_call_recording(
     session_id: str,
     recording: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    participant: dict = Depends(get_current_participant_user)
 ):
     """
     Upload a client-side recorded circle call.
@@ -784,31 +770,24 @@ async def upload_circle_call_recording(
         )
 
     # Verify user is a participant
-    circle_user_result = await db.execute(
-        select(CircleUser).where(CircleUser.user_id == current_user.id)
-    )
-    circle_user = circle_user_result.scalar_one_or_none()
-
-    child_user_result = await db.execute(
-        select(ChildUser).where(ChildUser.user_id == current_user.id)
-    )
-    child_user = child_user_result.scalar_one_or_none()
-
     is_participant = False
-    if circle_user and str(circle_user.circle_contact_id) == str(session.circle_contact_id):
+    participant_user = participant.get("user")
+    
+    if participant.get("type") == "circle_contact" and str(participant_user.circle_contact_id) == str(session.circle_contact_id):
         is_participant = True
-    elif child_user and str(child_user.child_id) == str(session.child_id):
+    elif participant.get("type") == "child" and str(participant_user.child_id) == str(session.child_id):
         is_participant = True
 
     # Parents can also upload recordings
-    ff_result = await db.execute(
-        select(FamilyFile).where(FamilyFile.id == session.family_file_id)
-    )
-    family_file = ff_result.scalar_one_or_none()
-
-    if family_file:
-        if current_user.id in [family_file.parent_a_id, family_file.parent_b_id]:
-            is_participant = True
+    if participant.get("type") == "parent":
+        ff_result = await db.execute(
+            select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+        )
+        family_file = ff_result.scalar_one_or_none()
+    
+        if family_file:
+            if participant_user.id in [family_file.parent_a_id, family_file.parent_b_id]:
+                is_participant = True
 
     if not is_participant:
         raise HTTPException(

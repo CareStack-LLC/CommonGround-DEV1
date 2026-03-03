@@ -269,7 +269,7 @@ function CircleCallContent() {
 
       // Notify backend that call ended
       if (sessionId) {
-        await circleCallsAPI.endCall(sessionId).catch(console.error);
+        await circleCallsAPI.endCall(sessionId, 'child').catch(console.error);
       }
 
       handleEndCall();
@@ -466,11 +466,10 @@ function CircleCallContent() {
             <button
               onClick={toggleAudio}
               disabled={!isCallJoined}
-              className={`p-4 rounded-full transition-all transform hover:scale-105 ${
-                isAudioOn
+              className={`p-4 rounded-full transition-all transform hover:scale-105 ${isAudioOn
                   ? 'bg-white/20 hover:bg-white/30 text-white'
                   : 'bg-red-500 hover:bg-red-600 text-white'
-              } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
+                } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
             >
               {isAudioOn ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
@@ -481,11 +480,10 @@ function CircleCallContent() {
               <button
                 onClick={toggleVideo}
                 disabled={!isCallJoined}
-                className={`p-4 rounded-full transition-all transform hover:scale-105 ${
-                  isVideoOn
+                className={`p-4 rounded-full transition-all transform hover:scale-105 ${isVideoOn
                     ? 'bg-white/20 hover:bg-white/30 text-white'
                     : 'bg-red-500 hover:bg-red-600 text-white'
-                } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
                 title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
               >
                 {isVideoOn ? <Video className="h-6 w-6" /> : <VideoOff className="h-6 w-6" />}

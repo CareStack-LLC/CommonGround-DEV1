@@ -8078,8 +8078,11 @@ export const circleCallsAPI = {
     circle_contact_id: string;
     child_id: string;
     call_type?: 'video' | 'audio';
-  }): Promise<CircleCallJoinResponse> {
-    return fetchAPI<CircleCallJoinResponse>('/circle-calls/initiate', {
+  }, authType: 'parent' | 'child' | 'circle' = 'parent'): Promise<CircleCallJoinResponse> {
+    const fetchFn = authType === 'child' ? fetchAPIWithChildAuth :
+      authType === 'circle' ? fetchAPIWithCircleAuth :
+        fetchAPI;
+    return fetchFn<CircleCallJoinResponse>('/circle-calls/initiate', {
       method: 'POST',
       body: JSON.stringify({
         circle_contact_id: data.circle_contact_id,
@@ -8094,8 +8097,11 @@ export const circleCallsAPI = {
    */
   async joinCall(sessionId: string, data: {
     user_name: string;
-  }): Promise<CircleCallJoinResponse> {
-    return fetchAPI<CircleCallJoinResponse>(`/circle-calls/${sessionId}/join`, {
+  }, authType: 'parent' | 'child' | 'circle' = 'parent'): Promise<CircleCallJoinResponse> {
+    const fetchFn = authType === 'child' ? fetchAPIWithChildAuth :
+      authType === 'circle' ? fetchAPIWithCircleAuth :
+        fetchAPI;
+    return fetchFn<CircleCallJoinResponse>(`/circle-calls/${sessionId}/join`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -8104,8 +8110,11 @@ export const circleCallsAPI = {
   /**
    * Decline an incoming circle call
    */
-  async declineCall(sessionId: string): Promise<{ success: boolean; message: string }> {
-    return fetchAPI(`/circle-calls/${sessionId}/decline`, {
+  async declineCall(sessionId: string, authType: 'parent' | 'child' | 'circle' = 'parent'): Promise<{ success: boolean; message: string }> {
+    const fetchFn = authType === 'child' ? fetchAPIWithChildAuth :
+      authType === 'circle' ? fetchAPIWithCircleAuth :
+        fetchAPI;
+    return fetchFn(`/circle-calls/${sessionId}/decline`, {
       method: 'POST',
     });
   },
@@ -8113,8 +8122,11 @@ export const circleCallsAPI = {
   /**
    * End an active circle call
    */
-  async endCall(sessionId: string): Promise<CircleCallSession> {
-    return fetchAPI<CircleCallSession>(`/circle-calls/${sessionId}/end`, {
+  async endCall(sessionId: string, authType: 'parent' | 'child' | 'circle' = 'parent'): Promise<CircleCallSession> {
+    const fetchFn = authType === 'child' ? fetchAPIWithChildAuth :
+      authType === 'circle' ? fetchAPIWithCircleAuth :
+        fetchAPI;
+    return fetchFn<CircleCallSession>(`/circle-calls/${sessionId}/end`, {
       method: 'POST',
     });
   },
@@ -8122,11 +8134,14 @@ export const circleCallsAPI = {
   /**
    * Upload client-side recording
    */
-  async uploadRecording(sessionId: string, file: File): Promise<{ success: boolean; storage_path: string }> {
+  async uploadRecording(sessionId: string, file: File, authType: 'parent' | 'child' | 'circle' = 'parent'): Promise<{ success: boolean; storage_path: string }> {
     const formData = new FormData();
     formData.append('file', file);
 
-    const token = getAuthToken();
+    const token = authType === 'child' ? getChildAuthToken() :
+      authType === 'circle' ? getCircleAuthToken() :
+        getAuthToken();
+
     const response = await fetch(`${API_URL}/circle-calls/${sessionId}/upload-recording`, {
       method: 'POST',
       headers: {

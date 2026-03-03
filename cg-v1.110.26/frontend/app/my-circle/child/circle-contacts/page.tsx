@@ -116,7 +116,7 @@ export default function CircleContactsPage() {
         circle_contact_id: contact.id,
         child_id: userData.childId,
         call_type: callType,
-      });
+      }, 'child');
 
       // Store session data for call screen
       localStorage.setItem(

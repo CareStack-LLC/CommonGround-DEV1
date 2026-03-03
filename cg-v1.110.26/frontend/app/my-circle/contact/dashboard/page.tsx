@@ -213,7 +213,7 @@ export default function CircleContactDashboardPage() {
         circle_contact_id: userData.contactId,
         child_id: child.child_id,
         call_type: callType,
-      });
+      }, 'circle');
 
       localStorage.setItem('circle_call_session', JSON.stringify({
         roomUrl: response.room_url,

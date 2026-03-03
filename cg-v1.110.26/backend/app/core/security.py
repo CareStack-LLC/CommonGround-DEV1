@@ -339,3 +339,78 @@ async def get_current_circle_user(
         )
 
     return circle_user
+
+
+async def get_current_participant_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Get the current authenticated user (Parent, Child, or Circle Contact).
+    Returns a dict with 'type' and 'user' object.
+    
+    Args:
+        credentials: HTTP authorization credentials
+        db: Database session
+        
+    Returns:
+        Dict containing user type and user object
+        
+    Raises:
+        HTTPException: If authentication fails
+    """
+    token = credentials.credentials
+    payload = decode_token(token)
+    token_type = payload.get("type", "access")
+
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if token_type == "access":
+        result = await db.execute(
+            select(User)
+            .where(User.id == user_id)
+            .options(selectinload(User.profile))
+        )
+        user = result.scalar_one_or_none()
+        if not user or not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found or inactive",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return {"type": "parent", "user": user}
+
+    elif token_type == "child_user":
+        result = await db.execute(select(ChildUser).where(ChildUser.id == user_id))
+        user = result.scalar_one_or_none()
+        if not user or not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Child user not found or inactive",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return {"type": "child", "user": user}
+
+    elif token_type == "circle_user":
+        result = await db.execute(select(CircleUser).where(CircleUser.id == user_id))
+        user = result.scalar_one_or_none()
+        if not user or not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Circle user not found or inactive",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return {"type": "circle_contact", "user": user}
+
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid token type for participant: {token_type}",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
