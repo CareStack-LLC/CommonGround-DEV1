@@ -1,0 +1,21 @@
+{
+  "extends": "@commonground/tsconfig/react-native.json",
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@commonground/types": ["../../packages/types/src"],
+      "@commonground/api-client": ["../../packages/api-client/src"],
+      "@commonground/utils": ["../../packages/utils/src"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts",
+    "nativewind-env.d.ts"
+  ],
+  "exclude": ["node_modules"]
+}

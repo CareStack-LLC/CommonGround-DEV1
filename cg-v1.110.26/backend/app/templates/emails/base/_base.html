@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+  <title>{% block title %}CommonGround{% endblock %}</title>
+
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:AllowPNG/>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+
+  {% include 'base/_styles.html' %}
+</head>
+<body style="margin: 0; padding: 0; background-color: #F5F0E8; font-family: Arial, Helvetica, sans-serif;">
+  <!-- Preheader Text (hidden preview text) -->
+  <div style="display: none; max-height: 0; overflow: hidden;">
+    {% block preheader %}{% endblock %}
+    &zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+  </div>
+
+  <!-- Email Wrapper -->
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #F5F0E8;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+
+        <!-- Email Container -->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="email-container" style="background-color: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+
+          <!-- Header -->
+          <tr>
+            <td class="header-{{ header_color | default('sage') }}" style="padding: 32px; text-align: center; {% block header_style %}background: linear-gradient(135deg, #4A6C58 0%, #6B9B7A 100%);{% endblock %}">
+              {% block header %}
+              <img src="{{ icons.logo }}" alt="CommonGround" width="180" height="45" style="display: block; margin: 0 auto;">
+              {% endblock %}
+            </td>
+          </tr>
+
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 40px 32px;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="footer" style="background-color: #F5F0E8; padding: 24px 32px; text-align: center;">
+              {% block footer %}
+              <p style="margin: 0 0 8px 0; font-size: 14px; color: #6B7B74;">
+                CommonGround — Peaceful co-parenting starts here
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #94A3A0;">
+                {% if unsubscribe_url %}
+                <a href="{{ unsubscribe_url }}" style="color: #94A3A0; text-decoration: underline;">Manage preferences</a> |
+                {% endif %}
+                <a href="{{ support_url | default('https://commonground.family/support') }}" style="color: #94A3A0; text-decoration: underline;">Get help</a>
+              </p>
+              {% endblock %}
+            </td>
+          </tr>
+
+        </table>
+        <!-- End Email Container -->
+
+        <!-- Legal Footer -->
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="margin-top: 16px;">
+          <tr>
+            <td style="text-align: center; padding: 0 20px;">
+              <p style="margin: 0; font-size: 11px; color: #94A3A0; line-height: 1.5;">
+                {% block legal_footer %}
+                This email was sent by CommonGround, Inc.<br>
+                © {{ current_year | default('2026') }} CommonGround. All rights reserved.
+                {% endblock %}
+              </p>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+  <!-- End Email Wrapper -->
+
+</body>
+</html>

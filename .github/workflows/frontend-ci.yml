@@ -1,0 +1,152 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'cg-v1.110.26/frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'cg-v1.110.26/frontend/**'
+
+jobs:
+  test:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cg-v1.110.26/frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: cg-v1.110.26/frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint || echo "::warning::ESLint found issues"
+        continue-on-error: true
+
+      - name: Run TypeScript type checking
+        run: npx tsc --noEmit || echo "::warning::TypeScript found type errors"
+        continue-on-error: true
+
+      - name: Build application
+        env:
+          NEXT_PUBLIC_API_URL: https://commonground-api.onrender.com
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      - name: Check build output
+        run: |
+          if [ -d ".next" ]; then
+            echo "✅ Build successful!"
+            ls -lah .next
+          else
+            echo "❌ Build failed - no .next directory"
+            exit 1
+          fi
+
+  deploy:
+    name: Deploy to Vercel
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check Vercel configuration
+        id: check-vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+            echo "configured=true" >> $GITHUB_OUTPUT
+            echo "✅ Vercel secrets configured"
+          else
+            echo "configured=false" >> $GITHUB_OUTPUT
+            echo "::warning::Vercel secrets not configured. Skipping deployment."
+            echo "Required secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID"
+          fi
+
+      - name: Deploy to Vercel (Production)
+        if: steps.check-vercel.outputs.configured == 'true'
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./cg-v1.110.26/frontend
+
+      - name: Deployment status
+        run: |
+          if [ "${{ steps.check-vercel.outputs.configured }}" == "true" ]; then
+            echo "🚀 Frontend deployed to production!"
+          else
+            echo "⚠️ Deployment skipped - configure Vercel secrets in repository settings"
+          fi
+
+  preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check Vercel configuration
+        id: check-vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+            echo "configured=true" >> $GITHUB_OUTPUT
+          else
+            echo "configured=false" >> $GITHUB_OUTPUT
+            echo "::warning::Vercel secrets not configured. Skipping preview deployment."
+          fi
+
+      - name: Deploy to Vercel (Preview)
+        if: steps.check-vercel.outputs.configured == 'true'
+        uses: amondnet/vercel-action@v25
+        id: vercel-deploy
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./cg-v1.110.26/frontend
+
+      - name: Comment PR with preview URL
+        if: steps.check-vercel.outputs.configured == 'true' && steps.vercel-deploy.outputs.preview-url
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🚀 **Preview deployment ready!**\n\n✅ Frontend: ${{ steps.vercel-deploy.outputs.preview-url }}`
+            })
+
+      - name: Preview skipped notice
+        if: steps.check-vercel.outputs.configured != 'true'
+        run: echo "⚠️ Preview deployment skipped - Vercel secrets not configured"

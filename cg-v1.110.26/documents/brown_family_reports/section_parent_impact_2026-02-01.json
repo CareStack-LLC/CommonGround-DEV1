@@ -1,0 +1,52 @@
+{
+  "section_type": "parent_impact",
+  "section_title": "Parent Impact Summary",
+  "section_order": 7,
+  "evidence_count": 0,
+  "data_sources": [
+    "messages",
+    "message_flags",
+    "exchange_check_ins"
+  ],
+  "content_data": {
+    "parent_impacts": [],
+    "case_health": {
+      "score": 0,
+      "status": "unknown",
+      "summary": "Insufficient data for analysis"
+    },
+    "recommendations": [
+      "Continue current positive co-parenting practices"
+    ],
+    "trend_analysis": {
+      "weekly_data": [
+        {
+          "week": 1,
+          "start": "January 02, 2026",
+          "interventions": 0
+        },
+        {
+          "week": 2,
+          "start": "January 09, 2026",
+          "interventions": 0
+        },
+        {
+          "week": 3,
+          "start": "January 16, 2026",
+          "interventions": 0
+        },
+        {
+          "week": 4,
+          "start": "January 23, 2026",
+          "interventions": 0
+        }
+      ],
+      "trend": "stable"
+    },
+    "report_period": {
+      "start": "January 02, 2026",
+      "end": "February 01, 2026"
+    },
+    "methodology_note": "Impact scores are calculated using a weighted average of communication quality, schedule compliance, and cooperation metrics."
+  }
+}

@@ -1,0 +1,75 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}New Message from {{ sender_name }}{% endblock %}
+
+{% block preheader %}{{ sender_name }} sent you a message on CommonGround.{% endblock %}
+
+{% block content %}
+<!-- Message Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <img src="{{ icons.message }}" alt="" width="48" height="48" style="display: inline-block;">
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 24px;">
+  New Message
+</h1>
+
+<!-- Sender Info -->
+<div style="background-color: #F5F0E8; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td>
+        <span style="color: #6B7B74; font-size: 14px;">From</span><br>
+        <strong style="color: #2D3A35; font-size: 18px;">{{ sender_name }}</strong>
+      </td>
+      <td style="text-align: right;">
+        <span style="color: #6B7B74; font-size: 14px;">{{ sent_at | default('Just now') }}</span>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- Message Preview -->
+<div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <p style="margin: 0; color: #2D3A35; font-size: 16px; line-height: 1.6;">
+    "{{ message_preview | truncate(150) }}"
+  </p>
+  {% if message_truncated %}
+  <p style="margin: 12px 0 0 0; color: #94A3A0; font-size: 14px;">
+    Message continues...
+  </p>
+  {% endif %}
+</div>
+
+{% if aria_flagged %}
+<!-- ARIA Notice -->
+<div style="background-color: #FEF7ED; border-left: 4px solid #D4A574; padding: 16px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td width="32" valign="top">
+        <img src="{{ icons.warning }}" alt="" width="24" height="24">
+      </td>
+      <td style="padding-left: 12px;">
+        <strong style="color: #D4A574; font-size: 14px;">ARIA Notice</strong>
+        <p style="margin: 4px 0 0 0; color: #6B7B74; font-size: 14px;">
+          This message was reviewed by ARIA. View the full message for context.
+        </p>
+      </td>
+    </tr>
+  </table>
+</div>
+{% endif %}
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ message_url }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    View Full Message
+  </a>
+</div>
+
+<!-- Reminder -->
+<p style="color: #94A3A0; font-size: 13px; text-align: center; margin: 0;">
+  All messages are securely logged and can be referenced in your records.
+</p>
+{% endblock %}

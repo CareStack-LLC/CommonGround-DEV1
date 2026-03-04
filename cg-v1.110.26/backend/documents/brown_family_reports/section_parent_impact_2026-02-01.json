@@ -1,0 +1,103 @@
+{
+  "section_type": "parent_impact",
+  "section_title": "Parent Impact Summary",
+  "section_order": 7,
+  "content_data": {
+    "parent_impacts": [
+      {
+        "parent_type": "father",
+        "name": "Marcus Brown",
+        "communication_quality": {
+          "score": 35.6,
+          "total_messages": 90,
+          "interventions": 39,
+          "good_faith_rate": 25.6
+        },
+        "schedule_compliance": {
+          "score": 96.2,
+          "total_exchanges": 78,
+          "on_time": 75
+        },
+        "cooperation_score": 65.0,
+        "overall_impact_score": 62.6,
+        "strengths": [
+          "Consistently punctual for exchanges"
+        ],
+        "areas_for_improvement": [
+          "Consider accepting more ARIA suggestions",
+          "Focus on constructive communication"
+        ]
+      },
+      {
+        "parent_type": "mother",
+        "name": "Tasha Brown",
+        "communication_quality": {
+          "score": 39.6,
+          "total_messages": 106,
+          "interventions": 41,
+          "good_faith_rate": 29.3
+        },
+        "schedule_compliance": {
+          "score": 98.7,
+          "total_exchanges": 78,
+          "on_time": 77
+        },
+        "cooperation_score": 65.0,
+        "overall_impact_score": 65.0,
+        "strengths": [
+          "Consistently punctual for exchanges"
+        ],
+        "areas_for_improvement": [
+          "Consider accepting more ARIA suggestions",
+          "Focus on constructive communication"
+        ]
+      }
+    ],
+    "case_health": {
+      "score": 63.8,
+      "status": "stable",
+      "summary": "Co-parenting relationship is functional with some areas for improvement."
+    },
+    "recommendations": [
+      "Recommend communication coaching for father",
+      "Recommend communication coaching for mother"
+    ],
+    "trend_analysis": {
+      "weekly_data": [
+        {
+          "week": 1,
+          "start": "May 07, 2025",
+          "interventions": 1
+        },
+        {
+          "week": 2,
+          "start": "May 14, 2025",
+          "interventions": 2
+        },
+        {
+          "week": 3,
+          "start": "May 21, 2025",
+          "interventions": 2
+        },
+        {
+          "week": 4,
+          "start": "May 28, 2025",
+          "interventions": 4
+        }
+      ],
+      "trend": "declining"
+    },
+    "report_period": {
+      "start": "May 07, 2025",
+      "end": "February 01, 2026"
+    },
+    "methodology_note": "Impact scores are calculated using a weighted average of communication quality, schedule compliance, and cooperation metrics."
+  },
+  "evidence_count": 2,
+  "data_sources": [
+    "messages",
+    "message_flags",
+    "exchange_check_ins"
+  ],
+  "generation_time_ms": null
+}

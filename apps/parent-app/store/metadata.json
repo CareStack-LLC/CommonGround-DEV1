@@ -1,0 +1,42 @@
+{
+  "name": "CommonGround - Co-Parenting",
+  "subtitle": "Co-parent with clarity and peace",
+  "description": {
+    "short": "The complete co-parenting app for separated families. Manage schedules, communicate, and keep kids connected.",
+    "full": "CommonGround is the trusted co-parenting platform that helps separated families communicate effectively, manage custody schedules, and keep children connected with both parents and extended family.\n\nKEY FEATURES:\n\n📅 SHARED CALENDAR\n• Create and manage custody schedules\n• Track exchanges, activities, and appointments\n• Get reminders for important events\n• Request schedule changes with approval workflow\n\n💬 SECURE MESSAGING\n• Keep all co-parenting communication in one place\n• Maintain a documented record of conversations\n• Share photos, documents, and updates\n• Reduce conflict with structured communication\n\n📞 VIDEO CALLING\n• Connect children with both parents via video\n• High-quality, reliable calls powered by Daily.co\n• Optional call recording for documentation\n• Safe, monitored environment for kids\n\n👨‍👩‍👧‍👦 FAMILY CIRCLE\n• Invite grandparents, aunts, uncles to connect\n• Approve who can contact your children\n• Kids can video call approved family members\n• Share memories and photos with the whole family\n\n📋 FAMILY FILE\n• Store important documents securely\n• Share medical records, school forms, IDs\n• Access information both parents need\n• Keep everything organized in one place\n\n🔒 PRIVACY & SECURITY\n• End-to-end secure messaging\n• COPPA compliant for child safety\n• Your data is never sold\n• SOC 2 Type II certified\n\nCommonGround is designed by family law professionals and child psychologists to reduce conflict and put children first.\n\nDownload CommonGround today and find common ground with your co-parent."
+  },
+  "keywords": [
+    "co-parenting",
+    "custody",
+    "shared parenting",
+    "divorce",
+    "separated parents",
+    "custody schedule",
+    "parenting app",
+    "family calendar",
+    "co-parent communication",
+    "child custody"
+  ],
+  "category": {
+    "ios": "Lifestyle",
+    "android": "Parenting"
+  },
+  "contentRating": {
+    "ios": "4+",
+    "android": "Everyone"
+  },
+  "privacy_policy_url": "https://commonground.app/privacy",
+  "terms_url": "https://commonground.app/terms",
+  "support_url": "https://commonground.app/support",
+  "marketing_url": "https://commonground.app",
+  "screenshots": {
+    "required": [
+      "Dashboard view showing schedule overview",
+      "Calendar with custody schedule",
+      "Messaging conversation",
+      "Video call in progress",
+      "Family circle management"
+    ]
+  },
+  "whats_new": "• Improved video calling with Daily.co integration\n• New Family Circle feature for extended family\n• Enhanced push notifications\n• Performance improvements and bug fixes"
+}

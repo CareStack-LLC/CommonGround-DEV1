@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Kidscom - Child-friendly styles */
+@layer components {
+  /* Big, friendly buttons */
+  .btn-fun {
+    @apply bg-purple-500 text-white py-4 px-8 rounded-3xl font-bold text-xl shadow-lg;
+  }
+
+  .btn-fun-pink {
+    @apply bg-pink-500 text-white py-4 px-8 rounded-3xl font-bold text-xl shadow-lg;
+  }
+
+  .btn-fun-orange {
+    @apply bg-orange-500 text-white py-4 px-8 rounded-3xl font-bold text-xl shadow-lg;
+  }
+
+  .btn-fun-cyan {
+    @apply bg-cyan-500 text-white py-4 px-8 rounded-3xl font-bold text-xl shadow-lg;
+  }
+
+  .btn-fun-lime {
+    @apply bg-lime-500 text-white py-4 px-8 rounded-3xl font-bold text-xl shadow-lg;
+  }
+
+  /* Playful cards */
+  .card-fun {
+    @apply bg-white rounded-4xl shadow-xl p-6 border-4 border-purple-100;
+  }
+
+  /* Big, tappable contact circles */
+  .contact-circle {
+    @apply w-24 h-24 rounded-full items-center justify-center shadow-lg;
+  }
+
+  /* PIN input buttons */
+  .pin-button {
+    @apply w-20 h-20 rounded-full bg-white shadow-lg items-center justify-center;
+  }
+
+  .pin-button-text {
+    @apply text-4xl font-bold text-purple-600;
+  }
+
+  /* Fun section headers */
+  .section-title {
+    @apply text-2xl font-bold text-purple-700;
+  }
+}

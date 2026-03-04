@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log In to CommonGround</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f8faf9;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .header {
+            background-color: #4a5d53;
+            /* cg-sage-dark */
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .content p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #4a5d53;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 32px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #3b4a42;
+        }
+
+        .aria-note {
+            background-color: #fff9e6;
+            border: 1px solid #fceeb5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #b45309;
+            text-align: left;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .footer {
+            background-color: #f1f3f2;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .footer a {
+            color: #4a5d53;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CommonGround</h1>
+        </div>
+
+        <div class="content">
+            <h2 style="color: #4a5d53; margin-top: 0;">Your Magic Link</h2>
+            <p>
+                Need to log in without a password? No problem. Click the button below to sign in directly to your
+                CommonGround account.
+            </p>
+
+            <!-- Supabase Token Link -->
+            <a href="{{ .ConfirmationURL }}" class="btn">Log In Now</a>
+
+            <p style="font-size: 14px; color: #888; margin-top: 20px;">
+                This link expires in 24 hours. If you didn't request a login link, you can safely ignore this email.
+            </p>
+
+            <!-- Subtle Aria Branding -->
+            <div class="aria-note">
+                <span style="font-size: 20px;">⚡</span>
+                <div>
+                    <strong>Quick & Secure</strong><br />
+                    Magic links are a secure way to access your account without remembering another password.
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 CommonGround. All rights reserved.<br>
+            Building peace for co-parents everywhere.
+        </div>
+    </div>
+</body>
+
+</html>

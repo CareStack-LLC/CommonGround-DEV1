@@ -1,0 +1,45 @@
+{
+  "name": "commonground",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=web-parent",
+    "dev:parent": "turbo dev --filter=mobile-parent",
+    "dev:kidscom": "turbo dev --filter=mobile-kidscom",
+    "dev:mycircle": "turbo dev --filter=mobile-mycircle",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "test": "turbo test",
+    "clean": "turbo clean",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.2.0",
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "@react-native-async-storage/async-storage": "2"
+      },
+      "ignoreMissing": [
+        "react-helmet-async"
+      ]
+    }
+  },
+  "dependencies": {
+    "abort-controller": "^3.0.0",
+    "event-target-shim": "^6.0.2"
+  }
+}

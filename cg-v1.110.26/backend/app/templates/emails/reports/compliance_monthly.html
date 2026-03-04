@@ -1,0 +1,110 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Monthly Compliance Report - {{ month_name }}{% endblock %}
+
+{% block preheader %}Your monthly co-parenting compliance summary for {{ month_name }} is ready.{% endblock %}
+
+{% block content %}
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Monthly Compliance Report
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  {{ month_name }} {{ year }} • {{ family_file_name }}
+</p>
+
+<!-- Compliance Score Card -->
+<div style="background-color: {% if compliance_rate >= 90 %}#E8F0EC{% elif compliance_rate >= 70 %}#FEF7ED{% else %}#FEE2E2{% endif %}; border-radius: 12px; padding: 32px; margin-bottom: 24px; text-align: center;">
+  <p style="color: #6B7B74; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">
+    Overall Compliance
+  </p>
+  <p style="font-size: 48px; font-weight: 700; margin: 0; color: {% if compliance_rate >= 90 %}#4A6C58{% elif compliance_rate >= 70 %}#D4A574{% else %}#C53030{% endif %};">
+    {{ compliance_rate }}%
+  </p>
+  <p style="color: #6B7B74; font-size: 14px; margin: 8px 0 0 0;">
+    {% if compliance_rate >= 90 %}
+    Excellent compliance this month!
+    {% elif compliance_rate >= 70 %}
+    Good progress, room for improvement
+    {% else %}
+    Attention needed on compliance
+    {% endif %}
+  </p>
+</div>
+
+<!-- Stats Grid -->
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 24px;">
+  <tr>
+    <td width="50%" style="padding-right: 8px;">
+      <div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 8px; padding: 16px; text-align: center;">
+        <span style="color: #4A6C58; font-size: 28px; font-weight: 700; display: block;">{{ total_exchanges }}</span>
+        <span style="color: #6B7B74; font-size: 12px; text-transform: uppercase;">Total Exchanges</span>
+      </div>
+    </td>
+    <td width="50%" style="padding-left: 8px;">
+      <div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 8px; padding: 16px; text-align: center;">
+        <span style="color: #4A6C58; font-size: 28px; font-weight: 700; display: block;">{{ on_time_count }}</span>
+        <span style="color: #6B7B74; font-size: 12px; text-transform: uppercase;">On Time</span>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<!-- Summary by Category -->
+<div style="background-color: #F5F0E8; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <h3 style="color: #2D3A35; font-size: 16px; margin: 0 0 16px 0;">
+    This Month's Summary
+  </h3>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB;">
+        <span style="color: #6B7B74;">Exchanges Completed</span>
+      </td>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB; text-align: right;">
+        <strong style="color: #4A6C58;">{{ completed_exchanges }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB;">
+        <span style="color: #6B7B74;">Exchanges Missed</span>
+      </td>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB; text-align: right;">
+        <strong style="color: {% if missed_exchanges > 0 %}#C53030{% else %}#4A6C58{% endif %};">{{ missed_exchanges }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB;">
+        <span style="color: #6B7B74;">GPS Verified</span>
+      </td>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB; text-align: right;">
+        <strong style="color: #2D3A35;">{{ gps_verified_count }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0;">
+        <span style="color: #6B7B74;">Messages Exchanged</span>
+      </td>
+      <td style="padding: 8px 0; text-align: right;">
+        <strong style="color: #2D3A35;">{{ message_count }}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ full_report_url }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    View Full Report
+  </a>
+</div>
+
+<!-- Court Note -->
+<div style="background-color: #E8F0EC; border-radius: 8px; padding: 16px; text-align: center;">
+  <p style="margin: 0; color: #4A6C58; font-size: 14px;">
+    <strong>Court-Ready:</strong> Compliance metrics are logged and verifiable.
+    Full reports can be exported for legal proceedings.
+  </p>
+</div>
+{% endblock %}

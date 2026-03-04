@@ -1,0 +1,137 @@
+{
+  "section_type": "chain_of_custody",
+  "section_title": "Chain of Custody",
+  "section_order": 8,
+  "content_data": {
+    "chain_verification": {
+      "is_valid": false,
+      "events_verified": 79,
+      "breaks_found": 70,
+      "break_details": [
+        {
+          "position": 1,
+          "event_id": "e8ed7590-2813-4a3e-9fc6-8da1ded23a80",
+          "expected_previous": "b360bfdce8f8dcaa8a285582ac4212569680522c5bca3a9102e1792fe7280ed5",
+          "actual_previous": "419aeb944f39c98e569e9cc57b77e352e58388c0f7627306631d4a38499032cc",
+          "timestamp": "May 07, 2025 at 05:01 AM"
+        },
+        {
+          "position": 5,
+          "event_id": "1ebf7e8a-9048-46ff-8a35-fdce2fe16847",
+          "expected_previous": "f4c0d510f7957739a785f9e9baef1c87ed47bedd63f195d6899d8dc6f5b9a312",
+          "actual_previous": "5cfd8601919e7f28d401b92f2aad36b2abd656a54249754ca31208d2d3065e22",
+          "timestamp": "May 11, 2025 at 04:37 AM"
+        },
+        {
+          "position": 10,
+          "event_id": "1ba4346b-281c-44e1-a697-d202080dab2f",
+          "expected_previous": "b360bfdce8f8dcaa8a285582ac4212569680522c5bca3a9102e1792fe7280ed5",
+          "actual_previous": "f4c0d510f7957739a785f9e9baef1c87ed47bedd63f195d6899d8dc6f5b9a312",
+          "timestamp": "May 20, 2025 at 04:37 AM"
+        },
+        {
+          "position": 11,
+          "event_id": "f45076e4-0568-45b5-8603-5c32f8a99c31",
+          "expected_previous": "419aeb944f39c98e569e9cc57b77e352e58388c0f7627306631d4a38499032cc",
+          "actual_previous": "b360bfdce8f8dcaa8a285582ac4212569680522c5bca3a9102e1792fe7280ed5",
+          "timestamp": "May 22, 2025 at 04:54 AM"
+        },
+        {
+          "position": 13,
+          "event_id": "0ef301e0-d6e9-4109-bb13-2830b3c3637b",
+          "expected_previous": "b360bfdce8f8dcaa8a285582ac4212569680522c5bca3a9102e1792fe7280ed5",
+          "actual_previous": "419aeb944f39c98e569e9cc57b77e352e58388c0f7627306631d4a38499032cc",
+          "timestamp": "May 29, 2025 at 04:37 AM"
+        },
+        {
+          "position": 14,
+          "event_id": "5cd9e2f3-eb4b-405d-a5cd-d41a47d0b8b0",
+          "expected_previous": "f4c0d510f7957739a785f9e9baef1c87ed47bedd63f195d6899d8dc6f5b9a312",
+          "actual_previous": "b360bfdce8f8dcaa8a285582ac4212569680522c5bca3a9102e1792fe7280ed5",
+          "timestamp": "May 29, 2025 at 05:01 AM"
+        },
+        {
+          "position": 16,
+          "event_id": "f1ef2859-e492-42a0-9356-55390649fc44",
+          "expected_previous": "419aeb944f39c98e569e9cc57b77e352e58388c0f7627306631d4a38499032cc",
+          "actual_previous": "b360bfdce8f8dcaa8a285582ac4212569680522c5bca3a9102e1792fe7280ed5",
+          "timestamp": "June 01, 2025 at 04:54 AM"
+        },
+        {
+          "position": 20,
+          "event_id": "97051cc5-4467-4a9d-8001-84bf1fb66d37",
+          "expected_previous": "f4c0d510f7957739a785f9e9baef1c87ed47bedd63f195d6899d8dc6f5b9a312",
+          "actual_previous": "419aeb944f39c98e569e9cc57b77e352e58388c0f7627306631d4a38499032cc",
+          "timestamp": "June 02, 2025 at 05:01 AM"
+        },
+        {
+          "position": 22,
+          "event_id": "9896f0eb-d05a-46e5-845e-fbbbb57c93a6",
+          "expected_previous": "b360bfdce8f8dcaa8a285582ac4212569680522c5bca3a9102e1792fe7280ed5",
+          "actual_previous": "f4c0d510f7957739a785f9e9baef1c87ed47bedd63f195d6899d8dc6f5b9a312",
+          "timestamp": "June 11, 2025 at 04:54 AM"
+        },
+        {
+          "position": 25,
+          "event_id": "c03d27e4-bda0-4a6c-a08c-856fb1c173a1",
+          "expected_previous": "419aeb944f39c98e569e9cc57b77e352e58388c0f7627306631d4a38499032cc",
+          "actual_previous": "f4c0d510f7957739a785f9e9baef1c87ed47bedd63f195d6899d8dc6f5b9a312",
+          "timestamp": "June 19, 2025 at 04:37 AM"
+        }
+      ]
+    },
+    "chain_hash": "d762a670f2288517c6f35e314462fa042b70d49bed77bb2c1e7dc0414c90a484",
+    "chain_statistics": {
+      "total_events": 149,
+      "event_types": {
+        "custody_exchange_completed": 56,
+        "message_flagged": 44,
+        "payment_verified": 49
+      },
+      "first_event": {
+        "timestamp": "May 07, 2025 at 04:54 AM",
+        "type": "custody_exchange_completed",
+        "hash": "b360bfdce8f8dcaa..."
+      },
+      "last_event": {
+        "timestamp": "January 29, 2026 at 05:01 AM",
+        "type": "payment_verified",
+        "hash": "419aeb944f39c98e..."
+      }
+    },
+    "audit_summary": {
+      "total_entries": 450,
+      "by_action": {
+        "export_report": 82,
+        "update_profile": 93,
+        "view_message": 86,
+        "login": 88,
+        "view_calendar": 101
+      },
+      "by_resource": {
+        "report": 82,
+        "message": 86,
+        "calendar": 101,
+        "user": 181
+      },
+      "unique_users_accessed": 2
+    },
+    "integrity_statement": "INTEGRITY WARNING: The data chain verification found 70 potential integrity issues. This may indicate data migration, system updates, or other events that affected the chain. Review break details for more information.",
+    "report_period": {
+      "start": "May 07, 2025",
+      "end": "February 01, 2026"
+    },
+    "verification_timestamp": "February 02, 2026 at 05:44 AM",
+    "methodology": {
+      "hash_algorithm": "SHA-256",
+      "chain_type": "Linear hash chain with previous_hash linking",
+      "immutability": "Events are append-only and cannot be modified"
+    }
+  },
+  "evidence_count": 149,
+  "data_sources": [
+    "event_logs",
+    "audit_logs"
+  ],
+  "generation_time_ms": null
+}

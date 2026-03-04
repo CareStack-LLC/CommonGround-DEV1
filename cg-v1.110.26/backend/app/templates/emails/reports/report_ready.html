@@ -1,0 +1,89 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Your {{ report_type }} Report is Ready{% endblock %}
+
+{% block preheader %}Your {{ report_type }} report for {{ date_range }} is ready to download.{% endblock %}
+
+{% block content %}
+<!-- Document Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <img src="{{ icons.document }}" alt="" width="48" height="48" style="display: inline-block;">
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Your Report is Ready
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  Your <strong style="color: #4A6C58;">{{ report_type }}</strong> report has been generated
+  and is ready for download.
+</p>
+
+<!-- Report Details Card -->
+<div style="background-color: #E8F0EC; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Report Type</span><br>
+        <strong style="color: #2D3A35; font-size: 18px;">{{ report_type }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Period Covered</span><br>
+        <strong style="color: #2D3A35;">{{ date_range }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0;">
+        <span style="color: #6B7B74; font-size: 14px;">Family File</span><br>
+        <strong style="color: #2D3A35;">{{ family_file_name }}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+{% if highlights %}
+<!-- Report Highlights -->
+<div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <h3 style="color: #2D3A35; font-size: 16px; margin: 0 0 16px 0;">
+    Key Highlights
+  </h3>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    {% for highlight in highlights %}
+    <tr>
+      <td style="padding: 8px 0; {% if not loop.last %}border-bottom: 1px solid #E8E3DB;{% endif %}">
+        <span style="color: #6B7B74; font-size: 13px;">{{ highlight.label }}</span><br>
+        <strong style="color: #4A6C58; font-size: 20px;">{{ highlight.value }}</strong>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ download_url }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    Download Report (PDF)
+  </a>
+</div>
+
+{% if expiry_date %}
+<!-- Expiry Notice -->
+<div style="background-color: #FEF7ED; border-left: 4px solid #D4A574; padding: 12px 16px; margin-bottom: 24px;">
+  <p style="margin: 0; font-size: 14px; color: #6B7B74;">
+    <strong style="color: #D4A574;">Note:</strong> This download link expires on {{ expiry_date }}.
+    Download your report before then or generate a new one from your dashboard.
+  </p>
+</div>
+{% endif %}
+
+<!-- Court Notice -->
+<p style="color: #94A3A0; font-size: 13px; text-align: center; margin: 0;">
+  This report includes verified platform data and can be used as supporting documentation.
+  Reports include integrity verification for authenticity.
+</p>
+{% endblock %}

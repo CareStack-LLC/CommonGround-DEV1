@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to CommonGround</title>
+    <style>
+      /* Client-specific styles */
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #f8faf9;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #1a1a1a;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+      .header {
+        background-color: #4a5d53; /* cg-sage-dark equivalent */
+        padding: 40px 20px;
+        text-align: center;
+      }
+      .header h1 {
+        color: #ffffff;
+        margin: 0;
+        font-size: 28px;
+        font-weight: 300;
+        letter-spacing: 0.5px;
+      }
+      .content {
+        padding: 40px 30px;
+      }
+      .intro {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      .intro p {
+        font-size: 18px;
+        color: #555;
+      }
+      .step {
+        margin-bottom: 40px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 40px;
+      }
+      .step:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .step-image {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: block;
+      }
+      .step-title {
+        font-size: 20px;
+        color: #4a5d53; /* Branding Sage */
+        margin-bottom: 10px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .step-number {
+        background-color: #e8ece9;
+        color: #4a5d53;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+      .step-desc {
+        color: #444;
+        font-size: 16px;
+      }
+      .aria-section {
+        background-color: #fff9e6; /* Amber subtle */
+        padding: 30px;
+        border-radius: 12px;
+        margin-top: 20px;
+        border: 1px solid #fceeb5;
+      }
+      .aria-title {
+        color: #b45309; /* Amber dark */
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 15px;
+        font-size: 18px;
+      }
+      .btn {
+        display: inline-block;
+        background-color: #4a5d53;
+        color: #ffffff;
+        text-decoration: none;
+        padding: 12px 28px;
+        border-radius: 6px;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+      .footer {
+        background-color: #f1f3f2;
+        padding: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #888;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Welcome to CommonGround</h1>
+      </div>
+      
+      <div class="content">
+        <div class="intro">
+          <p>We're here to help you navigate co-parenting with clarity and calm. Follow these simple steps to get started with your new secure family space.</p>
+        </div>
+
+        <!-- Step 1: Family File -->
+        <div class="step">
+          <img src="./images/family_file.png" alt="Family File Illustration" class="step-image" />
+          <div class="step-title">
+            <span class="step-number">1</span> Create Your Family File
+          </div>
+          <p class="step-desc">
+            Think of this as your secure digital home base. Setup your <strong>Family File</strong> to organize everything in one place—your children's profiles, shared expenses, and important documents. It’s the foundation for organized co-parenting.
+          </p>
+        </div>
+
+        <!-- Step 2: Agreements -->
+        <div class="step">
+          <img src="./images/agreements.png" alt="Agreements Illustration" class="step-image" />
+          <div class="step-title">
+            <span class="step-number">2</span> Choose Your Agreement Path
+          </div>
+          <p class="step-desc">
+            Every situation is unique. Need a simple, temporary understanding? Use a <strong>QuickAccord</strong> for fast, flexible arrangements. Need a comprehensive, long-term plan? Build a <strong>SharedCare Agreement</strong> to cover every detail of your parenting schedule.
+          </p>
+        </div>
+
+        <!-- Step 3: Money -->
+        <div class="step">
+          <img src="./images/money.png" alt="Money Management Illustration" class="step-image" />
+          <div class="step-title">
+            <span class="step-number">3</span> Manage Finances clearly
+          </div>
+          <p class="step-desc">
+            Stop the receipt chase. Use <strong>ClearFund Requests</strong> to track shared expenses transparently. Your personal **Parent Wallet** keeps everything organized, ensuring financial discussions stay factual and fair.
+          </p>
+        </div>
+
+        <!-- Aria Section -->
+        <div class="aria-section">
+          <img src="./images/aria.png" alt="Aria Guardian" style="width: 60px; height: 60px; float: right; margin-left: 15px; border-radius: 50%;" />
+          <div class="aria-title">
+            Meet Aria, Your Sentiment Shield
+          </div>
+          <p style="margin: 0; color: #555;">
+            Communication can be hard. Aria is your always-on AI mediator that helps keep conversations constructive. It flags high-conflict language before you send it and blocks toxic messages to keep your peace of mind intact.
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+          <a href="#" class="btn">Get Started Now</a>
+        </div>
+      </div>
+
+      <div class="footer">
+        &copy; 2026 CommonGround. All rights reserved.<br>
+        Building peace for co-parents everywhere.
+      </div>
+    </div>
+  </body>
+</html>

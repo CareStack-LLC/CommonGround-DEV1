@@ -1,0 +1,26 @@
+{
+  "name": "@commonground/daily-video",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@daily-co/react-native-daily-js": "^0.82.0",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
+  },
+  "devDependencies": {
+    "@commonground/tsconfig": "workspace:*",
+    "@types/react": "~19.1.0",
+    "typescript": "~5.9.0"
+  },
+  "peerDependencies": {
+    "@commonground/api-client": "workspace:*",
+    "expo-av": "~16.0.0",
+    "expo-haptics": "~15.0.0"
+  }
+}

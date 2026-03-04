@@ -1,0 +1,131 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Expense Approved: {{ expense_title }}{% endblock %}
+
+{% block preheader %}The {{ expense_category }} expense for ${{ total_amount }} has been approved.{% endblock %}
+
+{% block header_style %}background: linear-gradient(135deg, #4A6C58 0%, #6B9B7A 100%);{% endblock %}
+
+{% block content %}
+<!-- Success Checkmark -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <div style="display: inline-block; width: 80px; height: 80px; background-color: #E8F0EC; border-radius: 50%; line-height: 80px;">
+    <img src="{{ icons.checkmark }}" alt="" width="40" height="40" style="display: inline-block; vertical-align: middle;">
+  </div>
+</div>
+
+<h1 style="color: #4A6C58; text-align: center; margin-bottom: 8px;">
+  Expense Approved
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  The expense has been approved and is ready for payment processing.
+</p>
+
+<!-- Expense Summary Card -->
+<div style="background-color: #E8F0EC; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <h2 style="color: #4A6C58; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">
+    Approved Expense
+  </h2>
+  <p style="color: #2D3A35; font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">
+    {{ expense_title }}
+  </p>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Category</span><br>
+        <strong style="color: #2D3A35;">{{ expense_category | title }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Total Amount</span><br>
+        <strong style="color: #2D3A35; font-size: 20px;">${{ "%.2f"|format(total_amount) }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Approved By</span><br>
+        <strong style="color: #2D3A35;">{{ approver_name }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Approved On</span><br>
+        <strong style="color: #2D3A35;">{{ approved_date }}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- Payment Split -->
+<div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <h3 style="color: #2D3A35; font-size: 16px; margin: 0 0 16px 0;">
+    Payment Breakdown
+  </h3>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 12px 0; border-bottom: 1px solid #E8E3DB;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td>
+              <span style="color: #2D3A35; font-weight: 600;">{{ parent_a_name }}</span><br>
+              <span style="color: #6B7B74; font-size: 13px;">{{ parent_a_percentage }}%</span>
+            </td>
+            <td style="text-align: right;">
+              <strong style="color: #4A6C58; font-size: 18px;">${{ "%.2f"|format(parent_a_amount) }}</strong>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 12px 0;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td>
+              <span style="color: #2D3A35; font-weight: 600;">{{ parent_b_name }}</span><br>
+              <span style="color: #6B7B74; font-size: 13px;">{{ parent_b_percentage }}%</span>
+            </td>
+            <td style="text-align: right;">
+              <strong style="color: #4A6C58; font-size: 18px;">${{ "%.2f"|format(parent_b_amount) }}</strong>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
+
+{% if receipt_url %}
+<!-- Receipt Status -->
+<div style="background-color: #E8F0EC; border-radius: 8px; padding: 12px 16px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td width="24">
+        <img src="{{ icons.document }}" alt="" width="20" height="20">
+      </td>
+      <td style="padding-left: 12px;">
+        <span style="color: #4A6C58; font-size: 14px;">Receipt on file - <a href="{{ receipt_url }}" style="color: #4A6C58;">View receipt</a></span>
+      </td>
+    </tr>
+  </table>
+</div>
+{% endif %}
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ expense_url }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    View Expense Details
+  </a>
+</div>
+
+<!-- Info Note -->
+<p style="color: #94A3A0; font-size: 13px; text-align: center; margin: 0;">
+  Payment will be processed according to your ClearFund settings.
+  All transactions are logged for your records.
+</p>
+{% endblock %}

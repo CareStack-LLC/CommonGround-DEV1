@@ -1,0 +1,31 @@
+{
+  "section_type": "intervention_log",
+  "section_title": "Intervention Log",
+  "section_order": 6,
+  "evidence_count": 0,
+  "data_sources": [
+    "message_flags"
+  ],
+  "content_data": {
+    "total_interventions": 0,
+    "intervention_log": [],
+    "by_outcome": {
+      "accepted": 0,
+      "modified": 0,
+      "rejected": 0,
+      "sent_anyway": 0,
+      "no_action": 0
+    },
+    "by_category": {},
+    "repeat_patterns": {
+      "high_frequency_days": [],
+      "common_categories": [],
+      "escalation_detected": false
+    },
+    "report_period": {
+      "start": "January 02, 2026",
+      "end": "February 01, 2026"
+    },
+    "note": "Message content is redacted for privacy. Only intervention metadata is shown."
+  }
+}

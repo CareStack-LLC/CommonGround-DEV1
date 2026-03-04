@@ -1,0 +1,51 @@
+{
+  "section_type": "exchange_gps_verification",
+  "section_title": "Exchange GPS Verification Report",
+  "section_order": 9,
+  "evidence_count": 0,
+  "data_sources": [
+    "custody_exchange_instances",
+    "gps_coordinates"
+  ],
+  "content_data": {
+    "summary": {
+      "report_period": {
+        "start": "January 02, 2026",
+        "end": "February 01, 2026"
+      },
+      "total_exchanges": 0,
+      "gps_verified_count": 0,
+      "gps_verified_rate": 0
+    },
+    "compliance_metrics": {
+      "overall": {
+        "geofence_compliance_rate": 0,
+        "on_time_rate": 0,
+        "completed_count": 0,
+        "missed_count": 0,
+        "one_party_only_count": 0,
+        "disputed_count": 0
+      },
+      "petitioner": {
+        "total_check_ins": 0,
+        "avg_distance_meters": null,
+        "geofence_hit_rate": 0,
+        "on_time_rate": 0
+      },
+      "respondent": {
+        "total_check_ins": 0,
+        "avg_distance_meters": null,
+        "geofence_hit_rate": 0,
+        "on_time_rate": 0
+      }
+    },
+    "exchange_log": [],
+    "evidence_maps": [],
+    "verification_methodology": {
+      "description": "GPS coordinates captured at check-in via Silent Handoff feature",
+      "geofence_explanation": "Distance from designated exchange location measured using Haversine formula",
+      "accuracy_note": "GPS accuracy varies by device; device-reported accuracy included in data",
+      "privacy_statement": "Locations captured only at check-in moment, no continuous tracking"
+    }
+  }
+}

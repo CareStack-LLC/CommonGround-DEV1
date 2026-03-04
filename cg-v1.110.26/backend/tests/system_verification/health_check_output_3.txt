@@ -1,0 +1,42 @@
+ImportError while loading conftest '/Users/tj/Desktop/CommonGround/mvp/backend/tests/system_verification/conftest.py'.
+mvp/backend/tests/system_verification/conftest.py:19: in <module>
+    from app.main import app
+mvp/backend/app/main.py:10: in <module>
+    from app.core.config import settings
+mvp/backend/app/core/__init__.py:3: in <module>
+    from app.core.config import settings
+mvp/backend/app/core/config.py:94: in <module>
+    settings = Settings()
+mvp/backend/venv/lib/python3.10/site-packages/pydantic_settings/main.py:194: in __init__
+    super().__init__(
+E   pydantic_core._pydantic_core.ValidationError: 10 validation errors for Settings
+E   SECRET_KEY
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   DATABASE_URL
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   SUPABASE_URL
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   SUPABASE_ANON_KEY
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   SUPABASE_SERVICE_KEY
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   ANTHROPIC_API_KEY
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   OPENAI_API_KEY
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   STRIPE_SECRET_KEY
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   STRIPE_PUBLISHABLE_KEY
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing
+E   STRIPE_WEBHOOK_SECRET
+E     Field required [type=missing, input_value={}, input_type=dict]
+E       For further information visit https://errors.pydantic.dev/2.12/v/missing

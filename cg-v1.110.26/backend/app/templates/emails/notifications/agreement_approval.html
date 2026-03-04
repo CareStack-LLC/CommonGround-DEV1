@@ -1,0 +1,91 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Agreement Ready for Your Review{% endblock %}
+
+{% block preheader %}{{ submitter_name }} has submitted an agreement for your approval on CommonGround.{% endblock %}
+
+{% block header_style %}background: linear-gradient(135deg, #D4A574 0%, #C4956A 100%);{% endblock %}
+
+{% block content %}
+<!-- Document Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <img src="{{ icons.document }}" alt="" width="48" height="48" style="display: inline-block;">
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Agreement Ready for Review
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  <strong style="color: #2D3A35;">{{ submitter_name }}</strong> has submitted an agreement
+  and is waiting for your approval.
+</p>
+
+<!-- Agreement Details Card -->
+<div style="background-color: #FEF7ED; border: 1px solid #D4A574; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <h2 style="color: #D4A574; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">
+    Agreement
+  </h2>
+  <p style="color: #2D3A35; font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">
+    {{ agreement_title | default('Parenting Agreement') }}
+  </p>
+
+  {% if sections_updated %}
+  <div style="border-top: 1px solid #E5C9A8; padding-top: 16px;">
+    <span style="color: #6B7B74; font-size: 14px;">Sections updated:</span>
+    <p style="color: #2D3A35; margin: 4px 0 0 0;">
+      {{ sections_updated | join(', ') }}
+    </p>
+  </div>
+  {% endif %}
+</div>
+
+<!-- What to Do -->
+<div style="background-color: #FFFBF5; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <h3 style="color: #2D3A35; font-size: 16px; margin: 0 0 12px 0;">
+    What happens next?
+  </h3>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td width="24" valign="top" style="padding: 4px 0;">
+        <span style="display: inline-block; width: 20px; height: 20px; background-color: #4A6C58; color: white; border-radius: 50%; text-align: center; font-size: 12px; line-height: 20px;">1</span>
+      </td>
+      <td style="padding: 4px 0 4px 12px; color: #6B7B74; font-size: 14px;">
+        Review the agreement carefully
+      </td>
+    </tr>
+    <tr>
+      <td width="24" valign="top" style="padding: 4px 0;">
+        <span style="display: inline-block; width: 20px; height: 20px; background-color: #4A6C58; color: white; border-radius: 50%; text-align: center; font-size: 12px; line-height: 20px;">2</span>
+      </td>
+      <td style="padding: 4px 0 4px 12px; color: #6B7B74; font-size: 14px;">
+        Request changes if needed, or approve
+      </td>
+    </tr>
+    <tr>
+      <td width="24" valign="top" style="padding: 4px 0;">
+        <span style="display: inline-block; width: 20px; height: 20px; background-color: #4A6C58; color: white; border-radius: 50%; text-align: center; font-size: 12px; line-height: 20px;">3</span>
+      </td>
+      <td style="padding: 4px 0 4px 12px; color: #6B7B74; font-size: 14px;">
+        Once both approve, the agreement is activated
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ review_url }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #D4A574; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    Review Agreement
+  </a>
+</div>
+
+<!-- Important Note -->
+<div style="background-color: #E8F0EC; border-radius: 8px; padding: 16px; text-align: center;">
+  <p style="margin: 0; color: #4A6C58; font-size: 14px;">
+    <strong>Important:</strong> Both parents must approve for the agreement to take effect.
+    Take your time to review all sections.
+  </p>
+</div>
+{% endblock %}

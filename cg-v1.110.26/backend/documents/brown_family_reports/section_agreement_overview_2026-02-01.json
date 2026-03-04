@@ -1,0 +1,74 @@
+{
+  "section_type": "agreement_overview",
+  "section_title": "Agreement Overview",
+  "section_order": 1,
+  "content_data": {
+    "case_info": {
+      "case_name": "Brown v. Brown (Marcus & Tasha)",
+      "case_number": "SF-2026-D491D4F6",
+      "state": "CA",
+      "county": "San Francisco",
+      "status": "active",
+      "created_at": "February 01, 2026"
+    },
+    "petitioner": {
+      "role": "petitioner",
+      "parent_type": "father",
+      "user_id": "eb9a2b70-76ed-4cb5-b8fb-23e1776423ee",
+      "name": "Marcus Brown"
+    },
+    "respondent": {
+      "role": "respondent",
+      "parent_type": "mother",
+      "user_id": "cb157af9-69e8-4c81-943a-83deea6746cc",
+      "name": "Tasha Brown"
+    },
+    "parties": [
+      {
+        "role": "petitioner",
+        "parent_type": "father",
+        "user_id": "eb9a2b70-76ed-4cb5-b8fb-23e1776423ee",
+        "name": "Marcus Brown"
+      },
+      {
+        "role": "respondent",
+        "parent_type": "mother",
+        "user_id": "cb157af9-69e8-4c81-943a-83deea6746cc",
+        "name": "Tasha Brown"
+      }
+    ],
+    "children": [],
+    "agreement": {
+      "title": "Shared Care Agreement",
+      "type": "shared_care",
+      "status": "active",
+      "effective_date": null,
+      "summary": "This custody agreement establishes that Parent A will have the children 80% of the time, while Parent B will have them 20% of the time, with regular visits every other weekend. Both parents will share decision-making responsibilities and alternate holidays annually to ensure balanced family time.",
+      "petitioner_approved_at": "September 08, 2025",
+      "respondent_approved_at": "September 17, 2025",
+      "key_terms": {
+        "custody_split": "80/20",
+        "child_support": "$800/month",
+        "cost_split": "50/50"
+      }
+    },
+    "custody_summary": {
+      "petitioner_days": 231,
+      "petitioner_pct": 85.2,
+      "respondent_days": 40,
+      "respondent_pct": 14.8,
+      "total_days": 271
+    },
+    "report_period": {
+      "start": "May 07, 2025",
+      "end": "February 01, 2026"
+    }
+  },
+  "evidence_count": 1,
+  "data_sources": [
+    "cases",
+    "children",
+    "agreements"
+  ],
+  "generation_time_ms": null
+}

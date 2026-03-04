@@ -1,0 +1,871 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.9, pytest-9.0.2, pluggy-1.6.0 -- /Users/tj/Desktop/CommonGround/mvp/backend/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/tj/Desktop/CommonGround
+plugins: anyio-4.12.0, asyncio-1.3.0, langsmith-0.5.1, cov-7.0.0
+asyncio: mode=strict, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 13 items
+
+mvp/backend/tests/system_verification/test_auth_verification.py::test_auth_flow ERROR [  7%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestDatabaseHealth::test_database_connection ERROR [ 15%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestDatabaseHealth::test_database_tables_exist ERROR [ 23%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestRedisHealth::test_redis_connection PASSED [ 30%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestRedisHealth::test_redis_performance PASSED [ 38%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestExternalAPIs::test_supabase_connectivity PASSED [ 46%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestExternalAPIs::test_anthropic_api_connectivity PASSED [ 53%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestExternalAPIs::test_openai_api_connectivity PASSED [ 61%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestApplicationHealth::test_application_startup ERROR [ 69%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestApplicationHealth::test_health_endpoint ERROR [ 76%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestApplicationHealth::test_openapi_docs_accessible ERROR [ 84%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestPerformance::test_database_query_performance ERROR [ 92%]
+mvp/backend/tests/system_verification/test_health_checks.py::TestPerformance::test_concurrent_requests ERROR [100%]
+
+==================================== ERRORS ====================================
+_______________________ ERROR at setup of test_auth_flow _______________________
+
+self = <Coroutine test_auth_flow>
+
+    def setup(self) -> None:
+        runner_fixture_id = f"_{self._loop_scope}_scoped_runner"
+        if runner_fixture_id not in self.fixturenames:
+            self.fixturenames.append(runner_fixture_id)
+>       return super().setup()
+
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:743: in pytest_fixture_setup
+    hook_result = yield
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:313: in _asyncgen_fixture_wrapper
+    result = runner.run(setup(), context=context)
+mvp/backend/venv/lib/python3.10/site-packages/backports/asyncio/runner/runner.py:175: in run
+    return self._loop.run_until_complete(task)  # type: ignore[union-attr, no-any-return]
+../../miniconda3/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+../../miniconda3/lib/python3.10/asyncio/futures.py:201: in result
+    raise self._exception.with_traceback(self._exception_tb)
+../../miniconda3/lib/python3.10/asyncio/tasks.py:234: in __step
+    result = coro.throw(exc)
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:309: in setup
+    res = await gen_obj.__anext__()
+mvp/backend/tests/system_verification/conftest.py:64: in test_db_engine
+    async with engine.begin() as conn:
+../../miniconda3/lib/python3.10/contextlib.py:199: in __aenter__
+    return await anext(self.gen)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:1068: in begin
+    async with conn:
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/base.py:121: in __aenter__
+    return await self.start(is_ctxmanager=True)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:275: in start
+    await greenlet_spawn(self.sync_engine.connect)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:201: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3285: in connect
+    return self._connection_cls(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:143: in __init__
+    self._dbapi_connection = engine.raw_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3309: in raw_connection
+    return self.pool.connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:447: in connect
+    return _ConnectionFairy._checkout(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:1264: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:711: in checkout
+    rec = pool._do_get()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/impl.py:306: in _do_get
+    return self._create_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:388: in _create_connection
+    return _ConnectionRecord(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:673: in __init__
+    self.__connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:899: in __connect
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:895: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/create.py:661: in connect
+    return dialect.connect(*cargs, **cparams)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:630: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:955: in connect
+    await_only(creator_fn(*arg, **kw)),
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connection.py:2443: in connect
+    return await connect_utils._connect(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1218: in _connect
+    conn = await _connect_addr(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1054: in _connect_addr
+    return await __connect_addr(params, True, *args)
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1102: in __connect_addr
+    await connected
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None
+future = <Future finished exception=InvalidCatalogNameError('database "commonground_test" does not exist')>
+
+    def __wakeup(self, future):
+        try:
+>           future.result()
+E           asyncpg.exceptions.InvalidCatalogNameError: database "commonground_test" does not exist
+
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: InvalidCatalogNameError
+________ ERROR at setup of TestDatabaseHealth.test_database_connection _________
+
+self = <Coroutine test_database_connection>
+
+    def setup(self) -> None:
+        runner_fixture_id = f"_{self._loop_scope}_scoped_runner"
+        if runner_fixture_id not in self.fixturenames:
+            self.fixturenames.append(runner_fixture_id)
+>       return super().setup()
+
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:743: in pytest_fixture_setup
+    hook_result = yield
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:313: in _asyncgen_fixture_wrapper
+    result = runner.run(setup(), context=context)
+mvp/backend/venv/lib/python3.10/site-packages/backports/asyncio/runner/runner.py:175: in run
+    return self._loop.run_until_complete(task)  # type: ignore[union-attr, no-any-return]
+../../miniconda3/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+../../miniconda3/lib/python3.10/asyncio/futures.py:201: in result
+    raise self._exception.with_traceback(self._exception_tb)
+../../miniconda3/lib/python3.10/asyncio/tasks.py:234: in __step
+    result = coro.throw(exc)
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:309: in setup
+    res = await gen_obj.__anext__()
+mvp/backend/tests/system_verification/conftest.py:64: in test_db_engine
+    async with engine.begin() as conn:
+../../miniconda3/lib/python3.10/contextlib.py:199: in __aenter__
+    return await anext(self.gen)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:1068: in begin
+    async with conn:
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/base.py:121: in __aenter__
+    return await self.start(is_ctxmanager=True)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:275: in start
+    await greenlet_spawn(self.sync_engine.connect)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:201: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3285: in connect
+    return self._connection_cls(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:143: in __init__
+    self._dbapi_connection = engine.raw_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3309: in raw_connection
+    return self.pool.connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:447: in connect
+    return _ConnectionFairy._checkout(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:1264: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:711: in checkout
+    rec = pool._do_get()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/impl.py:306: in _do_get
+    return self._create_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:388: in _create_connection
+    return _ConnectionRecord(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:673: in __init__
+    self.__connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:899: in __connect
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:895: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/create.py:661: in connect
+    return dialect.connect(*cargs, **cparams)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:630: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:955: in connect
+    await_only(creator_fn(*arg, **kw)),
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connection.py:2443: in connect
+    return await connect_utils._connect(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1218: in _connect
+    conn = await _connect_addr(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1054: in _connect_addr
+    return await __connect_addr(params, True, *args)
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1102: in __connect_addr
+    await connected
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None
+future = <Future finished exception=InvalidCatalogNameError('database "commonground_test" does not exist')>
+
+    def __wakeup(self, future):
+        try:
+>           future.result()
+E           asyncpg.exceptions.InvalidCatalogNameError: database "commonground_test" does not exist
+
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: InvalidCatalogNameError
+_______ ERROR at setup of TestDatabaseHealth.test_database_tables_exist ________
+
+self = <Coroutine test_database_tables_exist>
+
+    def setup(self) -> None:
+        runner_fixture_id = f"_{self._loop_scope}_scoped_runner"
+        if runner_fixture_id not in self.fixturenames:
+            self.fixturenames.append(runner_fixture_id)
+>       return super().setup()
+
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:743: in pytest_fixture_setup
+    hook_result = yield
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:313: in _asyncgen_fixture_wrapper
+    result = runner.run(setup(), context=context)
+mvp/backend/venv/lib/python3.10/site-packages/backports/asyncio/runner/runner.py:175: in run
+    return self._loop.run_until_complete(task)  # type: ignore[union-attr, no-any-return]
+../../miniconda3/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+../../miniconda3/lib/python3.10/asyncio/futures.py:201: in result
+    raise self._exception.with_traceback(self._exception_tb)
+../../miniconda3/lib/python3.10/asyncio/tasks.py:234: in __step
+    result = coro.throw(exc)
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:309: in setup
+    res = await gen_obj.__anext__()
+mvp/backend/tests/system_verification/conftest.py:64: in test_db_engine
+    async with engine.begin() as conn:
+../../miniconda3/lib/python3.10/contextlib.py:199: in __aenter__
+    return await anext(self.gen)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:1068: in begin
+    async with conn:
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/base.py:121: in __aenter__
+    return await self.start(is_ctxmanager=True)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:275: in start
+    await greenlet_spawn(self.sync_engine.connect)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:201: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3285: in connect
+    return self._connection_cls(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:143: in __init__
+    self._dbapi_connection = engine.raw_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3309: in raw_connection
+    return self.pool.connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:447: in connect
+    return _ConnectionFairy._checkout(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:1264: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:711: in checkout
+    rec = pool._do_get()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/impl.py:306: in _do_get
+    return self._create_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:388: in _create_connection
+    return _ConnectionRecord(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:673: in __init__
+    self.__connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:899: in __connect
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:895: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/create.py:661: in connect
+    return dialect.connect(*cargs, **cparams)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:630: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:955: in connect
+    await_only(creator_fn(*arg, **kw)),
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connection.py:2443: in connect
+    return await connect_utils._connect(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1218: in _connect
+    conn = await _connect_addr(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1054: in _connect_addr
+    return await __connect_addr(params, True, *args)
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1102: in __connect_addr
+    await connected
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None
+future = <Future finished exception=InvalidCatalogNameError('database "commonground_test" does not exist')>
+
+    def __wakeup(self, future):
+        try:
+>           future.result()
+E           asyncpg.exceptions.InvalidCatalogNameError: database "commonground_test" does not exist
+
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: InvalidCatalogNameError
+_______ ERROR at setup of TestApplicationHealth.test_application_startup _______
+
+self = <Coroutine test_application_startup>
+
+    def setup(self) -> None:
+        runner_fixture_id = f"_{self._loop_scope}_scoped_runner"
+        if runner_fixture_id not in self.fixturenames:
+            self.fixturenames.append(runner_fixture_id)
+>       return super().setup()
+
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:743: in pytest_fixture_setup
+    hook_result = yield
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:313: in _asyncgen_fixture_wrapper
+    result = runner.run(setup(), context=context)
+mvp/backend/venv/lib/python3.10/site-packages/backports/asyncio/runner/runner.py:175: in run
+    return self._loop.run_until_complete(task)  # type: ignore[union-attr, no-any-return]
+../../miniconda3/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+../../miniconda3/lib/python3.10/asyncio/futures.py:201: in result
+    raise self._exception.with_traceback(self._exception_tb)
+../../miniconda3/lib/python3.10/asyncio/tasks.py:234: in __step
+    result = coro.throw(exc)
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:309: in setup
+    res = await gen_obj.__anext__()
+mvp/backend/tests/system_verification/conftest.py:64: in test_db_engine
+    async with engine.begin() as conn:
+../../miniconda3/lib/python3.10/contextlib.py:199: in __aenter__
+    return await anext(self.gen)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:1068: in begin
+    async with conn:
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/base.py:121: in __aenter__
+    return await self.start(is_ctxmanager=True)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:275: in start
+    await greenlet_spawn(self.sync_engine.connect)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:201: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3285: in connect
+    return self._connection_cls(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:143: in __init__
+    self._dbapi_connection = engine.raw_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3309: in raw_connection
+    return self.pool.connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:447: in connect
+    return _ConnectionFairy._checkout(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:1264: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:711: in checkout
+    rec = pool._do_get()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/impl.py:306: in _do_get
+    return self._create_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:388: in _create_connection
+    return _ConnectionRecord(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:673: in __init__
+    self.__connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:899: in __connect
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:895: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/create.py:661: in connect
+    return dialect.connect(*cargs, **cparams)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:630: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:955: in connect
+    await_only(creator_fn(*arg, **kw)),
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connection.py:2443: in connect
+    return await connect_utils._connect(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1218: in _connect
+    conn = await _connect_addr(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1054: in _connect_addr
+    return await __connect_addr(params, True, *args)
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1102: in __connect_addr
+    await connected
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None
+future = <Future finished exception=InvalidCatalogNameError('database "commonground_test" does not exist')>
+
+    def __wakeup(self, future):
+        try:
+>           future.result()
+E           asyncpg.exceptions.InvalidCatalogNameError: database "commonground_test" does not exist
+
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: InvalidCatalogNameError
+_________ ERROR at setup of TestApplicationHealth.test_health_endpoint _________
+
+self = <Coroutine test_health_endpoint>
+
+    def setup(self) -> None:
+        runner_fixture_id = f"_{self._loop_scope}_scoped_runner"
+        if runner_fixture_id not in self.fixturenames:
+            self.fixturenames.append(runner_fixture_id)
+>       return super().setup()
+
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:743: in pytest_fixture_setup
+    hook_result = yield
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:313: in _asyncgen_fixture_wrapper
+    result = runner.run(setup(), context=context)
+mvp/backend/venv/lib/python3.10/site-packages/backports/asyncio/runner/runner.py:175: in run
+    return self._loop.run_until_complete(task)  # type: ignore[union-attr, no-any-return]
+../../miniconda3/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+../../miniconda3/lib/python3.10/asyncio/futures.py:201: in result
+    raise self._exception.with_traceback(self._exception_tb)
+../../miniconda3/lib/python3.10/asyncio/tasks.py:234: in __step
+    result = coro.throw(exc)
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:309: in setup
+    res = await gen_obj.__anext__()
+mvp/backend/tests/system_verification/conftest.py:64: in test_db_engine
+    async with engine.begin() as conn:
+../../miniconda3/lib/python3.10/contextlib.py:199: in __aenter__
+    return await anext(self.gen)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:1068: in begin
+    async with conn:
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/base.py:121: in __aenter__
+    return await self.start(is_ctxmanager=True)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:275: in start
+    await greenlet_spawn(self.sync_engine.connect)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:201: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3285: in connect
+    return self._connection_cls(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:143: in __init__
+    self._dbapi_connection = engine.raw_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3309: in raw_connection
+    return self.pool.connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:447: in connect
+    return _ConnectionFairy._checkout(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:1264: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:711: in checkout
+    rec = pool._do_get()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/impl.py:306: in _do_get
+    return self._create_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:388: in _create_connection
+    return _ConnectionRecord(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:673: in __init__
+    self.__connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:899: in __connect
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:895: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/create.py:661: in connect
+    return dialect.connect(*cargs, **cparams)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:630: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:955: in connect
+    await_only(creator_fn(*arg, **kw)),
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connection.py:2443: in connect
+    return await connect_utils._connect(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1218: in _connect
+    conn = await _connect_addr(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1054: in _connect_addr
+    return await __connect_addr(params, True, *args)
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1102: in __connect_addr
+    await connected
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None
+future = <Future finished exception=InvalidCatalogNameError('database "commonground_test" does not exist')>
+
+    def __wakeup(self, future):
+        try:
+>           future.result()
+E           asyncpg.exceptions.InvalidCatalogNameError: database "commonground_test" does not exist
+
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: InvalidCatalogNameError
+_____ ERROR at setup of TestApplicationHealth.test_openapi_docs_accessible _____
+
+self = <Coroutine test_openapi_docs_accessible>
+
+    def setup(self) -> None:
+        runner_fixture_id = f"_{self._loop_scope}_scoped_runner"
+        if runner_fixture_id not in self.fixturenames:
+            self.fixturenames.append(runner_fixture_id)
+>       return super().setup()
+
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:743: in pytest_fixture_setup
+    hook_result = yield
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:313: in _asyncgen_fixture_wrapper
+    result = runner.run(setup(), context=context)
+mvp/backend/venv/lib/python3.10/site-packages/backports/asyncio/runner/runner.py:175: in run
+    return self._loop.run_until_complete(task)  # type: ignore[union-attr, no-any-return]
+../../miniconda3/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+../../miniconda3/lib/python3.10/asyncio/futures.py:201: in result
+    raise self._exception.with_traceback(self._exception_tb)
+../../miniconda3/lib/python3.10/asyncio/tasks.py:234: in __step
+    result = coro.throw(exc)
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:309: in setup
+    res = await gen_obj.__anext__()
+mvp/backend/tests/system_verification/conftest.py:64: in test_db_engine
+    async with engine.begin() as conn:
+../../miniconda3/lib/python3.10/contextlib.py:199: in __aenter__
+    return await anext(self.gen)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:1068: in begin
+    async with conn:
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/base.py:121: in __aenter__
+    return await self.start(is_ctxmanager=True)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:275: in start
+    await greenlet_spawn(self.sync_engine.connect)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:201: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3285: in connect
+    return self._connection_cls(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:143: in __init__
+    self._dbapi_connection = engine.raw_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3309: in raw_connection
+    return self.pool.connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:447: in connect
+    return _ConnectionFairy._checkout(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:1264: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:711: in checkout
+    rec = pool._do_get()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/impl.py:306: in _do_get
+    return self._create_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:388: in _create_connection
+    return _ConnectionRecord(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:673: in __init__
+    self.__connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:899: in __connect
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:895: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/create.py:661: in connect
+    return dialect.connect(*cargs, **cparams)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:630: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:955: in connect
+    await_only(creator_fn(*arg, **kw)),
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connection.py:2443: in connect
+    return await connect_utils._connect(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1218: in _connect
+    conn = await _connect_addr(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1054: in _connect_addr
+    return await __connect_addr(params, True, *args)
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1102: in __connect_addr
+    await connected
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None
+future = <Future finished exception=InvalidCatalogNameError('database "commonground_test" does not exist')>
+
+    def __wakeup(self, future):
+        try:
+>           future.result()
+E           asyncpg.exceptions.InvalidCatalogNameError: database "commonground_test" does not exist
+
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: InvalidCatalogNameError
+______ ERROR at setup of TestPerformance.test_database_query_performance _______
+
+self = <Coroutine test_database_query_performance>
+
+    def setup(self) -> None:
+        runner_fixture_id = f"_{self._loop_scope}_scoped_runner"
+        if runner_fixture_id not in self.fixturenames:
+            self.fixturenames.append(runner_fixture_id)
+>       return super().setup()
+
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:743: in pytest_fixture_setup
+    hook_result = yield
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:313: in _asyncgen_fixture_wrapper
+    result = runner.run(setup(), context=context)
+mvp/backend/venv/lib/python3.10/site-packages/backports/asyncio/runner/runner.py:175: in run
+    return self._loop.run_until_complete(task)  # type: ignore[union-attr, no-any-return]
+../../miniconda3/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+../../miniconda3/lib/python3.10/asyncio/futures.py:201: in result
+    raise self._exception.with_traceback(self._exception_tb)
+../../miniconda3/lib/python3.10/asyncio/tasks.py:234: in __step
+    result = coro.throw(exc)
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:309: in setup
+    res = await gen_obj.__anext__()
+mvp/backend/tests/system_verification/conftest.py:64: in test_db_engine
+    async with engine.begin() as conn:
+../../miniconda3/lib/python3.10/contextlib.py:199: in __aenter__
+    return await anext(self.gen)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:1068: in begin
+    async with conn:
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/base.py:121: in __aenter__
+    return await self.start(is_ctxmanager=True)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:275: in start
+    await greenlet_spawn(self.sync_engine.connect)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:201: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3285: in connect
+    return self._connection_cls(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:143: in __init__
+    self._dbapi_connection = engine.raw_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3309: in raw_connection
+    return self.pool.connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:447: in connect
+    return _ConnectionFairy._checkout(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:1264: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:711: in checkout
+    rec = pool._do_get()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/impl.py:306: in _do_get
+    return self._create_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:388: in _create_connection
+    return _ConnectionRecord(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:673: in __init__
+    self.__connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:899: in __connect
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:895: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/create.py:661: in connect
+    return dialect.connect(*cargs, **cparams)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:630: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:955: in connect
+    await_only(creator_fn(*arg, **kw)),
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connection.py:2443: in connect
+    return await connect_utils._connect(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1218: in _connect
+    conn = await _connect_addr(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1054: in _connect_addr
+    return await __connect_addr(params, True, *args)
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1102: in __connect_addr
+    await connected
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None
+future = <Future finished exception=InvalidCatalogNameError('database "commonground_test" does not exist')>
+
+    def __wakeup(self, future):
+        try:
+>           future.result()
+E           asyncpg.exceptions.InvalidCatalogNameError: database "commonground_test" does not exist
+
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: InvalidCatalogNameError
+__________ ERROR at setup of TestPerformance.test_concurrent_requests __________
+
+self = <Coroutine test_concurrent_requests>
+
+    def setup(self) -> None:
+        runner_fixture_id = f"_{self._loop_scope}_scoped_runner"
+        if runner_fixture_id not in self.fixturenames:
+            self.fixturenames.append(runner_fixture_id)
+>       return super().setup()
+
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:458: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:743: in pytest_fixture_setup
+    hook_result = yield
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:313: in _asyncgen_fixture_wrapper
+    result = runner.run(setup(), context=context)
+mvp/backend/venv/lib/python3.10/site-packages/backports/asyncio/runner/runner.py:175: in run
+    return self._loop.run_until_complete(task)  # type: ignore[union-attr, no-any-return]
+../../miniconda3/lib/python3.10/asyncio/base_events.py:649: in run_until_complete
+    return future.result()
+../../miniconda3/lib/python3.10/asyncio/futures.py:201: in result
+    raise self._exception.with_traceback(self._exception_tb)
+../../miniconda3/lib/python3.10/asyncio/tasks.py:234: in __step
+    result = coro.throw(exc)
+mvp/backend/venv/lib/python3.10/site-packages/pytest_asyncio/plugin.py:309: in setup
+    res = await gen_obj.__anext__()
+mvp/backend/tests/system_verification/conftest.py:64: in test_db_engine
+    async with engine.begin() as conn:
+../../miniconda3/lib/python3.10/contextlib.py:199: in __aenter__
+    return await anext(self.gen)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:1068: in begin
+    async with conn:
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/base.py:121: in __aenter__
+    return await self.start(is_ctxmanager=True)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/ext/asyncio/engine.py:275: in start
+    await greenlet_spawn(self.sync_engine.connect)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:201: in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3285: in connect
+    return self._connection_cls(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:143: in __init__
+    self._dbapi_connection = engine.raw_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/base.py:3309: in raw_connection
+    return self.pool.connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:447: in connect
+    return _ConnectionFairy._checkout(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:1264: in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:711: in checkout
+    rec = pool._do_get()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/impl.py:306: in _do_get
+    return self._create_connection()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:388: in _create_connection
+    return _ConnectionRecord(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:673: in __init__
+    self.__connect()
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:899: in __connect
+    with util.safe_reraise():
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/langhelpers.py:224: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/pool/base.py:895: in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/create.py:661: in connect
+    return dialect.connect(*cargs, **cparams)
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/engine/default.py:630: in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py:955: in connect
+    await_only(creator_fn(*arg, **kw)),
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:132: in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+mvp/backend/venv/lib/python3.10/site-packages/sqlalchemy/util/_concurrency_py3k.py:196: in greenlet_spawn
+    value = await result
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connection.py:2443: in connect
+    return await connect_utils._connect(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1218: in _connect
+    conn = await _connect_addr(
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1054: in _connect_addr
+    return await __connect_addr(params, True, *args)
+mvp/backend/venv/lib/python3.10/site-packages/asyncpg/connect_utils.py:1102: in __connect_addr
+    await connected
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = None
+future = <Future finished exception=InvalidCatalogNameError('database "commonground_test" does not exist')>
+
+    def __wakeup(self, future):
+        try:
+>           future.result()
+E           asyncpg.exceptions.InvalidCatalogNameError: database "commonground_test" does not exist
+
+../../miniconda3/lib/python3.10/asyncio/tasks.py:304: InvalidCatalogNameError
+=============================== warnings summary ===============================
+mvp/backend/app/schemas/auth.py:78
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/auth.py:78: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UserResponse(BaseModel):
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:72
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:72: DeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'
+    ParserElement.enablePackrat()
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85: DeprecationWarning: 'escChar' argument is deprecated, use 'esc_char'
+    quoted_identifier = QuotedString('"', escChar="\\", unquoteResults=True)
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/expressions/parser.py:85: DeprecationWarning: 'unquoteResults' argument is deprecated, use 'unquote_results'
+    quoted_identifier = QuotedString('"', escChar="\\", unquoteResults=True)
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:366
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:366: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, data: TableMetadataV1) -> TableMetadataV1:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:495
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:495: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_schemas(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:499
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:499: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_partition_specs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:503
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:503: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_sort_orders(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:507
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:507: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:539
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:539: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_schemas(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:543
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:543: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_partition_specs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:547
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:547: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def check_sort_orders(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:551
+  /Users/tj/Desktop/CommonGround/mvp/backend/venv/lib/python3.10/site-packages/pyiceberg/table/metadata.py:551: PydanticDeprecatedSince212: Using `@model_validator` with mode='after' on a classmethod is deprecated. Instead, use an instance method. See the documentation at https://docs.pydantic.dev/2.12/concepts/validators/#model-after-validator. Deprecated in Pydantic V2.12 to be removed in V3.0.
+    def construct_refs(cls, table_metadata: TableMetadata) -> TableMetadata:
+
+mvp/backend/app/schemas/user.py:7
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/user.py:7: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class UserProfileResponse(BaseModel):
+
+mvp/backend/app/schemas/case.py:15
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/case.py:15: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    children: list[dict] = Field(..., min_items=1, max_items=20)
+
+mvp/backend/app/schemas/case.py:15
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/case.py:15: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    children: list[dict] = Field(..., min_items=1, max_items=20)
+
+mvp/backend/app/schemas/case.py:77
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/case.py:77: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class CaseResponse(BaseModel):
+
+mvp/backend/app/schemas/agreement.py:25
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/agreement.py:25: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class AgreementResponse(BaseModel):
+
+mvp/backend/app/schemas/agreement.py:44
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/agreement.py:44: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class AgreementSectionResponse(BaseModel):
+
+mvp/backend/app/schemas/message.py:108
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:108: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class MessageFlagResponse(BaseModel):
+
+mvp/backend/app/schemas/message.py:125
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:125: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class MessageResponse(BaseModel):
+
+mvp/backend/app/schemas/message.py:157
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:157: PydanticDeprecatedSince20: `min_items` is deprecated and will be removed, use `min_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    participants: List[str] = Field(..., min_items=2, max_items=10)
+
+mvp/backend/app/schemas/message.py:157
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:157: PydanticDeprecatedSince20: `max_items` is deprecated and will be removed, use `max_length` instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    participants: List[str] = Field(..., min_items=2, max_items=10)
+
+mvp/backend/app/schemas/message.py:184
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/message.py:184: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ThreadResponse(BaseModel):
+
+mvp/backend/app/api/v1/endpoints/messages.py:42
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/api/v1/endpoints/messages.py:42: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
+    ai_provider: str = Query(default="claude", regex="^(claude|openai|regex)$"),
+
+mvp/backend/app/schemas/schedule.py:41
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/schedule.py:41: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ScheduleEventResponse(BaseModel):
+
+mvp/backend/app/schemas/schedule.py:83
+  /Users/tj/Desktop/CommonGround/mvp/backend/app/schemas/schedule.py:83: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.12/migration/
+    class ExchangeCheckInResponse(BaseModel):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR mvp/backend/tests/system_verification/test_auth_verification.py::test_auth_flow
+ERROR mvp/backend/tests/system_verification/test_health_checks.py::TestDatabaseHealth::test_database_connection
+ERROR mvp/backend/tests/system_verification/test_health_checks.py::TestDatabaseHealth::test_database_tables_exist
+ERROR mvp/backend/tests/system_verification/test_health_checks.py::TestApplicationHealth::test_application_startup
+ERROR mvp/backend/tests/system_verification/test_health_checks.py::TestApplicationHealth::test_health_endpoint
+ERROR mvp/backend/tests/system_verification/test_health_checks.py::TestApplicationHealth::test_openapi_docs_accessible
+ERROR mvp/backend/tests/system_verification/test_health_checks.py::TestPerformance::test_database_query_performance
+ERROR mvp/backend/tests/system_verification/test_health_checks.py::TestPerformance::test_concurrent_requests
+================== 5 passed, 27 warnings, 8 errors in 10.07s ===================

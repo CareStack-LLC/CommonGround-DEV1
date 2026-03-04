@@ -1,0 +1,1184 @@
+{
+  "section_type": "exchange_gps_verification",
+  "section_title": "Exchange GPS Verification Report",
+  "section_order": 9,
+  "content_data": {
+    "summary": {
+      "report_period": {
+        "start": "May 07, 2025",
+        "end": "February 01, 2026"
+      },
+      "total_exchanges": 78,
+      "gps_verified_count": 75,
+      "gps_verified_rate": 96.2
+    },
+    "compliance_metrics": {
+      "overall": {
+        "geofence_compliance_rate": 104.0,
+        "on_time_rate": 100.0,
+        "completed_count": 64,
+        "missed_count": 4,
+        "one_party_only_count": 0,
+        "disputed_count": 0
+      },
+      "petitioner": {
+        "total_check_ins": 36,
+        "avg_distance_meters": 60.1,
+        "geofence_hit_rate": 100.0,
+        "on_time_rate": 100.0
+      },
+      "respondent": {
+        "total_check_ins": 39,
+        "avg_distance_meters": 23.8,
+        "geofence_hit_rate": 100.0,
+        "on_time_rate": 97.4
+      }
+    },
+    "exchange_log": [
+      {
+        "date": "February 01, 2026",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.76971449895065,
+          "gps_lng": -122.42686740006302,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 24.019314428645192,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "January 30, 2026",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.7697168564508,
+          "gps_lng": -122.42692177645324,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 17.697308558359254,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "January 25, 2026",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.769782879515084,
+          "gps_lng": -122.42680725486737,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 36.40197012676974,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "January 23, 2026",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.769694508985324,
+          "gps_lng": -122.42693545584005,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 21.718493238861583,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "January 18, 2026",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "late_arrival",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.7697,
+          "gps_lng": -122.4269,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 20.0,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": false
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "January 16, 2026",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.76964625472198,
+          "gps_lng": -122.42698181638544,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 35.72685332329439,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "January 11, 2026",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "disputed_location",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.7747,
+          "gps_lng": -122.42190000000001,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 600.0,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": false
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "January 09, 2026",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.76966698137756,
+          "gps_lng": -122.426967067607,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 11.571924867867189,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "January 04, 2026",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.76961308478395,
+          "gps_lng": -122.42697848447803,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 22.36582485871212,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "January 02, 2026",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.769629626465154,
+          "gps_lng": -122.42682003800127,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 31.36517631785717,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "December 28, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.769714103954186,
+          "gps_lng": -122.42697221820531,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 33.69468886799099,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "December 26, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "disputed_location",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.7697,
+          "gps_lng": -122.4269,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 20.0,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": false
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "December 21, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.76975545105764,
+          "gps_lng": -122.42681362178824,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 49.0678306190926,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "December 19, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.769735622233,
+          "gps_lng": -122.42686868114805,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 39.36307689945217,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "December 14, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "missed",
+        "outcome": "missed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": false,
+          "check_in_time": null,
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": false
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "December 12, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.76970819777019,
+          "gps_lng": -122.4269442636278,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 19.027103973250696,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "December 07, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.769760616951146,
+          "gps_lng": -122.42698784681312,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 17.095374008560743,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "December 05, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.76964768111614,
+          "gps_lng": -122.42693503049432,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 11.784068838814598,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "November 30, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.769680710871015,
+          "gps_lng": -122.4269596783076,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 19.98502831543015,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "November 28, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "disputed_location",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.7697,
+          "gps_lng": -122.4269,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 20.0,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": false
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "November 23, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.769645449391376,
+          "gps_lng": -122.42683572509998,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 39.9513099697726,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "November 21, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.76972158660287,
+          "gps_lng": -122.4268177768398,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 22.75204903446235,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "November 16, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "disputed_location",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.7747,
+          "gps_lng": -122.42190000000001,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 600.0,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": false
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "November 14, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.769778196294105,
+          "gps_lng": -122.4268538964973,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 27.953155005275534,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "November 09, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.76974877010165,
+          "gps_lng": -122.4269291884001,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 24.717425696603883,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "November 07, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.76970577314979,
+          "gps_lng": -122.42696924042788,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 9.628221270773487,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "November 02, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.76961242804728,
+          "gps_lng": -122.42688017927932,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 16.953940521318827,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "October 31, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.769644152152594,
+          "gps_lng": -122.4269867722624,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 40.299069481226354,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      },
+      {
+        "date": "October 26, 2025",
+        "scheduled_time": "06:00 PM",
+        "title": "Weekend Dropoff",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "completed",
+        "from_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:55 PM",
+          "gps_lat": 37.769633082101265,
+          "gps_lng": -122.4269440937089,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 49.07006062352975,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "06:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": true
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "05:30 PM",
+          "end": "06:30 PM"
+        }
+      },
+      {
+        "date": "October 24, 2025",
+        "scheduled_time": "05:00 PM",
+        "title": "Weekend Pickup",
+        "location": "[ADDRESS REDACTED], SF",
+        "geofence_radius_meters": 150,
+        "status": "completed",
+        "outcome": "disputed_location",
+        "from_parent": {
+          "role": "respondent",
+          "checked_in": true,
+          "check_in_time": "04:55 PM",
+          "gps_lat": 37.7697,
+          "gps_lng": -122.4269,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": 20.0,
+          "within_geofence": true
+        },
+        "to_parent": {
+          "role": "petitioner",
+          "checked_in": true,
+          "check_in_time": "05:02 PM",
+          "gps_lat": null,
+          "gps_lng": null,
+          "device_accuracy_meters": null,
+          "distance_from_geofence_meters": null,
+          "within_geofence": false
+        },
+        "qr_confirmed": false,
+        "window": {
+          "start": "04:30 PM",
+          "end": "05:30 PM"
+        }
+      }
+    ],
+    "evidence_maps": [
+      {
+        "instance_id": "b7128190-63b5-4e8e-ad62-d31818010d2b",
+        "date": "February 01, 2026",
+        "time": "06:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.42686740006302,37.76971449895065)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      },
+      {
+        "instance_id": "137bd398-840a-49fc-9b90-9775fc3827d5",
+        "date": "January 30, 2026",
+        "time": "05:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.42692177645324,37.7697168564508)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      },
+      {
+        "instance_id": "92ec9d96-b506-4c74-8adb-dc21b5bce227",
+        "date": "January 25, 2026",
+        "time": "06:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.42680725486737,37.769782879515084)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      },
+      {
+        "instance_id": "65bb6efe-e334-4374-ae73-360ba838c9b7",
+        "date": "January 23, 2026",
+        "time": "05:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.42693545584005,37.769694508985324)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      },
+      {
+        "instance_id": "9fe2e112-7b7d-4328-829b-338d40ce81db",
+        "date": "January 18, 2026",
+        "time": "06:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.4269,37.7697)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      },
+      {
+        "instance_id": "cda08107-83d7-4801-a582-1935d44aba38",
+        "date": "January 16, 2026",
+        "time": "05:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.42698181638544,37.76964625472198)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      },
+      {
+        "instance_id": "99c8fb5d-d8bc-4056-a832-2e65dbd4df64",
+        "date": "January 11, 2026",
+        "time": "06:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.42190000000001,37.7747)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      },
+      {
+        "instance_id": "fa83546c-9e45-423c-b668-cdcd557d31cc",
+        "date": "January 09, 2026",
+        "time": "05:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.426967067607,37.76966698137756)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      },
+      {
+        "instance_id": "5927e170-93ac-4b4b-ae40-653d2986874b",
+        "date": "January 04, 2026",
+        "time": "06:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.42697848447803,37.76961308478395)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      },
+      {
+        "instance_id": "f36dc835-8e99-4209-b214-567f9b64b2ac",
+        "date": "January 02, 2026",
+        "time": "05:00 PM",
+        "map_url": "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l-star+0000FF(-122.4269,37.7697),pin-s-p+00AA00(-122.42682003800127,37.769629626465154)/-122.4269,37.7697,16/600x400?access_token=pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA&logo=false",
+        "geofence_center": {
+          "lat": 37.7697,
+          "lng": -122.4269
+        },
+        "geofence_radius_meters": 150
+      }
+    ],
+    "verification_methodology": {
+      "description": "GPS coordinates captured at check-in via Silent Handoff feature",
+      "geofence_explanation": "Distance from designated exchange location measured using Haversine formula",
+      "accuracy_note": "GPS accuracy varies by device; device-reported accuracy included in data",
+      "privacy_statement": "Locations captured only at check-in moment, no continuous tracking"
+    }
+  },
+  "evidence_count": 78,
+  "data_sources": [
+    "custody_exchange_instances",
+    "gps_coordinates"
+  ],
+  "generation_time_ms": null
+}

@@ -1,0 +1,108 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Expense Request: {{ expense_title }}{% endblock %}
+
+{% block preheader %}{{ requester_name }} submitted a ${{ total_amount }} expense for {{ expense_category }}.{% endblock %}
+
+{% block header_style %}background: linear-gradient(135deg, #D4A574 0%, #C49664 100%);{% endblock %}
+
+{% block content %}
+<!-- Money Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <img src="{{ icons.money }}" alt="" width="48" height="48" style="display: inline-block;">
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  New Expense Request
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  <strong style="color: #D4A574;">{{ requester_name }}</strong> has submitted an expense
+  that requires your action.
+</p>
+
+<!-- Expense Details Card -->
+<div style="background-color: #FEF7ED; border: 2px solid #D4A574; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB;">
+        <span style="color: #6B7B74; font-size: 14px;">Expense</span><br>
+        <strong style="color: #2D3A35; font-size: 20px;">{{ expense_title }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB;">
+        <span style="color: #6B7B74; font-size: 14px;">Category</span><br>
+        <strong style="color: #2D3A35;">{{ expense_category | title }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #E8E3DB;">
+        <span style="color: #6B7B74; font-size: 14px;">Total Amount</span><br>
+        <strong style="color: #2D3A35; font-size: 24px;">${{ "%.2f"|format(total_amount) }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0;">
+        <span style="color: #6B7B74; font-size: 14px;">Your Share ({{ your_percentage }}%)</span><br>
+        <strong style="color: #D4A574; font-size: 28px;">${{ "%.2f"|format(your_share) }}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+{% if expense_description %}
+<!-- Description -->
+<div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+  <p style="margin: 0 0 8px 0; color: #6B7B74; font-size: 13px; text-transform: uppercase;">Description</p>
+  <p style="margin: 0; color: #2D3A35; font-size: 15px;">{{ expense_description }}</p>
+</div>
+{% endif %}
+
+{% if receipt_attached %}
+<!-- Receipt Indicator -->
+<div style="background-color: #E8F0EC; border-radius: 8px; padding: 12px 16px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td width="24">
+        <img src="{{ icons.document }}" alt="" width="20" height="20">
+      </td>
+      <td style="padding-left: 12px;">
+        <span style="color: #4A6C58; font-size: 14px; font-weight: 600;">Receipt attached</span>
+      </td>
+    </tr>
+  </table>
+</div>
+{% endif %}
+
+{% if children_names %}
+<!-- Child Information -->
+<div style="background-color: #F5F0E8; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+  <p style="margin: 0 0 8px 0; color: #6B7B74; font-size: 13px;">This expense is for:</p>
+  <p style="margin: 0; color: #2D3A35; font-size: 16px; font-weight: 600;">{{ children_names | join(', ') }}</p>
+</div>
+{% endif %}
+
+<!-- Action Buttons -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ approve_url }}"
+     style="display: inline-block; padding: 16px 32px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; margin-right: 8px;">
+    Review & Approve
+  </a>
+</div>
+
+<!-- Deadline Notice -->
+{% if deadline %}
+<div style="background-color: #FEF7ED; border-left: 4px solid #D4A574; padding: 12px 16px; margin-bottom: 24px;">
+  <p style="margin: 0; font-size: 14px; color: #6B7B74;">
+    <strong style="color: #D4A574;">Please respond by:</strong> {{ deadline }}
+  </p>
+</div>
+{% endif %}
+
+<!-- Info Note -->
+<p style="color: #94A3A0; font-size: 13px; text-align: center; margin: 0;">
+  All expense records are maintained for compliance documentation.
+  You can view the full expense history in your ClearFund dashboard.
+</p>
+{% endblock %}

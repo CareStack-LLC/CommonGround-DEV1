@@ -1,0 +1,119 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Payment Reminder: ${{ amount_due }} Due{% endblock %}
+
+{% block preheader %}You have an outstanding ClearFund payment of ${{ amount_due }} due {{ due_date }}.{% endblock %}
+
+{% block header_style %}background: linear-gradient(135deg, #D4A574 0%, #C49664 100%);{% endblock %}
+
+{% block content %}
+<!-- Warning Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <img src="{{ icons.warning }}" alt="" width="48" height="48" style="display: inline-block;">
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Payment Reminder
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  You have an outstanding payment that needs your attention.
+</p>
+
+<!-- Amount Due Card -->
+<div style="background-color: {% if is_overdue %}#FEE2E2{% else %}#FEF7ED{% endif %}; border: 2px solid {% if is_overdue %}#C53030{% else %}#D4A574{% endif %}; border-radius: 12px; padding: 32px; margin-bottom: 24px; text-align: center;">
+  <p style="color: #6B7B74; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">
+    Amount Due
+  </p>
+  <p style="font-size: 48px; font-weight: 700; margin: 0; color: {% if is_overdue %}#C53030{% else %}#D4A574{% endif %};">
+    ${{ "%.2f"|format(amount_due) }}
+  </p>
+  <p style="color: {% if is_overdue %}#C53030{% else %}#6B7B74{% endif %}; font-size: 14px; margin: 8px 0 0 0;">
+    {% if is_overdue %}
+    <strong>Overdue</strong> - Was due {{ due_date }}
+    {% else %}
+    Due by {{ due_date }}
+    {% endif %}
+  </p>
+</div>
+
+<!-- Outstanding Items -->
+{% if outstanding_items %}
+<div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <h3 style="color: #2D3A35; font-size: 16px; margin: 0 0 16px 0;">
+    Outstanding Expenses
+  </h3>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    {% for item in outstanding_items %}
+    <tr>
+      <td style="padding: 10px 0; {% if not loop.last %}border-bottom: 1px solid #E8E3DB;{% endif %}">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td>
+              <span style="color: #2D3A35; font-weight: 500;">{{ item.title }}</span><br>
+              <span style="color: #6B7B74; font-size: 13px;">{{ item.category | title }} • {{ item.date }}</span>
+            </td>
+            <td style="text-align: right;">
+              <strong style="color: #D4A574;">${{ "%.2f"|format(item.amount) }}</strong>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endif %}
+
+<!-- Payment Methods -->
+<div style="background-color: #F5F0E8; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
+  <h3 style="color: #2D3A35; font-size: 16px; margin: 0 0 16px 0;">
+    Payment Options
+  </h3>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 12px; background-color: #FFFBF5; border-radius: 8px; margin-bottom: 8px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td width="32" valign="top">
+              <img src="{{ icons.money }}" alt="" width="24" height="24">
+            </td>
+            <td style="padding-left: 12px;">
+              <strong style="color: #2D3A35;">Pay via ClearFund</strong>
+              <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
+                Secure payment through your CommonGround dashboard
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ payment_url }}"
+     style="display: inline-block; padding: 16px 48px; background-color: {% if is_overdue %}#C53030{% else %}#4A6C58{% endif %}; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    Make Payment
+  </a>
+</div>
+
+{% if is_overdue %}
+<!-- Overdue Warning -->
+<div style="background-color: #FEE2E2; border-left: 4px solid #C53030; padding: 12px 16px; margin-bottom: 24px;">
+  <p style="margin: 0; font-size: 14px; color: #7F1D1D;">
+    <strong>Important:</strong> Overdue payments are tracked and may be included
+    in compliance reports. Please make your payment as soon as possible.
+  </p>
+</div>
+{% endif %}
+
+<!-- Info Note -->
+<p style="color: #94A3A0; font-size: 13px; text-align: center; margin: 0;">
+  Payment history is maintained for record-keeping and compliance documentation.
+  Contact support if you have questions about your balance.
+</p>
+{% endblock %}

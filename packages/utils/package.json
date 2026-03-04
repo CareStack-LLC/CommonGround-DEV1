@@ -1,0 +1,45 @@
+{
+  "name": "@commonground/utils",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared utilities for CommonGround applications",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./date": {
+      "import": "./dist/date.mjs",
+      "require": "./dist/date.js",
+      "types": "./dist/date.d.ts"
+    },
+    "./format": {
+      "import": "./dist/format.mjs",
+      "require": "./dist/format.js",
+      "types": "./dist/format.d.ts"
+    },
+    "./validation": {
+      "import": "./dist/validation.mjs",
+      "require": "./dist/validation.js",
+      "types": "./dist/validation.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/date.ts src/format.ts src/validation.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts src/date.ts src/format.ts src/validation.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "date-fns": "^3.6.0"
+  },
+  "devDependencies": {
+    "@commonground/tsconfig": "workspace:*",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
+  }
+}

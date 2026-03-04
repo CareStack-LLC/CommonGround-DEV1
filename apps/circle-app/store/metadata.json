@@ -1,0 +1,42 @@
+{
+  "name": "My Circle by CommonGround",
+  "subtitle": "Connect with your grandkids & family",
+  "description": {
+    "short": "Video call and share memories with grandchildren and family. Stay connected with the kids you love.",
+    "full": "My Circle is the easy way for grandparents, aunts, uncles, and family friends to stay connected with children in separated families. Part of the trusted CommonGround co-parenting platform.\n\n👨‍👩‍👧‍👦 STAY CONNECTED\n• Video call grandchildren anytime they're available\n• See when kids are online and ready to chat\n• Share photos and create lasting memories\n• Send messages and stickers\n\n📞 SIMPLE VIDEO CALLS\n• One-tap calling - no complicated setup\n• High-quality video that works on any connection\n• Large, easy-to-read buttons\n• Works on phone or tablet\n\n📸 SHARE MEMORIES\n• Send photos to your grandkids\n• Receive photos and artwork from kids\n• Build a shared photo album\n• Comment and react with love\n\n💌 MESSAGING\n• Send text messages and fun stickers\n• Share what's happening in your life\n• Keep the conversation going between calls\n• All messages are parent-approved\n\n🔒 PARENT APPROVED\n• Parents control who can contact their children\n• You'll receive an invitation code from the family\n• All interactions are safe and monitored\n• No direct access without parent approval\n\n✨ EASY TO USE\n• Designed for all ages and tech comfort levels\n• Large text and simple navigation\n• No complicated settings to manage\n• Helpful tips throughout the app\n\n⚠️ GETTING STARTED:\n1. Receive an invitation code from the child's parent\n2. Download My Circle and enter the code\n3. Create your account\n4. Start connecting with your grandchildren!\n\nMy Circle is part of CommonGround, the trusted co-parenting platform that helps separated families stay connected and put children first."
+  },
+  "keywords": [
+    "grandparents app",
+    "video call grandkids",
+    "family connection",
+    "grandchildren",
+    "extended family",
+    "family video chat",
+    "senior friendly",
+    "grandparent video call",
+    "family photos",
+    "stay connected"
+  ],
+  "category": {
+    "ios": "Lifestyle",
+    "android": "Communication"
+  },
+  "contentRating": {
+    "ios": "4+",
+    "android": "Everyone"
+  },
+  "privacy_policy_url": "https://commonground.app/privacy",
+  "terms_url": "https://commonground.app/terms",
+  "support_url": "https://commonground.app/support",
+  "marketing_url": "https://commonground.app/circle",
+  "screenshots": {
+    "required": [
+      "Home screen with connected grandchildren",
+      "Video call in progress",
+      "Messages conversation",
+      "Photo memories gallery",
+      "Simple settings screen"
+    ]
+  },
+  "whats_new": "• New My Circle app for extended family!\n• Easy video calling with grandchildren\n• Share photos and create memories\n• Simple, grandparent-friendly design"
+}
