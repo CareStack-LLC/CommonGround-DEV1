@@ -51,6 +51,11 @@ class PlanResponse(BaseModel):
     price_monthly: Decimal
     price_annual: Decimal
 
+    # Stripe IDs — used by frontend to pass correct price_id to checkout
+    stripe_price_id_monthly: Optional[str] = None
+    stripe_price_id_annual: Optional[str] = None
+    stripe_product_id: Optional[str] = None
+
     features: Dict[str, Any]
     trial_days: int
     display_order: int
@@ -107,7 +112,7 @@ class SubscriptionStatusResponse(BaseModel):
 class CheckoutRequest(BaseModel):
     """Request to create a Stripe Checkout session."""
 
-    plan_code: str = Field(..., description="Plan to subscribe to: 'plus' or 'family_plus'")
+    plan_code: str = Field(..., description="Plan to subscribe to: 'web_starter', 'plus', or 'complete'")
     period: str = Field(
         default="monthly",
         description="Billing period: 'monthly' or 'annual'",

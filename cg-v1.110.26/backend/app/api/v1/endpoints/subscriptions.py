@@ -76,13 +76,16 @@ async def list_subscription_plans(
     # Fallback to hardcoded plans if database unavailable or empty
     hardcoded_plans = [
         PlanResponse(
-            id="plan_starter_001",
-            plan_code="starter",
-            display_name="Starter",
-            description="Everything you need to get started with better co-parenting.",
+            id="plan_web_starter_001",
+            plan_code="web_starter",
+            display_name="Web Starter",
+            description="Free plan to get started with CommonGround.",
             badge=None,
             price_monthly=0.00,
             price_annual=0.00,
+            stripe_price_id_monthly="price_1T7WgnB3EXvvERPfyu40gtfE",
+            stripe_price_id_annual=None,
+            stripe_product_id="prod_U5i6vWb4ktGrTN",
             features={
                 "aria_manual_sentiment": True,
                 "clearfund_fee_exempt": False,
@@ -90,7 +93,7 @@ async def list_subscription_plans(
                 "circle_contacts_limit": 0,
                 "kidcoms_access": False,
             },
-            trial_days=14,
+            trial_days=0,
             display_order=0,
         ),
         PlanResponse(
@@ -99,8 +102,11 @@ async def list_subscription_plans(
             display_name="Plus",
             description="Better scheduling, no fees, and a trusted contact.",
             badge="Most Popular",
-            price_monthly=12.00,
-            price_annual=120.00,
+            price_monthly=17.99,
+            price_annual=199.99,
+            stripe_price_id_monthly="price_1T7WgnB3EXvvERPfcpZeMSSH",
+            stripe_price_id_annual="price_1T7WgnB3EXvvERPfe7NNFlru",
+            stripe_product_id="prod_U5i6Efw49ipfb3",
             features={
                 "aria_manual_sentiment": True,
                 "clearfund_fee_exempt": True,
@@ -112,13 +118,16 @@ async def list_subscription_plans(
             display_order=1,
         ),
         PlanResponse(
-            id="plan_family_plus_001",
-            plan_code="family_plus",
-            display_name="Family+",
-            description="Full access including KidComs video calls and theater mode.",
-            badge=None,
-            price_monthly=25.00,
-            price_annual=250.00,
+            id="plan_complete_001",
+            plan_code="complete",
+            display_name="Complete",
+            description="Full access including KidComs video calls and all features.",
+            badge="Best Value",
+            price_monthly=34.99,
+            price_annual=349.99,
+            stripe_price_id_monthly="price_1T7WgoB3EXvvERPfDm7qKpBN",
+            stripe_price_id_annual="price_1T7WgoB3EXvvERPfmDy9KtDh",
+            stripe_product_id="prod_U5i6lsgC2mOHxn",
             features={
                 "aria_manual_sentiment": True,
                 "aria_advanced": True,
@@ -239,10 +248,10 @@ async def create_checkout_session(
         )
 
     # Validate plan code
-    if request.plan_code not in ("plus", "family_plus"):
+    if request.plan_code not in ("web_starter", "plus", "complete"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid plan code. Must be 'plus' or 'family_plus'"
+            detail="Invalid plan code. Must be 'web_starter', 'plus', or 'complete'"
         )
 
     # Get plan for price ID
@@ -460,10 +469,10 @@ async def upgrade_subscription(
         )
 
     # Validate plan code
-    if request.plan_code not in ("plus", "family_plus"):
+    if request.plan_code not in ("web_starter", "plus", "complete"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid plan code. Must be 'plus' or 'family_plus'"
+            detail="Invalid plan code. Must be 'web_starter', 'plus', or 'complete'"
         )
 
     # Must have an existing subscription to upgrade
