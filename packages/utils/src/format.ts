@@ -168,7 +168,9 @@ export function caseToTitleCase(text: string): string {
  * Mask sensitive data (e.g., email, phone)
  */
 export function maskEmail(email: string): string {
-  const [localPart, domain] = email.split('@');
+  const parts = email.split('@');
+  const localPart = parts[0] ?? '';
+  const domain = parts[1];
   if (!domain) return email;
 
   const visibleChars = Math.min(2, localPart.length);
