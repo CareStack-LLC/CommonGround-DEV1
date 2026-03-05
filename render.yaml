@@ -23,13 +23,25 @@ services:
           property: connectionString
       - key: ALLOWED_ORIGINS
         value: https://common-ground-blue.vercel.app,https://commonground.family
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
       - key: ANTHROPIC_API_KEY
-        sync: false  # Set manually in Render dashboard
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_PUBLISHABLE_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: DAILY_API_KEY
+        sync: false
+      - key: MAPBOX_API_KEY
         sync: false
 
 databases:
