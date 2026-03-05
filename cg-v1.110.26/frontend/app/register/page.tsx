@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { APIError } from '@/lib/api';
-import { signInWithGoogle, signInWithApple } from '@/lib/supabase';
+import { signInWithGoogle } from '@/lib/supabase';
 import { Loader2, Mail, Lock, User, ArrowRight, Leaf, Users, CheckCircle } from 'lucide-react';
 
 /* =============================================================================
@@ -42,29 +42,17 @@ function RegisterContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
   const [grantData, setGrantData] = useState<GrantData | null>(null);
-  const [oauthLoading, setOauthLoading] = useState<'google' | 'apple' | null>(null);
+  const [oauthLoading, setOauthLoading] = useState<boolean>(false);
 
   const handleGoogleSignIn = async () => {
     setError('');
-    setOauthLoading('google');
+    setOauthLoading(true);
     try {
       await signInWithGoogle();
       // Redirect happens automatically via Supabase OAuth
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign up with Google');
-      setOauthLoading(null);
-    }
-  };
-
-  const handleAppleSignIn = async () => {
-    setError('');
-    setOauthLoading('apple');
-    try {
-      await signInWithApple();
-      // Redirect happens automatically via Supabase OAuth
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign up with Apple');
-      setOauthLoading(null);
+      setOauthLoading(false);
     }
   };
 
@@ -396,7 +384,7 @@ function RegisterContent() {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isLoading || oauthLoading !== null}
+                disabled={isLoading || oauthLoading}
                 className="w-full py-3.5 px-6 rounded-xl bg-cg-sage hover:bg-cg-sage-dark text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
               >
                 {isLoading ? (
@@ -426,15 +414,15 @@ function RegisterContent() {
             </div>
 
             {/* OAuth Buttons */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-3">
               {/* Google Sign Up */}
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
-                disabled={isLoading || oauthLoading !== null}
+                disabled={isLoading || oauthLoading}
                 className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-background hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {oauthLoading === 'google' ? (
+                {oauthLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 ) : (
                   <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -456,24 +444,7 @@ function RegisterContent() {
                     />
                   </svg>
                 )}
-                <span className="text-sm font-medium text-foreground">Google</span>
-              </button>
-
-              {/* Apple Sign Up */}
-              <button
-                type="button"
-                onClick={handleAppleSignIn}
-                disabled={isLoading || oauthLoading !== null}
-                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-border bg-background hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {oauthLoading === 'apple' ? (
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                ) : (
-                  <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                  </svg>
-                )}
-                <span className="text-sm font-medium text-foreground">Apple</span>
+                <span className="text-sm font-medium text-foreground">Sign up with Google</span>
               </button>
             </div>
 
