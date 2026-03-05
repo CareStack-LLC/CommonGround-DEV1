@@ -1055,10 +1055,10 @@ function MessagesContent() {
                               isAcknowledging={acknowledgingMessageId === message.id}
                             />
                             {/* ARIA v2: Reply suggestions for incoming messages */}
-                            {!isOwn && replySuggestions[message.id] && (
+                            {!isOwn && message.id && replySuggestions[message.id] && (
                               <ARIAReplySuggestion
                                 messageId={message.id}
-                                suggestions={replySuggestions[message.id]}
+                                suggestions={replySuggestions[message.id!]}
                                 onUse={(suggestion) => {
                                   setComposePreFill(suggestion);
                                   setShowCompose(true);
