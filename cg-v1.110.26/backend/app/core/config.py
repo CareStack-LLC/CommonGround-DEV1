@@ -67,7 +67,8 @@ class Settings(BaseSettings):
     # AI Services (for ARIA)
     ANTHROPIC_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
-    ARIA_DEFAULT_PROVIDER: str = "claude"  # "claude" or "openai"
+    GEMINI_API_KEY: Optional[str] = None
+    ARIA_DEFAULT_PROVIDER: str = "claude"  # "claude", "openai", or "gemini"
 
     # Stripe
     STRIPE_SECRET_KEY: Optional[str] = None
