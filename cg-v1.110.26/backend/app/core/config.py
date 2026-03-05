@@ -65,17 +65,17 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379"
 
     # AI Services (for ARIA)
-    ANTHROPIC_API_KEY: str
-    OPENAI_API_KEY: str
+    ANTHROPIC_API_KEY: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = None
     ARIA_DEFAULT_PROVIDER: str = "claude"  # "claude" or "openai"
 
     # Stripe
-    STRIPE_SECRET_KEY: str
-    STRIPE_PUBLISHABLE_KEY: str
-    STRIPE_WEBHOOK_SECRET: str
+    STRIPE_SECRET_KEY: Optional[str] = None
+    STRIPE_PUBLISHABLE_KEY: Optional[str] = None
+    STRIPE_WEBHOOK_SECRET: Optional[str] = None
 
     # Mapbox (for geocoding in Silent Handoff)
-    MAPBOX_API_KEY: str = "pk.eyJ1IjoidGVlamF5MzEwIiwiYSI6ImNtano1aGIzeTdidTYzZHB5ZWtkYTZoOHEifQ.ZIGoggSuBeAEIzeHaTk6tA"
+    MAPBOX_API_KEY: str = ""  # Set via MAPBOX_API_KEY environment variable
 
     # Daily.co (for KidComs video calls)
     DAILY_API_KEY: Optional[str] = None
