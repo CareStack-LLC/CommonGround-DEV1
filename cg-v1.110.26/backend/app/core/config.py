@@ -28,12 +28,12 @@ class Settings(BaseSettings):
     PORT: int = 8000
 
     # Frontend URL (used for generating invite links, etc.)
-    FRONTEND_URL: str = "https://common-ground-blue.vercel.app"
+    FRONTEND_URL: str = "https://www.find-commonground.com"
 
     # CORS
-    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://common-ground-blue.vercel.app,https://common-ground-git-main-teejays-projects-caad17d8.vercel.app"
-    # Allow Vercel preview/branch URLs by default (regex must match full origin)
-    CORS_ORIGIN_REGEX: str = r"https://.*\.vercel\.app$"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://www.find-commonground.com,https://find-commonground.com,https://common-ground-blue.vercel.app,https://common-ground-git-main-teejays-projects-caad17d8.vercel.app"
+    # Allow Vercel preview/branch URLs and production custom domain
+    CORS_ORIGIN_REGEX: str = r"https://(.*\.vercel\.app|find-commonground\.com|www\.find-commonground\.com)$"
 
     @property
     def allowed_origins_list(self) -> List[str]:

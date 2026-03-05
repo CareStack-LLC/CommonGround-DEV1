@@ -1,20 +1,23 @@
 import { createClient, Provider } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder-url.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-    const errorMsg = 'Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY) are missing! Please check your .env file.';
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     if (typeof window !== 'undefined') {
-        console.error(errorMsg);
+        console.error('Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY) are missing! Please check your .env file.');
     }
-    // Still initialize but with dummy values to prevent crash on import, 
-    // but auth calls will fail with a clear msg if these are missing.
 }
 
+/**
+ * Plain supabase client (uses localStorage). Keep for non-auth usage (DB queries,
+ * realtime, etc.). For OAuth sign-in, use signInWithOAuth() below which uses
+ * the SSR browser client that stores the PKCE verifier in cookies.
+ */
 export const supabase = createClient(
-    supabaseUrl || 'https://placeholder-url.supabase.co',
-    supabaseAnonKey || 'placeholder-key',
+    supabaseUrl,
+    supabaseAnonKey,
     {
         auth: {
             flowType: 'pkce',
@@ -22,14 +25,24 @@ export const supabase = createClient(
     }
 );
 
+/**
+ * SSR-aware browser client. Stores the PKCE code_verifier in a cookie so it
+ * survives the server-side OAuth redirect (unlike localStorage which is
+ * cleared between the initiation redirect and the callback).
+ */
+function getOAuthClient() {
+    return createBrowserClient(supabaseUrl, supabaseAnonKey);
+}
+
 // OAuth helper functions
 
 /**
  * Sign in with an OAuth provider (Google, Apple, etc.)
- * Redirects to the provider's auth page.
+ * Uses @supabase/ssr so the PKCE code_verifier is stored in a cookie.
  */
 export async function signInWithOAuth(provider: Provider) {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const client = getOAuthClient();
+    const { error } = await client.auth.signInWithOAuth({
         provider,
         options: {
             redirectTo: `${window.location.origin}/auth/callback`,
