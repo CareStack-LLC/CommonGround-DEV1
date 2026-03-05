@@ -1045,28 +1045,27 @@ function MessagesContent() {
                         const showAvatar = !prevMessage || prevMessage.sender_id !== message.sender_id;
 
                         return (
-                          <MessageBubble
-                            key={message.id}
-                            message={message}
-                            isOwn={isOwn}
-                            showAvatar={showAvatar}
-                            userName={isOwn ? undefined : 'Co-Parent'}
-                            onAcknowledge={handleAcknowledgeMessage}
-                            isAcknowledging={acknowledgingMessageId === message.id}
-                          />
-                          {/* ARIA v2: Reply suggestions for incoming messages */ }
-                        {
-                          !isOwn && replySuggestions[message.id] && (
-                            <ARIAReplySuggestion
-                              messageId={message.id}
-                              suggestions={replySuggestions[message.id]}
-                              onUse={(suggestion, idx) => {
-                                setComposePreFill(suggestion);
-                                setShowCompose(true);
-                              }}
+                          <div key={message.id}>
+                            <MessageBubble
+                              message={message}
+                              isOwn={isOwn}
+                              showAvatar={showAvatar}
+                              userName={isOwn ? undefined : 'Co-Parent'}
+                              onAcknowledge={handleAcknowledgeMessage}
+                              isAcknowledging={acknowledgingMessageId === message.id}
                             />
-                          )
-                        }
+                            {/* ARIA v2: Reply suggestions for incoming messages */}
+                            {!isOwn && replySuggestions[message.id] && (
+                              <ARIAReplySuggestion
+                                messageId={message.id}
+                                suggestions={replySuggestions[message.id]}
+                                onUse={(suggestion) => {
+                                  setComposePreFill(suggestion);
+                                  setShowCompose(true);
+                                }}
+                              />
+                            )}
+                          </div>
                         );
                       })}
 
