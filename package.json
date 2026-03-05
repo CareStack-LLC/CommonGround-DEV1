@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "cg-v1.110.26/*"
   ],
   "scripts": {
     "build": "turbo build",
