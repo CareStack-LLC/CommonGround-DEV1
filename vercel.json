@@ -1,0 +1,6 @@
+{
+    "version": 2,
+    "buildCommand": "cd cg-v1.110.26/frontend && pnpm install && pnpm run build",
+    "outputDirectory": "cg-v1.110.26/frontend/.next",
+    "framework": "nextjs"
+}
