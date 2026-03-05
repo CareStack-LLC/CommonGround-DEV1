@@ -1,8 +1,8 @@
-"""merge all heads
+"""Merge phase 1 and other heads
 
-Revision ID: merge_2026_02_04
-Revises: 578d6449b14a, b25878c61dcc, d3v1c3_setup
-Create Date: 2026-02-04 13:00:00.000000
+Revision ID: a6b0b8354b62
+Revises: 6074eb3feec1
+Create Date: 2026-03-05 01:03:49.691514
 
 """
 from typing import Sequence, Union
@@ -10,16 +10,19 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 
+
 # revision identifiers, used by Alembic.
-revision: str = 'merge_2026_02_04'
-down_revision: Union[str, Sequence[str], None] = ('b25878c61dcc', 'd3v1c3_setup')
+revision: str = 'a6b0b8354b62'
+down_revision: Union[str, Sequence[str], None] = '6074eb3feec1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    """Upgrade schema."""
     pass
 
 
 def downgrade() -> None:
+    """Downgrade schema."""
     pass

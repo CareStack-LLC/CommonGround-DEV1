@@ -66,25 +66,9 @@ def upgrade() -> None:
     op.create_index(op.f('ix_professional_call_logs_case_assignment_id'), 'professional_call_logs', ['case_assignment_id'], unique=False)
     op.create_index(op.f('ix_professional_call_logs_family_file_id'), 'professional_call_logs', ['family_file_id'], unique=False)
     op.create_index(op.f('ix_professional_call_logs_professional_id'), 'professional_call_logs', ['professional_id'], unique=False)
-    op.alter_column('agreement_sections', 'smart_rules',
-               existing_type=postgresql.JSONB(astext_type=sa.Text()),
-               type_=sa.JSON(),
-               existing_nullable=True)
-    op.add_column('child_users', sa.Column('device_setup_code', sa.String(length=8), nullable=True))
-    op.add_column('child_users', sa.Column('device_setup_expires_at', sa.DateTime(), nullable=True))
-    op.create_index(op.f('ix_child_users_device_setup_code'), 'child_users', ['device_setup_code'], unique=True)
-    op.alter_column('family_files', 'smart_config',
-               existing_type=postgresql.JSONB(astext_type=sa.Text()),
-               type_=sa.JSON(),
-               existing_nullable=True)
-    op.drop_index(op.f('idx_grant_codes_partner'), table_name='grant_codes')
-    op.create_index(op.f('ix_grant_codes_partner_id'), 'grant_codes', ['partner_id'], unique=False)
-    op.alter_column('subscription_plans', 'features',
-               existing_type=postgresql.JSONB(astext_type=sa.Text()),
-               type_=sa.JSON(),
-               existing_nullable=False,
-               existing_server_default=sa.text("'{}'::jsonb"))
-    # ### end Alembic commands ###
+
+
+
 
 
 def downgrade() -> None:

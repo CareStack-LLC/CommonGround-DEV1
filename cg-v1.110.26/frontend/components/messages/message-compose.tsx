@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { messagesAPI, ARIAAnalysisResponse, MessageAttachment, InterventionAction } from '@/lib/api';
 import { ARIAIntervention } from './aria-intervention';
+import { ARIARewriteModal, type ARIARewritePayload } from './aria-rewrite-modal';
 import {
   Send,
   Sparkles,
@@ -26,6 +27,7 @@ interface MessageComposeProps {
   recipientId: string;
   onMessageSent: (message?: any) => void;
   ariaEnabled?: boolean;
+  ariaMode?: 'off' | 'standard' | 'strict';
   onTyping?: () => void;
   onStopTyping?: () => void;
 }
@@ -54,6 +56,7 @@ export function MessageCompose({
   recipientId,
   onMessageSent,
   ariaEnabled = true,
+  ariaMode = 'standard',
   onTyping,
   onStopTyping,
 }: MessageComposeProps) {
@@ -61,9 +64,9 @@ export function MessageCompose({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [analysis, setAnalysis] = useState<ARIAAnalysisResponse | null>(null);
+  const [ariaRewritePayload, setAriaRewritePayload] = useState<ARIARewritePayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
-  // Track previous flagged state for "modified" interventions
   const [lastFlaggedAnalysis, setLastFlaggedAnalysis] = useState<ARIAAnalysisResponse | null>(null);
   const [lastFlaggedMessage, setLastFlaggedMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -181,7 +184,7 @@ export function MessageCompose({
     }
   };
 
-  const handleSendDirect = async (content: string, interventionAction?: InterventionAction) => {
+  const handleSendDirect = async (content: string, interventionAction?: InterventionAction, ariaAcceptedRewrite?: boolean) => {
     try {
       setIsSending(true);
       setError(null);
@@ -204,7 +207,15 @@ export function MessageCompose({
         content: payloadContent,
         message_type: 'text',
         intervention_action: interventionAction,
-      });
+        aria_accepted_rewrite: ariaAcceptedRewrite ?? false,
+      } as any);
+
+      // ARIA v2: backend may return 202 with a rewrite suggestion instead of saving
+      if ((newMessage as any)?.aria_flagged) {
+        setAriaRewritePayload(newMessage as unknown as ARIARewritePayload);
+        setIsSending(false);
+        return;
+      }
 
       // Upload attachments if any
       let uploadErrorMessages: string[] = [];
@@ -314,6 +325,23 @@ export function MessageCompose({
     });
   };
 
+  // ARIA v2: User chose to use ARIA's contextual rewrite
+  const handleUseARIARewrite = async (rewrittenContent: string) => {
+    setAriaRewritePayload(null);
+    await handleSendDirect(rewrittenContent, undefined, true);
+  };
+
+  // ARIA v2: Standard mode only — send original despite flagging
+  const handleSendOriginalAnyway = async () => {
+    setAriaRewritePayload(null);
+    await handleSendDirect(message, { action: 'sent_anyway', final_message: message }, true);
+  };
+
+  // ARIA v2: Dismiss rewrite modal and let user edit in compose box
+  const handleDismissRewriteModal = () => {
+    setAriaRewritePayload(null);
+  };
+
   const handleCancel = () => {
     setAnalysis(null);
     setError(null);
@@ -379,8 +407,23 @@ export function MessageCompose({
         </div>
       )}
 
-      {/* ARIA Intervention Modal */}
-      {analysis && analysis.is_flagged && (
+      {/* ARIA v2 Rewrite Modal (highest priority — shown instead of compose when flagged) */}
+      {ariaRewritePayload && (
+        <ARIARewriteModal
+          payload={ariaRewritePayload}
+          onUseRewrite={handleUseARIARewrite}
+          onEditRewrite={(startingContent) => {
+            setMessage(startingContent);
+            setAriaRewritePayload(null);
+          }}
+          onSendOriginal={ariaRewritePayload.aria_mode === 'standard' ? handleSendOriginalAnyway : undefined}
+          onCancel={handleDismissRewriteModal}
+          isSending={isSending}
+        />
+      )}
+
+      {/* Legacy ARIA Intervention Modal (regex-only path, kept for backwards compat) */}
+      {!ariaRewritePayload && analysis && analysis.is_flagged && (
         <ARIAIntervention
           analysis={analysis}
           originalMessage={message}
@@ -390,7 +433,7 @@ export function MessageCompose({
       )}
 
       {/* Compose Form */}
-      {!analysis?.is_flagged && (
+      {!ariaRewritePayload && !analysis?.is_flagged && (
         <div className="space-y-4">
           {/* ARIA Status Indicator */}
           {ariaEnabled && (

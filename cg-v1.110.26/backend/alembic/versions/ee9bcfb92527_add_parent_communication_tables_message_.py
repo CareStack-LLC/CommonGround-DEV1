@@ -258,10 +258,6 @@ def upgrade() -> None:
                existing_nullable=True)
     op.drop_index(op.f('ix_intake_sessions_access_token'), table_name='intake_sessions')
     op.drop_index(op.f('ix_intake_sessions_session_number'), table_name='intake_sessions')
-    op.drop_constraint(op.f('intake_sessions_case_assignment_id_fkey'), 'intake_sessions', type_='foreignkey')
-    op.drop_constraint(op.f('intake_sessions_firm_id_fkey'), 'intake_sessions', type_='foreignkey')
-    op.drop_column('intake_sessions', 'firm_id')
-    op.drop_column('intake_sessions', 'case_assignment_id')
     op.alter_column('kidcoms_communication_logs', 'aria_flags',
                existing_type=postgresql.JSONB(astext_type=sa.Text()),
                type_=sa.JSON(),

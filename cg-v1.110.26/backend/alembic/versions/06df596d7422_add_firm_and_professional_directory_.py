@@ -41,8 +41,6 @@ def upgrade() -> None:
     op.add_column('firms', sa.Column('payment_plans_available', sa.Boolean(), server_default=sa.text('false'), nullable=False))
     op.add_column('firms', sa.Column('works_with_nonprofits', sa.Boolean(), server_default=sa.text('false'), nullable=False))
     op.add_column('firms', sa.Column('service_location', sa.String(length=200), nullable=True))
-    op.drop_index(op.f('idx_intake_sessions_client_email'), table_name='intake_sessions')
-    op.create_index(op.f('ix_intake_sessions_client_email'), 'intake_sessions', ['client_email'], unique=False)
     op.add_column('professional_profiles', sa.Column('service_location', sa.String(length=200), nullable=True))
     op.alter_column('schedule_events', 'attendee_ids',
                existing_type=postgresql.JSONB(astext_type=sa.Text()),

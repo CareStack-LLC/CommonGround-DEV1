@@ -18,6 +18,8 @@ class MessageCreate(BaseModel):
     agreement_id: Optional[str] = Field(None, max_length=100)  # SharedCare Agreement context
     message_type: str = Field(default="text", max_length=50)
     intervention_action: Optional[InterventionAction] = None
+    # ARIA v2: set True when re-submitting after accepting/editing the ARIA rewrite
+    aria_accepted_rewrite: bool = Field(default=False)
 
     @field_validator('content')
     @classmethod

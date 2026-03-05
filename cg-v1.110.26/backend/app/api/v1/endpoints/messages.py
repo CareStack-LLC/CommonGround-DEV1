@@ -4,10 +4,10 @@ Message endpoints with ARIA integration.
 Handles parent-to-parent communication with AI-powered conflict prevention.
 """
 
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_, desc
+from sqlalchemy import select, and_, or_, desc, text
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
@@ -44,6 +44,7 @@ from datetime import datetime
 import uuid
 import hashlib
 import logging
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -241,9 +242,67 @@ async def analyze_message_content(
     )
 
 
+async def _store_reply_suggestions(
+    message_id: str,
+    family_file_id: Optional[str],
+    recipient_id: str,
+    message_content: str,
+    thread_history: List[str],
+    aria_mode: str
+) -> None:
+    """
+    Background task: generate reply suggestions and store them in aria_reply_suggestions.
+    Also pushes them via WebSocket to the recipient.
+    """
+    try:
+        suggestions = await aria_service.generate_reply_suggestion(
+            incoming_message=message_content,
+            thread_history=thread_history,
+            aria_mode=aria_mode
+        )
+        if not suggestions:
+            return
+
+        # Store in DB via raw SQL (avoids model dependency)
+        from app.core.database import async_session_maker
+        async with async_session_maker() as db_bg:
+            stmt = text("""
+                INSERT INTO aria_reply_suggestions
+                    (id, message_id, family_file_id, recipient_id, suggestions, aria_mode, created_at)
+                VALUES
+                    (:id, :msg_id, :ff_id, :recip_id, :suggestions, :aria_mode, NOW())
+            """)
+            await db_bg.execute(stmt, {
+                "id": str(uuid.uuid4()),
+                "msg_id": message_id,
+                "ff_id": family_file_id,
+                "recip_id": recipient_id,
+                "suggestions": json.dumps(suggestions),
+                "aria_mode": aria_mode,
+            })
+            await db_bg.commit()
+
+        # Push to recipient via WebSocket
+        try:
+            await manager.broadcast_to_case(
+                message={
+                    "type": "aria_reply_suggestions",
+                    "message_id": message_id,
+                    "suggestions": suggestions,
+                },
+                case_id=family_file_id,
+                exclude_user=None
+            )
+        except Exception as e:
+            print(f"[ARIA v2] WebSocket push for reply suggestions failed: {e}")
+    except Exception as e:
+        print(f"[ARIA v2] _store_reply_suggestions background task failed: {e}")
+
+
 @router.post("/", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 async def send_message(
     message_data: MessageCreate,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -268,8 +327,10 @@ async def send_message(
     """
     aria_enabled = True
     ai_provider = "regex"
+    aria_mode = "standard"  # ARIA v2: default mode
     case_context = {"children": []}
     context_id = None  # For WebSocket broadcast
+    thread_history: List[str] = []  # ARIA v2: conversation context for rewriting
 
     # Determine context: family file or court case
     if message_data.family_file_id:
@@ -303,7 +364,17 @@ async def send_message(
         # Get family file ARIA settings
         aria_enabled = family_file.aria_enabled
         ai_provider = family_file.aria_provider or "regex"
+        aria_mode = getattr(family_file, 'aria_mode', 'standard') or 'standard'
         context_id = message_data.family_file_id
+
+        # ARIA v2: Load recent thread history for contextual rewrite
+        history_result = await db.execute(
+            select(Message.content)
+            .where(Message.family_file_id == message_data.family_file_id)
+            .order_by(desc(Message.sent_at))
+            .limit(10)
+        )
+        thread_history = list(reversed([row[0] for row in history_result.fetchall()]))
 
         # Get children from family file for context
         children_result = await db.execute(
@@ -497,6 +568,56 @@ async def send_message(
             timestamp=datetime.utcnow()
         )
 
+    # ==========================================================================
+    # ARIA v2: Intercept flagged messages BEFORE saving — return rewrite modal
+    # ==========================================================================
+    aria_accepted_rewrite = getattr(message_data, 'aria_accepted_rewrite', False)
+
+    if (
+        aria_enabled
+        and aria_analysis
+        and aria_analysis.is_flagged
+        and not aria_analysis.block_send
+        and not aria_accepted_rewrite
+    ):
+        # Generate context-aware rewrite via Claude
+        flag_reason = aria_analysis.explanation or "toxic content"
+        rewrite = await aria_service.generate_contextual_rewrite(
+            flagged_message=message_data.content,
+            thread_history=thread_history,
+            flag_reason=flag_reason,
+            aria_mode=aria_mode
+        )
+
+        # Return 202 with the rewrite so the frontend shows the modal
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=202,
+            content={
+                "aria_flagged": True,
+                "aria_mode": aria_mode,
+                "original_message": message_data.content,
+                "suggested_rewrite": rewrite,
+                "explanation": aria_analysis.explanation,
+                "categories": [cat.value for cat in aria_analysis.categories],
+                "toxicity_score": aria_analysis.toxicity_score,
+            }
+        )
+
+    # In strict mode: if the message was flagged and user has NOT accepted a rewrite,
+    # we block the send even if aria_accepted_rewrite is somehow missing.
+    if (
+        aria_mode == "strict"
+        and aria_analysis
+        and aria_analysis.is_flagged
+        and not aria_analysis.block_send
+        and not aria_accepted_rewrite
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ARIA Strict Mode: You must use the suggested rewrite before sending."
+        )
+
     # Determine final content and original content based on intervention
     final_content = message_data.content
     original_content = None
@@ -633,6 +754,18 @@ async def send_message(
         except Exception as e:
             print(f"WebSocket broadcast failed: {e}")
 
+    # ARIA v2: Generate reply suggestions for recipient in background
+    if aria_enabled and aria_mode != "off" and message_data.family_file_id:
+        background_tasks.add_task(
+            _store_reply_suggestions,
+            message_id=str(new_message.id),
+            family_file_id=message_data.family_file_id,
+            recipient_id=new_message.recipient_id,
+            message_content=new_message.content,
+            thread_history=thread_history,
+            aria_mode=aria_mode
+        )
+
     # Send push notification to recipient if they have subscriptions
     if new_message.recipient_id and new_message.recipient_id != current_user.id:
         try:
@@ -670,7 +803,105 @@ async def send_message(
     )
 
 
-@router.post("/{message_id}/intervention", response_model=MessageResponse)
+@router.get("/{message_id}/suggestions")
+async def get_reply_suggestions(
+    message_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    ARIA v2: Fetch reply suggestions generated for an incoming message.
+
+    Only the recipient of the original message can fetch suggestions.
+    Returns the list of suggested reply strings.
+    """
+    # Verify the message exists and user is the recipient
+    msg_result = await db.execute(
+        select(Message).where(Message.id == message_id)
+    )
+    message = msg_result.scalar_one_or_none()
+
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    if message.recipient_id != str(current_user.id):
+        raise HTTPException(status_code=403, detail="Only the recipient can view reply suggestions")
+
+    # Fetch from aria_reply_suggestions
+    result = await db.execute(
+        text("""
+            SELECT suggestions, was_used, created_at
+            FROM aria_reply_suggestions
+            WHERE message_id = :msg_id
+            ORDER BY created_at DESC
+            LIMIT 1
+        """),
+        {"msg_id": message_id}
+    )
+    row = result.fetchone()
+
+    if not row:
+        return {"message_id": message_id, "suggestions": []}
+
+    suggestions = row[0] if isinstance(row[0], list) else json.loads(row[0])
+    return {
+        "message_id": message_id,
+        "suggestions": suggestions,
+        "was_used": row[1],
+        "created_at": row[2].isoformat() if row[2] else None
+    }
+
+
+@router.patch("/{message_id}/suggestions/mark-used")
+async def mark_suggestion_used(
+    message_id: str,
+    suggestion_index: int = Query(0, ge=0, le=1),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """ARIA v2: Mark a reply suggestion as used (analytics)."""
+    await db.execute(
+        text("""
+            UPDATE aria_reply_suggestions
+            SET was_used = true, used_suggestion_index = :idx
+            WHERE message_id = :msg_id AND recipient_id = :recip
+        """),
+        {"msg_id": message_id, "recip": str(current_user.id), "idx": suggestion_index}
+    )
+    await db.commit()
+    return {"status": "ok"}
+
+
+@router.patch("/family-file/{family_file_id}/aria-mode")
+async def update_aria_mode(
+    family_file_id: str,
+    aria_mode: str = Query(..., regex="^(off|standard|strict)$"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    ARIA v2: Update the ARIA mode for a family file.
+    Values: off | standard | strict
+    Both parents can change the mode.
+    """
+    result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == family_file_id)
+    )
+    family_file = result.scalar_one_or_none()
+
+    if not family_file:
+        raise HTTPException(status_code=404, detail="Family file not found")
+
+    if str(current_user.id) not in [family_file.parent_a_id, family_file.parent_b_id]:
+        raise HTTPException(status_code=403, detail="You don't have access to this family file")
+
+    family_file.aria_mode = aria_mode
+    await db.commit()
+
+    return {"family_file_id": family_file_id, "aria_mode": aria_mode, "status": "updated"}
+
+
+
 async def handle_intervention_response(
     message_id: str,
     action: InterventionAction,

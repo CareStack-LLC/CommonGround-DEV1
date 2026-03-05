@@ -16,7 +16,7 @@ import sqlalchemy as sa
 
 # revision identifiers
 revision = 'pp_phase1_001'
-down_revision = None  # Will be auto-set by Alembic chain
+down_revision = ('p1r2o3f4e5s6s7', '0dbb095fe408')
 branch_labels = None
 depends_on = None
 

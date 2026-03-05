@@ -13,6 +13,7 @@ import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
 import { MessageCompose } from '@/components/messages/message-compose';
+import { ARIAReplySuggestion } from '@/components/messages/aria-reply-suggestion';
 import { PreCallSettingsDialog } from '@/components/calls/pre-call-settings-dialog';
 import { SensitivityLevel } from '@/components/calls/aria-sensitivity-slider';
 import {
@@ -621,6 +622,10 @@ function MessagesContent() {
   const [isStartingCall, setIsStartingCall] = useState(false);
   const [acknowledgingMessageId, setAcknowledgingMessageId] = useState<string | null>(null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
+  // ARIA v2: reply suggestions keyed by message_id, and compose pre-fill
+  const [replySuggestions, setReplySuggestions] = useState<Record<string, string[]>>({});
+  const [composePreFill, setComposePreFill] = useState<string | undefined>(undefined);
+  const [ariaMode, setAriaMode] = useState<'off' | 'standard' | 'strict'>('standard');
 
   const handleAcceptDisclaimer = () => {
     setShowDisclaimer(false);
@@ -638,6 +643,16 @@ function MessagesContent() {
       });
     }
   }, [user?.id]);
+
+  // ARIA v2: handle incoming reply suggestion WebSocket events
+  const handleARIAReplySuggestions = useCallback((payload: any) => {
+    if (payload?.message_id && Array.isArray(payload?.suggestions)) {
+      setReplySuggestions((prev) => ({
+        ...prev,
+        [payload.message_id]: payload.suggestions,
+      }));
+    }
+  }, []);
 
   // Handle message read receipt updates
   const handleMessageRead = useCallback((messageId: string, readAt: string) => {
@@ -1039,6 +1054,19 @@ function MessagesContent() {
                             onAcknowledge={handleAcknowledgeMessage}
                             isAcknowledging={acknowledgingMessageId === message.id}
                           />
+                          {/* ARIA v2: Reply suggestions for incoming messages */ }
+                        {
+                          !isOwn && replySuggestions[message.id] && (
+                            <ARIAReplySuggestion
+                              messageId={message.id}
+                              suggestions={replySuggestions[message.id]}
+                              onUse={(suggestion, idx) => {
+                                setComposePreFill(suggestion);
+                                setShowCompose(true);
+                              }}
+                            />
+                          )
+                        }
                         );
                       })}
 
@@ -1073,7 +1101,8 @@ function MessagesContent() {
                         agreementId={selectedAgreement.id}
                         recipientId={getOtherParentId()}
                         onMessageSent={handleMessageSent}
-                        ariaEnabled={true}
+                        ariaEnabled={ariaMode !== 'off'}
+                        ariaMode={ariaMode}
                         onTyping={handleTyping}
                         onStopTyping={stopTyping}
                       />

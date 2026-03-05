@@ -806,6 +806,163 @@ Respond in JSON format:
             "last_activity": max(msg.sent_at for msg in messages).isoformat() if messages else None
         }
 
+    # =========================================================================
+    # ARIA v2 — Context-Aware Rewriting & Reply Suggestions
+    # =========================================================================
+
+    async def generate_contextual_rewrite(
+        self,
+        flagged_message: str,
+        thread_history: List[str],
+        flag_reason: str,
+        aria_mode: str = "standard"
+    ) -> Optional[str]:
+        """
+        ARIA v2: Rewrite a flagged outgoing message using conversation thread context.
+
+        Unlike the old nudge approach, ARIA now rewrites the entire message to be:
+        - On-topic with the thread (not a generic rephrase)
+        - Calm and child-focused
+        - Productive rather than escalating
+
+        Args:
+            flagged_message: The toxic message the parent tried to send
+            thread_history: Recent messages in the thread (newest last)
+            flag_reason: Human-readable reason(s) why it was flagged
+            aria_mode: 'standard' or 'strict'
+
+        Returns:
+            The rewritten message string, or None if rewrite fails
+        """
+        try:
+            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+
+            thread_context = ""
+            if thread_history:
+                # Show up to the last 10 messages for context
+                recent = thread_history[-10:]
+                thread_context = "\n".join(f"- {msg}" for msg in recent)
+            else:
+                thread_context = "No prior messages in this thread."
+
+            tone_instruction = (
+                "Use a firm but neutral tone."
+                if aria_mode == "strict"
+                else "Use a warm, collaborative tone."
+            )
+
+            prompt = f"""You are ARIA, a co-parenting communication assistant for CommonGround.
+
+THREAD CONTEXT — recent messages:
+{thread_context}
+
+The parent just tried to send this message:
+"{flagged_message}"
+
+This message was flagged for: {flag_reason}
+
+YOUR TASK:
+Rewrite this message to be calm, child-focused, and productive.
+
+STRICT RULES:
+1. Stay on the EXACT topic of the thread above — do not change the subject.
+2. Do NOT translate insults or anger. Redirect to the co-parenting task instead.
+3. Keep it brief (1–3 sentences).
+4. {tone_instruction}
+5. Start with a phrase that acknowledges the topic (e.g. "To keep us on track with the pickup schedule...")
+6. Output ONLY the rewritten message — no quotes, no explanation, no prefix.
+
+If the original message had zero constructive content (pure abuse), suggest:
+"I need a moment to collect my thoughts. Let's continue this conversation later."
+"""
+            response = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=256,
+                messages=[{"role": "user", "content": prompt}]
+            )
+
+            rewrite = response.content[0].text.strip()
+            return rewrite if rewrite else None
+
+        except Exception as e:
+            print(f"[ARIA v2] generate_contextual_rewrite failed: {e}")
+            return None
+
+    async def generate_reply_suggestion(
+        self,
+        incoming_message: str,
+        thread_history: List[str],
+        aria_mode: str = "standard"
+    ) -> List[str]:
+        """
+        ARIA v2: Generate 1–2 ready-to-use civil reply suggestions for an incoming message.
+
+        These are offered to the RECIPIENT as optional starter replies. The goal is
+        to keep the conversation productive and child-focused.
+
+        Args:
+            incoming_message: The message that was just received
+            thread_history: Recent messages in the thread
+            aria_mode: 'standard' or 'strict'
+
+        Returns:
+            List of 1–2 suggestion strings. Empty list on failure or if ARIA is off.
+        """
+        if aria_mode == "off":
+            return []
+
+        try:
+            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+
+            thread_context = ""
+            if thread_history:
+                recent = thread_history[-10:]
+                thread_context = "\n".join(f"- {msg}" for msg in recent)
+            else:
+                thread_context = "No prior messages in this thread."
+
+            tone_instruction = (
+                "Replies should be formal and neutral."
+                if aria_mode == "strict"
+                else "Replies should be friendly and collaborative."
+            )
+
+            prompt = f"""You are ARIA, a co-parenting communication assistant for CommonGround.
+
+THREAD CONTEXT — recent messages:
+{thread_context}
+
+An incoming message was just received:
+"{incoming_message}"
+
+YOUR TASK:
+Write 1–2 concise, civil reply options the recipient could use.
+
+STRICT RULES:
+1. Replies must stay relevant to the thread topic.
+2. Never suggest a reply that escalates conflict.
+3. Each reply should be 1–2 sentences maximum.
+4. {tone_instruction}
+5. Do NOT explain the suggestions. Just provide the reply text.
+
+Respond in valid JSON only:
+{{"suggestions": ["reply one", "reply two"]}}
+"""
+            response = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=200,
+                messages=[{"role": "user", "content": prompt}]
+            )
+
+            import json as _json
+            raw = response.content[0].text.strip()
+            parsed = _json.loads(raw)
+            return parsed.get("suggestions", [])[:2]
+
+        except Exception as e:
+            print(f"[ARIA v2] generate_reply_suggestion failed: {e}")
+            return []
+
 
 # Singleton instance
 aria_service = ARIAService()

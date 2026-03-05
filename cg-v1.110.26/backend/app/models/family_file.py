@@ -128,7 +128,9 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
     aria_provider: Mapped[str] = mapped_column(String(20), default="claude")
     aria_disabled_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     aria_disabled_by: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
-    aria_disabled_by: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+    aria_mode: Mapped[str] = mapped_column(
+        String(20), default="standard"
+    )  # off | standard | strict
     require_joint_approval: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # Smart Custody Config (V3)
