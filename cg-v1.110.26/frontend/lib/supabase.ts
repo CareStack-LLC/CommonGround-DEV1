@@ -14,7 +14,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(
     supabaseUrl || 'https://placeholder-url.supabase.co',
-    supabaseAnonKey || 'placeholder-key'
+    supabaseAnonKey || 'placeholder-key',
+    {
+        auth: {
+            flowType: 'pkce',
+        },
+    }
 );
 
 // OAuth helper functions
@@ -28,6 +33,10 @@ export async function signInWithOAuth(provider: Provider) {
         provider,
         options: {
             redirectTo: `${window.location.origin}/auth/callback`,
+            queryParams: {
+                access_type: 'offline',
+                prompt: 'consent',
+            },
         },
     });
 
