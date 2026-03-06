@@ -130,6 +130,16 @@ async def health_check():
     return {"status": "healthy"}
 
 
+@app.get("/debug/cors")
+async def debug_cors():
+    """Debug endpoint to check CORS configuration."""
+    return {
+        "allowed_origins_raw": settings.ALLOWED_ORIGINS,
+        "allowed_origins_list": settings.allowed_origins_list,
+        "regex": settings.CORS_ORIGIN_REGEX
+    }
+
+
 @app.get("/debug/email-config")
 async def debug_email_config():
     """Debug endpoint to check email configuration."""
