@@ -1173,27 +1173,67 @@ class AgreementService:
                 for data in section_dict.values()
             ])
 
+            # Create the header info
+            created_date = agreement.created_at.strftime("%B %d, %Y") if agreement.created_at else "Unknown Date"
+            hash_display = agreement.pdf_hash or "Pending Verification"
+            status_display = "Draft"
+            if agreement.status == "active":
+                status_display = "✓ Active and Enforceable"
+            elif agreement.status == "approved" or (agreement.petitioner_approved and agreement.respondent_approved):
+                status_display = "✓ Approved by Both Parents"
+            elif agreement.petitioner_approved or agreement.respondent_approved:
+                status_display = "Partial Approval"
+            
+            header_markdown = f"""# {agreement.title.upper()}
+**Court Case #:** {agreement.case_id or 'N/A'}
+**Created:** {created_date}
+**Status:** {status_display}
+**SHA-256 Hash:** {hash_display}
+
+---
+
+"""
+
             import json
             response = client.chat.completions.create(
                 model="gpt-4o",
-                max_tokens=2500,
+                max_tokens=3500,
                 response_format={ "type": "json_object" },
                 messages=[
                     {
                         "role": "system",
                         "content": """You are a legal document summarizer for co-parenting agreements.
-Your job is to extract key provisions and present them in a clear, mobile-friendly format.
-You must return a JSON object with the exact following keys:
-- "narrative_summary": One or two plain-English paragraphs summarizing the agreement. Include parent names, children's names, custody type, and major decision-makers.
-- "schedule_type": The type of rotation schedule. Should be one of "50/50 Rotation", "70/30 Rotation", "80/20 Rotation", "2-2-3 Rotation", "Week-on/Week-off". If it doesn't match standard patterns, return "Custom for Rotation".
-- "exchange_time": The specific time for custody exchanges (e.g., "5:00 PM"). Extract from the text. Return "Custom time" if not specified.
-- "schedule_table_markdown": A markdown table representing the regular schedule. Provide headers (e.g., "| Week | Mon-Sun |") and rows containing the actual parents' names from the agreement.
-- "holidays_table_markdown": A markdown table representing the holidays schedule based ONLY on holidays explicitly mentioned. Usually includes columns like "Holiday", "Even Yrs", "Odd Yrs".
-- "fixed_days_table_markdown": A markdown table for fixed days. Extract actual fixed days and rules mentioned."""
+Your job is to transform the agreement text into a court-ready legal document summary formatted in Markdown.
+
+You must return a JSON object with a single key "court_ready_markdown" containing Sections 1 through 6 exactly as specified below.
+
+## Section 1: Agreement Summary (Executive Overview)
+PARTIES (Mother, Father, Child names/DOB if available)
+CUSTODY ARRANGEMENT (Legal, Physical, Schedule Type)
+FINANCIAL RESPONSIBILITY (Child support, insurance, uncovered, extracurricular)
+DECISION-MAKING AUTHORITY (Education, healthcare, religious, extracurricular)
+
+## Section 2: Regular Parenting Schedule
+REGULAR WEEKLY SCHEDULE (Describe rotation, Exchange details, Mid-week contact, Summer schedule)
+
+## Section 3: Holiday & Special Days Schedule
+Table of all holidays mentioned, including Even Yrs and Odd Yrs allocations.
+Also include Child's Birthday and Fixed Days tables if applicable.
+
+## Section 4: Decision-Making Matrix
+Table with Decision Category, Mother, Father, Resolution Process. Categories: Education, Healthcare (routine), Healthcare (emergency), Religious training, Extracurricular, Legal matters, Daycare, Travel. Also list Emergency Medical rules beneath the table.
+
+## Section 5: Communication & Conduct Guidelines
+Required Platform, Message Response Time, Emergency Contact, Prohibited Communications list, Child Contact rules.
+
+## Section 6: Quick Reference Card
+Table with summary properties (Custody Type, Time-Sharing, Child Support, Exchange Time, Exchange Location, Decision-Making, Dispute Resolution, Communication Platform, Holiday Schedule, Mid-week Contact, Modification Process).
+
+Ensure your output is strictly markdown containing these 6 sections with appropriate ## headers and Markdown tables. Do NOT include a Document Verification section."""
                     },
                     {
                         "role": "user",
-                        "content": f"""Summarize the following agreement into the requested JSON format. Ensure you output valid JSON.
+                        "content": f"""Summarize the following agreement into the requested structure. Ensure you output valid JSON.
 
 AGREEMENT SECTIONS:
 {sections_text}"""
@@ -1202,19 +1242,34 @@ AGREEMENT SECTIONS:
             )
 
             result_json = json.loads(response.choices[0].message.content)
-            summary_narrative = result_json.get("narrative_summary", "")
-            sched_type = result_json.get("schedule_type", "Custom for Rotation")
-            exchange_time = result_json.get("exchange_time", "Custom time")
-            schedule_table_md = result_json.get("schedule_table_markdown", "")
-            holidays_table_md = result_json.get("holidays_table_markdown", "")
-            fixed_days_table_md = result_json.get("fixed_days_table_markdown", "")
+            sections_markdown = result_json.get("court_ready_markdown", "Error generating summary.")
 
-            # 2. Build markdown tables
-            schedule_table = f"## 📅 Regular Schedule\n\n**{sched_type}** (Exchange at {exchange_time})\n\n{schedule_table_md}"
-            holiday_table = f"## 🎄 Holidays & Special Days\n\n**Alternating Holidays**\n\n{holidays_table_md}\n\n**Fixed Days**\n\n{fixed_days_table_md}"
+            # Generate signature block
+            pet_date = agreement.petitioner_approved_at.strftime("%B %d, %Y %I:%M %p") if agreement.petitioner_approved_at else "_______________"
+            res_date = agreement.respondent_approved_at.strftime("%B %d, %Y %I:%M %p") if agreement.respondent_approved_at else "_______________"
+
+            signature_markdown = f"""
+
+---
+
+## Section 7: Document Verification
+
+**AGREEMENT SIGNATURES & VERIFICATION**
+
+Parent 1: _________________________ Date: {pet_date}
+*Electronically signed via CommonGround Platform*
+
+Parent 2: _________________________ Date: {res_date}
+*Electronically signed via CommonGround Platform*
+
+**Document Hash (SHA-256):**
+`{hash_display}`
+
+*This agreement was generated by CommonGround Co-Parenting Platform and is court-admissible evidence in family law proceedings.*
+"""
 
             # 3. Combine parts
-            summary_markdown = f"{summary_narrative}\n\n---\n\n{schedule_table}\n\n---\n\n{holiday_table}"
+            summary_markdown = header_markdown + sections_markdown + signature_markdown
 
             # 4. Extract details for the summary
             key_points_data = self.extract_key_points_from_sections(section_dict, agreement)
