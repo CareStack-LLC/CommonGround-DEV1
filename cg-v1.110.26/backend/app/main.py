@@ -139,6 +139,38 @@ async def debug_cors():
         "regex": settings.CORS_ORIGIN_REGEX
     }
 
+from sqlalchemy import text
+from app.api.deps import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends
+
+@app.get("/debug/db")
+async def debug_db(db: AsyncSession = Depends(get_db)):
+    """Debug endpoint to check the database connection and verify the active host."""
+    try:
+        # Get raw database URL (safely mask password)
+        raw_url = settings.DATABASE_URL
+        if "@" in raw_url:
+            masked_url = raw_url.split("://")[0] + "://***:***@" + raw_url.split("@")[1]
+        else:
+            masked_url = "Malformed or missing DATABASE_URL"
+
+        # Check if users table exists via raw SQL
+        result = await db.execute(text("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';"))
+        users_exists = result.scalar() == 1
+        
+        # Check current search path
+        path_result = await db.execute(text("SHOW search_path;"))
+        search_path = path_result.scalar()
+
+        return {
+            "database_url_host": masked_url,
+            "public_users_table_exists": users_exists,
+            "search_path": search_path
+        }
+    except Exception as e:
+        return {"error": str(e), "type": str(type(e))}
+
 
 @app.get("/debug/email-config")
 async def debug_email_config():
