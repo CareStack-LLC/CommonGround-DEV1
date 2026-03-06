@@ -233,6 +233,15 @@ from app.models.partner import (
     PartnerStatus,
     PartnerStaffRole,
 )
+from app.models.circle_call import (
+    CircleCallRoom,
+    CircleCallSession,
+    CircleCallTranscriptChunk,
+    CircleCallFlag,
+    CircleCallType,
+    CircleCallStatus,
+    CircleCallSeverity,
+)
 
 __all__ = [
     "Base",
@@ -462,4 +471,12 @@ __all__ = [
     "UserAnonymizationMap",
     "PartnerStatus",
     "PartnerStaffRole",
+    # Circle Call System
+    "CircleCallRoom",
+    "CircleCallSession",
+    "CircleCallTranscriptChunk",
+    "CircleCallFlag",
+    "CircleCallType",
+    "CircleCallStatus",
+    "CircleCallSeverity",
 ]
