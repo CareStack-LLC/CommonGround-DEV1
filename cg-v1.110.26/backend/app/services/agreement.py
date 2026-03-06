@@ -1207,29 +1207,25 @@ Your job is to transform the agreement text into a court-ready legal document su
 
 You must return a JSON object with a single key "court_ready_markdown" containing Sections 1 through 6 exactly as specified below.
 
-### Section 1: Agreement Summary (Executive Overview)
-PARTIES (Mother, Father, Child names/DOB if available)
-CUSTODY ARRANGEMENT (Legal, Physical, Schedule Type)
-FINANCIAL RESPONSIBILITY (Child support, insurance, uncovered, extracurricular)
-DECISION-MAKING AUTHORITY (Education, healthcare, religious, extracurricular)
+### Section 1: 📋 Agreement Overview
+Concise bullet points for PARTIES, CUSTODY, FINANCIAL, and DECISION-MAKING.
 
-### Section 2: Regular Parenting Schedule
-REGULAR WEEKLY SCHEDULE (Describe rotation, Exchange details, Mid-week contact, Summer schedule)
+### Section 2: 📅 Parenting Schedule
+REGULAR WEEKLY SCHEDULE (Concise rotation, Exchange time/location).
 
-### Section 3: Holiday & Special Days Schedule
-Table of all holidays mentioned, including Even Yrs and Odd Yrs allocations.
-Also include Child's Birthday and Fixed Days tables if applicable.
+### Section 3: 🎄 Holidays & Birthdays
+Markdown table of holidays (Even/Odd yrs). Include a small Child's Birthday table.
 
-### Section 4: Decision-Making Matrix
-Table with Decision Category, Mother, Father, Resolution Process. Categories: Education, Healthcare (routine), Healthcare (emergency), Religious training, Extracurricular, Legal matters, Daycare, Travel. Also list Emergency Medical rules beneath the table.
+### Section 4: ⚖️ Decision-Making Matrix
+Compact table: Category, Mother, Father. (Education, Healthcare, Religious, Extra, Legal, Travel).
 
-### Section 5: Communication & Conduct Guidelines
-Required Platform, Message Response Time, Emergency Contact, Prohibited Communications list, Child Contact rules.
+### Section 5: 📱 Communication Rules
+Required Platform, Response Time, Emergency Contact as a simple list.
 
-### Section 6: Quick Reference Card
-Table with summary properties (Custody Type, Time-Sharing, Child Support, Exchange Time, Exchange Location, Decision-Making, Dispute Resolution, Communication Platform, Holiday Schedule, Mid-week Contact, Modification Process).
+### Section 6: 📌 Quick Reference
+A small 2-column key/value table for quick lookups on the phone.
 
-Ensure your output is strictly markdown containing these 6 sections with appropriate ### headers and Markdown tables. Do NOT include a Document Verification section."""
+Ensure your output is strictly markdown using ### headers for all 6 sections. Focus on density and readability for mobile screens. Do NOT include a Document Verification section. Emojis and simple tables are encouraged. Use bold sparingly for labels."""
                     },
                     {
                         "role": "user",

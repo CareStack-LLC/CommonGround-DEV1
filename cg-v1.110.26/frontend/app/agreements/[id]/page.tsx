@@ -748,32 +748,50 @@ function AgreementDetailsContent() {
 
                     {/* Render comprehensive markdown summary */}
                     {/* Render comprehensive markdown summary with custom components */}
-                    <div className="prose prose-sm max-w-none prose-headings:text-foreground prose-headings:font-semibold prose-h2:text-lg md:prose-h2:text-xl prose-h2:mt-6 md:prose-h2:mt-8 prose-h2:mb-3 md:prose-h2:mb-4 prose-h3:text-base md:prose-h3:text-lg prose-h3:mt-4 md:prose-h3:mt-5 prose-h3:mb-2 prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-sm md:prose-p:text-base prose-strong:text-foreground prose-strong:font-semibold">
+                    <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-sm md:prose-p:text-base prose-strong:text-foreground prose-strong:font-semibold">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
                           table: ({ node, ...props }) => (
-                            <div className="my-6 w-full overflow-x-auto rounded-xl border border-border shadow-sm">
-                              <table className="w-full text-sm text-left relative" {...props} />
+                            <div className="my-4 w-full overflow-x-auto rounded-xl border border-border shadow-sm">
+                              <table className="w-full text-xs md:text-sm text-left relative" {...props} />
                             </div>
                           ),
                           thead: ({ node, ...props }) => (
-                            <thead className="bg-muted/50 text-xs uppercase tracking-wider font-semibold text-muted-foreground border-b border-border" {...props} />
+                            <thead className="bg-muted/30 text-[10px] md:text-xs uppercase tracking-wider font-bold text-muted-foreground border-b border-border" {...props} />
                           ),
                           th: ({ node, ...props }) => (
-                            <th className="px-4 py-3 whitespace-nowrap" {...props} />
+                            <th className="px-3 py-2 whitespace-nowrap" {...props} />
                           ),
                           td: ({ node, ...props }) => (
-                            <td className="px-4 py-3 border-b border-border/50 last:border-0 align-top" {...props} />
+                            <td className="px-3 py-2 border-b border-border/50 last:border-0 align-top" {...props} />
                           ),
                           tr: ({ node, ...props }) => (
-                            <tr className="hover:bg-muted/20 transition-colors" {...props} />
+                            <tr className="hover:bg-muted/10 transition-colors" {...props} />
                           ),
-                          h3: ({ node, ...props }) => (
-                            <h3 className="text-base font-semibold text-foreground mt-4 mb-2 flex items-center gap-2" {...props} />
-                          ),
+                          h3: ({ node, ...props }) => {
+                            // Map specific keywords to colors to match dashboard
+                            const text = String(props.children);
+                            let colorClass = "text-[var(--portal-primary)]";
+                            if (text.includes("Holidays")) colorClass = "text-cg-amber";
+                            if (text.includes("Decision")) colorClass = "text-cg-slate";
+                            if (text.includes("Quick")) colorClass = "text-cg-sage";
+
+                            return (
+                              <h3
+                                className={`text-[11px] md:text-xs font-bold uppercase tracking-widest ${colorClass} mt-6 mb-2 pb-1 border-b border-border/50 flex items-center gap-2`}
+                                {...props}
+                              />
+                            );
+                          },
                           ul: ({ node, ...props }) => (
-                            <ul className="my-2 space-y-1 list-disc list-inside text-muted-foreground" {...props} />
+                            <ul className="my-2 space-y-1.5 list-disc list-inside text-muted-foreground text-sm" {...props} />
+                          ),
+                          li: ({ node, ...props }) => (
+                            <li className="leading-snug" {...props} />
+                          ),
+                          p: ({ node, ...props }) => (
+                            <p className="mb-3 last:mb-0" {...props} />
                           )
                         }}
                       >
