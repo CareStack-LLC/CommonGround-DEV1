@@ -407,6 +407,21 @@ class AuthService:
                 existing_user.last_name = request.last_name
             existing_user.last_login = datetime.utcnow()
 
+            # Ensure user has a profile
+            profile_result = await self.db.execute(
+                select(UserProfile).where(UserProfile.user_id == existing_user.id)
+            )
+            existing_profile = profile_result.scalar_one_or_none()
+            if not existing_profile:
+                print(f"User {existing_user.id} missing profile. Creating one.")
+                profile = UserProfile(
+                    user_id=existing_user.id,
+                    first_name=request.first_name or existing_user.first_name,
+                    last_name=request.last_name or existing_user.last_name or "",
+                    avatar_url=request.avatar_url,
+                )
+                self.db.add(profile)
+
             await self.db.commit()
             await self.db.refresh(existing_user)
             user = existing_user
