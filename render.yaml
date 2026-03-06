@@ -22,7 +22,7 @@ services:
           name: commonground-db
           property: connectionString
       - key: ALLOWED_ORIGINS
-        value: https://common-ground-blue.vercel.app,https://commonground.family
+        value: https://common-ground-blue.vercel.app,https://www.find-commonground.com,https://find-commonground.com
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
