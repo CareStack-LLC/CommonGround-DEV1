@@ -42,10 +42,15 @@ function getOAuthClient() {
  */
 export async function signInWithOAuth(provider: Provider) {
     const client = getOAuthClient();
+
+    // Explicitly construct the redirect URL to guarantee Next.js and Vercel
+    // routing matches the cookie domain precisely.
+    const redirectUrl = new URL('/auth/callback', window.location.origin);
+
     const { error } = await client.auth.signInWithOAuth({
         provider,
         options: {
-            redirectTo: `${window.location.origin}/auth/callback`,
+            redirectTo: redirectUrl.toString(),
             queryParams: {
                 access_type: 'offline',
                 prompt: 'consent',
