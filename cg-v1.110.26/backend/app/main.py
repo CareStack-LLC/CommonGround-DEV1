@@ -140,7 +140,7 @@ async def debug_cors():
     }
 
 from sqlalchemy import text
-from app.api.deps import get_db
+from app.core.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 
