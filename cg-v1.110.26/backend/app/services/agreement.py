@@ -1152,14 +1152,17 @@ class AgreementService:
                 "status": agreement.status
             }
 
-        # Build section content dictionary
+        # Build section content dictionary combining sections of the same type
         section_dict = {}
         for section in sections:
             if section.is_completed and section.content:
-                section_dict[section.section_type] = {
-                    "title": section.section_title,
-                    "content": section.content
-                }
+                if section.section_type not in section_dict:
+                    section_dict[section.section_type] = {
+                        "title": section.section_title,
+                        "content": section.content
+                    }
+                else:
+                    section_dict[section.section_type]["content"] += f"\n\n{section.content}"
 
         # Generate comprehensive summary using AI
         try:
@@ -1255,7 +1258,7 @@ AGREEMENT SECTIONS:
                 key_points.append("**Child Support:** Mya is to pay Thomas $350 per month")
             else:
                 # Detect amount
-                amount_match = re.search(r'\$(\d+(?:\.\d{2})?)', content)
+                amount_match = re.search(r'\$(\d+(?:,\d{3})*(?:\.\d{2})?)', content)
                 if amount_match:
                     amount = amount_match.group(0)
                     key_points.append(f"**Child Support:** {amount}/mo")
@@ -1270,6 +1273,8 @@ AGREEMENT SECTIONS:
                 key_points.append("**Schedule:** Week on/week off (50/50)")
             elif "every other weekend" in content.lower():
                 key_points.append("**Schedule:** Every other weekend (70/30)")
+            elif "one weekend" in content.lower() or "1st weekend" in content.lower():
+                key_points.append("**Schedule:** One weekend a month")
 
         # 3. EXCHANGES (V1: transportation, V2: logistics)
         content = get_content(["transportation", "logistics"])
