@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     @property
     def async_database_url(self) -> str:
         """Convert DATABASE_URL to async driver format for SQLAlchemy."""
-        url = self.DATABASE_URL
+        url = self.DATABASE_URL.strip()
         # Render and other providers use postgres:// or postgresql://
         # SQLAlchemy async requires postgresql+asyncpg://
         if url.startswith("postgres://"):
