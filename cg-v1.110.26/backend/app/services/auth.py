@@ -10,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import create_access_token, create_refresh_token, decode_token
-from app.core.supabase import get_supabase_admin_client
+from app.core.supabase import get_supabase_client
 from app.models.user import User, UserProfile
 from app.schemas.auth import RegisterRequest, LoginRequest, OAuthSyncRequest
 
@@ -26,8 +26,7 @@ class AuthService:
             db: Database session
         """
         self.db = db
-        # Must use admin client (Service Role Key) for GoTrue management APIs
-        self.supabase = get_supabase_admin_client()
+        self.supabase = get_supabase_client()
 
     async def register_user(self, request: RegisterRequest) -> Tuple[User, str, str]:
         """
