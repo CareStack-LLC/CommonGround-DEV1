@@ -436,7 +436,7 @@ class AuthService:
             await self.db.commit()
 
         # Generate our JWT tokens
-        access_token = create_access_token(user.id)
-        refresh_token = create_refresh_token(user.id)
+        access_token = create_access_token(data={"sub": user.id})
+        refresh_token = create_refresh_token(data={"sub": user.id})
 
         return user, access_token, refresh_token
