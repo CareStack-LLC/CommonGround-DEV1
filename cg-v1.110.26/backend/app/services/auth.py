@@ -428,6 +428,8 @@ class AuthService:
             # Create default profile for new OAuth users
             profile = UserProfile(
                 user_id=user.id,
+                first_name=request.first_name,
+                last_name=request.last_name or "",
                 avatar_url=request.avatar_url,
             )
             self.db.add(profile)
