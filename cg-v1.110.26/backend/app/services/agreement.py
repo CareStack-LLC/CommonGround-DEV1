@@ -1173,23 +1173,27 @@ class AgreementService:
                 for data in section_dict.values()
             ])
 
+            import json
             response = client.chat.completions.create(
                 model="gpt-4o",
                 max_tokens=2500,
+                response_format={ "type": "json_object" },
                 messages=[
                     {
                         "role": "system",
                         "content": """You are a legal document summarizer for co-parenting agreements.
 Your job is to extract key provisions and present them in a clear, mobile-friendly format.
-Write in plain English that parents can easily understand.
-Be concise but include specific details like names, times, dates, amounts, and locations.
-Use emojis for holidays to make them scannable."""
+You must return a JSON object with the exact following keys:
+- "narrative_summary": One or two plain-English paragraphs summarizing the agreement. Include parent names, children's names, custody type, and major decision-makers.
+- "schedule_type": The type of rotation schedule. Should be one of "50/50 Rotation", "70/30 Rotation", "80/20 Rotation", "2-2-3 Rotation", "Week-on/Week-off". If it doesn't match standard patterns, return "Custom for Rotation".
+- "exchange_time": The specific time for custody exchanges (e.g., "5:00 PM"). Extract from the text. Return "Custom time" if not specified.
+- "schedule_table_markdown": A markdown table representing the regular schedule. Provide headers (e.g., "| Week | Mon-Sun |") and rows containing the actual parents' names from the agreement.
+- "holidays_table_markdown": A markdown table representing the holidays schedule based ONLY on holidays explicitly mentioned. Usually includes columns like "Holiday", "Even Yrs", "Odd Yrs".
+- "fixed_days_table_markdown": A markdown table for fixed days. Extract actual fixed days and rules mentioned."""
                     },
                     {
                         "role": "user",
-                        "content": f"""Generate a narrative summary paragraph of this custody agreement.
-Do NOT include any titles, headers, or tables. Just one or two comprehensive, plain-English paragraphs.
-Include: parent names, children's names and ages, custody type, schedule type, and major decision-makers.
+                        "content": f"""Summarize the following agreement into the requested JSON format. Ensure you output valid JSON.
 
 AGREEMENT SECTIONS:
 {sections_text}"""
@@ -1197,11 +1201,17 @@ AGREEMENT SECTIONS:
                 ]
             )
 
-            summary_narrative = response.choices[0].message.content.strip()
+            result_json = json.loads(response.choices[0].message.content)
+            summary_narrative = result_json.get("narrative_summary", "")
+            sched_type = result_json.get("schedule_type", "Custom for Rotation")
+            exchange_time = result_json.get("exchange_time", "Custom time")
+            schedule_table_md = result_json.get("schedule_table_markdown", "")
+            holidays_table_md = result_json.get("holidays_table_markdown", "")
+            fixed_days_table_md = result_json.get("fixed_days_table_markdown", "")
 
-            # 2. Generate hardcoded tables
-            schedule_table = self._generate_schedule_table(section_dict)
-            holiday_table = self._generate_holiday_table(section_dict)
+            # 2. Build markdown tables
+            schedule_table = f"## 📅 Regular Schedule\n\n**{sched_type}** (Exchange at {exchange_time})\n\n{schedule_table_md}"
+            holiday_table = f"## 🎄 Holidays & Special Days\n\n**Alternating Holidays**\n\n{holidays_table_md}\n\n**Fixed Days**\n\n{fixed_days_table_md}"
 
             # 3. Combine parts
             summary_markdown = f"{summary_narrative}\n\n---\n\n{schedule_table}\n\n---\n\n{holiday_table}"
