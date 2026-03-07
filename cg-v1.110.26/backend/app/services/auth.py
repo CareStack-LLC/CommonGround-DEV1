@@ -228,6 +228,25 @@ class AuthService:
                     await self.db.commit()
                     await self.db.refresh(user)
 
+                # Ensure profile exists even if user already existed
+                if user:
+                    # Check for profile
+                    result = await self.db.execute(
+                        select(UserProfile).where(UserProfile.user_id == user.id)
+                    )
+                    profile = result.scalar_one_or_none()
+                    if not profile:
+                        print(f"Profile missing for existing user {user.id}, creating one")
+                        profile = UserProfile(
+                            user_id=user.id,
+                            first_name=user.first_name,
+                            last_name=user.last_name,
+                            subscription_tier="web_starter",
+                            subscription_status="active"
+                        )
+                        self.db.add(profile)
+                        await self.db.commit()
+
             if not user:
                 print("User not found locally, auto-creating")
                 # Auto-create user if they exist in Supabase Auth but not locally
