@@ -3,7 +3,7 @@ Authentication service for user registration, login, and token management.
 """
 
 from datetime import datetime
-from typing import Tuple
+from typing import Tuple, Optional
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
