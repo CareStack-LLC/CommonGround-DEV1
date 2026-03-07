@@ -295,7 +295,7 @@ async def _send_report_request_notification(
 
                 <div class="field">
                     <div class="field-label">Family File</div>
-                    <div class="field-value">{family_file.case_name} (ID: {family_file.id})</div>
+                    <div class="field-value">{family_file.title} (ID: {family_file.id})</div>
                 </div>
 
                 <div class="field">
