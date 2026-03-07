@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, desc, text
 from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
@@ -75,7 +76,7 @@ async def analyze_message_content(
         ARIA analysis result
     """
     aria_enabled = True
-    ai_provider = "regex"
+    ai_provider = settings.ARIA_DEFAULT_PROVIDER
     case_context = {"children": []}
 
     # Check which context to use
@@ -101,7 +102,7 @@ async def analyze_message_content(
 
         # Get family file ARIA settings
         aria_enabled = family_file.aria_enabled
-        ai_provider = family_file.aria_provider or "regex"
+        ai_provider = family_file.aria_provider or settings.ARIA_DEFAULT_PROVIDER
 
         # Get children from family file for context
         children_result = await db.execute(
@@ -157,7 +158,7 @@ async def analyze_message_content(
 
         # Get case ARIA settings
         aria_enabled = case.aria_enabled
-        ai_provider = case.aria_provider or "regex"
+        ai_provider = case.aria_provider or settings.ARIA_DEFAULT_PROVIDER
 
         # Get case context (children for context)
         children_result = await db.execute(
@@ -205,7 +206,7 @@ async def analyze_message_content(
     elif ai_provider == "openai":
         analysis = await aria_service.analyze_with_openai(content, case_context)
     else:
-        # Fast regex analysis (ai_provider="regex" or default)
+        # Fast regex analysis (ai_provider=settings.ARIA_DEFAULT_PROVIDER or default)
         result = aria_service.analyze_message(content)
         analysis = {
             "toxicity_score": result.toxicity_score,
@@ -214,7 +215,7 @@ async def analyze_message_content(
             "explanation": result.explanation,
             "suggestions": [result.suggestion] if result.suggestion else [],
             "ai_powered": False,
-            "provider": "regex"
+            "provider": settings.ARIA_DEFAULT_PROVIDER
         }
 
     # Determine if flagged
@@ -326,7 +327,7 @@ async def send_message(
         Created message with ARIA analysis result if flagged
     """
     aria_enabled = True
-    ai_provider = "regex"
+    ai_provider = settings.ARIA_DEFAULT_PROVIDER
     aria_mode = "standard"  # ARIA v2: default mode
     case_context = {"children": []}
     context_id = None  # For WebSocket broadcast
@@ -363,7 +364,7 @@ async def send_message(
 
         # Get family file ARIA settings
         aria_enabled = family_file.aria_enabled
-        ai_provider = family_file.aria_provider or "regex"
+        ai_provider = family_file.aria_provider or settings.ARIA_DEFAULT_PROVIDER
         aria_mode = getattr(family_file, 'aria_mode', 'standard') or 'standard'
         context_id = message_data.family_file_id
 
@@ -445,7 +446,7 @@ async def send_message(
 
         # Get case ARIA settings
         aria_enabled = case.aria_enabled
-        ai_provider = case.aria_provider or "regex"
+        ai_provider = case.aria_provider or settings.ARIA_DEFAULT_PROVIDER
         context_id = message_data.case_id
 
         # Get children for context

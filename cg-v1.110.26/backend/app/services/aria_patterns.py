@@ -168,6 +168,7 @@ HOSTILITY_PATTERNS = [
     r'\bigly\b', r'\bfat\b', r'\bdisgusting\b', r'\bgross\b',
     r'\byou\s*a\s*funky\b', r'\bfunky\s*ass\b', r'\bbig\s*headed\s*ass\b',
     r'\bbrokey\b', r'\bdon\'?t\s*piss\s*me\s*off\b',
+    r'\bdumb\s*ass\b', r'\bdumbass\b',
 ]
 
 # ==============================================================================
