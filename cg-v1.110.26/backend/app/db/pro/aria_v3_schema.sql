@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS aria_jobs (
 CREATE TABLE IF NOT EXISTS aria_events (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     job_id UUID REFERENCES aria_jobs(id),
-    message_id UUID NOT NULL,
+    message_id TEXT NOT NULL,
     
     -- Analysis Results
     classification_source TEXT NOT NULL, -- 'pattern', 'llm', 'hybrid'
