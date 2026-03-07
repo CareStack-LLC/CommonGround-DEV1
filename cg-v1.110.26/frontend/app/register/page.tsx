@@ -34,6 +34,73 @@ function RegisterContent() {
   const [step, setStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('month');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    first_name: '',
+    last_name: '',
+  });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [inviteData, setInviteData] = useState<InviteData | null>(null);
+  const [grantData, setGrantData] = useState<GrantData | null>(null);
+  const [oauthLoading, setOauthLoading] = useState<boolean>(false);
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setOauthLoading(true);
+    try {
+      await signInWithGoogle();
+      // Redirect happens automatically via Supabase OAuth
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to sign up with Google');
+      setOauthLoading(false);
+    }
+  };
+
+  // Parse invite and grant code parameters on mount
+  useEffect(() => {
+    // Parse invite parameter
+    const invite = searchParams.get('invite');
+    if (invite) {
+      try {
+        const decoded = JSON.parse(atob(invite));
+        setInviteData(decoded);
+
+        // Pre-fill form with invite data
+        const nameParts = decoded.name?.split(' ') || [];
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        setFormData((prev) => ({
+          ...prev,
+          email: decoded.email || '',
+          first_name: firstName,
+          last_name: lastName,
+        }));
+      } catch (e) {
+        console.error('Failed to parse invite data:', e);
+      }
+    }
+
+    // Parse grant code parameter (from partner landing page)
+    const grantCode = searchParams.get('grant_code');
+    const partner = searchParams.get('partner');
+    if (grantCode) {
+      setGrantData({
+        code: grantCode.toUpperCase(),
+        partner: partner || ''
+      });
+    }
+  }, [searchParams]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const plans = [
     {
@@ -435,8 +502,8 @@ function RegisterContent() {
                       key={plan.id}
                       onClick={() => setSelectedPlan(plan.id)}
                       className={`relative cursor-pointer group rounded-3xl border-2 p-6 transition-all duration-300 hover:shadow-xl ${selectedPlan === plan.id
-                          ? 'border-cg-sage bg-cg-sage-subtle ring-1 ring-cg-sage'
-                          : 'border-border bg-background hover:border-cg-sage/50'
+                        ? 'border-cg-sage bg-cg-sage-subtle ring-1 ring-cg-sage'
+                        : 'border-border bg-background hover:border-cg-sage/50'
                         }`}
                     >
                       {selectedPlan === plan.id && (
