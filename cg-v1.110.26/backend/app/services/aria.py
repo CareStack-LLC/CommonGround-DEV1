@@ -995,7 +995,7 @@ If the original message had zero constructive content (pure abuse), suggest:
 "I need a moment to collect my thoughts. Let's continue this conversation later."
 """
             response = client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-3-5-sonnet-20241022",
                 max_tokens=256,
                 messages=[{"role": "user", "content": prompt}]
             )
@@ -1068,7 +1068,7 @@ Respond in valid JSON only:
 {{"suggestions": ["reply one", "reply two"]}}
 """
             response = client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-3-5-sonnet-20241022",
                 max_tokens=200,
                 messages=[{"role": "user", "content": prompt}]
             )
