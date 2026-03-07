@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react';
 import { messagesAPI, ARIAAnalysisResponse, MessageAttachment, InterventionAction } from '@/lib/api';
-import { ARIAIntervention } from './aria-intervention';
 import { ARIARewriteModal, type ARIARewritePayload } from './aria-rewrite-modal';
 import {
   Send,
@@ -172,10 +171,20 @@ export function MessageCompose({
       setError(null);
       const result = await messagesAPI.analyze(message, { caseId, familyFileId });
       if (result.is_flagged) {
+        setAriaRewritePayload({
+          aria_flagged: true,
+          aria_mode: ariaMode as any,
+          original_message: message,
+          suggested_rewrite: result.suggestion,
+          explanation: result.explanation,
+          categories: result.categories,
+          toxicity_score: result.toxicity_score
+        });
         setLastFlaggedAnalysis(result);
         setLastFlaggedMessage(message);
+      } else {
+        setAnalysis(result);
       }
-      setAnalysis(result);
     } catch (err: any) {
       console.error('Analysis failed:', err);
       setError(err.message || 'Failed to analyze message');
@@ -354,40 +363,9 @@ export function MessageCompose({
       return;
     }
 
-    if (ariaEnabled && message.trim()) {
-      try {
-        setIsAnalyzing(true);
-        setError(null);
-
-        const result = await messagesAPI.analyze(message, { caseId, familyFileId });
-
-        if (result.is_flagged) {
-          setLastFlaggedAnalysis(result);
-          setLastFlaggedMessage(message);
-          setAnalysis(result);
-          setIsAnalyzing(false);
-          return;
-        }
-
-        setIsAnalyzing(false);
-
-        // Check if this was a modification of a previously flagged message
-        if (lastFlaggedAnalysis && lastFlaggedMessage && message !== lastFlaggedMessage) {
-          await handleSendDirect(message, {
-            action: 'modified',
-            final_message: message
-          });
-        } else {
-          await handleSendDirect(message);
-        }
-      } catch (err: any) {
-        console.error('ARIA analysis failed:', err);
-        setError(err.message || 'Failed to analyze message');
-        setIsAnalyzing(false);
-      }
-    } else {
-      await handleSendDirect(message);
-    }
+    // ARIA v2: Bypass pre-analysis and go straight to send.
+    // The backend will return a 202 if a rewrite is needed.
+    await handleSendDirect(message);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -422,18 +400,8 @@ export function MessageCompose({
         />
       )}
 
-      {/* Legacy ARIA Intervention Modal (regex-only path, kept for backwards compat) */}
-      {!ariaRewritePayload && analysis && analysis.is_flagged && (
-        <ARIAIntervention
-          analysis={analysis}
-          originalMessage={message}
-          onSendAnyway={handleSendAnyway}
-          onCancel={handleCancel}
-        />
-      )}
-
       {/* Compose Form */}
-      {!ariaRewritePayload && !analysis?.is_flagged && (
+      {!ariaRewritePayload && (
         <div className="space-y-4">
           {/* ARIA Status Indicator */}
           {ariaEnabled && (
