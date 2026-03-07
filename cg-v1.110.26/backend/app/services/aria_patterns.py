@@ -109,10 +109,10 @@ THREATENING_PATTERNS = [
 # ==============================================================================
 CUSTODY_WEAPONIZATION_PATTERNS = [
     # Gatekeeping - Allow for fillers (damn, fscking, my) between key phrases
-    r'\b(won\'?t|never)\s+(?:[\w\'\*]+\s+){0,3}see\s+(?:[\w\'\*]+\s+){0,3}kids?\b', 
-    r'\bblock(ing)?\s+(?:[\w\'\*]+\s+){0,3}number\b', 
-    r'\btaking\s+(?:[\w\'\*]+\s+){0,3}kids?\s+(?:[\w\'\*]+\s+){0,3}away\b', 
-    r'\brun\s+away\s+with\s+(?:[\w\'\*]+\s+){0,3}(them|kids?)\b',
+    r'\b(won\'?t|never)\b.*?\bsee\b.*?\b(kids?|child(ren)?|bab[yi]es?)\b', 
+    r'\bblock(ing)?\b.*?\bnumber\b', 
+    r'\btaking\b.*?\b(kids?|child(ren)?|bab[yi]es?)\b.*?\baway\b', 
+    r'\brun\s+away\s+with\b.*?\b(them|kids?|child(ren)?|bab[yi]es?)\b',
 
     # Parental Alienation
     r'\btell\s+(?:[\w\'\*]+\s+){0,3}them\s+(?:[\w\'\*]+\s+){0,3}truth\b', 
