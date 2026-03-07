@@ -78,6 +78,7 @@ class ARIAService:
         r'\bpathetic\b', r'\bloser\b', r'\bworthless\b', r'\buseless\b',
         r'\bincompetent\b', r'\bcrazy\b', r'\binsane\b', r'\bpsycho\b',
         r'\bterrible\s+(mother|father|parent)\b', r'\bbad\s+(mother|father|parent)\b',
+        r'\bdumb\s*ass\b', r'\bdumbass\b', r'\bjerk\b', r'\bclown\b',
     ]
 
     HOSTILITY_PATTERNS = [

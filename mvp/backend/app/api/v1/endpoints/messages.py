@@ -29,6 +29,7 @@ from app.schemas.message import (
 from app.services.aria import aria_service
 from app.services.activity import log_message_activity
 from app.core.websocket import manager
+from app.core.config import settings
 from datetime import datetime
 import uuid
 import hashlib
@@ -142,7 +143,7 @@ async def analyze_message_content(
 
         # Get case ARIA settings
         aria_enabled = case.aria_enabled
-        ai_provider = case.aria_provider or "regex"
+        ai_provider = case.aria_provider or settings.ARIA_DEFAULT_PROVIDER
 
         # Get case context (children for context)
         children_result = await db.execute(
