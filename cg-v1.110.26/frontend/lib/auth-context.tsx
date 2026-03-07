@@ -16,6 +16,7 @@ interface AuthContextType {
     password: string;
     first_name: string;
     last_name: string;
+    subscription_price_id?: string | null;
   }) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -84,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string;
     first_name: string;
     last_name: string;
+    subscription_price_id?: string | null;
   }) => {
     const response = await authAPI.register(data);
     setUser(response.user);
