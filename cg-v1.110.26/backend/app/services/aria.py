@@ -188,7 +188,21 @@ class ARIAService:
         r'\bdumbass\b': "unprofessional",
         r'\bcrazy\b': "unreasonable",
         r'\binsane\b': "difficult to understand",
-    }
+    def map_categories(self, ai_categories: List[str]) -> List[ToxicityCategory]:
+        """Safe mapping of AI strings to ToxicityCategory enum."""
+        valid_cats = []
+        for cat in ai_categories:
+            cat_lower = str(cat).lower().strip().replace(" ", "_")
+            try:
+                # Try direct value match
+                valid_cats.append(ToxicityCategory(cat_lower))
+            except ValueError:
+                # Try to find a partial match or common aliases
+                for member in ToxicityCategory:
+                    if member.value in cat_lower or cat_lower in member.value:
+                        valid_cats.append(member)
+                        break
+        return list(set(valid_cats))  # Unique members
 
     async def log_event(
         self,
