@@ -155,13 +155,19 @@ function RegisterContent() {
 
     try {
       const plan = plans.find(p => p.id === selectedPlan);
-      await register({
+      const response = await register({
         email: formData.email,
         password: formData.password,
         first_name: formData.first_name,
         last_name: formData.last_name,
         subscription_price_id: billingInterval === 'month' ? plan?.priceId.month : plan?.priceId.year
       });
+
+      // If a checkout URL is returned, redirect to Stripe
+      if (response && response.checkout_url) {
+        window.location.href = response.checkout_url;
+        return; // Don't proceed to dashboard yet
+      }
 
       // If we have invite data, accept the invite to link user to case
       if (inviteData) {

@@ -13,6 +13,7 @@ class RegisterRequest(BaseModel):
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
     phone: Optional[str] = Field(None, max_length=20)
+    subscription_price_id: Optional[str] = Field(None, max_length=100)
 
     @field_validator('password')
     @classmethod
@@ -74,6 +75,7 @@ class LoginResponse(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
     user: "UserResponse"
+    checkout_url: Optional[str] = None
 
 
 class UserResponse(BaseModel):

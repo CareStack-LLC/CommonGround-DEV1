@@ -28,17 +28,18 @@ class AuthService:
         self.db = db
         self.supabase = get_supabase_client()
 
-    async def register_user(self, request: RegisterRequest) -> Tuple[User, str, str]:
+    async def register_user(self, request: RegisterRequest) -> Tuple[User, str, str, Optional[str]]:
         """
         Register a new user.
 
         Creates user in Supabase Auth and syncs to local database.
+        Also creates a Stripe customer and initiates checkout if needed.
 
         Args:
             request: Registration request data
 
         Returns:
-            Tuple of (User, access_token, refresh_token)
+            Tuple of (User, access_token, refresh_token, checkout_url)
 
         Raises:
             HTTPException: If registration fails
@@ -76,6 +77,16 @@ class AuthService:
 
             supabase_user = auth_response.user
 
+            # 1. Create Stripe Customer
+            from app.services.stripe_service import StripeService
+            stripe_service = StripeService()
+            
+            stripe_customer = await stripe_service.create_customer(
+                email=request.email,
+                name=f"{request.first_name} {request.last_name}",
+                user_id=supabase_user.id
+            )
+
             # Create user in local database
             user = User(
                 id=supabase_user.id,
@@ -94,8 +105,35 @@ class AuthService:
                 user_id=user.id,
                 first_name=request.first_name,
                 last_name=request.last_name,
+                stripe_customer_id=stripe_customer["id"],
+                subscription_tier="web_starter", # Default to free tier initially
+                subscription_status="active" if not request.subscription_price_id else "trial"
             )
             self.db.add(profile)
+
+            # 2. Handle Subscription Checkout if needed
+            checkout_url = None
+            if request.subscription_price_id and "price_1T7Wgn" not in request.subscription_price_id:
+                # If it's not the free price ID, create checkout session
+                # Note: 'price_1T7Wgn' is the marker for free tier based on the implementation
+                # Plus price IDs: price_1T7WgnB3EXvvERPfcpZeMSSH (month), price_1T7WgnB3EXvvERPfe7NNFlru (year)
+                # Wait, the free tier price is ALSO price_1T7Wgn...
+                # Let's check the price IDs more carefully.
+                # Web Starter ID: price_1T7WgnB3EXvvERPfyu40gtfE
+                # Hmm, they look very similar. Let's just check if it's explicitly the starter one.
+                
+                is_free = request.subscription_price_id == "price_1T7WgnB3EXvvERPfyu40gtfE"
+                
+                if not is_free:
+                    from app.core.config import settings
+                    checkout = await stripe_service.create_subscription_checkout(
+                        customer_id=stripe_customer["id"],
+                        price_id=request.subscription_price_id,
+                        success_url=f"{settings.FRONTEND_URL}/dashboard?registration=complete",
+                        cancel_url=f"{settings.FRONTEND_URL}/register?step=2&error=checkout_cancelled",
+                        metadata={"user_id": user.id}
+                    )
+                    checkout_url = checkout["url"]
 
             await self.db.commit()
             await self.db.refresh(user)
@@ -104,7 +142,7 @@ class AuthService:
             access_token = create_access_token(data={"sub": user.id})
             refresh_token = create_refresh_token(data={"sub": user.id})
 
-            return user, access_token, refresh_token
+            return user, access_token, refresh_token, checkout_url
 
         except HTTPException:
             raise

@@ -37,7 +37,7 @@ async def register(
         LoginResponse with user data and JWT tokens
     """
     auth_service = AuthService(db)
-    user, access_token, refresh_token = await auth_service.register_user(request)
+    user, access_token, refresh_token, checkout_url = await auth_service.register_user(request)
 
     return LoginResponse(
         access_token=access_token,
@@ -49,7 +49,8 @@ async def register(
             email_verified=user.email_verified,
             first_name=user.first_name,
             last_name=user.last_name,
-        )
+        ),
+        checkout_url=checkout_url
     )
 
 

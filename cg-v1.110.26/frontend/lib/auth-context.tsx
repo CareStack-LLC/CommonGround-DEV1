@@ -11,16 +11,10 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: {
-    email: string;
-    password: string;
-    first_name: string;
-    last_name: string;
-    subscription_price_id?: string | null;
-  }) => Promise<void>;
-  logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+}) => Promise<{ user: User; checkout_url?: string | null }>;
+logout: () => Promise<void>;
+refreshUser: () => Promise<void>;
+refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -97,6 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (profileError) {
       console.error('Failed to load profile after registration:', profileError);
     }
+
+    return response;
   };
 
   const logout = async () => {
