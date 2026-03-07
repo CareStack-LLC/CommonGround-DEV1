@@ -109,7 +109,7 @@ THREATENING_PATTERNS = [
 # ==============================================================================
 CUSTODY_WEAPONIZATION_PATTERNS = [
     # Gatekeeping - Allow for fillers (damn, fscking, my) between key phrases
-    r'\b(won\'?t|never)\b.*?\bsee\b.*?\b(kids?|child(ren)?|bab[yi]es?)\b', 
+    r'\b(won\'?t|never|can\'?t|cannot)\b.*?\bsee\b.*?\b(kids?|child(ren)?|bab[yi]es?)\b', 
     r'\bblock(ing)?\b.*?\bnumber\b', 
     r'\btaking\b.*?\b(kids?|child(ren)?|bab[yi]es?)\b.*?\baway\b', 
     r'\brun\s+away\s+with\b.*?\b(them|kids?|child(ren)?|bab[yi]es?)\b',

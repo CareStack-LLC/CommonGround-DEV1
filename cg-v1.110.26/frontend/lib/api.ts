@@ -324,6 +324,7 @@ export interface AuthResponse {
   refresh_token: string;
   token_type: string;
   user: User;
+  checkout_url?: string | null;
 }
 
 export interface User {

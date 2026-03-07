@@ -13,6 +13,9 @@ from app.core.security import create_access_token, create_refresh_token, decode_
 from app.core.supabase import get_supabase_client
 from app.models.user import User, UserProfile
 from app.schemas.auth import RegisterRequest, LoginRequest, OAuthSyncRequest
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class AuthService:
@@ -44,20 +47,24 @@ class AuthService:
         Raises:
             HTTPException: If registration fails
         """
-        # Check if user already exists
-        result = await self.db.execute(
-            select(User).where(User.email == request.email)
-        )
-        existing_user = result.scalar_one_or_none()
-
-        if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email already registered"
-            )
-
         try:
+            logger.info(f"🚀 Starting registration for: {request.email}")
+            
+            # Check if user already exists
+            result = await self.db.execute(
+                select(User).where(User.email == request.email)
+            )
+            existing_user = result.scalar_one_or_none()
+
+            if existing_user:
+                logger.warning(f"⚠️ Registration failed: Email {request.email} already exists")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Email already registered"
+                )
+
             # Create user in Supabase Auth
+            logger.info(f"📡 Creating Supabase Auth account for {request.email}")
             auth_response = self.supabase.auth.sign_up({
                 "email": request.email,
                 "password": request.password,
@@ -70,14 +77,17 @@ class AuthService:
             })
 
             if not auth_response.user:
+                logger.error(f"❌ Supabase Auth failed for {request.email}: No user in response")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Failed to create user in Supabase"
                 )
 
             supabase_user = auth_response.user
+            logger.info(f"✅ Supabase User created: {supabase_user.id}")
 
             # 1. Create Stripe Customer
+            logger.info(f"💳 Creating Stripe customer for {request.email}")
             from app.services.stripe_service import StripeService
             stripe_service = StripeService()
             
@@ -86,6 +96,7 @@ class AuthService:
                 name=f"{request.first_name} {request.last_name}",
                 user_id=supabase_user.id
             )
+            logger.info(f"✅ Stripe Customer created: {stripe_customer['id']}")
 
             # Create user in local database
             user = User(
@@ -110,18 +121,12 @@ class AuthService:
                 subscription_status="active" if not request.subscription_price_id else "trial"
             )
             self.db.add(profile)
+            logger.info(f"📝 Local database records prepared for {user.id}")
 
             # 2. Handle Subscription Checkout if needed
             checkout_url = None
             if request.subscription_price_id and "price_1T7Wgn" not in request.subscription_price_id:
-                # If it's not the free price ID, create checkout session
-                # Note: 'price_1T7Wgn' is the marker for free tier based on the implementation
-                # Plus price IDs: price_1T7WgnB3EXvvERPfcpZeMSSH (month), price_1T7WgnB3EXvvERPfe7NNFlru (year)
-                # Wait, the free tier price is ALSO price_1T7Wgn...
-                # Let's check the price IDs more carefully.
-                # Web Starter ID: price_1T7WgnB3EXvvERPfyu40gtfE
-                # Hmm, they look very similar. Let's just check if it's explicitly the starter one.
-                
+                logger.info(f"🛒 Initiating checkout for price: {request.subscription_price_id}")
                 is_free = request.subscription_price_id == "price_1T7WgnB3EXvvERPfyu40gtfE"
                 
                 if not is_free:
@@ -134,19 +139,24 @@ class AuthService:
                         metadata={"user_id": user.id}
                     )
                     checkout_url = checkout["url"]
+                    logger.info(f"🔗 Checkout URL generated: {checkout_url}")
 
             await self.db.commit()
+            logger.info(f"💾 Database transaction committed for {user.id}")
             await self.db.refresh(user)
 
             # Create JWT tokens
             access_token = create_access_token(data={"sub": user.id})
             refresh_token = create_refresh_token(data={"sub": user.id})
 
+            logger.info(f"✨ Registration successful for {request.email}")
             return user, access_token, refresh_token, checkout_url
 
-        except HTTPException:
+        except HTTPException as e:
+            logger.warning(f"⚠️ Registration HTTP error for {request.email}: {e.detail}")
             raise
         except Exception as e:
+            logger.error(f"💥 Unexpected registration error for {request.email}: {str(e)}", exc_info=True)
             await self.db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
