@@ -188,6 +188,7 @@ class ARIAService:
         r'\bdumbass\b': "unprofessional",
         r'\bcrazy\b': "unreasonable",
         r'\binsane\b': "difficult to understand",
+    }
     def map_categories(self, ai_categories: List[str]) -> List[ToxicityCategory]:
         """Safe mapping of AI strings to ToxicityCategory enum."""
         valid_cats = []

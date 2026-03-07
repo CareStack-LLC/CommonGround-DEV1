@@ -537,7 +537,7 @@ async def send_message(
             else:
                 toxicity_level = ToxicityLevel.SEVERE
 
-            categories_list = [ToxicityCategory(cat) for cat in analysis_result.get("categories", [])]
+            categories_list = aria_service.map_categories(analysis_result.get("categories", []))
             # STRICT BLOCKING: Enforce zero tolerance for AI results too
             block_send = (
                 ToxicityCategory.THREATENING in categories_list or
@@ -574,7 +574,7 @@ async def send_message(
             else:
                 toxicity_level = ToxicityLevel.SEVERE
 
-            categories_list = [ToxicityCategory(cat) for cat in analysis_result.get("categories", [])]
+            categories_list = aria_service.map_categories(analysis_result.get("categories", []))
             # STRICT BLOCKING: Enforce zero tolerance for AI results too
             block_send = (
                 ToxicityCategory.THREATENING in categories_list or
