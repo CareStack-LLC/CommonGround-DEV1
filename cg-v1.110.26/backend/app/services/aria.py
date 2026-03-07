@@ -1004,7 +1004,31 @@ If the original message had zero constructive content (pure abuse), suggest:
             return rewrite if rewrite else None
 
         except Exception as e:
-            print(f"[ARIA v2] generate_contextual_rewrite failed: {e}")
+            print(f"[ARIA v2] generate_contextual_rewrite (Claude) failed: {e}")
+            
+            # Fallback to OpenAI if Anthropic fails
+            try:
+                print("[ARIA v2] Attempting OpenAI fallback for contextual rewrite...")
+                openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+                
+                # Use a similar prompt for OpenAI
+                response = openai_client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": "You are ARIA, a co-parenting communication assistant for CommonGround. Rewrite provided toxic messages to be calm, child-focused, and productive. Follow the BIFF method (Brief, Informative, Friendly, Firm). Output ONLY the rewritten message."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=256,
+                    temperature=0.7
+                )
+                
+                rewrite = response.choices[0].message.content.strip()
+                if rewrite:
+                    print("[ARIA v2] OpenAI fallback successful.")
+                    return rewrite
+            except Exception as oe:
+                print(f"[ARIA v2] OpenAI fallback failed: {oe}")
+                
             return None
 
     async def generate_reply_suggestion(
@@ -1079,7 +1103,32 @@ Respond in valid JSON only:
             return parsed.get("suggestions", [])[:2]
 
         except Exception as e:
-            print(f"[ARIA v2] generate_reply_suggestion failed: {e}")
+            print(f"[ARIA v2] generate_reply_suggestion (Claude) failed: {e}")
+            
+            # Fallback to OpenAI if Anthropic fails
+            try:
+                print("[ARIA v2] Attempting OpenAI fallback for reply suggestions...")
+                openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+                
+                response = openai_client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[
+                        {"role": "system", "content": "You are ARIA, a co-parenting communication assistant for CommonGround. Provide concise, civil reply options in JSON format: {\"suggestions\": [\"reply one\", \"reply two\"]}"},
+                        {"role": "user", "content": prompt}
+                    ],
+                    max_tokens=200,
+                    response_format={"type": "json_object"}
+                )
+                
+                import json as _json
+                parsed = _json.loads(response.choices[0].message.content)
+                suggestions = parsed.get("suggestions", [])[:2]
+                if suggestions:
+                    print("[ARIA v2] OpenAI fallback successful.")
+                    return suggestions
+            except Exception as oe:
+                print(f"[ARIA v2] OpenAI fallback failed: {oe}")
+                
             return []
 
 
