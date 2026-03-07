@@ -221,49 +221,6 @@ async def analyze_message_content(
     # Determine if flagged
     is_flagged = analysis["toxicity_score"] > 0.3
 
-    if is_flagged:
-        # ARIA v2: Log preview intervention for audit trail
-        try:
-            from app.services.aria import SentimentAnalysis, ToxicityCategory, ToxicityLevel
-            from datetime import datetime
-            
-            # Map score to level for the log object
-            score = analysis["toxicity_score"]
-            if score < 0.2:
-                level = ToxicityLevel.NONE
-            elif score < 0.4:
-                level = ToxicityLevel.LOW
-            elif score < 0.6:
-                level = ToxicityLevel.MEDIUM
-            elif score < 0.8:
-                level = ToxicityLevel.HIGH
-            else:
-                level = ToxicityLevel.SEVERE
-
-            analysis_obj = SentimentAnalysis(
-                original_message=content,
-                toxicity_level=level,
-                toxicity_score=score,
-                categories=aria_service.map_categories(analysis.get("categories", [])),
-                triggers=analysis.get("triggers", []),
-                explanation=analysis.get("explanation", ""),
-                suggestion=analysis["suggestions"][0] if analysis.get("suggestions") else None,
-                is_flagged=True,
-                timestamp=datetime.utcnow()
-            )
-            
-            await aria_service.log_event(
-                db=db,
-                user_id=str(current_user.id),
-                family_file_id=family_file_id,
-                message_id=f"preview_{uuid.uuid4()}",
-                content_type="text_preview",
-                analysis=analysis_obj,
-                context_data={"source": "analyze_endpoint"}
-            )
-        except Exception as e:
-            logger.error(f"Failed to log ARIA preview event: {e}")
-
     # Map score to level
     score = analysis["toxicity_score"]
     if score < 0.2:
