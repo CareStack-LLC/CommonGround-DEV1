@@ -119,6 +119,77 @@ class ARIAService:
             ],
         }
 
+    # Mediator Templates (BIFF Method: Brief, Informative, Friendly, Firm)
+    TEMPLATES = {
+        ToxicityCategory.THREATENING: [
+            "I am feeling very upset right now. I need to take a break from this conversation. I will respond when I am calm.",
+            "This conversation is becoming unproductive. Let's pause and continue this later within the app.",
+        ],
+        ToxicityCategory.HOSTILITY: [
+            "I'm finding it hard to discuss this productively right now. Can we focus solely on the logistics for [Child's Name]?",
+            "Let's keep our communication focused on the schedule and the children.",
+        ],
+        ToxicityCategory.PROFANITY: [
+            "I am frustrated, but I want to keep this professional. Let's discuss the specific issue at hand.",
+            "Please let me know what specific information you need regarding the schedule.",
+        ],
+        ToxicityCategory.INSULT: [
+            "I disagree with your assessment, but I am willing to discuss the specific issue regarding the children.",
+            "Let's move past personal comments and focus on the decision we need to make.",
+        ],
+        ToxicityCategory.BLAME: [
+            "I see this situation differently. Let's focus on how to solve the problem moving forward.",
+            "Rather than assigning blame, can we work together to find a solution?",
+        ],
+        ToxicityCategory.DISMISSIVE: [
+            "I understand you might be busy, but I need a clear answer on this for the children's planning.",
+            "Please let me know if you are available to discuss this, as I need to finalize the plan.",
+        ],
+    }
+
+    # Context-Aware Phrase Replacements (Gentler, Mediator-style)
+    SUGGESTIONS = {
+        # Profanity and hostility -> De-escalation
+        r'\bwhat\s+type\s+of\s+stupid\s+shit\s+is\s+that\b': "I don't understand the reasoning behind this request",
+        r'\bshut\s*up\b': "I would appreciate a break from this conversation",
+        r'\bfuck\s+off\b': "I am not willing to continue this conversation right now",
+        r'\bgo\s+to\s+hell\b': "I am very upset",
+        r'\bget\s+lost\b': "Please give me some space",
+        r'\bfuck\s+you\b': "I am angry",
+        r'\byou\s+are\s+a\s+bitch\b': "I am finding your behavior difficult",
+        r'\bstop\s+being\s+a\s+bitch\b': "Please stop communicating this way",
+
+        # Hate and contempt -> I-statements
+        r'\bi\s+hate\s+you\b': "I am feeling very hostile towards you right now",
+        r'\bhate\s+you\b': "I am struggling with our relationship",
+        r'\bcan\'?t\s+stand\s+you\b': "I find interacting with you challenging",
+
+        # Absolutes -> Observations
+        r'\byou\s+never\b': "It seems that often",
+        r'\byou\s+always\b': "I feel that frequently",
+        r'\bevery\s+time\s+you\b': "When this happens",
+
+        # Dismissive -> Engagement
+        r'\bwhatever\b': "I hear you",
+        r'\bfigure\s+it\s+out\b': "please clarify what you mean",
+        r'\bnot\s+my\s+problem\b': "this is an issue we share",
+        r'\bdeal\s+with\s+it\b': "we need to resolve this",
+        r'\bgo\s+look\b': "the information is in the calendar",
+
+        # Blame -> Shared Problem Solving
+        r'\byour\s+fault\b': "the result of this situation",
+        r'\bblame\s+you\b': "I feel this is responsible",
+        
+        # Insults -> Description of Behavior (not person)
+        r'\bstupid\b': "unclear",
+        r'\bidiot\b': "confused", 
+        r'\bmoron\b': "mistaken",
+        r'\bdumb\b': "ill-advised",
+        r'\bdumbass\b': "unprofessional",
+        r'\bcrazy\b': "unreasonable",
+        r'\binsane\b': "difficult to understand",
+    }
+
     async def log_event(
         self,
         db: AsyncSession,
