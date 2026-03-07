@@ -42,6 +42,78 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# Outdated Stripe Price ID that must be bypassed if found in DB
+OLD_PRICE_ID = "price_1SpxbpBQiJH5qPMu2hVbTv2F"
+
+# Source of truth for Stripe IDs in March 2026 test account
+HARDCODED_PLANS = [
+    PlanResponse(
+        id="plan_web_starter_001",
+        plan_code="web_starter",
+        display_name="Web Starter",
+        description="Free plan to get started with CommonGround.",
+        badge=None,
+        price_monthly=0.00,
+        price_annual=0.00,
+        stripe_price_id_monthly="price_1T7WgnB3EXvvERPfyu40gtfE",
+        stripe_price_id_annual=None,
+        stripe_product_id="prod_U5i6vWb4ktGrTN",
+        features={
+            "aria_manual_sentiment": True,
+            "clearfund_fee_exempt": False,
+            "quick_accords": False,
+            "circle_contacts_limit": 0,
+            "kidcoms_access": False,
+        },
+        trial_days=0,
+        display_order=0,
+    ),
+    PlanResponse(
+        id="plan_plus_001",
+        plan_code="plus",
+        display_name="Plus",
+        description="Better scheduling, no fees, and a trusted contact.",
+        badge="Most Popular",
+        price_monthly=17.99,
+        price_annual=199.99,
+        stripe_price_id_monthly="price_1T7WgnB3EXvvERPfcpZeMSSH",
+        stripe_price_id_annual="price_1T7WgnB3EXvvERPfe7NNFlru",
+        stripe_product_id="prod_U5i6Efw49ipfb3",
+        features={
+            "aria_manual_sentiment": True,
+            "clearfund_fee_exempt": True,
+            "quick_accords": True,
+            "circle_contacts_limit": 1,
+            "kidcoms_access": False,
+        },
+        trial_days=14,
+        display_order=1,
+    ),
+    PlanResponse(
+        id="plan_complete_001",
+        plan_code="complete",
+        display_name="Complete",
+        description="Full access including KidComs video calls and all features.",
+        badge="Best Value",
+        price_monthly=34.99,
+        price_annual=349.99,
+        stripe_price_id_monthly="price_1T7WgoB3EXvvERPfDm7qKpBN",
+        stripe_price_id_annual="price_1T7WgoB3EXvvERPfmDy9KtDh",
+        stripe_product_id="prod_U5i6lsgC2mOHxn",
+        features={
+            "aria_manual_sentiment": True,
+            "aria_advanced": True,
+            "clearfund_fee_exempt": True,
+            "quick_accords": True,
+            "circle_contacts_limit": 5,
+            "kidcoms_access": True,
+            "theater_mode": True,
+        },
+        trial_days=14,
+        display_order=2,
+    ),
+]
+
 
 # =============================================================================
 # Plan Listing
@@ -74,74 +146,7 @@ async def list_subscription_plans(
         logger.warning(f"Failed to fetch plans from database: {e}")
 
     # Fallback to hardcoded plans if database unavailable or empty
-    hardcoded_plans = [
-        PlanResponse(
-            id="plan_web_starter_001",
-            plan_code="web_starter",
-            display_name="Web Starter",
-            description="Free plan to get started with CommonGround.",
-            badge=None,
-            price_monthly=0.00,
-            price_annual=0.00,
-            stripe_price_id_monthly="price_1T7WgnB3EXvvERPfyu40gtfE",
-            stripe_price_id_annual=None,
-            stripe_product_id="prod_U5i6vWb4ktGrTN",
-            features={
-                "aria_manual_sentiment": True,
-                "clearfund_fee_exempt": False,
-                "quick_accords": False,
-                "circle_contacts_limit": 0,
-                "kidcoms_access": False,
-            },
-            trial_days=0,
-            display_order=0,
-        ),
-        PlanResponse(
-            id="plan_plus_001",
-            plan_code="plus",
-            display_name="Plus",
-            description="Better scheduling, no fees, and a trusted contact.",
-            badge="Most Popular",
-            price_monthly=17.99,
-            price_annual=199.99,
-            stripe_price_id_monthly="price_1T7WgnB3EXvvERPfcpZeMSSH",
-            stripe_price_id_annual="price_1T7WgnB3EXvvERPfe7NNFlru",
-            stripe_product_id="prod_U5i6Efw49ipfb3",
-            features={
-                "aria_manual_sentiment": True,
-                "clearfund_fee_exempt": True,
-                "quick_accords": True,
-                "circle_contacts_limit": 1,
-                "kidcoms_access": False,
-            },
-            trial_days=14,
-            display_order=1,
-        ),
-        PlanResponse(
-            id="plan_complete_001",
-            plan_code="complete",
-            display_name="Complete",
-            description="Full access including KidComs video calls and all features.",
-            badge="Best Value",
-            price_monthly=34.99,
-            price_annual=349.99,
-            stripe_price_id_monthly="price_1T7WgoB3EXvvERPfDm7qKpBN",
-            stripe_price_id_annual="price_1T7WgoB3EXvvERPfmDy9KtDh",
-            stripe_product_id="prod_U5i6lsgC2mOHxn",
-            features={
-                "aria_manual_sentiment": True,
-                "aria_advanced": True,
-                "clearfund_fee_exempt": True,
-                "quick_accords": True,
-                "circle_contacts_limit": 5,
-                "kidcoms_access": True,
-                "theater_mode": True,
-            },
-            trial_days=14,
-            display_order=2,
-        ),
-    ]
-    return PlansListResponse(plans=hardcoded_plans)
+    return PlansListResponse(plans=HARDCODED_PLANS)
 
 
 # =============================================================================
@@ -272,6 +277,18 @@ async def create_checkout_session(
         plan.stripe_price_id_annual if request.period == "annual"
         else plan.stripe_price_id_monthly
     )
+
+    # CRITICAL: If the database contains the outdated price ID, force a fallback
+    # to the hardcoded March 2026 IDs to resolve the "No such price" error immediately.
+    if price_id == OLD_PRICE_ID or not price_id:
+        logger.warning(f"Outdated or missing price ID found in DB for {request.plan_code}. Forcing fallback.")
+        fallback_plan = next((p for p in HARDCODED_PLANS if p.plan_code == request.plan_code), None)
+        if fallback_plan:
+            price_id = (
+                fallback_plan.stripe_price_id_annual if request.period == "annual"
+                else fallback_plan.stripe_price_id_monthly
+            )
+            logger.info(f"Using fallback price ID: {price_id}")
 
     if not price_id:
         raise HTTPException(
@@ -514,6 +531,17 @@ async def upgrade_subscription(
         plan.stripe_price_id_annual if request.period == "annual"
         else plan.stripe_price_id_monthly
     )
+
+    # CRITICAL: Same fallback logic for upgrade as for initial subscription
+    if price_id == OLD_PRICE_ID or not price_id:
+        logger.warning(f"Outdated or missing price ID found in DB for {request.plan_code}. Forcing fallback.")
+        fallback_plan = next((p for p in HARDCODED_PLANS if p.plan_code == request.plan_code), None)
+        if fallback_plan:
+            price_id = (
+                fallback_plan.stripe_price_id_annual if request.period == "annual"
+                else fallback_plan.stripe_price_id_monthly
+            )
+            logger.info(f"Using fallback price ID: {price_id}")
 
     if not price_id:
         raise HTTPException(
