@@ -171,6 +171,75 @@ async def get_current_subscription(
             detail="User profile not found"
         )
 
+    # =========================================================================
+    # Proactive Stripe Synchronization
+    # =========================================================================
+    # If the user has a Stripe Customer ID, check Stripe to ensure local DB is sync'd.
+    # This ensures that after a successful checkout, the dashboard updates immediately.
+    if profile.stripe_customer_id:
+        try:
+            logger.info(f"Proactively syncing subscription for customer {profile.stripe_customer_id}")
+            existing_subs = await stripe_service.get_customer_subscriptions(profile.stripe_customer_id)
+            
+            # Find the most relevant active/trialing subscription
+            active_subs = [s for s in existing_subs if s["status"] in ("active", "trialing", "past_due")]
+            
+            if active_subs:
+                sub = active_subs[0]
+                stripe_sub_id = sub["id"]
+                stripe_status = sub["status"]
+                stripe_price_id = sub.get("price_id")
+                
+                # Update local DB if Stripe has new information
+                needs_update = False
+                
+                # Check status/ID sync
+                if profile.stripe_subscription_id != stripe_sub_id:
+                    profile.stripe_subscription_id = stripe_sub_id
+                    needs_update = True
+                
+                if profile.subscription_status != stripe_status:
+                    profile.subscription_status = stripe_status
+                    needs_update = True
+                
+                # Map Stripe Price ID back to our plan codes
+                new_tier = None
+                for plan in HARDCODED_PLANS:
+                    if stripe_price_id in (plan.stripe_price_id_monthly, plan.stripe_price_id_annual):
+                        new_tier = plan.plan_code
+                        break
+                
+                if new_tier and profile.subscription_tier != new_tier:
+                    logger.info(f"Sync: Updating user {current_user.id} tier from {profile.subscription_tier} to {new_tier}")
+                    profile.subscription_tier = new_tier
+                    needs_update = True
+                
+                # Sync dates if available
+                if sub.get("current_period_start") and profile.subscription_period_start != sub["current_period_start"]:
+                    profile.subscription_period_start = sub["current_period_start"]
+                    needs_update = True
+                
+                if sub.get("current_period_end") and profile.subscription_period_end != sub["current_period_end"]:
+                    profile.subscription_period_end = sub["current_period_end"]
+                    needs_update = True
+
+                if needs_update:
+                    await db.commit()
+                    logger.info(f"Successfully sync'd Stripe state for user {current_user.id}")
+            else:
+                # No active subscriptions in Stripe, but we have one locally?
+                if profile.stripe_subscription_id:
+                    logger.info(f"Sync: Clearing inactive subscription {profile.stripe_subscription_id} for user {current_user.id}")
+                    profile.stripe_subscription_id = None
+                    profile.subscription_status = "cancelled"
+                    profile.subscription_tier = "web_starter"
+                    await db.commit()
+
+        except Exception as e:
+            logger.error(f"Failed proactive Stripe sync for user {current_user.id}: {e}")
+            # Non-blocking, continue with local data if sync fails
+            pass
+
     # Get effective tier (accounting for grants)
     effective_tier = feature_gate.get_effective_tier(current_user)
 
@@ -213,7 +282,7 @@ async def get_current_subscription(
         grant_expires_at=grant_expires_at,
         features=features,
         is_trial=profile.subscription_status == "trial",
-        trial_ends_at=profile.subscription_ends_at if profile.subscription_status == "trial" else None,
+        trial_ends_at=profile.subscription_period_end if profile.subscription_status == "trial" else None,
     )
 
 
