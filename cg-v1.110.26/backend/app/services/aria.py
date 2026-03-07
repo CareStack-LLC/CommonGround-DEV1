@@ -648,14 +648,21 @@ CRITICAL CONTEXT: All messages are COURT DOCUMENTATION that may be reviewed by j
 
 Your role is to ensure communication is appropriate for court review and focused on children's welfare.
 
-Analyze messages for COURT-INAPPROPRIATE content:
-- Physical threats or violence (CRITICAL - may have criminal implications)
-- Hostility, contempt, or hate speech (judges view very negatively)
-- Profanity or insults (unprofessional in legal context)
-- Blame, manipulation, or guilt-tripping (bad faith communication)
-- Dismissiveness or passive-aggression (non-collaborative)
-- All caps/shouting (appears aggressive)
-- Anything a judge would view as poor co-parenting
+Analyze messages for COURT-INAPPROPRIATE content using ONLY these categories:
+- PROFANITY: Using swear words or vulgar language
+- INSULT: Name-calling or demeaning labels
+- HOSTILITY: Aggressive, angry, or confrontational tone
+- SARCASM: Mocking or biting irony
+- BLAME: Accusing the other parent of fault
+- DISMISSIVE: Ignoring or belittling the other's concerns
+- THREATENING: Physical threats or safety concerns (CRITICAL)
+- MANIPULATION: Emotional or psychological coercion
+- PASSIVE_AGGRESSIVE: Indirectly aggressive or avoiding direct communication
+- ALL_CAPS: Shouting or excessive emphasis
+- CUSTODY_WEAPONIZATION: Using children or visitations as leverage
+- FINANCIAL_COERCION: Using money/expenses as leverage
+- HATE_SPEECH: Attacks based on protected characteristics
+- SEXUAL_HARASSMENT: Inappropriate sexual content
 
 Guidance for Suggestions:
 Use the **BIFF Method** (Brief, Informative, Friendly, Firm).
@@ -795,7 +802,6 @@ Respond in JSON format:
         # Calculate average toxicity
         toxicity_scores = [f.toxicity_score for f in flags if f.toxicity_score]
         avg_toxicity = sum(toxicity_scores) / len(toxicity_scores) if toxicity_scores else 0.0
-
         # Suggestion acceptance rates
         accepted = sum(1 for f in flags if f.user_action == "accepted")
         modified = sum(1 for f in flags if f.user_action == "modified")
