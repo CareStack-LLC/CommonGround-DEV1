@@ -136,8 +136,6 @@ async def health_check():
 
     Checks database connectivity and returns service status.
     """
-    from app.core.database import get_db_engine
-
     checks = {"api": "healthy"}
 
     # Check database connectivity
