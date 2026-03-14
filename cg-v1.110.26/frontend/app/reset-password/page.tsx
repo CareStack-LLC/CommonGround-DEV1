@@ -9,7 +9,7 @@ import { authAPI } from '@/lib/api';
 /* =============================================================================
    RESET PASSWORD PAGE
    Design: Organic Minimalist ("The Sanctuary of Truth")
-   Palette: Sage Green (#4A6C58), Slate Blue (#475569), Warm Sand
+   Palette: Sage Green (#3DAA8A), Slate Blue (#475569), Warm Sand
    ============================================================================= */
 
 function ResetPasswordForm() {

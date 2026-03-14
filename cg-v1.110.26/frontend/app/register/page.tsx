@@ -11,7 +11,7 @@ import { Loader2, Mail, Lock, User, ArrowRight, Leaf, Users, CheckCircle } from 
 /* =============================================================================
    REGISTER PAGE
    Design: Organic Minimalist ("The Sanctuary of Truth")
-   Palette: Sage Green (#4A6C58), Slate Blue (#475569), Warm Sand
+   Palette: Sage Green (#3DAA8A), Slate Blue (#475569), Warm Sand
    ============================================================================= */
 
 interface InviteData {

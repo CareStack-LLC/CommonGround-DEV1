@@ -17,7 +17,7 @@ import {
 /**
  * How It Works Page
  *
- * Matches homepage design: Crimson Text serif, warm colors, compelling copy
+ * Matches homepage design: DM Serif Display serif, warm colors, compelling copy
  */
 
 const steps = [
@@ -34,8 +34,8 @@ const steps = [
     icon: Users,
     title: 'Invite your co-parent',
     description: 'They get a secure link. You both have equal access from day one.',
-    color: 'from-[#D97757]/10 to-[#D97757]/5',
-    iconColor: 'text-[#D97757]',
+    color: 'from-[#F5A623]/10 to-[#F5A623]/5',
+    iconColor: 'text-[#F5A623]',
   },
   {
     number: '03',
@@ -49,15 +49,15 @@ const steps = [
     number: '04',
     icon: MessageSquare,
     title: 'Communicate through ARIA',
-    description: 'AI catches conflict before it starts. Send messages you won\'t regret.',
-    color: 'from-[#D97757]/10 to-[#D97757]/5',
-    iconColor: 'text-[#D97757]',
+    description: 'AI promotes clarity before tension builds. Send messages you won\'t regret.',
+    color: 'from-[#F5A623]/10 to-[#F5A623]/5',
+    iconColor: 'text-[#F5A623]',
   },
   {
     number: '05',
     icon: Calendar,
     title: 'Let automation do the rest',
-    description: 'Schedules, reminders, expenses—all tracked. No more "who owes what" fights.',
+    description: 'Schedules, reminders, expenses—all tracked. No more "who owes what" confusion.',
     color: 'from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5',
     iconColor: 'text-[var(--portal-primary)]',
   },
@@ -71,17 +71,17 @@ const benefits = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            From conflict to
+            From chaos to
             <br />
-            <span className="text-[#D97757]">calm in 5 steps</span>
+            <span className="text-[#F5A623]">calm in 5 steps</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
             No therapists. No mediators. Just a system that
@@ -118,7 +118,7 @@ export default function HowItWorksPage() {
                     <div className="flex items-center gap-4">
                       <span
                         className="text-6xl font-serif text-gray-100 group-hover:text-[var(--portal-primary)]/20 transition-colors"
-                        style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                        style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                       >
                         {step.number}
                       </span>
@@ -130,8 +130,8 @@ export default function HowItWorksPage() {
                     {/* Content */}
                     <div className="flex-1">
                       <h3
-                        className="text-2xl font-semibold text-[#2C3E50] mb-2"
-                        style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                        className="text-2xl font-semibold text-[#1E3A4A] mb-2"
+                        style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                       >
                         {step.title}
                       </h3>
@@ -153,13 +153,13 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Ready to stop fighting?
+            Ready to find common ground?
           </h2>
           <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
             Most parents see results in the first week.
@@ -167,7 +167,7 @@ export default function HowItWorksPage() {
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center justify-center px-10 py-5 bg-[#D97757] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
+            className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#E0951A] transition-all shadow-2xl hover:-translate-y-1 group"
           >
             Start Free Today
             <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />

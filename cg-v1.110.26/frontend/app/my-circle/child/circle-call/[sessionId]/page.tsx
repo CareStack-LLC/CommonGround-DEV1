@@ -308,10 +308,10 @@ function CircleCallContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-[#2C5F5D]" />
-          <p className="text-xl font-bold text-[#2C3E50]">Connecting your call...</p>
+          <p className="text-xl font-bold text-[#1E3A4A]">Connecting your call...</p>
           <p className="text-gray-600 mt-2">Getting everything ready! 🎉</p>
         </div>
       </div>
@@ -320,7 +320,7 @@ function CircleCallContent() {
 
   if (error || !callSession) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center p-4">
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">😕</div>
           <h1 className="text-2xl font-bold text-[#2C5F5D] mb-2">Oops!</h1>
@@ -338,7 +338,7 @@ function CircleCallContent() {
 
   if (callEnded) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center p-4">
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">👋</div>
           <h1 className="text-2xl font-bold text-[#2C5F5D] mb-2">Call Ended</h1>
@@ -356,7 +356,7 @@ function CircleCallContent() {
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="flex h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="flex h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* ARIA Safety Alert Overlay */}
       {ariaAlert && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -364,7 +364,7 @@ function CircleCallContent() {
             <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="h-8 w-8 text-amber-600" />
             </div>
-            <h2 className="text-xl font-bold text-[#2C3E50] mb-2">
+            <h2 className="text-xl font-bold text-[#1E3A4A] mb-2">
               {ariaAlert.callTerminated ? 'Call Ending' : 'Safety Notice'}
             </h2>
             <p className="text-gray-600 mb-4">{ariaAlert.message}</p>
@@ -392,7 +392,7 @@ function CircleCallContent() {
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div>
-              <h1 className="text-[#2C3E50] font-bold">
+              <h1 className="text-[#1E3A4A] font-bold">
                 {isCallJoined ? `Talking with ${callSession.contactName}` : 'Connecting...'}
               </h1>
               <p className="text-xs text-gray-600 flex items-center gap-2">
@@ -411,7 +411,7 @@ function CircleCallContent() {
         {/* Video Area */}
         <div className="flex-1 relative overflow-hidden">
           {!isCallJoined ? (
-            <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#D97757]/80 flex items-center justify-center">
+            <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]/80 flex items-center justify-center">
               <div className="text-center">
                 <Loader2 className="h-16 w-16 animate-spin text-white mx-auto mb-4" />
                 <p className="text-white text-xl font-bold">
@@ -427,7 +427,7 @@ function CircleCallContent() {
                 {remoteParticipants.length > 0 ? (
                   <VideoTile participant={remoteParticipants[0]} isFullScreen />
                 ) : (
-                  <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#D97757]/80 flex items-center justify-center">
+                  <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]/80 flex items-center justify-center">
                     <div className="text-center">
                       <div className="text-6xl mb-4">⏳</div>
                       <p className="text-white text-lg font-bold">Waiting for {callSession.contactName}...</p>
@@ -558,7 +558,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]">
             <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold">
               {participant.name[0]?.toUpperCase() || '?'}
             </div>
@@ -586,14 +586,14 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]/80">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]/80">
             <div className="w-32 h-32 rounded-full bg-white/20 flex items-center justify-center text-white text-5xl font-bold">
               {participant.name[0]?.toUpperCase() || '?'}
             </div>
           </div>
         )}
         <div className="absolute bottom-24 left-0 right-0 text-center">
-          <span className="text-white text-xl font-bold bg-[#2C3E50]/80 px-6 py-2 rounded-full backdrop-blur-sm">
+          <span className="text-white text-xl font-bold bg-[#1E3A4A]/80 px-6 py-2 rounded-full backdrop-blur-sm">
             {participant.name}
           </span>
         </div>
@@ -618,14 +618,14 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]">
           <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center text-white text-4xl font-bold">
             {participant.name[0]?.toUpperCase() || '?'}
           </div>
         </div>
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#2C3E50]/90 to-transparent p-4">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1E3A4A]/90 to-transparent p-4">
         <div className="flex items-center justify-between">
           <span className="text-white font-bold">
             {participant.name}
@@ -647,10 +647,10 @@ export default function CircleCallPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center">
           <div className="text-center">
             <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-[#2C5F5D]" />
-            <p className="text-xl font-bold text-[#2C3E50]">Loading...</p>
+            <p className="text-xl font-bold text-[#1E3A4A]">Loading...</p>
           </div>
         </div>
       }

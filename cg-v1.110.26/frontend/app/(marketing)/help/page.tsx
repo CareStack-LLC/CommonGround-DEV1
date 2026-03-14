@@ -21,7 +21,7 @@ import {
 /**
  * Help Center Page
  *
- * Matches homepage design: Crimson Text serif, warm colors
+ * Matches homepage design: DM Serif Display serif, warm colors
  */
 
 const categories = [
@@ -30,8 +30,8 @@ const categories = [
     title: 'Messaging & ARIA',
     description: 'How to communicate effectively',
     href: '/help/messaging',
-    color: 'from-[#D97757]/10 to-[#D97757]/5',
-    iconColor: 'text-[#D97757]',
+    color: 'from-[#F5A623]/10 to-[#F5A623]/5',
+    iconColor: 'text-[#F5A623]',
   },
   {
     icon: FileText,
@@ -46,8 +46,8 @@ const categories = [
     title: 'Scheduling',
     description: 'Manage custody schedules',
     href: '/help/schedule',
-    color: 'from-[#D97757]/10 to-[#D97757]/5',
-    iconColor: 'text-[#D97757]',
+    color: 'from-[#F5A623]/10 to-[#F5A623]/5',
+    iconColor: 'text-[#F5A623]',
   },
   {
     icon: Wallet,
@@ -62,8 +62,8 @@ const categories = [
     title: 'Court & Legal',
     description: 'Documentation for court',
     href: '/help/court',
-    color: 'from-[#D97757]/10 to-[#D97757]/5',
-    iconColor: 'text-[#D97757]',
+    color: 'from-[#F5A623]/10 to-[#F5A623]/5',
+    iconColor: 'text-[#F5A623]',
   },
   {
     icon: Settings,
@@ -86,15 +86,15 @@ const popularQuestions = [
 
 export default function HelpCenterPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            How can we <span className="text-[#D97757]">help?</span>
+            How can we <span className="text-[#F5A623]">help?</span>
           </h1>
           <p className="text-xl text-gray-600 mb-10">
             Find answers, tutorials, and support resources.
@@ -107,7 +107,7 @@ export default function HelpCenterPage() {
               <input
                 type="text"
                 placeholder="Search for help..."
-                className="w-full pl-14 pr-5 py-4 text-lg rounded-full border-2 border-gray-200 bg-white text-[#2C3E50] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors shadow-lg"
+                className="w-full pl-14 pr-5 py-4 text-lg rounded-full border-2 border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors shadow-lg"
               />
             </div>
           </div>
@@ -134,7 +134,7 @@ export default function HelpCenterPage() {
                     <Icon className="h-6 w-6 text-[var(--portal-primary)]" />
                   </div>
                   <div>
-                    <p className="font-semibold text-[#2C3E50] group-hover:text-[var(--portal-primary)] transition-colors">
+                    <p className="font-semibold text-[#1E3A4A] group-hover:text-[var(--portal-primary)] transition-colors">
                       {item.title}
                     </p>
                     <p className="text-sm text-gray-500">{item.description}</p>
@@ -151,10 +151,10 @@ export default function HelpCenterPage() {
       <section className="py-16 sm:py-24">
         <div className="max-w-6xl mx-auto px-6">
           <h2
-            className="text-2xl sm:text-3xl font-serif text-[#2C3E50] mb-10 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-2xl sm:text-3xl font-serif text-[#1E3A4A] mb-10 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Browse by <span className="text-[#D97757]">category</span>
+            Browse by <span className="text-[#F5A623]">category</span>
           </h2>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -170,8 +170,8 @@ export default function HelpCenterPage() {
                     <Icon className={`h-7 w-7 ${category.iconColor}`} />
                   </div>
                   <h3
-                    className="text-lg font-semibold text-[#2C3E50] mb-1 group-hover:text-[var(--portal-primary)] transition-colors"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-lg font-semibold text-[#1E3A4A] mb-1 group-hover:text-[var(--portal-primary)] transition-colors"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {category.title}
                   </h3>
@@ -187,10 +187,10 @@ export default function HelpCenterPage() {
       <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <h2
-            className="text-2xl sm:text-3xl font-serif text-[#2C3E50] mb-10 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-2xl sm:text-3xl font-serif text-[#1E3A4A] mb-10 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Popular <span className="text-[#D97757]">questions</span>
+            Popular <span className="text-[#F5A623]">questions</span>
           </h2>
 
           <div className="space-y-4">
@@ -200,7 +200,7 @@ export default function HelpCenterPage() {
                 href={item.href}
                 className="flex items-center justify-between p-5 bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl border-2 border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all group"
               >
-                <span className="text-[#2C3E50] font-medium group-hover:text-[var(--portal-primary)] transition-colors">
+                <span className="text-[#1E3A4A] font-medium group-hover:text-[var(--portal-primary)] transition-colors">
                   {item.question}
                 </span>
                 <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all" />
@@ -213,10 +213,10 @@ export default function HelpCenterPage() {
       {/* Contact CTA */}
       <section className="py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] rounded-3xl p-10 text-white text-center">
+          <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] rounded-3xl p-10 text-white text-center">
             <h2
               className="text-3xl sm:text-4xl font-serif mb-4"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
               Still need help?
             </h2>
@@ -226,7 +226,7 @@ export default function HelpCenterPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center px-8 py-4 bg-[#D97757] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all shadow-lg hover:-translate-y-0.5 group"
+                className="inline-flex items-center justify-center px-8 py-4 bg-[#F5A623] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all shadow-lg hover:-translate-y-0.5 group"
               >
                 <Mail className="w-5 h-5 mr-2" />
                 Contact Support

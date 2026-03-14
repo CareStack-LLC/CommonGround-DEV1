@@ -196,7 +196,7 @@ function NewQuickAccordContent() {
             <Zap className="w-6 h-6 text-amber-500" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               New QuickAccord
             </h1>
             <p className="text-sm text-muted-foreground font-medium">
@@ -217,7 +217,7 @@ function NewQuickAccordContent() {
       {!conversationId && (
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               What type of arrangement do you need?
             </CardTitle>
             <CardDescription className="font-medium">
@@ -293,7 +293,7 @@ function NewQuickAccordContent() {
               <Bot className="h-5 w-5 text-[var(--portal-primary)]" />
             </div>
             <div>
-              <CardTitle className="text-lg font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <CardTitle className="text-lg font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Chat with ARIA
               </CardTitle>
               <CardDescription className="font-medium">
@@ -327,14 +327,14 @@ function NewQuickAccordContent() {
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-md ${
                   message.role === 'user'
-                    ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white'
+                    ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white'
                     : 'bg-white border-2 border-slate-200 text-foreground'
                 }`}
               >
                 <p className="whitespace-pre-wrap text-sm font-medium">{message.content}</p>
               </div>
               {message.role === 'user' && (
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center flex-shrink-0 shadow-sm">
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] flex items-center justify-center flex-shrink-0 shadow-sm">
                   <User className="h-4 w-4 text-white" />
                 </div>
               )}
@@ -383,7 +383,7 @@ function NewQuickAccordContent() {
               <Button
                 onClick={startConversation}
                 disabled={!inputValue.trim() || isSending}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white font-bold px-6 rounded-xl hover:shadow-lg transition-all duration-300"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold px-6 rounded-xl hover:shadow-lg transition-all duration-300"
               >
                 Start
               </Button>
@@ -399,7 +399,7 @@ function NewQuickAccordContent() {
               <Button
                 onClick={sendMessage}
                 disabled={!inputValue.trim() || isSending}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white font-bold px-4 rounded-xl hover:shadow-lg transition-all duration-300"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold px-4 rounded-xl hover:shadow-lg transition-all duration-300"
               >
                 <Send className="h-4 w-4" />
               </Button>
@@ -412,7 +412,7 @@ function NewQuickAccordContent() {
       {extractedData && Object.keys(extractedData).length > 0 && (
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="text-lg font-bold flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
                 <CheckCircle className="h-5 w-5 text-emerald-600" />
               </div>

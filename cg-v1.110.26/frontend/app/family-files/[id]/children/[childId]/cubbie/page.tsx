@@ -138,7 +138,7 @@ function ChildCubbiePageContent() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-foreground sm:text-3xl" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h1 className="text-2xl font-bold text-foreground sm:text-3xl" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               {child?.first_name}'s Cubbie
             </h1>
             <p className="mt-1 text-muted-foreground font-medium">
@@ -147,7 +147,7 @@ function ChildCubbiePageContent() {
           </div>
           <Button
             onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie/new`)}
-            className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white hover:shadow-lg hover:scale-105 transition-all duration-200 rounded-xl"
+            className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white hover:shadow-lg hover:scale-105 transition-all duration-200 rounded-xl"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Item
@@ -219,7 +219,7 @@ function ChildCubbiePageContent() {
                   </div>
 
                   {/* Item Details */}
-                  <h3 className="font-bold text-lg text-foreground mb-1 group-hover:text-[var(--portal-primary)] transition-colors" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{item.name}</h3>
+                  <h3 className="font-bold text-lg text-foreground mb-1 group-hover:text-[var(--portal-primary)] transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.name}</h3>
                   <p className="text-muted-foreground text-sm mb-3 font-medium">
                     {CATEGORY_LABELS[item.category]}
                   </p>
@@ -246,7 +246,7 @@ function ChildCubbiePageContent() {
             <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
               <Package className="h-10 w-10 text-[var(--portal-primary)]" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               No items registered for {child?.first_name} yet
             </h3>
             <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
@@ -254,7 +254,7 @@ function ChildCubbiePageContent() {
             </p>
             <Button
               onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie/new`)}
-              className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-6 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+              className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-6 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
             >
               <Plus className="h-5 w-5 mr-2" />
               Add First Item

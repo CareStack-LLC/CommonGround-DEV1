@@ -131,7 +131,7 @@ function ActionStreamItem({
         <Icon className={`w-6 h-6 ${iconColor}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{title}</p>
+        <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{title}</p>
         <p className="text-sm text-muted-foreground truncate font-medium">{subtitle}</p>
       </div>
       {hasNotification && (
@@ -246,14 +246,14 @@ function UpcomingEventItem({ event }: { event: UpcomingEvent }) {
         <Icon className={`w-6 h-6 ${color}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{getDisplayTitle()}</p>
+        <p className="font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{getDisplayTitle()}</p>
         <p className="text-sm text-muted-foreground truncate font-medium">
           {timeLabel}
           {subtitle && ` • ${subtitle}`}
         </p>
       </div>
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-        <span className="text-xs font-bold text-white bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] px-3 py-1 rounded-full shadow-md">
+        <span className="text-xs font-bold text-white bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] px-3 py-1 rounded-full shadow-md">
           {timeRemaining}
         </span>
         <span className="text-xs text-muted-foreground font-semibold">{dayLabel}</span>
@@ -276,7 +276,7 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
             <CheckCircle className="w-6 h-6 text-[var(--portal-primary)]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
+            <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>All caught up!</p>
             <p className="text-sm text-muted-foreground font-medium">No upcoming events in the next 7 days</p>
           </div>
         </div>
@@ -295,7 +295,7 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
         <div className="p-3 border-t-2 border-slate-100 bg-slate-50">
           <button
             onClick={() => router.push('/schedule')}
-            className="w-full text-center text-sm text-[var(--portal-primary)] hover:text-[#1e4442] font-bold py-2 transition-all duration-200 hover:scale-105"
+            className="w-full text-center text-sm text-[var(--portal-primary)] hover:text-[#2D6A8F] font-bold py-2 transition-all duration-200 hover:scale-105"
           >
             View full schedule →
           </button>
@@ -636,10 +636,10 @@ function DashboardContent() {
       <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
         {/* Header with Greeting */}
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             {greeting},
           </h1>
-          <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             {user?.first_name}
           </h2>
         </div>
@@ -659,7 +659,7 @@ function DashboardContent() {
                 <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <FolderOpen className="w-10 h-10 text-[var(--portal-primary)]" />
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Welcome to CommonGround
                 </h3>
                 <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
@@ -667,7 +667,7 @@ function DashboardContent() {
                 </p>
                 <button
                   onClick={() => router.push('/family-files/new')}
-                  className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                  className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
                 >
                   Create Family File
                   <ArrowRight className="w-5 h-5" />
@@ -680,7 +680,7 @@ function DashboardContent() {
                   <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
                     <MessageSquare className="w-6 h-6 text-[var(--portal-primary)]" />
                   </div>
-                  <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>ARIA Messaging</h4>
+                  <h4 className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>ARIA Messaging</h4>
                   <p className="text-sm text-muted-foreground mt-2 font-medium">
                     AI-powered communication that reduces conflict
                   </p>
@@ -689,7 +689,7 @@ function DashboardContent() {
                   <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
                     <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
                   </div>
-                  <h4 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Shared Calendar</h4>
+                  <h4 className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Shared Calendar</h4>
                   <p className="text-sm text-muted-foreground mt-2 font-medium">
                     Track custody schedules and exchanges
                   </p>
@@ -744,7 +744,7 @@ function DashboardContent() {
 
               {/* Action Stream */}
               <section>
-                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Action Stream
                 </h3>
                 <div className="space-y-3">
@@ -759,7 +759,7 @@ function DashboardContent() {
                           <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
                         </div>
                         <div>
-                          <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>All caught up!</p>
+                          <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>All caught up!</p>
                           <p className="text-sm text-muted-foreground font-medium">No pending items to review</p>
                         </div>
                       </div>
@@ -900,7 +900,7 @@ function DashboardContent() {
 
               {/* Upcoming Events */}
               <section>
-                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Coming Up
                 </h3>
                 <UpcomingEventsList events={dashboardSummary?.upcoming_events} />
@@ -908,7 +908,7 @@ function DashboardContent() {
 
               {/* Quick Actions */}
               <section>
-                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Quick Actions
                 </h3>
                 <div className="grid grid-cols-4 gap-3">
@@ -939,12 +939,12 @@ function DashboardContent() {
               {familyFilesWithData.length > 0 && (
                 <section>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                       Family Files
                     </h3>
                     <button
                       onClick={() => router.push('/family-files')}
-                      className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#1e4442] transition-colors flex items-center gap-1"
+                      className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#2D6A8F] transition-colors flex items-center gap-1"
                     >
                       View all
                       <ChevronRight className="h-4 w-4" />
@@ -961,7 +961,7 @@ function DashboardContent() {
                           <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                          <p className="font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             {familyFile.title}
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">
@@ -977,7 +977,7 @@ function DashboardContent() {
 
               {/* Recent Activity */}
               <section>
-                <h3 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Recent Activity
                 </h3>
                 <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">

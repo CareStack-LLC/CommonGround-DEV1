@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const featuredTestimonials = [
   {
-    quote: "After years of hostile text messages, CommonGround changed everything. ARIA helped me realize how my words sounded, even when I didn't mean them that way. Now my ex and I can actually discuss our kids without fighting.",
+    quote: "After years of difficult communication, CommonGround changed everything. ARIA helped me realize how my words sounded, even when I didn't mean them that way. Now my co-parent and I can actually discuss our kids with calm and clarity.",
     author: "Michelle T.",
     role: "Mother of two",
     location: "Denver, CO",
@@ -31,7 +31,7 @@ const featuredTestimonials = [
     rating: 5,
   },
   {
-    quote: "As a family law attorney, I recommend CommonGround to every client going through custody proceedings. The documentation is impeccable, and the reduced conflict means faster resolutions.",
+    quote: "As a family law attorney, I recommend CommonGround to every client going through custody proceedings. The documentation is impeccable, and the calmer communication means faster resolutions.",
     author: "Sarah M., Esq.",
     role: "Family Law Attorney",
     location: "Los Angeles, CA",
@@ -69,7 +69,7 @@ const parentTestimonials = [
     quote: "My kids noticed the difference. They used to hide in their rooms when I got back from their dad's house. Now transitions are smooth.",
     author: "Lisa M.",
     location: "Portland, OR",
-    useCase: "Conflict Reduction",
+    useCase: "Peaceful Communication",
   },
   {
     quote: "When our modification hearing came up, I had 18 months of documented communication showing I'd always tried to cooperate. The judge was impressed.",
@@ -81,7 +81,7 @@ const parentTestimonials = [
 
 const professionalTestimonials = [
   {
-    quote: "The compliance metrics and communication logs make my job so much easier. I can see patterns immediately instead of relying on conflicting parent accounts.",
+    quote: "The compliance metrics and communication logs make my job so much easier. I can see patterns immediately instead of relying on differing parent accounts.",
     author: "Dr. Karen H.",
     role: "Custody Evaluator",
     organization: "Family Court Services",
@@ -99,7 +99,7 @@ const professionalTestimonials = [
     organization: "Mediation Services LLC",
   },
   {
-    quote: "I've had clients whose cases settled faster because CommonGround documentation made the facts undeniable. Less discovery, less conflict, lower costs.",
+    quote: "I've had clients whose cases settled faster because CommonGround documentation made the facts undeniable. Less discovery, calmer communication, lower costs.",
     author: "James W., Esq.",
     role: "Family Law Attorney",
     organization: "Williams Family Law",
@@ -107,7 +107,7 @@ const professionalTestimonials = [
 ];
 
 const stats = [
-  { value: '94%', label: 'Report reduced conflict' },
+  { value: '94%', label: 'Report calmer communication' },
   { value: '89%', label: 'Would recommend to others' },
   { value: '76%', label: 'Fewer arguments about schedules' },
   { value: '82%', label: 'Better co-parent communication' },

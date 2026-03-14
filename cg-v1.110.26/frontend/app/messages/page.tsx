@@ -47,12 +47,12 @@ function WelcomeDisclaimer({ onAccept }: { onAccept: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-300">
         {/* Header */}
-        <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] p-6 text-center">
+        <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] p-6 text-center">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-            Welcome to The Neutral Zone
+          <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+            Welcome to Messages
           </h2>
           <p className="text-white/80 mt-1 text-sm font-medium">
             A safe space for co-parenting communication
@@ -102,7 +102,7 @@ function WelcomeDisclaimer({ onAccept }: { onAccept: () => void }) {
           <div className="pt-4 border-t border-slate-100">
             <button
               onClick={onAccept}
-              className="w-full py-3 px-6 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300"
+              className="w-full py-3 px-6 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300"
             >
               I Understand, Continue
             </button>
@@ -122,7 +122,7 @@ interface FamilyFileWithAgreements {
 }
 
 /**
- * The Neutral Zone - ARIA-Protected Co-Parenting Chat
+ * Messages - ARIA-Protected Co-Parenting Chat
  *
  * Design Philosophy: Safe space for communication
  * - User bubbles: Teal
@@ -171,7 +171,7 @@ function MessageBubble({
     <div className={`flex gap-2 sm:gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}>
       {/* Avatar */}
       {showAvatar && (
-        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isOwn ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644]' : 'bg-gradient-to-br from-slate-400 to-slate-500'
+        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isOwn ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F]' : 'bg-gradient-to-br from-slate-400 to-slate-500'
           }`}>
           <span className="text-xs font-bold text-white">
             {isOwn ? 'You' : (userName?.charAt(0) || 'P')}
@@ -183,7 +183,7 @@ function MessageBubble({
       {/* Bubble */}
       <div className={`max-w-[80%] sm:max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
         <div className={`relative group ${isOwn
-          ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
+          ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
           : 'bg-white text-slate-900 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg border-2 border-slate-200'
           }`}>
           {/* ARIA Review Badge */}
@@ -313,8 +313,8 @@ function EmptyChatState({ onCompose }: { onCompose: () => void }) {
       <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
         <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-[var(--portal-primary)]" />
       </div>
-      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-        The Neutral Zone
+      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+        Messages
       </h3>
       <p className="text-sm sm:text-base text-slate-600 font-medium max-w-sm mb-4 sm:mb-6">
         This is a safe space for co-parenting communication. ARIA Guardian monitors conversations
@@ -377,7 +377,7 @@ function ChatHeader({
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFileName}</h2>
+                <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{familyFileName}</h2>
                 {isCoParentOnline && (
                   <span className="text-xs text-emerald-600 font-medium hidden sm:inline">Online</span>
                 )}
@@ -473,7 +473,7 @@ function ConversationSelector({
         <div className="w-16 h-16 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-4">
           <Users className="h-8 w-8 text-[var(--portal-primary)]" />
         </div>
-        <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No Family Files</h3>
+        <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No Family Files</h3>
         <p className="text-sm text-muted-foreground mb-4">
           Create a family file to start messaging
         </p>
@@ -952,10 +952,10 @@ function MessagesContent() {
                     <MessageSquare className="h-5 w-5 text-[var(--portal-primary)]" />
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                       Comms
                     </h1>
-                    <p className="text-xs text-slate-600 font-medium">The Neutral Zone</p>
+                    <p className="text-xs text-slate-600 font-medium">Messages</p>
                   </div>
                 </div>
               </div>
@@ -986,8 +986,8 @@ function MessagesContent() {
                 <div className="w-24 h-24 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center mb-6">
                   <Shield className="h-12 w-12 text-[var(--portal-primary)]" />
                 </div>
-                <h2 className="text-2xl font-semibold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                  Welcome to The Neutral Zone
+                <h2 className="text-2xl font-semibold text-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  Welcome to Messages
                 </h2>
                 <p className="text-muted-foreground max-w-md mb-2">
                   A safe space for co-parenting communication, protected by ARIA Guardian.

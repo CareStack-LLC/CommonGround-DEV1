@@ -363,7 +363,7 @@ function AgreementSectionCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="font-serif text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="font-serif text-lg font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   {section.section_title}
                 </h3>
                 {section.is_required && (
@@ -705,7 +705,7 @@ function AgreementDetailsContent() {
                         </span>
                       )}
                     </div>
-                    <h1 className="font-serif text-3xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    <h1 className="font-serif text-3xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                       {agreement.title}
                     </h1>
                   </div>
@@ -886,7 +886,7 @@ function AgreementDetailsContent() {
 
             {/* Actions Card */}
             <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-              <h3 className="font-semibold text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Actions</h3>
+              <h3 className="font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Actions</h3>
               <div className="space-y-3">
                 {/* Draft Actions */}
                 {agreement.status === 'draft' && (
@@ -1034,7 +1034,7 @@ function AgreementDetailsContent() {
               <div className="p-6 border-b border-slate-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-serif text-xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    <h3 className="font-serif text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                       Agreement Sections
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">

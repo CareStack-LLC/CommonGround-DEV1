@@ -286,7 +286,7 @@ export default function CalendarView({
                       c => c.id === event.collection_id
                     );
                     const eventColor = event.is_owner
-                      ? collection?.color || '#4A6C58'
+                      ? collection?.color || '#3DAA8A'
                       : '#64748B'; // Slate for shared events
 
                     // RSVP indicator

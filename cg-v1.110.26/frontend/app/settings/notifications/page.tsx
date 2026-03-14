@@ -262,7 +262,7 @@ export default function NotificationSettingsPage() {
           <Bell className="w-6 h-6 text-amber-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Notification Settings
           </h2>
           <p className="text-sm text-slate-500 font-medium">
@@ -295,7 +295,7 @@ export default function NotificationSettingsPage() {
       {pushSupported && (
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className={`p-2 rounded-xl shadow-md ${
                 pushSubscribed
                   ? 'bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5'
@@ -348,7 +348,7 @@ export default function NotificationSettingsPage() {
         {/* Quick Actions */}
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               Quick Actions
             </CardTitle>
             <CardDescription className="font-medium">
@@ -372,7 +372,7 @@ export default function NotificationSettingsPage() {
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <CardTitle className="text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Notification Types
                 </CardTitle>
                 <CardDescription className="font-medium">

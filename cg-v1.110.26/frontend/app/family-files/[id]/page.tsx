@@ -446,7 +446,7 @@ function FamilyFileDetailContent() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
                 <FolderHeart className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
-              <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{familyFile.title}</h1>
+              <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{familyFile.title}</h1>
               {familyFile.has_court_case && (
                 <CGBadge variant="slate">
                   <Scale className="h-3 w-3 mr-1" />
@@ -466,7 +466,7 @@ function FamilyFileDetailContent() {
           </SheetTrigger>
           <SheetContent className="w-full sm:max-w-md overflow-y-auto">
             <SheetHeader>
-              <SheetTitle className="flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <SheetTitle className="flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
                   <Settings className="h-5 w-5 text-[var(--portal-primary)]" />
                 </div>
@@ -749,7 +749,7 @@ function FamilyFileDetailContent() {
           {/* Quick Actions */}
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
             <div className="mb-6">
-              <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Quick Actions</h2>
+              <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Quick Actions</h2>
             </div>
             <div className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
@@ -915,7 +915,7 @@ function FamilyFileDetailContent() {
                     <Zap className="h-5 w-5 text-[#F59E0B]" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>QuickAccords</h2>
+                    <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>QuickAccords</h2>
                     <p className="text-sm text-slate-600 font-medium">Situational agreements</p>
                   </div>
                 </div>
@@ -991,7 +991,7 @@ function FamilyFileDetailContent() {
                     <FileText className="h-5 w-5 text-slate-600" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>SharedCare Agreements</h2>
+                    <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>SharedCare Agreements</h2>
                     <p className="text-sm text-slate-600 font-medium">Comprehensive co-parenting agreements</p>
                   </div>
                 </div>
@@ -1063,7 +1063,7 @@ function FamilyFileDetailContent() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
                 <Users className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
-              <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Parents</h2>
+              <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Parents</h2>
             </div>
             <div className="space-y-4">
               {/* Parent A */}
@@ -1111,7 +1111,7 @@ function FamilyFileDetailContent() {
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
                   <Baby className="h-5 w-5 text-[var(--portal-primary)]" />
                 </div>
-                <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Children</h2>
+                <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Children</h2>
               </div>
               <button className="w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors">
                 <Plus className="h-4 w-4 text-slate-600" />
@@ -1161,7 +1161,7 @@ function FamilyFileDetailContent() {
 
           {/* Info */}
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-            <h2 className="text-xl font-bold text-slate-900 mb-6" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Details</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-6" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Details</h2>
 
             {/* Quick Facts from Active Agreement */}
             {activeAgreementSummary && activeAgreementSummary.key_points && activeAgreementSummary.key_points.length > 0 && (
@@ -1220,7 +1220,7 @@ function FamilyFileDetailContent() {
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center shadow-md">
                   <Briefcase className="h-5 w-5 text-emerald-600" />
                 </div>
-                <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Legal Team</h2>
+                <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Legal Team</h2>
               </div>
               <Dialog open={isInviteProfOpen} onOpenChange={setIsInviteProfOpen}>
                 <DialogTrigger asChild>

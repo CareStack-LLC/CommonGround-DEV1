@@ -68,13 +68,13 @@ function TabButton({
         group relative flex items-center gap-2.5 px-4 py-3 text-sm font-bold
         rounded-xl transition-all duration-300 flex-shrink-0
         ${active
-          ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md'
+          ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
           : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
         }
       `}
     >
       <Icon className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${active ? '' : 'group-hover:scale-110'}`} />
-      <span className="hidden sm:inline whitespace-nowrap" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{label}</span>
+      <span className="hidden sm:inline whitespace-nowrap" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{label}</span>
       {badge && (
         <span className={`
           hidden sm:inline text-xs px-2 py-0.5 rounded-full font-semibold
@@ -127,7 +127,7 @@ function QuickActionCard({
         <Icon className={`w-6 h-6 ${classes.iconColor}`} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{title}</p>
+        <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{title}</p>
         <p className="text-sm text-muted-foreground truncate font-medium">{description}</p>
       </div>
       <ChevronLeft className="h-5 w-5 rotate-180 text-slate-400 flex-shrink-0 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
@@ -383,7 +383,7 @@ function ScheduleContent() {
               <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Calendar className="w-10 h-10 text-[var(--portal-primary)]" />
               </div>
-              <h2 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h2 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Welcome to TimeBridge
               </h2>
               <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
@@ -391,7 +391,7 @@ function ScheduleContent() {
               </p>
               <button
                 onClick={() => router.push('/family-files')}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
               >
                 <Users className="w-5 h-5" />
                 Go to Family Files
@@ -424,7 +424,7 @@ function ScheduleContent() {
               <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 TimeBridge
               </h1>
             </div>

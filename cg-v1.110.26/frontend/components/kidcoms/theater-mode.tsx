@@ -371,7 +371,7 @@ export function TheaterMode({
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex flex-col">
+    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 bg-white/90 backdrop-blur-sm border-b border-gray-200">
         <div className="flex items-center space-x-3">
@@ -379,7 +379,7 @@ export function TheaterMode({
             Theater Mode
           </span>
           {content && (
-            <span className="text-[#2C3E50] font-medium hidden sm:inline">{content.title}</span>
+            <span className="text-[#1E3A4A] font-medium hidden sm:inline">{content.title}</span>
           )}
         </div>
         <div className="flex items-center space-x-2">
@@ -444,7 +444,7 @@ export function TheaterMode({
                   <div className="absolute inset-0 bg-[#2C5F5D] rounded-full blur-2xl opacity-10" />
                   <Library className="relative h-16 w-16 md:h-20 md:w-20 text-[#2C5F5D] mx-auto" />
                 </div>
-                <h2 className="text-lg md:text-xl text-[#2C3E50] mb-2 font-semibold">
+                <h2 className="text-lg md:text-xl text-[#1E3A4A] mb-2 font-semibold">
                   Choose something to watch together
                 </h2>
                 <p className="text-gray-600 mb-6 text-sm md:text-base">
@@ -583,7 +583,7 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]">
           <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-semibold shadow-lg shadow-[#2C5F5D]/20">
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
@@ -594,10 +594,10 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
       {!participant.isLocal && <audio ref={audioRef} />}
 
       {/* Name label */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#2C3E50]/90 to-transparent px-2 py-1">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1E3A4A]/90 to-transparent px-2 py-1">
         <span className="text-white text-xs truncate block drop-shadow-lg">
           {participant.odName}
-          {participant.isLocal && <span className="text-[#D97757]"> (You)</span>}
+          {participant.isLocal && <span className="text-[#F5A623]"> (You)</span>}
         </span>
       </div>
 

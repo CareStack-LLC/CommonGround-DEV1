@@ -10,7 +10,7 @@ import {
   Lock,
   ArrowRight,
   Check,
-  AlertTriangle,
+  Heart,
   Clock,
   BarChart3,
   Download,
@@ -18,43 +18,43 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'High-Conflict Co-Parenting App | Custody Documentation | CommonGround',
-  description: 'The co-parenting app designed for high-conflict situations. Document everything, protect yourself, and build evidence for court. AI-powered conflict prevention.',
-  keywords: 'high conflict custody, co-parenting with a narcissist, custody documentation app, parallel parenting app, high conflict divorce, custody battle evidence, co-parenting app narcissist',
+  title: 'When Communication Is Difficult | Co-Parenting Support | CommonGround',
+  description: 'Co-parenting tools designed for families who need extra structure. Document everything, communicate clearly, and keep your children protected with court-ready records.',
+  keywords: 'co-parenting support, custody documentation app, parallel parenting app, structured co-parenting, custody records, co-parenting tools',
 };
 
 /**
- * High-Conflict Co-Parenting Landing Page
+ * Structured Co-Parenting Landing Page
  *
- * SEO-focused page targeting parents in difficult custody situations.
- * Emphasizes documentation, protection, and court-ready evidence.
+ * For parents who need extra structure and documentation support.
+ * Child-focused, calm tone per brand voice guidelines.
  */
 
 const protectionFeatures = [
   {
     icon: MessageSquare,
-    title: 'ARIA Conflict Shield',
-    description: 'Every message is analyzed by AI before sending. Remove hostile language, stay calm, and never give ammunition.',
+    title: 'ARIA Communication Support',
+    description: 'Every message is reviewed by AI to help keep conversations constructive and focused on your children.',
   },
   {
     icon: FileText,
     title: 'Complete Documentation',
-    description: 'Every message, schedule change, exchange, and agreement is timestamped and stored. Nothing can be denied or gaslit.',
+    description: 'Every message, schedule change, exchange, and agreement is timestamped and securely stored for your records.',
   },
   {
     icon: Scale,
-    title: 'Court-Ready Evidence',
-    description: 'Export comprehensive evidence packages with hash verification. Judges and attorneys can trust your records.',
+    title: 'Court-Ready Records',
+    description: 'Export comprehensive documentation packages with hash verification that attorneys and courts can trust.',
   },
   {
     icon: Eye,
-    title: 'Pattern Recognition',
-    description: 'Track and document patterns of behavior: late pickups, last-minute changes, communication violations.',
+    title: 'Pattern Tracking',
+    description: 'Track scheduling patterns, response times, and agreement compliance to maintain clear, objective records.',
   },
   {
     icon: BarChart3,
     title: 'Compliance Metrics',
-    description: 'Objective data on who follows the agreement and who doesn\'t. No more "he said, she said."',
+    description: 'Objective data on schedule adherence and communication responsiveness. Clear facts, not assumptions.',
   },
   {
     icon: Lock,
@@ -63,102 +63,102 @@ const protectionFeatures = [
   },
 ];
 
-const parallelParentingFeatures = [
+const structuredParentingFeatures = [
   {
-    title: 'Minimal Direct Contact',
-    description: 'ARIA handles coordination so you don\'t have to engage in unnecessary back-and-forth.',
+    title: 'Clear Boundaries',
+    description: 'Set communication windows, topic guidelines, and response timeframes that work for your family.',
   },
   {
-    title: 'Boundary Enforcement',
-    description: 'Set communication windows, topic restrictions, and response timeframes.',
+    title: 'Minimal Direct Contact',
+    description: 'ARIA handles coordination so you can focus on your children instead of managing interactions.',
   },
   {
     title: 'Automatic Record Keeping',
-    description: 'Everything is documented automatically. Focus on your kids, not on building evidence.',
+    description: 'Everything is documented automatically. Focus on being present for your kids.',
   },
   {
-    title: 'Good Faith Protection',
-    description: 'Your constructive communication attempts are tracked. Their violations are too.',
+    title: 'Constructive Communication',
+    description: 'Your thoughtful communication efforts are tracked. Build a record of good faith cooperation.',
   },
 ];
 
-const warningSignsYouNeedThis = [
-  'Your co-parent twists your words or denies conversations',
-  'You feel anxious every time you see a message notification',
-  'Court orders seem like suggestions to your co-parent',
-  'Schedule changes come at the last minute with unreasonable demands',
-  'You\'ve been told you\'re "too difficult" for wanting basic cooperation',
-  'Your co-parent refuses to communicate except through you',
-  'Important information about your children is withheld',
-  'Every interaction feels like a battle you\'re losing',
+const signsYouCouldBenefit = [
+  'Communication with your co-parent often feels stressful',
+  'You want clear records of all parenting decisions',
+  'Schedule changes sometimes cause confusion or frustration',
+  'You want to ensure your children have consistent routines',
+  'Important information about your children sometimes gets lost',
+  'You want structure and clarity in your co-parenting relationship',
+  'You need documentation for legal proceedings',
+  'You want to focus more on your children and less on coordination',
 ];
 
 const courtExportFeatures = [
   {
     title: 'Communication Logs',
-    description: 'Complete message history with timestamps, ARIA interventions, and response times.',
+    description: 'Complete message history with timestamps, ARIA suggestions, and response times.',
   },
   {
     title: 'Schedule Compliance',
-    description: 'Visual timeline of all exchanges, late arrivals, no-shows, and modifications.',
+    description: 'Visual timeline of all exchanges, modifications, and adherence to agreements.',
   },
   {
-    title: 'Good Faith Metrics',
-    description: 'Objective measures of each parent\'s willingness to cooperate and communicate constructively.',
+    title: 'Cooperation Metrics',
+    description: 'Objective measures of each parent\'s communication responsiveness and cooperation.',
   },
   {
     title: 'Pattern Analysis',
-    description: 'AI-identified patterns in communication and behavior over time.',
+    description: 'AI-identified patterns in communication and scheduling over time.',
   },
   {
-    title: 'Evidence Package',
+    title: 'Documentation Package',
     description: 'Court-formatted PDF with hash verification, ready for legal proceedings.',
   },
   {
-    title: 'Expert Integration',
+    title: 'Professional Access',
     description: 'Share read-only access with attorneys, GALs, therapists, or custody evaluators.',
   },
 ];
 
 const testimonials = [
   {
-    quote: "My ex used to deny everything. Now I have receipts for every single interaction. When he told the judge I 'never respond,' I showed them my response times.",
-    context: "Parent in custody modification case",
+    quote: "CommonGround gave me peace of mind. I have clear records of every interaction, and my attorney said the documentation was exactly what we needed.",
+    context: "Parent using CommonGround for 14 months",
   },
   {
-    quote: "ARIA stopped me from sending messages I would have regretted. My attorney said my communication record was the strongest evidence we had.",
-    context: "Using CommonGround for 14 months",
+    quote: "ARIA helped me communicate more clearly. My kids noticed the difference — they said things feel calmer now.",
+    context: "Parent in California",
   },
   {
-    quote: "The pattern tracking was what convinced the evaluator. They could see exactly who was causing the conflict - and it wasn't me.",
-    context: "Completed custody evaluation",
+    quote: "The structure changed everything for our family. The kids know what to expect, and we spend less time coordinating and more time being parents.",
+    context: "Parent in Texas",
   },
 ];
 
 const faqs = [
   {
     question: 'How is this different from just texting?',
-    answer: 'Text messages can be deleted, screenshots can be questioned, and context is easily lost. CommonGround creates tamper-proof records with timestamps, read receipts, response times, and hash verification that courts can trust. Every message is permanently logged and cannot be denied.',
+    answer: 'Text messages can be deleted, screenshots can be questioned, and context is easily lost. CommonGround creates tamper-proof records with timestamps, read receipts, response times, and hash verification that courts can trust. Every message is permanently logged.',
   },
   {
-    question: 'What if my co-parent refuses to use the app?',
-    answer: 'You can still use CommonGround for one-sided documentation. Your messages are logged even if they respond via text. Many courts are now ordering the use of parenting apps in high-conflict cases. Your attorney can request it be included in your parenting plan.',
+    question: 'What if my co-parent doesn\'t want to use the app?',
+    answer: 'You can still use CommonGround for one-sided documentation. Your messages are logged even if they respond via text. Many courts now recommend parenting apps for structured communication. Your attorney can request it be included in your parenting plan.',
   },
   {
     question: 'Can my co-parent see that ARIA suggested changes?',
-    answer: 'They only see the final message you send. They cannot see your original draft or that you used ARIA. However, the fact that you consistently engage with ARIA constructively is tracked in your good faith metrics.',
+    answer: 'They only see the final message you send. They cannot see your original draft or that you used ARIA. Your constructive communication efforts are tracked in your cooperation metrics.',
   },
   {
     question: 'Will this help in court?',
-    answer: 'CommonGround evidence has been used successfully in custody modifications, contempt hearings, and protective order cases. The objective nature of the data - timestamps, GPS verification, compliance metrics - provides the documentation courts need. Several family law attorneys now recommend it to clients.',
+    answer: 'CommonGround documentation has been used successfully in custody proceedings. The objective nature of the data — timestamps, GPS verification, compliance metrics — provides the clear records courts need. Several family law attorneys now recommend it to clients.',
   },
   {
     question: 'What about emergency situations?',
-    answer: 'CommonGround is for regular co-parenting communication, not emergencies. For true emergencies involving child safety, always call 911 first. However, all emergency-related follow-up communication should still go through the app for documentation purposes.',
+    answer: 'CommonGround is for regular co-parenting communication, not emergencies. For emergencies involving child safety, always call 911 first. However, all follow-up communication should still go through the app for documentation purposes.',
   },
   {
     question: 'How long are records kept?',
-    answer: 'All records are kept indefinitely on paid plans. Free tier users have 90-day message history, but upgrade at any time to access complete archives. We recommend maintaining your account through the duration of any ongoing custody case.',
+    answer: 'All records are kept indefinitely on paid plans. Free tier users have 90-day message history, but you can upgrade at any time to access complete archives. We recommend maintaining your account through the duration of any ongoing custody case.',
   },
 ];
 
@@ -168,36 +168,36 @@ export default function HighConflictPage() {
       {/* Hero Section */}
       <section className="relative py-20 lg:py-28 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-red-500/5 blur-3xl" />
+          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-[#F5A623]/5 blur-3xl" />
           <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-sage/5 blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 dark:bg-red-900/30 rounded-full mb-6">
-              <Shield className="w-4 h-4 text-red-600 dark:text-red-400" />
-              <span className="text-sm font-medium text-red-600 dark:text-red-400">
-                For High-Conflict Custody Situations
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#F5A623]/10 rounded-full mb-6">
+              <Shield className="w-4 h-4 text-[#F5A623]" />
+              <span className="text-sm font-medium text-[#F5A623]">
+                Extra Support for Your Family
               </span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6">
-              Protect yourself.{' '}
-              <span className="text-cg-sage">Document everything.</span>
+              When communication is difficult,{' '}
+              <span className="text-cg-sage">your children still come first.</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-4">
-              When co-parenting feels like a constant battle, you need more than
-              a calendar app. You need armor.
+              Some families need more structure. CommonGround provides the tools
+              to keep things calm, clear, and focused on your children.
             </p>
             <p className="text-lg text-muted-foreground mb-8">
-              CommonGround gives you AI-powered communication tools and court-ready
-              documentation for high-conflict custody situations.
+              AI-powered communication support and court-ready documentation
+              that helps your family find stability.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/register"
                 className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
               >
-                Start Documenting Now
+                Get Started Free
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
@@ -211,21 +211,21 @@ export default function HighConflictPage() {
         </div>
       </section>
 
-      {/* Warning Signs Section */}
-      <section className="py-16 bg-red-50 dark:bg-red-950/20 border-y border-red-200 dark:border-red-800/50">
+      {/* Signs You Could Benefit */}
+      <section className="py-16 bg-[#FEF7ED] border-y border-[#F5A623]/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-semibold text-foreground mb-2">
-              Sound Familiar?
+              Could your family benefit from more structure?
             </h2>
             <p className="text-muted-foreground">
-              If you're experiencing any of these, you need documentation on your side.
+              Many families find that clear structure and documentation brings peace.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
-            {warningSignsYouNeedThis.map((sign, index) => (
+            {signsYouCouldBenefit.map((sign, index) => (
               <div key={index} className="flex items-start gap-3 p-4 bg-background rounded-lg border border-border/50">
-                <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <Heart className="w-5 h-5 text-[#F5A623] flex-shrink-0 mt-0.5" />
                 <span className="text-sm text-foreground">{sign}</span>
               </div>
             ))}
@@ -238,10 +238,10 @@ export default function HighConflictPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Your Protection Toolkit
+              Tools that protect your family
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Every feature designed to document, protect, and prepare you for court if needed.
+              Every feature designed to bring clarity, structure, and peace to your co-parenting.
             </p>
           </div>
 
@@ -265,29 +265,30 @@ export default function HighConflictPage() {
         </div>
       </section>
 
-      {/* Parallel Parenting */}
+      {/* Structured Parenting */}
       <section className="py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage-subtle rounded-full mb-6">
                 <Brain className="w-4 h-4 text-cg-sage" />
-                <span className="text-sm font-medium text-cg-sage">Parallel Parenting Mode</span>
+                <span className="text-sm font-medium text-cg-sage">Structured Co-Parenting</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
-                When co-parenting isn't possible
+                Clear boundaries, calmer families
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Traditional co-parenting requires cooperation. When that's not possible,
-                parallel parenting lets you raise your children effectively while
-                minimizing conflict.
+                When direct communication is challenging, structured co-parenting
+                lets you focus on raising your children effectively while maintaining
+                healthy boundaries.
               </p>
               <p className="text-muted-foreground mb-8">
-                CommonGround is designed for parallel parenting: clear boundaries,
-                minimal contact, automatic documentation, and zero opportunity for manipulation.
+                CommonGround provides the structure: clear boundaries,
+                automatic documentation, and communication support that keeps
+                the focus on your children.
               </p>
               <div className="space-y-4">
-                {parallelParentingFeatures.map((feature) => (
+                {structuredParentingFeatures.map((feature) => (
                   <div key={feature.title} className="flex items-start gap-3">
                     <div className="w-5 h-5 rounded-full bg-cg-sage-subtle flex items-center justify-center mt-0.5">
                       <Check className="w-3 h-3 text-cg-sage" />
@@ -318,14 +319,14 @@ export default function HighConflictPage() {
                 <div className="p-4 bg-muted/30 rounded-lg">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-muted-foreground">Co-parent average response</span>
-                    <span className="font-semibold text-red-500">18.7 hours</span>
+                    <span className="font-semibold text-[#F5A623]">18.7 hours</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full">
-                    <div className="h-2 bg-red-500 rounded-full" style={{ width: '22%' }} />
+                    <div className="h-2 bg-[#F5A623] rounded-full" style={{ width: '22%' }} />
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  This data is automatically tracked and available in court exports.
+                  Response times are tracked automatically and available in documentation exports.
                 </p>
               </div>
             </div>
@@ -337,16 +338,16 @@ export default function HighConflictPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 dark:bg-amber-900/30 rounded-full mb-6">
-              <Gavel className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <span className="text-sm font-medium text-amber-600 dark:text-amber-400">Court-Ready</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#F5A623]/10 rounded-full mb-6">
+              <Gavel className="w-4 h-4 text-[#F5A623]" />
+              <span className="text-sm font-medium text-[#F5A623]">Court-Ready</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Evidence That Holds Up
+              Documentation you can trust
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              When you need to prove what really happened, CommonGround exports give you
-              the documentation courts trust.
+              When you need clear records, CommonGround exports provide
+              the documentation that courts and attorneys rely on.
             </p>
           </div>
 
@@ -365,7 +366,7 @@ export default function HighConflictPage() {
               className="inline-flex items-center gap-2 text-cg-sage font-medium hover:underline"
             >
               <Download className="w-4 h-4" />
-              See a sample court export
+              See a sample documentation export
             </Link>
           </div>
         </div>
@@ -376,10 +377,10 @@ export default function HighConflictPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              Parents Who Fought Back
+              Families finding peace
             </h2>
             <p className="text-lg text-muted-foreground">
-              Documentation changed their cases.
+              Structure and clarity changed their co-parenting experience.
             </p>
           </div>
 
@@ -389,7 +390,7 @@ export default function HighConflictPage() {
                 key={index}
                 className="bg-background rounded-xl p-6 border border-border/50"
               >
-                <div className="text-cg-sage text-4xl font-serif mb-4">"</div>
+                <div className="text-cg-sage text-4xl font-serif mb-4">&ldquo;</div>
                 <p className="text-foreground mb-6">{testimonial.quote}</p>
                 <div className="text-sm text-muted-foreground">{testimonial.context}</div>
               </div>
@@ -431,13 +432,13 @@ export default function HighConflictPage() {
       {/* CTA */}
       <section className="py-20 bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Shield className="w-12 h-12 text-cg-sage mx-auto mb-6" />
+          <Heart className="w-12 h-12 text-cg-sage mx-auto mb-6" />
           <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
-            Stop fighting blind.
+            Your children deserve calm.
           </h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            Every day without documentation is another day of "he said, she said."
-            Start building your evidence today.
+            Clear structure and documentation bring peace of mind to your family.
+            Start building a calmer co-parenting experience today.
           </p>
           <Link
             href="/register"
@@ -447,7 +448,7 @@ export default function HighConflictPage() {
             <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="text-sm text-muted-foreground mt-4">
-            No credit card required. Start documenting in minutes.
+            No credit card required. Start in minutes.
           </p>
         </div>
       </section>

@@ -64,7 +64,7 @@ const directoryFeatures = [
 
 export default function ProfessionalsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
         <div className="max-w-5xl mx-auto px-6 text-center">
@@ -73,12 +73,12 @@ export default function ProfessionalsPage() {
             <span className="text-sm font-medium text-[var(--portal-primary)]">For Family Law Professionals</span>
           </div>
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Clients find you when they
             <br />
-            <span className="text-[#D97757]">need you most</span>
+            <span className="text-[#F5A623]">need you most</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
             CommonGround puts your firm in front of parents at the moment they're ready to file—
@@ -87,7 +87,7 @@ export default function ProfessionalsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact?type=professional"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
             >
               Contact Sales
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -103,7 +103,7 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* Firm Directory Highlight */}
-      <section className="py-16 sm:py-24 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -113,7 +113,7 @@ export default function ProfessionalsPage() {
               </div>
               <h2
                 className="text-3xl sm:text-4xl font-serif mb-6"
-                style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
                 Be one click away from your next client
               </h2>
@@ -124,7 +124,7 @@ export default function ProfessionalsPage() {
               <ul className="space-y-3">
                 {directoryFeatures.map((item) => (
                   <li key={item} className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-[#D97757] flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-[#F5A623] flex items-center justify-center">
                       <Check className="w-3 h-3 text-white" />
                     </div>
                     <span className="text-white/90">{item}</span>
@@ -148,18 +148,18 @@ export default function ProfessionalsPage() {
                   key={i}
                   className={`p-4 rounded-xl mb-3 transition-all ${
                     firm.highlight
-                      ? 'bg-[#D97757]/10 border-2 border-[#D97757]/30'
+                      ? 'bg-[#F5A623]/10 border-2 border-[#F5A623]/30'
                       : 'bg-gray-50 border border-gray-100'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className={`font-semibold ${firm.highlight ? 'text-[#D97757]' : 'text-[#2C3E50]'}`}>
+                      <p className={`font-semibold ${firm.highlight ? 'text-[#F5A623]' : 'text-[#1E3A4A]'}`}>
                         {firm.name}
                       </p>
                       <p className="text-sm text-gray-500">{firm.specialty}</p>
                     </div>
-                    <div className={`text-sm font-medium ${firm.highlight ? 'text-[#D97757]' : 'text-[var(--portal-primary)]'}`}>
+                    <div className={`text-sm font-medium ${firm.highlight ? 'text-[#F5A623]' : 'text-[var(--portal-primary)]'}`}>
                       {firm.rating}
                     </div>
                   </div>
@@ -175,10 +175,10 @@ export default function ProfessionalsPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2
-              className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              Built for family law <span className="text-[#D97757]">professionals</span>
+              Built for family law <span className="text-[#F5A623]">professionals</span>
             </h2>
           </div>
 
@@ -191,7 +191,7 @@ export default function ProfessionalsPage() {
                   className="flex items-center gap-3 bg-gradient-to-br from-[#F5F9F9] to-white rounded-full px-6 py-3 border-2 border-[var(--portal-primary)]/10"
                 >
                   <Icon className="w-5 h-5 text-[var(--portal-primary)]" />
-                  <span className="font-medium text-[#2C3E50]">{item.role}</span>
+                  <span className="font-medium text-[#1E3A4A]">{item.role}</span>
                 </div>
               );
             })}
@@ -210,18 +210,18 @@ export default function ProfessionalsPage() {
                   key={benefit.title}
                   className={`rounded-3xl p-8 border-2 transition-all hover:shadow-lg group ${
                     benefit.highlight
-                      ? 'bg-gradient-to-br from-[#D97757]/10 to-[#D97757]/5 border-[#D97757]/20 hover:border-[#D97757]/40'
+                      ? 'bg-gradient-to-br from-[#F5A623]/10 to-[#F5A623]/5 border-[#F5A623]/20 hover:border-[#F5A623]/40'
                       : 'bg-gradient-to-br from-[#F5F9F9] to-white border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30'
                   }`}
                 >
                   <div className={`h-14 w-14 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${
-                    benefit.highlight ? 'bg-[#D97757]/20' : 'bg-[var(--portal-primary)]/10'
+                    benefit.highlight ? 'bg-[#F5A623]/20' : 'bg-[var(--portal-primary)]/10'
                   }`}>
-                    <Icon className={`h-7 w-7 ${benefit.highlight ? 'text-[#D97757]' : 'text-[var(--portal-primary)]'}`} />
+                    <Icon className={`h-7 w-7 ${benefit.highlight ? 'text-[#F5A623]' : 'text-[var(--portal-primary)]'}`} />
                   </div>
                   <h3
-                    className="text-xl font-semibold text-[#2C3E50] mb-3"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-xl font-semibold text-[#1E3A4A] mb-3"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {benefit.title}
                   </h3>
@@ -238,10 +238,10 @@ export default function ProfessionalsPage() {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2
-              className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              Simple to <span className="text-[#D97757]">get started</span>
+              Simple to <span className="text-[#F5A623]">get started</span>
             </h2>
           </div>
 
@@ -255,14 +255,14 @@ export default function ProfessionalsPage() {
               <div key={item.step} className="flex gap-6 items-start">
                 <span
                   className="text-5xl font-serif text-gray-100"
-                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   {item.step}
                 </span>
                 <div className="flex-1 pt-2">
                   <h3
-                    className="text-xl font-semibold text-[#2C3E50] mb-2"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-xl font-semibold text-[#1E3A4A] mb-2"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {item.title}
                   </h3>
@@ -275,11 +275,11 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Ready to grow your practice?
           </h2>
@@ -290,7 +290,7 @@ export default function ProfessionalsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact?type=professional"
-              className="inline-flex items-center justify-center px-10 py-5 bg-[#D97757] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
+              className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
             >
               Contact Sales
               <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />

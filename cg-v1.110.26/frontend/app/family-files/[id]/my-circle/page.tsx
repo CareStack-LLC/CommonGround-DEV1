@@ -328,7 +328,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                 <ArrowLeft className="h-5 w-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/10 to-teal-600/5 flex items-center justify-center shadow-md">
                     <Users className="h-6 w-6 text-teal-600" />
                   </div>
@@ -438,7 +438,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
             {/* Circle Contacts */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Circle Contacts</h2>
+                <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Circle Contacts</h2>
                 <span className="text-sm text-slate-600 font-medium">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</span>
               </div>
 
@@ -447,7 +447,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                   <div className="w-20 h-20 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-6">
                     <Users className="h-10 w-10 text-teal-500" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No contacts yet</h3>
+                  <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No contacts yet</h3>
                   <p className="text-slate-600 mb-6">Invite trusted people to your circle</p>
                   {contactLimitGate.canAddMore ? (
                     <button

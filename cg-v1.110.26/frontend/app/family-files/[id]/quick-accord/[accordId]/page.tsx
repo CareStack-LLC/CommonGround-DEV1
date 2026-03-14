@@ -255,7 +255,7 @@ function QuickAccordDetailContent() {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xl sm:text-2xl">{getCategoryIcon(quickAccord.purpose_category)}</span>
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{quickAccord.title}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{quickAccord.title}</h1>
             </div>
             <p className="text-sm text-muted-foreground mt-1">
               {quickAccord.accord_number} - {getCategoryLabel(quickAccord.purpose_category)}
@@ -404,7 +404,7 @@ function QuickAccordDetailContent() {
         {/* Details */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Details</CardTitle>
+            <CardTitle className="text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {quickAccord.purpose_description && (
@@ -468,7 +468,7 @@ function QuickAccordDetailContent() {
         {/* Logistics */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Logistics</CardTitle>
+            <CardTitle className="text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Logistics</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {quickAccord.pickup_responsibility && (
@@ -521,7 +521,7 @@ function QuickAccordDetailContent() {
         {/* Approval Status */}
         <Card className="md:col-span-2">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Approval Status</CardTitle>
+            <CardTitle className="text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Approval Status</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -582,7 +582,7 @@ function QuickAccordDetailContent() {
         {quickAccord.ai_summary && (
           <Card className="md:col-span-2">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <CardTitle className="text-lg flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <Zap className="h-5 w-5 text-cg-amber" />
                 ARIA Summary
               </CardTitle>

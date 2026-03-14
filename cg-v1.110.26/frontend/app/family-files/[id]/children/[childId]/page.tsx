@@ -96,12 +96,12 @@ function TabButton({
     <button
       onClick={onClick}
       className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 ${isActive
-        ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md'
+        ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
         : 'bg-white border-2 border-slate-200 text-muted-foreground hover:text-foreground hover:border-[var(--portal-primary)]/30 hover:shadow-lg'
         }`}
     >
       <Icon className={`h-4 w-4 transition-transform duration-200 ${isActive ? '' : 'group-hover:scale-110'}`} />
-      <span className="hidden sm:inline" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{tab.label}</span>
+      <span className="hidden sm:inline" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{tab.label}</span>
     </button>
   );
 }
@@ -187,7 +187,7 @@ function SectionCard({
           <div className="w-9 h-9 rounded-xl bg-cg-sage/10 flex items-center justify-center">
             {icon}
           </div>
-          <h3 className="font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{title}</h3>
+          <h3 className="font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{title}</h3>
         </div>
 
         {editMode ? (
@@ -652,13 +652,13 @@ function ChildProfileContent() {
               <AlertCircle className="h-6 w-6 text-red-600" />
             </div>
             <div>
-              <p className="font-bold text-red-700" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Error Loading Profile</p>
+              <p className="font-bold text-red-700" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Error Loading Profile</p>
               <p className="text-sm text-red-600 mt-1 font-medium">{error}</p>
             </div>
           </div>
           <button
             onClick={() => router.push(`/family-files/${familyFileId}`)}
-            className="mt-4 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-6 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            className="mt-4 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-6 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
           >
             Back to Family File
           </button>
@@ -708,7 +708,7 @@ function ChildProfileContent() {
               <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pending Approval</h3>
+              <h3 className="font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Pending Approval</h3>
               <p className="text-sm text-muted-foreground mt-1">
                 Both parents need to approve before this profile becomes active.
               </p>
@@ -765,7 +765,7 @@ function ChildProfileContent() {
       {/* Profile Header */}
       <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
         {/* Decorative Header */}
-        <div className="h-20 sm:h-24 bg-gradient-to-br from-[#2C5F5D] via-[#2C5F5D]/90 to-[#1f4644] relative">
+        <div className="h-20 sm:h-24 bg-gradient-to-br from-[#2C5F5D] via-[#2C5F5D]/90 to-[#2D6A8F] relative">
           {/* Subtle pattern overlay */}
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
         </div>
@@ -820,7 +820,7 @@ function ChildProfileContent() {
             <div className="flex-1 pt-1 sm:pt-2">
               <div className="flex items-start justify-between gap-3 sm:gap-4">
                 <div className="min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     {child.preferred_name || child.first_name} {child.last_name}
                   </h1>
                   <p className="text-sm sm:text-base text-muted-foreground mt-0.5 sm:mt-1">
@@ -868,7 +868,7 @@ function ChildProfileContent() {
                   disabled={checkingIn || isChildWithMe}
                   className={`px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2 font-medium ${isChildWithMe
                     ? 'bg-[#2C5F5D]/10 text-[#2C5F5D] cursor-not-allowed border-2 border-[#2C5F5D]/20'
-                    : 'bg-gradient-to-br from-[#2C5F5D] to-[#1f4644] text-white hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50'
+                    : 'bg-gradient-to-br from-[#2C5F5D] to-[#2D6A8F] text-white hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50'
                     }`}
                 >
                   {checkingIn ? (
@@ -1067,7 +1067,7 @@ function ChildProfileContent() {
               />
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Stethoscope className="h-4 w-4 text-cg-sage" />
                   Healthcare Providers
                 </h4>
@@ -1096,7 +1096,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Insurance</h4>
+                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Insurance</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <FormInput
                     label="Provider"
@@ -1121,7 +1121,7 @@ function ChildProfileContent() {
               <InfoField label="Medical Conditions" value={child.medical_conditions} emptyText="None reported" />
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Stethoscope className="h-4 w-4 text-cg-sage" />
                   Healthcare Providers
                 </h4>
@@ -1142,7 +1142,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Insurance</h4>
+                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Insurance</h4>
                 <div className="grid grid-cols-2 gap-6">
                   <InfoField label="Provider" value={child.insurance_provider} />
                   <InfoField label="Policy Number" value={child.insurance_policy_number} />
@@ -1273,7 +1273,7 @@ function ChildProfileContent() {
           {editMode ? (
             <div className="space-y-6">
               <div>
-                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Food</h4>
+                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Food</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <FormTextarea
                     label="Favorite Foods"
@@ -1291,7 +1291,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Activity className="h-4 w-4 text-cg-sage" />
                   Activities & Comfort
                 </h4>
@@ -1316,7 +1316,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Shirt className="h-4 w-4 text-cg-sage" />
                   Sizes
                 </h4>
@@ -1335,7 +1335,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Moon className="h-4 w-4 text-cg-sage" />
                   Temperament & Emotional Needs
                 </h4>
@@ -1363,7 +1363,7 @@ function ChildProfileContent() {
           ) : (
             <div className="space-y-6">
               <div>
-                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Food</h4>
+                <h4 className="font-medium text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Food</h4>
                 <div className="grid grid-cols-2 gap-6">
                   <InfoField label="Favorites" value={child.favorite_foods} />
                   <InfoField label="Dislikes" value={child.food_dislikes} />
@@ -1371,7 +1371,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Activity className="h-4 w-4 text-cg-sage" />
                   Activities & Comfort
                 </h4>
@@ -1383,7 +1383,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Shirt className="h-4 w-4 text-cg-sage" />
                   Sizes
                 </h4>
@@ -1394,7 +1394,7 @@ function ChildProfileContent() {
               </div>
 
               <div className="pt-4 border-t border-border">
-                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h4 className="font-medium text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Moon className="h-4 w-4 text-cg-sage" />
                   Temperament & Emotional Needs
                 </h4>

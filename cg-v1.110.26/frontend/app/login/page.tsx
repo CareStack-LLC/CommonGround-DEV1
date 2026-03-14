@@ -50,7 +50,7 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFF8F3]">
+    <div className="min-h-screen flex flex-col bg-[#F4F8F7]">
       {/* Organic decorative background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
@@ -59,7 +59,7 @@ function LoginContent() {
         />
         <div
           className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.03]"
-          style={{ background: 'radial-gradient(circle, #D97757 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(circle, #F5A623 0%, transparent 70%)' }}
         />
       </div>
 
@@ -67,9 +67,9 @@ function LoginContent() {
       <header className="relative z-10 p-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-3 text-[#2C3E50] hover:text-[var(--portal-primary)] transition-colors group"
+          className="inline-flex items-center gap-3 text-[#1E3A4A] hover:text-[var(--portal-primary)] transition-colors group"
         >
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] flex items-center justify-center shadow-sm">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] flex items-center justify-center shadow-sm">
             <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <circle cx="12" cy="12" r="10" />
               <path d="M12 6v12M6 12h12" />
@@ -77,7 +77,7 @@ function LoginContent() {
           </div>
           <span
             className="text-xl font-bold tracking-tight"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             CommonGround
           </span>
@@ -92,8 +92,8 @@ function LoginContent() {
             {/* Header */}
             <div className="text-center mb-8">
               <h1
-                className="text-3xl sm:text-4xl font-bold text-[#2C3E50] mb-3"
-                style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                className="text-3xl sm:text-4xl font-bold text-[#1E3A4A] mb-3"
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
                 Welcome Back
               </h1>
@@ -141,7 +141,7 @@ function LoginContent() {
                   </label>
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-[var(--portal-primary)] hover:text-[#1e4442] font-medium transition-colors"
+                    className="text-sm text-[var(--portal-primary)] hover:text-[#2D6A8F] font-medium transition-colors"
                   >
                     Forgot password?
                   </Link>
@@ -167,7 +167,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={isLoading || oauthLoading}
-                className="w-full py-4 px-6 rounded-xl bg-[var(--portal-primary)] hover:bg-[#1e4442] text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                className="w-full py-4 px-6 rounded-xl bg-[var(--portal-primary)] hover:bg-[#2D6A8F] text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
               >
                 {isLoading ? (
                   <>
@@ -262,7 +262,7 @@ function LoginContent() {
                 <span className="text-xs font-medium">Secure</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-[#D97757]" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="h-5 w-5 text-[#F5A623]" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span className="text-xs font-medium">Court-Ready</span>

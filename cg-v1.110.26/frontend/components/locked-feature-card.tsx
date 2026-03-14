@@ -74,7 +74,7 @@ export function LockedFeatureCard({
         </div>
         <button
           onClick={handleUpgrade}
-          className="text-sm font-semibold text-[var(--portal-primary)] hover:text-[#1e4442] transition-colors flex-shrink-0"
+          className="text-sm font-semibold text-[var(--portal-primary)] hover:text-[#2D6A8F] transition-colors flex-shrink-0"
         >
           Upgrade
         </button>
@@ -106,7 +106,7 @@ export function LockedFeatureCard({
             </div>
             <h3
               className="text-lg font-bold text-slate-500"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
               {displayTitle}
             </h3>
@@ -121,7 +121,7 @@ export function LockedFeatureCard({
         {/* Upgrade CTA */}
         <button
           onClick={handleUpgrade}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
         >
           Upgrade to {requiredTier === 'plus' ? 'Plus' : 'Complete'}
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

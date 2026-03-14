@@ -109,7 +109,7 @@ function NewFamilyFileContent() {
           <ArrowLeft className="h-5 w-5 text-slate-600" />
         </button>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
               <FolderHeart className="h-6 w-6 text-[var(--portal-primary)]" />
             </div>
@@ -132,7 +132,7 @@ function NewFamilyFileContent() {
         {/* Basic Info */}
         <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Basic Information</h2>
+            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Basic Information</h2>
             <p className="text-sm text-slate-600 font-medium mt-1">
               Give your Family File a name and set your role
             </p>
@@ -173,7 +173,7 @@ function NewFamilyFileContent() {
         {/* Co-Parent Invitation */}
         <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
                 <Mail className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
@@ -218,7 +218,7 @@ function NewFamilyFileContent() {
         {/* Location */}
         <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Jurisdiction (Optional)</h2>
+            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Jurisdiction (Optional)</h2>
             <p className="text-sm text-slate-600 font-medium mt-1">
               State and county for legal context
             </p>
@@ -254,7 +254,7 @@ function NewFamilyFileContent() {
         {/* Children */}
         <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
                 <Baby className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>

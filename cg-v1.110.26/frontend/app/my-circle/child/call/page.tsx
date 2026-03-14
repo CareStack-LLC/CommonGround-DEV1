@@ -395,10 +395,10 @@ function ChildCallContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-[#2C5F5D]" />
-          <p className="text-xl font-bold text-[#2C3E50]">Connecting your call...</p>
+          <p className="text-xl font-bold text-[#1E3A4A]">Connecting your call...</p>
           <p className="text-gray-600 mt-2">Getting everything ready! 🎉</p>
         </div>
       </div>
@@ -407,7 +407,7 @@ function ChildCallContent() {
 
   if (error || !callSession) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center p-4">
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">😕</div>
           <h1 className="text-2xl font-bold text-[#2C5F5D] mb-2">Oops!</h1>
@@ -425,7 +425,7 @@ function ChildCallContent() {
 
   if (callEnded) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center p-4">
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">👋</div>
           <h1 className="text-2xl font-bold text-[#2C5F5D] mb-2">Call Ended</h1>
@@ -443,7 +443,7 @@ function ChildCallContent() {
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="flex h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="flex h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* ARIA Warning Overlay */}
       {ariaWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -451,7 +451,7 @@ function ChildCallContent() {
             <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="h-8 w-8 text-amber-600" />
             </div>
-            <h2 className="text-xl font-bold text-[#2C3E50] mb-2">
+            <h2 className="text-xl font-bold text-[#1E3A4A] mb-2">
               {ariaWarning.type === 'terminate' ? 'Call Ending' : 'Friendly Reminder'}
             </h2>
             <p className="text-gray-600 mb-4">{ariaWarning.message}</p>
@@ -479,7 +479,7 @@ function ChildCallContent() {
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div>
-              <h1 className="text-[#2C3E50] font-bold">
+              <h1 className="text-[#1E3A4A] font-bold">
                 {isCallJoined ? `Talking with ${callSession.contactName}` : 'Connecting...'}
               </h1>
               <p className="text-xs text-gray-600 flex items-center gap-1">
@@ -501,7 +501,7 @@ function ChildCallContent() {
         {/* Video Area */}
         <div className="flex-1 relative overflow-hidden">
           {!isCallJoined ? (
-            <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#D97757]/80 flex items-center justify-center">
+            <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]/80 flex items-center justify-center">
               <div className="text-center">
                 <Loader2 className="h-16 w-16 animate-spin text-white mx-auto mb-4" />
                 <p className="text-white text-xl font-bold">
@@ -517,7 +517,7 @@ function ChildCallContent() {
                 {remoteParticipants.length > 0 ? (
                   <VideoTile participant={remoteParticipants[0]} isFullScreen />
                 ) : (
-                  <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#D97757]/80 flex items-center justify-center">
+                  <div className="h-full bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]/80 flex items-center justify-center">
                     <div className="text-center">
                       <div className="text-6xl mb-4">⏳</div>
                       <p className="text-white text-lg font-bold">Waiting for {callSession.contactName}...</p>
@@ -634,7 +634,7 @@ function ChildCallContent() {
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-all transform hover:scale-105 ${!isCallJoined
                 ? 'bg-white/10 text-white/30 opacity-50 cursor-not-allowed'
-                : 'bg-[#D97757] hover:bg-[#D97757]/90 text-white'
+                : 'bg-[#F5A623] hover:bg-[#F5A623]/90 text-white'
                 }`}
               title="Watch Together! 🎬"
             >
@@ -670,7 +670,7 @@ function ChildCallContent() {
       {activePanel && (
         <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
           <div className="p-4 border-b border-gray-200">
-            <h3 className="text-[#2C3E50] font-bold text-lg capitalize flex items-center gap-2">
+            <h3 className="text-[#1E3A4A] font-bold text-lg capitalize flex items-center gap-2">
               {activePanel === 'chat' ? '💬' : '👥'} {activePanel}
             </h3>
           </div>
@@ -694,7 +694,7 @@ function ChildCallContent() {
                             {msg.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
-                        <p className="text-[#2C3E50] text-sm">{msg.content}</p>
+                        <p className="text-[#1E3A4A] text-sm">{msg.content}</p>
                       </div>
                     ))
                   )}
@@ -708,7 +708,7 @@ function ChildCallContent() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
-                      className="flex-1 bg-gray-100 text-[#2C3E50] rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] border border-gray-200"
+                      className="flex-1 bg-gray-100 text-[#1E3A4A] rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2C5F5D] border border-gray-200"
                     />
                     <button
                       onClick={handleSendMessage}
@@ -729,11 +729,11 @@ function ChildCallContent() {
                     key={participant.odId}
                     className="flex items-center space-x-3 p-3 bg-white rounded-xl shadow-sm border border-gray-200"
                   >
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2C5F5D] to-[#D97757] flex items-center justify-center text-white text-lg font-bold">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2C5F5D] to-[#F5A623] flex items-center justify-center text-white text-lg font-bold">
                       {participant.odName[0]?.toUpperCase() || '?'}
                     </div>
                     <div className="flex-1">
-                      <p className="text-[#2C3E50] font-bold">
+                      <p className="text-[#1E3A4A] font-bold">
                         {participant.odName}
                         {participant.isLocal && ' (You)'}
                       </p>
@@ -835,7 +835,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]">
             <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold">
               {participant.odName[0]?.toUpperCase() || '?'}
             </div>
@@ -864,7 +864,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]/80">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]/80">
             <div className="w-32 h-32 rounded-full bg-white/20 flex items-center justify-center text-white text-5xl font-bold">
               {participant.odName[0]?.toUpperCase() || '?'}
             </div>
@@ -872,7 +872,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
         )}
         {/* Name overlay */}
         <div className="absolute bottom-24 left-0 right-0 text-center">
-          <span className="text-white text-xl font-bold bg-[#2C3E50]/80 px-6 py-2 rounded-full backdrop-blur-sm">
+          <span className="text-white text-xl font-bold bg-[#1E3A4A]/80 px-6 py-2 rounded-full backdrop-blur-sm">
             {participant.odName}
           </span>
         </div>
@@ -906,7 +906,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#D97757]">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]">
           <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center text-white text-4xl font-bold">
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
@@ -914,7 +914,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
       )}
 
       {/* Name and status overlay */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#2C3E50]/90 to-transparent p-4">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1E3A4A]/90 to-transparent p-4">
         <div className="flex items-center justify-between">
           <span className="text-white font-bold">
             {participant.odName}
@@ -936,10 +936,10 @@ export default function ChildCallPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center">
           <div className="text-center">
             <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-[#2C5F5D]" />
-            <p className="text-xl font-bold text-[#2C3E50]">Loading...</p>
+            <p className="text-xl font-bold text-[#1E3A4A]">Loading...</p>
           </div>
         </div>
       }

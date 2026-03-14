@@ -143,7 +143,7 @@ export default function CircleContactsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center">
         <div className="text-center">
           <ARIAMascot state="loading" greeting="Loading your circle..." />
         </div>
@@ -153,10 +153,10 @@ export default function CircleContactsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center p-6">
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
           <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-[#2C3E50] mb-2">Oops!</h2>
+          <h2 className="text-2xl font-bold text-[#1E3A4A] mb-2">Oops!</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => router.push('/my-circle/child/dashboard')}
@@ -171,13 +171,13 @@ export default function CircleContactsPage() {
 
   if (contacts.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] pb-24">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] pb-24">
         <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200">
           <div className="max-w-2xl mx-auto px-6 py-6">
             <KidComsLogo size="sm" className="mb-3" />
             <div className="flex items-center gap-2">
               <Users className="w-8 h-8 text-[#2C5F5D]" />
-              <h1 className="text-2xl font-bold text-[#2C3E50]">Circle Contacts</h1>
+              <h1 className="text-2xl font-bold text-[#1E3A4A]">Circle Contacts</h1>
             </div>
             <p className="text-gray-600 mt-1">Call your family and friends</p>
           </div>
@@ -198,11 +198,11 @@ export default function CircleContactsPage() {
   }
 
   return (
-    <div className="min-h-screen relative pb-24 bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen relative pb-24 bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Subtle decorative lines */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
         <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
-        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
+        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#F5A623]" />
       </div>
 
       <div className="relative z-10">
@@ -213,7 +213,7 @@ export default function CircleContactsPage() {
             <div className="flex items-center gap-3">
               <Users className="w-10 h-10 text-[#2C5F5D]" />
               <div>
-                <h1 className="text-3xl font-bold text-[#2C3E50]">Circle Contacts</h1>
+                <h1 className="text-3xl font-bold text-[#1E3A4A]">Circle Contacts</h1>
                 <p className="text-gray-600 text-sm">
                   {contacts.length} {contacts.length === 1 ? 'contact' : 'contacts'} available
                 </p>

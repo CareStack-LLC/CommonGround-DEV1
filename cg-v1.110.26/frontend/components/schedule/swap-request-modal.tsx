@@ -155,7 +155,7 @@ export default function SwapRequestModal({
                             <Button type="button" onClick={onClose} variant="outline" className="sm:flex-shrink-0">
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={isLoading} className="flex-1 bg-[var(--portal-primary)] hover:bg-[#1f4644]">
+                            <Button type="submit" disabled={isLoading} className="flex-1 bg-[var(--portal-primary)] hover:bg-[#2D6A8F]">
                                 {isLoading ? 'Submitting...' : 'Submit Request'}
                             </Button>
                         </div>

@@ -83,7 +83,7 @@ export function UpgradeBanner({
         </p>
         <button
           onClick={handleUpgrade}
-          className="text-sm font-semibold text-[var(--portal-primary)] hover:text-[#1e4442] transition-colors"
+          className="text-sm font-semibold text-[var(--portal-primary)] hover:text-[#2D6A8F] transition-colors"
         >
           Upgrade
         </button>
@@ -131,7 +131,7 @@ export function UpgradeBanner({
         <div className="flex items-center gap-2">
           <button
             onClick={handleUpgrade}
-            className="flex items-center gap-2 px-4 py-2 bg-[var(--portal-primary)] text-white font-semibold rounded-xl hover:bg-[#1e4442] transition-colors group"
+            className="flex items-center gap-2 px-4 py-2 bg-[var(--portal-primary)] text-white font-semibold rounded-xl hover:bg-[#2D6A8F] transition-colors group"
           >
             Upgrade Now
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -158,7 +158,7 @@ export function UpgradeBanner({
       )}
     >
       {/* Accent bar */}
-      <div className="h-2 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644]" />
+      <div className="h-2 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]" />
 
       <div className="p-6">
         <div className="flex items-start gap-4">
@@ -168,7 +168,7 @@ export function UpgradeBanner({
           <div className="flex-1 min-w-0">
             <h3
               className="text-lg font-bold text-slate-900 mb-1"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
               Upgrade to {targetTier}
             </h3>
@@ -195,7 +195,7 @@ export function UpgradeBanner({
 
             <button
               onClick={handleUpgrade}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-semibold rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-200 group"
             >
               Upgrade to {targetTier}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

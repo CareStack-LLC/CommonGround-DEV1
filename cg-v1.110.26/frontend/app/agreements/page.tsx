@@ -78,7 +78,7 @@ function FamilyFileCard({
           <div
             className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-sm ${
               isSelected
-                ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] text-white'
+                ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white'
                 : 'bg-slate-100 text-slate-600'
             }`}
           >
@@ -171,7 +171,7 @@ function AgreementCard({
             <FileSignature className="h-5 w-5 text-[var(--portal-primary)]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-slate-900 truncate group-hover:text-[var(--portal-primary)] transition-colors" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h3 className="font-bold text-slate-900 truncate group-hover:text-[var(--portal-primary)] transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               {agreement.title}
             </h3>
             <p className="text-xs text-slate-500 mt-0.5 font-medium">
@@ -254,7 +254,7 @@ function EmptyAgreementsState({
       <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
         <FileSignature className="h-10 w-10 text-[var(--portal-primary)]" />
       </div>
-      <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+      <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
         No Agreements Yet
       </h3>
       <p className="text-slate-600 font-medium mb-8 max-w-sm mx-auto leading-relaxed">
@@ -265,7 +265,7 @@ function EmptyAgreementsState({
           onClick={onCreate}
           className="
             inline-flex items-center gap-2 px-6 py-3
-            bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white
+            bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white
             rounded-xl font-bold shadow-md hover:shadow-lg
             transition-all duration-300
           "
@@ -298,7 +298,7 @@ function BuilderChoiceModal({
       <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300 border-2 border-slate-200">
         {/* Header */}
         <div className="p-6 border-b-2 border-slate-100">
-          <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Create Your Agreement
           </h2>
           <p className="text-slate-600 font-medium mt-1">
@@ -325,7 +325,7 @@ function BuilderChoiceModal({
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-bold text-slate-900 group-hover:text-amber-700 transition-colors" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <h3 className="font-bold text-slate-900 group-hover:text-amber-700 transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     Talk to ARIA
                   </h3>
                   <span className="px-2.5 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full shadow-sm">
@@ -362,11 +362,11 @@ function BuilderChoiceModal({
             "
           >
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[#1f4644] flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
                 <FileText className="h-7 w-7" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-slate-900 group-hover:text-[var(--portal-primary)] transition-colors mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="font-bold text-slate-900 group-hover:text-[var(--portal-primary)] transition-colors mb-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Step-by-Step Wizard
                 </h3>
                 <p className="text-sm text-slate-600 font-medium leading-relaxed">
@@ -528,7 +528,7 @@ function AgreementsListContent() {
               <FileSignature className="h-6 w-6 text-[var(--portal-primary)]" />
             </div>
             <div>
-              <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h1 className="text-2xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Agreements
               </h1>
               <p className="text-sm text-slate-600 font-medium">
@@ -544,7 +544,7 @@ function AgreementsListContent() {
           {/* Sidebar - Family File Selection */}
           <div className="w-full lg:w-80 lg:flex-shrink-0">
             <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-5 sticky top-8">
-              <h2 className="font-bold text-slate-900 mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h2 className="font-bold text-slate-900 mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <FolderOpen className="h-4 w-4 text-[var(--portal-primary)]" />
                 Family Files
               </h2>
@@ -559,7 +559,7 @@ function AgreementsListContent() {
                   <Link href="/family-files/new">
                     <button className="
                       inline-flex items-center gap-2 px-4 py-2 text-sm
-                      bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white
+                      bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white
                       rounded-xl font-bold shadow-md hover:shadow-lg
                       transition-all duration-300
                     ">
@@ -591,7 +591,7 @@ function AgreementsListContent() {
                   <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center shadow-md">
                     <FileText className="h-10 w-10 text-slate-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     Select a Family File
                   </h3>
                   <p className="text-slate-600 font-medium">
@@ -609,7 +609,7 @@ function AgreementsListContent() {
                         <Scale className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Court Custody Case Active</h3>
+                        <h3 className="font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Court Custody Case Active</h3>
                         <p className="text-sm text-slate-600 font-medium mt-1 leading-relaxed">
                           This family file has an active Court Custody Case. New SharedCare Agreements cannot be created. Use QuickAccords for situational agreements.
                         </p>
@@ -622,7 +622,7 @@ function AgreementsListContent() {
                 <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-5">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
-                      <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                      <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                         {selectedFamilyFile.title}
                       </h2>
                       <p className="text-sm text-slate-600 font-medium">
@@ -637,7 +637,7 @@ function AgreementsListContent() {
                         transition-all duration-300
                         ${!canCreateAgreement || isCreatingAgreement
                           ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md hover:shadow-lg'
+                          : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md hover:shadow-lg'
                         }
                       `}
                     >
@@ -679,7 +679,7 @@ function AgreementsListContent() {
                         <AlertCircle className="h-5 w-5 text-red-600" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-bold text-red-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Failed to load agreements</p>
+                        <p className="font-bold text-red-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Failed to load agreements</p>
                         <p className="text-sm text-red-700 font-medium mt-1">{error}</p>
                         <button
                           onClick={() => loadAgreements(selectedFamilyFile.id)}

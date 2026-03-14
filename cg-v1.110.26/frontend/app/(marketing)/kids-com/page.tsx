@@ -35,7 +35,7 @@ import {
 
 export default function KidsComPage() {
     return (
-        <div className="min-h-screen bg-[#F5F0E8] overflow-x-hidden">
+        <div className="min-h-screen bg-[#F4F8F7] overflow-x-hidden">
 
             {/* 1. HERO SECTION */}
             <section className="relative pt-8 pb-16 lg:pt-16 lg:pb-24 overflow-hidden">
@@ -143,7 +143,7 @@ export default function KidsComPage() {
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Protection</h3>
                             <p className="text-slate-600 max-w-xs mx-auto">
-                                ARIA helps keep communication calm, filtering conflict so kids can just be kids.
+                                ARIA helps keep communication calm and protected, so kids can just be kids.
                             </p>
                         </div>
 
@@ -152,7 +152,7 @@ export default function KidsComPage() {
             </section>
 
             {/* 3. FEATURE GRID */}
-            <section className="py-16 md:py-24 bg-[#F5F0E8] relative z-0">
+            <section className="py-16 md:py-24 bg-[#F4F8F7] relative z-0">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 mb-4">
@@ -225,7 +225,7 @@ export default function KidsComPage() {
                                 </div>
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">ARIA Guardrails</h3>
                                 <p className="text-slate-600 leading-relaxed">
-                                    Toxic/hostile message filtering and de-escalation nudges keep the vibe safe and positive.
+                                    Gentle message screening and de-escalation nudges keep the vibe safe and child-friendly.
                                 </p>
                             </CardContent>
                         </Card>
@@ -255,7 +255,7 @@ export default function KidsComPage() {
                             How KidsCom works
                         </h2>
                         <p className="text-sm text-slate-500 font-medium bg-slate-100 inline-block px-4 py-2 rounded-full">
-                            KidsCom experiences focus on bonding—not legal conflict.
+                            KidsCom experiences focus on bonding—not legal stress.
                         </p>
                     </div>
 
@@ -266,7 +266,7 @@ export default function KidsComPage() {
 
                         {/* Step 1 */}
                         <div className="flex flex-col items-center text-center relative z-10">
-                            <div className="w-24 h-24 bg-white border-4 border-[#F5F0E8] rounded-full flex items-center justify-center mb-6 text-2xl font-bold text-slate-900 shadow-sm">
+                            <div className="w-24 h-24 bg-white border-4 border-[#F4F8F7] rounded-full flex items-center justify-center mb-6 text-2xl font-bold text-slate-900 shadow-sm">
                                 1
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Pick a moment</h3>
@@ -277,7 +277,7 @@ export default function KidsComPage() {
 
                         {/* Step 2 */}
                         <div className="flex flex-col items-center text-center relative z-10">
-                            <div className="w-24 h-24 bg-white border-4 border-[#F5F0E8] rounded-full flex items-center justify-center mb-6 text-2xl font-bold text-slate-900 shadow-sm">
+                            <div className="w-24 h-24 bg-white border-4 border-[#F4F8F7] rounded-full flex items-center justify-center mb-6 text-2xl font-bold text-slate-900 shadow-sm">
                                 2
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Invite co-parent</h3>
@@ -288,7 +288,7 @@ export default function KidsComPage() {
 
                         {/* Step 3 */}
                         <div className="flex flex-col items-center text-center relative z-10">
-                            <div className="w-24 h-24 bg-white border-4 border-[#F5F0E8] rounded-full flex items-center justify-center mb-6 text-2xl font-bold text-slate-900 shadow-sm">
+                            <div className="w-24 h-24 bg-white border-4 border-[#F4F8F7] rounded-full flex items-center justify-center mb-6 text-2xl font-bold text-slate-900 shadow-sm">
                                 3
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Bond with child</h3>
@@ -302,7 +302,7 @@ export default function KidsComPage() {
             </section>
 
             {/* 5. CONTENT PREVIEW STRIP */}
-            <section className="py-16 bg-[#F5F0E8] overflow-hidden">
+            <section className="py-16 bg-[#F4F8F7] overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row gap-6 overflow-x-auto pb-4 md:pb-0 scrollbar-hide snap-x">
 
@@ -370,7 +370,7 @@ export default function KidsComPage() {
                         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
                             <div className="flex items-start gap-3">
                                 <Check className="w-5 h-5 text-emerald-300 mt-0.5 flex-shrink-0" />
-                                <p className="font-medium">Reduces conflict exposure for children</p>
+                                <p className="font-medium">Keeps children supported and protected</p>
                             </div>
                         </div>
                         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
@@ -388,7 +388,7 @@ export default function KidsComPage() {
             </section>
 
             {/* 7. PRICING GATE ("KidsCom starts with Plus") */}
-            <section id="pricing" className="py-16 md:py-24 bg-[#F5F0E8]">
+            <section id="pricing" className="py-16 md:py-24 bg-[#F4F8F7]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 mb-4">
@@ -451,7 +451,7 @@ export default function KidsComPage() {
                                     </div>
                                     <div className="flex items-center gap-3 justify-center text-slate-600 text-sm">
                                         <Check className="w-4 h-4 text-emerald-600" />
-                                        High-conflict tools
+                                        Advanced support tools
                                     </div>
                                 </div>
                                 <Button variant="outline" className="w-full rounded-full border-slate-300 text-slate-700 hover:bg-slate-50 font-bold py-6 mt-4" asChild>
@@ -476,10 +476,10 @@ export default function KidsComPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
                         {/* Testimonial 1 */}
-                        <div className="bg-[#F5F0E8] p-8 rounded-3xl relative">
+                        <div className="bg-[#F4F8F7] p-8 rounded-3xl relative">
                             <div className="text-amber-400 text-4xl font-serif absolute top-6 left-6 opacity-30">"</div>
                             <p className="text-slate-700 italic mb-4 relative z-10 font-medium leading-relaxed">
-                                Since we started doing the Milo stories, bedtime at Dad's house isn't a battle anymore. He actually sleeps.
+                                Since we started doing the Milo stories, bedtime at Dad's house feels peaceful now. He actually sleeps.
                             </p>
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-xs">SM</div>
@@ -488,7 +488,7 @@ export default function KidsComPage() {
                         </div>
 
                         {/* Testimonial 2 */}
-                        <div className="bg-[#F5F0E8] p-8 rounded-3xl relative">
+                        <div className="bg-[#F4F8F7] p-8 rounded-3xl relative">
                             <div className="text-amber-400 text-4xl font-serif absolute top-6 left-6 opacity-30">"</div>
                             <p className="text-slate-700 italic mb-4 relative z-10 font-medium leading-relaxed">
                                 Scheduling movie night used to start arguments. Now we just tap a button in KidsCom and it's handled.
@@ -504,7 +504,7 @@ export default function KidsComPage() {
             </section>
 
             {/* 9. FAQ */}
-            <section className="py-16 md:py-24 bg-[#F5F0E8]">
+            <section className="py-16 md:py-24 bg-[#F4F8F7]">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="text-3xl font-bold font-serif text-slate-900 mb-10 text-center">
                         Common Questions
@@ -534,7 +534,7 @@ export default function KidsComPage() {
                                 How does ARIA keep messages safe?
                             </AccordionTrigger>
                             <AccordionContent className="text-slate-600 leading-relaxed">
-                                ARIA scans messages for hostile language, aggression, or toxic patterns *before* they are sent, suggesting gentler alternatives to keep communication productive.
+                                ARIA reviews messages before they are sent, suggesting gentler alternatives to keep communication constructive and child-friendly.
                             </AccordionContent>
                         </AccordionItem>
 

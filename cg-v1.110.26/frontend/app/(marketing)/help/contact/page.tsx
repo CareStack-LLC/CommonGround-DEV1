@@ -36,7 +36,7 @@ const inquiryTypes = [
     icon: MessageSquare,
     label: 'Technical Support',
     description: 'Help with your account',
-    color: '#D97757',
+    color: '#F5A623',
   },
   {
     id: 'professional',
@@ -50,7 +50,7 @@ const inquiryTypes = [
     icon: Gavel,
     label: 'Court/Enterprise',
     description: 'Organizational access',
-    color: '#D97757',
+    color: '#F5A623',
   },
   {
     id: 'security',
@@ -85,14 +85,14 @@ function ContactForm() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center px-6">
         <div className="max-w-md mx-auto text-center">
           <div className="w-20 h-20 bg-[var(--portal-primary)]/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 className="w-10 h-10 text-[var(--portal-primary)]" />
           </div>
           <h1
-            className="text-3xl font-serif text-[#2C3E50] mb-4"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl font-serif text-[#1E3A4A] mb-4"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Message Sent!
           </h1>
@@ -112,15 +112,15 @@ function ContactForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-12 sm:pt-32 sm:pb-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#2C3E50] mb-4 leading-[1.1]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#1E3A4A] mb-4 leading-[1.1]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Get in <span className="text-[#D97757]">Touch</span>
+            Get in <span className="text-[#F5A623]">Touch</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
             Have questions? We're here to help. Choose your inquiry type below.
@@ -137,16 +137,16 @@ function ContactForm() {
                 <Clock className="w-6 h-6 text-[var(--portal-primary)]" />
               </div>
               <div>
-                <div className="font-semibold text-[#2C3E50]">Support Hours</div>
+                <div className="font-semibold text-[#1E3A4A]">Support Hours</div>
                 <div className="text-gray-600 text-sm">Mon-Fri, 9am-6pm PT</div>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#D97757]/10 flex items-center justify-center">
-                <Mail className="w-6 h-6 text-[#D97757]" />
+              <div className="w-12 h-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center">
+                <Mail className="w-6 h-6 text-[#F5A623]" />
               </div>
               <div>
-                <div className="font-semibold text-[#2C3E50]">Response Time</div>
+                <div className="font-semibold text-[#1E3A4A]">Response Time</div>
                 <div className="text-gray-600 text-sm">Usually within 24 hours</div>
               </div>
             </div>
@@ -163,7 +163,7 @@ function ContactForm() {
               <div className="bg-white rounded-3xl p-8 border-2 border-[var(--portal-primary)]/10">
                 {/* Inquiry Type Selection */}
                 <div className="mb-8">
-                  <label className="block text-sm font-medium text-[#2C3E50] mb-4">
+                  <label className="block text-sm font-medium text-[#1E3A4A] mb-4">
                     What can we help you with?
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -186,7 +186,7 @@ function ContactForm() {
                               isSelected ? 'text-[var(--portal-primary)]' : 'text-gray-400'
                             }`}
                           />
-                          <div className="font-medium text-[#2C3E50] text-sm">{type.label}</div>
+                          <div className="font-medium text-[#1E3A4A] text-sm">{type.label}</div>
                         </button>
                       );
                     })}
@@ -197,7 +197,7 @@ function ContactForm() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-[#2C3E50] mb-2">
+                      <label htmlFor="name" className="block text-sm font-medium text-[#1E3A4A] mb-2">
                         Name
                       </label>
                       <input
@@ -206,12 +206,12 @@ function ContactForm() {
                         required
                         value={formState.name}
                         onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-[#2C3E50] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors"
                         placeholder="Your name"
                       />
                     </div>
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-[#2C3E50] mb-2">
+                      <label htmlFor="email" className="block text-sm font-medium text-[#1E3A4A] mb-2">
                         Email
                       </label>
                       <input
@@ -220,14 +220,14 @@ function ContactForm() {
                         required
                         value={formState.email}
                         onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-[#2C3E50] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors"
                         placeholder="you@example.com"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="subject" className="block text-sm font-medium text-[#2C3E50] mb-2">
+                    <label htmlFor="subject" className="block text-sm font-medium text-[#1E3A4A] mb-2">
                       Subject
                     </label>
                     <input
@@ -236,13 +236,13 @@ function ContactForm() {
                       required
                       value={formState.subject}
                       onChange={(e) => setFormState({ ...formState, subject: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-[#2C3E50] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors"
                       placeholder="How can we help?"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-[#2C3E50] mb-2">
+                    <label htmlFor="message" className="block text-sm font-medium text-[#1E3A4A] mb-2">
                       Message
                     </label>
                     <textarea
@@ -251,7 +251,7 @@ function ContactForm() {
                       rows={6}
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-[#2C3E50] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors resize-none"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:border-[var(--portal-primary)] transition-colors resize-none"
                       placeholder="Tell us more about your inquiry..."
                     />
                   </div>
@@ -259,7 +259,7 @@ function ContactForm() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full sm:w-auto px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? 'Sending...' : 'Send Message'}
                   </button>
@@ -272,8 +272,8 @@ function ContactForm() {
               {/* Direct Email */}
               <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
                 <h3
-                  className="font-semibold text-[#2C3E50] mb-4"
-                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  className="font-semibold text-[#1E3A4A] mb-4"
+                  style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   Email Us Directly
                 </h3>
@@ -305,8 +305,8 @@ function ContactForm() {
               {/* Quick Links */}
               <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
                 <h3
-                  className="font-semibold text-[#2C3E50] mb-4"
-                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  className="font-semibold text-[#1E3A4A] mb-4"
+                  style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   Quick Links
                 </h3>
@@ -330,11 +330,11 @@ function ContactForm() {
               </div>
 
               {/* Enterprise CTA */}
-              <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] rounded-2xl p-6 text-white">
+              <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] rounded-2xl p-6 text-white">
                 <Building2 className="w-8 h-8 mb-4" />
                 <h3
                   className="font-semibold text-lg mb-2"
-                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   Enterprise Solutions
                 </h3>
@@ -343,7 +343,7 @@ function ContactForm() {
                 </p>
                 <Link
                   href="/pricing/courts"
-                  className="inline-flex items-center gap-2 text-[#D97757] font-medium text-sm hover:gap-3 transition-all"
+                  className="inline-flex items-center gap-2 text-[#F5A623] font-medium text-sm hover:gap-3 transition-all"
                 >
                   Learn more
                   <ArrowRight className="w-4 h-4" />
@@ -357,11 +357,11 @@ function ContactForm() {
       {/* Urgent Support */}
       <section className="py-12 sm:py-16">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-gradient-to-br from-[#D97757]/10 to-[#D97757]/5 rounded-3xl p-8 border-2 border-[#D97757]/20 text-center">
-            <AlertCircle className="w-10 h-10 text-[#D97757] mx-auto mb-4" />
+          <div className="bg-gradient-to-br from-[#F5A623]/10 to-[#F5A623]/5 rounded-3xl p-8 border-2 border-[#F5A623]/20 text-center">
+            <AlertCircle className="w-10 h-10 text-[#F5A623] mx-auto mb-4" />
             <h3
-              className="text-xl font-serif text-[#2C3E50] mb-2"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              className="text-xl font-serif text-[#1E3A4A] mb-2"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
               Need immediate help?
             </h3>
@@ -369,7 +369,7 @@ function ContactForm() {
               For urgent account access issues, email{' '}
               <a
                 href="mailto:support@commonground.app"
-                className="text-[#D97757] font-medium hover:underline"
+                className="text-[#F5A623] font-medium hover:underline"
               >
                 support@commonground.app
               </a>{' '}
@@ -384,7 +384,7 @@ function ContactForm() {
 
 function ContactFormFallback() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center">
       <div className="text-gray-600">Loading...</div>
     </div>
   );

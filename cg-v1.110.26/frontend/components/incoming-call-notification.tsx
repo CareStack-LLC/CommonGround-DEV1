@@ -153,7 +153,7 @@ export function IncomingCallNotification() {
 
         {/* Call Info */}
         <div className="text-center mb-8">
-          <h2 className="text-white text-2xl font-semibold mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-white text-2xl font-semibold mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             {incomingCall.caller_name}
           </h2>
           <p className="text-slate-400 flex items-center justify-center gap-2">
