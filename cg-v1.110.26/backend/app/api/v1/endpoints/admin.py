@@ -38,12 +38,37 @@ router = APIRouter()
 # Shared tier pricing helper
 # =============================================================================
 
-# Correct prices matching actual Stripe plans
+# Correct prices matching actual Stripe plans (from Stripe test export March 2026)
 _DEFAULT_TIER_PRICES = {
-    "web_starter": 0, "essential": 0, "starter": 0,
-    "plus": 17.99, "complete": 34.99, "family_plus": 25.00,
-    "premium": 49.99,
+    "web_starter": 0,
+    "plus": 17.99, "complete": 34.99,
+    "professional_starter": 49.99,
     "solo": 99.00, "small_firm": 299.00, "mid_size": 799.00,
+}
+
+# Canonical mapping of Stripe Price IDs → tier codes
+STRIPE_PRICE_TO_TIER: dict[str, str] = {
+    # Consumer tiers
+    "price_1T7WgnB3EXvvERPfyu40gtfE": "web_starter",      # $0/mo
+    "price_1T7WgnB3EXvvERPfcpZeMSSH": "plus",              # $17.99/mo
+    "price_1T7WgnB3EXvvERPfe7NNFlru": "plus",              # $199.99/yr
+    "price_1T7WgoB3EXvvERPfDm7qKpBN": "complete",          # $34.99/mo
+    "price_1T7WgoB3EXvvERPfmDy9KtDh": "complete",          # $349.99/yr
+    # Professional tiers
+    "price_1T7WgoB3EXvvERPfTe6d3Ccx": "professional_starter",  # $49.99/mo
+    "price_1T7WgpB3EXvvERPfjThfJqeO": "solo",              # $99/mo
+    "price_1T7WgpB3EXvvERPf4wDi0fjN": "small_firm",        # $299/mo
+    "price_1T7WgqB3EXvvERPftbsE7Y2f": "mid_size",          # $799/mo
+}
+
+STRIPE_PRODUCT_TO_TIER: dict[str, str] = {
+    "prod_U5i6vWb4ktGrTN": "web_starter",
+    "prod_U5i6Efw49ipfb3": "plus",
+    "prod_U5i6lsgC2mOHxn": "complete",
+    "prod_U5i6Vfe7E6vHtZ": "professional_starter",
+    "prod_U5i6WdwYSiC9wc": "solo",
+    "prod_U5i6tXPi3LbW5h": "small_firm",
+    "prod_U5i6Pvkzonm0fe": "mid_size",
 }
 
 
@@ -1296,20 +1321,39 @@ async def sync_stripe_subscriptions(
                 }
                 new_status = status_map.get(stripe_status, stripe_status)
 
-                # Check if update needed
+                # Check if status update needed
                 if profile.subscription_status != new_status:
                     profile.subscription_status = new_status
                     updated += 1
 
+                # Sync tier from Stripe price ID
+                items_data = sub.get("items", {}).get("data", [])
+                if items_data:
+                    price_id = items_data[0].get("price", {}).get("id")
+                    if price_id and price_id in STRIPE_PRICE_TO_TIER:
+                        new_tier = STRIPE_PRICE_TO_TIER[price_id]
+                        if profile.subscription_tier != new_tier:
+                            profile.subscription_tier = new_tier
+                            if profile.subscription_status == new_status:
+                                updated += 1  # Count as update if tier changed
+
                 # Update subscription period dates if available
-                if hasattr(sub, "current_period_start") and sub.current_period_start:
-                    profile.subscription_period_start = datetime.fromtimestamp(sub.current_period_start)
-                if hasattr(sub, "current_period_end") and sub.current_period_end:
-                    profile.subscription_period_end = datetime.fromtimestamp(sub.current_period_end)
+                period_start = sub.get("current_period_start")
+                period_end = sub.get("current_period_end")
+                if period_start:
+                    profile.subscription_period_start = datetime.fromtimestamp(period_start)
+                if period_end:
+                    profile.subscription_period_end = datetime.fromtimestamp(period_end)
 
                 # Update Stripe subscription ID
                 if not profile.stripe_subscription_id or profile.stripe_subscription_id != sub.id:
                     profile.stripe_subscription_id = sub.id
+            else:
+                # No Stripe subscription — ensure user is on free tier
+                if profile.subscription_tier and profile.subscription_tier not in ("web_starter",):
+                    # User has a paid tier but no Stripe subscription — leave as-is
+                    # (could be a grant or manually assigned tier)
+                    pass
         except Exception as e:
             errors.append({"customer_id": profile.stripe_customer_id, "error": str(e)})
 

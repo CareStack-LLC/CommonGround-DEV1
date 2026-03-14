@@ -71,34 +71,34 @@ SUBSCRIPTION_PRODUCTS = {
         "metadata": {"tier": "professional_starter", "type": "professional"},
         "product_id": "prod_U5i6Vfe7E6vHtZ",
         "prices": {
-            "monthly": {"amount": Decimal("0.00"), "id": "price_1T7WgoB3EXvvERPfO7RszlVq"},
+            "monthly": {"amount": Decimal("49.99"), "id": "price_1T7WgoB3EXvvERPfTe6d3Ccx"},
         },
     },
     "professional_solo": {
         "name": "Professional - Solo",
         "description": "For solo practitioners",
         "metadata": {"tier": "professional_solo", "type": "professional"},
-        "product_id": "prod_U5i6qK0y9S8s4f",
+        "product_id": "prod_U5i6WdwYSiC9wc",
         "prices": {
-            "monthly": {"amount": Decimal("99.00"), "id": "price_1T7WgoB3EXvvERPf5lqYlPsn"},
+            "monthly": {"amount": Decimal("99.00"), "id": "price_1T7WgpB3EXvvERPfjThfJqeO"},
         },
     },
     "professional_small_firm": {
         "name": "Professional - Small Firm",
         "description": "For small firms and teams",
         "metadata": {"tier": "professional_small_firm", "type": "professional"},
-        "product_id": "prod_U5i6Wfe7E6vHtZ",
+        "product_id": "prod_U5i6tXPi3LbW5h",
         "prices": {
-            "monthly": {"amount": Decimal("299.00"), "id": "price_1T7WgoB3EXvvERPfTe6d3Ccx"},
+            "monthly": {"amount": Decimal("299.00"), "id": "price_1T7WgpB3EXvvERPf4wDi0fjN"},
         },
     },
     "professional_mid_size": {
         "name": "Professional - Mid-Size",
         "description": "For mid-size firms with expanded case and team limits",
         "metadata": {"tier": "professional_mid_size", "type": "professional"},
-        "product_id": "prod_U5i76092E7v6uB",
+        "product_id": "prod_U5i6Pvkzonm0fe",
         "prices": {
-            "monthly": {"amount": Decimal("799.00"), "id": "price_1T7WgoB3EXvvERPfoq938f4f"},
+            "monthly": {"amount": Decimal("799.00"), "id": "price_1T7WgqB3EXvvERPftbsE7Y2f"},
         },
     },
     # Reports (One-time payments, but tracked here for sync)
@@ -117,16 +117,16 @@ SUBSCRIPTION_PRODUCTS = {
         "metadata": {"type": "report", "report_type": "communication_analysis"},
         "product_id": "prod_U5i6T4xMbbYmrh",
         "prices": {
-            "one_time": {"amount": Decimal("49.00"), "id": "price_1T7WgrB3EXvvERPfgGIUwJwa"},
+            "one_time": {"amount": Decimal("79.00"), "id": "price_1T7WgrB3EXvvERPfgGIUwJwa"},
         },
     },
     "report_court": {
         "name": "Court Investigation Package",
         "description": "Comprehensive analysis of communication, schedule, and custody exchanges",
         "metadata": {"type": "report", "report_type": "court_investigation"},
-        "product_id": "prod_U5i76092E7v6uB",
+        "product_id": "prod_U5i6ZMoAoSQBEH",
         "prices": {
-            "one_time": {"amount": Decimal("149.00"), "id": "price_1T7WgrB3EXvvERPfv7Qz9yOq"},
+            "one_time": {"amount": Decimal("149.00"), "id": "price_1T7WgqB3EXvvERPfdLfdqwwC"},
         },
     },
     "rush_delivery": {

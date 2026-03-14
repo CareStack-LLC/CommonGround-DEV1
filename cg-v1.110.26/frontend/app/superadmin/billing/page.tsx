@@ -9,9 +9,10 @@ import {
 import { adminAPI, type BillingOverview, type SyncResult } from '@/lib/admin-api';
 
 const TIER_LABELS: Record<string, string> = {
-  web_starter: 'Web Starter', essential: 'Essential', starter: 'Starter',
-  plus: 'Plus', complete: 'Complete', family_plus: 'Family Plus',
-  premium: 'Premium', solo: 'Solo', small_firm: 'Small Firm', mid_size: 'Mid Size',
+  web_starter: 'Web Starter',
+  plus: 'Plus', complete: 'Complete',
+  professional_starter: 'Starter (Pro)',
+  solo: 'Solo (Pro)', small_firm: 'Small Firm (Pro)', mid_size: 'Mid Size (Pro)',
 };
 
 const STATUS_COLORS: Record<string, string> = {

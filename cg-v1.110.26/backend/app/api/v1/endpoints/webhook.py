@@ -343,11 +343,43 @@ async def handle_payout_failed(db: AsyncSession, event_data: dict) -> None:
 # Subscription Event Handlers
 # ============================================================================
 
+
+# Canonical mapping of Stripe Price IDs → tier codes (from Stripe test export)
+STRIPE_PRICE_TO_TIER: dict[str, str] = {
+    # Consumer tiers
+    "price_1T7WgnB3EXvvERPfyu40gtfE": "web_starter",      # $0/mo
+    "price_1T7WgnB3EXvvERPfcpZeMSSH": "plus",              # $17.99/mo
+    "price_1T7WgnB3EXvvERPfe7NNFlru": "plus",              # $199.99/yr
+    "price_1T7WgoB3EXvvERPfDm7qKpBN": "complete",          # $34.99/mo
+    "price_1T7WgoB3EXvvERPfmDy9KtDh": "complete",          # $349.99/yr
+    # Professional tiers
+    "price_1T7WgoB3EXvvERPfTe6d3Ccx": "professional_starter",  # $49.99/mo
+    "price_1T7WgpB3EXvvERPfjThfJqeO": "solo",              # $99/mo
+    "price_1T7WgpB3EXvvERPf4wDi0fjN": "small_firm",        # $299/mo
+    "price_1T7WgqB3EXvvERPftbsE7Y2f": "mid_size",          # $799/mo
+}
+
+STRIPE_PRODUCT_TO_TIER: dict[str, str] = {
+    "prod_U5i6vWb4ktGrTN": "web_starter",
+    "prod_U5i6Efw49ipfb3": "plus",
+    "prod_U5i6lsgC2mOHxn": "complete",
+    "prod_U5i6Vfe7E6vHtZ": "professional_starter",
+    "prod_U5i6WdwYSiC9wc": "solo",
+    "prod_U5i6tXPi3LbW5h": "small_firm",
+    "prod_U5i6Pvkzonm0fe": "mid_size",
+}
+
+
 async def _get_tier_from_price_id(db: AsyncSession, price_id: str) -> str:
     """Map Stripe price ID to subscription tier (plan_code)."""
     if not price_id:
-        return "starter"
+        return "web_starter"
 
+    # 1. Check hardcoded mapping first (fastest, always correct)
+    if price_id in STRIPE_PRICE_TO_TIER:
+        return STRIPE_PRICE_TO_TIER[price_id]
+
+    # 2. Fall back to database lookup
     result = await db.execute(
         select(SubscriptionPlan).where(
             (SubscriptionPlan.stripe_price_id_monthly == price_id) |
@@ -355,7 +387,7 @@ async def _get_tier_from_price_id(db: AsyncSession, price_id: str) -> str:
         )
     )
     plan = result.scalar_one_or_none()
-    return plan.plan_code if plan else "starter"
+    return plan.plan_code if plan else "web_starter"
 
 
 async def _get_profile_by_stripe_customer(db: AsyncSession, customer_id: str) -> Optional[UserProfile]:
@@ -549,8 +581,8 @@ async def handle_subscription_deleted(db: AsyncSession, event_data: dict) -> Non
         logger.warning(f"No profile found for Stripe customer {customer_id}")
         return
 
-    # Downgrade to starter
-    profile.subscription_tier = "starter"
+    # Downgrade to web_starter (free tier)
+    profile.subscription_tier = "web_starter"
     profile.subscription_status = "cancelled"
     profile.stripe_subscription_id = None
     profile.subscription_period_start = None
