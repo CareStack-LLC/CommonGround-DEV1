@@ -414,6 +414,43 @@
   --portal-line-height: 1.6;
 }
 
+/* SuperAdmin Portal - "Dark Command Center" */
+.superadmin-portal {
+  --portal-primary: #7c3aed;
+  --portal-primary-hover: #6d28d9;
+  --portal-primary-light: #a78bfa;
+  --portal-secondary: #3b82f6;
+  --portal-secondary-light: #60a5fa;
+  --portal-accent: #f59e0b;
+  --portal-accent-hover: #d97706;
+  --portal-background: #0f1117;
+  --portal-surface: #1a1b26;
+  --portal-surface-elevated: #1e1f2e;
+  --portal-border: #27272a;
+  --portal-border-hover: #3f3f46;
+  --portal-text: #e4e4e7;
+  --portal-text-light: #a1a1aa;
+  --portal-text-heading: #fafafa;
+
+  --portal-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --portal-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --portal-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --portal-shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.6);
+
+  --portal-radius-sm: 0.5rem;
+  --portal-radius-md: 0.75rem;
+  --portal-radius-lg: 1rem;
+  --portal-radius-xl: 1.25rem;
+  --portal-radius-full: 9999px;
+
+  --portal-spacing-section: 1.5rem;
+  --portal-spacing-card: 1rem;
+  --portal-spacing-element: 0.75rem;
+
+  --portal-font-heading: 'Inter', 'DM Sans', system-ui, sans-serif;
+  --portal-font-body: 'Inter', 'DM Sans', system-ui, sans-serif;
+}
+
 /* Court Portal - "Legal Authority" */
 .court-portal {
   /* Colors - Formal, authoritative */
