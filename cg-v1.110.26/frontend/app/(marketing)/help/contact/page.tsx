@@ -75,12 +75,39 @@ function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const [error, setError] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    setError('');
+
+    try {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_URL}/api/v1/marketing/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formState.name,
+          email: formState.email,
+          inquiry_type: selectedType,
+          subject: formState.subject,
+          message: formState.message,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || 'Failed to send message');
+      }
+
+      setIsSubmitted(true);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -256,6 +283,12 @@ function ContactForm() {
                     />
                   </div>
 
+                  {error && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                      <p className="text-sm text-red-700 font-medium">{error}</p>
+                    </div>
+                  )}
+
                   <button
                     type="submit"
                     disabled={isSubmitting}
@@ -279,25 +312,25 @@ function ContactForm() {
                 </h3>
                 <div className="space-y-3">
                   <a
-                    href="mailto:support@commonground.app"
+                    href="mailto:support@find-commonground.com"
                     className="flex items-center gap-3 text-sm text-gray-600 hover:text-[var(--portal-primary)] transition-colors"
                   >
                     <Mail className="w-4 h-4" />
-                    support@commonground.app
+                    support@find-commonground.com
                   </a>
                   <a
-                    href="mailto:hello@commonground.app"
+                    href="mailto:hello@find-commonground.com"
                     className="flex items-center gap-3 text-sm text-gray-600 hover:text-[var(--portal-primary)] transition-colors"
                   >
                     <Mail className="w-4 h-4" />
-                    hello@commonground.app
+                    hello@find-commonground.com
                   </a>
                   <a
-                    href="mailto:partnerships@commonground.app"
+                    href="mailto:partnerships@find-commonground.com"
                     className="flex items-center gap-3 text-sm text-gray-600 hover:text-[var(--portal-primary)] transition-colors"
                   >
                     <Mail className="w-4 h-4" />
-                    partnerships@commonground.app
+                    partnerships@find-commonground.com
                   </a>
                 </div>
               </div>
@@ -336,13 +369,13 @@ function ContactForm() {
                   className="font-semibold text-lg mb-2"
                   style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
-                  Enterprise Solutions
+                  Professional Solutions
                 </h3>
                 <p className="text-sm text-white/80 mb-4">
-                  Custom solutions for courts and organizations.
+                  Tools for attorneys, mediators, and family law professionals.
                 </p>
                 <Link
-                  href="/pricing/courts"
+                  href="/professionals"
                   className="inline-flex items-center gap-2 text-[#F5A623] font-medium text-sm hover:gap-3 transition-all"
                 >
                   Learn more
@@ -368,10 +401,10 @@ function ContactForm() {
             <p className="text-gray-600 max-w-xl mx-auto">
               For urgent account access issues, email{' '}
               <a
-                href="mailto:support@commonground.app"
+                href="mailto:support@find-commonground.com"
                 className="text-[#F5A623] font-medium hover:underline"
               >
-                support@commonground.app
+                support@find-commonground.com
               </a>{' '}
               with "URGENT" in the subject line.
             </p>

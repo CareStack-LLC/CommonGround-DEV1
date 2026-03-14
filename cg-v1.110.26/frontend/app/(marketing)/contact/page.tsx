@@ -12,21 +12,21 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: 'Support',
-      email: 'support@commonground.app',
+      email: 'support@find-commonground.com',
       description: 'Technical issues, billing questions, or account help',
       color: 'var(--portal-primary)'
     },
     {
       icon: Mail,
       title: 'General Inquiries',
-      email: 'hello@commonground.app',
+      email: 'hello@find-commonground.com',
       description: 'Questions about CommonGround or how it works',
       color: '#F5A623'
     },
     {
       icon: Mail,
       title: 'Professional Partnerships',
-      email: 'partnerships@commonground.app',
+      email: 'partnerships@find-commonground.com',
       description: 'Law firms, courts, mediators, or organizational access',
       color: 'var(--portal-primary)'
     }
@@ -51,7 +51,7 @@ export default function ContactPage() {
       icon: Activity,
       title: 'System Status',
       description: 'Check platform status',
-      link: 'https://status.commonground.app',
+      link: 'https://status.find-commonground.com',
       color: 'var(--portal-primary)'
     }
   ];
@@ -227,10 +227,10 @@ export default function ContactPage() {
               If you're experiencing a technical emergency that prevents access to your account or
               critical features, email{' '}
               <a
-                href="mailto:support@commonground.app"
+                href="mailto:support@find-commonground.com"
                 className="font-medium text-[var(--portal-primary)] hover:underline"
               >
-                support@commonground.app
+                support@find-commonground.com
               </a>{' '}
               with "URGENT" in the subject line. We'll prioritize your request.
             </p>

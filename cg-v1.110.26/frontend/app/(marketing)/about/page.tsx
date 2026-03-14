@@ -44,7 +44,7 @@ export default function AboutPage() {
             {/* Mission statement box */}
             <div className="border-l-4 border-[var(--portal-primary)] pl-6 py-3 bg-gradient-to-r from-[#E8F4F8] to-transparent">
               <p className="text-gray-700 font-medium text-lg">
-                Every child deserves parents who can work together — even when they can't be together.
+                Protecting children through better co-parent communication — supported by parents, attorneys, and family law professionals working together.
               </p>
             </div>
           </div>
@@ -337,6 +337,12 @@ export default function AboutPage() {
           </div>
           <p className="text-sm text-gray-500 mt-6">
             No credit card required. Free tier forever. 14-day trial on paid plans.
+          </p>
+          <p className="text-sm text-gray-400 mt-3">
+            Family law professional?{' '}
+            <Link href="/lawyers" className="text-[var(--portal-primary)] hover:underline">
+              Learn about our attorney partnership program
+            </Link>.
           </p>
         </div>
       </section>

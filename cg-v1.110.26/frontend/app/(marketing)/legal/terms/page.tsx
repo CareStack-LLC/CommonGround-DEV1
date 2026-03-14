@@ -435,8 +435,8 @@ export default function TermsOfServicePage() {
               <h3 className="font-semibold text-[#1E3A4A] mb-2">Informal Resolution First</h3>
               <p className="text-gray-600 text-sm">
                 Before filing a formal dispute, you agree to contact us at{' '}
-                <a href="mailto:legal@commonground.app" className="text-[var(--portal-primary)] hover:underline">
-                  legal@commonground.app
+                <a href="mailto:legal@find-commonground.com" className="text-[var(--portal-primary)] hover:underline">
+                  legal@find-commonground.com
                 </a>{' '}
                 to attempt informal resolution. We'll work in good faith to resolve your concerns.
               </p>
@@ -521,7 +521,7 @@ export default function TermsOfServicePage() {
               { title: 'No Waiver', desc: 'Our failure to enforce any right does not waive that right or any other provision.' },
               { title: 'Assignment', desc: 'You may not assign these Terms. We may assign our rights without restriction.' },
               { title: 'Changes', desc: 'We may update these Terms with notice. Continued use after changes constitutes acceptance.' },
-              { title: 'Contact', desc: 'Questions? Email legal@commonground.app' },
+              { title: 'Contact', desc: 'Questions? Email legal@find-commonground.com' },
             ].map((item) => (
               <div
                 key={item.title}
@@ -549,10 +549,10 @@ export default function TermsOfServicePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:legal@commonground.app"
+              href="mailto:legal@find-commonground.com"
               className="inline-flex items-center justify-center px-8 py-4 bg-[#F5A623] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all"
             >
-              legal@commonground.app
+              legal@find-commonground.com
             </a>
             <Link
               href="/legal/privacy"

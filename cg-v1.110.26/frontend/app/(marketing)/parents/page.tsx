@@ -46,7 +46,7 @@ export default function ParentsLandingPage() {
               </h1>
 
               <p className="text-xl text-[#4A4A4A] leading-relaxed max-w-xl">
-                Every message can feel calm and supported. Document everything, split expenses fairly, and focus on what matters: your kids.
+                Your children deserve stability. Keep communication calm, document everything, split expenses fairly, and protect what matters most: your kids.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -116,8 +116,8 @@ export default function ParentsLandingPage() {
             {[
               {
                 icon: MessageSquare,
-                problem: '"Communication feels overwhelming"',
-                solution: 'ARIA helps keep messages constructive and calm',
+                problem: '"Every message feels stressful"',
+                solution: 'ARIA supports calm, child-focused communication',
                 color: '#D4956C',
               },
               {

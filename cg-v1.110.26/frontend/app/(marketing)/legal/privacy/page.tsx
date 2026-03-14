@@ -317,8 +317,8 @@ export default function PrivacyPolicyPage() {
 
           <p className="text-center text-gray-600 mt-8">
             To exercise these rights, email{' '}
-            <a href="mailto:privacy@commonground.app" className="text-[var(--portal-primary)] font-medium hover:underline">
-              privacy@commonground.app
+            <a href="mailto:privacy@find-commonground.com" className="text-[var(--portal-primary)] font-medium hover:underline">
+              privacy@find-commonground.com
             </a>
           </p>
         </div>
@@ -433,10 +433,10 @@ export default function PrivacyPolicyPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:privacy@commonground.app"
+              href="mailto:privacy@find-commonground.com"
               className="inline-flex items-center justify-center px-8 py-4 bg-[#F5A623] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all"
             >
-              privacy@commonground.app
+              privacy@find-commonground.com
             </a>
             <Link
               href="/legal/terms"

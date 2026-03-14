@@ -35,8 +35,8 @@ function Logo() {
       <svg width="40" height="40" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="hdr-bg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#1E3A4A" />
-            <stop offset="100%" stopColor="#2D6A8F" />
+            <stop offset="0%" stopColor="#E8F4F8" />
+            <stop offset="100%" stopColor="#D6ECE8" />
           </linearGradient>
           <linearGradient id="hdr-lf" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#5BC4A0" />

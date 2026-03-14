@@ -69,17 +69,35 @@ function LoginContent() {
           href="/"
           className="inline-flex items-center gap-3 text-[#1E3A4A] hover:text-[var(--portal-primary)] transition-colors group"
         >
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] flex items-center justify-center shadow-sm">
-            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 6v12M6 12h12" />
-            </svg>
-          </div>
+          <svg width="40" height="40" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="login-bg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#E8F4F8" />
+                <stop offset="100%" stopColor="#D6ECE8" />
+              </linearGradient>
+              <linearGradient id="login-lf" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#5BC4A0" />
+                <stop offset="100%" stopColor="#3DAA8A" />
+              </linearGradient>
+              <linearGradient id="login-rf" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#4BA8C8" />
+                <stop offset="100%" stopColor="#2D6A8F" />
+              </linearGradient>
+            </defs>
+            <rect width="512" height="512" rx="120" fill="url(#login-bg)" />
+            <circle cx="168" cy="148" r="48" fill="url(#login-lf)" />
+            <path d="M118 218 Q168 258 218 218" stroke="url(#login-lf)" strokeWidth="16" strokeLinecap="round" fill="none" />
+            <circle cx="344" cy="148" r="48" fill="url(#login-rf)" />
+            <path d="M294 218 Q344 258 394 218" stroke="url(#login-rf)" strokeWidth="16" strokeLinecap="round" fill="none" />
+            <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+            <circle cx="256" cy="330" r="38" fill="#F5A623" />
+            <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
+          </svg>
           <span
-            className="text-xl font-bold tracking-tight"
-            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+            className="text-xl tracking-tight"
+            style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            CommonGround
+            <span className="font-bold text-[#1E3A4A]">Common</span><span className="font-normal text-[#3DAA8A]">Ground</span>
           </span>
         </Link>
       </header>

@@ -341,13 +341,13 @@ export default function GrantPartnershipPage() {
                     </p>
                     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <Link
-                            href="mailto:partnerships@commonground.app?subject=Grant Partnership Application"
+                            href="mailto:partnerships@find-commonground.com?subject=Grant Partnership Application"
                             className="px-8 py-4 bg-white text-[var(--portal-primary)] rounded-full font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
                         >
                             Apply for Partnership
                         </Link>
                         <Link
-                            href="mailto:partnerships@commonground.app?subject=Grant Partnership Questions"
+                            href="mailto:partnerships@find-commonground.com?subject=Grant Partnership Questions"
                             className="px-8 py-4 bg-transparent border-2 border-white/30 hover:bg-white/10 text-white rounded-full font-medium text-lg transition-all duration-200"
                         >
                             Schedule Discovery Call

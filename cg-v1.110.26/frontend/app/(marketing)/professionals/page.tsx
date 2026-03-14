@@ -86,17 +86,17 @@ export default function ProfessionalsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/contact?type=professional"
+              href="/contact?type=demo"
               className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
             >
-              Contact Sales
+              Schedule a Demo
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
-              href="/contact?type=demo"
+              href="/contact?type=professional"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-[var(--portal-primary)] font-semibold rounded-full border-2 border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 transition-all"
             >
-              Schedule Demo
+              Contact Sales
             </Link>
           </div>
         </div>
@@ -140,7 +140,7 @@ export default function ProfessionalsPage() {
                 <span className="text-gray-500">Find a professional near Los Angeles, CA...</span>
               </div>
               {[
-                { name: 'Morrison Family Law', specialty: 'High-Conflict Custody', rating: '4.9' },
+                { name: 'Morrison Family Law', specialty: 'Custody & Co-Parenting', rating: '4.9' },
                 { name: 'Chen & Associates', specialty: 'Mediation, Collaborative', rating: '4.8' },
                 { name: 'Your Firm Here', specialty: 'Your Specialty', rating: '★', highlight: true },
               ].map((firm, i) => (
@@ -289,17 +289,17 @@ export default function ProfessionalsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/contact?type=professional"
-              className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
+              href="/contact?type=demo"
+              className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#E09520] transition-all shadow-2xl hover:-translate-y-1 group"
             >
-              Contact Sales
+              Schedule a Demo
               <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />
             </Link>
             <Link
-              href="/contact?type=demo"
+              href="/contact?type=professional"
               className="inline-flex items-center justify-center px-10 py-5 bg-white/10 text-white font-bold text-lg rounded-full hover:bg-white/20 transition-all border-2 border-white/30"
             >
-              Schedule Demo
+              Contact Sales
             </Link>
           </div>
         </div>

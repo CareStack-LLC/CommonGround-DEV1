@@ -18,7 +18,7 @@ const faqCategories = [
     faqs: [
       {
         question: 'What is CommonGround?',
-        answer: 'CommonGround is a co-parenting platform that helps separated parents communicate effectively, manage custody schedules, track expenses, and create agreements. Our AI assistant ARIA helps reduce conflict by suggesting calmer ways to communicate.',
+        answer: 'CommonGround is a co-parenting platform that helps separated parents communicate effectively, manage custody schedules, track expenses, and create agreements. Our AI assistant ARIA supports peaceful communication by suggesting calmer ways to express yourself.',
       },
       {
         question: 'How do I get started?',
@@ -41,7 +41,7 @@ const faqCategories = [
     faqs: [
       {
         question: 'What is ARIA?',
-        answer: 'ARIA (AI Relationship Intelligence Assistant) analyzes messages before they\'re sent. If ARIA detects language that might cause conflict, it suggests calmer alternatives while preserving your intended meaning.',
+        answer: 'ARIA (AI Relationship Intelligence Assistant) analyzes messages before they\'re sent. If ARIA detects language that could be misread or escalate tension, it suggests calmer alternatives while preserving your intended meaning.',
       },
       {
         question: 'Does ARIA read all my messages?',
@@ -80,7 +80,7 @@ const faqCategories = [
       },
       {
         question: 'Do you offer hardship pricing?',
-        answer: 'Yes. We believe every family deserves access to better co-parenting tools. Contact support@commonground.app to discuss hardship options.',
+        answer: 'Yes. We believe every family deserves access to better co-parenting tools. Contact support@find-commonground.com to discuss hardship options.',
       },
     ],
   },
@@ -114,7 +114,7 @@ const faqCategories = [
       },
       {
         question: 'Can I upload receipts?',
-        answer: 'Yes. Attach photos or PDFs of receipts to any expense. This documentation helps with court records and prevents disputes.',
+        answer: 'Yes. Attach photos or PDFs of receipts to any expense. This documentation helps with court records and keeps finances clear for everyone.',
       },
       {
         question: 'How are expenses split?',

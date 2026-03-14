@@ -66,19 +66,19 @@ export default function HomePage() {
             </p>
 
             {/* CTA */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
               <Link
                 href="/register"
                 className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D8A70] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
               >
-                Start Free
+                Start Free — Parents
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                href="/about"
+                href="/lawyers"
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-[var(--portal-primary)] font-semibold rounded-full hover:bg-gray-50 transition-all border-2 border-[var(--portal-primary)]"
               >
-                Our Story
+                For Attorneys — Schedule a Demo
               </Link>
             </div>
 
@@ -94,7 +94,11 @@ export default function HomePage() {
               </span>
               <span className="flex items-center gap-1.5">
                 <Check className="h-4 w-4 text-[var(--portal-primary)]" />
-                Court-ready
+                Court-ready documentation
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Check className="h-4 w-4 text-[var(--portal-primary)]" />
+                Trusted by 500+ law firms
               </span>
             </div>
           </div>
@@ -338,7 +342,11 @@ export default function HomePage() {
             <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />
           </Link>
           <p className="text-sm text-white/60 mt-6">
-            Forever free tier. No credit card required. Cancel anytime.
+            Forever free tier for parents. No credit card required. Cancel anytime.
+          </p>
+          <p className="text-sm text-white/50 mt-3">
+            Family law attorney?{' '}
+            <Link href="/lawyers" className="text-[#F5A623] hover:underline">Schedule a demo for your practice</Link>.
           </p>
         </div>
       </section>

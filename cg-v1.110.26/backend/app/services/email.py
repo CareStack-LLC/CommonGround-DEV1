@@ -933,6 +933,191 @@ class EmailService:
 
         return await self._send_email(to_email, subject, html_body)
 
+    # ==================== Marketing Emails ====================
+
+    async def send_newsletter_welcome(self, to_email: str) -> bool:
+        """
+        Send welcome email to new newsletter subscriber.
+
+        Args:
+            to_email: Subscriber email address
+
+        Returns:
+            Success status
+        """
+        subject = "Welcome to the CommonGround Newsletter!"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to CommonGround</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8fafc;">
+            <div style="background: linear-gradient(135deg, #1E3A4A 0%, #2D6A8F 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0 0 8px 0; font-family: Georgia, serif; font-size: 24px;">CommonGround</h1>
+                <p style="color: #5BC4A0; margin: 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Co-Parenting, Reimagined</p>
+            </div>
+
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
+                <h2 style="margin-top: 0; color: #1E3A4A;">You're on the list!</h2>
+
+                <p>Thanks for subscribing to the CommonGround newsletter. We're glad to have you.</p>
+
+                <p>Here's what you can expect:</p>
+                <ul style="color: #475569; padding-left: 20px;">
+                    <li>Co-parenting tips and insights</li>
+                    <li>Platform updates and new features</li>
+                    <li>Resources for healthier family communication</li>
+                    <li>Stories from the CommonGround community</li>
+                </ul>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{self.frontend_url}" style="display: inline-block; background: linear-gradient(135deg, #3DAA8A, #5BC4A0); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                        Visit CommonGround
+                    </a>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
+                    You received this email because you subscribed to the CommonGround newsletter.
+                    If you no longer wish to receive these emails, you can unsubscribe at any time.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_contact_form_notification(
+        self,
+        name: str,
+        email: str,
+        inquiry_type: str,
+        subject: Optional[str],
+        message: str,
+        internal_email: str,
+    ) -> bool:
+        """
+        Send contact form contents to the appropriate internal team email.
+
+        Args:
+            name: Submitter's name
+            email: Submitter's email
+            inquiry_type: Type of inquiry
+            subject: Optional subject line
+            message: Message body
+            internal_email: Internal email address to route to
+
+        Returns:
+            Success status
+        """
+        email_subject = f"Contact Form: {subject or inquiry_type.capitalize() + ' Inquiry'} from {name}"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>New Contact Form Submission</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: #1E3A4A; padding: 20px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 20px;">New Contact Form Submission</h1>
+            </div>
+
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr>
+                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9; width: 120px;">Name</td>
+                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;">{name}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9;">Email</td>
+                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;"><a href="mailto:{email}">{email}</a></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9;">Type</td>
+                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;">{inquiry_type.capitalize()}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9;">Subject</td>
+                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;">{subject or 'N/A'}</td>
+                    </tr>
+                </table>
+
+                <h3 style="color: #1E3A4A; margin-bottom: 8px;">Message</h3>
+                <div style="background: #f8fafc; border-radius: 8px; padding: 16px; white-space: pre-wrap;">{message}</div>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
+                    This message was submitted via the CommonGround contact form.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return await self._send_email(internal_email, email_subject, html_body)
+
+    async def send_contact_form_confirmation(self, to_email: str, name: str) -> bool:
+        """
+        Send confirmation email to contact form submitter.
+
+        Args:
+            to_email: Submitter's email
+            name: Submitter's name
+
+        Returns:
+            Success status
+        """
+        subject = "We received your message — CommonGround"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Message Received</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8fafc;">
+            <div style="background: linear-gradient(135deg, #1E3A4A 0%, #2D6A8F 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0 0 8px 0; font-family: Georgia, serif; font-size: 24px;">CommonGround</h1>
+                <p style="color: #5BC4A0; margin: 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Co-Parenting, Reimagined</p>
+            </div>
+
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
+                <p style="margin-top: 0;">Hi {name},</p>
+
+                <p>Thank you for reaching out to CommonGround. We've received your message and a member of our team will get back to you within 1-2 business days.</p>
+
+                <p>In the meantime, feel free to explore our platform or check out our resources:</p>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{self.frontend_url}" style="display: inline-block; background: linear-gradient(135deg, #3DAA8A, #5BC4A0); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                        Visit CommonGround
+                    </a>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
+                    This is an automated confirmation. Please do not reply directly to this email.
+                    If you need immediate assistance, contact us at support@find-commonground.com.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return await self._send_email(to_email, subject, html_body)
+
     # ==================== Internal Methods ====================
 
     async def _send_email(

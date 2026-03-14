@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { NewsletterForm } from './newsletter-form';
 
 /**
  * Marketing Footer Component
@@ -25,7 +26,6 @@ const footerLinks = {
     links: [
       { label: 'For Parents', href: '/pricing' },
       { label: 'For Professionals', href: '/professionals' },
-      { label: 'For Courts', href: '/pricing/courts' },
     ],
   },
   company: {
@@ -64,38 +64,34 @@ const footerLinks = {
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2">
-      <div className="w-10 h-10 bg-cg-sage rounded-xl flex items-center justify-center">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeDasharray="4 4"
-          />
-          <circle cx="12" cy="12" r="3" fill="white" />
-          <path
-            d="M12 9V6M15 12H18M12 15V18M9 12H6"
-            stroke="white"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
-      <span className="text-xl font-semibold text-foreground">CommonGround</span>
+    <Link href="/" className="flex items-center gap-2.5">
+      <svg width="40" height="40" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ftr-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#1E3A4A" />
+            <stop offset="100%" stopColor="#2D6A8F" />
+          </linearGradient>
+          <linearGradient id="ftr-lf" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#5BC4A0" />
+            <stop offset="100%" stopColor="#3DAA8A" />
+          </linearGradient>
+          <linearGradient id="ftr-rf" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#4BA8C8" />
+            <stop offset="100%" stopColor="#2D6A8F" />
+          </linearGradient>
+        </defs>
+        <rect width="512" height="512" rx="120" fill="url(#ftr-bg)" />
+        <circle cx="168" cy="148" r="48" fill="url(#ftr-lf)" />
+        <path d="M118 218 Q168 258 218 218" stroke="url(#ftr-lf)" strokeWidth="16" strokeLinecap="round" fill="none" />
+        <circle cx="344" cy="148" r="48" fill="url(#ftr-rf)" />
+        <path d="M294 218 Q344 258 394 218" stroke="url(#ftr-rf)" strokeWidth="16" strokeLinecap="round" fill="none" />
+        <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+        <circle cx="256" cy="330" r="38" fill="#F5A623" />
+        <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
+      </svg>
+      <span className="text-xl text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+        <span className="font-bold">Common</span><span className="font-normal text-[#3DAA8A]">Ground</span>
+      </span>
     </Link>
   );
 }
@@ -112,7 +108,7 @@ export function MarketingFooter() {
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
             <Logo />
             <p className="mt-4 text-sm text-muted-foreground max-w-xs">
-              Reducing conflict in separated families through technology, transparency, and AI-powered communication.
+              Child-centered co-parenting tools trusted by families and attorneys. Secure, safe, and court-ready.
             </p>
           </div>
 
@@ -145,19 +141,9 @@ export function MarketingFooter() {
                 Get co-parenting tips and product updates delivered to your inbox.
               </p>
             </div>
-            <form className="flex gap-2 w-full md:w-auto" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 md:w-64 px-4 py-2 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-cg-sage focus:border-transparent"
-              />
-              <button
-                type="submit"
-                className="bg-cg-sage text-white font-medium px-6 py-2 rounded-lg transition-all duration-200 hover:bg-cg-sage-light hover:shadow-lg whitespace-nowrap"
-              >
-                Subscribe
-              </button>
-            </form>
+            <div className="w-full md:w-auto">
+              <NewsletterForm />
+            </div>
           </div>
         </div>
 

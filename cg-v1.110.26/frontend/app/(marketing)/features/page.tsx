@@ -25,9 +25,9 @@ export default function FeaturesPage() {
   const features = [
     {
       icon: MessageSquare,
-      problem: "Every message feels like walking on eggshells",
-      solution: "ARIA helps keep messages constructive",
-      detail: "No rewrites. No suggestions. Just awareness. Our AI gently highlights language that could be misread so you can rethink before things get heated. Keep communication respectful without censorship.",
+      problem: "Every message feels stressful to send",
+      solution: "ARIA helps keep messages calm and constructive",
+      detail: "No rewrites. No censorship. Just awareness. Our AI gently highlights language that could be misread so you can rethink before sending. Keep communication peaceful and child-focused.",
       benefit: "87% calmer conversations",
       color: "#F5A623"
     },
@@ -41,7 +41,7 @@ export default function FeaturesPage() {
     },
     {
       icon: DollarSign,
-      problem: "Money discussions never seem to end",
+      problem: "Money discussions feel never-ending",
       solution: "Track every dollar, split costs automatically",
       detail: "ClearFund handles school fees, medical bills, extracurriculars. Upload receipts, set split percentages, track payments. No fees. No back-and-forth. Just clear records for court if you need them.",
       benefit: "100% payment transparency",
@@ -57,7 +57,7 @@ export default function FeaturesPage() {
     },
     {
       icon: MapPin,
-      problem: "Exchanges feel stressful and uncomfortable",
+      problem: "Exchanges feel stressful for everyone",
       solution: "Silent Handoff: contactless exchanges with GPS proof",
       detail: "Drop off at a public location. GPS confirms arrival. QR code confirms pickup. Zero interaction required. Complete records of every exchange with timestamps and locations.",
       benefit: "Verified exchanges, zero stress",
@@ -65,7 +65,7 @@ export default function FeaturesPage() {
     },
     {
       icon: Clock,
-      problem: "Tracking parenting time for court is a nightmare",
+      problem: "Tracking parenting time for court is time-consuming",
       solution: "Automatic custody tracking down to the day",
       detail: "Every exchange, every overnight, every hour tracked automatically. Generate reports showing exactly who had the kids when. Court-ready analytics that hold up under scrutiny.",
       benefit: "Accurate time records for court",
@@ -101,9 +101,9 @@ export default function FeaturesPage() {
             className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Built for parents who
+            Built for families who need
             <br />
-            <span className="text-[var(--portal-primary)]">aren't talking</span>
+            <span className="text-[var(--portal-primary)]">structure and peace</span>
           </h1>
 
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
@@ -215,13 +215,13 @@ export default function FeaturesPage() {
           </h2>
 
           <p className="text-xl text-white/80 mb-8 leading-relaxed max-w-2xl mx-auto">
-            We don't try to fix your relationship. We just remove the reasons to interact.
+            We automate the coordination so you can focus on being a parent.
             Schedules run themselves. Money tracks itself. The kids stay connected.
           </p>
 
           <p className="text-lg text-white/60 leading-relaxed max-w-2xl mx-auto">
             Everything you need. Nothing you don't. No forced mediation. No relationship coaching.
-            Just tools that work when you're not.
+            Just structured tools that bring calm to your family.
           </p>
         </div>
       </section>
@@ -259,6 +259,12 @@ export default function FeaturesPage() {
           <p className="mt-6 text-sm text-gray-500">
             Free tier includes ARIA messaging, basic scheduling, and ClearFund tracking.
             No fees.
+          </p>
+          <p className="mt-3 text-sm text-gray-400">
+            Family law professional?{' '}
+            <button onClick={() => router.push('/lawyers')} className="text-[var(--portal-primary)] hover:underline">
+              See how attorneys use CommonGround
+            </button>
           </p>
         </div>
       </section>

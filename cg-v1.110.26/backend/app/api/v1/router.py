@@ -54,6 +54,7 @@ from app.api.v1.endpoints import (
     smart_analytics,
     invitations,
     sendgrid_webhooks,
+    marketing,
 )
 
 api_router = APIRouter()
@@ -175,6 +176,9 @@ api_router.include_router(invitations.router, prefix="/invitations", tags=["Invi
 
 # SendGrid Webhooks - Email delivery tracking
 api_router.include_router(sendgrid_webhooks.router, prefix="/webhooks", tags=["SendGrid Webhooks"])
+
+# Marketing - Newsletter and contact form
+api_router.include_router(marketing.router, prefix="/marketing", tags=["Marketing"])
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])

@@ -23,8 +23,8 @@ import {
 const features = [
   {
     icon: Shield,
-    title: 'Catches conflict before you send',
-    description: 'ARIA reads your message and flags hostility, blame, and passive-aggression.',
+    title: 'Supports clarity before you send',
+    description: 'ARIA reads your message and gently flags language that could be misread or cause tension.',
   },
   {
     icon: RefreshCw,
@@ -78,8 +78,8 @@ export default function ARIAPage() {
             AI Relationship Intelligence Assistant
           </p>
           <p className="text-lg text-gray-500 mb-8 max-w-2xl mx-auto">
-            ARIA catches the messages you'll regret—before you send them.
-            <span className="font-medium text-[var(--portal-primary)]"> Think of her as spell-check for conflict.</span>
+            ARIA helps you communicate with calm and clarity—before you hit send.
+            <span className="font-medium text-[var(--portal-primary)]"> Think of her as a supportive guide for every message.</span>
           </p>
           <Link
             href="/register"
@@ -103,8 +103,8 @@ export default function ARIAPage() {
                 See ARIA in action
               </h2>
               <p className="text-lg text-white/80 mb-6">
-                You write what you're thinking. ARIA catches what could escalate.
-                You decide whether to soften it—or send anyway.
+                You write what you're thinking. ARIA highlights what could be misread.
+                You decide whether to adjust your tone — or send as-is.
               </p>
               <p className="text-white/60 italic">
                 "ARIA saved me from sending so many messages I'd regret."
@@ -135,7 +135,7 @@ export default function ARIAPage() {
                   </div>
 
                   <div className="bg-gradient-to-br from-[#F5A623]/30 to-[#F5A623]/10 rounded-2xl p-4 border border-[#F5A623]/40 shadow-lg mx-2">
-                    <p className="text-[#F5A623] font-semibold text-sm mb-2">Could escalate conflict</p>
+                    <p className="text-[#F5A623] font-semibold text-sm mb-2">A calmer approach</p>
                     <p className="text-white/90 text-sm leading-relaxed">
                       "Always" is an absolutist word that typically triggers defensiveness. Try focusing on the specific instance.
                     </p>
@@ -163,10 +163,10 @@ export default function ARIAPage() {
               className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              More than <span className="text-[#F5A623]">spell-check</span>
+              More than <span className="text-[#F5A623]">a messaging tool</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              ARIA understands context, tracks patterns, and helps you build a record of positive communication.
+              ARIA understands context, supports cooperative communication, and helps you build a record of good faith.
             </p>
           </div>
 
@@ -244,8 +244,8 @@ export default function ARIAPage() {
                 ARIA keeps kids <span className="text-[#F5A623]">protected</span>
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                When children use KidComs to talk with their other parent, ARIA watches over conversations
-                with age-appropriate guardrails. No adult conflict leaks through.
+                When children use KidComs to talk with their other parent, ARIA provides gentle, age-appropriate
+                guardrails. Children stay protected and supported in a safe space.
               </p>
               <ul className="space-y-3">
                 {[

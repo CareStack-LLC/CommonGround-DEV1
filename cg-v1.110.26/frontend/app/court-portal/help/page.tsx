@@ -344,10 +344,10 @@ export default function CourtHelpPage() {
               <div>
                 <div className="font-medium">Email Support</div>
                 <a
-                  href="mailto:court-support@commonground.app"
+                  href="mailto:court-support@find-commonground.com"
                   className="text-sm text-indigo-600 hover:underline"
                 >
-                  court-support@commonground.app
+                  court-support@find-commonground.com
                 </a>
               </div>
             </div>

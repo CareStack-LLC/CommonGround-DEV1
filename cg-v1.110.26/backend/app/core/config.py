@@ -93,7 +93,7 @@ class Settings(BaseSettings):
     # Email
     EMAIL_ENABLED: bool = False
     SENDGRID_API_KEY: Optional[str] = None
-    FROM_EMAIL: str = "noreply@commonground.family"
+    FROM_EMAIL: str = "noreply@find-commonground.com"
     FROM_NAME: str = "CommonGround"
 
     # Monitoring
@@ -112,7 +112,7 @@ class Settings(BaseSettings):
     # Web Push (VAPID)
     VAPID_PUBLIC_KEY: Optional[str] = None
     VAPID_PRIVATE_KEY: Optional[str] = None
-    VAPID_SUBJECT: str = "mailto:support@commonground.family"
+    VAPID_SUBJECT: str = "mailto:support@find-commonground.com"
 
     @property
     def is_production(self) -> bool:

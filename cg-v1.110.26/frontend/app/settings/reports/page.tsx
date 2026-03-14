@@ -713,10 +713,10 @@ export default function ReportsSettingsPage() {
           <p className="text-xs">
             Questions? Contact us at{' '}
             <a
-              href="mailto:reports@commonground.app"
+              href="mailto:reports@find-commonground.com"
               className="text-[var(--portal-primary)] hover:underline font-bold"
             >
-              reports@commonground.app
+              reports@find-commonground.com
             </a>
           </p>
         </CardContent>

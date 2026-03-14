@@ -15,7 +15,7 @@ export default function PricingPage() {
       name: 'Web Starter',
       code: 'web_starter',
       tagline: 'For getting started',
-      whoFor: 'Parents testing the waters',
+      whoFor: 'Parents ready for a calmer path',
       monthly: 0,
       annual: 0,
       features: [
@@ -49,8 +49,8 @@ export default function PricingPage() {
     {
       name: 'Complete',
       code: 'complete',
-      tagline: 'For families & court',
-      whoFor: 'Parents heading to court',
+      tagline: 'For complete family peace',
+      whoFor: 'Parents who want full protection and clarity',
       monthly: 34.99,
       annual: 349.99,
       features: [
@@ -237,6 +237,25 @@ export default function PricingPage() {
           <p className="text-center text-sm text-gray-500 mt-8">
             All paid plans include a 14-day free trial. Cancel anytime.
           </p>
+
+          {/* Professional Pricing */}
+          <div className="mt-12 bg-gradient-to-br from-[#1E3A4A]/5 to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10 text-center">
+            <h3
+              className="text-2xl font-serif text-[#1E3A4A] mb-3"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+            >
+              For Family Law Professionals
+            </h3>
+            <p className="text-gray-600 mb-4 max-w-xl mx-auto">
+              Custom pricing for attorneys, mediators, and law firms. Includes the Professional Portal, court-ready exports, and firm directory listing.
+            </p>
+            <button
+              onClick={() => router.push('/lawyers')}
+              className="px-6 py-3 bg-[var(--portal-primary)] text-white rounded-xl font-medium hover:bg-[#2D6A8F] transition-all duration-200 shadow-md hover:shadow-lg"
+            >
+              Schedule a Demo
+            </button>
+          </div>
         </div>
       </section>
 

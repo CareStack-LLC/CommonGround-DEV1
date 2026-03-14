@@ -49,7 +49,7 @@ const steps = [
     number: '04',
     icon: MessageSquare,
     title: 'Communicate through ARIA',
-    description: 'AI promotes clarity before tension builds. Send messages you won\'t regret.',
+    description: 'AI supports clarity and calm in every message. Communicate with confidence.',
     color: 'from-[#F5A623]/10 to-[#F5A623]/5',
     iconColor: 'text-[#F5A623]',
   },
@@ -79,13 +79,13 @@ export default function HowItWorksPage() {
             className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            From chaos to
+            From setup to
             <br />
-            <span className="text-[#F5A623]">calm in 5 steps</span>
+            <span className="text-[#F5A623]">family peace in 5 steps</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            No therapists. No mediators. Just a system that
-            <span className="font-medium text-[var(--portal-primary)]"> handles the hard parts for you.</span>
+            Secure, structured, and simple. A system that
+            <span className="font-medium text-[var(--portal-primary)]"> handles coordination so you can focus on your children.</span>
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
@@ -162,8 +162,8 @@ export default function HowItWorksPage() {
             Ready to find common ground?
           </h2>
           <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-            Most parents see results in the first week.
-            The ones who don't? They weren't ready yet.
+            Most parents see calmer communication in the first week.
+            Join thousands of families who found a better way forward.
           </p>
           <Link
             href="/register"
