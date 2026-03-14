@@ -131,8 +131,28 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
-    return {"status": "healthy"}
+    """
+    Health check endpoint for monitoring (UptimeRobot, Render, etc.).
+
+    Checks database connectivity and returns service status.
+    """
+    from app.core.database import get_db_engine
+
+    checks = {"api": "healthy"}
+
+    # Check database connectivity
+    try:
+        from sqlalchemy import text as sa_text
+        from app.core.database import engine
+        async with engine.connect() as conn:
+            await conn.execute(sa_text("SELECT 1"))
+        checks["database"] = "healthy"
+    except Exception:
+        checks["database"] = "unhealthy"
+
+    overall = "healthy" if all(v == "healthy" for v in checks.values()) else "degraded"
+
+    return {"status": overall, "checks": checks}
 
 
 @app.get("/debug/cors")

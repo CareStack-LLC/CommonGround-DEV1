@@ -38,6 +38,12 @@ class User(Base, UUIDMixin, TimestampMixin):
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
+    # Admin access (SuperAdmin Portal)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
+    admin_role: Mapped[Optional[str]] = mapped_column(
+        String(30), nullable=True
+    )  # super_admin, ops_lead, csm, support_agent
+
     # MFA
     mfa_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
 

@@ -135,35 +135,30 @@ async def generate_parent_report(
 @router.get(
     "/types",
     summary="Get available report types",
-    description="Get information about available report types and their descriptions.",
+    description="Get parent report types with GTM spec codes (P-1 through P-7).",
 )
 async def get_report_types() -> dict:
-    """Get available report types with descriptions."""
+    """
+    Get available parent report types with descriptions.
+
+    Returns both the internal type ID (for API calls) and the GTM spec
+    code (P-1 through P-7) for reference.
+    """
+    from app.services.reports.report_registry import get_parent_reports
+
     return {
         "report_types": [
             {
-                "id": "custody_time",
-                "name": "Custody Time Report",
-                "description": "Parenting time split, actual vs agreed comparison, and exchange compliance",
-                "available": True,
-            },
-            {
-                "id": "communication",
-                "name": "Communication Summary",
-                "description": "Message patterns, ARIA interventions, and response time analysis",
-                "available": True,
-            },
-            {
-                "id": "expense",
-                "name": "Expense Summary",
-                "description": "ClearFund obligations, payment history, and financial compliance",
-                "available": True,
-            },
-            {
-                "id": "schedule",
-                "name": "Schedule History",
-                "description": "Exchange records with GPS verification and event history",
-                "available": True,
-            },
+                "id": report["internal_type"],
+                "code": report["code"],
+                "name": report["name"],
+                "description": report["description"],
+                "tier_required": report["tier_required"],
+                "sha256_verified": report["sha256_verified"],
+                "court_ready": report["court_ready"],
+                "available": report["available"],
+                "paid": report.get("paid", False),
+            }
+            for report in get_parent_reports()
         ]
     }
