@@ -1,257 +1,250 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  UserCheck,
-  UserX,
-  ExternalLink,
-  Filter,
-} from "lucide-react";
-import { adminAPI, AdminUser, UserSearchResult } from "@/lib/admin-api";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+  Users, Search, ChevronLeft, ChevronRight, Shield,
+  Filter, ArrowUpDown, UserCheck, UserX, Eye,
+} from 'lucide-react';
+import { adminAPI, type AdminUser, type UserSearchResult } from '@/lib/admin-api';
 
-const TIERS = ["all", "starter", "plus", "family_plus", "solo", "small_firm", "mid_size"];
+const TIERS = [
+  { value: '', label: 'All tiers' },
+  { value: 'essential', label: 'Essential' },
+  { value: 'starter', label: 'Starter' },
+  { value: 'plus', label: 'Plus' },
+  { value: 'family_plus', label: 'Family Plus' },
+  { value: 'solo', label: 'Solo' },
+  { value: 'small_firm', label: 'Small Firm' },
+  { value: 'mid_size', label: 'Mid Size' },
+];
+
+const TIER_COLORS: Record<string, string> = {
+  essential: 'bg-zinc-700/50 text-zinc-400',
+  starter: 'bg-zinc-700/50 text-zinc-300',
+  plus: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
+  family_plus: 'bg-violet-500/15 text-violet-400 border border-violet-500/20',
+  solo: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
+  small_firm: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
+  mid_size: 'bg-rose-500/15 text-rose-400 border border-rose-500/20',
+};
+
 const PAGE_SIZE = 25;
 
-export default function SuperAdminUsers() {
-  const [result, setResult] = useState<UserSearchResult | null>(null);
-  const [query, setQuery] = useState("");
-  const [tier, setTier] = useState("all");
-  const [activeFilter, setActiveFilter] = useState<string>("all");
-  const [offset, setOffset] = useState(0);
+function timeAgo(dateStr: string | null): string {
+  if (!dateStr) return 'Never';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'now';
+  if (mins < 60) return `${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h`;
+  const days = Math.floor(hrs / 24);
+  if (days < 30) return `${days}d`;
+  return `${Math.floor(days / 30)}mo`;
+}
+
+export default function UsersPage() {
+  const router = useRouter();
+  const [data, setData] = useState<UserSearchResult | null>(null);
   const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
+  const [tier, setTier] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [page, setPage] = useState(0);
 
   const fetchUsers = useCallback(async () => {
-    setLoading(true);
     try {
-      const params: any = { limit: PAGE_SIZE, offset };
-      if (query) params.q = query;
-      if (tier !== "all") params.tier = tier;
-      if (activeFilter === "active") params.is_active = true;
-      if (activeFilter === "inactive") params.is_active = false;
-      const data = await adminAPI.searchUsers(params);
-      setResult(data);
+      setLoading(true);
+      const result = await adminAPI.searchUsers({
+        q: query || undefined,
+        tier: tier || undefined,
+        is_active: statusFilter === 'all' ? undefined : statusFilter === 'active',
+        limit: PAGE_SIZE,
+        offset: page * PAGE_SIZE,
+        sort_by: sortBy,
+        sort_order: sortOrder,
+      });
+      setData(result);
     } catch (err) {
-      console.error("Failed to load users:", err);
+      console.error('Failed to load users:', err);
     } finally {
       setLoading(false);
     }
-  }, [query, tier, activeFilter, offset]);
+  }, [query, tier, statusFilter, page, sortBy, sortOrder]);
 
   useEffect(() => {
-    fetchUsers();
+    const timer = setTimeout(fetchUsers, 300);
+    return () => clearTimeout(timer);
   }, [fetchUsers]);
 
-  // Debounced search
-  const [searchInput, setSearchInput] = useState("");
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setQuery(searchInput);
-      setOffset(0);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
+  useEffect(() => { setPage(0); }, [query, tier, statusFilter, sortBy, sortOrder]);
 
-  const totalPages = result ? Math.ceil(result.total / PAGE_SIZE) : 0;
-  const currentPage = Math.floor(offset / PAGE_SIZE) + 1;
+  const totalPages = data ? Math.ceil(data.total / PAGE_SIZE) : 0;
+
+  const toggleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('desc');
+    }
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold text-white">User Management</h1>
-        <p className="text-sm text-zinc-500 mt-1">
-          {result ? `${result.total} total users` : "Loading..."}
-        </p>
+        <h1 className="text-xl font-bold text-white">User Management</h1>
+        <p className="text-sm text-zinc-500 mt-0.5">{data ? `${data.total.toLocaleString()} total users` : 'Loading...'}</p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
           <input
             type="text"
             placeholder="Search by name or email..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-[#1a1b26] border border-zinc-800 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-colors"
           />
         </div>
-        <select
-          value={tier}
-          onChange={(e) => { setTier(e.target.value); setOffset(0); }}
-          className="px-3 py-2 bg-[#1a1b26] border border-zinc-800 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50"
-        >
-          {TIERS.map((t) => (
-            <option key={t} value={t}>
-              {t === "all" ? "All Tiers" : t.replace(/_/g, " ")}
-            </option>
-          ))}
-        </select>
-        <select
-          value={activeFilter}
-          onChange={(e) => { setActiveFilter(e.target.value); setOffset(0); }}
-          className="px-3 py-2 bg-[#1a1b26] border border-zinc-800 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50"
-        >
-          <option value="all">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
+        <div className="flex gap-2">
+          <select
+            value={tier}
+            onChange={(e) => setTier(e.target.value)}
+            className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+          >
+            {TIERS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+          </select>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+          >
+            <option value="all">All status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
       </div>
 
       {/* Table */}
-      <div className="bg-[#1a1b26] rounded-xl border border-zinc-800 overflow-hidden">
+      <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-zinc-800">
+              <tr className="border-b border-zinc-800/80">
                 <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                  User
+                  <button onClick={() => toggleSort('first_name')} className="flex items-center gap-1 hover:text-zinc-300 transition-colors">
+                    User <ArrowUpDown className="w-3 h-3" />
+                  </button>
+                </th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Tier</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden lg:table-cell">
+                  <button onClick={() => toggleSort('created_at')} className="flex items-center gap-1 hover:text-zinc-300 transition-colors">
+                    Joined <ArrowUpDown className="w-3 h-3" />
+                  </button>
                 </th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden md:table-cell">
-                  Tier
+                  <button onClick={() => toggleSort('last_active')} className="flex items-center gap-1 hover:text-zinc-300 transition-colors">
+                    Last Active <ArrowUpDown className="w-3 h-3" />
+                  </button>
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden lg:table-cell">
-                  Last Active
-                </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Status</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider w-16" />
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-800/50">
+            <tbody className="divide-y divide-zinc-800/40">
               {loading ? (
-                [...Array(5)].map((_, i) => (
+                Array.from({ length: 10 }).map((_, i) => (
                   <tr key={i}>
-                    <td className="px-4 py-3" colSpan={5}>
-                      <div className="h-4 bg-zinc-800 rounded w-64 animate-pulse" />
-                    </td>
+                    <td colSpan={6} className="px-4 py-3"><div className="animate-pulse bg-zinc-800/60 rounded h-8" /></td>
                   </tr>
                 ))
-              ) : result?.users.length === 0 ? (
+              ) : data?.users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-zinc-500">
-                    No users found matching your filters.
+                  <td colSpan={6} className="px-4 py-12 text-center text-zinc-500">No users found matching your criteria.</td>
+                </tr>
+              ) : data?.users.map((user) => (
+                <tr
+                  key={user.id}
+                  onClick={() => router.push(`/superadmin/users/${user.id}`)}
+                  className="hover:bg-zinc-800/30 cursor-pointer transition-colors"
+                >
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-medium text-zinc-400">
+                        {user.first_name?.[0]}{user.last_name?.[0]}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-zinc-200 font-medium truncate flex items-center gap-1.5">
+                          {user.first_name} {user.last_name}
+                          {user.is_admin && <Shield className="w-3 h-3 text-violet-400" />}
+                        </div>
+                        <div className="text-xs text-zinc-500 truncate">{user.email}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${TIER_COLORS[user.subscription_tier || ''] || 'bg-zinc-800 text-zinc-500'}`}>
+                      {(user.subscription_tier || 'unknown').replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 hidden lg:table-cell text-zinc-500 text-xs">
+                    {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '—'}
+                  </td>
+                  <td className="px-4 py-3 hidden md:table-cell text-zinc-500 text-xs">
+                    {timeAgo(user.last_active)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                      user.is_active
+                        ? 'bg-emerald-500/15 text-emerald-400'
+                        : 'bg-red-500/15 text-red-400'
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${user.is_active ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                      {user.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Eye className="w-4 h-4 text-zinc-600 hover:text-zinc-300 inline-block" />
                   </td>
                 </tr>
-              ) : (
-                result?.users.map((user) => (
-                  <UserRow key={user.id} user={user} onRefresh={fetchUsers} />
-                ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800">
+        {data && data.total > PAGE_SIZE && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800/60">
             <span className="text-xs text-zinc-500">
-              Page {currentPage} of {totalPages}
+              Showing {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, data.total)} of {data.total}
             </span>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
-                disabled={offset === 0}
-                className="text-zinc-400 hover:text-white disabled:opacity-30"
+            <div className="flex items-center gap-1">
+              <button
+                disabled={page === 0}
+                onClick={() => setPage(page - 1)}
+                className="p-1.5 rounded-lg hover:bg-zinc-800/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setOffset(offset + PAGE_SIZE)}
-                disabled={currentPage >= totalPages}
-                className="text-zinc-400 hover:text-white disabled:opacity-30"
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="text-xs text-zinc-400 px-2">{page + 1} / {totalPages}</span>
+              <button
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage(page + 1)}
+                className="p-1.5 rounded-lg hover:bg-zinc-800/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
         )}
       </div>
     </div>
-  );
-}
-
-function UserRow({ user, onRefresh }: { user: AdminUser; onRefresh: () => void }) {
-  const tierColors: Record<string, string> = {
-    starter: "bg-zinc-700/50 text-zinc-300",
-    plus: "bg-blue-500/20 text-blue-300",
-    family_plus: "bg-violet-500/20 text-violet-300",
-    solo: "bg-emerald-500/20 text-emerald-300",
-    small_firm: "bg-amber-500/20 text-amber-300",
-    mid_size: "bg-rose-500/20 text-rose-300",
-  };
-
-  const formatDate = (d: string | null) => {
-    if (!d) return "Never";
-    return new Date(d).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  return (
-    <tr className="hover:bg-zinc-800/30 transition-colors">
-      <td className="px-4 py-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-zinc-200">
-              {user.first_name} {user.last_name}
-            </span>
-            {user.is_admin && (
-              <Badge className="bg-violet-500/20 text-violet-300 border-violet-500/30 text-[10px]">
-                Admin
-              </Badge>
-            )}
-          </div>
-          <span className="text-xs text-zinc-500">{user.email}</span>
-        </div>
-      </td>
-      <td className="px-4 py-3 hidden md:table-cell">
-        <span
-          className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-            tierColors[user.subscription_tier || "starter"] || tierColors.starter
-          }`}
-        >
-          {(user.subscription_tier || "starter").replace(/_/g, " ")}
-        </span>
-      </td>
-      <td className="px-4 py-3 hidden lg:table-cell text-xs text-zinc-400">
-        {formatDate(user.last_active)}
-      </td>
-      <td className="px-4 py-3">
-        {user.is_active ? (
-          <span className="inline-flex items-center gap-1 text-xs text-emerald-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            Active
-          </span>
-        ) : (
-          <span className="inline-flex items-center gap-1 text-xs text-red-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-            Inactive
-          </span>
-        )}
-      </td>
-      <td className="px-4 py-3 text-right">
-        <Link
-          href={`/superadmin/users/${user.id}`}
-          className="inline-flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 transition-colors"
-        >
-          View <ExternalLink className="h-3 w-3" />
-        </Link>
-      </td>
-    </tr>
   );
 }

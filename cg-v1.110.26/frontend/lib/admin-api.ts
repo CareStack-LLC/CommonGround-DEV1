@@ -38,10 +38,13 @@ async function adminFetch<T>(endpoint: string, options: RequestInit = {}): Promi
 // --- Types ---
 
 export interface DashboardData {
-  users: { total: number; active_30d: number; new_7d: number };
+  users: { total: number; active_30d: number; active_today: number; new_7d: number; new_24h: number };
   family_files: { active: number };
   professionals: { total: number };
-  subscriptions: { tier_breakdown: Record<string, number>; estimated_mrr: number };
+  subscriptions: { tier_breakdown: Record<string, number>; estimated_mrr: number; past_due_count: number };
+  engagement: { messages_7d: number; aria_interventions_7d: number };
+  recent_signups: { id: string; name: string; created_at: string | null }[];
+  recent_admin_actions: { id: string; action: string; user_email: string; description: string | null; created_at: string | null }[];
   generated_at: string;
 }
 
@@ -76,10 +79,34 @@ export interface AdminUserDetail {
   profile: {
     subscription_tier: string;
     subscription_status: string;
+    subscription_ends_at: string | null;
+    subscription_period_start: string | null;
+    subscription_period_end: string | null;
     stripe_customer_id: string | null;
     stripe_subscription_id: string | null;
+    timezone: string | null;
+    state: string | null;
   } | null;
   family_file_count: number;
+  stats: {
+    messages_sent: number;
+    aria_interventions: number;
+    family_files: number;
+  };
+  family_files: {
+    id: string;
+    file_number: string;
+    title: string;
+    status: string;
+    created_at: string | null;
+  }[];
+  recent_activity: {
+    id: string;
+    action: string;
+    description: string | null;
+    created_at: string | null;
+    status: string;
+  }[];
 }
 
 export interface UserSearchResult {
@@ -93,16 +120,23 @@ export interface BillingOverview {
   consumer_subscriptions: Record<string, { total: number; statuses: Record<string, number> }>;
   professional_subscriptions: Record<string, number>;
   past_due_count: number;
+  trial_count: number;
+  cancelled_30d: number;
+  new_paid_30d: number;
+  mrr_by_tier: Record<string, { count: number; price: number; mrr: number }>;
+  total_mrr: number;
   note: string;
 }
 
 export interface AuditLogEntry {
   id: string;
   user_id: string;
+  user_email: string | null;
   action: string;
   resource_type: string;
   resource_id: string | null;
   description: string | null;
+  ip_address: string | null;
   created_at: string | null;
 }
 
@@ -119,6 +153,58 @@ export interface GrowthStats {
   total_new_users: number;
 }
 
+export interface EngagementStats {
+  period_days: number;
+  daily_messages: { date: string; count: number }[];
+  daily_aria_interventions: { date: string; count: number }[];
+  totals: {
+    messages: number;
+    aria_interventions: number;
+    aria_acceptance_rate: number;
+    new_family_files: number;
+    new_agreements: number;
+  };
+}
+
+export interface ReportRequest {
+  id: string;
+  action: string;
+  user_email: string | null;
+  description: string | null;
+  status: string;
+  created_at: string | null;
+  metadata: Record<string, unknown> | null;
+}
+
+export interface ReportListResult {
+  reports: ReportRequest[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface ReportCreateResult {
+  id: string;
+  report_type: string;
+  status: string;
+  requested_at: string;
+  requested_by: string;
+  message: string;
+}
+
+export interface PlatformHealth {
+  status: 'healthy' | 'degraded' | 'critical';
+  active_sessions: number;
+  errors_24h: number;
+  suspicious_24h: number;
+  database: {
+    users: number;
+    profiles: number;
+    audit_logs: number;
+  };
+  checked_at: string;
+}
+
 // --- API calls ---
 
 export const adminAPI = {
@@ -130,6 +216,8 @@ export const adminAPI = {
     is_active?: boolean;
     limit?: number;
     offset?: number;
+    sort_by?: string;
+    sort_order?: string;
   }) => {
     const searchParams = new URLSearchParams();
     if (params.q) searchParams.set('q', params.q);
@@ -137,6 +225,8 @@ export const adminAPI = {
     if (params.is_active !== undefined) searchParams.set('is_active', String(params.is_active));
     if (params.limit) searchParams.set('limit', String(params.limit));
     if (params.offset) searchParams.set('offset', String(params.offset));
+    if (params.sort_by) searchParams.set('sort_by', params.sort_by);
+    if (params.sort_order) searchParams.set('sort_order', params.sort_order);
     return adminFetch<UserSearchResult>(`/admin/users?${searchParams}`);
   },
 
@@ -151,9 +241,10 @@ export const adminAPI = {
 
   getBillingOverview: () => adminFetch<BillingOverview>('/admin/billing/overview'),
 
-  getAuditLog: (params: { action?: string; limit?: number; offset?: number }) => {
+  getAuditLog: (params: { action?: string; admin_email?: string; limit?: number; offset?: number }) => {
     const searchParams = new URLSearchParams();
     if (params.action) searchParams.set('action', params.action);
+    if (params.admin_email) searchParams.set('admin_email', params.admin_email);
     if (params.limit) searchParams.set('limit', String(params.limit));
     if (params.offset) searchParams.set('offset', String(params.offset));
     return adminFetch<AuditLogResult>(`/admin/audit-log?${searchParams}`);
@@ -161,4 +252,25 @@ export const adminAPI = {
 
   getGrowthStats: (days: number = 30) =>
     adminFetch<GrowthStats>(`/admin/stats/growth?days=${days}`),
+
+  getEngagementStats: (days: number = 30) =>
+    adminFetch<EngagementStats>(`/admin/stats/engagement?days=${days}`),
+
+  getReports: (params: { status?: string; limit?: number; offset?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params.status) searchParams.set('status_filter', params.status);
+    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.offset) searchParams.set('offset', String(params.offset));
+    return adminFetch<ReportListResult>(`/admin/reports?${searchParams}`);
+  },
+
+  createReport: (reportType: string, dateRangeDays: number = 30, notes?: string) => {
+    const searchParams = new URLSearchParams();
+    searchParams.set('report_type', reportType);
+    searchParams.set('date_range_days', String(dateRangeDays));
+    if (notes) searchParams.set('notes', notes);
+    return adminFetch<ReportCreateResult>(`/admin/reports/request?${searchParams}`, { method: 'POST' });
+  },
+
+  getPlatformHealth: () => adminFetch<PlatformHealth>('/admin/health'),
 };
