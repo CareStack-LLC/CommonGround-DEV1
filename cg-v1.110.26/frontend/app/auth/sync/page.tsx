@@ -72,7 +72,9 @@ function AuthSyncContent() {
 
                 setStatus('Success! Redirecting...');
                 await new Promise(resolve => setTimeout(resolve, 400));
-                router.push(next);
+                // Full page navigation so AuthProvider re-initializes
+                // and picks up the newly-stored tokens from localStorage.
+                window.location.href = next;
 
             } catch (err) {
                 console.error('[auth/sync] error:', err);
@@ -81,7 +83,9 @@ function AuthSyncContent() {
                 // the user. They might already exist or the backend might not be critical.
                 if (!msg.includes('No session')) {
                     console.warn('[auth/sync] Backend sync failed, redirecting anyway:', msg);
-                    router.push(next);
+                    // Full page navigation so AuthProvider re-initializes
+                // and picks up the newly-stored tokens from localStorage.
+                window.location.href = next;
                 } else {
                     setError(msg);
                 }
