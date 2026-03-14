@@ -23,7 +23,7 @@ export default function ParentsLandingPage() {
           <div
             className="absolute -top-[40%] -right-[20%] w-[800px] h-[800px] rounded-full opacity-[0.03]"
             style={{
-              background: 'radial-gradient(circle, #4A6C58 0%, transparent 70%)',
+              background: 'radial-gradient(circle, #3DAA8A 0%, transparent 70%)',
             }}
           />
         </div>
@@ -32,34 +32,34 @@ export default function ParentsLandingPage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left: Hero content */}
             <div className="space-y-8">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#4A6C58]/5 border border-[#4A6C58]/10">
-                <Sparkles className="w-4 h-4 text-[#4A6C58]" />
-                <span className="text-sm font-medium text-[#4A6C58]">Trusted by 10,000+ families</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#3DAA8A]/5 border border-[#3DAA8A]/10">
+                <Sparkles className="w-4 h-4 text-[#3DAA8A]" />
+                <span className="text-sm font-medium text-[#3DAA8A]">Trusted by 10,000+ families</span>
               </div>
 
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-serif leading-[1.1] text-[#1A1A1A]">
-                Conflict-Free
+                Peaceful
                 <br />
-                <span className="text-[#4A6C58]">Co-Parenting</span>
+                <span className="text-[#3DAA8A]">Co-Parenting</span>
                 <br />
                 Made Simple
               </h1>
 
               <p className="text-xl text-[#4A4A4A] leading-relaxed max-w-xl">
-                Every text doesn't have to be a battle. Document everything, split expenses fairly, and focus on what matters: your kids.
+                Your children deserve stability. Keep communication calm, document everything, split expenses fairly, and protect what matters most: your kids.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link
                   href="/auth/register"
-                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#4A6C58] text-white text-lg font-semibold rounded-xl hover:bg-[#3D5A49] transition-all hover:scale-105 shadow-lg hover:shadow-xl"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#3DAA8A] text-white text-lg font-semibold rounded-xl hover:bg-[#3D5A49] transition-all hover:scale-105 shadow-lg hover:shadow-xl"
                 >
                   Start Your Free Trial
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
                   href="/demo"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#4A6C58] text-lg font-semibold rounded-xl border-2 border-[#4A6C58]/20 hover:border-[#4A6C58] transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#3DAA8A] text-lg font-semibold rounded-xl border-2 border-[#3DAA8A]/20 hover:border-[#3DAA8A] transition-all"
                 >
                   Watch Demo
                 </Link>
@@ -73,19 +73,19 @@ export default function ParentsLandingPage() {
             {/* Right: Stats grid */}
             <div className="grid grid-cols-2 gap-6">
               {[
-                { value: '87%', label: 'Reduction in hostile messages' },
+                { value: '87%', label: 'Calmer conversations reported' },
                 { value: '10K+', label: 'Families using CommonGround' },
                 { value: '99.4%', label: 'On-time exchange rate' },
                 { value: '4.9★', label: 'Average user rating' },
               ].map((stat, i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-2xl p-8 border border-[#E8E5E0] hover:border-[#4A6C58]/30 transition-all hover:shadow-lg"
+                  className="bg-white rounded-2xl p-8 border border-[#E8E5E0] hover:border-[#3DAA8A]/30 transition-all hover:shadow-lg"
                   style={{
                     animationDelay: `${i * 100}ms`,
                   }}
                 >
-                  <div className="text-4xl font-serif font-bold text-[#4A6C58] mb-2">
+                  <div className="text-4xl font-serif font-bold text-[#3DAA8A] mb-2">
                     {stat.value}
                   </div>
                   <div className="text-sm text-[#6A6A6A] leading-snug">
@@ -105,7 +105,7 @@ export default function ParentsLandingPage() {
             <h2 className="text-4xl lg:text-5xl font-serif text-[#1A1A1A] mb-4">
               You Shouldn't Have to Dread
               <br />
-              <span className="text-[#4A6C58]">Every Message</span>
+              <span className="text-[#3DAA8A]">Every Message</span>
             </h2>
             <p className="text-xl text-[#6A6A6A] max-w-2xl mx-auto">
               We built CommonGround to give you peace of mind—not more stress.
@@ -116,15 +116,15 @@ export default function ParentsLandingPage() {
             {[
               {
                 icon: MessageSquare,
-                problem: '"He sends toxic messages constantly"',
-                solution: 'ARIA blocks hostile content before it reaches you',
+                problem: '"Every message feels stressful"',
+                solution: 'ARIA supports calm, child-focused communication',
                 color: '#D4956C',
               },
               {
                 icon: DollarSign,
                 problem: '"I can\'t keep track of who owes what"',
                 solution: 'ClearFund tracks every dollar, automatically',
-                color: '#4A6C58',
+                color: '#3DAA8A',
               },
               {
                 icon: FileCheck,
@@ -155,7 +155,7 @@ export default function ParentsLandingPage() {
                 {/* Arrow */}
                 <div className="flex items-center">
                   <div className="flex-1 h-px bg-gradient-to-r from-[#E8E5E0] to-transparent" />
-                  <ArrowRight className="w-5 h-5 text-[#4A6C58] mx-2" />
+                  <ArrowRight className="w-5 h-5 text-[#3DAA8A] mx-2" />
                   <div className="flex-1 h-px bg-gradient-to-l from-[#E8E5E0] to-transparent" />
                 </div>
 
@@ -181,7 +181,7 @@ export default function ParentsLandingPage() {
             <h2 className="text-4xl lg:text-5xl font-serif text-[#1A1A1A] mb-4">
               Everything You Need
               <br />
-              <span className="text-[#4A6C58]">In One Place</span>
+              <span className="text-[#3DAA8A]">In One Place</span>
             </h2>
           </div>
 
@@ -191,11 +191,11 @@ export default function ParentsLandingPage() {
                 icon: Shield,
                 name: 'ARIA Safe Messaging',
                 benefits: [
-                  'Blocks toxic content automatically',
+                  'Helps keep messages constructive',
                   'Flags messages that could hurt you in court',
                   'Peace of mind with every send',
                 ],
-                color: '#4A6C58',
+                color: '#3DAA8A',
               },
               {
                 icon: DollarSign,
@@ -220,7 +220,7 @@ export default function ParentsLandingPage() {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="bg-white rounded-3xl p-8 border border-[#E8E5E0] hover:border-[#4A6C58]/30 hover:shadow-xl transition-all"
+                className="bg-white rounded-3xl p-8 border border-[#E8E5E0] hover:border-[#3DAA8A]/30 hover:shadow-xl transition-all"
               >
                 {/* Icon */}
                 <div
@@ -239,7 +239,7 @@ export default function ParentsLandingPage() {
                 <ul className="space-y-3">
                   {feature.benefits.map((benefit, j) => (
                     <li key={j} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-[#4A6C58] flex-shrink-0 mt-0.5" />
+                      <Check className="w-5 h-5 text-[#3DAA8A] flex-shrink-0 mt-0.5" />
                       <span className="text-[#4A4A4A] leading-relaxed">{benefit}</span>
                     </li>
                   ))}
@@ -251,7 +251,7 @@ export default function ParentsLandingPage() {
       </section>
 
       {/* Social Proof / Stats Section */}
-      <section className="py-20 lg:py-32 bg-gradient-to-br from-[#4A6C58] to-[#3D5A49] text-white">
+      <section className="py-20 lg:py-32 bg-gradient-to-br from-[#3DAA8A] to-[#3D5A49] text-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-serif mb-4">
@@ -260,13 +260,13 @@ export default function ParentsLandingPage() {
               Finding Peace
             </h2>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              CommonGround is already helping families reduce conflict and focus on their children.
+              CommonGround is already helping families find stability and focus on their children.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { value: '87%', label: 'Less hostile messages', subtext: 'ARIA blocks toxicity' },
+              { value: '87%', label: 'Calmer communication', subtext: 'ARIA supports constructive messaging' },
               { value: '10,000+', label: 'Families protected', subtext: 'Growing every day' },
               { value: '$2.4M', label: 'Expenses tracked', subtext: 'Fair & transparent' },
               { value: '99.4%', label: 'Exchange success rate', subtext: 'GPS verified' },
@@ -297,11 +297,11 @@ export default function ParentsLandingPage() {
               ))}
             </div>
             <blockquote className="text-2xl font-serif text-[#1A1A1A] mb-6 leading-relaxed italic">
-              "I used to dread checking my phone. Now ARIA blocks the toxicity, and I actually feel safe communicating about our daughter. This app saved my sanity."
+              "I used to dread checking my phone. Now ARIA helps keep messages constructive, and I actually feel safe communicating about our daughter. This app gave me peace of mind."
             </blockquote>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#4A6C58]/10 flex items-center justify-center">
-                <Heart className="w-6 h-6 text-[#4A6C58]" />
+              <div className="w-12 h-12 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center">
+                <Heart className="w-6 h-6 text-[#3DAA8A]" />
               </div>
               <div>
                 <div className="font-semibold text-[#1A1A1A]">Sarah M.</div>
@@ -318,22 +318,22 @@ export default function ParentsLandingPage() {
           <h2 className="text-4xl lg:text-6xl font-serif text-[#1A1A1A] mb-6">
             Ready to Reclaim
             <br />
-            <span className="text-[#4A6C58]">Your Peace?</span>
+            <span className="text-[#3DAA8A]">Your Peace?</span>
           </h2>
           <p className="text-xl text-[#6A6A6A] mb-10 max-w-2xl mx-auto">
-            Join 10,000+ parents who chose peace over conflict. Start your 14-day free trial—no credit card required.
+            Join 10,000+ parents who chose a calmer path forward. Start your 14-day free trial—no credit card required.
           </p>
 
           <Link
             href="/auth/register"
-            className="group inline-flex items-center justify-center gap-3 px-12 py-5 bg-[#4A6C58] text-white text-xl font-semibold rounded-2xl hover:bg-[#3D5A49] transition-all hover:scale-105 shadow-2xl hover:shadow-3xl"
+            className="group inline-flex items-center justify-center gap-3 px-12 py-5 bg-[#3DAA8A] text-white text-xl font-semibold rounded-2xl hover:bg-[#3D5A49] transition-all hover:scale-105 shadow-2xl hover:shadow-3xl"
           >
             Start Your Free Trial
             <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </Link>
 
           <p className="mt-6 text-sm text-[#6A6A6A]">
-            Questions? <Link href="/help/contact" className="text-[#4A6C58] hover:underline">Contact us</Link> • Takes 2 minutes to set up
+            Questions? <Link href="/help/contact" className="text-[#3DAA8A] hover:underline">Contact us</Link> • Takes 2 minutes to set up
           </p>
         </div>
       </section>

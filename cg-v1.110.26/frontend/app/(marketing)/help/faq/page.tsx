@@ -18,7 +18,7 @@ const faqCategories = [
     faqs: [
       {
         question: 'What is CommonGround?',
-        answer: 'CommonGround is a co-parenting platform that helps separated parents communicate effectively, manage custody schedules, track expenses, and create agreements. Our AI assistant ARIA helps reduce conflict by suggesting calmer ways to communicate.',
+        answer: 'CommonGround is a co-parenting platform that helps separated parents communicate effectively, manage custody schedules, track expenses, and create agreements. Our AI assistant ARIA supports peaceful communication by suggesting calmer ways to express yourself.',
       },
       {
         question: 'How do I get started?',
@@ -41,7 +41,7 @@ const faqCategories = [
     faqs: [
       {
         question: 'What is ARIA?',
-        answer: 'ARIA (AI Relationship Intelligence Assistant) analyzes messages before they\'re sent. If ARIA detects language that might cause conflict, it suggests calmer alternatives while preserving your intended meaning.',
+        answer: 'ARIA (AI Relationship Intelligence Assistant) analyzes messages before they\'re sent. If ARIA detects language that could be misread or escalate tension, it suggests calmer alternatives while preserving your intended meaning.',
       },
       {
         question: 'Does ARIA read all my messages?',
@@ -80,7 +80,7 @@ const faqCategories = [
       },
       {
         question: 'Do you offer hardship pricing?',
-        answer: 'Yes. We believe every family deserves access to better co-parenting tools. Contact support@commonground.app to discuss hardship options.',
+        answer: 'Yes. We believe every family deserves access to better co-parenting tools. Contact support@find-commonground.com to discuss hardship options.',
       },
     ],
   },
@@ -114,7 +114,7 @@ const faqCategories = [
       },
       {
         question: 'Can I upload receipts?',
-        answer: 'Yes. Attach photos or PDFs of receipts to any expense. This documentation helps with court records and prevents disputes.',
+        answer: 'Yes. Attach photos or PDFs of receipts to any expense. This documentation helps with court records and keeps finances clear for everyone.',
       },
       {
         question: 'How are expenses split?',
@@ -183,15 +183,15 @@ export default function FAQPage() {
   const currentCategory = faqCategories.find(c => c.id === activeCategory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-12 sm:pt-32 sm:pb-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#2C3E50] mb-4 leading-[1.1]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#1E3A4A] mb-4 leading-[1.1]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Frequently Asked <span className="text-[#D97757]">Questions</span>
+            Frequently Asked <span className="text-[#F5A623]">Questions</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
             Find quick answers to common questions about CommonGround.
@@ -200,7 +200,7 @@ export default function FAQPage() {
       </section>
 
       {/* Category Navigation */}
-      <section className="pb-8 sticky top-16 bg-gradient-to-b from-[#FFF8F3] to-transparent z-40 pt-4">
+      <section className="pb-8 sticky top-16 bg-gradient-to-b from-[#F4F8F7] to-transparent z-40 pt-4">
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex flex-wrap justify-center gap-2">
             {faqCategories.map((category) => {
@@ -240,8 +240,8 @@ export default function FAQPage() {
                   );
                 })()}
                 <h2
-                  className="text-2xl font-serif text-[#2C3E50]"
-                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  className="text-2xl font-serif text-[#1E3A4A]"
+                  style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   {currentCategory.title}
                 </h2>
@@ -260,7 +260,7 @@ export default function FAQPage() {
                         onClick={() => toggleQuestion(questionId)}
                         className="w-full flex items-center justify-between p-6 text-left"
                       >
-                        <span className="font-medium text-[#2C3E50] pr-4">{faq.question}</span>
+                        <span className="font-medium text-[#1E3A4A] pr-4">{faq.question}</span>
                         <ChevronDown
                           className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${
                             isOpen ? 'rotate-180' : ''
@@ -282,12 +282,12 @@ export default function FAQPage() {
       </section>
 
       {/* Still Have Questions */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <MessageSquare className="w-12 h-12 mx-auto mb-6 text-[#D97757]" />
+          <MessageSquare className="w-12 h-12 mx-auto mb-6 text-[#F5A623]" />
           <h2
             className="text-3xl sm:text-4xl font-serif mb-4"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Still have questions?
           </h2>
@@ -297,7 +297,7 @@ export default function FAQPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/help/contact"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[#D97757] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all group"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[#F5A623] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all group"
             >
               Contact Support
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

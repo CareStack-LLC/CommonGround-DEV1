@@ -5,6 +5,7 @@ Main API router - combines all endpoint routers.
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    admin,
     auth,
     users,
     partners,
@@ -51,6 +52,9 @@ from app.api.v1.endpoints import (
     recording_audit,
     analytics,
     smart_analytics,
+    invitations,
+    sendgrid_webhooks,
+    marketing,
 )
 
 api_router = APIRouter()
@@ -166,3 +170,15 @@ api_router.include_router(smart_analytics.router, prefix="/analytics", tags=["Sm
 
 # Partner Program - Nonprofit grant partnerships
 api_router.include_router(partners.router, prefix="/partners", tags=["Partner Program"])
+
+# Invitations - Case invitation flow with magic link auth
+api_router.include_router(invitations.router, prefix="/invitations", tags=["Invitations"])
+
+# SendGrid Webhooks - Email delivery tracking
+api_router.include_router(sendgrid_webhooks.router, prefix="/webhooks", tags=["SendGrid Webhooks"])
+
+# Marketing - Newsletter and contact form
+api_router.include_router(marketing.router, prefix="/marketing", tags=["Marketing"])
+
+# SuperAdmin Portal - Platform administration
+api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])

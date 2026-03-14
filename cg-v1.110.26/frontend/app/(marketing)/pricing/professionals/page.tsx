@@ -183,10 +183,6 @@ export default function ProfessionalPricingPage() {
               <Link href="/pricing" className="text-cg-sage hover:underline">
                 See individual plans
               </Link>
-              {' · '}
-              <Link href="/pricing/courts" className="text-cg-sage hover:underline">
-                Court pricing
-              </Link>
             </p>
           </div>
         </div>

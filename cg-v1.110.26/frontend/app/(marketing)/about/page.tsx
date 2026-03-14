@@ -4,47 +4,47 @@ import { ArrowRight, Heart, Shield, Users, CheckCircle, MessageSquare, Calendar 
 
 export const metadata: Metadata = {
   title: 'About Us | CommonGround',
-  description: 'CommonGround exists to help families find peace when communication has broken down. Technology built for when co-parenting is hard.',
+  description: 'CommonGround helps families find peace and stability through structured co-parenting tools. Technology built to put children first.',
 };
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#E8F4F8]">
       {/* Hero - Mission Statement */}
       <section className="relative overflow-hidden">
         {/* Subtle decorative elements */}
         <div className="absolute inset-0 opacity-[0.03]">
-          <div className="absolute top-20 left-0 w-full h-px bg-[#D97757]" />
+          <div className="absolute top-20 left-0 w-full h-px bg-[#F5A623]" />
           <div className="absolute top-40 right-0 w-2/3 h-px bg-[var(--portal-primary)]" />
-          <div className="absolute bottom-40 left-0 w-1/2 h-px bg-[#D97757]" />
+          <div className="absolute bottom-40 left-0 w-1/2 h-px bg-[#F5A623]" />
         </div>
 
         <div className="max-w-5xl mx-auto px-6 py-16 sm:py-24 relative">
           <div className="max-w-3xl">
             {/* Label */}
             <div className="inline-flex items-center gap-2 mb-6">
-              <div className="h-px w-12 bg-[#D97757]" />
-              <span className="text-sm font-medium text-[#D97757] tracking-wide uppercase">
+              <div className="h-px w-12 bg-[#F5A623]" />
+              <span className="text-sm font-medium text-[#F5A623] tracking-wide uppercase">
                 Our Mission
               </span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#2C3E50] mb-6 leading-[1.1]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-              When communication breaks down,
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#1E3A4A] mb-6 leading-[1.1]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              Every child deserves
               <br />
-              <span className="text-[var(--portal-primary)]">children still need peace</span>
+              <span className="text-[var(--portal-primary)]">a peaceful family</span>
             </h1>
 
             <p className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-8">
-              CommonGround exists to help families navigate co-parenting when talking has become too hard.
-              We believe technology can reduce conflict, protect children, and create space for healing.
+              CommonGround helps families navigate co-parenting with calm and clarity.
+              We believe technology can bring structure, protect children, and create space for families to thrive.
             </p>
 
             {/* Mission statement box */}
-            <div className="border-l-4 border-[var(--portal-primary)] pl-6 py-3 bg-gradient-to-r from-[#F5F9F9] to-transparent">
+            <div className="border-l-4 border-[var(--portal-primary)] pl-6 py-3 bg-gradient-to-r from-[#E8F4F8] to-transparent">
               <p className="text-gray-700 font-medium text-lg">
-                Every child deserves parents who can work together—even when they can't be together.
+                Protecting children through better co-parent communication — supported by parents, attorneys, and family law professionals working together.
               </p>
             </div>
           </div>
@@ -56,26 +56,27 @@ export default function AboutPage() {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="inline-flex items-center gap-2 mb-4">
-              <Heart className="h-5 w-5 text-[#D97757]" />
-              <span className="text-sm font-semibold text-[#D97757] uppercase tracking-wide">
-                The Reality
+              <Heart className="h-5 w-5 text-[#F5A623]" />
+              <span className="text-sm font-semibold text-[#F5A623] uppercase tracking-wide">
+                Why We Exist
               </span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-              Co-parenting apps assume <span className="text-[#D97757]">you're talking</span>
+            <h2 className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              Co-parenting takes <span className="text-[#F5A623]">the right tools</span>
             </h2>
             <div className="space-y-4 text-gray-600 leading-relaxed">
               <p>
-                Most co-parenting tools are designed for parents who are already cooperating.
-                But what about families where communication has become toxic? Where every
-                conversation escalates into conflict?
+                Most co-parenting tools assume parents are already communicating well.
+                But many families need more structure — clear boundaries, automatic scheduling,
+                and support to keep conversations focused on the children.
               </p>
               <p>
-                <strong className="text-gray-700">Millions of children</strong> live in high-conflict
-                custody situations. They hear the arguments. They feel the tension. They blame themselves.
+                <strong className="text-gray-700">Millions of children</strong> are caught in the middle
+                when co-parenting communication breaks down. They feel the stress.
+                They deserve better.
               </p>
               <p className="text-gray-700 font-medium">
-                These families don't need better communication tools. They need space to heal.
+                These families need tools that create calm and structure. That's why we built CommonGround.
               </p>
             </div>
           </div>
@@ -84,27 +85,27 @@ export default function AboutPage() {
             {/* Statistics cards */}
             <div className="space-y-4">
               <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10 shadow-sm">
-                <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   40%
                 </div>
                 <p className="text-sm text-gray-600 font-medium">
                   of marriages end in divorce, impacting millions of children each year
                 </p>
               </div>
-              <div className="bg-white rounded-2xl p-6 border-2 border-[#D97757]/10 shadow-sm">
-                <div className="text-4xl font-bold text-[#D97757] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="bg-white rounded-2xl p-6 border-2 border-[#F5A623]/10 shadow-sm">
+                <div className="text-4xl font-bold text-[#F5A623] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   25-30%
                 </div>
                 <p className="text-sm text-gray-600 font-medium">
-                  of divorces involve high conflict that directly harms children's wellbeing
+                  of separations involve challenges that directly affect children's wellbeing
                 </p>
               </div>
               <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10 shadow-sm">
-                <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <div className="text-4xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   $50B+
                 </div>
                 <p className="text-sm text-gray-600 font-medium">
-                  annual cost of high-conflict custody battles on families and courts
+                  annual cost of difficult custody situations on families and courts
                 </p>
               </div>
             </div>
@@ -113,48 +114,48 @@ export default function AboutPage() {
       </section>
 
       {/* The Solution - How We're Different */}
-      <section className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white py-16 sm:py-20 my-12">
+      <section className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white py-16 sm:py-20 my-12">
         <div className="max-w-5xl mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-4">
-              <Shield className="h-5 w-5 text-[#D97757]" />
-              <span className="text-sm font-semibold text-[#D97757] uppercase tracking-wide">
+              <Shield className="h-5 w-5 text-[#F5A623]" />
+              <span className="text-sm font-semibold text-[#F5A623] uppercase tracking-wide">
                 Our Approach
               </span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-serif mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-              Technology that reduces conflict, <span className="text-[#D97757]">not just manages it</span>
+            <h2 className="text-3xl sm:text-4xl font-serif mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              Technology that creates calm, <span className="text-[#F5A623]">not just manages it</span>
             </h2>
             <p className="text-lg text-white/80">
-              CommonGround is designed for families where communication has broken down.
-              We remove friction, automate the painful parts, and create accountability without escalation.
+              CommonGround is designed to bring structure and peace to co-parenting.
+              We reduce friction, automate coordination, and help families focus on what matters — their children.
             </p>
           </div>
 
           {/* Feature grid */}
           <div className="grid sm:grid-cols-3 gap-6">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <MessageSquare className="h-10 w-10 text-[#D97757] mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Communication Without Conflict</h3>
+              <MessageSquare className="h-10 w-10 text-[#F5A623] mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Clear Communication</h3>
               <p className="text-white/70 text-sm">
-                ARIA AI analyzes messages before they're sent, catching inflammatory language
-                before it causes damage
+                ARIA AI helps keep messages constructive and child-focused,
+                so conversations stay calm and productive
               </p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <Calendar className="h-10 w-10 text-[#D97757] mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Automation Over Argument</h3>
+              <Calendar className="h-10 w-10 text-[#F5A623] mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Effortless Coordination</h3>
               <p className="text-white/70 text-sm">
-                Set schedules once, never negotiate pickups again. Silent handoffs with GPS
-                verification eliminate contact
+                Set schedules once, get automatic reminders. Smooth handoffs with GPS
+                verification give children consistency
               </p>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <CheckCircle className="h-10 w-10 text-[#D97757] mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Accountability & Evidence</h3>
+              <CheckCircle className="h-10 w-10 text-[#F5A623] mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Trusted Documentation</h3>
               <p className="text-white/70 text-sm">
-                Court-ready documentation of every interaction, payment, and exchange.
-                Truth over accusations.
+                Court-ready records of every interaction, payment, and exchange.
+                Clear facts that everyone can rely on
               </p>
             </div>
           </div>
@@ -170,70 +171,70 @@ export default function AboutPage() {
               What We Believe
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Principles that <span className="text-[var(--portal-primary)]">guide everything we build</span>
           </h2>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10">
+          <div className="bg-gradient-to-br from-[#E8F4F8] to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10">
             <div className="flex items-start gap-4">
               <div className="h-10 w-10 rounded-full bg-[var(--portal-primary)] flex items-center justify-center flex-shrink-0">
                 <Heart className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Children First, Always
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Every feature we build asks: "Will this reduce stress on the kids?"
-                  If it doesn't help children feel safer and more secure, we don't build it.
+                  Every feature we build asks: "Will this help children feel safer and more secure?"
+                  If it doesn't serve the children, we don't build it.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#FFF8F3] to-white rounded-2xl p-8 border-2 border-[#D97757]/10">
+          <div className="bg-gradient-to-br from-[#FEF7ED] to-white rounded-2xl p-8 border-2 border-[#F5A623]/10">
             <div className="flex items-start gap-4">
-              <div className="h-10 w-10 rounded-full bg-[#D97757] flex items-center justify-center flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-[#F5A623] flex items-center justify-center flex-shrink-0">
                 <Shield className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                  Safety Through Distance
+                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  Peace Through Structure
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Sometimes the best communication is no communication. We create structured space
-                  between parents when tension is high, protecting everyone involved.
+                  Clear boundaries and consistent routines give families the stability they need.
+                  We create structured space that protects everyone involved.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10">
+          <div className="bg-gradient-to-br from-[#E8F4F8] to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10">
             <div className="flex items-start gap-4">
               <div className="h-10 w-10 rounded-full bg-[var(--portal-primary)] flex items-center justify-center flex-shrink-0">
                 <CheckCircle className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                  Truth Over Drama
+                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  Clarity Over Confusion
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Objective records replace he-said-she-said. GPS verification. Timestamped messages.
-                  Payment receipts. Let the facts speak.
+                  Objective records bring clarity. GPS verification. Timestamped messages.
+                  Payment receipts. Clear facts everyone can rely on.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#FFF8F3] to-white rounded-2xl p-8 border-2 border-[#D97757]/10">
+          <div className="bg-gradient-to-br from-[#FEF7ED] to-white rounded-2xl p-8 border-2 border-[#F5A623]/10">
             <div className="flex items-start gap-4">
-              <div className="h-10 w-10 rounded-full bg-[#D97757] flex items-center justify-center flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-[#F5A623] flex items-center justify-center flex-shrink-0">
                 <Users className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   No Judgment, Just Support
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -247,59 +248,59 @@ export default function AboutPage() {
       </section>
 
       {/* The Impact */}
-      <section className="bg-gradient-to-br from-[#FFF8F3] to-[#FFE8D9] py-16 sm:py-20">
+      <section className="bg-gradient-to-br from-[#FEF7ED] to-[#F5A623]/10 py-16 sm:py-20">
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-4">
-              <Heart className="h-5 w-5 text-[#D97757]" />
-              <span className="text-sm font-semibold text-[#D97757] uppercase tracking-wide">
+              <Heart className="h-5 w-5 text-[#F5A623]" />
+              <span className="text-sm font-semibold text-[#F5A623] uppercase tracking-wide">
                 Making a Difference
               </span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-              Real families finding <span className="text-[#D97757]">real peace</span>
+            <h2 className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              Real families finding <span className="text-[#F5A623]">real peace</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Thousands of families use CommonGround to reduce conflict, improve co-parenting,
-              and give their children the stability they deserve.
+              Thousands of families use CommonGround to bring calm and structure
+              to their co-parenting, giving their children the stability they deserve.
             </p>
           </div>
 
           {/* Impact metrics */}
           <div className="grid sm:grid-cols-3 gap-8 mb-12">
             <div className="text-center">
-              <div className="text-5xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="text-5xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 10K+
               </div>
-              <p className="text-gray-700 font-medium">Families served</p>
+              <p className="text-gray-700 font-medium">Families supported</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-[#D97757] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="text-5xl font-bold text-[#F5A623] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 85%
               </div>
-              <p className="text-gray-700 font-medium">Report reduced conflict</p>
+              <p className="text-gray-700 font-medium">Report calmer co-parenting</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <div className="text-5xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 500K+
               </div>
-              <p className="text-gray-700 font-medium">Messages mediated by ARIA</p>
+              <p className="text-gray-700 font-medium">Messages supported by ARIA</p>
             </div>
           </div>
 
-          {/* Testimonial highlights - anonymous */}
+          {/* Testimonial highlights */}
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-[var(--portal-primary)]/10">
               <p className="text-gray-700 italic mb-4">
-                "For the first time in years, I don't dread opening messages from my ex.
-                ARIA catches the hostile tone before it reaches me. It's like having a buffer."
+                "For the first time in years, I feel calm about co-parenting.
+                ARIA keeps our messages focused on the kids, and the structure makes everything predictable."
               </p>
               <p className="text-sm text-gray-500">— Parent in California</p>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#D97757]/10">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F5A623]/10">
               <p className="text-gray-700 italic mb-4">
-                "The silent handoff changed everything. We don't have to see each other,
-                and my son doesn't have to witness the tension anymore."
+                "The automated scheduling changed everything. Our children know exactly what to expect,
+                and we spend less time coordinating and more time being present."
               </p>
               <p className="text-sm text-gray-500">— Parent in Texas</p>
             </div>
@@ -310,19 +311,19 @@ export default function AboutPage() {
       {/* CTA - Join the Mission */}
       <section className="max-w-4xl mx-auto px-6 py-16 sm:py-20 text-center">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Every family deserves peace.
             <br />
-            <span className="text-[#D97757]">Yours can start today.</span>
+            <span className="text-[#F5A623]">Yours can start today.</span>
           </h2>
           <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-            Join thousands of parents who've found a better way to co-parent.
-            Reduce conflict. Protect your children. Create space to heal.
+            Join thousands of families who've found a calmer way to co-parent.
+            Structure, clarity, and peace for your children.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/register"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-colors shadow-lg hover:shadow-xl group"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D8A70] transition-colors shadow-lg hover:shadow-xl group"
             >
               Start Your Free Trial
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -335,7 +336,13 @@ export default function AboutPage() {
             </Link>
           </div>
           <p className="text-sm text-gray-500 mt-6">
-            No credit card required • Free tier forever • 14-day trial on paid plans
+            No credit card required. Free tier forever. 14-day trial on paid plans.
+          </p>
+          <p className="text-sm text-gray-400 mt-3">
+            Family law professional?{' '}
+            <Link href="/lawyers" className="text-[var(--portal-primary)] hover:underline">
+              Learn about our attorney partnership program
+            </Link>.
           </p>
         </div>
       </section>

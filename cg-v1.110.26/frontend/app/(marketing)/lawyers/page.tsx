@@ -52,7 +52,7 @@ export default function LawyersLandingPage() {
               </h1>
 
               <p className="text-xl text-white/80 leading-relaxed max-w-xl">
-                Stop drowning in case management chaos. CommonGround gives you the tools to run a modern family law practice—automated evidence, client portals, and court-ready exports.
+                Streamline your family law practice with CommonGround. Automated evidence compilation, secure client portals, and court-ready exports — all in one platform.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4">

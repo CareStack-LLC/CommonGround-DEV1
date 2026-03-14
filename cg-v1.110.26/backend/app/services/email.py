@@ -708,6 +708,130 @@ class EmailService:
 
         return await self._send_email(to_email, subject, html_body)
 
+    # ==================== Attorney-Branded Invitation Emails (GTM Fix #1) ====================
+
+    async def send_attorney_case_invitation(
+        self,
+        to_email: str,
+        to_name: str,
+        inviter_name: str,
+        family_file_title: str,
+        magic_link: str,
+        children_names: List[str],
+        attorney_name: Optional[str] = None,
+        attorney_firm: Optional[str] = None,
+        from_name_override: Optional[str] = None,
+        is_resend: bool = False,
+    ) -> Optional[str]:
+        """
+        Send attorney-branded case invitation with magic link.
+
+        Fix #1: Attorney name shows in From field for 70%+ open rates.
+        Fix #2: Magic link for one-tap activation.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            inviter_name: Attorney or parent name
+            family_file_title: Family file title
+            magic_link: One-tap activation URL
+            children_names: Children's names
+            attorney_name: Attorney name for branding
+            attorney_firm: Attorney firm for branding
+            from_name_override: Custom From Name for SendGrid
+            is_resend: Whether this is a follow-up resend
+
+        Returns:
+            SendGrid message ID for tracking, or None
+        """
+        if is_resend:
+            subject = f"Reminder: {inviter_name} is waiting for you on CommonGround"
+        elif attorney_name:
+            subject = f"{attorney_name} has set up CommonGround for your family"
+        else:
+            subject = f"{inviter_name} invited you to CommonGround"
+
+        # Build branded HTML
+        firm_line = f"<p style='color: #64748b; font-size: 14px; margin: 0;'>{attorney_firm}</p>" if attorney_firm else ""
+        children_section = ""
+        if children_names:
+            names = ", ".join(children_names)
+            children_section = f"""
+            <div style="background: #f0f9ff; border-radius: 8px; padding: 16px; margin: 20px 0;">
+                <p style="margin: 0; color: #1e3a4a; font-size: 14px;">
+                    <strong>Children:</strong> {names}
+                </p>
+            </div>
+            """
+
+        resend_note = ""
+        if is_resend:
+            resend_note = """
+            <div style="background: #fef3c7; border-radius: 8px; padding: 12px; margin: 16px 0;">
+                <p style="margin: 0; color: #92400e; font-size: 13px;">
+                    This is a friendly reminder. Your invitation is still waiting.
+                </p>
+            </div>
+            """
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>You're Invited to CommonGround</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8fafc;">
+            <div style="background: linear-gradient(135deg, #1E3A4A 0%, #2D6A8F 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0 0 8px 0; font-family: Georgia, serif; font-size: 24px;">CommonGround</h1>
+                <p style="color: #5BC4A0; margin: 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Co-Parenting, Reimagined</p>
+            </div>
+
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
+                <p style="margin-top: 0; font-size: 16px;">Hi {to_name},</p>
+
+                {resend_note}
+
+                <p><strong>{inviter_name}</strong> has invited you to use CommonGround — a secure platform designed to make co-parenting communication easier, more organized, and focused on what matters most: your children.</p>
+
+                {children_section}
+
+                <p>CommonGround helps you:</p>
+                <ul style="color: #475569; padding-left: 20px;">
+                    <li>Communicate with AI-assisted message guidance</li>
+                    <li>Track schedules and custody exchanges</li>
+                    <li>Manage shared expenses transparently</li>
+                    <li>Build agreements that work for everyone</li>
+                </ul>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{magic_link}" style="display: inline-block; background: linear-gradient(135deg, #3DAA8A, #5BC4A0); color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 8px rgba(61, 170, 138, 0.3);">
+                        Get Started — It's Free
+                    </a>
+                </div>
+
+                <p style="color: #64748b; font-size: 13px; text-align: center;">One tap to activate. No password needed.</p>
+
+                {firm_line}
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
+                    This invitation expires in 7 days. If you have questions, reply to this email or contact support at support@find-commonground.com.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return await self._send_email(
+            to_email,
+            subject,
+            html_body,
+            from_name_override=from_name_override,
+        )
+
     # ==================== Auth Emails ====================
 
     async def send_security_alert(
@@ -809,6 +933,191 @@ class EmailService:
 
         return await self._send_email(to_email, subject, html_body)
 
+    # ==================== Marketing Emails ====================
+
+    async def send_newsletter_welcome(self, to_email: str) -> bool:
+        """
+        Send welcome email to new newsletter subscriber.
+
+        Args:
+            to_email: Subscriber email address
+
+        Returns:
+            Success status
+        """
+        subject = "Welcome to the CommonGround Newsletter!"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Welcome to CommonGround</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8fafc;">
+            <div style="background: linear-gradient(135deg, #1E3A4A 0%, #2D6A8F 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0 0 8px 0; font-family: Georgia, serif; font-size: 24px;">CommonGround</h1>
+                <p style="color: #5BC4A0; margin: 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Co-Parenting, Reimagined</p>
+            </div>
+
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
+                <h2 style="margin-top: 0; color: #1E3A4A;">You're on the list!</h2>
+
+                <p>Thanks for subscribing to the CommonGround newsletter. We're glad to have you.</p>
+
+                <p>Here's what you can expect:</p>
+                <ul style="color: #475569; padding-left: 20px;">
+                    <li>Co-parenting tips and insights</li>
+                    <li>Platform updates and new features</li>
+                    <li>Resources for healthier family communication</li>
+                    <li>Stories from the CommonGround community</li>
+                </ul>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{self.frontend_url}" style="display: inline-block; background: linear-gradient(135deg, #3DAA8A, #5BC4A0); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                        Visit CommonGround
+                    </a>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
+                    You received this email because you subscribed to the CommonGround newsletter.
+                    If you no longer wish to receive these emails, you can unsubscribe at any time.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_contact_form_notification(
+        self,
+        name: str,
+        email: str,
+        inquiry_type: str,
+        subject: Optional[str],
+        message: str,
+        internal_email: str,
+    ) -> bool:
+        """
+        Send contact form contents to the appropriate internal team email.
+
+        Args:
+            name: Submitter's name
+            email: Submitter's email
+            inquiry_type: Type of inquiry
+            subject: Optional subject line
+            message: Message body
+            internal_email: Internal email address to route to
+
+        Returns:
+            Success status
+        """
+        email_subject = f"Contact Form: {subject or inquiry_type.capitalize() + ' Inquiry'} from {name}"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>New Contact Form Submission</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: #1E3A4A; padding: 20px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 20px;">New Contact Form Submission</h1>
+            </div>
+
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr>
+                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9; width: 120px;">Name</td>
+                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;">{name}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9;">Email</td>
+                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;"><a href="mailto:{email}">{email}</a></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9;">Type</td>
+                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;">{inquiry_type.capitalize()}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9;">Subject</td>
+                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;">{subject or 'N/A'}</td>
+                    </tr>
+                </table>
+
+                <h3 style="color: #1E3A4A; margin-bottom: 8px;">Message</h3>
+                <div style="background: #f8fafc; border-radius: 8px; padding: 16px; white-space: pre-wrap;">{message}</div>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
+                    This message was submitted via the CommonGround contact form.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return await self._send_email(internal_email, email_subject, html_body)
+
+    async def send_contact_form_confirmation(self, to_email: str, name: str) -> bool:
+        """
+        Send confirmation email to contact form submitter.
+
+        Args:
+            to_email: Submitter's email
+            name: Submitter's name
+
+        Returns:
+            Success status
+        """
+        subject = "We received your message — CommonGround"
+
+        html_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Message Received</title>
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8fafc;">
+            <div style="background: linear-gradient(135deg, #1E3A4A 0%, #2D6A8F 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+                <h1 style="color: white; margin: 0 0 8px 0; font-family: Georgia, serif; font-size: 24px;">CommonGround</h1>
+                <p style="color: #5BC4A0; margin: 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Co-Parenting, Reimagined</p>
+            </div>
+
+            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
+                <p style="margin-top: 0;">Hi {name},</p>
+
+                <p>Thank you for reaching out to CommonGround. We've received your message and a member of our team will get back to you within 1-2 business days.</p>
+
+                <p>In the meantime, feel free to explore our platform or check out our resources:</p>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{self.frontend_url}" style="display: inline-block; background: linear-gradient(135deg, #3DAA8A, #5BC4A0); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                        Visit CommonGround
+                    </a>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+
+                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
+                    This is an automated confirmation. Please do not reply directly to this email.
+                    If you need immediate assistance, contact us at support@find-commonground.com.
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+
+        return await self._send_email(to_email, subject, html_body)
+
     # ==================== Internal Methods ====================
 
     async def _send_email(
@@ -816,8 +1125,9 @@ class EmailService:
         to_email: str,
         subject: str,
         html_body: str,
-        text_body: Optional[str] = None
-    ) -> bool:
+        text_body: Optional[str] = None,
+        from_name_override: Optional[str] = None,
+    ) -> Optional[str]:
         """
         Send email via SendGrid or log in development mode.
 
@@ -826,10 +1136,13 @@ class EmailService:
             subject: Email subject
             html_body: HTML email body
             text_body: Plain text fallback (auto-generated if not provided)
+            from_name_override: Custom From Name (e.g., "Jane Smith via CommonGround")
 
         Returns:
-            Success status
+            SendGrid message ID for tracking, or True/False for dev mode
         """
+        sender_name = from_name_override or self.from_name
+
         # Development mode - log to console
         if not self.enabled:
             logger.info(f"[EMAIL DEV MODE] To: {to_email} | Subject: {subject}")
@@ -837,10 +1150,10 @@ class EmailService:
             print(f"EMAIL (Development Mode - Not Sent)")
             print(f"{'='*60}")
             print(f"To: {to_email}")
-            print(f"From: {self.from_name} <{self.from_email}>")
+            print(f"From: {sender_name} <{self.from_email}>")
             print(f"Subject: {subject}")
             print(f"{'='*60}\n")
-            return True
+            return None
 
         # Production mode - send via SendGrid
         try:
@@ -848,7 +1161,7 @@ class EmailService:
             from sendgrid.helpers.mail import Mail, Email, To, Content
 
             message = Mail(
-                from_email=Email(self.from_email, self.from_name),
+                from_email=Email(self.from_email, sender_name),
                 to_emails=To(to_email),
                 subject=subject,
                 html_content=Content("text/html", html_body)
@@ -859,17 +1172,19 @@ class EmailService:
 
             if response.status_code in [200, 201, 202]:
                 logger.info(f"Email sent successfully to {to_email}: {subject}")
-                return True
+                # Extract message ID from response headers for tracking
+                msg_id = response.headers.get("X-Message-Id")
+                return msg_id
             else:
                 logger.error(f"SendGrid returned status {response.status_code} for {to_email}")
-                return False
+                return None
 
         except ImportError:
             logger.error("SendGrid library not installed. Run: pip install sendgrid")
-            return False
+            return None
         except Exception as e:
             logger.error(f"Failed to send email to {to_email}: {str(e)}")
-            return False
+            return None
 
 
 # Create a singleton instance

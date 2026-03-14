@@ -324,7 +324,7 @@ export default function ReportsSettingsPage() {
             <FileText className="w-6 h-6 text-slate-400" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-slate-500" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h2 className="text-xl font-semibold text-slate-500" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               Reports & Documentation
             </h2>
             <p className="text-sm text-slate-400">Download PDF reports and documentation</p>
@@ -349,7 +349,7 @@ export default function ReportsSettingsPage() {
           <FileText className="w-6 h-6 text-[var(--portal-primary)]" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Reports & Documentation
           </h2>
           <p className="text-sm text-slate-500 font-medium">
@@ -370,7 +370,7 @@ export default function ReportsSettingsPage() {
       {familyFiles.length > 0 && (
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
                 <FileCheck className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
@@ -407,7 +407,7 @@ export default function ReportsSettingsPage() {
           <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
             <Download className="h-5 w-5 text-emerald-600" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Self-Service Reports
           </h3>
           <span className="text-xs bg-emerald-500/10 text-emerald-600 font-bold px-3 py-1 rounded-full shadow-sm">
@@ -435,7 +435,7 @@ export default function ReportsSettingsPage() {
                   </div>
                 )}
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
                       <Icon className="h-5 w-5 text-blue-600" />
                     </div>
@@ -483,7 +483,7 @@ export default function ReportsSettingsPage() {
           <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
             <Scale className="h-5 w-5 text-amber-600" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Professional Investigation Reports
           </h3>
         </div>
@@ -518,7 +518,7 @@ export default function ReportsSettingsPage() {
                         <Icon className="h-6 w-6 text-amber-600" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                        <CardTitle className="text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                           {report.title}
                         </CardTitle>
                         <CardDescription className="mt-1 font-medium">
@@ -681,7 +681,7 @@ export default function ReportsSettingsPage() {
       {/* Help Section */}
       <Card className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
               <Shield className="h-5 w-5 text-[var(--portal-primary)]" />
             </div>
@@ -713,10 +713,10 @@ export default function ReportsSettingsPage() {
           <p className="text-xs">
             Questions? Contact us at{' '}
             <a
-              href="mailto:reports@commonground.app"
+              href="mailto:reports@find-commonground.com"
               className="text-[var(--portal-primary)] hover:underline font-bold"
             >
-              reports@commonground.app
+              reports@find-commonground.com
             </a>
           </p>
         </CardContent>

@@ -23,8 +23,8 @@ import {
 const features = [
   {
     icon: Shield,
-    title: 'Catches conflict before you send',
-    description: 'ARIA reads your message and flags hostility, blame, and passive-aggression.',
+    title: 'Supports clarity before you send',
+    description: 'ARIA reads your message and gently flags language that could be misread or cause tension.',
   },
   {
     icon: RefreshCw,
@@ -60,7 +60,7 @@ const beforeAfter = [
 
 export default function ARIAPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
         <div className="max-w-5xl mx-auto px-6 text-center">
@@ -69,21 +69,21 @@ export default function ARIAPage() {
             <span className="text-sm font-medium text-[var(--portal-primary)]">AI-Powered Communication</span>
           </div>
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Meet <span className="text-[#D97757]">ARIA</span>
+            Meet <span className="text-[#F5A623]">ARIA</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-600 mb-4">
             AI Relationship Intelligence Assistant
           </p>
           <p className="text-lg text-gray-500 mb-8 max-w-2xl mx-auto">
-            ARIA catches the messages you'll regret—before you send them.
-            <span className="font-medium text-[var(--portal-primary)]"> Think of her as spell-check for conflict.</span>
+            ARIA helps you communicate with calm and clarity—before you hit send.
+            <span className="font-medium text-[var(--portal-primary)]"> Think of her as a supportive guide for every message.</span>
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+            className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
           >
             Try ARIA Free
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -92,19 +92,19 @@ export default function ARIAPage() {
       </section>
 
       {/* How ARIA Works - Demo */}
-      <section className="py-16 sm:py-24 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h2
                 className="text-3xl sm:text-4xl font-serif mb-6"
-                style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
                 See ARIA in action
               </h2>
               <p className="text-lg text-white/80 mb-6">
-                You write what you're thinking. ARIA catches what could escalate.
-                You decide whether to soften it—or send anyway.
+                You write what you're thinking. ARIA highlights what could be misread.
+                You decide whether to adjust your tone — or send as-is.
               </p>
               <p className="text-white/60 italic">
                 "ARIA saved me from sending so many messages I'd regret."
@@ -129,13 +129,13 @@ export default function ARIAPage() {
                   </div>
 
                   <div className="flex justify-center my-2">
-                    <div className="bg-[#D97757] text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
+                    <div className="bg-[#F5A623] text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
                       ⚠️ ARIA ALERT
                     </div>
                   </div>
 
-                  <div className="bg-gradient-to-br from-[#D97757]/30 to-[#D97757]/10 rounded-2xl p-4 border border-[#D97757]/40 shadow-lg mx-2">
-                    <p className="text-[#D97757] font-semibold text-sm mb-2">Could escalate conflict</p>
+                  <div className="bg-gradient-to-br from-[#F5A623]/30 to-[#F5A623]/10 rounded-2xl p-4 border border-[#F5A623]/40 shadow-lg mx-2">
+                    <p className="text-[#F5A623] font-semibold text-sm mb-2">A calmer approach</p>
                     <p className="text-white/90 text-sm leading-relaxed">
                       "Always" is an absolutist word that typically triggers defensiveness. Try focusing on the specific instance.
                     </p>
@@ -160,13 +160,13 @@ export default function ARIAPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2
-              className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              More than <span className="text-[#D97757]">spell-check</span>
+              More than <span className="text-[#F5A623]">a messaging tool</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              ARIA understands context, tracks patterns, and helps you build a record of positive communication.
+              ARIA understands context, supports cooperative communication, and helps you build a record of good faith.
             </p>
           </div>
 
@@ -182,8 +182,8 @@ export default function ARIAPage() {
                     <Icon className="h-7 w-7 text-[var(--portal-primary)]" />
                   </div>
                   <h3
-                    className="text-xl font-semibold text-[#2C3E50] mb-3"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-xl font-semibold text-[#1E3A4A] mb-3"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {feature.title}
                   </h3>
@@ -200,10 +200,10 @@ export default function ARIAPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2
-              className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              The ARIA <span className="text-[#D97757]">difference</span>
+              The ARIA <span className="text-[#F5A623]">difference</span>
             </h2>
           </div>
 
@@ -229,23 +229,23 @@ export default function ARIAPage() {
       </section>
 
       {/* ARIA for Kids (KidComs) - with mascot */}
-      <section className="py-16 sm:py-24 bg-gradient-to-br from-[#FFF8F3] to-white">
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-[#F4F8F7] to-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#D97757]/10 rounded-full mb-6">
-                <Heart className="w-4 h-4 text-[#D97757]" />
-                <span className="text-sm font-medium text-[#D97757]">Child-First Design</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#F5A623]/10 rounded-full mb-6">
+                <Heart className="w-4 h-4 text-[#F5A623]" />
+                <span className="text-sm font-medium text-[#F5A623]">Child-First Design</span>
               </div>
               <h2
-                className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-6"
-                style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-6"
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
-                ARIA keeps kids <span className="text-[#D97757]">protected</span>
+                ARIA keeps kids <span className="text-[#F5A623]">protected</span>
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                When children use KidComs to talk with their other parent, ARIA watches over conversations
-                with age-appropriate guardrails. No adult conflict leaks through.
+                When children use KidComs to talk with their other parent, ARIA provides gentle, age-appropriate
+                guardrails. Children stay protected and supported in a safe space.
               </p>
               <ul className="space-y-3">
                 {[
@@ -255,10 +255,10 @@ export default function ARIAPage() {
                   'Creates a safe space for parent-child connection',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[#D97757]/10 flex items-center justify-center">
-                      <Check className="w-4 h-4 text-[#D97757]" />
+                    <div className="w-6 h-6 rounded-full bg-[#F5A623]/10 flex items-center justify-center">
+                      <Check className="w-4 h-4 text-[#F5A623]" />
                     </div>
-                    <span className="text-[#2C3E50]">{item}</span>
+                    <span className="text-[#1E3A4A]">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -268,10 +268,10 @@ export default function ARIAPage() {
             <div className="relative flex justify-center">
               <div className="relative">
                 {/* Decorative background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#D97757]/20 to-[var(--portal-primary)]/20 rounded-full blur-3xl scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#F5A623]/20 to-[var(--portal-primary)]/20 rounded-full blur-3xl scale-110" />
 
                 {/* Mascot with actual image */}
-                <div className="relative bg-white rounded-3xl p-8 shadow-2xl border-4 border-[#D97757]/20">
+                <div className="relative bg-white rounded-3xl p-8 shadow-2xl border-4 border-[#F5A623]/20">
                   <div className="w-48 h-48 mx-auto relative">
                     <Image
                       src="/images/Aria.png"
@@ -281,8 +281,8 @@ export default function ARIAPage() {
                     />
                   </div>
                   <p
-                    className="text-center text-[#2C3E50] font-semibold mt-4"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-center text-[#1E3A4A] font-semibold mt-4"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     Hi! I'm ARIA
                   </p>
@@ -297,12 +297,12 @@ export default function ARIAPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <Heart className="w-12 h-12 mx-auto mb-6 text-[#D97757]" />
+          <Heart className="w-12 h-12 mx-auto mb-6 text-[#F5A623]" />
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Ready to communicate better?
           </h2>
@@ -312,7 +312,7 @@ export default function ARIAPage() {
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center justify-center px-10 py-5 bg-[#D97757] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
+            className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
           >
             Get Started Free
             <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />

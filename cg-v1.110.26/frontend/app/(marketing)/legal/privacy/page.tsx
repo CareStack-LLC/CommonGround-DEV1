@@ -57,7 +57,7 @@ export default function PrivacyPolicyPage() {
   const lastUpdated = 'January 24, 2026';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
@@ -65,10 +65,10 @@ export default function PrivacyPolicyPage() {
             <Shield className="w-8 h-8 text-[var(--portal-primary)]" />
           </div>
           <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#2C3E50] mb-4 leading-[1.1]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-4xl sm:text-5xl lg:text-6xl font-serif text-[#1E3A4A] mb-4 leading-[1.1]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Privacy <span className="text-[#D97757]">Policy</span>
+            Privacy <span className="text-[#F5A623]">Policy</span>
           </h1>
           <p className="text-lg text-gray-600 mb-2">
             Your family's data is sacred. Here's how we protect it.
@@ -80,10 +80,10 @@ export default function PrivacyPolicyPage() {
       {/* Our Commitment */}
       <section className="py-12 -mt-8">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] rounded-3xl p-8 text-white">
+          <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] rounded-3xl p-8 text-white">
             <h2
               className="text-2xl font-serif mb-4"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
               Our Commitment to You
             </h2>
@@ -102,7 +102,7 @@ export default function PrivacyPolicyPage() {
                 return (
                   <div key={item.text} className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-[#D97757]" />
+                      <Icon className="w-5 h-5 text-[#F5A623]" />
                     </div>
                     <span className="text-sm text-white/90">{item.text}</span>
                   </div>
@@ -117,10 +117,10 @@ export default function PrivacyPolicyPage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <h2
-            className="text-3xl font-serif text-[#2C3E50] mb-4 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl font-serif text-[#1E3A4A] mb-4 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Information We <span className="text-[#D97757]">Collect</span>
+            Information We <span className="text-[#F5A623]">Collect</span>
           </h2>
           <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
             We collect only what's necessary to provide our services. Here's exactly what we gather:
@@ -133,8 +133,8 @@ export default function PrivacyPolicyPage() {
                 className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10"
               >
                 <h3
-                  className="font-semibold text-[#2C3E50] mb-3"
-                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  className="font-semibold text-[#1E3A4A] mb-3"
+                  style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   {category.title}
                 </h3>
@@ -156,10 +156,10 @@ export default function PrivacyPolicyPage() {
       <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <h2
-            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl font-serif text-[#1E3A4A] mb-8 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            How We <span className="text-[#D97757]">Use</span> Your Information
+            How We <span className="text-[#F5A623]">Use</span> Your Information
           </h2>
 
           <div className="space-y-4">
@@ -175,7 +175,7 @@ export default function PrivacyPolicyPage() {
                 key={item.title}
                 className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30 transition-colors"
               >
-                <h3 className="font-semibold text-[#2C3E50] mb-1">{item.title}</h3>
+                <h3 className="font-semibold text-[#1E3A4A] mb-1">{item.title}</h3>
                 <p className="text-gray-600 text-sm">{item.desc}</p>
               </div>
             ))}
@@ -187,10 +187,10 @@ export default function PrivacyPolicyPage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <h2
-            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl font-serif text-[#1E3A4A] mb-8 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            What We <span className="text-[#D97757]">Never</span> Do
+            What We <span className="text-[#F5A623]">Never</span> Do
           </h2>
 
           <div className="bg-gradient-to-br from-red-50 to-white rounded-3xl p-8 border-2 border-red-100">
@@ -200,7 +200,7 @@ export default function PrivacyPolicyPage() {
                   <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
                     <span className="text-red-500 font-bold text-sm">✕</span>
                   </div>
-                  <span className="text-[#2C3E50] font-medium">{item}</span>
+                  <span className="text-[#1E3A4A] font-medium">{item}</span>
                 </li>
               ))}
             </ul>
@@ -212,15 +212,15 @@ export default function PrivacyPolicyPage() {
       <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <h2
-            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl font-serif text-[#1E3A4A] mb-8 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Who Can <span className="text-[#D97757]">Access</span> Your Data
+            Who Can <span className="text-[#F5A623]">Access</span> Your Data
           </h2>
 
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
-              <h3 className="font-semibold text-[#2C3E50] mb-2">Your Co-Parent</h3>
+              <h3 className="font-semibold text-[#1E3A4A] mb-2">Your Co-Parent</h3>
               <p className="text-gray-600 text-sm">
                 Messages, shared calendars, agreements, and expense records are visible to both parents.
                 This is core to how CommonGround works.
@@ -228,7 +228,7 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
-              <h3 className="font-semibold text-[#2C3E50] mb-2">Authorized Professionals</h3>
+              <h3 className="font-semibold text-[#1E3A4A] mb-2">Authorized Professionals</h3>
               <p className="text-gray-600 text-sm">
                 Attorneys, GALs, and mediators you invite can view case information according to
                 permissions you set. All access is logged and can be revoked anytime.
@@ -236,7 +236,7 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
-              <h3 className="font-semibold text-[#2C3E50] mb-2">Service Providers</h3>
+              <h3 className="font-semibold text-[#1E3A4A] mb-2">Service Providers</h3>
               <p className="text-gray-600 text-sm mb-3">
                 Trusted partners who help us operate, all bound by strict confidentiality:
               </p>
@@ -250,7 +250,7 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
-              <h3 className="font-semibold text-[#2C3E50] mb-2">Legal Requirements</h3>
+              <h3 className="font-semibold text-[#1E3A4A] mb-2">Legal Requirements</h3>
               <p className="text-gray-600 text-sm">
                 We may disclose information when required by law, court order, or to protect the
                 safety of users. We will notify you when legally permitted.
@@ -264,13 +264,13 @@ export default function PrivacyPolicyPage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <h2
-            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl font-serif text-[#1E3A4A] mb-8 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            How We <span className="text-[#D97757]">Protect</span> Your Data
+            How We <span className="text-[#F5A623]">Protect</span> Your Data
           </h2>
 
-          <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] rounded-3xl p-8 text-white">
+          <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] rounded-3xl p-8 text-white">
             <div className="grid sm:grid-cols-2 gap-4">
               {securityMeasures.map((measure) => (
                 <div key={measure.label} className="flex items-center justify-between border-b border-white/20 pb-3">
@@ -287,10 +287,10 @@ export default function PrivacyPolicyPage() {
       <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <h2
-            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl font-serif text-[#1E3A4A] mb-8 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Your <span className="text-[#D97757]">Rights</span>
+            Your <span className="text-[#F5A623]">Rights</span>
           </h2>
 
           <div className="grid sm:grid-cols-2 gap-4">
@@ -308,7 +308,7 @@ export default function PrivacyPolicyPage() {
               >
                 <div className="flex items-center gap-2 mb-1">
                   <Check className="w-5 h-5 text-[var(--portal-primary)]" />
-                  <h3 className="font-semibold text-[#2C3E50]">{right.title}</h3>
+                  <h3 className="font-semibold text-[#1E3A4A]">{right.title}</h3>
                 </div>
                 <p className="text-gray-600 text-sm pl-7">{right.desc}</p>
               </div>
@@ -317,8 +317,8 @@ export default function PrivacyPolicyPage() {
 
           <p className="text-center text-gray-600 mt-8">
             To exercise these rights, email{' '}
-            <a href="mailto:privacy@commonground.app" className="text-[var(--portal-primary)] font-medium hover:underline">
-              privacy@commonground.app
+            <a href="mailto:privacy@find-commonground.com" className="text-[var(--portal-primary)] font-medium hover:underline">
+              privacy@find-commonground.com
             </a>
           </p>
         </div>
@@ -328,10 +328,10 @@ export default function PrivacyPolicyPage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6">
           <h2
-            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl font-serif text-[#1E3A4A] mb-8 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Data <span className="text-[#D97757]">Retention</span>
+            Data <span className="text-[#F5A623]">Retention</span>
           </h2>
 
           <div className="space-y-4">
@@ -340,16 +340,16 @@ export default function PrivacyPolicyPage() {
                 <span className="text-[var(--portal-primary)] font-bold">∞</span>
               </div>
               <div>
-                <h3 className="font-semibold text-[#2C3E50]">Active Accounts</h3>
+                <h3 className="font-semibold text-[#1E3A4A]">Active Accounts</h3>
                 <p className="text-gray-600 text-sm">Data retained while your account is active</p>
               </div>
             </div>
             <div className="flex items-start gap-4 p-5 bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl border-2 border-[var(--portal-primary)]/10">
-              <div className="w-12 h-12 rounded-xl bg-[#D97757]/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-[#D97757] font-bold">90</span>
+              <div className="w-12 h-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center flex-shrink-0">
+                <span className="text-[#F5A623] font-bold">90</span>
               </div>
               <div>
-                <h3 className="font-semibold text-[#2C3E50]">After Deletion Request</h3>
+                <h3 className="font-semibold text-[#1E3A4A]">After Deletion Request</h3>
                 <p className="text-gray-600 text-sm">Data deleted within 90 days of account deletion request</p>
               </div>
             </div>
@@ -358,7 +358,7 @@ export default function PrivacyPolicyPage() {
                 <span className="text-gray-500 font-bold">⚖</span>
               </div>
               <div>
-                <h3 className="font-semibold text-[#2C3E50]">Legal Requirements</h3>
+                <h3 className="font-semibold text-[#1E3A4A]">Legal Requirements</h3>
                 <p className="text-gray-600 text-sm">Some data may be retained longer if required by law or court proceedings</p>
               </div>
             </div>
@@ -370,15 +370,15 @@ export default function PrivacyPolicyPage() {
       <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6">
           <h2
-            className="text-3xl font-serif text-[#2C3E50] mb-8 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl font-serif text-[#1E3A4A] mb-8 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Special <span className="text-[#D97757]">Provisions</span>
+            Special <span className="text-[#F5A623]">Provisions</span>
           </h2>
 
           <div className="space-y-6">
             <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
-              <h3 className="font-semibold text-[#2C3E50] mb-2">Children's Privacy</h3>
+              <h3 className="font-semibold text-[#1E3A4A] mb-2">Children's Privacy</h3>
               <p className="text-gray-600 text-sm">
                 CommonGround is designed for parents, not children. Information about children is
                 provided by parents and protected with the same security as all data. We do not
@@ -387,7 +387,7 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
-              <h3 className="font-semibold text-[#2C3E50] mb-2">California Residents (CCPA)</h3>
+              <h3 className="font-semibold text-[#1E3A4A] mb-2">California Residents (CCPA)</h3>
               <p className="text-gray-600 text-sm mb-3">
                 California residents have additional rights under the CCPA:
               </p>
@@ -400,7 +400,7 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
-              <h3 className="font-semibold text-[#2C3E50] mb-2">International Users</h3>
+              <h3 className="font-semibold text-[#1E3A4A] mb-2">International Users</h3>
               <p className="text-gray-600 text-sm">
                 CommonGround is based in the United States. If you access our services from outside
                 the US, your information will be transferred to and processed in the US. We comply
@@ -409,7 +409,7 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
-              <h3 className="font-semibold text-[#2C3E50] mb-2">Policy Changes</h3>
+              <h3 className="font-semibold text-[#1E3A4A] mb-2">Policy Changes</h3>
               <p className="text-gray-600 text-sm">
                 We may update this policy from time to time. We'll notify you of significant changes
                 via email or through the platform. Continued use after changes constitutes acceptance.
@@ -420,11 +420,11 @@ export default function PrivacyPolicyPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2
             className="text-3xl sm:text-4xl font-serif mb-4"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Questions about privacy?
           </h2>
@@ -433,10 +433,10 @@ export default function PrivacyPolicyPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:privacy@commonground.app"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[#D97757] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all"
+              href="mailto:privacy@find-commonground.com"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[#F5A623] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all"
             >
-              privacy@commonground.app
+              privacy@find-commonground.com
             </a>
             <Link
               href="/legal/terms"
