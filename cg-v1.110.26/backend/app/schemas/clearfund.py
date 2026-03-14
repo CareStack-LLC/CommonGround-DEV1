@@ -131,6 +131,12 @@ class ObligationResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    # Dispute tracking
+    dispute_status: str = "none"
+    dispute_reason: Optional[str] = None
+    disputed_at: Optional[datetime] = None
+    disputed_by: Optional[str] = None
+
     # Computed properties
     is_fully_funded: bool = False
     funding_percentage: float = 0.0
@@ -154,6 +160,12 @@ class ObligationCancel(BaseModel):
     """Cancel obligation request."""
 
     reason: str = Field(..., min_length=10, max_length=500, description="Cancellation reason")
+
+
+class ObligationDispute(BaseModel):
+    """Dispute an obligation."""
+
+    reason: str = Field(..., min_length=10, max_length=1000, description="Reason for disputing this expense")
 
 
 # ============================================================================

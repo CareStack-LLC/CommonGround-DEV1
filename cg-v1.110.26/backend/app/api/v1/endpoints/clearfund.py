@@ -26,6 +26,7 @@ from app.schemas.clearfund import (
     ObligationResponse,
     ObligationListResponse,
     ObligationCancel,
+    ObligationDispute,
     ObligationFilters,
     FundingCreate,
     FundingStatusResponse,
@@ -192,6 +193,43 @@ async def cancel_obligation(
     obligation = await service.cancel_obligation(
         obligation_id, data.reason, current_user
     )
+    return ObligationResponse.model_validate(obligation)
+
+
+@router.post("/obligations/{obligation_id}/dispute")
+async def dispute_obligation(
+    obligation_id: str,
+    data: ObligationDispute,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> ObligationResponse:
+    """
+    Dispute an obligation.
+
+    Either parent can dispute an expense obligation. Disputes freeze
+    the obligation and create an audit trail for court records.
+    """
+    service = ClearFundService(db)
+    obligation = await service.dispute_obligation(
+        obligation_id, data.reason, current_user
+    )
+    return ObligationResponse.model_validate(obligation)
+
+
+@router.post("/obligations/{obligation_id}/resolve-dispute")
+async def resolve_dispute(
+    obligation_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> ObligationResponse:
+    """
+    Resolve a dispute on an obligation.
+
+    Marks the dispute as resolved, returning the obligation to its
+    previous workflow state.
+    """
+    service = ClearFundService(db)
+    obligation = await service.resolve_dispute(obligation_id, current_user)
     return ObligationResponse.model_validate(obligation)
 
 

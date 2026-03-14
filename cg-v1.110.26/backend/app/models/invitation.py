@@ -117,6 +117,10 @@ class CaseInvitation(Base, UUIDMixin, TimestampMixin):
     last_resent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     auto_resend_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # Delayed send support (e.g., 2hr delay after single-parent activation)
+    scheduled_send_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    send_delayed: Mapped[bool] = mapped_column(Boolean, default=False)
+
     # Role in the family file
     parent_role: Mapped[str] = mapped_column(
         String(20), default="parent_b"

@@ -59,6 +59,10 @@ FEATURE_DEFINITIONS = {
     "kidcoms_access": ["family_plus"],
     "theater_mode": ["family_plus"],
 
+    # Parent Calls (co-parent communication)
+    "parent_voice_call": ["plus", "family_plus"],
+    "parent_video_call": ["family_plus"],
+
     # Court & Reporting
     "court_reporting": ["family_plus"],
 

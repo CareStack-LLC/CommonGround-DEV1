@@ -502,6 +502,27 @@ class ProfessionalAccessService:
         if not request.professional_id:
             raise ValueError("Request has no linked professional")
 
+        # Enforce case limit for the assigned professional
+        from app.models.professional import TIER_CASE_LIMITS, ProfessionalTier
+        prof_result = await self.db.execute(
+            select(ProfessionalProfile).where(
+                ProfessionalProfile.id == request.professional_id
+            )
+        )
+        prof = prof_result.scalar_one_or_none()
+        if prof:
+            tier = prof.subscription_tier or ProfessionalTier.STARTER.value
+            try:
+                tier_enum = ProfessionalTier(tier)
+            except ValueError:
+                tier_enum = ProfessionalTier.STARTER
+            max_cases = TIER_CASE_LIMITS.get(tier_enum, 3)
+            if prof.active_case_count >= max_cases:
+                raise ValueError(
+                    f"Professional has reached the maximum of {max_cases} active cases "
+                    f"for their {tier} tier. Upgrade required to accept more cases."
+                )
+
         # Check for existing assignment
         existing = await self._get_existing_assignment(
             request.professional_id,
@@ -553,6 +574,12 @@ class ProfessionalAccessService:
         if "can_message_by_default" in firm_settings:
             can_message = firm_settings["can_message_by_default"]
 
+        # Determine if dual-parent consent is required (GAL = "court" representing)
+        needs_dual_consent = representing == "court"
+        has_dual_consent = (
+            request.parent_a_approved and request.parent_b_approved
+        )
+
         # Create new assignment with inherited settings
         assignment = CaseAssignment(
             id=str(uuid4()),
@@ -567,6 +594,10 @@ class ProfessionalAccessService:
             can_message_client=can_message,
             status=AssignmentStatus.ACTIVE.value,
             assigned_at=datetime.utcnow(),
+            # GAL dual-parent consent tracking
+            consent_both_parents=needs_dual_consent,
+            consent_parent_a_at=request.parent_a_approved_at if has_dual_consent else None,
+            consent_parent_b_at=request.parent_b_approved_at if has_dual_consent else None,
         )
 
         self.db.add(assignment)
