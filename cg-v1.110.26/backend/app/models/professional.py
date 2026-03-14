@@ -531,6 +531,11 @@ class CaseAssignment(Base, UUIDMixin, TimestampMixin):
     # Messaging permission
     can_message_client: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # GAL/Professional dual-parent consent
+    consent_both_parents: Mapped[bool] = mapped_column(Boolean, default=False)
+    consent_parent_a_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    consent_parent_b_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     # Status
     status: Mapped[str] = mapped_column(String(20), default=AssignmentStatus.ACTIVE.value)
 

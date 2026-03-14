@@ -689,7 +689,22 @@ async def send_message(
             analysis=aria_analysis,
             context_data={"preceding_messages": case_context}
         )
-        
+
+        # Notify assigned attorneys about the blocked message
+        if message_data.family_file_id:
+            try:
+                from app.services.aria_attorney_notify import notify_attorneys_on_block
+                await notify_attorneys_on_block(
+                    db=db,
+                    family_file_id=message_data.family_file_id,
+                    sender_id=str(current_user.id),
+                    blocked_content=aria_analysis.original_message,
+                    categories=[c.value for c in aria_analysis.categories],
+                    toxicity_score=aria_analysis.toxicity_score,
+                )
+            except Exception:
+                pass  # Attorney notification is best-effort, don't block the flow
+
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Message blocked by ARIA Safety Shield: Content contains prohibited threats, hate speech, or sexual harassment."

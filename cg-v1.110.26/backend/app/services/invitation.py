@@ -83,6 +83,7 @@ class InvitationService:
         attorney_email: Optional[str] = None,
         parent_role: str = "parent_b",
         children_names: Optional[list] = None,
+        delay_hours: Optional[int] = None,
     ) -> CaseInvitation:
         """
         Send a case invitation to a parent.
@@ -140,6 +141,7 @@ class InvitationService:
         source = InvitationSource.ATTORNEY.value if attorney_name else InvitationSource.PARENT.value
 
         # Create invitation record
+        is_delayed = delay_hours is not None and delay_hours > 0
         invitation = CaseInvitation(
             invitee_email=invitee_email,
             invitee_name=invitee_name,
@@ -154,6 +156,11 @@ class InvitationService:
             token_expires_at=token_expires,
             status=InvitationStatus.PENDING.value,
             parent_role=parent_role,
+            send_delayed=is_delayed,
+            scheduled_send_at=(
+                datetime.utcnow() + timedelta(hours=delay_hours)
+                if is_delayed else None
+            ),
         )
         self.db.add(invitation)
         await self.db.flush()
@@ -166,30 +173,36 @@ class InvitationService:
         # Build magic link URL
         magic_link = f"{settings.FRONTEND_URL}/accept-invitation?token={token}"
 
-        # Send attorney-branded email (Fix #1)
+        # Send attorney-branded email (Fix #1) — skip if delayed
         from_name = f"{attorney_name} via CommonGround" if attorney_name else "CommonGround"
         inviter_display = attorney_name or f"{inviter.first_name} {inviter.last_name}"
 
-        try:
-            sendgrid_msg_id = await self.email_service.send_attorney_case_invitation(
-                to_email=invitee_email,
-                to_name=invitee_name or invitee_email.split("@")[0],
-                inviter_name=inviter_display,
-                family_file_title=family_file.title,
-                magic_link=magic_link,
-                children_names=children_names or [],
-                attorney_name=attorney_name,
-                attorney_firm=attorney_firm,
-                from_name_override=from_name,
+        if not is_delayed:
+            try:
+                sendgrid_msg_id = await self.email_service.send_attorney_case_invitation(
+                    to_email=invitee_email,
+                    to_name=invitee_name or invitee_email.split("@")[0],
+                    inviter_name=inviter_display,
+                    family_file_title=family_file.title,
+                    magic_link=magic_link,
+                    children_names=children_names or [],
+                    attorney_name=attorney_name,
+                    attorney_firm=attorney_firm,
+                    from_name_override=from_name,
+                )
+
+                invitation.status = InvitationStatus.SENT.value
+                if sendgrid_msg_id:
+                    invitation.sendgrid_message_id = sendgrid_msg_id
+
+            except Exception as e:
+                logger.error(f"Failed to send invitation email: {e}")
+                # Don't fail the invitation creation, just log the error
+        else:
+            logger.info(
+                f"Invitation {invitation.id} scheduled for delayed send at "
+                f"{invitation.scheduled_send_at}"
             )
-
-            invitation.status = InvitationStatus.SENT.value
-            if sendgrid_msg_id:
-                invitation.sendgrid_message_id = sendgrid_msg_id
-
-        except Exception as e:
-            logger.error(f"Failed to send invitation email: {e}")
-            # Don't fail the invitation creation, just log the error
 
         # Create case event (Fix #4)
         await self._create_case_event(
@@ -612,6 +625,71 @@ class InvitationService:
             )
         )
         return list(result.scalars().all())
+
+    async def get_pending_delayed_sends(self) -> list:
+        """
+        Get invitations that were created with a delay and are now ready to send.
+
+        Returns invitations where scheduled_send_at has passed but email
+        hasn't been sent yet (status still PENDING + send_delayed=True).
+        """
+        now = datetime.utcnow()
+        result = await self.db.execute(
+            select(CaseInvitation).where(
+                and_(
+                    CaseInvitation.send_delayed == True,
+                    CaseInvitation.status == InvitationStatus.PENDING.value,
+                    CaseInvitation.scheduled_send_at <= now,
+                )
+            )
+        )
+        return list(result.scalars().all())
+
+    async def process_delayed_send(self, invitation: CaseInvitation) -> CaseInvitation:
+        """
+        Send a previously delayed invitation now that its scheduled time has passed.
+        """
+        from app.core.config import settings
+
+        magic_link = f"{settings.FRONTEND_URL}/accept-invitation?token={invitation.token}"
+        from_name = (
+            f"{invitation.attorney_name} via CommonGround"
+            if invitation.attorney_name
+            else "CommonGround"
+        )
+        inviter_display = invitation.attorney_name or "CommonGround"
+
+        # Look up family file for title
+        result = await self.db.execute(
+            select(FamilyFile).where(FamilyFile.id == invitation.family_file_id)
+        )
+        family_file = result.scalar_one_or_none()
+
+        try:
+            sendgrid_msg_id = await self.email_service.send_attorney_case_invitation(
+                to_email=invitation.invitee_email,
+                to_name=invitation.invitee_name or invitation.invitee_email.split("@")[0],
+                inviter_name=inviter_display,
+                family_file_title=family_file.title if family_file else "Your Family File",
+                magic_link=magic_link,
+                children_names=[],
+                attorney_name=invitation.attorney_name,
+                attorney_firm=invitation.attorney_firm,
+                from_name_override=from_name,
+            )
+
+            invitation.status = InvitationStatus.SENT.value
+            invitation.send_delayed = False
+            if sendgrid_msg_id:
+                invitation.sendgrid_message_id = sendgrid_msg_id
+
+            await self.db.commit()
+            await self.db.refresh(invitation)
+
+        except Exception as e:
+            logger.error(f"Failed to send delayed invitation {invitation.id}: {e}")
+
+        return invitation
 
     async def get_invitation_status(self, family_file_id: str) -> list:
         """Get all invitations for a family file with status."""

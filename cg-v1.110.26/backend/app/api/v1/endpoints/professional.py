@@ -1518,6 +1518,9 @@ async def accept_case_invitation(
     profile: ProfessionalProfile = Depends(get_current_professional),
 ):
     """Professional accepts a parent's invitation to access their case."""
+    # Enforce case limit before accepting a new case
+    await enforce_case_limit(profile)
+
     service = ProfessionalAccessService(db)
 
     try:
@@ -3109,11 +3112,33 @@ async def generate_compliance_report(
     Initially creates a pending report record.
     """
     # Ensure professional has access to the case
-    await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
-    
+    assignment = await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
+
+    # Enforce dual-parent consent for reports that require it (e.g. GAL welfare)
+    from app.services.reports.report_registry import get_report_by_code
+    report_def = get_report_by_code(data.report_type) if data.report_type else None
+    if not report_def:
+        # Also check by internal_type in case report_type is the internal name
+        from app.services.reports.report_registry import ALL_REPORTS
+        report_def = next(
+            (r for r in ALL_REPORTS.values() if r["internal_type"] == data.report_type),
+            None
+        )
+    if report_def and report_def.get("requires_dual_consent"):
+        if not (
+            getattr(assignment, "consent_both_parents", False)
+            and getattr(assignment, "consent_parent_a_at", None)
+            and getattr(assignment, "consent_parent_b_at", None)
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This report requires consent from both parents. "
+                       "Both parents must approve GAL access before generating this report."
+            )
+
     # Force the family_file_id to match the path
     data.family_file_id = family_file_id
-    
+
     return await ComplianceReportService(db).create_report(profile.id, data)
 
 

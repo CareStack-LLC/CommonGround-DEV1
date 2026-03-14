@@ -268,12 +268,29 @@ class ARIAService:
     ) -> SentimentAnalysis:
         """
         Hybrid Analysis Flow (V3):
-        1. Fast Regex Check (Synchronous logic)
-        2. If Blocked -> Return Blocked Result & Log Event
-        3. If Allowed/Flagged -> Queue for Async ML (aria_jobs) & Return Fast Result
+        1. Look up family file DV/sensitivity settings
+        2. Fast Regex Check (Synchronous logic) with sensitivity offset
+        3. If Blocked -> Return Blocked Result & Log Event
+        4. If Allowed/Flagged -> Queue for Async ML (aria_jobs) & Return Fast Result
         """
+        # 0. Look up DV sensitivity offset from family file
+        sensitivity_offset = 0.0
+        if family_file_id:
+            from app.models.family_file import FamilyFile
+            result = await db.execute(
+                select(FamilyFile.is_dv_case, FamilyFile.aria_sensitivity_level)
+                .where(FamilyFile.id == family_file_id)
+            )
+            row = result.first()
+            if row:
+                is_dv, level = row
+                if is_dv or level == "maximum":
+                    sensitivity_offset = 0.15
+                elif level == "elevated":
+                    sensitivity_offset = 0.08
+
         # 1. Fast Regex Check
-        regex_result = self.analyze_message(message_text, context)
+        regex_result = self.analyze_message(message_text, context, sensitivity_offset)
 
         # 2. If already blocked, no need for ML
         if regex_result.block_send:
@@ -357,7 +374,8 @@ class ARIAService:
     def analyze_message(
         self,
         message: str,
-        context: Optional[List[str]] = None
+        context: Optional[List[str]] = None,
+        sensitivity_offset: float = 0.0
     ) -> SentimentAnalysis:
         """
         Analyze a message for toxicity (Regex Pattern Engine).
@@ -402,16 +420,21 @@ class ARIAService:
 
         # Calculate toxicity score and level
         toxicity_score = self._calculate_score(categories, triggers)
-        toxicity_level = self._get_level(toxicity_score)
+        # DV-mode: apply sensitivity offset to tighten thresholds
+        # sensitivity_offset=0.15 means all thresholds are lowered by 0.15
+        toxicity_level = self._get_level(toxicity_score, sensitivity_offset)
 
         # Blocking Logic: Block if SEVERE and THREATENING (physical harm)
         # Also block HATE SPEECH and SEXUAL HARASSMENT automatically
         # UPDATE: User requested zero tolerance for threats ("ill knock you out")
+        # DV-mode: also block HIGH severity messages (not just SEVERE)
         block_send = (
             ToxicityCategory.THREATENING in categories or
             ToxicityCategory.HATE_SPEECH in categories or
             ToxicityCategory.SEXUAL_HARASSMENT in categories
         )
+        if sensitivity_offset > 0 and toxicity_level in [ToxicityLevel.HIGH, ToxicityLevel.SEVERE]:
+            block_send = True
 
         # Generate explanation
         explanation = self._generate_explanation(categories)
@@ -473,15 +496,21 @@ class ARIAService:
 
         return min(1.0, score)
 
-    def _get_level(self, score: float) -> ToxicityLevel:
-        """Convert score to toxicity level"""
+    def _get_level(self, score: float, sensitivity_offset: float = 0.0) -> ToxicityLevel:
+        """Convert score to toxicity level.
+
+        Args:
+            score: Toxicity score 0.0-1.0
+            sensitivity_offset: Lowers all thresholds by this amount.
+                DV cases use 0.15, meaning LOW triggers at 0.15 instead of 0.3.
+        """
         if score == 0:
             return ToxicityLevel.NONE
-        elif score < 0.3:
+        elif score < (0.3 - sensitivity_offset):
             return ToxicityLevel.LOW
-        elif score < 0.6:
+        elif score < (0.6 - sensitivity_offset):
             return ToxicityLevel.MEDIUM
-        elif score < 0.85:
+        elif score < (0.85 - sensitivity_offset):
             return ToxicityLevel.HIGH
         else:
             return ToxicityLevel.SEVERE

@@ -1359,6 +1359,27 @@ class CustodyExchangeService:
             instance.updated_at = now
             closed_count += 1
 
+            # Notify attorneys on missed exchanges
+            if instance.handoff_outcome in ("missed", "one_party_present"):
+                try:
+                    from app.services.aria_attorney_notify import notify_attorneys_on_missed_exchange
+                    # Determine which parent didn't show
+                    no_show_id = None
+                    if not instance.from_parent_checked_in and exchange.from_parent_id:
+                        no_show_id = exchange.from_parent_id
+                    elif not instance.to_parent_checked_in and exchange.to_parent_id:
+                        no_show_id = exchange.to_parent_id
+                    if no_show_id and exchange.family_file_id:
+                        await notify_attorneys_on_missed_exchange(
+                            db=db,
+                            family_file_id=exchange.family_file_id,
+                            exchange_instance_id=instance.id,
+                            no_show_parent_id=no_show_id,
+                            scheduled_time=instance.scheduled_time,
+                        )
+                except Exception:
+                    pass  # Best-effort notification
+
         await db.commit()
         return closed_count
 

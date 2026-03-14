@@ -123,6 +123,9 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
     state: Mapped[Optional[str]] = mapped_column(String(2), nullable=True)
     county: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
+    # DV Case Flag
+    is_dv_case: Mapped[bool] = mapped_column(Boolean, default=False)
+
     # Settings
     aria_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     aria_provider: Mapped[str] = mapped_column(String(20), default="claude")
@@ -131,6 +134,9 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
     aria_mode: Mapped[str] = mapped_column(
         String(20), default="standard"
     )  # off | standard | strict
+    aria_sensitivity_level: Mapped[str] = mapped_column(
+        String(20), default="standard"
+    )  # standard | elevated | maximum — DV cases use "maximum"
     require_joint_approval: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # Smart Custody Config (V3)

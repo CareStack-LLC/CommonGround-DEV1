@@ -180,6 +180,14 @@ class Obligation(Base, UUIDMixin, TimestampMixin):
     cancelled_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     cancellation_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    # Dispute tracking
+    dispute_status: Mapped[str] = mapped_column(
+        String(20), default="none"
+    )  # none | disputed | resolved
+    dispute_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    disputed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    disputed_by: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+
     # Notes
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 

@@ -536,6 +536,107 @@ class ClearFundService:
             ) from e
 
     # ========================================================================
+    # Dispute
+    # ========================================================================
+
+    async def dispute_obligation(
+        self,
+        obligation_id: str,
+        reason: str,
+        user: User
+    ) -> Obligation:
+        """Dispute an obligation. Either parent can dispute."""
+        obligation = await self.get_obligation(obligation_id, user)
+
+        if obligation.status in ["completed", "cancelled", "expired"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Cannot dispute obligation in status: {obligation.status}"
+            )
+
+        if obligation.dispute_status == "disputed":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Obligation is already disputed"
+            )
+
+        try:
+            obligation.dispute_status = "disputed"
+            obligation.dispute_reason = reason
+            obligation.disputed_at = datetime.utcnow()
+            obligation.disputed_by = str(user.id)
+
+            await self.db.commit()
+            await self.db.refresh(obligation)
+
+            # Broadcast dispute via WebSocket
+            broadcast_id = obligation.family_file_id or obligation.case_id
+            if broadcast_id:
+                await realtime_service.broadcast_obligation_updated(
+                    family_file_id=broadcast_id,
+                    obligation_id=str(obligation.id),
+                    obligation_data={
+                        "id": str(obligation.id),
+                        "title": obligation.title,
+                        "status": obligation.status,
+                        "dispute_status": "disputed",
+                        "disputed_by": str(user.id),
+                        "dispute_reason": reason,
+                    }
+                )
+
+            return obligation
+
+        except Exception as e:
+            await self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to dispute obligation: {str(e)}"
+            ) from e
+
+    async def resolve_dispute(
+        self,
+        obligation_id: str,
+        user: User
+    ) -> Obligation:
+        """Resolve a dispute on an obligation."""
+        obligation = await self.get_obligation(obligation_id, user)
+
+        if obligation.dispute_status != "disputed":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Obligation is not currently disputed"
+            )
+
+        try:
+            obligation.dispute_status = "resolved"
+
+            await self.db.commit()
+            await self.db.refresh(obligation)
+
+            broadcast_id = obligation.family_file_id or obligation.case_id
+            if broadcast_id:
+                await realtime_service.broadcast_obligation_updated(
+                    family_file_id=broadcast_id,
+                    obligation_id=str(obligation.id),
+                    obligation_data={
+                        "id": str(obligation.id),
+                        "title": obligation.title,
+                        "status": obligation.status,
+                        "dispute_status": "resolved",
+                    }
+                )
+
+            return obligation
+
+        except Exception as e:
+            await self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to resolve dispute: {str(e)}"
+            ) from e
+
+    # ========================================================================
     # Funding
     # ========================================================================
 
