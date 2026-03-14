@@ -22,7 +22,6 @@ import {
   Users,
   Info,
   Briefcase,
-  Handshake,
   Mail,
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
@@ -61,7 +60,6 @@ const marketingLinks: TopNavLink[] = [
   { name: 'Features', path: '/features', icon: Sparkles },
   { name: 'Pricing', path: '/pricing', icon: DollarSign },
   { name: 'About', path: '/about', icon: Info },
-  { name: 'Grant Program', path: '/grant-partnership', icon: Handshake },
   { name: 'Contact', path: '/contact', icon: Mail },
 ];
 

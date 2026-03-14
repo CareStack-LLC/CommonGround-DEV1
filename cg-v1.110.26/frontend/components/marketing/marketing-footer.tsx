@@ -48,7 +48,6 @@ const footerLinks = {
   partners: {
     title: 'Partners',
     links: [
-      { label: 'Grant Program', href: '/grant-partnership' },
       { label: 'Partner Directory', href: '/partners' },
     ],
   },

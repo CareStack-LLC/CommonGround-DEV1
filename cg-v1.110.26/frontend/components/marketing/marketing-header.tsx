@@ -24,7 +24,6 @@ const navItems: NavItem[] = [
   { label: 'Features', href: '/features' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'About', href: '/about' },
-  { label: 'Grant Program', href: '/grant-partnership' },
   { label: 'Contact', href: '/contact' },
 ];
 
