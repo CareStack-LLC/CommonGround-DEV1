@@ -10,20 +10,26 @@ import { adminAPI, type AdminUser, type UserSearchResult } from '@/lib/admin-api
 
 const TIERS = [
   { value: '', label: 'All tiers' },
+  { value: 'web_starter', label: 'Web Starter' },
   { value: 'essential', label: 'Essential' },
   { value: 'starter', label: 'Starter' },
   { value: 'plus', label: 'Plus' },
+  { value: 'complete', label: 'Complete' },
   { value: 'family_plus', label: 'Family Plus' },
-  { value: 'solo', label: 'Solo' },
-  { value: 'small_firm', label: 'Small Firm' },
-  { value: 'mid_size', label: 'Mid Size' },
+  { value: 'premium', label: 'Premium' },
+  { value: 'solo', label: 'Solo (Pro)' },
+  { value: 'small_firm', label: 'Small Firm (Pro)' },
+  { value: 'mid_size', label: 'Mid Size (Pro)' },
 ];
 
 const TIER_COLORS: Record<string, string> = {
+  web_starter: 'bg-zinc-700/50 text-zinc-400',
   essential: 'bg-zinc-700/50 text-zinc-400',
   starter: 'bg-zinc-700/50 text-zinc-300',
   plus: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
+  complete: 'bg-violet-500/15 text-violet-400 border border-violet-500/20',
   family_plus: 'bg-violet-500/15 text-violet-400 border border-violet-500/20',
+  premium: 'bg-purple-500/15 text-purple-400 border border-purple-500/20',
   solo: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
   small_firm: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
   mid_size: 'bg-rose-500/15 text-rose-400 border border-rose-500/20',

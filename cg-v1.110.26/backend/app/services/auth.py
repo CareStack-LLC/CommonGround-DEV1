@@ -237,12 +237,27 @@ class AuthService:
                     profile = result.scalar_one_or_none()
                     if not profile:
                         print(f"Profile missing for existing user {user.id}, creating one")
+                        # Create Stripe customer for user missing profile
+                        stripe_customer_id = None
+                        try:
+                            from app.services.stripe_service import StripeService
+                            stripe_svc = StripeService()
+                            customer = await stripe_svc.create_customer(
+                                email=user.email,
+                                name=f"{user.first_name} {user.last_name}".strip(),
+                                user_id=str(user.id),
+                                metadata={"platform": "commonground"},
+                            )
+                            stripe_customer_id = customer["id"]
+                        except Exception:
+                            pass
                         profile = UserProfile(
                             user_id=user.id,
                             first_name=user.first_name,
                             last_name=user.last_name,
                             subscription_tier="web_starter",
-                            subscription_status="active"
+                            subscription_status="active",
+                            stripe_customer_id=stripe_customer_id,
                         )
                         self.db.add(profile)
                         await self.db.commit()
@@ -273,11 +288,28 @@ class AuthService:
                 )
                 self.db.add(user)
 
-                # Create user profile
+                # Create Stripe customer for new auto-created user
+                stripe_customer_id = None
+                try:
+                    from app.services.stripe_service import StripeService
+                    stripe_svc = StripeService()
+                    customer = await stripe_svc.create_customer(
+                        email=supabase_user.email,
+                        name=f"{first_name} {last_name}".strip(),
+                        user_id=str(user.id),
+                        metadata={"platform": "commonground"},
+                    )
+                    stripe_customer_id = customer["id"]
+                    print(f"Stripe customer created for auto-created user: {stripe_customer_id}")
+                except Exception as stripe_err:
+                    print(f"Stripe customer creation failed (non-blocking): {stripe_err}")
+
+                # Create user profile with Stripe customer ID
                 profile = UserProfile(
                     user_id=user.id,
                     first_name=first_name,
                     last_name=last_name,
+                    stripe_customer_id=stripe_customer_id,
                 )
                 self.db.add(profile)
 
@@ -507,12 +539,28 @@ class AuthService:
             await self.db.commit()
             await self.db.refresh(user)
 
+            # Create Stripe customer for new OAuth user
+            stripe_customer_id = None
+            try:
+                from app.services.stripe_service import StripeService
+                stripe_svc = StripeService()
+                customer = await stripe_svc.create_customer(
+                    email=request.email,
+                    name=f"{request.first_name} {request.last_name or ''}".strip(),
+                    user_id=str(user.id),
+                    metadata={"platform": "commonground"},
+                )
+                stripe_customer_id = customer["id"]
+            except Exception as stripe_err:
+                print(f"Stripe customer creation failed for OAuth user (non-blocking): {stripe_err}")
+
             # Create default profile for new OAuth users
             profile = UserProfile(
                 user_id=user.id,
                 first_name=request.first_name,
                 last_name=request.last_name or "",
                 avatar_url=request.avatar_url,
+                stripe_customer_id=stripe_customer_id,
             )
             self.db.add(profile)
             await self.db.commit()

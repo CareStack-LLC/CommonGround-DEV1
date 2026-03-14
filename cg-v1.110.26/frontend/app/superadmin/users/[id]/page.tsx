@@ -30,10 +30,13 @@ function timeAgo(dateStr: string | null): string {
 }
 
 const TIER_COLORS: Record<string, string> = {
+  web_starter: 'bg-zinc-700/50 text-zinc-400',
   essential: 'bg-zinc-700/50 text-zinc-400',
   starter: 'bg-zinc-700/50 text-zinc-300',
   plus: 'bg-blue-500/15 text-blue-400',
+  complete: 'bg-violet-500/15 text-violet-400',
   family_plus: 'bg-violet-500/15 text-violet-400',
+  premium: 'bg-purple-500/15 text-purple-400',
   solo: 'bg-emerald-500/15 text-emerald-400',
   small_firm: 'bg-amber-500/15 text-amber-400',
   mid_size: 'bg-rose-500/15 text-rose-400',

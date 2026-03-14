@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users, Activity, TrendingUp, DollarSign, Zap,
   MessageSquare, Shield, Clock, ArrowUpRight,
   ArrowDownRight, UserPlus, CreditCard, ScrollText,
   FileText, ExternalLink, RefreshCw, AlertTriangle,
+  Radio,
 } from 'lucide-react';
 import { adminAPI, type DashboardData, type GrowthStats, type PlatformHealth } from '@/lib/admin-api';
 
@@ -43,6 +44,8 @@ export default function SuperAdminDashboard() {
   const [health, setHealth] = useState<PlatformHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
+  const refreshRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -56,6 +59,7 @@ export default function SuperAdminDashboard() {
       setDashboard(d);
       setGrowth(g);
       setHealth(h);
+      setLastRefreshed(new Date());
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load dashboard');
     } finally {
@@ -63,7 +67,16 @@ export default function SuperAdminDashboard() {
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+    // Auto-refresh every 30 seconds
+    refreshRef.current = setInterval(() => {
+      fetchData();
+    }, 30000);
+    return () => {
+      if (refreshRef.current) clearInterval(refreshRef.current);
+    };
+  }, [fetchData]);
 
   if (error) {
     return (
@@ -98,14 +111,20 @@ export default function SuperAdminDashboard() {
             {dashboard ? `Last updated ${timeAgo(dashboard.generated_at)}` : 'Loading...'}
           </p>
         </div>
-        <button
-          onClick={fetchData}
-          disabled={loading}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-medium transition-colors disabled:opacity-50"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1.5 text-[11px] text-emerald-400/80">
+            <Radio className="w-3 h-3 animate-pulse" />
+            Live — auto-refresh 30s
+          </span>
+          <button
+            onClick={fetchData}
+            disabled={loading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-medium transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Platform Health Banner */}

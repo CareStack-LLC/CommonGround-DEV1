@@ -58,6 +58,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Activity tracking: update User.last_active on authenticated requests
+from app.middleware.activity import ActivityTrackingMiddleware
+app.add_middleware(ActivityTrackingMiddleware)
+
 
 # Global exception handler to ensure CORS headers are always present
 # This is important because uncaught exceptions skip the CORS middleware

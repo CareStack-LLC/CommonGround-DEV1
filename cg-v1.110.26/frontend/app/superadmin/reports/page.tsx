@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import {
   FileText, Plus, Clock, CheckCircle, AlertTriangle,
-  Loader2, Download, RefreshCw, Calendar, ChevronRight,
+  Loader2, Download, RefreshCw, Calendar,
+  FileJson, FileSpreadsheet,
 } from 'lucide-react';
 import { adminAPI, type ReportRequest } from '@/lib/admin-api';
 
@@ -41,6 +42,8 @@ export default function ReportsPage() {
   const [notes, setNotes] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [downloading, setDownloading] = useState<string | null>(null);
+  const pollRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchReports = useCallback(async () => {
     try {
@@ -51,6 +54,26 @@ export default function ReportsPage() {
       });
       setReports(result.reports);
       setTotal(result.total);
+
+      // Auto-poll if any reports are pending/processing
+      const hasPending = result.reports.some(r => r.status === 'pending' || r.status === 'processing');
+      if (hasPending && !pollRef.current) {
+        pollRef.current = setInterval(async () => {
+          try {
+            const refreshed = await adminAPI.getReports({ status: statusFilter || undefined, limit: 50 });
+            setReports(refreshed.reports);
+            setTotal(refreshed.total);
+            const stillPending = refreshed.reports.some(r => r.status === 'pending' || r.status === 'processing');
+            if (!stillPending && pollRef.current) {
+              clearInterval(pollRef.current);
+              pollRef.current = null;
+            }
+          } catch { /* silent */ }
+        }, 5000);
+      } else if (!hasPending && pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
     } catch (err) {
       console.error('Failed to load reports:', err);
     } finally {
@@ -58,7 +81,12 @@ export default function ReportsPage() {
     }
   }, [statusFilter]);
 
-  useEffect(() => { fetchReports(); }, [fetchReports]);
+  useEffect(() => {
+    fetchReports();
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [fetchReports]);
 
   const handleCreate = async () => {
     try {
@@ -76,12 +104,31 @@ export default function ReportsPage() {
     }
   };
 
+  const handleDownload = async (reportId: string, format: 'json' | 'csv') => {
+    try {
+      setDownloading(`${reportId}-${format}`);
+      const blob = await adminAPI.downloadReport(reportId, format);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report_${reportId.slice(0, 8)}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download failed:', err);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Reports</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">Request and manage admin reports</p>
+          <p className="text-sm text-zinc-500 mt-0.5">Request and download admin reports</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -181,7 +228,7 @@ export default function ReportsPage() {
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
             >
               {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-              {creating ? 'Requesting...' : 'Request Report'}
+              {creating ? 'Generating...' : 'Generate Report'}
             </button>
           </div>
         </div>
@@ -223,7 +270,9 @@ export default function ReportsPage() {
               const StatusIcon = statusCfg.icon;
               const reportType = report.action.replace('admin:report_', '');
               const typeInfo = REPORT_TYPES.find(t => t.value === reportType);
-              const metadata = report.metadata as Record<string, string | number> | null;
+              const metadata = report.metadata as Record<string, unknown> | null;
+              const rowCount = metadata?.row_count as number | undefined;
+              const isCompleted = report.status === 'completed' || report.status === 'success';
 
               return (
                 <div key={report.id} className="flex items-center gap-4 px-5 py-4 hover:bg-zinc-800/20 transition-colors">
@@ -233,17 +282,45 @@ export default function ReportsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-zinc-200">{typeInfo?.label || reportType}</span>
-                      {metadata?.date_range_days && (
+                      {metadata?.date_range_days != null && (
                         <span className="text-[11px] text-zinc-600 flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
                           {String(metadata.date_range_days)}d
                         </span>
+                      )}
+                      {rowCount != null && (
+                        <span className="text-[11px] text-zinc-600">{rowCount} rows</span>
                       )}
                     </div>
                     <div className="text-xs text-zinc-500 mt-0.5 truncate">
                       {report.description || 'No description'}
                     </div>
                   </div>
+
+                  {/* Download buttons for completed reports */}
+                  {isCompleted && (
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button
+                        onClick={() => handleDownload(report.id, 'csv')}
+                        disabled={downloading === `${report.id}-csv`}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-800/60 hover:bg-zinc-700/60 text-xs text-zinc-400 hover:text-zinc-200 transition-colors disabled:opacity-50"
+                        title="Download CSV"
+                      >
+                        {downloading === `${report.id}-csv` ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileSpreadsheet className="w-3 h-3" />}
+                        CSV
+                      </button>
+                      <button
+                        onClick={() => handleDownload(report.id, 'json')}
+                        disabled={downloading === `${report.id}-json`}
+                        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-zinc-800/60 hover:bg-zinc-700/60 text-xs text-zinc-400 hover:text-zinc-200 transition-colors disabled:opacity-50"
+                        title="Download JSON"
+                      >
+                        {downloading === `${report.id}-json` ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileJson className="w-3 h-3" />}
+                        JSON
+                      </button>
+                    </div>
+                  )}
+
                   <div className="text-right flex-shrink-0">
                     <span className={`text-xs font-medium capitalize ${statusCfg.color}`}>{report.status}</span>
                     <div className="text-[11px] text-zinc-600 mt-0.5">{formatDate(report.created_at)}</div>

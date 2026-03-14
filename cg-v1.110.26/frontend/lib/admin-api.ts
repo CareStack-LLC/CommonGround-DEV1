@@ -35,6 +35,22 @@ async function adminFetch<T>(endpoint: string, options: RequestInit = {}): Promi
   return res.json();
 }
 
+async function adminFetchBlob(endpoint: string): Promise<Blob> {
+  const token = getAuthToken();
+  if (!token) throw new Error('Not authenticated');
+
+  const res = await fetch(`${API_URL}${endpoint}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || `Admin API error ${res.status}`);
+  }
+
+  return res.blob();
+}
+
 // --- Types ---
 
 export interface DashboardData {
@@ -116,6 +132,26 @@ export interface UserSearchResult {
   offset: number;
 }
 
+export interface StripePayment {
+  id: string;
+  customer: string;
+  customer_email: string | null;
+  amount: number;
+  currency: string;
+  status: string;
+  created: string;
+  description: string | null;
+}
+
+export interface StripeLiveData {
+  stripe_available: boolean;
+  active_subscriptions?: number;
+  total_mrr?: number;
+  total_customers?: number;
+  recent_payments?: StripePayment[];
+  error?: string;
+}
+
 export interface BillingOverview {
   consumer_subscriptions: Record<string, { total: number; statuses: Record<string, number> }>;
   professional_subscriptions: Record<string, number>;
@@ -125,6 +161,7 @@ export interface BillingOverview {
   new_paid_30d: number;
   mrr_by_tier: Record<string, { count: number; price: number; mrr: number }>;
   total_mrr: number;
+  stripe_live: StripeLiveData | null;
   note: string;
 }
 
@@ -189,6 +226,7 @@ export interface ReportCreateResult {
   status: string;
   requested_at: string;
   requested_by: string;
+  row_count?: number;
   message: string;
 }
 
@@ -203,6 +241,20 @@ export interface PlatformHealth {
     audit_logs: number;
   };
   checked_at: string;
+}
+
+export interface SyncResult {
+  synced: number;
+  failed: number;
+  already_synced?: number;
+  total_checked?: number;
+  checked?: number;
+  updated?: number;
+  errors: { user_id?: string; email?: string; customer_id?: string; error: string }[];
+}
+
+export interface TierConfig {
+  tiers: { name: string; price: number; user_count: number; is_paid: boolean }[];
 }
 
 // --- API calls ---
@@ -272,5 +324,18 @@ export const adminAPI = {
     return adminFetch<ReportCreateResult>(`/admin/reports/request?${searchParams}`, { method: 'POST' });
   },
 
+  downloadReport: (reportId: string, format: 'json' | 'csv' = 'json') =>
+    adminFetchBlob(`/admin/reports/${reportId}/download?format=${format}`),
+
   getPlatformHealth: () => adminFetch<PlatformHealth>('/admin/health'),
+
+  // Stripe sync operations
+  syncStripeCustomers: () =>
+    adminFetch<SyncResult>('/admin/stripe/sync-customers', { method: 'POST' }),
+
+  syncStripeSubscriptions: () =>
+    adminFetch<SyncResult>('/admin/stripe/sync-subscriptions', { method: 'POST' }),
+
+  // Tier configuration
+  getTierConfig: () => adminFetch<TierConfig>('/admin/config/tiers'),
 };

@@ -16,7 +16,10 @@ const ACTION_FILTERS = [
   { value: 'view_billing', label: 'Billing Views' },
   { value: 'view_growth', label: 'Growth Stats' },
   { value: 'view_engagement', label: 'Engagement Stats' },
-  { value: 'report_', label: 'Report Requests' },
+  { value: 'report_', label: 'Report Actions' },
+  { value: 'download_report', label: 'Report Downloads' },
+  { value: 'sync_stripe', label: 'Stripe Sync' },
+  { value: 'view_health', label: 'Health Checks' },
 ];
 
 const ACTION_COLORS: Record<string, string> = {
@@ -27,6 +30,9 @@ const ACTION_COLORS: Record<string, string> = {
   'admin:view_billing': 'bg-emerald-500/15 text-emerald-400',
   'admin:view_growth_stats': 'bg-indigo-500/15 text-indigo-400',
   'admin:view_engagement_stats': 'bg-indigo-500/15 text-indigo-400',
+  'admin:sync_stripe_customers': 'bg-cyan-500/15 text-cyan-400',
+  'admin:sync_stripe_subscriptions': 'bg-cyan-500/15 text-cyan-400',
+  'admin:download_report': 'bg-emerald-500/15 text-emerald-400',
 };
 
 function formatDate(dateStr: string | null): string {

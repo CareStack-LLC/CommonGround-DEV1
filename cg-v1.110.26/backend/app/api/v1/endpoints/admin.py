@@ -14,11 +14,13 @@ All endpoints require is_admin=True on the authenticated user.
 All actions are logged to the audit_logs table.
 """
 
+import io
 import logging
 from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select, or_, and_, case as sql_case, cast, Date
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -30,6 +32,37 @@ from app.models.audit import AuditLog
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+
+# =============================================================================
+# Shared tier pricing helper
+# =============================================================================
+
+# Correct prices matching actual Stripe plans
+_DEFAULT_TIER_PRICES = {
+    "web_starter": 0, "essential": 0, "starter": 0,
+    "plus": 17.99, "complete": 34.99, "family_plus": 25.00,
+    "premium": 49.99,
+    "solo": 99.00, "small_firm": 299.00, "mid_size": 799.00,
+}
+
+
+async def _get_tier_prices(db: AsyncSession) -> dict[str, float]:
+    """Get tier prices, falling back to defaults."""
+    try:
+        from app.models.subscription import SubscriptionPlan
+        result = await db.execute(select(SubscriptionPlan))
+        plans = result.scalars().all()
+        if plans:
+            prices = {}
+            for plan in plans:
+                code = plan.plan_code if hasattr(plan, "plan_code") else (plan.name or "").lower().replace(" ", "_")
+                price = float(plan.price_monthly) if hasattr(plan, "price_monthly") and plan.price_monthly else 0
+                prices[code] = price
+            return {**_DEFAULT_TIER_PRICES, **prices}
+    except Exception:
+        pass
+    return _DEFAULT_TIER_PRICES.copy()
 
 
 # =============================================================================
@@ -127,11 +160,8 @@ async def get_admin_dashboard(
     for tier, count in tier_result:
         tier_counts[tier or "unknown"] = count
 
-    # MRR estimate (rough calculation from tier counts)
-    tier_prices = {
-        "plus": 12.00, "family_plus": 25.00,
-        "solo": 99.00, "small_firm": 299.00, "mid_size": 799.00,
-    }
+    # MRR estimate using correct tier prices
+    tier_prices = await _get_tier_prices(db)
     estimated_mrr = sum(
         tier_prices.get(tier, 0) * count
         for tier, count in tier_counts.items()
@@ -578,11 +608,8 @@ async def get_billing_overview(
         )
     )
 
-    # Tier prices for MRR calculation
-    tier_prices = {
-        "plus": 12.00, "family_plus": 25.00,
-        "solo": 99.00, "small_firm": 299.00, "mid_size": 799.00,
-    }
+    # Tier prices from config/DB (correct prices)
+    tier_prices = await _get_tier_prices(db)
 
     # Calculate MRR by tier
     mrr_by_tier = {}
@@ -601,10 +628,58 @@ async def get_billing_overview(
     new_paid_30d = await db.scalar(
         select(func.count(UserProfile.id)).where(
             UserProfile.subscription_status == "active",
-            UserProfile.subscription_tier.notin_(["essential", "starter", "unknown"]),
+            UserProfile.subscription_tier.notin_(["essential", "starter", "web_starter", "unknown"]),
             UserProfile.created_at >= thirty_days_ago,
         )
     )
+
+    # --- Live Stripe data (graceful fallback) ---
+    stripe_live = None
+    try:
+        import stripe
+        from app.core.config import settings as app_settings
+        if app_settings.STRIPE_SECRET_KEY:
+            stripe.api_key = app_settings.STRIPE_SECRET_KEY
+
+            # Active subscriptions from Stripe
+            subs = stripe.Subscription.list(status="active", limit=100)
+            stripe_active_count = len(subs.data)
+            stripe_mrr_cents = sum(
+                sub.plan.amount * sub.quantity
+                for sub in subs.data
+                if sub.plan and sub.plan.amount
+            )
+
+            # Recent invoices
+            invoices = stripe.Invoice.list(limit=20, status="paid")
+            recent_payments = [
+                {
+                    "id": inv.id,
+                    "customer": inv.customer,
+                    "customer_email": inv.customer_email,
+                    "amount": inv.amount_paid / 100.0,
+                    "currency": inv.currency,
+                    "status": inv.status,
+                    "created": datetime.fromtimestamp(inv.created).isoformat(),
+                    "description": inv.lines.data[0].description if inv.lines and inv.lines.data else None,
+                }
+                for inv in invoices.data
+            ]
+
+            # Total customers
+            customers = stripe.Customer.list(limit=1)
+            total_customers = customers.total_count if hasattr(customers, "total_count") else len(customers.data)
+
+            stripe_live = {
+                "stripe_available": True,
+                "active_subscriptions": stripe_active_count,
+                "total_mrr": round(stripe_mrr_cents / 100.0, 2),
+                "total_customers": total_customers,
+                "recent_payments": recent_payments,
+            }
+    except Exception as e:
+        logger.warning(f"Stripe API unavailable for billing overview: {e}")
+        stripe_live = {"stripe_available": False, "error": str(e)}
 
     await _log_admin_action(db, admin_user, "view_billing", "platform")
     await db.commit()
@@ -618,7 +693,8 @@ async def get_billing_overview(
         "new_paid_30d": new_paid_30d,
         "mrr_by_tier": mrr_by_tier,
         "total_mrr": round(total_mrr, 2),
-        "note": "For detailed transaction data, use the Stripe Dashboard.",
+        "stripe_live": stripe_live,
+        "note": "MRR calculated from database tier counts. See stripe_live for real-time Stripe data.",
     }
 
 
@@ -913,7 +989,7 @@ async def create_report_request(
         action=f"admin:report_{report_type}",
         resource_type="report",
         method="POST",
-        status="pending",
+        status="processing",
         description=f"Report request: {report_type} for last {date_range_days} days" + (f" - {notes}" if notes else ""),
         extra_metadata={
             "report_type": report_type,
@@ -924,15 +1000,49 @@ async def create_report_request(
     )
     db.add(report_log)
     await db.commit()
+    await db.refresh(report_log)
 
-    return {
-        "id": str(report_log.id),
-        "report_type": report_type,
-        "status": "pending",
-        "requested_at": now.isoformat(),
-        "requested_by": admin_user.email,
-        "message": f"Report '{report_type}' has been queued for processing.",
-    }
+    # Actually generate the report
+    try:
+        from app.services.admin_report_service import generate_report
+        report_data = await generate_report(db, report_type, date_range_days)
+
+        report_log.status = "completed"
+        report_log.extra_metadata = {
+            **report_log.extra_metadata,
+            "report_data": report_data,
+            "completed_at": datetime.utcnow().isoformat(),
+            "row_count": report_data.get("row_count", 0),
+        }
+        await db.commit()
+
+        return {
+            "id": str(report_log.id),
+            "report_type": report_type,
+            "status": "completed",
+            "requested_at": now.isoformat(),
+            "requested_by": admin_user.email,
+            "row_count": report_data.get("row_count", 0),
+            "message": f"Report '{report_type}' generated successfully.",
+        }
+    except Exception as e:
+        logger.error(f"Report generation failed: {e}")
+        report_log.status = "failed"
+        report_log.extra_metadata = {
+            **report_log.extra_metadata,
+            "error": str(e),
+            "failed_at": datetime.utcnow().isoformat(),
+        }
+        await db.commit()
+
+        return {
+            "id": str(report_log.id),
+            "report_type": report_type,
+            "status": "failed",
+            "requested_at": now.isoformat(),
+            "requested_by": admin_user.email,
+            "message": f"Report generation failed: {str(e)}",
+        }
 
 
 # =============================================================================
@@ -1003,3 +1113,254 @@ async def get_platform_health(
         },
         "checked_at": now.isoformat(),
     }
+
+
+# =============================================================================
+# MODULE 08: Report Download
+# =============================================================================
+
+@router.get(
+    "/reports/{report_id}/download",
+    summary="Download a completed report",
+)
+async def download_report(
+    report_id: str,
+    format: str = Query("json", description="Output format: json or csv"),
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> StreamingResponse:
+    """Download a completed admin report as JSON or CSV."""
+    result = await db.execute(
+        select(AuditLog).where(
+            AuditLog.id == report_id,
+            AuditLog.action.like("admin:report_%"),
+        )
+    )
+    report = result.scalar_one_or_none()
+
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    if report.status != "completed":
+        raise HTTPException(status_code=400, detail=f"Report is not completed (status: {report.status})")
+
+    report_data = (report.extra_metadata or {}).get("report_data")
+    if not report_data:
+        raise HTTPException(status_code=400, detail="Report data not available")
+
+    await _log_admin_action(db, admin_user, "download_report", "report", report_id)
+    await db.commit()
+
+    report_type = (report.extra_metadata or {}).get("report_type", "report")
+
+    if format == "csv":
+        from app.services.admin_report_service import report_to_csv
+        csv_content = report_to_csv(report_data)
+        return StreamingResponse(
+            io.StringIO(csv_content),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={report_type}_{report_id[:8]}.csv"},
+        )
+    else:
+        import json
+        return StreamingResponse(
+            io.StringIO(json.dumps(report_data, indent=2, default=str)),
+            media_type="application/json",
+            headers={"Content-Disposition": f"attachment; filename={report_type}_{report_id[:8]}.json"},
+        )
+
+
+# =============================================================================
+# MODULE 09: Stripe Sync
+# =============================================================================
+
+@router.post(
+    "/stripe/sync-customers",
+    summary="Backfill Stripe customers for users without one",
+)
+async def sync_stripe_customers(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Find all users without a Stripe customer ID and create one.
+    Safe to run multiple times (idempotent).
+    """
+    # Find profiles without Stripe customer ID
+    result = await db.execute(
+        select(UserProfile, User)
+        .join(User, User.id == UserProfile.user_id)
+        .where(
+            (UserProfile.stripe_customer_id == None) | (UserProfile.stripe_customer_id == ""),
+            User.is_deleted == False,
+        )
+    )
+    profiles_to_sync = result.all()
+
+    synced = 0
+    failed = 0
+    errors = []
+    already_synced = 0
+
+    try:
+        from app.services.stripe_service import StripeService
+        stripe_svc = StripeService()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Stripe service unavailable: {e}")
+
+    for profile, user in profiles_to_sync:
+        if profile.stripe_customer_id:
+            already_synced += 1
+            continue
+        try:
+            customer = await stripe_svc.create_customer(
+                email=user.email,
+                name=f"{user.first_name} {user.last_name}".strip(),
+                user_id=str(user.id),
+                metadata={"platform": "commonground", "synced_by": "admin_backfill"},
+            )
+            profile.stripe_customer_id = customer["id"]
+            synced += 1
+        except Exception as e:
+            failed += 1
+            errors.append({"user_id": str(user.id), "email": user.email, "error": str(e)})
+
+    await _log_admin_action(
+        db, admin_user, "sync_stripe_customers", "platform",
+        details=f"Synced {synced}, failed {failed}, already had {already_synced}",
+    )
+    await db.commit()
+
+    return {
+        "synced": synced,
+        "failed": failed,
+        "already_synced": already_synced,
+        "total_checked": len(profiles_to_sync),
+        "errors": errors[:10],  # Limit error details
+    }
+
+
+@router.post(
+    "/stripe/sync-subscriptions",
+    summary="Sync subscription status from Stripe",
+)
+async def sync_stripe_subscriptions(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    For each user with a Stripe customer ID, check their Stripe subscription
+    and update the local DB if it differs.
+    """
+    import stripe
+    from app.core.config import settings as app_settings
+
+    if not app_settings.STRIPE_SECRET_KEY:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+
+    stripe.api_key = app_settings.STRIPE_SECRET_KEY
+
+    result = await db.execute(
+        select(UserProfile)
+        .where(
+            UserProfile.stripe_customer_id != None,
+            UserProfile.stripe_customer_id != "",
+        )
+    )
+    profiles = result.scalars().all()
+
+    updated = 0
+    checked = 0
+    errors = []
+
+    for profile in profiles:
+        checked += 1
+        try:
+            subs = stripe.Subscription.list(
+                customer=profile.stripe_customer_id,
+                status="all",
+                limit=1,
+            )
+            if subs.data:
+                sub = subs.data[0]
+                stripe_status = sub.status  # active, trialing, past_due, canceled, etc.
+
+                # Map Stripe status to our status
+                status_map = {
+                    "active": "active",
+                    "trialing": "trial",
+                    "past_due": "past_due",
+                    "canceled": "cancelled",
+                    "incomplete": "incomplete",
+                    "unpaid": "past_due",
+                }
+                new_status = status_map.get(stripe_status, stripe_status)
+
+                # Check if update needed
+                if profile.subscription_status != new_status:
+                    profile.subscription_status = new_status
+                    updated += 1
+
+                # Update subscription period dates if available
+                if hasattr(sub, "current_period_start") and sub.current_period_start:
+                    profile.subscription_period_start = datetime.fromtimestamp(sub.current_period_start)
+                if hasattr(sub, "current_period_end") and sub.current_period_end:
+                    profile.subscription_period_end = datetime.fromtimestamp(sub.current_period_end)
+
+                # Update Stripe subscription ID
+                if not profile.stripe_subscription_id or profile.stripe_subscription_id != sub.id:
+                    profile.stripe_subscription_id = sub.id
+        except Exception as e:
+            errors.append({"customer_id": profile.stripe_customer_id, "error": str(e)})
+
+    await _log_admin_action(
+        db, admin_user, "sync_stripe_subscriptions", "platform",
+        details=f"Checked {checked}, updated {updated}",
+    )
+    await db.commit()
+
+    return {
+        "checked": checked,
+        "updated": updated,
+        "errors": errors[:10],
+    }
+
+
+# =============================================================================
+# MODULE 10: Tier Configuration
+# =============================================================================
+
+@router.get(
+    "/config/tiers",
+    summary="Get subscription tier configuration",
+)
+async def get_tier_config(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Returns all subscription tier names, prices, and metadata.
+    Used by frontend to dynamically populate tier dropdowns.
+    """
+    tier_prices = await _get_tier_prices(db)
+
+    # Get actual usage counts per tier
+    tier_result = await db.execute(
+        select(
+            UserProfile.subscription_tier,
+            func.count(UserProfile.id),
+        )
+        .group_by(UserProfile.subscription_tier)
+    )
+    tier_counts = {tier or "unknown": count for tier, count in tier_result}
+
+    tiers = []
+    for tier_name, price in sorted(tier_prices.items(), key=lambda x: x[1]):
+        tiers.append({
+            "name": tier_name,
+            "price": price,
+            "user_count": tier_counts.get(tier_name, 0),
+            "is_paid": price > 0,
+        })
+
+    return {"tiers": tiers}
