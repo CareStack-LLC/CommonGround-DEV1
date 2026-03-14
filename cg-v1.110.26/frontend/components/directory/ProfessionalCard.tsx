@@ -61,7 +61,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
                             </div>
                         ) : (
                             <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center shadow-inner">
-                                <span className="text-4xl font-bold text-slate-400" style={{ fontFamily: 'Crimson Text, serif' }}>
+                                <span className="text-4xl font-bold text-slate-400" style={{ fontFamily: 'DM Serif Display, serif' }}>
                                     {firm.name.charAt(0)}
                                 </span>
                             </div>
@@ -88,7 +88,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
             <CardContent className="flex-1 p-6 space-y-4">
                 <div>
                     <div className="flex justify-between items-start gap-2 mb-2">
-                        <h3 className="font-bold text-xl leading-tight group-hover:text-[var(--portal-primary)] transition-colors cursor-pointer text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                        <h3 className="font-bold text-xl leading-tight group-hover:text-[var(--portal-primary)] transition-colors cursor-pointer text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             {firm.name}
                         </h3>
                     </div>
@@ -134,7 +134,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
             <CardFooter className="p-5 pt-0 mt-auto flex flex-row gap-2">
                 <Button
                     variant="default"
-                    className="flex-1 rounded-full bg-[#4A6C58] hover:bg-[#3A5646] text-white shadow-sm transition-all duration-300 font-bold h-11"
+                    className="flex-1 rounded-full bg-[#3DAA8A] hover:bg-[#3A5646] text-white shadow-sm transition-all duration-300 font-bold h-11"
                     onClick={handleViewProfile}
                 >
                     View Profile
@@ -142,7 +142,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
                 {onInvite && (
                     <Button
                         variant="outline"
-                        className="flex-shrink-0 px-6 rounded-full border-2 border-[#4A6C58] text-[#4A6C58] hover:bg-[#E8F0EC] font-bold h-11"
+                        className="flex-shrink-0 px-6 rounded-full border-2 border-[#3DAA8A] text-[#3DAA8A] hover:bg-[#E8F0EC] font-bold h-11"
                         onClick={(e) => { e.stopPropagation(); onInvite(firm); }}
                     >
                         Invite

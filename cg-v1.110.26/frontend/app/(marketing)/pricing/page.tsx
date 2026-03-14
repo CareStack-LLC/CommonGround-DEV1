@@ -43,13 +43,13 @@ export default function PricingPage() {
         'My Circle: 1 trusted contact',
         'Mobile apps (coming soon)'
       ],
-      color: '#D97757',
+      color: '#F5A623',
       cta: 'Start Trial'
     },
     {
       name: 'Complete',
       code: 'complete',
-      tagline: 'For high-conflict & court',
+      tagline: 'For families & court',
       whoFor: 'Parents heading to court',
       monthly: 34.99,
       annual: 349.99,
@@ -89,18 +89,18 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF8F3]">
+    <div className="min-h-screen bg-[#F4F8F7]">
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Start free.
             <br />
@@ -132,7 +132,7 @@ export default function PricingPage() {
               }`}
             >
               Annual
-              <span className="ml-2 text-xs text-[#D97757] font-bold">Save 17%</span>
+              <span className="ml-2 text-xs text-[#F5A623] font-bold">Save 17%</span>
             </button>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function PricingPage() {
               <div
                 key={plan.code}
                 className={`relative bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 ${
-                  plan.popular ? 'ring-2 ring-[#D97757] scale-105' : ''
+                  plan.popular ? 'ring-2 ring-[#F5A623] scale-105' : ''
                 }`}
                 style={{
                   animationDelay: `${idx * 100}ms`,
@@ -156,7 +156,7 @@ export default function PricingPage() {
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#D97757] text-white text-sm font-medium px-4 py-1 rounded-full">
+                    <span className="bg-[#F5A623] text-white text-sm font-medium px-4 py-1 rounded-full">
                       Most Popular
                     </span>
                   </div>
@@ -165,8 +165,8 @@ export default function PricingPage() {
                 {/* Header */}
                 <div className="text-center mb-6">
                   <h2
-                    className="text-3xl font-serif text-[#2C3E50] mb-2"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-3xl font-serif text-[#1E3A4A] mb-2"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {plan.name}
                   </h2>
@@ -185,7 +185,7 @@ export default function PricingPage() {
                   </div>
 
                   {getSavings(plan) && (
-                    <div className="text-sm text-[#D97757] font-medium">
+                    <div className="text-sm text-[#F5A623] font-medium">
                       {getSavings(plan)}
                     </div>
                   )}
@@ -244,8 +244,8 @@ export default function PricingPage() {
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2
-            className="text-4xl sm:text-5xl font-serif text-[#2C3E50] mb-6"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-4xl sm:text-5xl font-serif text-[#1E3A4A] mb-6"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Why upgrade?
           </h2>
@@ -253,7 +253,7 @@ export default function PricingPage() {
           <div className="grid md:grid-cols-3 gap-6 mt-12">
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="text-3xl mb-3">⏰</div>
-              <h3 className="font-serif text-xl text-[#2C3E50] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h3 className="font-serif text-xl text-[#1E3A4A] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Stop coordinating
               </h3>
               <p className="text-gray-600 text-sm">
@@ -263,8 +263,8 @@ export default function PricingPage() {
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="text-3xl mb-3">💰</div>
-              <h3 className="font-serif text-xl text-[#2C3E50] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
-                Stop fighting about money
+              <h3 className="font-serif text-xl text-[#1E3A4A] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                Keep finances clear
               </h3>
               <p className="text-gray-600 text-sm">
                 Track every dollar. Upload receipts. Auto-split costs. Clear records for court.
@@ -273,7 +273,7 @@ export default function PricingPage() {
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="text-3xl mb-3">⚖️</div>
-              <h3 className="font-serif text-xl text-[#2C3E50] mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h3 className="font-serif text-xl text-[#1E3A4A] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Be court-ready
               </h3>
               <p className="text-gray-600 text-sm">
@@ -288,8 +288,8 @@ export default function PricingPage() {
       <section className="py-20 px-6 bg-white">
         <div className="max-w-3xl mx-auto">
           <h2
-            className="text-4xl font-serif text-[#2C3E50] mb-12 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-4xl font-serif text-[#1E3A4A] mb-12 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Common questions
           </h2>
@@ -314,7 +314,7 @@ export default function PricingPage() {
               }
             ].map((faq) => (
               <details key={faq.q} className="group bg-gray-50 rounded-xl p-6">
-                <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-[#2C3E50]">
+                <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-[#1E3A4A]">
                   {faq.q}
                   <span className="text-gray-400 group-open:rotate-180 transition-transform">
                     ▼
@@ -331,15 +331,15 @@ export default function PricingPage() {
       <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#234846] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6 leading-tight"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Ready to stop fighting?
+            Ready to find common ground?
           </h2>
 
           <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">

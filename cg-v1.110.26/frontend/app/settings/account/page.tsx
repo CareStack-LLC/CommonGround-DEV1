@@ -144,7 +144,7 @@ export default function AccountSettingsPage() {
           <User className="w-6 h-6 text-blue-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Account Settings
           </h2>
           <p className="text-sm text-slate-500 font-medium">
@@ -174,7 +174,7 @@ export default function AccountSettingsPage() {
         {/* Profile Information */}
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
                 <User className="h-5 w-5 text-blue-600" />
               </div>
@@ -232,7 +232,7 @@ export default function AccountSettingsPage() {
         {/* Contact Information */}
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
                 <Mail className="h-5 w-5 text-emerald-600" />
               </div>
@@ -307,7 +307,7 @@ export default function AccountSettingsPage() {
         {/* Address Information */}
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
                 <MapPin className="h-5 w-5 text-amber-600" />
               </div>
@@ -425,7 +425,7 @@ export default function AccountSettingsPage() {
           <button
             type="submit"
             disabled={isSaving}
-            className="px-6 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+            className="px-6 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 disabled:opacity-50"
           >
             {isSaving ? (
               <span className="flex items-center gap-2">

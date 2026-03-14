@@ -96,7 +96,7 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
           <circle cx="12" cy="12" r="2.5" fill="#2C5F5D" />
         </svg>
       </div>
-      <span className="text-lg font-semibold text-white hidden sm:inline" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+      <span className="text-lg font-semibold text-white hidden sm:inline" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
         CommonGround
       </span>
     </div>
@@ -241,7 +241,7 @@ export function Navigation() {
                       <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl border-2 border-slate-100 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
                         {/* User Info */}
                         <div className="px-5 py-4 border-b border-slate-100">
-                          <p className="font-bold text-slate-900 text-lg" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                          <p className="font-bold text-slate-900 text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             {user?.first_name} {user?.last_name}
                           </p>
                           <p className="text-sm text-slate-500 font-medium truncate">{user?.email}</p>

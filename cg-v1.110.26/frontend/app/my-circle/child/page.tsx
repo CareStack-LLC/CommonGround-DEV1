@@ -123,11 +123,11 @@ function ChildLoginContent() {
 
   if (!familyFileId) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center p-4 relative overflow-hidden">
         {/* Subtle decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
           <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
-          <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
+          <div className="absolute top-64 right-0 w-3/4 h-px bg-[#F5A623]" />
         </div>
 
         <div className="relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
@@ -149,11 +149,11 @@ function ChildLoginContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Subtle decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
         <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
-        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#D97757]" />
+        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#F5A623]" />
         <div className="absolute bottom-32 left-0 w-2/3 h-px bg-[#2C5F5D]" />
       </div>
 
@@ -279,7 +279,7 @@ function ChildLoginContent() {
               <button
                 onClick={handlePinBackspace}
                 disabled={isLoading}
-                className="p-4 bg-[#D97757]/20 hover:bg-[#D97757]/30 text-[#D97757] rounded-2xl transition-colors flex items-center justify-center disabled:opacity-50"
+                className="p-4 bg-[#F5A623]/20 hover:bg-[#F5A623]/30 text-[#F5A623] rounded-2xl transition-colors flex items-center justify-center disabled:opacity-50"
               >
                 <Delete className="h-6 w-6" />
               </button>
@@ -308,7 +308,7 @@ export default function ChildLoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9] flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center">
           <Loader2 className="h-12 w-12 animate-spin text-[#2C5F5D]" />
         </div>
       }

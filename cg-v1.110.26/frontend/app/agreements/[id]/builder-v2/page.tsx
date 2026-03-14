@@ -278,13 +278,13 @@ function BuilderV2Content() {
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <Card className="max-w-md border-2 border-slate-200 rounded-2xl shadow-lg">
             <CardHeader>
-              <CardTitle className="text-destructive" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Error</CardTitle>
+              <CardTitle className="text-destructive" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Error</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-foreground mb-4 font-medium">{error}</p>
               <Button
                 onClick={() => router.push('/agreements')}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] hover:opacity-90"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] hover:opacity-90"
               >
                 Back to Agreements
               </Button>
@@ -318,7 +318,7 @@ function BuilderV2Content() {
                 <FileText className="w-5 h-5 text-[var(--portal-primary)]" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>SharedCare Agreement</h1>
+                <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>SharedCare Agreement</h1>
                 <p className="text-sm text-muted-foreground font-medium">Simple 7-Section Builder</p>
               </div>
             </div>
@@ -346,7 +346,7 @@ function BuilderV2Content() {
           </div>
           <div className="w-full bg-slate-200 rounded-full h-2.5 shadow-inner">
             <div
-              className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] h-2.5 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] h-2.5 rounded-full transition-all duration-300"
               style={{ width: `${getProgressPercentage()}%` }}
             />
           </div>
@@ -363,7 +363,7 @@ function BuilderV2Content() {
                 onClick={() => setCurrentSectionIndex(index)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap border-2 ${
                   index === currentSectionIndex
-                    ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white border-transparent shadow-lg'
+                    ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white border-transparent shadow-lg'
                     : completedSections.has(section.key)
                     ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:shadow-md'
                     : 'text-muted-foreground border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-md bg-white'
@@ -393,7 +393,7 @@ function BuilderV2Content() {
                   <Lightbulb className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Would you like to add more detail?</CardTitle>
+                  <CardTitle className="text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Would you like to add more detail?</CardTitle>
                   <CardDescription className="font-medium">
                     These Quick Accords can be added now or later to supplement your main agreement.
                   </CardDescription>
@@ -422,7 +422,7 @@ function BuilderV2Content() {
                 </Button>
                 <Button
                   onClick={handleContinueAfterSuggestions}
-                  className="flex-1 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] hover:opacity-90 font-bold transition-all duration-300"
+                  className="flex-1 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] hover:opacity-90 font-bold transition-all duration-300"
                 >
                   Continue
                 </Button>
@@ -436,11 +436,11 @@ function BuilderV2Content() {
           <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white font-bold text-lg shadow-md">
+                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold text-lg shadow-md">
                   {currentSection.number}
                 </div>
                 <div>
-                  <CardTitle style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{currentSection.title}</CardTitle>
+                  <CardTitle style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{currentSection.title}</CardTitle>
                   <CardDescription className="font-medium">{currentSection.description}</CardDescription>
                 </div>
               </div>
@@ -474,7 +474,7 @@ function BuilderV2Content() {
             {currentSectionIndex < sections.length - 1 ? (
               <Button
                 onClick={handleNext}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] hover:opacity-90 font-bold transition-all duration-300 shadow-lg"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] hover:opacity-90 font-bold transition-all duration-300 shadow-lg"
               >
                 Save & Continue
                 <ChevronRight className="h-4 w-4 ml-2" />
@@ -592,7 +592,7 @@ function PartiesChildrenForm({
       {familyFile ? (
         <div className="space-y-4">
           <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10 border-2 border-[var(--portal-primary)]/20">
-            <h3 className="font-bold text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h3 className="font-bold text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <CheckCircle2 className="h-5 w-5 text-emerald-500" />
               Parent Information
             </h3>
@@ -635,7 +635,7 @@ function PartiesChildrenForm({
           {/* Children Information */}
           {familyFile.children && familyFile.children.length > 0 && (
             <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10 border-2 border-[var(--portal-primary)]/20">
-              <h3 className="font-bold text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h3 className="font-bold text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                 Children ({familyFile.children.length})
               </h3>
@@ -1040,7 +1040,7 @@ function AcknowledgmentForm({ data, onChange }: { data: any; onChange: (field: s
   return (
     <div className="space-y-6">
       <div className="p-5 rounded-xl border-2 border-[var(--portal-primary)]/20 bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10">
-        <h3 className="font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Review Your Agreement</h3>
+        <h3 className="font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Review Your Agreement</h3>
         <p className="text-sm text-muted-foreground font-medium">
           Please review all sections. Once both parents acknowledge, this agreement becomes active.
         </p>

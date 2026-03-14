@@ -29,7 +29,12 @@ from app.models.base import Base, TimestampMixin, UUIDMixin
 
 
 # Subscription tier codes
-SUBSCRIPTION_TIERS = ["web_starter", "plus", "complete"]
+# Consumer tiers
+CONSUMER_TIERS = ["web_starter", "plus", "complete"]
+# Professional tiers (Attorney-First GTM)
+PROFESSIONAL_TIERS = ["solo", "small_firm", "mid_size", "enterprise"]
+# All tiers
+SUBSCRIPTION_TIERS = CONSUMER_TIERS + PROFESSIONAL_TIERS
 
 # Subscription statuses
 SUBSCRIPTION_STATUSES = ["trial", "active", "past_due", "cancelled", "grant"]

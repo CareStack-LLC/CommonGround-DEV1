@@ -225,7 +225,7 @@ export default function KidComsPage() {
               <ArrowLeft className="h-5 w-5 text-slate-600" />
             </button>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
                   <Video className="h-6 w-6 text-purple-600" />
                 </div>
@@ -262,7 +262,7 @@ export default function KidComsPage() {
             {/* Child Selector */}
             {children.length > 0 && (
               <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-                <h2 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Select Child</h2>
+                <h2 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Select Child</h2>
                 <div className="space-y-2">
                   {children.map((child) => (
                     <button
@@ -297,7 +297,7 @@ export default function KidComsPage() {
 
             {/* Quick Actions */}
             <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Quick Actions</h2>
+              <h2 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Quick Actions</h2>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => startVideoCall()}
@@ -356,7 +356,7 @@ export default function KidComsPage() {
           <div className="lg:col-span-1">
             <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Heart className="h-5 w-5 text-teal-500" />
                   My Circle
                 </h2>
@@ -373,7 +373,7 @@ export default function KidComsPage() {
                   <div className="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4">
                     <Users className="h-8 w-8 text-teal-500" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No circle contacts yet</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No circle contacts yet</h3>
                   <p className="text-slate-600 mb-4">Add trusted contacts to your circle</p>
                   <button
                     onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
@@ -424,7 +424,7 @@ export default function KidComsPage() {
           {/* Right Column - Recent Sessions */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <Clock className="h-5 w-5 text-slate-600" />
                 Recent Sessions
               </h2>
@@ -483,7 +483,7 @@ export default function KidComsPage() {
             {/* Feature Status */}
             {settings && (
               <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-                <h2 className="text-base font-bold text-slate-900 mb-4" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Enabled Features</h2>
+                <h2 className="text-base font-bold text-slate-900 mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Enabled Features</h2>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center gap-2">
                     <div className={cn(

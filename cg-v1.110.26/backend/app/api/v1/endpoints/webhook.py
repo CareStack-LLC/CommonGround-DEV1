@@ -366,11 +366,69 @@ async def _get_profile_by_stripe_customer(db: AsyncSession, customer_id: str) ->
     return result.scalar_one_or_none()
 
 
+async def _get_professional_by_stripe_customer(db: AsyncSession, customer_id: str):
+    """Find professional profile by Stripe customer ID."""
+    from app.models.professional import ProfessionalProfile
+    result = await db.execute(
+        select(ProfessionalProfile).where(
+            ProfessionalProfile.stripe_customer_id == customer_id
+        )
+    )
+    return result.scalar_one_or_none()
+
+
+async def _sync_professional_subscription(db: AsyncSession, event_data: dict) -> bool:
+    """
+    Sync subscription event to professional profile if applicable.
+
+    Returns True if a professional profile was updated.
+    """
+    from datetime import datetime
+    from app.models.professional import ProfessionalTier, TIER_CASE_LIMITS
+
+    customer_id = event_data.get("customer_id")
+    if not customer_id:
+        return False
+
+    prof = await _get_professional_by_stripe_customer(db, customer_id)
+    if not prof:
+        return False
+
+    subscription_id = event_data.get("subscription_id")
+    status = event_data.get("status")
+    price_id = event_data.get("price_id")
+    period_end = event_data.get("current_period_end")
+
+    # Map price to tier
+    tier = await _get_tier_from_price_id(db, price_id)
+
+    # Update professional profile
+    prof.subscription_tier = tier
+    prof.subscription_status = status or prof.subscription_status
+    prof.stripe_subscription_id = subscription_id
+
+    # Update case limits based on tier
+    try:
+        tier_enum = ProfessionalTier(tier)
+        prof.max_active_cases = TIER_CASE_LIMITS.get(tier_enum, 3)
+    except ValueError:
+        pass
+
+    if period_end:
+        prof.subscription_ends_at = datetime.fromtimestamp(period_end)
+
+    logger.info(
+        f"Synced professional subscription: profile={prof.id}, tier={tier}, status={status}"
+    )
+    return True
+
+
 async def handle_subscription_created(db: AsyncSession, event_data: dict) -> None:
     """
     Handle new subscription creation.
 
-    Syncs subscription to user profile when Stripe confirms subscription created.
+    Syncs subscription to user profile or professional profile
+    when Stripe confirms subscription created.
     """
     from datetime import datetime
 
@@ -383,6 +441,10 @@ async def handle_subscription_created(db: AsyncSession, event_data: dict) -> Non
 
     if not customer_id:
         logger.warning(f"No customer_id in subscription.created event")
+        return
+
+    # Check professional profile first
+    if await _sync_professional_subscription(db, event_data):
         return
 
     profile = await _get_profile_by_stripe_customer(db, customer_id)
@@ -411,7 +473,7 @@ async def handle_subscription_updated(db: AsyncSession, event_data: dict) -> Non
     """
     Handle subscription updates.
 
-    Syncs status changes, plan changes, and period updates to user profile.
+    Syncs status changes, plan changes, and period updates to user or professional profile.
     """
     from datetime import datetime
 
@@ -425,6 +487,10 @@ async def handle_subscription_updated(db: AsyncSession, event_data: dict) -> Non
 
     if not customer_id:
         logger.warning(f"No customer_id in subscription.updated event")
+        return
+
+    # Check professional profile first
+    if await _sync_professional_subscription(db, event_data):
         return
 
     profile = await _get_profile_by_stripe_customer(db, customer_id)
@@ -457,13 +523,25 @@ async def handle_subscription_deleted(db: AsyncSession, event_data: dict) -> Non
     """
     Handle subscription cancellation/deletion.
 
-    Downgrades user to starter tier when subscription ends.
+    Downgrades user or professional to starter tier when subscription ends.
     """
     customer_id = event_data.get("customer_id")
     subscription_id = event_data.get("subscription_id")
 
     if not customer_id:
         logger.warning(f"No customer_id in subscription.deleted event")
+        return
+
+    # Check professional profile first
+    prof = await _get_professional_by_stripe_customer(db, customer_id)
+    if prof:
+        from app.models.professional import ProfessionalTier, TIER_CASE_LIMITS
+        prof.subscription_tier = ProfessionalTier.STARTER.value
+        prof.subscription_status = "cancelled"
+        prof.stripe_subscription_id = None
+        prof.max_active_cases = TIER_CASE_LIMITS[ProfessionalTier.STARTER]
+        prof.subscription_ends_at = None
+        logger.info(f"Professional subscription {subscription_id} deleted, downgraded to starter")
         return
 
     profile = await _get_profile_by_stripe_customer(db, customer_id)

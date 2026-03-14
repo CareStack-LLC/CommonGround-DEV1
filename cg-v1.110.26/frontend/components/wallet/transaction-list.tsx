@@ -144,7 +144,7 @@ export default function TransactionList({
     <div className="space-y-6">
       {Object.entries(groupedTransactions).map(([date, txs]) => (
         <div key={date}>
-          <h4 className="text-sm font-bold text-muted-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{date}</h4>
+          <h4 className="text-sm font-bold text-muted-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{date}</h4>
           <div className="space-y-2">
             {txs.map((tx) => {
               const Icon = getTransactionIcon(tx.transaction_type);

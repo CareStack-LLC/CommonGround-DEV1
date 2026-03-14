@@ -379,7 +379,7 @@ export default function BillingSettingsPage() {
             <CreditCard className="w-6 h-6 text-emerald-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               Billing & Subscription
             </h2>
             <p className="text-sm text-slate-500 font-medium">
@@ -391,7 +391,7 @@ export default function BillingSettingsPage() {
         {/* Current Plan */}
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
                 <Crown className="h-5 w-5 text-amber-600" />
               </div>
@@ -447,7 +447,7 @@ export default function BillingSettingsPage() {
           <CreditCard className="w-6 h-6 text-emerald-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Billing & Subscription
           </h2>
           <p className="text-sm text-slate-500 font-medium">
@@ -481,7 +481,7 @@ export default function BillingSettingsPage() {
       {/* Current Plan */}
       <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
               <Crown className="h-5 w-5 text-amber-600" />
             </div>
@@ -566,7 +566,7 @@ export default function BillingSettingsPage() {
       {!isGrantUser && (
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl shadow-md">
                 <Sparkles className="h-5 w-5 text-purple-600" />
               </div>
@@ -745,7 +745,7 @@ export default function BillingSettingsPage() {
       {!isPaidUser && (
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
                 <Gift className="h-5 w-5 text-emerald-600" />
               </div>
@@ -811,7 +811,7 @@ export default function BillingSettingsPage() {
       {isPaidUser && (
         <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
                 <CreditCard className="h-5 w-5 text-blue-600" />
               </div>

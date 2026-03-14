@@ -117,7 +117,7 @@ function NetBalanceCard({
 
   return (
     <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
-      <div className="h-2 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644]" />
+      <div className="h-2 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]" />
       <div className="p-5">
         <div className="flex items-start justify-between">
           <div>
@@ -464,7 +464,7 @@ function PaymentsContent() {
               <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <Wallet className="w-10 h-10 text-[var(--portal-primary)]" />
               </div>
-              <h2 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h2 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Welcome to ClearFund
               </h2>
               <p className="text-muted-foreground font-medium mb-8 max-w-md mx-auto">
@@ -472,7 +472,7 @@ function PaymentsContent() {
               </p>
               <button
                 onClick={() => router.push('/family-files')}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
               >
                 <Users className="w-5 h-5" />
                 Go to Family Files
@@ -506,7 +506,7 @@ function PaymentsContent() {
                 <Wallet className="w-6 h-6 text-[var(--portal-primary)]" />
               </div>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   ClearFund
                 </h1>
               </div>
@@ -527,7 +527,7 @@ function PaymentsContent() {
           {/* Add Expense Button */}
           <button
             onClick={() => router.push('/payments/new')}
-            className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-5 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
+            className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-5 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
           >
             <Plus className="h-5 w-5" />
             <span className="hidden sm:inline">Add</span>
@@ -548,7 +548,7 @@ function PaymentsContent() {
                 <CreditCard className="w-6 h-6 text-[var(--portal-primary)]" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <h3 className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   {wallet ? 'Complete Wallet Setup' : 'Set Up Payment Wallet'}
                 </h3>
                 <p className="text-sm text-muted-foreground mt-0.5 font-medium">
@@ -560,7 +560,7 @@ function PaymentsContent() {
               </div>
               <button
                 onClick={() => router.push('/wallet')}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-5 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2 whitespace-nowrap"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-5 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2 whitespace-nowrap"
               >
                 <Wallet className="h-4 w-4" />
                 {wallet ? 'Continue Setup' : 'Set Up Wallet'}
@@ -611,7 +611,7 @@ function PaymentsContent() {
               <AlertTriangle className="h-6 w-6 text-red-600" />
             </div>
             <div>
-              <p className="font-bold text-red-700" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <p className="font-bold text-red-700" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 {metrics.total_overdue} Overdue Obligation{metrics.total_overdue > 1 ? 's' : ''}
               </p>
               <p className="text-sm text-red-600 font-medium">
@@ -635,7 +635,7 @@ function PaymentsContent() {
             `}
           >
             <Clock className={`h-4 w-4 transition-transform duration-200 ${activeTab === 'pending' ? '' : 'group-hover:scale-110'}`} />
-            <span style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pending</span>
+            <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Pending</span>
             {metrics && metrics.total_pending_funding > 0 && (
               <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
                 activeTab === 'pending' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
@@ -650,13 +650,13 @@ function PaymentsContent() {
               group flex items-center gap-2 px-4 py-3 text-sm font-bold rounded-xl
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'active'
-                ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md'
+                ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
                 : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
               }
             `}
           >
             <ArrowUpRight className={`h-4 w-4 transition-transform duration-200 ${activeTab === 'active' ? '' : 'group-hover:scale-110'}`} />
-            <span style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Active</span>
+            <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Active</span>
             {metrics && metrics.total_funded > 0 && (
               <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
                 activeTab === 'active' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
@@ -677,7 +677,7 @@ function PaymentsContent() {
             `}
           >
             <CheckCircle className={`h-4 w-4 transition-transform duration-200 ${activeTab === 'completed' ? '' : 'group-hover:scale-110'}`} />
-            <span style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Completed</span>
+            <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Completed</span>
           </button>
           <button
             onClick={() => setActiveTab('ledger')}
@@ -691,7 +691,7 @@ function PaymentsContent() {
             `}
           >
             <BarChart3 className={`h-4 w-4 transition-transform duration-200 ${activeTab === 'ledger' ? '' : 'group-hover:scale-110'}`} />
-            <span style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Ledger</span>
+            <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Ledger</span>
           </button>
         </div>
 
@@ -709,7 +709,7 @@ function PaymentsContent() {
                   <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                     <Receipt className="w-10 h-10 text-slate-400" />
                   </div>
-                  <h3 className="font-bold text-foreground mb-2 text-lg" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <h3 className="font-bold text-foreground mb-2 text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     No {activeTab} expenses
                   </h3>
                   <p className="text-sm text-muted-foreground mb-6 font-medium">
@@ -722,7 +722,7 @@ function PaymentsContent() {
                   {activeTab === 'pending' && (
                     <button
                       onClick={() => router.push('/payments/new')}
-                      className="bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                      className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
                     >
                       <Plus className="h-5 w-5" />
                       Add Expense
@@ -744,7 +744,7 @@ function PaymentsContent() {
               <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-50 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <BarChart3 className="w-10 h-10 text-purple-600" />
               </div>
-              <h3 className="font-bold text-foreground mb-2 text-lg" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h3 className="font-bold text-foreground mb-2 text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Transaction Ledger
               </h3>
               <p className="text-sm text-muted-foreground mb-6 font-medium">

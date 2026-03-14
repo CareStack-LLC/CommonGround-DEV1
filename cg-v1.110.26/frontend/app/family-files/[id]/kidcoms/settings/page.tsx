@@ -156,7 +156,7 @@ export default function KidComsSettingsPage() {
               <ChevronLeft className="h-5 w-5 text-slate-600" />
             </button>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
                   <Settings className="h-6 w-6 text-purple-600" />
                 </div>
@@ -209,7 +209,7 @@ export default function KidComsSettingsPage() {
 
           {/* Circle Approval */}
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/5 flex items-center justify-center">
                 <Users className="h-4 w-4 text-blue-600" />
               </div>
@@ -252,7 +252,7 @@ export default function KidComsSettingsPage() {
 
           {/* Features */}
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center">
                 <Video className="h-4 w-4 text-purple-600" />
               </div>
@@ -294,7 +294,7 @@ export default function KidComsSettingsPage() {
 
           {/* Session Limits */}
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
                 <Clock className="h-4 w-4 text-amber-600" />
               </div>
@@ -347,7 +347,7 @@ export default function KidComsSettingsPage() {
 
           {/* Parental Controls */}
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center">
                 <Shield className="h-4 w-4 text-emerald-600" />
               </div>
@@ -397,7 +397,7 @@ export default function KidComsSettingsPage() {
 
           {/* Notifications */}
           <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500/10 to-teal-600/5 flex items-center justify-center">
                 <Bell className="h-4 w-4 text-teal-600" />
               </div>

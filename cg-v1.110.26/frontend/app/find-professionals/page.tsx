@@ -248,7 +248,7 @@ function FindProfessionalsContent() {
           <ChevronRight className="h-5 w-5 text-slate-600 rotate-180" />
         </button>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center shadow-md">
               <Building2 className="h-5 w-5 text-emerald-600" />
             </div>
@@ -329,7 +329,7 @@ function FindProfessionalsContent() {
           <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center shadow-md">
             <Building2 className="h-10 w-10 text-emerald-600" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No firms found</h3>
+          <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No firms found</h3>
           <p className="text-slate-600 font-medium">Try adjusting your search filters or check back later</p>
         </div>
       ) : (
@@ -357,7 +357,7 @@ function FindProfessionalsContent() {
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDQwIDAgTCAwIDAgMCA0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-30" />
 
                 <div className="relative flex items-center gap-4">
-                  <DialogTitle className="text-xl font-bold text-white flex items-center gap-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <DialogTitle className="text-xl font-bold text-white flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     <UserPlus className="w-5 h-5" />
                     Confirm Invitation
                   </DialogTitle>

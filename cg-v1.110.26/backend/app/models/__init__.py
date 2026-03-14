@@ -168,6 +168,8 @@ from app.models.subscription import (
     GrantCode,
     GrantRedemption,
     ClearFundFee,
+    CONSUMER_TIERS,
+    PROFESSIONAL_TIERS,
     SUBSCRIPTION_TIERS,
     SUBSCRIPTION_STATUSES,
     GRANT_STATUSES,
@@ -241,6 +243,13 @@ from app.models.circle_call import (
     CircleCallType,
     CircleCallStatus,
     CircleCallSeverity,
+)
+from app.models.invitation import (
+    CaseInvitation,
+    CaseEvent,
+    InvitationStatus,
+    InvitationSource,
+    CaseEventType,
 )
 
 __all__ = [
@@ -406,6 +415,8 @@ __all__ = [
     "GrantCode",
     "GrantRedemption",
     "ClearFundFee",
+    "CONSUMER_TIERS",
+    "PROFESSIONAL_TIERS",
     "SUBSCRIPTION_TIERS",
     "SUBSCRIPTION_STATUSES",
     "GRANT_STATUSES",
@@ -479,4 +490,10 @@ __all__ = [
     "CircleCallType",
     "CircleCallStatus",
     "CircleCallSeverity",
+    # Invitation Flow (GTM Critical Fixes)
+    "CaseInvitation",
+    "CaseEvent",
+    "InvitationStatus",
+    "InvitationSource",
+    "CaseEventType",
 ]

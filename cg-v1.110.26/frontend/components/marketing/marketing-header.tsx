@@ -30,38 +30,39 @@ const navItems: NavItem[] = [
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2">
-      <div className="w-10 h-10 bg-cg-sage rounded-xl flex items-center justify-center">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeDasharray="4 4"
-          />
-          <circle cx="12" cy="12" r="3" fill="white" />
-          <path
-            d="M12 9V6M15 12H18M12 15V18M9 12H6"
-            stroke="white"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
-      <span className="text-xl font-semibold text-foreground">CommonGround</span>
+    <Link href="/" className="flex items-center gap-2.5">
+      {/* Brand icon: two parents (teal + blue) with golden arch and child */}
+      <svg width="40" height="40" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hdr-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#1E3A4A" />
+            <stop offset="100%" stopColor="#2D6A8F" />
+          </linearGradient>
+          <linearGradient id="hdr-lf" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#5BC4A0" />
+            <stop offset="100%" stopColor="#3DAA8A" />
+          </linearGradient>
+          <linearGradient id="hdr-rf" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#4BA8C8" />
+            <stop offset="100%" stopColor="#2D6A8F" />
+          </linearGradient>
+        </defs>
+        <rect width="512" height="512" rx="120" fill="url(#hdr-bg)" />
+        {/* Left parent */}
+        <circle cx="168" cy="148" r="48" fill="url(#hdr-lf)" />
+        <path d="M118 218 Q168 258 218 218" stroke="url(#hdr-lf)" strokeWidth="16" strokeLinecap="round" fill="none" />
+        {/* Right parent */}
+        <circle cx="344" cy="148" r="48" fill="url(#hdr-rf)" />
+        <path d="M294 218 Q344 258 394 218" stroke="url(#hdr-rf)" strokeWidth="16" strokeLinecap="round" fill="none" />
+        {/* Golden arch */}
+        <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+        {/* Child */}
+        <circle cx="256" cy="330" r="38" fill="#F5A623" />
+        <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
+      </svg>
+      <span className="text-xl text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+        <span className="font-bold">Common</span><span className="font-normal text-[#3DAA8A]">Ground</span>
+      </span>
     </Link>
   );
 }

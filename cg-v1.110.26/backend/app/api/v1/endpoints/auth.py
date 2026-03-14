@@ -212,6 +212,36 @@ async def confirm_password_reset(
     return {"message": "Password has been reset successfully."}
 
 
+@router.post("/magic-link", status_code=status.HTTP_200_OK)
+async def send_magic_link(
+    email: str = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Send a magic link for passwordless authentication.
+
+    Uses Supabase OTP to send a sign-in link to the user's email.
+    If the user doesn't exist, creates a new account.
+
+    Returns:
+        Success message (always succeeds to prevent email enumeration)
+    """
+    from app.core.supabase import get_supabase_client
+    supabase = get_supabase_client()
+
+    try:
+        supabase.auth.sign_in_with_otp({
+            "email": email,
+            "options": {
+                "should_create_user": True,
+            }
+        })
+    except Exception:
+        pass  # Silent failure to prevent email enumeration
+
+    return {"message": "If an account exists for this email, a sign-in link has been sent."}
+
+
 @router.post("/oauth/sync", response_model=LoginResponse)
 async def oauth_sync(
     request: OAuthSyncRequest,

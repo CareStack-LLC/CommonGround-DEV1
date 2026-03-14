@@ -69,7 +69,7 @@ const useCases = [
 
 export default function CourtPricingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F3] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
         <div className="max-w-5xl mx-auto px-6 text-center">
@@ -78,12 +78,12 @@ export default function CourtPricingPage() {
             <span className="text-sm font-medium text-[var(--portal-primary)]">For Family Courts</span>
           </div>
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Modernize your
             <br />
-            <span className="text-[#D97757]">family court</span>
+            <span className="text-[#F5A623]">family court</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Digital parenting plans. Compliance monitoring.
@@ -92,7 +92,7 @@ export default function CourtPricingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact?type=court"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#1e4442] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
             >
               Contact Sales
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -121,7 +121,7 @@ export default function CourtPricingPage() {
                 <div key={outcome.label} className="text-center">
                   <div
                     className="text-4xl font-serif font-bold text-[var(--portal-primary)] mb-2"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {outcome.value}
                   </div>
@@ -143,10 +143,10 @@ export default function CourtPricingPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2
-              className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              Built for <span className="text-[#D97757]">courts</span>
+              Built for <span className="text-[#F5A623]">courts</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Tools designed specifically for family court administration.
@@ -165,8 +165,8 @@ export default function CourtPricingPage() {
                     <Icon className="h-7 w-7 text-[var(--portal-primary)]" />
                   </div>
                   <h3
-                    className="text-xl font-semibold text-[#2C3E50] mb-3"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-xl font-semibold text-[#1E3A4A] mb-3"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {feature.title}
                   </h3>
@@ -184,10 +184,10 @@ export default function CourtPricingPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2
-                className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-6"
-                style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-6"
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
-                How courts use <span className="text-[#D97757]">CommonGround</span>
+                How courts use <span className="text-[#F5A623]">CommonGround</span>
               </h2>
               <ul className="space-y-4">
                 {useCases.map((item) => (
@@ -195,16 +195,16 @@ export default function CourtPricingPage() {
                     <div className="w-6 h-6 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center">
                       <Check className="w-4 h-4 text-[var(--portal-primary)]" />
                     </div>
-                    <span className="text-[#2C3E50] font-medium">{item}</span>
+                    <span className="text-[#1E3A4A] font-medium">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] rounded-3xl p-8 text-white">
+            <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] rounded-3xl p-8 text-white">
               <h3
                 className="text-2xl font-serif mb-4"
-                style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
                 Flexible options for every court
               </h3>
@@ -220,14 +220,14 @@ export default function CourtPricingPage() {
                   'Custom integrations',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-[#D97757]" />
+                    <Check className="w-4 h-4 text-[#F5A623]" />
                     <span className="text-white/90">{item}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 href="/contact?type=court"
-                className="inline-flex items-center justify-center w-full px-6 py-4 bg-[#D97757] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all group"
+                className="inline-flex items-center justify-center w-full px-6 py-4 bg-[#F5A623] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all group"
               >
                 Get Custom Quote
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -242,10 +242,10 @@ export default function CourtPricingPage() {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2
-              className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-4"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              Simple <span className="text-[#D97757]">implementation</span>
+              Simple <span className="text-[#F5A623]">implementation</span>
             </h2>
           </div>
 
@@ -259,14 +259,14 @@ export default function CourtPricingPage() {
               <div key={item.step} className="flex gap-6 items-start">
                 <span
                   className="text-5xl font-serif text-gray-100"
-                  style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                  style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   {item.step}
                 </span>
                 <div className="flex-1 pt-2">
                   <h3
-                    className="text-xl font-semibold text-[#2C3E50] mb-2"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-xl font-semibold text-[#1E3A4A] mb-2"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {item.title}
                   </h3>
@@ -279,11 +279,11 @@ export default function CourtPricingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#1e4442] text-white">
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Ready to modernize?
           </h2>
@@ -293,7 +293,7 @@ export default function CourtPricingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact?type=court-demo"
-              className="inline-flex items-center justify-center px-10 py-5 bg-[#D97757] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
+              className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
             >
               Schedule Demo
               <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />

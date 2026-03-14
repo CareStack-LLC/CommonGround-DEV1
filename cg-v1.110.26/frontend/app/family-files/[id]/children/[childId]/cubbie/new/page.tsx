@@ -162,7 +162,7 @@ function NewCubbieItemPageContent() {
 
         <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
           <div className="px-6 py-6 border-b border-slate-100 bg-muted/30">
-            <h1 className="text-2xl font-bold text-foreground mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Add Item to {child?.first_name}'s Cubbie</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Add Item to {child?.first_name}'s Cubbie</h1>
             <p className="text-muted-foreground">
               Register a high-value item that travels with {child?.first_name}
             </p>
@@ -357,7 +357,7 @@ function NewCubbieItemPageContent() {
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white hover:shadow-lg hover:scale-[1.02] transition-all duration-200 rounded-xl font-bold"
+                  className="flex-1 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white hover:shadow-lg hover:scale-[1.02] transition-all duration-200 rounded-xl font-bold"
                 >
                   {submitting ? (
                     <>

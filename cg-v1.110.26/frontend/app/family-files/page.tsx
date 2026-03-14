@@ -145,7 +145,7 @@ function FamilyFilesContent() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <p className="text-sm text-slate-600 font-medium mb-1">{getGreeting()}</p>
-          <h1 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Family Files</h1>
+          <h1 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Family Files</h1>
           <p className="text-slate-600 font-medium mt-1">
             Manage your co-parenting arrangements
           </p>
@@ -178,7 +178,7 @@ function FamilyFilesContent() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
               <Mail className="h-5 w-5 text-[var(--portal-primary)]" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Pending Invitations</h2>
+            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Pending Invitations</h2>
           </div>
           <div className="space-y-3">
             {invitations.map((invitation) => (
@@ -239,7 +239,7 @@ function FamilyFilesContent() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-500/10 to-slate-600/5 flex items-center justify-center shadow-md">
               <FolderHeart className="h-5 w-5 text-slate-600" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Your Family Files</h2>
+            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Your Family Files</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {familyFiles.map((file) => (
@@ -255,7 +255,7 @@ function FamilyFilesContent() {
                         <FolderHeart className="h-6 w-6 text-[var(--portal-primary)]" />
                       </div>
                       <div className="min-w-0">
-                        <h3 className="text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{file.title}</h3>
+                        <h3 className="text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{file.title}</h3>
                         <p className="text-xs text-slate-600 font-medium">
                           {file.family_file_number}
                         </p>

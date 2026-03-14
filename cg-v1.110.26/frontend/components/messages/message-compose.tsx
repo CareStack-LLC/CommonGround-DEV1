@@ -41,7 +41,7 @@ interface AttachmentFile {
 }
 
 /**
- * Message Compose Component - The Neutral Zone
+ * Message Compose Component - Messages
  *
  * Features:
  * - ARIA Guardian integration
@@ -494,7 +494,7 @@ export function MessageCompose({
                   <div className="w-10 h-10 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl flex items-center justify-center shadow-sm mb-2">
                     <Shield className="h-5 w-5 text-[#2C5F5D] animate-pulse" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-800" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <h4 className="text-lg font-bold text-slate-800" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     ARIA Checking...
                   </h4>
                   <div className="flex gap-1 mt-1">

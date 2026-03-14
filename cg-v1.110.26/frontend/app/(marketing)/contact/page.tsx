@@ -21,7 +21,7 @@ export default function ContactPage() {
       title: 'General Inquiries',
       email: 'hello@commonground.app',
       description: 'Questions about CommonGround or how it works',
-      color: '#D97757'
+      color: '#F5A623'
     },
     {
       icon: Mail,
@@ -45,7 +45,7 @@ export default function ContactPage() {
       title: 'FAQs',
       description: 'Common questions answered',
       link: '/pricing', // FAQ section is on pricing page
-      color: '#D97757'
+      color: '#F5A623'
     },
     {
       icon: Activity,
@@ -57,18 +57,18 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFF8F3]">
+    <div className="min-h-screen bg-[#F4F8F7]">
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             We're here
             <br />
@@ -77,7 +77,7 @@ export default function ContactPage() {
 
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
             Whether you need support, have a question, or want to explore partnerships—
-            <span className="font-medium text-[#D97757]"> we're listening.</span>
+            <span className="font-medium text-[#F5A623]"> we're listening.</span>
           </p>
         </div>
       </section>
@@ -89,14 +89,14 @@ export default function ContactPage() {
             <div className="flex items-center gap-4">
               <Clock className="w-8 h-8 text-[var(--portal-primary)]" />
               <div>
-                <div className="font-semibold text-[#2C3E50]">Support Hours</div>
+                <div className="font-semibold text-[#1E3A4A]">Support Hours</div>
                 <div className="text-gray-600">Mon-Fri, 9am-6pm EST</div>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Mail className="w-8 h-8 text-[#D97757]" />
+              <Mail className="w-8 h-8 text-[#F5A623]" />
               <div>
-                <div className="font-semibold text-[#2C3E50]">Response Time</div>
+                <div className="font-semibold text-[#1E3A4A]">Response Time</div>
                 <div className="text-gray-600">Usually within 24 hours</div>
               </div>
             </div>
@@ -108,8 +108,8 @@ export default function ContactPage() {
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <h2
-            className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-12 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-12 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Get in touch
           </h2>
@@ -135,8 +135,8 @@ export default function ContactPage() {
                   </div>
 
                   <h3
-                    className="text-2xl font-serif text-[#2C3E50] mb-2"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-2xl font-serif text-[#1E3A4A] mb-2"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {method.title}
                   </h3>
@@ -163,8 +163,8 @@ export default function ContactPage() {
       <section className="py-16 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2
-            className="text-3xl sm:text-4xl font-serif text-[#2C3E50] mb-12 text-center"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-12 text-center"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Self-service resources
           </h2>
@@ -182,7 +182,7 @@ export default function ContactPage() {
                       router.push(resource.link);
                     }
                   }}
-                  className="bg-[#FFF8F3] rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 text-left"
+                  className="bg-[#F4F8F7] rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 text-left"
                   style={{
                     animationDelay: `${idx * 100}ms`,
                     animation: 'slideUp 0.6s ease-out forwards',
@@ -197,8 +197,8 @@ export default function ContactPage() {
                   </div>
 
                   <h3
-                    className="text-xl font-serif text-[#2C3E50] mb-2"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-xl font-serif text-[#1E3A4A] mb-2"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {resource.title}
                   </h3>
@@ -216,10 +216,10 @@ export default function ContactPage() {
       {/* Emergency Support Note */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-[var(--portal-primary)]/10 to-[#D97757]/10 rounded-2xl p-8 border-2 border-[var(--portal-primary)]/20">
+          <div className="bg-gradient-to-br from-[var(--portal-primary)]/10 to-[#F5A623]/10 rounded-2xl p-8 border-2 border-[var(--portal-primary)]/20">
             <h3
-              className="text-2xl font-serif text-[#2C3E50] mb-4 text-center"
-              style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+              className="text-2xl font-serif text-[#1E3A4A] mb-4 text-center"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
               Need immediate help?
             </h3>
@@ -242,13 +242,13 @@ export default function ContactPage() {
       <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#234846] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6 leading-tight"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             {user ? 'Back to your dashboard' : 'Ready to get started?'}
           </h2>

@@ -25,11 +25,11 @@ export default function FeaturesPage() {
   const features = [
     {
       icon: MessageSquare,
-      problem: "Every message turns into a fight",
-      solution: "ARIA flags toxic language before you hit send",
-      detail: "No rewrites. No suggestions. Just awareness. Our AI catches hostile, passive-aggressive, and inflammatory language so you can rethink before it escalates. Keep communication civil without censorship.",
-      benefit: "87% reduction in hostile messages",
-      color: "#D97757"
+      problem: "Every message feels like walking on eggshells",
+      solution: "ARIA helps keep messages constructive",
+      detail: "No rewrites. No suggestions. Just awareness. Our AI gently highlights language that could be misread so you can rethink before things get heated. Keep communication respectful without censorship.",
+      benefit: "87% calmer conversations",
+      color: "#F5A623"
     },
     {
       icon: Calendar,
@@ -41,11 +41,11 @@ export default function FeaturesPage() {
     },
     {
       icon: DollarSign,
-      problem: "Money fights never end",
+      problem: "Money discussions never seem to end",
       solution: "Track every dollar, split costs automatically",
-      detail: "ClearFund handles school fees, medical bills, extracurriculars. Upload receipts, set split percentages, track payments. No fees. No arguing. Just clear records for court if you need them.",
+      detail: "ClearFund handles school fees, medical bills, extracurriculars. Upload receipts, set split percentages, track payments. No fees. No back-and-forth. Just clear records for court if you need them.",
       benefit: "100% payment transparency",
-      color: "#D97757"
+      color: "#F5A623"
     },
     {
       icon: Video,
@@ -57,11 +57,11 @@ export default function FeaturesPage() {
     },
     {
       icon: MapPin,
-      problem: "Exchanges are tense and confrontational",
+      problem: "Exchanges feel stressful and uncomfortable",
       solution: "Silent Handoff: contactless exchanges with GPS proof",
       detail: "Drop off at a public location. GPS confirms arrival. QR code confirms pickup. Zero interaction required. Complete records of every exchange with timestamps and locations.",
-      benefit: "Verified exchanges, zero conflict",
-      color: "#D97757"
+      benefit: "Verified exchanges, zero stress",
+      color: "#F5A623"
     },
     {
       icon: Clock,
@@ -77,7 +77,7 @@ export default function FeaturesPage() {
       solution: "One-click court-ready evidence packages",
       detail: "Export messages, schedules, expenses, custody time, and exchange logs in court-accepted formats. SHA-256 verification proves authenticity. Everything organized and timestamped.",
       benefit: "Professional evidence bundles",
-      color: "#D97757"
+      color: "#F5A623"
     }
   ];
 
@@ -88,18 +88,18 @@ export default function FeaturesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFF8F3]">
+    <div className="min-h-screen bg-[#F4F8F7]">
       {/* Hero Section */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#2C3E50] mb-6 leading-[1.05]"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Built for parents who
             <br />
@@ -108,8 +108,8 @@ export default function FeaturesPage() {
 
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
             Every feature solves one problem:{' '}
-            <span className="font-medium text-[#D97757]">
-              less coordination, fewer fights, more automation.
+            <span className="font-medium text-[#F5A623]">
+              less coordination, more peace of mind, more automation.
             </span>
           </p>
 
@@ -163,14 +163,14 @@ export default function FeaturesPage() {
                   </div>
 
                   {/* Problem */}
-                  <h3 className="text-lg font-medium text-gray-500 mb-2 line-through decoration-[#D97757]/30">
+                  <h3 className="text-lg font-medium text-gray-500 mb-2 line-through decoration-[#F5A623]/30">
                     {feature.problem}
                   </h3>
 
                   {/* Solution */}
                   <h2
-                    className="text-2xl sm:text-3xl font-serif text-[#2C3E50] mb-4 leading-tight"
-                    style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+                    className="text-2xl sm:text-3xl font-serif text-[#1E3A4A] mb-4 leading-tight"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {feature.solution}
                   </h2>
@@ -198,20 +198,20 @@ export default function FeaturesPage() {
       </section>
 
       {/* Philosophy Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#234846] text-white relative overflow-hidden">
+      <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6 leading-tight"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             The less you have to talk,
             <br />
-            <span className="text-[#D97757]">the less you have to fight</span>
+            <span className="text-[#F5A623]">the more peace your family has</span>
           </h2>
 
           <p className="text-xl text-white/80 mb-8 leading-relaxed max-w-2xl mx-auto">
@@ -230,10 +230,10 @@ export default function FeaturesPage() {
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2
-            className="text-4xl sm:text-5xl font-serif text-[#2C3E50] mb-6"
-            style={{ fontFamily: 'Crimson Text, Georgia, serif' }}
+            className="text-4xl sm:text-5xl font-serif text-[#1E3A4A] mb-6"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Ready to stop fighting?
+            Ready to find common ground?
           </h2>
 
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
@@ -244,7 +244,7 @@ export default function FeaturesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => router.push('/signup')}
-              className="px-8 py-4 bg-[var(--portal-primary)] text-white rounded-xl font-medium text-lg hover:bg-[#234846] transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              className="px-8 py-4 bg-[var(--portal-primary)] text-white rounded-xl font-medium text-lg hover:bg-[#2D6A8F] transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               Start Free
             </button>

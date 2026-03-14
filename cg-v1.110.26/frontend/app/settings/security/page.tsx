@@ -295,7 +295,7 @@ export default function SecuritySettingsPage() {
           <Shield className="w-6 h-6 text-red-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Security Settings
           </h2>
           <p className="text-sm text-slate-500 font-medium">
@@ -325,7 +325,7 @@ export default function SecuritySettingsPage() {
       {/* Change Password */}
       <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
               <Lock className="h-5 w-5 text-[var(--portal-primary)]" />
             </div>
@@ -419,7 +419,7 @@ export default function SecuritySettingsPage() {
       {/* Two-Factor Authentication */}
       <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-xl shadow-md">
               <Shield className="h-5 w-5 text-red-600" />
             </div>
@@ -549,7 +549,7 @@ export default function SecuritySettingsPage() {
       {/* Active Sessions */}
       <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl shadow-md">
               <Monitor className="h-5 w-5 text-purple-600" />
             </div>
@@ -613,7 +613,7 @@ export default function SecuritySettingsPage() {
       {/* Account Email */}
       <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
               <Mail className="h-5 w-5 text-blue-600" />
             </div>

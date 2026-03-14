@@ -204,7 +204,7 @@ function CourtFilingContent() {
             <Gavel className="h-6 w-6 text-[var(--portal-primary)]" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Court Filing</h1>
+            <h1 className="text-2xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Court Filing</h1>
             <p className="text-muted-foreground font-medium">{familyFile.title}</p>
           </div>
         </div>
@@ -214,13 +214,13 @@ function CourtFilingContent() {
             <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center mx-auto shadow-md">
               <CheckCircle className="h-7 w-7 text-emerald-600" />
             </div>
-            <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Already Linked to Court</h2>
+            <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Already Linked to Court</h2>
             <p className="text-muted-foreground max-w-md mx-auto font-medium">
               This family file is already linked to a court case. You can view the court case details from the family file page.
             </p>
             <button
               onClick={() => router.push(`/family-files/${id}`)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               Return to Family File
             </button>
@@ -247,7 +247,7 @@ function CourtFilingContent() {
           <Gavel className="h-6 w-6 text-[var(--portal-primary)]" />
         </div>
         <div>
-          <h1 className="text-2xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h1 className="text-2xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Court Filing
           </h1>
           <p className="text-muted-foreground mt-1 font-medium">{familyFile?.title}</p>
@@ -259,7 +259,7 @@ function CourtFilingContent() {
         <div className="flex items-start gap-3">
           <Info className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-amber-800" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>California Family Court Forms</p>
+            <p className="font-bold text-amber-800" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>California Family Court Forms</p>
             <p className="text-sm text-amber-700 mt-1 font-medium">
               The FL-300 (Request for Order) and FL-311 (Child Custody and Visitation Application Attachment) are California judicial council forms. Requirements may vary by county.
             </p>
@@ -282,7 +282,7 @@ function CourtFilingContent() {
           {/* Process Steps */}
           <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
             <div className="p-6 border-b-2 border-slate-100">
-              <h2 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Filing Process</h2>
+              <h2 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Filing Process</h2>
               <p className="text-sm text-muted-foreground mt-1 font-medium">
                 Follow these steps to submit your family file to the court
               </p>
@@ -312,7 +312,7 @@ function CourtFilingContent() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{step.title}</h3>
+                      <h3 className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{step.title}</h3>
                       <p className="text-sm text-muted-foreground mt-1 font-medium">{step.description}</p>
                       {step.forms && (
                         <div className="mt-3 space-y-2">
@@ -343,7 +343,7 @@ function CourtFilingContent() {
             <div className="p-6 border-b-2 border-slate-100">
               <div className="flex items-center gap-3">
                 <Scale className="h-5 w-5 text-[var(--portal-primary)]" />
-                <h2 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Link to Existing Court Case</h2>
+                <h2 className="text-lg font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Link to Existing Court Case</h2>
               </div>
               <p className="text-sm text-muted-foreground mt-1 font-medium">
                 If you already have a court case number, enter it here to link your family file
@@ -351,7 +351,7 @@ function CourtFilingContent() {
             </div>
             <div className="p-6 space-y-4">
               <div className="space-y-2">
-                <label htmlFor="caseNumber" className="block text-sm font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Case Number</label>
+                <label htmlFor="caseNumber" className="block text-sm font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Case Number</label>
                 <input
                   id="caseNumber"
                   placeholder="e.g., 23FL12345"
@@ -365,7 +365,7 @@ function CourtFilingContent() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="courtName" className="block text-sm font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Court Name (Optional)</label>
+                <label htmlFor="courtName" className="block text-sm font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Court Name (Optional)</label>
                 <input
                   id="courtName"
                   placeholder="e.g., Superior Court of California, County of Los Angeles"
@@ -378,7 +378,7 @@ function CourtFilingContent() {
               <button
                 onClick={handleCreateCourtCase}
                 disabled={isSubmitting || !caseNumber.trim()}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isSubmitting ? (
                   <>
@@ -401,7 +401,7 @@ function CourtFilingContent() {
           {/* Quick Links */}
           <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
             <div className="p-4 border-b-2 border-slate-100">
-              <h2 className="font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Resources</h2>
+              <h2 className="font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Resources</h2>
             </div>
             <div className="p-4 space-y-3">
               <a
@@ -441,7 +441,7 @@ function CourtFilingContent() {
           {/* Your Data Summary */}
           <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
             <div className="p-4 border-b-2 border-slate-100">
-              <h2 className="font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Your Family File</h2>
+              <h2 className="font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Your Family File</h2>
             </div>
             <div className="p-4 space-y-3 text-sm">
               <div className="flex justify-between items-center">
@@ -484,7 +484,7 @@ function CourtFilingContent() {
                 <Info className="h-5 w-5 text-[var(--portal-primary)]" />
               </div>
               <div>
-                <p className="text-sm font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Need help?</p>
+                <p className="text-sm font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Need help?</p>
                 <p className="text-sm text-muted-foreground mt-1 font-medium">
                   Consider consulting with a family law attorney for guidance on court filings.
                 </p>

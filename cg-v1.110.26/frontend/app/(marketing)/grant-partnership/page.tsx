@@ -10,17 +10,17 @@ export const metadata = {
 
 export default function GrantPartnershipPage() {
     return (
-        <div className="font-sans text-[#2C3E50] bg-[#FFF8F3]">
+        <div className="font-sans text-[#1E3A4A] bg-[#F4F8F7]">
             {/* Hero Section */}
             <section className="relative overflow-hidden pt-24 pb-32 lg:pt-32 lg:pb-40">
                 {/* Background Blobs - matching Pricing page */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
                 </div>
 
                 <div className="container relative mx-auto px-4 text-center z-10">
-                    <h1 className="mx-auto mb-6 max-w-4xl font-serif text-5xl font-bold leading-tight md:text-6xl animate-in fade-in slide-in-from-bottom-4 duration-700 text-[#2C3E50]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                    <h1 className="mx-auto mb-6 max-w-4xl font-serif text-5xl font-bold leading-tight md:text-6xl animate-in fade-in slide-in-from-bottom-4 duration-700 text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                         Grant Partnership Program
                     </h1>
                     <p className="mx-auto mb-10 max-w-2xl text-xl text-gray-600 md:text-2xl animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 leading-relaxed">
@@ -48,19 +48,19 @@ export default function GrantPartnershipPage() {
                 <div className="container mx-auto">
                     <div className="grid grid-cols-1 gap-8 rounded-2xl bg-white p-8 shadow-xl md:grid-cols-2 lg:grid-cols-4 border border-gray-100">
                         <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>$5,249</div>
+                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>$5,249</div>
                             <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Value Per Partner (25 codes)</div>
                         </div>
                         <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>68%</div>
+                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>68%</div>
                             <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Conflict Reduction</div>
                         </div>
                         <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>24/7</div>
+                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>24/7</div>
                             <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">AI Mediation Support</div>
                         </div>
                         <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Zero</div>
+                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Zero</div>
                             <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Cost to Your Organization</div>
                         </div>
                     </div>
@@ -71,7 +71,7 @@ export default function GrantPartnershipPage() {
             <section className="py-24">
                 <div className="container mx-auto px-4">
                     <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#2C3E50]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Why Partner with CommonGround?</h2>
+                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Why Partner with CommonGround?</h2>
                         <p className="mx-auto max-w-2xl text-lg text-gray-600">
                             We help nonprofits create lasting impact for families navigating divorce and co-parenting challenges.
                         </p>
@@ -111,10 +111,10 @@ export default function GrantPartnershipPage() {
                             },
                         ].map((item, i) => (
                             <div key={i} className="group bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[#D97757]/20 text-[var(--portal-primary)] group-hover:from-[var(--portal-primary)] group-hover:to-[#D97757] group-hover:text-white transition-all duration-300">
+                                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[#F5A623]/20 text-[var(--portal-primary)] group-hover:from-[var(--portal-primary)] group-hover:to-[#F5A623] group-hover:text-white transition-all duration-300">
                                     <item.icon className="h-7 w-7" />
                                 </div>
-                                <h3 className="mb-3 font-serif text-2xl font-bold text-[#2C3E50]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{item.title}</h3>
+                                <h3 className="mb-3 font-serif text-2xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h3>
                                 <p className="text-gray-600 leading-relaxed">{item.desc}</p>
                             </div>
                         ))}
@@ -126,7 +126,7 @@ export default function GrantPartnershipPage() {
             <section className="bg-white py-24">
                 <div className="container mx-auto px-4">
                     <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#2C3E50]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>How the Partnership Works</h2>
+                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>How the Partnership Works</h2>
                         <p className="mx-auto max-w-2xl text-lg text-gray-600">
                             A true partnership where we both contribute to family success.
                         </p>
@@ -134,8 +134,8 @@ export default function GrantPartnershipPage() {
 
                     <div className="grid gap-8 lg:grid-cols-2">
                         {/* Your Organization Provides */}
-                        <div className="rounded-2xl bg-[#FFF8F3] p-8 md:p-10 border border-gray-100 shadow-sm">
-                            <h3 className="mb-6 border-b-2 border-[var(--portal-primary)]/20 pb-4 font-serif text-3xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Your Organization Provides</h3>
+                        <div className="rounded-2xl bg-[#F4F8F7] p-8 md:p-10 border border-gray-100 shadow-sm">
+                            <h3 className="mb-6 border-b-2 border-[var(--portal-primary)]/20 pb-4 font-serif text-3xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Your Organization Provides</h3>
                             <ul className="space-y-4">
                                 {[
                                     "Distribute grant codes to eligible families",
@@ -157,7 +157,7 @@ export default function GrantPartnershipPage() {
                         {/* CommonGround Provides */}
                         <div className="rounded-2xl bg-white p-8 md:p-10 border border-gray-200 shadow-xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--portal-primary)]/5 rounded-bl-full pointer-events-none"></div>
-                            <h3 className="mb-6 border-b-2 border-[var(--portal-primary)]/20 pb-4 font-serif text-3xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>CommonGround Provides</h3>
+                            <h3 className="mb-6 border-b-2 border-[var(--portal-primary)]/20 pb-4 font-serif text-3xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>CommonGround Provides</h3>
                             <ul className="space-y-4">
                                 {[
                                     "Free Complete tier for 180 days ($210 value per family)",
@@ -179,11 +179,11 @@ export default function GrantPartnershipPage() {
                     </div>
 
                     {/* Grant Value Box */}
-                    <div className="mt-12 overflow-hidden rounded-2xl bg-gradient-to-br from-[#D97757] to-[#c99943] text-white shadow-xl relative">
+                    <div className="mt-12 overflow-hidden rounded-2xl bg-gradient-to-br from-[#F5A623] to-[#c99943] text-white shadow-xl relative">
                         <div className="absolute inset-0 bg-[url('/assets/grain.png')] opacity-20 hover:opacity-10 transition-opacity"></div>
                         <div className="p-8 text-center md:p-12 relative z-10">
-                            <h3 className="mb-2 font-serif text-3xl font-bold text-white/90" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Total Partnership Value</h3>
-                            <div className="my-6 font-serif text-6xl md:text-7xl font-bold text-white drop-shadow-sm" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>$5,249</div>
+                            <h3 className="mb-2 font-serif text-3xl font-bold text-white/90" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Total Partnership Value</h3>
+                            <div className="my-6 font-serif text-6xl md:text-7xl font-bold text-white drop-shadow-sm" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>$5,249</div>
                             <div className="mx-auto max-w-3xl bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
                                 <p className="text-lg text-white font-medium">
                                     Complete tier ($34.99/month × 6 months) × 25 families = <span className="font-bold underline md:no-underline">$5,248.50</span> in professional tools provided free.
@@ -195,10 +195,10 @@ export default function GrantPartnershipPage() {
             </section>
 
             {/* Features Showcase */}
-            <section className="py-24 bg-[#FFF8F3]">
+            <section className="py-24 bg-[#F4F8F7]">
                 <div className="container mx-auto px-4">
                     <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#2C3E50]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Complete Tier Features</h2>
+                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Complete Tier Features</h2>
                         <p className="mx-auto max-w-2xl text-lg text-gray-600">
                             Your clients receive our most comprehensive plan with all premium features included.
                         </p>
@@ -209,7 +209,7 @@ export default function GrantPartnershipPage() {
                             {
                                 icon: BrainCircuit,
                                 title: "ARIA AI Mediation",
-                                desc: "Real-time message analysis prevents 80% of hostile exchanges before they're sent",
+                                desc: "Real-time message analysis helps keep 80% of conversations constructive",
                             },
                             {
                                 icon: Users,
@@ -252,7 +252,7 @@ export default function GrantPartnershipPage() {
                                     <item.icon className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <h4 className="mb-2 font-serif text-xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{item.title}</h4>
+                                    <h4 className="mb-2 font-serif text-xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
                                     <p className="text-sm leading-relaxed text-gray-600">{item.desc}</p>
                                 </div>
                             </div>
@@ -265,11 +265,11 @@ export default function GrantPartnershipPage() {
             <section className="bg-[var(--portal-primary)] text-white py-24 relative overflow-hidden">
                 {/* Background blobs for visual interest */}
                 <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#D97757] rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 opacity-50"></div>
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 opacity-50"></div>
 
                 <div className="container relative mx-auto px-4 z-10">
                     <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-white" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Measurable Impact for Grant Reports</h2>
+                        <h2 className="mb-4 font-serif text-4xl font-bold text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Measurable Impact for Grant Reports</h2>
                         <p className="mx-auto max-w-2xl text-lg text-white/80">
                             Prove your program's effectiveness with concrete, trackable outcomes.
                         </p>
@@ -278,14 +278,14 @@ export default function GrantPartnershipPage() {
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {[
                             { title: "Activation Rate", desc: "Track how many families activated their grant codes and began using the platform—demonstrating engagement." },
-                            { title: "Conflict Reduction", desc: "Measure the percentage decrease in hostile communication over time, showing tangible behavioral change." },
+                            { title: "Communication Improvement", desc: "Measure the percentage increase in constructive communication over time, showing tangible behavioral change." },
                             { title: "Sustained Engagement", desc: "Monitor 30-day and 90-day retention rates to prove families continue benefiting long after your program ends." },
-                            { title: "Legal Fee Savings", desc: "Calculate estimated legal costs prevented through reduced conflict and better documentation." },
+                            { title: "Legal Fee Savings", desc: "Calculate estimated legal costs prevented through improved communication and better documentation." },
                             { title: "Feature Utilization", desc: "See how families use schedules, expense tracking, and agreements—proving comprehensive support." },
                             { title: "Client Satisfaction", desc: "Access Net Promoter Scores and anonymized testimonials demonstrating service quality." },
                         ].map((item, i) => (
                             <div key={i} className="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm transition-all hover:bg-white/10 hover:-translate-y-1">
-                                <h4 className="mb-3 font-serif text-2xl font-bold text-[#D97757]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{item.title}</h4>
+                                <h4 className="mb-3 font-serif text-2xl font-bold text-[#F5A623]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
                                 <p className="leading-relaxed text-blue-50/90">{item.desc}</p>
                             </div>
                         ))}
@@ -297,7 +297,7 @@ export default function GrantPartnershipPage() {
             <section id="how-it-works" className="py-24 bg-white">
                 <div className="container mx-auto px-4">
                     <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#2C3E50]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Partnership Process</h2>
+                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Partnership Process</h2>
                         <p className="mx-auto max-w-2xl text-lg text-gray-600">
                             From application to active partnership in 3-4 weeks.
                         </p>
@@ -315,10 +315,10 @@ export default function GrantPartnershipPage() {
                             { num: "5", title: "Launch", desc: "Begin distributing codes. Access your dashboard to track real-time engagement." },
                         ].map((item, i) => (
                             <div key={i} className="relative z-10 text-center bg-white md:bg-transparent md:p-0 p-6 rounded-xl border md:border-0 border-gray-100 shadow-sm md:shadow-none">
-                                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[var(--portal-primary)] to-[#2C5F5D] text-3xl font-bold text-white shadow-xl shadow-[var(--portal-primary)]/20 font-serif" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[var(--portal-primary)] to-[#2C5F5D] text-3xl font-bold text-white shadow-xl shadow-[var(--portal-primary)]/20 font-serif" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                                     {item.num}
                                 </div>
-                                <h4 className="mb-3 font-serif text-xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>{item.title}</h4>
+                                <h4 className="mb-3 font-serif text-xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
                                 <p className="text-sm text-gray-500">{item.desc}</p>
                             </div>
                         ))}
@@ -331,11 +331,11 @@ export default function GrantPartnershipPage() {
                 {/* Abstract shapes matching pricing page */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#D97757] rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
                 </div>
 
                 <div className="container mx-auto px-4 relative z-10">
-                    <h2 className="mb-6 font-serif text-4xl font-bold md:text-5xl text-white" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Ready to Amplify Your Impact?</h2>
+                    <h2 className="mb-6 font-serif text-4xl font-bold md:text-5xl text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Ready to Amplify Your Impact?</h2>
                     <p className="mx-auto mb-10 max-w-3xl text-xl text-white/80 leading-relaxed">
                         Join nonprofits across Southern California who are transforming how they support families through divorce and co-parenting challenges.
                     </p>

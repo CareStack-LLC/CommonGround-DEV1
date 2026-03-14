@@ -26,7 +26,7 @@ interface ARIAInterventionProps {
  * WS3: ARIA Intervention Component (Guardian Visual Update)
  *
  * Visual refresh to match the "ARIA Guardian" splash screen aesthetic.
- * uses Crimson Text for headings and cleaner status indicators.
+ * uses DM Serif Display for headings and cleaner status indicators.
  */
 export function ARIAIntervention({
   analysis,
@@ -128,7 +128,7 @@ export function ARIAIntervention({
           {/* Title & Subtitle */}
           <div className="flex-1 min-w-0 pt-1">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 {config.title}
               </h3>
               {/* Optional: Add 'Guardian Active' badge? */}

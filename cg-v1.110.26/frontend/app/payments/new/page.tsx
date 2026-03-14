@@ -172,13 +172,13 @@ function NewExpenseContent() {
             <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
               <DollarSign className="h-7 w-7 text-slate-500" />
             </div>
-            <h2 className="text-2xl font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No Active Cases or Family Files</h2>
+            <h2 className="text-2xl font-semibold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No Active Cases or Family Files</h2>
             <p className="text-muted-foreground mb-6 font-medium">
               You need an active case or family file to create expense requests.
             </p>
             <button
               onClick={() => router.push('/dashboard')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               Go to Dashboard
             </button>
@@ -207,7 +207,7 @@ function NewExpenseContent() {
             <ArrowLeft className="h-4 w-4 mr-1 group-hover:-translate-x-1 transition-transform duration-300" />
             Back to Payments
           </button>
-          <h1 className="text-2xl font-semibold text-foreground flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+          <h1 className="text-2xl font-semibold text-foreground flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
               <DollarSign className="h-6 w-6 text-[var(--portal-primary)]" />
             </div>
@@ -233,7 +233,7 @@ function NewExpenseContent() {
               {/* Case/Family File Selection */}
               {items.length > 1 && (
                 <div>
-                  <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                  <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     Case / Family File
                   </label>
                   <select
@@ -253,7 +253,7 @@ function NewExpenseContent() {
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Title *
                 </label>
                 <input
@@ -269,7 +269,7 @@ function NewExpenseContent() {
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Category *
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -293,7 +293,7 @@ function NewExpenseContent() {
 
               {/* Amount */}
               <div>
-                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Total Amount *
                 </label>
                 <div className="relative">
@@ -313,7 +313,7 @@ function NewExpenseContent() {
 
               {/* Split Percentage */}
               <div>
-                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Cost Split
                 </label>
                 <div className="flex items-center gap-4">
@@ -343,7 +343,7 @@ function NewExpenseContent() {
 
               {/* Due Date */}
               <div>
-                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Due Date
                 </label>
                 <input
@@ -356,7 +356,7 @@ function NewExpenseContent() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Description
                 </label>
                 <textarea
@@ -371,7 +371,7 @@ function NewExpenseContent() {
 
               {/* Requirements */}
               <div className="space-y-3">
-                <label className="block text-sm font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <label className="block text-sm font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Requirements
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-all duration-300">
@@ -396,7 +396,7 @@ function NewExpenseContent() {
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Notes (optional)
                 </label>
                 <textarea
@@ -423,7 +423,7 @@ function NewExpenseContent() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="flex-1 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isSubmitting ? 'Creating...' : 'Create Expense'}
             </button>

@@ -57,14 +57,14 @@ export default function WalletBalanceCard({
               <Wallet className="h-6 w-6 text-[var(--portal-primary)]" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-foreground mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Set Up Your Wallet</h3>
+              <h3 className="font-semibold text-foreground mb-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Set Up Your Wallet</h3>
               <p className="text-sm text-muted-foreground mb-4 font-medium">
                 Connect your bank account to send and receive payments through ClearFund.
               </p>
               {onSetupWallet && (
                 <button
                   onClick={onSetupWallet}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                 >
                   <CreditCard className="h-4 w-4" />
                   Connect Bank Account
@@ -87,14 +87,14 @@ export default function WalletBalanceCard({
               <Clock className="h-6 w-6 text-amber-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-foreground mb-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Complete Wallet Setup</h3>
+              <h3 className="font-semibold text-foreground mb-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Complete Wallet Setup</h3>
               <p className="text-sm text-muted-foreground mb-4 font-medium">
                 Finish connecting your bank account to start using ClearFund payments.
               </p>
               {onSetupWallet && (
                 <button
                   onClick={onSetupWallet}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                 >
                   <ExternalLink className="h-4 w-4" />
                   Continue Setup
@@ -129,7 +129,7 @@ export default function WalletBalanceCard({
             </div>
             <div>
               <p className="text-sm text-muted-foreground font-medium">Available Balance</p>
-              <p className="text-3xl font-bold text-foreground font-mono tabular-nums" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <p className="text-3xl font-bold text-foreground font-mono tabular-nums" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 {formatCurrency(availableBalance)}
               </p>
             </div>
@@ -149,7 +149,7 @@ export default function WalletBalanceCard({
           {onAddFunds && (
             <button
               onClick={onAddFunds}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               <TrendingUp className="h-4 w-4" />
               Add Funds

@@ -97,7 +97,7 @@ export default function SettingsPage() {
               </div>
 
               <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-[var(--portal-primary)]
-                transition-colors duration-300" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                transition-colors duration-300" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 {card.title}
               </h3>
 
@@ -128,7 +128,7 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div className="flex-1">
-            <h4 className="text-base font-bold text-slate-900 mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h4 className="text-base font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               Need help with settings?
             </h4>
             <p className="text-sm text-slate-600 font-medium">

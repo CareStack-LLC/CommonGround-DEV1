@@ -133,7 +133,7 @@ export default function ParentingTimeCard({
           <div className="w-9 h-9 rounded-xl bg-cg-sage/10 flex items-center justify-center">
             <Clock className="h-4.5 w-4.5 text-cg-sage" />
           </div>
-          <h3 className="font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Parenting Time</h3>
+          <h3 className="font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Parenting Time</h3>
         </div>
 
         {/* Period Selector */}

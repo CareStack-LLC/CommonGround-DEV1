@@ -3307,6 +3307,172 @@ async def get_tier_usage(
 
 
 # =============================================================================
+# PROFESSIONAL SUBSCRIPTION & BILLING
+# =============================================================================
+
+@router.get(
+    "/subscription/plans",
+    summary="List available professional subscription plans",
+)
+async def list_professional_plans(
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    List all active professional subscription plans.
+
+    Returns plans with pricing, features, and Stripe price IDs.
+    No authentication required - used on registration/upgrade pages.
+    """
+    from sqlalchemy import select
+    from app.models.subscription import SubscriptionPlan
+
+    result = await db.execute(
+        select(SubscriptionPlan)
+        .where(SubscriptionPlan.is_active == True)
+        .where(SubscriptionPlan.plan_code.in_(["solo", "small_firm", "mid_size", "enterprise"]))
+        .order_by(SubscriptionPlan.display_order)
+    )
+    plans = result.scalars().all()
+
+    return [
+        {
+            "id": plan.id,
+            "plan_code": plan.plan_code,
+            "display_name": plan.display_name,
+            "description": plan.description,
+            "badge": plan.badge,
+            "price_monthly": float(plan.price_monthly),
+            "price_annual": float(plan.price_annual),
+            "features": plan.features,
+            "trial_days": plan.trial_days,
+            "stripe_price_id_monthly": plan.stripe_price_id_monthly,
+            "stripe_price_id_annual": plan.stripe_price_id_annual,
+        }
+        for plan in plans
+    ]
+
+
+@router.post(
+    "/subscription/checkout",
+    summary="Create Stripe checkout for professional subscription",
+)
+async def create_professional_checkout(
+    plan_code: str = Body(..., embed=True),
+    billing_period: str = Body("monthly", embed=True),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Create a Stripe Checkout session for a professional subscription.
+
+    Args:
+        plan_code: The plan to subscribe to (solo, small_firm, mid_size)
+        billing_period: "monthly" or "annual"
+
+    Returns checkout session URL for redirect.
+    """
+    from sqlalchemy import select
+    from app.models.subscription import SubscriptionPlan
+    from app.services.stripe_service import StripeService
+
+    # Validate plan
+    if plan_code not in ("solo", "small_firm", "mid_size"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid plan. Choose: solo, small_firm, or mid_size",
+        )
+
+    # Get the plan from DB
+    result = await db.execute(
+        select(SubscriptionPlan).where(SubscriptionPlan.plan_code == plan_code)
+    )
+    plan = result.scalar_one_or_none()
+    if not plan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Plan '{plan_code}' not found",
+        )
+
+    # Determine price ID
+    if billing_period == "annual":
+        price_id = plan.stripe_price_id_annual
+    else:
+        price_id = plan.stripe_price_id_monthly
+
+    if not price_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Stripe price not configured for {plan_code} ({billing_period})",
+        )
+
+    stripe_service = StripeService()
+
+    # Create or get Stripe customer
+    if not profile.stripe_customer_id:
+        customer = await stripe_service.create_customer(
+            email=profile.user.email if profile.user else "",
+            name=f"{profile.user.first_name} {profile.user.last_name}" if profile.user else "",
+            user_id=profile.user_id,
+            metadata={"professional_profile_id": profile.id, "account_type": "professional"},
+        )
+        profile.stripe_customer_id = customer["id"]
+        await db.commit()
+
+    # Create checkout session
+    from app.core.config import settings
+
+    frontend_url = settings.FRONTEND_URL or "https://common-ground-blue.vercel.app"
+    session = await stripe_service.create_subscription_checkout(
+        customer_id=profile.stripe_customer_id,
+        price_id=price_id,
+        success_url=f"{frontend_url}/professional/settings?checkout=success",
+        cancel_url=f"{frontend_url}/professional/settings?checkout=cancelled",
+        trial_days=plan.trial_days,
+        metadata={
+            "professional_profile_id": profile.id,
+            "plan_code": plan_code,
+            "account_type": "professional",
+        },
+    )
+
+    return {"checkout_url": session["url"], "session_id": session["id"]}
+
+
+@router.post(
+    "/subscription/portal",
+    summary="Create Stripe billing portal session",
+)
+async def create_billing_portal(
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """
+    Create a Stripe Customer Portal session for managing subscriptions.
+
+    Allows professionals to update payment methods, view invoices,
+    and manage their subscription.
+    """
+    from app.services.stripe_service import StripeService
+    from app.core.config import settings
+
+    if not profile.stripe_customer_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No billing account found. Subscribe to a plan first.",
+        )
+
+    stripe_service = StripeService()
+    frontend_url = settings.FRONTEND_URL or "https://common-ground-blue.vercel.app"
+
+    portal_url = await stripe_service.create_customer_portal_session(
+        customer_id=profile.stripe_customer_id,
+        return_url=f"{frontend_url}/professional/settings",
+    )
+
+    return {"portal_url": portal_url}
+
+
+# =============================================================================
 # OCR DOCUMENT PROCESSING
 # =============================================================================
 

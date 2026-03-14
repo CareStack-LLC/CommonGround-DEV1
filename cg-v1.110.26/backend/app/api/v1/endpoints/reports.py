@@ -231,6 +231,84 @@ async def request_professional_report(
         )
 
 
+@router.get(
+    "/types",
+    summary="Get available professional report types",
+    description="Get attorney report types with GTM spec codes (A-1 through A-8).",
+)
+async def get_professional_report_types() -> dict:
+    """
+    Get available professional/attorney report types.
+
+    Returns both the internal type ID and the GTM spec code (A-1 through A-8).
+    """
+    from app.services.reports.report_registry import get_attorney_reports
+
+    return {
+        "report_types": [
+            {
+                "id": report["internal_type"],
+                "code": report["code"],
+                "name": report["name"],
+                "description": report["description"],
+                "tier_required": report["tier_required"],
+                "sha256_verified": report["sha256_verified"],
+                "court_ready": report["court_ready"],
+                "available": report["available"],
+                "paid": report.get("paid", False),
+                "base_price_cents": report.get("base_price_cents"),
+            }
+            for report in get_attorney_reports()
+        ]
+    }
+
+
+@router.get(
+    "/catalog",
+    summary="Get complete report catalog",
+    description="Get all report types (parent P-1..P-7 and attorney A-1..A-8).",
+)
+async def get_report_catalog() -> dict:
+    """
+    Get the complete report catalog with all parent and attorney reports.
+
+    This is the unified report registry aligned with the GTM spec taxonomy.
+    """
+    from app.services.reports.report_registry import (
+        get_parent_reports,
+        get_attorney_reports,
+    )
+
+    return {
+        "parent_reports": [
+            {
+                "id": r["internal_type"],
+                "code": r["code"],
+                "name": r["name"],
+                "description": r["description"],
+                "tier_required": r["tier_required"],
+                "sha256_verified": r["sha256_verified"],
+                "court_ready": r["court_ready"],
+                "available": r["available"],
+            }
+            for r in get_parent_reports()
+        ],
+        "attorney_reports": [
+            {
+                "id": r["internal_type"],
+                "code": r["code"],
+                "name": r["name"],
+                "description": r["description"],
+                "tier_required": r["tier_required"],
+                "sha256_verified": r["sha256_verified"],
+                "court_ready": r["court_ready"],
+                "available": r["available"],
+            }
+            for r in get_attorney_reports()
+        ],
+    }
+
+
 async def _send_report_request_notification(
     user: User,
     family_file,

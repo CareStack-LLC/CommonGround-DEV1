@@ -236,7 +236,7 @@ function WalletContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground flex items-center gap-3" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
                   <Wallet className="h-6 w-6 text-[var(--portal-primary)]" />
                 </div>
@@ -286,23 +286,23 @@ function WalletContent() {
               onClick={() => setActiveTab('overview')}
               className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                 activeTab === 'overview'
-                  ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md'
+                  ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
                   : 'bg-white border-2 border-slate-200 text-muted-foreground hover:text-foreground hover:border-[var(--portal-primary)]/30 hover:shadow-lg'
               }`}
             >
               <Wallet className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'overview' ? 'group-hover:scale-110' : ''}`} />
-              <span style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Overview</span>
+              <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Overview</span>
             </button>
             <button
               onClick={() => setActiveTab('transactions')}
               className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                 activeTab === 'transactions'
-                  ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644] text-white shadow-md'
+                  ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
                   : 'bg-white border-2 border-slate-200 text-muted-foreground hover:text-foreground hover:border-[var(--portal-primary)]/30 hover:shadow-lg'
               }`}
             >
               <History className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'transactions' ? 'group-hover:scale-110' : ''}`} />
-              <span style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Transactions</span>
+              <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Transactions</span>
             </button>
             <button
               onClick={() => setActiveTab('children')}
@@ -313,7 +313,7 @@ function WalletContent() {
               }`}
             >
               <PiggyBank className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'children' ? 'group-hover:scale-110' : ''}`} />
-              <span style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Child Savings</span>
+              <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Child Savings</span>
               {childWallets.length > 0 && (
                 <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
                   activeTab === 'children' ? 'bg-white/20' : 'bg-purple-100 text-purple-600'
@@ -331,7 +331,7 @@ function WalletContent() {
               }`}
             >
               <ArrowDownLeft className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'payouts' ? 'group-hover:scale-110' : ''}`} />
-              <span style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Payouts</span>
+              <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Payouts</span>
             </button>
           </div>
         )}
@@ -352,7 +352,7 @@ function WalletContent() {
                         <Plus className="h-6 w-6 text-[var(--portal-primary)]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Add Funds</p>
+                        <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Add Funds</p>
                         <p className="text-sm text-muted-foreground font-medium">Deposit money</p>
                       </div>
                       <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
@@ -367,7 +367,7 @@ function WalletContent() {
                         <ArrowUpRight className="h-6 w-6 text-slate-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>ClearFund</p>
+                        <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>ClearFund</p>
                         <p className="text-sm text-muted-foreground font-medium">Pay expenses</p>
                       </div>
                       <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
@@ -379,7 +379,7 @@ function WalletContent() {
               {/* Recent Transactions */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Recent Activity</h3>
+                  <h3 className="font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Recent Activity</h3>
                   {transactions.length > 0 && (
                     <button
                       onClick={() => setActiveTab('transactions')}
@@ -413,7 +413,7 @@ function WalletContent() {
                   <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
                     <PiggyBank className="h-7 w-7 text-purple-600" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Child Savings</h3>
+                  <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Child Savings</h3>
                   <p className="text-muted-foreground mb-4 max-w-md mx-auto font-medium">
                     Child wallets are created automatically for children in your family files.
                     Family and friends can contribute to help build their savings.
@@ -441,7 +441,7 @@ function WalletContent() {
                   <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
                     <ArrowDownLeft className="h-7 w-7 text-emerald-600" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>No Payouts Yet</h3>
+                  <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No Payouts Yet</h3>
                   <p className="text-muted-foreground max-w-md mx-auto font-medium">
                     When ClearFund obligations are fully funded, payouts will automatically
                     be sent to your connected bank account.
@@ -456,7 +456,7 @@ function WalletContent() {
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-bold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                          <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             Payout from Obligation
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">
@@ -493,7 +493,7 @@ function WalletContent() {
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border-2 border-slate-200">
             <div className="p-6 border-b-2 border-slate-200 bg-gradient-to-r from-slate-50 to-white">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Add Funds</h2>
+                <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Add Funds</h2>
                 <button
                   onClick={() => setShowDepositModal(false)}
                   className="p-2 hover:bg-slate-100 rounded-xl transition-all duration-300"

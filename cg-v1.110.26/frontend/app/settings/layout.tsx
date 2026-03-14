@@ -77,7 +77,7 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
               <Settings className="w-6 h-6 text-[var(--portal-primary)]" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+              <h1 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Settings
               </h1>
               <p className="text-sm text-slate-500 font-medium">

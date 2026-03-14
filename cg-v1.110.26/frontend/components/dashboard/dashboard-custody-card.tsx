@@ -263,7 +263,7 @@ export function DashboardCustodyCard({
                         )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-bold text-foreground truncate" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+                        <p className="font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             {childData?.first_name}
                         </p>
                         <div className="flex items-center gap-2">
@@ -287,10 +287,10 @@ export function DashboardCustodyCard({
                             disabled={isWithYou}
                             className={`
                                 ${isWithYou
-                                    ? 'bg-[#1f4644] opacity-50 cursor-not-allowed shadow-none hover:scale-100 hover:shadow-none'
+                                    ? 'bg-[#2D6A8F] opacity-50 cursor-not-allowed shadow-none hover:scale-100 hover:shadow-none'
                                     : (!hasCurrentSession
                                         ? 'bg-gradient-to-r from-cg-amber to-orange-500 animate-pulse'
-                                        : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1f4644]')
+                                        : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]')
                                 }
                             `}
                         />
@@ -320,7 +320,7 @@ export function DashboardCustodyCard({
                     <div className="relative mb-2">
                         <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
                             <div
-                                className={`h-full rounded-full transition-all duration-500 ${isWithYou ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#1e4442]' : 'bg-cg-slate/60'}`}
+                                className={`h-full rounded-full transition-all duration-500 ${isWithYou ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]' : 'bg-cg-slate/60'}`}
                                 style={{ width: `${progress}%` }}
                             />
                         </div>

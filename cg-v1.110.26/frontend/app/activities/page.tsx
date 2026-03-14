@@ -139,7 +139,7 @@ function ActivitySection({
 
   return (
     <div className="mb-6">
-      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3 px-1" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3 px-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
         {title}
       </h3>
       <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg divide-y divide-slate-100 overflow-hidden">
@@ -326,7 +326,7 @@ function ActivitiesContent() {
                 <Bell className="w-5 h-5 text-[var(--portal-primary)]" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>Activity</h1>
+                <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Activity</h1>
                 {unreadCount > 0 && (
                   <p className="text-sm text-muted-foreground font-medium">
                     {unreadCount} unread
@@ -354,7 +354,7 @@ function ActivitiesContent() {
             <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
               <Bell className="w-7 h-7 text-slate-500" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2" style={{ fontFamily: 'Crimson Text, Georgia, serif' }}>
+            <h3 className="text-lg font-semibold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               No activity yet
             </h3>
             <p className="text-muted-foreground max-w-sm mx-auto font-medium">
