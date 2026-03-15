@@ -138,8 +138,8 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
             {/* Header Actions */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 className="text-lg font-bold text-slate-900">Compliance Reports</h3>
-                    <p className="text-sm text-slate-500">Generate and download case documentation</p>
+                    <h3 className="text-lg font-bold text-foreground">Compliance Reports</h3>
+                    <p className="text-sm text-muted-foreground">Generate and download case documentation</p>
                 </div>
                 <div className="flex gap-2">
                     <Button
@@ -158,17 +158,17 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                 {reports.length > 0 ? (
                     <div className="space-y-3">
                         {reports.map((report) => (
-                            <Card key={report.id} className="overflow-hidden border-slate-100 hover:border-emerald-200 transition-colors group">
+                            <Card key={report.id} className="overflow-hidden border-border hover:border-emerald-200 transition-colors group">
                                 <div className="p-4 flex items-center justify-between">
                                     <div className="flex items-center gap-4">
                                         <div className="h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500">
                                             <FileText className="h-5 w-5" />
                                         </div>
                                         <div>
-                                            <h4 className="font-semibold text-slate-900 text-sm">
+                                            <h4 className="font-semibold text-foreground text-sm">
                                                 {report.report_type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                             </h4>
-                                            <p className="text-xs text-slate-500">
+                                            <p className="text-xs text-muted-foreground">
                                                 Generated on {new Date(report.created_at).toLocaleDateString()}
                                             </p>
                                         </div>
@@ -190,7 +190,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                                                 <Download className="h-4 w-4" />
                                             </Button>
                                         ) : (
-                                            <Button size="icon" variant="ghost" disabled className="h-8 w-8 text-slate-300">
+                                            <Button size="icon" variant="ghost" disabled className="h-8 w-8 text-muted-foreground/40">
                                                 <Clock className="h-4 w-4" />
                                             </Button>
                                         )}
@@ -200,9 +200,9 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-8 text-center">
-                        <FileCheck className="h-10 w-10 mx-auto text-slate-300 mb-3" />
-                        <p className="text-slate-500 font-medium">No reports generated yet.</p>
+                    <div className="bg-muted border border-dashed border-border rounded-xl p-8 text-center">
+                        <FileCheck className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+                        <p className="text-muted-foreground font-medium">No reports generated yet.</p>
                         <Button
                             variant="link"
                             className="text-indigo-600"

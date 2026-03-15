@@ -104,13 +104,13 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
             {/* Main Call View */}
             <div className="flex-1 flex flex-col gap-6 h-full">
                 {/* Call Management Header */}
-                <Card className="border-slate-200">
+                <Card className="border-border">
                     <CardContent className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className={`h-3 w-3 rounded-full ${isLive ? 'bg-red-500 animate-pulse' : 'bg-slate-300'}`} />
+                            <div className={`h-3 w-3 rounded-full ${isLive ? 'bg-red-500 animate-pulse' : 'bg-muted-foreground/40'}`} />
                             <div className="space-y-0.5">
-                                <h2 className="font-bold text-slate-900">{isLive ? "Live Intake Session" : "Wait for Participants"}</h2>
-                                <div className="flex items-center gap-3 text-xs text-slate-500">
+                                <h2 className="font-bold text-foreground">{isLive ? "Live Intake Session" : "Wait for Participants"}</h2>
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                     <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {formatDuration(duration)}</span>
                                     <span className="flex items-center gap-1"><Users className="h-3 w-3" /> 2 / 2 Connected</span>
                                 </div>
@@ -161,30 +161,30 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                     </div>
                 </div>
 
-                {/* Real-time Transcription placeholders */}
-                <Card className="h-64 border-slate-200 overflow-hidden flex flex-col">
-                    <CardHeader className="py-3 px-4 bg-slate-50/50 border-b border-slate-100 flex flex-row items-center justify-between">
-                        <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-2">
+                {/* Real-time Transcription */}
+                <Card className="h-64 border-border overflow-hidden flex flex-col">
+                    <CardHeader className="py-3 px-4 bg-muted/50 border-b border-border flex flex-row items-center justify-between">
+                        <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                             <MessageSquare className="h-3 w-3" /> Live Transcription
                         </CardTitle>
-                        <Badge variant="outline" className="text-[10px] bg-white border-slate-200">Powered by Deepgram</Badge>
+                        <Badge variant="outline" className="text-[10px] bg-card border-border">Powered by Deepgram</Badge>
                     </CardHeader>
                     <CardContent className="p-0 flex-1 overflow-hidden" ref={scrollRef}>
                         <ScrollArea className="h-full p-4">
                             <div className="space-y-4">
                                 {transcripts.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center h-40 text-slate-300">
+                                    <div className="flex flex-col items-center justify-center h-40 text-muted-foreground/40">
                                         <Zap className="h-8 w-8 mb-2 opacity-50" />
                                         <p className="text-sm italic">Waiting for speech...</p>
                                     </div>
                                 ) : (
                                     transcripts.map((t, i) => (
-                                        <div key={i} className={`flex gap-3 text-sm animate-in fade-in slide-in-from-bottom-2 ${t.sender === 'ARIA' ? 'bg-indigo-50/50 p-2 rounded-lg border border-indigo-100' : ''}`}>
-                                            <span className={`font-bold min-w-[70px] ${t.sender === 'Parent A' ? 'text-teal-600' : t.sender === 'Parent B' ? 'text-blue-600' : 'text-indigo-600'}`}>
+                                        <div key={i} className={`flex gap-3 text-sm animate-in fade-in slide-in-from-bottom-2 ${t.sender === 'ARIA' ? 'bg-indigo-50 dark:bg-indigo-950/30 p-2 rounded-lg border border-indigo-100 dark:border-indigo-900/40' : ''}`}>
+                                            <span className={`font-bold min-w-[70px] ${t.sender === 'Parent A' ? 'text-teal-600 dark:text-teal-400' : t.sender === 'Parent B' ? 'text-blue-600 dark:text-blue-400' : 'text-indigo-600 dark:text-indigo-400'}`}>
                                                 {t.sender}:
                                             </span>
-                                            <span className="text-slate-700 leading-relaxed flex-1">{t.text}</span>
-                                            <span className="text-[10px] text-slate-400 font-mono mt-1">{t.time}</span>
+                                            <span className="text-foreground/80 leading-relaxed flex-1">{t.text}</span>
+                                            <span className="text-[10px] text-muted-foreground font-mono mt-1">{t.time}</span>
                                         </div>
                                     ))
                                 )}
@@ -197,10 +197,10 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
             {/* Sidebar Controls (Safety Shields & Metadata) */}
             <div className="w-full lg:w-80 flex flex-col gap-6">
                 {/* ARIA Safety Shield */}
-                <Card className="border-indigo-200 shadow-sm bg-gradient-to-b from-indigo-50/30 to-white">
-                    <CardHeader className="pb-3 border-b border-indigo-100 transition-colors">
+                <Card className="border-indigo-200 dark:border-indigo-900/40 shadow-sm bg-gradient-to-b from-indigo-50/30 dark:from-indigo-950/20 to-card">
+                    <CardHeader className="pb-3 border-b border-indigo-100 dark:border-indigo-900/40 transition-colors">
                         <div className="flex items-center justify-between">
-                            <CardTitle className="text-sm font-bold flex items-center gap-2 text-indigo-900">
+                            <CardTitle className="text-sm font-bold flex items-center gap-2 text-indigo-900 dark:text-indigo-300">
                                 <Shield className="h-4 w-4" />
                                 ARIA Safety Shield
                             </CardTitle>
@@ -210,7 +210,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                     <CardContent className="p-4 space-y-6">
                         <div className="space-y-3">
                             <div className="flex justify-between items-end">
-                                <span className="text-xs font-medium text-slate-600">Session Conflict Risk</span>
+                                <span className="text-xs font-medium text-muted-foreground">Session Conflict Risk</span>
                                 <span className={`text-sm font-bold ${riskScore > 60 ? 'text-red-500' : riskScore > 30 ? 'text-amber-500' : 'text-emerald-500'}`}>
                                     {riskScore}%
                                 </span>
@@ -220,12 +220,12 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
-                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-slate-200 hover:bg-red-50 hover:border-red-200 group">
-                                <AlertTriangle className="h-4 w-4 text-slate-400 group-hover:text-red-500" />
+                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-border hover:bg-red-50 dark:hover:bg-red-950/20 hover:border-red-200 dark:hover:border-red-900/40 group">
+                                <AlertTriangle className="h-4 w-4 text-muted-foreground group-hover:text-red-500" />
                                 <span className="text-[10px] font-bold">Intervene</span>
                             </Button>
-                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-slate-200 hover:bg-indigo-50 hover:border-indigo-200 group">
-                                <Zap className="h-4 w-4 text-slate-400 group-hover:text-indigo-500" />
+                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-border hover:bg-indigo-50 dark:hover:bg-indigo-950/20 hover:border-indigo-200 dark:hover:border-indigo-900/40 group">
+                                <Zap className="h-4 w-4 text-muted-foreground group-hover:text-indigo-500" />
                                 <span className="text-[10px] font-bold">Quiet Handoff</span>
                             </Button>
                         </div>
@@ -240,29 +240,29 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                 </Card>
 
                 {/* Case Reference Tab */}
-                <Card className="flex-1 border-slate-200 overflow-hidden flex flex-col">
+                <Card className="flex-1 border-border overflow-hidden flex flex-col">
                     <Tabs defaultValue="agreements" className="flex-1 flex flex-col">
-                        <TabsList className="bg-slate-50 border-b border-slate-100 rounded-none w-full justify-start px-2 py-0 h-10">
-                            <TabsTrigger value="agreements" className="text-[10px] h-8 data-[state=active]:bg-white">AGREEMENTS</TabsTrigger>
-                            <TabsTrigger value="details" className="text-[10px] h-8 data-[state=active]:bg-white">CASE STATS</TabsTrigger>
+                        <TabsList className="bg-muted border-b border-border rounded-none w-full justify-start px-2 py-0 h-10">
+                            <TabsTrigger value="agreements" className="text-[10px] h-8 data-[state=active]:bg-card">AGREEMENTS</TabsTrigger>
+                            <TabsTrigger value="details" className="text-[10px] h-8 data-[state=active]:bg-card">CASE STATS</TabsTrigger>
                         </TabsList>
                         <CardContent className="p-0 flex-1 overflow-hidden">
                             <TabsContent value="agreements" className="h-full m-0">
                                 <ScrollArea className="h-[280px] p-4">
                                     <div className="space-y-3">
-                                        <div className="p-2 rounded-lg border border-emerald-100 bg-emerald-50/50">
-                                            <h4 className="text-xs font-bold text-emerald-900 flex items-center justify-between">
+                                        <div className="p-2 rounded-lg border border-emerald-100 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-950/20">
+                                            <h4 className="text-xs font-bold text-emerald-900 dark:text-emerald-300 flex items-center justify-between">
                                                 Exchange Plan A-1
                                                 <ChevronRight className="h-3 w-3" />
                                             </h4>
-                                            <p className="text-[10px] text-emerald-700/70 mt-1 line-clamp-2">Exchanges at Starbucks (3rd St) every Friday at 5:00 PM.</p>
+                                            <p className="text-[10px] text-emerald-700/70 dark:text-emerald-400/70 mt-1 line-clamp-2">Exchanges at Starbucks (3rd St) every Friday at 5:00 PM.</p>
                                         </div>
-                                        <div className="p-2 rounded-lg border border-slate-200">
-                                            <h4 className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                                        <div className="p-2 rounded-lg border border-border">
+                                            <h4 className="text-xs font-bold text-foreground flex items-center justify-between">
                                                 Holiday Prep 2026
                                                 <ChevronRight className="h-3 w-3" />
                                             </h4>
-                                            <p className="text-[10px] text-slate-500 mt-1 line-clamp-2">Vacation selection requires 30 days notice.</p>
+                                            <p className="text-[10px] text-muted-foreground mt-1 line-clamp-2">Vacation selection requires 30 days notice.</p>
                                         </div>
                                     </div>
                                 </ScrollArea>
@@ -270,23 +270,23 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                             <TabsContent value="details" className="p-4 space-y-4 m-0">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase">Conflict Level</p>
-                                        <Badge variant="outline" className="text-orange-600 bg-orange-50 border-orange-200">HIGH-TEMP</Badge>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Conflict Level</p>
+                                        <Badge variant="outline" className="text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-900/40">HIGH-TEMP</Badge>
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase">Avg Response</p>
-                                        <p className="text-sm font-bold">4.2 hours</p>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Avg Response</p>
+                                        <p className="text-sm font-bold text-foreground">4.2 hours</p>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Recent Violations</p>
-                                    <p className="text-xs text-slate-600">3 late exchanges in past 30 days.</p>
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase">Recent Violations</p>
+                                    <p className="text-xs text-muted-foreground">3 late exchanges in past 30 days.</p>
                                 </div>
                             </TabsContent>
                         </CardContent>
                     </Tabs>
-                    <CardFooter className="p-3 bg-slate-50 flex justify-center">
-                        <Button variant="ghost" size="sm" className="h-8 text-[10px] text-slate-500">
+                    <CardFooter className="p-3 bg-muted flex justify-center">
+                        <Button variant="ghost" size="sm" className="h-8 text-[10px] text-muted-foreground">
                             <Settings className="h-3 w-3 mr-2" />
                             Call Settings
                         </Button>

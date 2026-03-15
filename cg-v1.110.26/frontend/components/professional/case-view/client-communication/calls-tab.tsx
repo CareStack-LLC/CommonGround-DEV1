@@ -135,8 +135,8 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
             {/* Header Actions */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 className="text-lg font-bold text-slate-900">Call Logs & Live Interface</h3>
-                    <p className="text-sm text-slate-500">Manage professional call history</p>
+                    <h3 className="text-lg font-bold text-foreground">Call Logs & Live Interface</h3>
+                    <p className="text-sm text-muted-foreground">Manage professional call history</p>
                 </div>
                 <div className="flex gap-2">
                     <Button
@@ -167,7 +167,7 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-white hover:bg-white/10"
+                            className="text-white hover:bg-card/10"
                             onClick={() => setIsLiveMode(false)}
                         >
                             Exit Live View
@@ -182,21 +182,21 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
             ) : callLogs.length > 0 ? (
                 <div className="space-y-3">
                     {callLogs.map((call) => (
-                        <Card key={call.id} className="overflow-hidden border-slate-100 hover:border-indigo-200 transition-colors group">
+                        <Card key={call.id} className="overflow-hidden border-border hover:border-indigo-200 transition-colors group">
                             <div className="p-4 flex items-start gap-4">
-                                <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+                                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
                                     <Phone className="h-5 w-5" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between mb-1">
-                                        <span className="font-semibold text-slate-900 capitalize">
+                                        <span className="font-semibold text-foreground capitalize">
                                             {call.call_type} Call
                                         </span>
                                         <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-wider">
                                             {call.status}
                                         </Badge>
                                     </div>
-                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mb-2">
                                         <span className="flex items-center gap-1">
                                             <Clock className="h-3 w-3" />
                                             {formatDuration(call.duration_seconds)}
@@ -210,13 +210,13 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                                             {call.participant_ids.length} Participants
                                         </span>
                                     </div>
-                                    <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                                         {call.notes || "No notes recorded for this call."}
                                     </p>
                                 </div>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
                                             <MoreVertical className="h-4 w-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -233,9 +233,9 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                     ))}
                 </div>
             ) : (
-                <div className="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-8 text-center">
-                    <Phone className="h-10 w-10 mx-auto text-slate-300 mb-3" />
-                    <p className="text-slate-500 font-medium">No calls logged yet.</p>
+                <div className="bg-muted border border-dashed border-border rounded-xl p-8 text-center">
+                    <Phone className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+                    <p className="text-muted-foreground font-medium">No calls logged yet.</p>
                     <Button
                         variant="link"
                         className="text-indigo-600"
@@ -281,7 +281,7 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                                     value={callForm.duration_seconds / 60}
                                     onChange={(e) => setCallForm({ ...callForm, duration_seconds: parseInt(e.target.value) * 60 })}
                                 />
-                                <span className="text-sm text-slate-500">minutes</span>
+                                <span className="text-sm text-muted-foreground">minutes</span>
                             </div>
                         </div>
                         <div className="grid grid-cols-4 items-start gap-4">

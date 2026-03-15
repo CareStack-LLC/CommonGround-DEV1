@@ -210,7 +210,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground" />
             </div>
         );
     }
@@ -220,8 +220,8 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
             {/* Header Actions */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 className="text-lg font-bold text-slate-900">Case Documentation</h3>
-                    <p className="text-sm text-slate-500">Manage professional call logs and compliance reports</p>
+                    <h3 className="text-lg font-bold text-foreground">Case Documentation</h3>
+                    <p className="text-sm text-muted-foreground">Manage professional call logs and compliance reports</p>
                 </div>
                 <div className="flex gap-2">
                     <Button
@@ -234,7 +234,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                     <Button
                         onClick={() => setIsGenReportOpen(true)}
                         variant="outline"
-                        className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                        className="border-indigo-200 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 dark:bg-indigo-950/20"
                     >
                         <FileText className="h-4 w-4 mr-2" />
                         Generate Report
@@ -275,7 +275,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                 <div className="grid lg:grid-cols-2 gap-8">
                     {/* Call Logs Section */}
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-slate-700 font-semibold px-1">
+                        <div className="flex items-center gap-2 text-foreground font-semibold px-1">
                             <History className="h-5 w-5 text-indigo-500" />
                             Recent Calls
                         </div>
@@ -283,21 +283,21 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                         {callLogs.length > 0 ? (
                             <div className="space-y-3">
                                 {callLogs.map((call) => (
-                                    <Card key={call.id} className="overflow-hidden border-slate-100 hover:border-indigo-200 transition-colors group">
+                                    <Card key={call.id} className="overflow-hidden border-border hover:border-indigo-200 dark:hover:border-indigo-900/40 transition-colors group">
                                         <div className="p-4 flex items-start gap-4">
-                                            <div className="h-10 w-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+                                            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-indigo-50 dark:hover:bg-indigo-950/20 dark:bg-indigo-950/20 group-hover:text-indigo-500 transition-colors">
                                                 <Phone className="h-5 w-5" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between mb-1">
-                                                    <span className="font-semibold text-slate-900 capitalize">
+                                                    <span className="font-semibold text-foreground capitalize">
                                                         {call.call_type} Call
                                                     </span>
                                                     <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-wider">
                                                         {call.status}
                                                     </Badge>
                                                 </div>
-                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
+                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground mb-2">
                                                     <span className="flex items-center gap-1">
                                                         <Clock className="h-3 w-3" />
                                                         {formatDuration(call.duration_seconds)}
@@ -311,13 +311,13 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                                         {call.participant_ids.length} Participants
                                                     </span>
                                                 </div>
-                                                <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                                                <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                                                     {call.notes || "No notes recorded for this call."}
                                                 </p>
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
                                                         <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -334,9 +334,9 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                 ))}
                             </div>
                         ) : (
-                            <div className="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-8 text-center">
-                                <Phone className="h-10 w-10 mx-auto text-slate-300 mb-3" />
-                                <p className="text-slate-500 font-medium">No calls logged yet.</p>
+                            <div className="bg-muted border border-dashed border-border rounded-xl p-8 text-center">
+                                <Phone className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+                                <p className="text-muted-foreground font-medium">No calls logged yet.</p>
                                 <Button
                                     variant="link"
                                     className="text-indigo-600"
@@ -350,7 +350,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
 
                     {/* Compliance Reports Section */}
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 text-slate-700 font-semibold px-1">
+                        <div className="flex items-center gap-2 text-foreground font-semibold px-1">
                             <FileCheck className="h-5 w-5 text-indigo-500" />
                             Compliance Reports
                         </div>
@@ -358,17 +358,17 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                         {reports.length > 0 ? (
                             <div className="space-y-3">
                                 {reports.map((report) => (
-                                    <Card key={report.id} className="overflow-hidden border-slate-100 hover:border-emerald-200 transition-colors group">
+                                    <Card key={report.id} className="overflow-hidden border-border hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-colors group">
                                         <div className="p-4 flex items-center justify-between">
                                             <div className="flex items-center gap-4">
-                                                <div className="h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500">
+                                                <div className="h-10 w-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center text-emerald-500">
                                                     <FileText className="h-5 w-5" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-semibold text-slate-900 text-sm">
+                                                    <h4 className="font-semibold text-foreground text-sm">
                                                         {report.report_type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
                                                     </h4>
-                                                    <p className="text-xs text-slate-500">
+                                                    <p className="text-xs text-muted-foreground">
                                                         Generated on {new Date(report.created_at).toLocaleDateString()}
                                                     </p>
                                                 </div>
@@ -390,7 +390,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                                         <Download className="h-4 w-4" />
                                                     </Button>
                                                 ) : (
-                                                    <Button size="icon" variant="ghost" disabled className="h-8 w-8 text-slate-300">
+                                                    <Button size="icon" variant="ghost" disabled className="h-8 w-8 text-muted-foreground/40">
                                                         <Clock className="h-4 w-4" />
                                                     </Button>
                                                 )}
@@ -400,9 +400,9 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                 ))}
                             </div>
                         ) : (
-                            <div className="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-8 text-center">
-                                <FileCheck className="h-10 w-10 mx-auto text-slate-300 mb-3" />
-                                <p className="text-slate-500 font-medium">No reports generated yet.</p>
+                            <div className="bg-muted border border-dashed border-border rounded-xl p-8 text-center">
+                                <FileCheck className="h-10 w-10 mx-auto text-muted-foreground/40 mb-3" />
+                                <p className="text-muted-foreground font-medium">No reports generated yet.</p>
                                 <Button
                                     variant="link"
                                     className="text-indigo-600"
@@ -414,10 +414,10 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                         )}
 
                         {/* Tips Card */}
-                        <Card className="bg-indigo-50 border-none mt-6">
+                        <Card className="bg-indigo-50 dark:bg-indigo-950/20 border-none mt-6">
                             <CardContent className="p-4 flex gap-3">
                                 <AlertCircle className="h-5 w-5 text-indigo-500 shrink-0" />
-                                <div className="text-xs text-indigo-800 leading-relaxed">
+                                <div className="text-xs text-indigo-800 dark:text-indigo-300 leading-relaxed">
                                     <p className="font-bold mb-1">Professional Advisory</p>
                                     Compliance reports aggregate ARIA flags, exchange metadata, and message sentiment. Use them for court submissions or mediation preparations.
                                 </div>
@@ -462,7 +462,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                     value={callForm.duration_seconds / 60}
                                     onChange={(e) => setCallForm({ ...callForm, duration_seconds: parseInt(e.target.value) * 60 })}
                                 />
-                                <span className="text-sm text-slate-500">minutes</span>
+                                <span className="text-sm text-muted-foreground">minutes</span>
                             </div>
                         </div>
                         <div className="grid grid-cols-4 items-start gap-4">

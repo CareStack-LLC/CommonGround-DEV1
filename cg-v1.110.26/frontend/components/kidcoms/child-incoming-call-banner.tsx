@@ -172,12 +172,12 @@ export function ChildIncomingCallBanner({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
-      <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center animate-in zoom-in-95">
+      <div className="bg-card rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center animate-in zoom-in-95 border border-border">
         {/* Animated calling indicator */}
         <div className="relative mx-auto w-28 h-28 mb-6">
-          <div className="absolute inset-0 rounded-full bg-teal-100 animate-ping opacity-75" />
-          <div className="absolute inset-0 rounded-full bg-emerald-200 animate-pulse" />
-          <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 overflow-hidden flex items-center justify-center shadow-lg border-4 border-white">
+          <div className="absolute inset-0 rounded-full bg-teal-100 dark:bg-teal-900/40 animate-ping opacity-75" />
+          <div className="absolute inset-0 rounded-full bg-emerald-200 dark:bg-emerald-800/50 animate-pulse" />
+          <div className="relative w-28 h-28 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 overflow-hidden flex items-center justify-center shadow-lg border-4 border-card">
             {callerImage ? (
               <img src={callerImage} alt={callerName} className="w-full h-full object-cover" />
             ) : callerEmoji ? (
@@ -190,11 +190,11 @@ export function ChildIncomingCallBanner({
 
         {/* Caller Info */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+          <h2 className="text-3xl font-bold text-foreground mb-2">
             {callerName}
           </h2>
-          <p className="text-lg text-gray-500">is calling you!</p>
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-400 mt-2">
+          <p className="text-lg text-muted-foreground">is calling you!</p>
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground/70 mt-2">
             <CallIcon className="h-4 w-4" />
             <span>{isVideoCall ? 'Video Call' : 'Voice Call'}</span>
           </div>
@@ -206,37 +206,37 @@ export function ChildIncomingCallBanner({
           <button
             onClick={handleReject}
             disabled={isJoining || isRejecting}
-            className="flex flex-col items-center gap-3 p-6 bg-red-100 hover:bg-red-200 rounded-2xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+            className="flex flex-col items-center gap-3 p-6 bg-red-100 dark:bg-red-950/30 hover:bg-red-200 dark:hover:bg-red-950/50 rounded-2xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
           >
             {isRejecting ? (
-              <Loader2 className="h-10 w-10 text-red-600 animate-spin" />
+              <Loader2 className="h-10 w-10 text-red-600 dark:text-red-400 animate-spin" />
             ) : (
               <div className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center shadow-md">
                 <X className="h-8 w-8 text-white" />
               </div>
             )}
-            <span className="font-bold text-red-700 text-lg">Not Now</span>
+            <span className="font-bold text-red-700 dark:text-red-400 text-lg">Not Now</span>
           </button>
 
           {/* Accept Button */}
           <button
             onClick={handleJoin}
             disabled={isJoining || isRejecting}
-            className="flex flex-col items-center gap-3 p-6 bg-emerald-100 hover:bg-emerald-200 rounded-2xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+            className="flex flex-col items-center gap-3 p-6 bg-emerald-100 dark:bg-emerald-950/30 hover:bg-emerald-200 dark:hover:bg-emerald-950/50 rounded-2xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
           >
             {isJoining ? (
-              <Loader2 className="h-10 w-10 text-emerald-600 animate-spin" />
+              <Loader2 className="h-10 w-10 text-emerald-600 dark:text-emerald-400 animate-spin" />
             ) : (
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center shadow-md">
                 <CallIcon className="h-8 w-8 text-white" />
               </div>
             )}
-            <span className="font-bold text-emerald-700 text-lg">Answer!</span>
+            <span className="font-bold text-emerald-700 dark:text-emerald-400 text-lg">Answer!</span>
           </button>
         </div>
 
         {/* Fun message */}
-        <p className="text-center text-sm text-gray-400 mt-6">
+        <p className="text-center text-sm text-muted-foreground/70 mt-6">
           Someone wants to talk to you!
         </p>
       </div>

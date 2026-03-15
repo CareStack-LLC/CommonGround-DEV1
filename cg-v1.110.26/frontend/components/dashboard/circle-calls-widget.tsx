@@ -61,11 +61,11 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
   }
 
   function getStatusColor(status: string, hasFlags: boolean): string {
-    if (hasFlags) return 'text-amber-600 bg-amber-50';
-    if (status === 'completed') return 'text-green-600 bg-green-50';
+    if (hasFlags) return 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30';
+    if (status === 'completed') return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30';
     if (status === 'missed') return 'text-muted-foreground bg-muted';
-    if (status === 'terminated') return 'text-red-600 bg-red-50';
-    return 'text-blue-600 bg-blue-50';
+    if (status === 'terminated') return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30';
+    return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30';
   }
 
   if (isLoading) {
@@ -118,7 +118,7 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
           </h3>
         </div>
         <div className="text-center py-8">
-          <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mx-auto mb-3">
+          <div className="w-16 h-16 rounded-full bg-purple-50 dark:bg-purple-950/30 flex items-center justify-center mx-auto mb-3">
             <Phone className="h-8 w-8 text-purple-400" />
           </div>
           <p className="text-sm text-muted-foreground">No circle calls yet</p>
@@ -157,13 +157,13 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
 
       {/* Safety Notice if flags */}
       {flaggedCalls > 0 && (
-        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+        <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-xl flex items-start gap-2">
+          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-amber-900">
+            <p className="text-sm font-medium text-amber-900 dark:text-amber-300">
               {flaggedCalls} {flaggedCalls === 1 ? 'call has' : 'calls have'} safety notices
             </p>
-            <p className="text-xs text-amber-700 mt-0.5">
+            <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
               ARIA detected concerning content
             </p>
           </div>
@@ -182,7 +182,7 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
               {/* Call Type Icon */}
               <div className={cn(
                 'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
-                call.call_type === 'video' ? 'bg-purple-100' : 'bg-muted'
+                call.call_type === 'video' ? 'bg-purple-100 dark:bg-purple-950/30' : 'bg-muted'
               )}>
                 {call.call_type === 'video' ? (
                   <Video className="h-5 w-5 text-purple-600" />
@@ -198,9 +198,9 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
                     {call.circle_contact_name} → {call.child_name}
                   </p>
                   {call.aria_intervention_count > 0 && (
-                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 rounded-full">
-                      <Shield className="h-3 w-3 text-amber-600" />
-                      <span className="text-xs font-medium text-amber-700">
+                    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-950/30 rounded-full">
+                      <Shield className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+                      <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
                         {call.aria_intervention_count}
                       </span>
                     </div>
