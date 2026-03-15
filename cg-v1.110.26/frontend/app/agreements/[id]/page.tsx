@@ -639,7 +639,7 @@ function AgreementDetailsContent() {
   const completionPercent = Math.round((completedSections / totalSections) * 100);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       {/* Back Button */}
@@ -686,7 +686,7 @@ function AgreementDetailsContent() {
         {!isLoading && agreement && (
           <div className="space-y-8">
             {/* Document Header - Paper Texture Background */}
-            <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
               {/* Decorative Header Bar */}
               <div className="h-2 bg-gradient-to-r from-cg-sage via-cg-amber to-cg-sage" />
 
@@ -885,7 +885,7 @@ function AgreementDetailsContent() {
 
 
             {/* Actions Card */}
-            <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-lg hover:shadow-xl transition-all duration-300">
               <h3 className="font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Actions</h3>
               <div className="space-y-3">
                 {/* Draft Actions */}
@@ -969,7 +969,7 @@ function AgreementDetailsContent() {
                     ) : (
                       <button
                         onClick={() => router.push('/settings/billing')}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-200 transition-colors"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-muted text-muted-foreground hover:bg-muted transition-colors"
                       >
                         <Lock className="h-4 w-4" />
                         Download PDF
@@ -1008,7 +1008,7 @@ function AgreementDetailsContent() {
                     ) : (
                       <button
                         onClick={() => router.push('/settings/billing')}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-200 transition-colors"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-muted text-muted-foreground hover:bg-muted transition-colors"
                       >
                         <Lock className="h-4 w-4" />
                         Download PDF
@@ -1030,8 +1030,8 @@ function AgreementDetailsContent() {
             </div>
 
             {/* Sections - The Living Document */}
-            <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="p-6 border-b border-slate-200">
+            <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+              <div className="p-6 border-b border-border">
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-serif text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
