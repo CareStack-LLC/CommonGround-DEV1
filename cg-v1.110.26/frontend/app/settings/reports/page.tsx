@@ -33,6 +33,7 @@ import {
   Gavel,
   ClipboardList,
   Lock,
+  Users,
 } from 'lucide-react';
 import { useFeatureGate } from '@/hooks/use-feature-gate';
 import { LockedFeatureCard } from '@/components/locked-feature-card';
@@ -77,8 +78,16 @@ const selfServiceReports = [
     title: 'Schedule & Events History',
     description: 'Calendar events, custody exchanges, and schedule modifications.',
     icon: Calendar,
-    reportType: 'schedule', // Coming soon
+    reportType: 'schedule',
     sections: ['parenting_time', 'agreement_overview'],
+  },
+  {
+    id: 'kidspace_communication',
+    title: 'KidSpace Communication Report',
+    description: 'Summary of KidSpace sessions, circle contact activity, schedule compliance, and ARIA flags.',
+    icon: Users,
+    reportType: 'kidspace_communication',
+    sections: ['kidspace_sessions', 'circle_activity'],
   },
 ];
 
@@ -139,6 +148,20 @@ const professionalReports = [
       'Compliance scoring by parent',
       'Pattern analysis',
       'Visual timeline',
+    ],
+  },
+  {
+    id: 'kidspace_court_communication',
+    title: 'KidSpace Court Communication Report',
+    description: 'Court-ready KidSpace communication analysis with full session logs, ARIA flags, and SHA-256 verification.',
+    price: 79,
+    icon: Users,
+    features: [
+      'Complete session-by-session detail with timestamps',
+      'Full message log with ARIA analysis',
+      'Circle contact permission audit trail',
+      'Communication schedule compliance',
+      'SHA-256 integrity verification',
     ],
   },
 ];
