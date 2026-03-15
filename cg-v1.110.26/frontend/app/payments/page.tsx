@@ -516,13 +516,30 @@ function PaymentsContent() {
                 </h1>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground ml-14">
-              <Users className="h-4 w-4" />
-              <span className="font-medium">{selectedFamilyFile.title}</span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground ml-14 flex-wrap">
+              <Users className="h-4 w-4 flex-shrink-0" />
+              {familyFilesWithAgreements.length > 1 ? (
+                <div className="relative">
+                  <select
+                    value={selectedFamilyFile.id}
+                    onChange={(e) => handleFamilyFileChange(e.target.value)}
+                    className="appearance-none bg-muted/50 border border-border rounded-lg px-2.5 py-1 pr-7 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all cursor-pointer hover:bg-muted"
+                  >
+                    {familyFilesWithAgreements.map((item) => (
+                      <option key={item.familyFile.id} value={item.familyFile.id}>
+                        {item.familyFile.title}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+                </div>
+              ) : (
+                <span className="font-medium">{selectedFamilyFile.title}</span>
+              )}
               {selectedAgreement && (
                 <>
                   <span className="text-muted-foreground">•</span>
-                  <FileText className="h-4 w-4" />
+                  <FileText className="h-4 w-4 flex-shrink-0" />
                   <span className="font-medium">{selectedAgreement.title}</span>
                 </>
               )}
