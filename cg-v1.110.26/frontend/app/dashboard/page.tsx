@@ -755,6 +755,7 @@ function DashboardContent() {
                       <DashboardCustodyCard
                         key={child.id}
                         childId={child.id}
+                        familyFileId={data.familyFile.id}
                         childData={child}
                         refreshTrigger={refreshKey}
                         onWithMe={async (id) => {

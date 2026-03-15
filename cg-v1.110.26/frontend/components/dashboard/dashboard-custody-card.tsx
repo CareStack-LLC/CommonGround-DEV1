@@ -7,41 +7,47 @@ import {
     getImageUrl,
     FamilyFileChild,
     custodyTimeAPI,
-    CustodyTimelineResponse
+    CustodyTimelineResponse,
+    familyFilesAPI,
+    ChildCustodyStatus,
 } from '@/lib/api';
 import { formatInUserTimezone, isToday as isTodayTz } from '@/lib/timezone';
-import { Users } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 
-// Format hours remaining into a human-readable string
-function formatHoursRemaining(hours: number | undefined): string {
-    if (!hours) return 'Unknown';
+// =============================================================================
+// HELPERS
+// =============================================================================
 
-    // Strict "Days" formatting as requested
-    const totalDays = hours / 24;
-    // Format to 1 decimal place if needed, removing .0
-    const formatted = parseFloat(totalDays.toFixed(1));
-    return `${formatted} Day${formatted !== 1 ? 's' : ''}`;
+function clamp(value: number, min: number, max: number) {
+    return Math.min(max, Math.max(min, value));
 }
 
+function formatDays(minutes: number): string {
+    const days = minutes / (60 * 24);
+    const rounded = Math.round(days * 10) / 10;
+    return rounded.toString();
+}
 
-function CheckInButton({
+// =============================================================================
+// CHECK-IN BUTTON (compact pill)
+// =============================================================================
+
+function CheckInPill({
     onClick,
     label,
-    className,
-    disabled = false
+    disabled = false,
+    pulse = false,
 }: {
     onClick: () => void | Promise<void>;
     label: string;
-    className: string;
     disabled?: boolean;
+    pulse?: boolean;
 }) {
     const [loading, setLoading] = useState(false);
 
     const handleClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        // Prevent event bubbling to parent card
-        if (loading) return;
-
+        if (loading || disabled) return;
         try {
             setLoading(true);
             await onClick();
@@ -54,25 +60,34 @@ function CheckInButton({
         <button
             onClick={handleClick}
             disabled={loading || disabled}
-            className={`px-4 py-2 text-xs font-bold text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-200 flex-shrink-0 flex items-center gap-2 ${className} ${loading ? 'opacity-80 cursor-wait' : ''}`}
+            className={`px-3 py-1.5 text-xs font-bold text-white rounded-lg transition-all duration-200 flex-shrink-0 ${
+                disabled
+                    ? 'bg-[var(--portal-primary)] opacity-40 cursor-not-allowed'
+                    : pulse
+                        ? 'bg-gradient-to-r from-cg-amber to-orange-500 animate-pulse hover:shadow-md'
+                        : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] hover:shadow-md hover:scale-105'
+            } ${loading ? 'opacity-80 cursor-wait' : ''}`}
         >
             {loading ? (
-                <>
-                    <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Processing...
-                </>
+                <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" />
             ) : label}
         </button>
     );
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
 export function DashboardCustodyCard({
     childId,
+    familyFileId,
     childData,
     onWithMe,
     refreshTrigger = 0,
 }: {
     childId: string;
+    familyFileId: string;
     childData?: FamilyFileChild;
     onWithMe?: (childId: string) => void | Promise<void>;
     refreshTrigger?: number;
@@ -81,26 +96,34 @@ export function DashboardCustodyCard({
     const [imageError, setImageError] = useState(false);
     const [loading, setLoading] = useState(true);
     const [timelineData, setTimelineData] = useState<CustodyTimelineResponse | null>(null);
+    const [childStatus, setChildStatus] = useState<ChildCustodyStatus | null>(null);
 
-    // Fetch data on mount or when refreshTrigger changes
+    // Load data
     useEffect(() => {
         async function loadData() {
             try {
-                // Don't set loading true on refresh to avoid flicker, only on initial mount if needed
                 if (!timelineData) setLoading(true);
 
-                const data = await custodyTimeAPI.getTimeline(childId, 30);
-                setTimelineData(data);
+                const [timeline, custodyStatus] = await Promise.allSettled([
+                    custodyTimeAPI.getTimeline(childId, 30),
+                    familyFilesAPI.getCustodyStatus(familyFileId),
+                ]);
+
+                if (timeline.status === 'fulfilled') setTimelineData(timeline.value);
+                if (custodyStatus.status === 'fulfilled') {
+                    const match = custodyStatus.value.children.find(c => c.child_id === childId);
+                    setChildStatus(match || null);
+                }
             } catch (err) {
-                console.error('Failed to load custody timeline:', err);
+                console.error('Failed to load custody data:', err);
             } finally {
                 setLoading(false);
             }
         }
         loadData();
-    }, [childId, refreshTrigger]);
+    }, [childId, familyFileId, refreshTrigger]);
 
-    // Subscribe to realtime changes
+    // Realtime subscription
     useEffect(() => {
         const channel = supabase
             .channel(`custody-updates-${childId}`)
@@ -113,244 +136,195 @@ export function DashboardCustodyCard({
                     filter: `child_id=eq.${childId}`,
                 },
                 () => {
-                    // Refresh data on any change
                     custodyTimeAPI.getTimeline(childId, 30).then(setTimelineData);
+                    familyFilesAPI.getCustodyStatus(familyFileId).then(status => {
+                        const match = status.children.find(c => c.child_id === childId);
+                        setChildStatus(match || null);
+                    }).catch(() => {});
                 }
             )
             .subscribe();
 
-        return () => {
-            supabase.removeChannel(channel);
-        };
-    }, [childId, supabase]);
+        return () => { supabase.removeChannel(channel); };
+    }, [childId, familyFileId]);
 
+    // Loading skeleton
     if (loading || !timelineData) {
         return (
-            <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-sm animate-pulse h-48">
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-muted" />
-                    <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-muted w-1/3 rounded" />
-                        <div className="h-3 bg-muted w-1/2 rounded" />
-                    </div>
-                </div>
+            <div className="bg-card rounded-2xl border-2 border-border p-4 shadow-sm animate-pulse">
+                <div className="h-4 bg-muted w-2/3 rounded mb-3" />
+                <div className="h-2 bg-muted rounded-full mb-6 mt-8" />
+                <div className="h-4 bg-muted w-1/2 rounded" />
             </div>
         );
     }
 
-    // Derive status from timeline data
+    // Derive state
     const currentSession = timelineData.sessions.find(s => s.is_current);
     const hasCurrentSession = !!currentSession;
-
-    // Default to user if no session (fallback) or check session parent_id
-    // If no current session, we don't know who it's with (Status: Unknown/Pending)
     const isWithYou = currentSession ? currentSession.parent_id === user?.id : false;
 
-    // Calculate stats from real-time stats
-    // We need to know which parent object corresponds to the current user
     const isParentA = timelineData.stats.parent_a.user_id === user?.id;
     const myStats = isParentA ? timelineData.stats.parent_a : timelineData.stats.parent_b;
-    const theirStats = isParentA ? timelineData.stats.parent_b : timelineData.stats.parent_a;
 
-    // Names
-    const coparentName = isParentA ? 'Co-parent' : 'Co-parent';
-
-    // Status Colors & Text
+    // Status
     let statusColor = 'bg-cg-slate';
-    let statusTextColor = 'text-cg-slate';
-    let statusText = 'Unknown Status';
+    let statusText = 'Unknown';
 
     if (hasCurrentSession) {
         if (isWithYou) {
             statusColor = 'bg-[var(--portal-primary)]';
-            statusTextColor = 'text-[var(--portal-primary)]';
             statusText = 'With You';
         } else {
             statusColor = 'bg-cg-slate';
-            statusTextColor = 'text-cg-slate';
-            statusText = `With ${coparentName}`;
+            statusText = 'With Co-parent';
         }
     } else {
-        // Needs Check-in State
-        statusColor = 'bg-cg-amber'; // Amber to signal attention
-        statusTextColor = 'text-cg-amber';
+        statusColor = 'bg-cg-amber';
         statusText = 'Pending Check-in';
     }
 
-    // We need "days with current parent" - this is effectively the current session duration roughly
-    // The user screenshot showed "Day 5". 
-    // We can calculate this from `currentSession.start_time`.
-    // Calculate streak in DAYS (1 decimal)
-    const getCurrentStreakDays = () => {
+    // Current streak
+    const currentStreakDays = (() => {
         if (!currentSession) return 0;
         const start = new Date(currentSession.start_time);
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - start.getTime());
-        const diffDays = diffTime / (1000 * 60 * 60 * 24);
-        return Math.round(diffDays * 10) / 10; // 1 decimal place
-    };
-    const currentStreakDays = getCurrentStreakDays();
+        const diffMs = Math.abs(new Date().getTime() - start.getTime());
+        return Math.round((diffMs / (1000 * 60 * 60 * 24)) * 10) / 10;
+    })();
 
-    // Next exchange logic
-    // The timeline endpoint returns sessions. The *next* session after current tells us when exchange happens.
-    // Or we find the current session and look at its `end_time`.
-    const nextExchangeTime = currentSession?.end_time;
-    const hasNextExchange = !!nextExchangeTime && new Date(nextExchangeTime).getFullYear() < 3000; // Check for realistic date
+    // Next exchange — use real data from custody status API
+    const nextExchangeTime = childStatus?.next_exchange_time;
+    const nextExchangeLocation = childStatus?.next_exchange_location;
+    const nextAction = childStatus?.next_action; // 'pickup' | 'dropoff'
+    const hasNextExchange = !!nextExchangeTime && new Date(nextExchangeTime).getFullYear() < 3000;
 
-    // Format next exchange time (timezone-aware)
-    const formatNextExchange = () => {
-        if (!nextExchangeTime) return null;
-        const exchangeTime = nextExchangeTime;
-        const isToday = isTodayTz(exchangeTime, timezone);
-
-        // Check if tomorrow
+    const formatNextExchange = (time: string) => {
+        const isToday = isTodayTz(time, timezone);
         const now = new Date();
         const tomorrow = new Date(now.getTime() + 86400000).toISOString();
-        const isTomorrow = formatInUserTimezone(exchangeTime, timezone, 'yyyy-MM-dd') ===
+        const isTomorrow = formatInUserTimezone(time, timezone, 'yyyy-MM-dd') ===
             formatInUserTimezone(tomorrow, timezone, 'yyyy-MM-dd');
 
-        const timeStr = formatInUserTimezone(exchangeTime, timezone, 'h:mm a');
-        const dayStr = formatInUserTimezone(exchangeTime, timezone, 'EEEE');
+        const timeStr = formatInUserTimezone(time, timezone, 'h:mm a');
+        const dayStr = formatInUserTimezone(time, timezone, 'EEEE');
 
         if (isToday) return `Today ${timeStr}`;
         if (isTomorrow) return `Tomorrow ${timeStr}`;
         return `${dayStr} ${timeStr}`;
     };
 
-    const nextExchangeStr = formatNextExchange();
-
-    // Calculate percentage for progress bar? 
-    // The original component had `progress_percentage`. 
-    // We can calculate it: (now - start) / (end - start) * 100
-    const getProgress = () => {
+    // Progress: (now - session_start) / (next_exchange - session_start)
+    const progress = (() => {
         if (!currentSession || !nextExchangeTime) return 0;
         const start = new Date(currentSession.start_time).getTime();
         const end = new Date(nextExchangeTime).getTime();
         const now = new Date().getTime();
-        const total = end - start;
-        const elapsed = now - start;
-        return Math.min(100, Math.max(0, (elapsed / total) * 100));
-    };
-    const progress = getProgress();
+        if (end <= start) return 0;
+        return clamp(((now - start) / (end - start)) * 100, 0, 100);
+    })();
 
-    // Helper to format days (always show 1 decimal if not whole, or just whole number)
-    const formatDays = (minutes: number) => {
-        const days = minutes / (60 * 24);
-        return (Math.round(days * 10) / 10).toString();
-    };
-
+    // Photo
+    const photoUrl = childData?.photo_url ? getImageUrl(childData.photo_url) : null;
+    const childName = childData?.first_name || '?';
 
     return (
-        <div className={`bg-card rounded-2xl border-2 ${!hasCurrentSession ? 'border-cg-amber/50' : 'border-border'} shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-4`}>
-            {/* Top accent bar */}
-            <div className={`h-2 ${statusColor}`} />
+        <div className={`bg-card rounded-2xl border-2 ${!hasCurrentSession ? 'border-cg-amber/50' : 'border-border'} shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden`}>
+            {/* Accent bar */}
+            <div className={`h-1.5 ${statusColor}`} />
 
-            <div className="p-5">
-                {/* Child header with "With Me" button */}
-                <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center flex-shrink-0 overflow-hidden ring-2 ring-white shadow-md">
-                        {childData?.photo_url && !imageError ? (
-                            <img
-                                src={getImageUrl(childData.photo_url) || ''}
-                                alt={childData.first_name}
-                                className="w-full h-full object-cover"
-                                onError={() => setImageError(true)}
-                            />
+            <div className="px-4 pt-3 pb-4">
+                {/* Top row: next exchange + With Me button */}
+                <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="min-w-0 flex-1">
+                        {hasCurrentSession && hasNextExchange ? (
+                            <>
+                                <p className="text-sm text-foreground">
+                                    <span className="text-[var(--portal-primary)] font-semibold">
+                                        Next {nextAction || 'exchange'}:
+                                    </span>{' '}
+                                    <span className="font-medium">{formatNextExchange(nextExchangeTime!)}</span>
+                                </p>
+                                {nextExchangeLocation && (
+                                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5 truncate">
+                                        <MapPin className="h-3 w-3 flex-shrink-0" />
+                                        {nextExchangeLocation}
+                                    </p>
+                                )}
+                            </>
+                        ) : hasCurrentSession ? (
+                            <p className="text-sm text-muted-foreground italic">No exchanges scheduled</p>
                         ) : (
-                            <span className="text-base font-bold text-[var(--portal-primary)]">
-                                {childData?.first_name?.charAt(0) || '?'}
-                            </span>
+                            <p className="text-sm text-cg-amber font-medium">Waiting for check-in</p>
                         )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                            {childData?.first_name}
-                        </p>
-                        <div className="flex items-center gap-2">
-                            <p className={`text-sm font-medium ${statusTextColor}`}>
-                                {statusText}
-                            </p>
-                            {/* Show days with current parent - ONLY if session active */}
-                            {hasCurrentSession && currentStreakDays > 0 && (
-                                <span className="text-sm font-semibold text-cg-amber">
-                                    • {currentStreakDays} Days
-                                </span>
-                            )}
-                        </div>
-                    </div>
 
-                    {/* With Me Button - Manual Override / Check-in */}
                     {onWithMe && (
-                        <CheckInButton
-                            onClick={isWithYou ? () => { } : () => onWithMe(childId)}
-                            label={isWithYou ? 'With Me' : (!hasCurrentSession ? 'Check In / Claim' : 'Check In / With Me')}
+                        <CheckInPill
+                            onClick={isWithYou ? () => {} : () => onWithMe(childId)}
+                            label={isWithYou ? 'With Me' : (!hasCurrentSession ? 'Check In' : 'With Me')}
                             disabled={isWithYou}
-                            className={`
-                                ${isWithYou
-                                    ? 'bg-[#2D6A8F] opacity-50 cursor-not-allowed shadow-none hover:scale-100 hover:shadow-none'
-                                    : (!hasCurrentSession
-                                        ? 'bg-gradient-to-r from-cg-amber to-orange-500 animate-pulse'
-                                        : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]')
-                                }
-                            `}
+                            pulse={!hasCurrentSession}
                         />
                     )}
                 </div>
 
-                {/* Next exchange info */}
-                {hasCurrentSession && hasNextExchange ? (
-                    <div className="mb-3">
-                        <p className="text-sm text-foreground">
-                            <span className="text-blue-600 font-medium">Next exchange:</span>{' '}
-                            <span className="font-medium">{nextExchangeStr}</span>
-                        </p>
+                {/* Progress bar with child photo riding it */}
+                <div className="relative mt-6 mb-5">
+                    {/* Track */}
+                    <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                        <div
+                            className={`h-full rounded-full transition-all duration-700 ${
+                                isWithYou
+                                    ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]'
+                                    : hasCurrentSession
+                                        ? 'bg-cg-slate/60'
+                                        : 'bg-cg-amber/40'
+                            }`}
+                            style={{ width: `${hasCurrentSession ? Math.max(progress, 3) : 0}%` }}
+                        />
                     </div>
-                ) : hasCurrentSession ? (
-                    <p className="text-sm text-muted-foreground mb-3 italic">
-                        No exchanges scheduled
-                    </p>
-                ) : (
-                    <p className="text-sm text-cg-amber mb-3 font-medium">
-                        Waiting for parent check-in to start tracking.
-                    </p>
-                )}
 
-                {/* Progress Bar - only show if exchange scheduled */}
-                {hasCurrentSession && hasNextExchange && (
-                    <div className="relative mb-2">
-                        <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden">
-                            <div
-                                className={`h-full rounded-full transition-all duration-500 ${isWithYou ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]' : 'bg-cg-slate/60'}`}
-                                style={{ width: `${progress}%` }}
-                            />
+                    {/* Child avatar riding the bar */}
+                    <div
+                        className="absolute -top-3.5 -translate-x-1/2 flex flex-col items-center transition-all duration-700"
+                        style={{ left: `${clamp(hasCurrentSession ? progress : 5, 8, 92)}%` }}
+                    >
+                        <div className="w-8 h-8 rounded-full ring-2 ring-card shadow-md overflow-hidden bg-muted flex items-center justify-center">
+                            {photoUrl && !imageError ? (
+                                <img
+                                    src={photoUrl}
+                                    alt={childName}
+                                    className="w-full h-full object-cover"
+                                    onError={() => setImageError(true)}
+                                />
+                            ) : (
+                                <span className="text-xs font-bold text-[var(--portal-primary)]">
+                                    {childName.charAt(0)}
+                                </span>
+                            )}
                         </div>
-                    </div>
-                )}
-
-                {/* Cumulative custody totals */}
-                <div className="mt-4 pt-4 border-t-2 border-border">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
-                            <span className="text-sm text-foreground font-semibold">
-                                Your total days
-                            </span>
-                        </div>
-                        <span className="text-2xl font-bold text-[var(--portal-primary)]">
-                            {formatDays(myStats.minutes)} <span className="text-xs font-medium text-muted-foreground">Days</span>
+                        <span className="text-[10px] font-bold text-foreground mt-0.5 whitespace-nowrap">
+                            {childName}
                         </span>
                     </div>
-                    <div className="flex items-center justify-between mt-2">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground shadow-sm" />
-                            <span className="text-sm text-muted-foreground font-medium">
-                                {coparentName}&apos;s total
-                            </span>
-                        </div>
-                        <span className="text-xl font-semibold text-muted-foreground">
-                            {formatDays(theirStats.minutes)} <span className="text-xs font-medium text-muted-foreground">Days</span>
-                        </span>
-                    </div>
+                </div>
+
+                {/* Status + streak below bar */}
+                <p className="text-xs text-center text-muted-foreground mb-3">
+                    <span className={isWithYou ? 'text-[var(--portal-primary)] font-semibold' : hasCurrentSession ? 'text-cg-slate font-medium' : 'text-cg-amber font-medium'}>
+                        {statusText}
+                    </span>
+                    {hasCurrentSession && currentStreakDays > 0 && (
+                        <span className="text-foreground font-medium"> · {currentStreakDays} Days</span>
+                    )}
+                </p>
+
+                {/* Total days - your time only */}
+                <div className="pt-3 border-t border-border flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Your total time</span>
+                    <span className="text-lg font-bold text-[var(--portal-primary)]">
+                        {formatDays(myStats.minutes)} <span className="text-xs font-medium text-muted-foreground">Days</span>
+                    </span>
                 </div>
             </div>
         </div>
