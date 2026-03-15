@@ -1032,9 +1032,18 @@ function DashboardContent() {
 
               {/* Recent Activity */}
               <section>
-                <h3 className="text-lg font-bold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  Recent Activity
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    Recent Activity
+                  </h3>
+                  <button
+                    onClick={() => router.push('/activities')}
+                    className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#2D6A8F] transition-colors flex items-center gap-1"
+                  >
+                    View all
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
                 <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
                   <ActivityFeed
                     activities={dashboardSummary?.recent_activities || []}
