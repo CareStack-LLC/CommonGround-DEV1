@@ -100,7 +100,7 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
         <circle cx="256" cy="330" r="38" fill="#F5A623" />
         <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
       </svg>
-      <span className="text-lg text-white hidden sm:inline" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+      <span className="text-lg text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
         <span className="font-bold">Common</span><span className="font-normal opacity-90">Ground</span>
       </span>
     </div>
