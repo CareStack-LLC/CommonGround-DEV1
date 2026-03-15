@@ -102,18 +102,18 @@ export function CustodyTimeline({ childId, className, compact = false }: Custody
 
                 {/* Live Timer Status */}
                 {currentSession && (
-                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 flex items-center space-x-4">
+                    <div className="bg-muted p-4 rounded-lg border border-border flex items-center space-x-4">
 
-                        <div className="bg-white p-2 rounded-full shadow-sm">
+                        <div className="bg-card p-2 rounded-full shadow-sm">
                             <Clock className="h-6 w-6 text-indigo-600" />
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-slate-500">Current Custody Status</p>
-                            <h3 className="text-xl font-bold text-slate-900">
+                            <p className="text-sm font-medium text-muted-foreground">Current Custody Status</p>
+                            <h3 className="text-xl font-bold text-foreground">
                                 {activeParentName}
                                 <span className="ml-2 text-indigo-600 font-mono">{currentDurationText}</span>
                             </h3>
-                            <p className="text-xs text-slate-400 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                                 Started {format(parseISO(currentSession.start_time), 'MMM d')}
                             </p>
                         </div>
@@ -124,9 +124,9 @@ export function CustodyTimeline({ childId, className, compact = false }: Custody
                 <div className="space-y-4">
                     <div className="flex justify-between items-end">
                         <div className="space-y-1">
-                            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Parent A</span>
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Parent A</span>
                             <div className="flex items-baseline space-x-2">
-                                <span className="text-2xl font-bold text-slate-900">{stats.parent_a.percentage}%</span>
+                                <span className="text-2xl font-bold text-foreground">{stats.parent_a.percentage}%</span>
                                 <span className={`text-xs font-medium ${stats.parent_a.variance > 0 ? 'text-green-600' : 'text-red-600'}`}>
                                     {stats.parent_a.variance > 0 ? '+' : ''}{stats.parent_a.variance}%
                                 </span>
@@ -134,17 +134,17 @@ export function CustodyTimeline({ childId, className, compact = false }: Custody
                         </div>
 
                         <div className="space-y-1 text-right">
-                            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Parent B</span>
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Parent B</span>
                             <div className="flex items-baseline space-x-2 justify-end">
                                 <span className={`text-xs font-medium ${stats.parent_b.variance > 0 ? 'text-green-600' : 'text-red-600'}`}>
                                     {stats.parent_b.variance > 0 ? '+' : ''}{stats.parent_b.variance}%
                                 </span>
-                                <span className="text-2xl font-bold text-slate-900">{stats.parent_b.percentage}%</span>
+                                <span className="text-2xl font-bold text-foreground">{stats.parent_b.percentage}%</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="h-4 w-full bg-slate-100 rounded-full overflow-hidden flex">
+                    <div className="h-4 w-full bg-muted rounded-full overflow-hidden flex">
                         <div
                             className="bg-indigo-500 h-full transition-all duration-1000 ease-out"
                             style={{ width: `${stats.parent_a.percentage}%` }}
@@ -154,29 +154,29 @@ export function CustodyTimeline({ childId, className, compact = false }: Custody
                             style={{ width: `${stats.parent_b.percentage}%` }}
                         />
                     </div>
-                    <div className="flex justify-between text-xs text-slate-400 px-1">
+                    <div className="flex justify-between text-xs text-muted-foreground px-1">
                         <span>Target: {stats.parent_a.agreed_percentage}%</span>
                         <span>Target: {stats.parent_b.agreed_percentage}%</span>
                     </div>
                 </div>
 
                 {/* Recent Sessions List */}
-                <div className="space-y-3 pt-4 border-t border-slate-100">
-                    <h4 className="text-sm font-medium text-slate-900">Recent Sessions</h4>
+                <div className="space-y-3 pt-4 border-t border-border">
+                    <h4 className="text-sm font-medium text-foreground">Recent Sessions</h4>
                     <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
                         {[...sessions].reverse().slice(0, 5).map((session, idx) => (
-                            <div key={idx} className="flex justify-between items-center text-sm p-2 hover:bg-slate-50 rounded">
+                            <div key={idx} className="flex justify-between items-center text-sm p-2 hover:bg-muted rounded">
                                 <div className="flex items-center space-x-2">
                                     <div className={`w-2 h-2 rounded-full ${session.parent_id === stats.parent_a.user_id ? 'bg-indigo-500' : 'bg-sky-400'}`} />
-                                    <span className="font-medium text-slate-700">
+                                    <span className="font-medium text-foreground">
                                         {session.parent_id === stats.parent_a.user_id ? 'Parent A' : 'Parent B'}
                                     </span>
                                 </div>
                                 <div className="text-right">
-                                    <div className="text-slate-900 font-medium">
+                                    <div className="text-foreground font-medium">
                                         {(session.duration_minutes / (60 * 24)).toFixed(1)} days
                                     </div>
-                                    <div className="text-xs text-slate-400">
+                                    <div className="text-xs text-muted-foreground">
                                         {format(parseISO(session.end_time), 'MMM d')}
                                     </div>
                                 </div>
