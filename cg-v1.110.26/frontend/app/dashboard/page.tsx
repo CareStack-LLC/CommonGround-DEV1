@@ -37,7 +37,10 @@ import {
   CheckCircle,
   Zap,
   Gavel,
-
+  Baby,
+  Clock,
+  Shield,
+  Handshake,
 } from 'lucide-react';
 
 import { UpgradeBanner } from '@/components/upgrade-banner';
@@ -125,7 +128,7 @@ function ActionStreamItem({
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
+      className="w-full bg-card rounded-2xl border-2 border-border p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
     >
       <div className={`w-14 h-14 ${iconBg} rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300`}>
         <Icon className={`w-6 h-6 ${iconColor}`} />
@@ -137,7 +140,7 @@ function ActionStreamItem({
       {hasNotification && (
         <div className="w-3 h-3 bg-cg-error rounded-full flex-shrink-0 shadow-md animate-pulse" />
       )}
-      <ChevronRight className="w-5 h-5 text-slate-400 flex-shrink-0 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+      <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
     </button>
   );
 }
@@ -155,7 +158,7 @@ function QuickActionButton({
   return (
     <button
       onClick={onClick}
-      className="group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-105"
+      className="group flex flex-col items-center gap-3 p-5 bg-card rounded-2xl border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-105"
     >
       <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
         <Icon className="w-6 h-6 text-[var(--portal-primary)]" />
@@ -240,7 +243,7 @@ function UpcomingEventItem({ event }: { event: UpcomingEvent }) {
   return (
     <button
       onClick={() => router.push('/schedule')}
-      className="w-full p-4 flex items-center gap-4 text-left hover:bg-slate-50 transition-all duration-200 rounded-xl group"
+      className="w-full p-4 flex items-center gap-4 text-left hover:bg-muted transition-all duration-200 rounded-xl group"
     >
       <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-200`}>
         <Icon className={`w-6 h-6 ${color}`} />
@@ -270,7 +273,7 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
 
   if (!events || events.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg">
+      <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-lg">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
             <CheckCircle className="w-6 h-6 text-[var(--portal-primary)]" />
@@ -285,14 +288,14 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg">
-      <div className="max-h-[280px] overflow-y-auto divide-y-2 divide-slate-100">
+    <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg">
+      <div className="max-h-[280px] overflow-y-auto divide-y-2 divide-border">
         {events.map((event) => (
           <UpcomingEventItem key={event.id} event={event} />
         ))}
       </div>
-      {events.length > 3 && (
-        <div className="p-3 border-t-2 border-slate-100 bg-slate-50">
+      {events.length > 5 && (
+        <div className="p-3 border-t-2 border-border bg-muted">
           <button
             onClick={() => router.push('/schedule')}
             className="w-full text-center text-sm text-[var(--portal-primary)] hover:text-[#2D6A8F] font-bold py-2 transition-all duration-200 hover:scale-105"
@@ -630,12 +633,12 @@ function DashboardContent() {
   const needsSetup = familyFilesWithData.length === 0 && !isLoading;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
       <Navigation />
 
       <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
         {/* Header with Greeting */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             {greeting},
           </h1>
@@ -643,6 +646,50 @@ function DashboardContent() {
             {user?.first_name}
           </h2>
         </div>
+
+        {/* Status Bar — At-a-glance counts */}
+        {!needsSetup && dashboardSummary && (
+          <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-6">
+            {[
+              {
+                icon: Baby,
+                label: 'Children',
+                value: familyFilesWithData.reduce((sum, f) => sum + (f.familyFile.children?.length || 0), 0),
+                color: 'text-[var(--portal-primary)]',
+                bg: 'bg-[var(--portal-primary)]/10',
+              },
+              {
+                icon: Calendar,
+                label: 'Events',
+                value: dashboardSummary.upcoming_events?.length || 0,
+                color: 'text-cg-amber',
+                bg: 'bg-cg-amber-subtle',
+              },
+              {
+                icon: MessageSquare,
+                label: 'Unread',
+                value: dashboardSummary.unread_messages_count || 0,
+                color: 'text-cg-slate',
+                bg: 'bg-cg-slate-subtle',
+              },
+              {
+                icon: Wallet,
+                label: 'Pending',
+                value: dashboardSummary.pending_expenses_count || 0,
+                color: 'text-cg-error',
+                bg: 'bg-cg-error-subtle',
+              },
+            ].map(({ icon: Icon, label, value, color, bg }) => (
+              <div key={label} className="bg-card rounded-xl border border-border p-3 text-center">
+                <div className={`w-8 h-8 ${bg} rounded-lg flex items-center justify-center mx-auto mb-1.5`}>
+                  <Icon className={`w-4 h-4 ${color}`} />
+                </div>
+                <p className="text-lg font-bold text-foreground">{value}</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground font-medium">{label}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Upgrade Banner for Free Users */}
         {isFree() && !needsSetup && (
@@ -655,7 +702,7 @@ function DashboardContent() {
           needsSetup ? (
             // Getting Started
             <div className="space-y-6">
-              <div className="bg-white rounded-3xl border-2 border-slate-200 p-10 text-center shadow-2xl">
+              <div className="bg-card rounded-3xl border-2 border-border p-10 text-center shadow-2xl">
                 <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <FolderOpen className="w-10 h-10 text-[var(--portal-primary)]" />
                 </div>
@@ -676,7 +723,7 @@ function DashboardContent() {
 
               {/* Quick Info Cards */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                   <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
                     <MessageSquare className="w-6 h-6 text-[var(--portal-primary)]" />
                   </div>
@@ -685,7 +732,7 @@ function DashboardContent() {
                     AI-powered communication that reduces conflict
                   </p>
                 </div>
-                <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                   <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
                     <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
                   </div>
@@ -698,9 +745,9 @@ function DashboardContent() {
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Custody Status Cards - One per child across all family files */}
+              {/* Custody Status Cards - Grid layout for at-a-glance view */}
               {familyFilesWithData.some(f => f.familyFile.children && f.familyFile.children.length > 0) && (
-                <div className="space-y-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                   {familyFilesWithData.map(data =>
                     data.familyFile.children?.map(child => (
                       <DashboardCustodyCard
@@ -754,7 +801,7 @@ function DashboardContent() {
                     dashboardSummary.unread_messages_count === 0 &&
                     dashboardSummary.pending_agreements_count === 0 &&
                     dashboardSummary.unread_court_count === 0 && (
-                      <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
+                      <div className="bg-card rounded-2xl border-2 border-border p-6 flex items-center gap-4 shadow-lg">
                         <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
                           <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
                         </div>
@@ -911,7 +958,7 @@ function DashboardContent() {
                 <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Quick Actions
                 </h3>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
                   <QuickActionButton
                     icon={MessageSquare}
                     label="Message"
@@ -931,6 +978,16 @@ function DashboardContent() {
                     icon={FolderOpen}
                     label="Files"
                     onClick={() => router.push('/family-files')}
+                  />
+                  <QuickActionButton
+                    icon={Shield}
+                    label="KidSpace"
+                    onClick={() => router.push('/kidcoms')}
+                  />
+                  <QuickActionButton
+                    icon={Handshake}
+                    label="Agreements"
+                    onClick={() => router.push('/agreements')}
                   />
                 </div>
               </section>
@@ -955,7 +1012,7 @@ function DashboardContent() {
                       <button
                         key={familyFile.id}
                         onClick={() => router.push(`/family-files/${familyFile.id}`)}
-                        className="group w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                        className="group w-full bg-card rounded-2xl border-2 border-border p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
                       >
                         <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
                           <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
@@ -968,7 +1025,7 @@ function DashboardContent() {
                             {familyFile.children?.length || 0} children
                           </p>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
                       </button>
                     ))}
                   </div>
@@ -977,10 +1034,10 @@ function DashboardContent() {
 
               {/* Recent Activity */}
               <section>
-                <h3 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                <h3 className="text-lg font-bold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Recent Activity
                 </h3>
-                <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
                   <ActivityFeed
                     activities={dashboardSummary?.recent_activities || []}
                     unreadCount={dashboardSummary?.unread_activity_count || 0}

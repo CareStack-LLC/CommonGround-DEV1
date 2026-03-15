@@ -45,7 +45,7 @@ import {
 function WelcomeDisclaimer({ onAccept }: { onAccept: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-300">
+      <div className="bg-card rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-300">
         {/* Header */}
         <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] p-6 text-center">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -61,52 +61,52 @@ function WelcomeDisclaimer({ onAccept }: { onAccept: () => void }) {
 
         {/* Content */}
         <div className="p-6 space-y-4">
-          <p className="text-slate-700 text-center font-medium">
+          <p className="text-foreground text-center font-medium">
             This secure messaging platform is designed for conversations about your children and custody matters.
           </p>
 
           {/* Key Points */}
           <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+            <div className="flex items-start gap-3 p-3 bg-muted rounded-xl">
               <div className="w-10 h-10 bg-[var(--portal-primary)]/10 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Lock className="w-5 h-5 text-[var(--portal-primary)]" />
               </div>
               <div>
-                <p className="font-semibold text-slate-900 text-sm">Secure & Documented</p>
-                <p className="text-xs text-slate-600">All messages and calls are encrypted, timestamped, and digitally signed for your protection.</p>
+                <p className="font-semibold text-foreground text-sm">Secure & Documented</p>
+                <p className="text-xs text-muted-foreground">All messages and calls are encrypted, timestamped, and digitally signed for your protection.</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+            <div className="flex items-start gap-3 p-3 bg-muted rounded-xl">
               <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Eye className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <p className="font-semibold text-slate-900 text-sm">ARIA Guardian Active</p>
-                <p className="text-xs text-slate-600">Our AI assistant monitors conversations and gently guides toward constructive communication.</p>
+                <p className="font-semibold text-foreground text-sm">ARIA Guardian Active</p>
+                <p className="text-xs text-muted-foreground">Our AI assistant monitors conversations and gently guides toward constructive communication.</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
+            <div className="flex items-start gap-3 p-3 bg-muted rounded-xl">
               <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Scale className="w-5 h-5 text-purple-600" />
               </div>
               <div>
-                <p className="font-semibold text-slate-900 text-sm">Court-Ready Records</p>
-                <p className="text-xs text-slate-600">Communication records may be used as documentation in legal proceedings if needed.</p>
+                <p className="font-semibold text-foreground text-sm">Court-Ready Records</p>
+                <p className="text-xs text-muted-foreground">Communication records may be used as documentation in legal proceedings if needed.</p>
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="pt-4 border-t border-slate-100">
+          <div className="pt-4 border-t border-border">
             <button
               onClick={onAccept}
               className="w-full py-3 px-6 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300"
             >
               I Understand, Continue
             </button>
-            <p className="text-xs text-slate-500 text-center mt-3">
+            <p className="text-xs text-muted-foreground text-center mt-3">
               By continuing, you acknowledge these terms for using CommonGround messaging.
             </p>
           </div>
@@ -184,7 +184,7 @@ function MessageBubble({
       <div className={`max-w-[80%] sm:max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
         <div className={`relative group ${isOwn
           ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
-          : 'bg-white text-slate-900 px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg border-2 border-slate-200'
+          : 'bg-card text-foreground px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg border-2 border-border'
           }`}>
           {/* ARIA Review Badge */}
           {message.was_flagged && (
@@ -208,7 +208,7 @@ function MessageBubble({
               {message.attachments.map((attachment) => (
                 <div
                   key={attachment.id}
-                  className={`rounded-lg overflow-hidden ${isOwn ? 'bg-white/10' : 'bg-slate-50'
+                  className={`rounded-lg overflow-hidden ${isOwn ? 'bg-white/10' : 'bg-muted'
                     }`}
                 >
                   {attachment.file_category === 'image' ? (
@@ -230,7 +230,7 @@ function MessageBubble({
                       href={attachment.storage_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex items-center gap-2 p-2 hover:opacity-80 transition-opacity ${isOwn ? 'text-white' : 'text-slate-900'
+                      className={`flex items-center gap-2 p-2 hover:opacity-80 transition-opacity ${isOwn ? 'text-white' : 'text-foreground'
                         }`}
                     >
                       {attachment.file_category === 'video' ? (
@@ -242,7 +242,7 @@ function MessageBubble({
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{attachment.file_name}</p>
-                        <p className={`text-xs ${isOwn ? 'text-white/70' : 'text-slate-600'}`}>
+                        <p className={`text-xs ${isOwn ? 'text-white/70' : 'text-muted-foreground'}`}>
                           {(attachment.file_size / 1024 / 1024).toFixed(1)} MB
                         </p>
                       </div>
@@ -270,7 +270,7 @@ function MessageBubble({
 
           {/* Acknowledge Button - Only for received messages that haven't been acknowledged */}
           {canAcknowledge && (
-            <div className="mt-2 pt-2 border-t border-slate-100">
+            <div className="mt-2 pt-2 border-t border-border">
               <button
                 onClick={() => onAcknowledge(message.id!)}
                 disabled={isAcknowledging}
@@ -313,10 +313,10 @@ function EmptyChatState({ onCompose }: { onCompose: () => void }) {
       <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center mb-4 sm:mb-6 shadow-lg">
         <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-[var(--portal-primary)]" />
       </div>
-      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+      <h3 className="text-lg sm:text-xl font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
         Messages
       </h3>
-      <p className="text-sm sm:text-base text-slate-600 font-medium max-w-sm mb-4 sm:mb-6">
+      <p className="text-sm sm:text-base text-muted-foreground font-medium max-w-sm mb-4 sm:mb-6">
         This is a safe space for co-parenting communication. ARIA Guardian monitors conversations
         to help maintain a constructive tone.
       </p>
@@ -350,14 +350,14 @@ function ChatHeader({
   onInitiateCall?: (callType: 'video' | 'audio') => void;
 }) {
   return (
-    <div className="bg-white border-b-2 border-slate-200 flex-shrink-0 shadow-md">
+    <div className="bg-card border-b-2 border-border flex-shrink-0 shadow-md">
       <div className="flex items-center justify-between p-3 sm:p-4 gap-2">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
           {/* Mobile back button - more prominent */}
           {onBack && (
             <button
               onClick={onBack}
-              className="lg:hidden p-2 -ml-1 rounded-xl bg-slate-100 hover:bg-[var(--portal-primary)]/10 border border-slate-200 transition-all duration-200 flex-shrink-0"
+              className="lg:hidden p-2 -ml-1 rounded-xl bg-muted hover:bg-[var(--portal-primary)]/10 border border-border transition-all duration-200 flex-shrink-0"
               aria-label="Back to conversations"
             >
               <ChevronLeft className="h-5 w-5 text-[var(--portal-primary)]" />
@@ -377,14 +377,14 @@ function ChatHeader({
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{familyFileName}</h2>
+                <h2 className="text-base sm:text-lg font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{familyFileName}</h2>
                 {isCoParentOnline && (
                   <span className="text-xs text-emerald-600 font-medium hidden sm:inline">Online</span>
                 )}
               </div>
               <div className="flex items-center gap-1">
-                <p className="text-xs text-slate-600 truncate font-medium">{agreementTitle}</p>
-                <ChevronLeft className="h-3 w-3 text-slate-400 lg:hidden rotate-180" />
+                <p className="text-xs text-muted-foreground truncate font-medium">{agreementTitle}</p>
+                <ChevronLeft className="h-3 w-3 text-muted-foreground lg:hidden rotate-180" />
               </div>
             </div>
           </button>
@@ -397,23 +397,23 @@ function ChatHeader({
                 onClick={() => onInitiateCall('audio')}
                 disabled={!parentBJoined}
                 className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${parentBJoined
-                  ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
-                  : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
+                  ? 'bg-card border-border hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
+                  : 'bg-muted border-border opacity-50 cursor-not-allowed'
                   }`}
                 title={parentBJoined ? "Audio call" : "Both parents must join before calling"}
               >
-                <Phone className={`h-5 w-5 ${parentBJoined ? 'text-[var(--portal-primary)]' : 'text-slate-400'}`} />
+                <Phone className={`h-5 w-5 ${parentBJoined ? 'text-[var(--portal-primary)]' : 'text-muted-foreground'}`} />
               </button>
               <button
                 onClick={() => onInitiateCall('video')}
                 disabled={!parentBJoined}
                 className={`p-2 rounded-xl border-2 transition-all duration-200 shadow-sm ${parentBJoined
-                  ? 'bg-white border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
-                  : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
+                  ? 'bg-card border-border hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer'
+                  : 'bg-muted border-border opacity-50 cursor-not-allowed'
                   }`}
                 title={parentBJoined ? "Video call" : "Both parents must join before calling"}
               >
-                <Video className={`h-5 w-5 ${parentBJoined ? 'text-[var(--portal-primary)]' : 'text-slate-400'}`} />
+                <Video className={`h-5 w-5 ${parentBJoined ? 'text-[var(--portal-primary)]' : 'text-muted-foreground'}`} />
               </button>
             </>
           )}
@@ -461,7 +461,7 @@ function ConversationSelector({
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
-          <p className="text-sm text-slate-600 font-medium">Loading conversations...</p>
+          <p className="text-sm text-muted-foreground font-medium">Loading conversations...</p>
         </div>
       </div>
     );
@@ -485,7 +485,7 @@ function ConversationSelector({
   }
 
   return (
-    <div className="divide-y divide-slate-100">
+    <div className="divide-y divide-border">
       {familyFilesWithAgreements.map((item) => {
         const { coParentName, coParentInitial } = getCoParentInfo(item.familyFile);
         const activeAgreement = getActiveAgreement(item.agreements);
@@ -505,14 +505,14 @@ function ConversationSelector({
               }}
               className={`w-full text-left p-4 transition-all duration-200 ${isSelected
                 ? 'bg-[var(--portal-primary)]/5'
-                : 'hover:bg-slate-50 active:bg-slate-100'
+                : 'hover:bg-muted active:bg-muted'
                 }`}
             >
               <div className="flex items-center gap-3">
                 {/* Avatar with initial */}
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-lg font-bold ${isSelected
                   ? 'bg-[var(--portal-primary)] text-white'
-                  : 'bg-gradient-to-br from-slate-200 to-slate-300 text-slate-600'
+                  : 'bg-gradient-to-br from-muted to-muted text-muted-foreground'
                   }`}>
                   {coParentInitial}
                 </div>
@@ -520,11 +520,11 @@ function ConversationSelector({
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <p className={`font-semibold truncate ${isSelected ? 'text-[var(--portal-primary)]' : 'text-slate-900'}`}>
+                    <p className={`font-semibold truncate ${isSelected ? 'text-[var(--portal-primary)]' : 'text-foreground'}`}>
                       {coParentName}
                     </p>
                     {/* Timestamp placeholder - would show last message time */}
-                    <span className="text-xs text-slate-500 flex-shrink-0">
+                    <span className="text-xs text-muted-foreground flex-shrink-0">
                       {item.agreements.length > 0 ? (
                         <span className="flex items-center gap-1">
                           <FileText className="w-3 h-3" />
@@ -533,10 +533,10 @@ function ConversationSelector({
                       ) : null}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-600 truncate font-medium">
+                  <p className="text-sm text-muted-foreground truncate font-medium">
                     {item.familyFile.title}
                   </p>
-                  <p className="text-xs text-slate-500 truncate mt-0.5">
+                  <p className="text-xs text-muted-foreground truncate mt-0.5">
                     {hasAgreements
                       ? `${activeAgreement?.title || 'Agreement'} • ${activeAgreement?.status === 'approved' || activeAgreement?.status === 'active' ? 'Active' : activeAgreement?.status}`
                       : 'No agreements yet - tap to create'
@@ -545,14 +545,14 @@ function ConversationSelector({
                 </div>
 
                 {/* Chevron */}
-                <ChevronLeft className="w-5 h-5 text-slate-400 flex-shrink-0 rotate-180" />
+                <ChevronLeft className="w-5 h-5 text-muted-foreground flex-shrink-0 rotate-180" />
               </div>
             </button>
 
             {/* Expanded agreements list when selected and multiple agreements */}
             {isSelected && item.agreements.length > 1 && (
-              <div className="bg-slate-50 border-t border-slate-100 py-2 px-4">
-                <p className="text-xs text-slate-500 font-medium mb-2 px-2">Select Agreement</p>
+              <div className="bg-muted border-t border-border py-2 px-4">
+                <p className="text-xs text-muted-foreground font-medium mb-2 px-2">Select Agreement</p>
                 <div className="space-y-1">
                   {item.agreements.map((agreement) => (
                     <button
@@ -560,13 +560,13 @@ function ConversationSelector({
                       onClick={() => onSelectAgreement(agreement, item.familyFile)}
                       className={`w-full text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${selectedAgreement?.id === agreement.id
                         ? 'bg-[var(--portal-primary)] text-white shadow-md'
-                        : 'bg-white hover:bg-slate-100 text-slate-900 border border-slate-200'
+                        : 'bg-card hover:bg-muted text-foreground border border-border'
                         }`}
                     >
                       <FileText className="h-4 w-4 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold truncate">{agreement.title}</p>
-                        <span className={`text-xs ${selectedAgreement?.id === agreement.id ? 'text-white/80' : 'text-slate-500'
+                        <span className={`text-xs ${selectedAgreement?.id === agreement.id ? 'text-white/80' : 'text-muted-foreground'
                           }`}>
                           {agreement.status === 'approved' || agreement.status === 'active' ? 'Active' : agreement.status}
                         </span>
@@ -579,9 +579,9 @@ function ConversationSelector({
 
             {/* No agreements - show create link */}
             {isSelected && !hasAgreements && (
-              <div className="bg-slate-50 border-t border-slate-100 p-4">
+              <div className="bg-muted border-t border-border p-4">
                 <div className="text-center">
-                  <p className="text-sm text-slate-600 mb-2">Create an agreement to start messaging</p>
+                  <p className="text-sm text-muted-foreground mb-2">Create an agreement to start messaging</p>
                   <Link
                     href={`/agreements?familyFileId=${item.familyFile.id}`}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--portal-primary)] text-white text-sm font-semibold rounded-xl hover:bg-[var(--portal-primary)]/90 transition-colors"
@@ -625,7 +625,7 @@ function MessagesContent() {
   // ARIA v2: reply suggestions keyed by message_id, and compose pre-fill
   const [replySuggestions, setReplySuggestions] = useState<Record<string, string[]>>({});
   const [composePreFill, setComposePreFill] = useState<string | undefined>(undefined);
-  const [ariaMode, setAriaMode] = useState<'off' | 'standard' | 'strict'>('standard');
+  const ariaMode = 'standard' as const;
 
   const handleAcceptDisclaimer = () => {
     setShowDisclaimer(false);
@@ -934,28 +934,28 @@ function MessagesContent() {
           {/* Sidebar - Conversations */}
           <aside className={`
             ${showSidebar ? 'flex' : 'hidden lg:flex'}
-            w-full lg:w-80 flex-col border-r-2 border-slate-200 bg-white shadow-sm
+            w-full lg:w-80 flex-col border-r-2 border-border bg-card shadow-sm
             absolute top-0 left-0 right-0 bottom-20 lg:relative lg:inset-auto lg:bottom-auto z-20 lg:z-auto
           `}>
             {/* Sidebar Header */}
-            <div className="p-4 border-b-2 border-slate-200 bg-white">
+            <div className="p-4 border-b-2 border-border bg-card">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => router.back()}
                   className="p-2 -ml-2 rounded-xl hover:bg-[var(--portal-primary)]/10 transition-all duration-200 flex-shrink-0"
                   aria-label="Go back"
                 >
-                  <ArrowLeft className="h-5 w-5 text-slate-600" />
+                  <ArrowLeft className="h-5 w-5 text-muted-foreground" />
                 </button>
                 <div className="flex items-center gap-2 flex-1">
                   <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-sm">
                     <MessageSquare className="h-5 w-5 text-[var(--portal-primary)]" />
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    <h1 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                       Comms
                     </h1>
-                    <p className="text-xs text-slate-600 font-medium">Messages</p>
+                    <p className="text-xs text-muted-foreground font-medium">Messages</p>
                   </div>
                 </div>
               </div>
@@ -1032,7 +1032,7 @@ function MessagesContent() {
                           <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center flex-shrink-0 shadow-md">
                             <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
                           </div>
-                          <p className="text-xs sm:text-sm font-bold text-slate-700 leading-relaxed">
+                          <p className="text-xs sm:text-sm font-bold text-foreground leading-relaxed">
                             ARIA Guardian is monitoring this conversation to help maintain a constructive tone.
                           </p>
                         </div>
@@ -1092,7 +1092,7 @@ function MessagesContent() {
 
                 {/* Compose Area */}
                 {showCompose ? (
-                  <div className="border-t-2 border-slate-200 p-3 sm:p-4 bg-white flex-shrink-0 shadow-inner">
+                  <div className="border-t-2 border-border p-3 sm:p-4 bg-card flex-shrink-0 shadow-inner">
                     {getOtherParentId() ? (
                       <MessageCompose
                         caseId={selectedAgreement.case_id || undefined}
@@ -1100,7 +1100,7 @@ function MessagesContent() {
                         agreementId={selectedAgreement.id}
                         recipientId={getOtherParentId()}
                         onMessageSent={handleMessageSent}
-                        ariaEnabled={ariaMode !== 'off'}
+                        ariaEnabled={true}
                         ariaMode={ariaMode}
                         onTyping={handleTyping}
                         onStopTyping={stopTyping}
@@ -1109,8 +1109,8 @@ function MessagesContent() {
                       <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 sm:p-4 flex items-center gap-2 sm:gap-3 shadow-md">
                         <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0" />
                         <div>
-                          <p className="font-bold text-slate-900 text-sm sm:text-base">Waiting for co-parent</p>
-                          <p className="text-xs sm:text-sm text-slate-600 font-medium">
+                          <p className="font-bold text-foreground text-sm sm:text-base">Waiting for co-parent</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
                             The other parent needs to join before you can exchange messages.
                           </p>
                         </div>
@@ -1118,26 +1118,26 @@ function MessagesContent() {
                     )}
                     <button
                       onClick={() => setShowCompose(false)}
-                      className="mt-3 text-sm text-slate-600 hover:text-slate-900 font-medium transition-colors"
+                      className="mt-3 text-sm text-muted-foreground hover:text-foreground font-medium transition-colors"
                     >
                       Cancel
                     </button>
                   </div>
                 ) : (
                   /* Quick Compose Button */
-                  <div className="border-t-2 border-slate-200 p-3 sm:p-4 bg-white flex-shrink-0 shadow-inner">
+                  <div className="border-t-2 border-border p-3 sm:p-4 bg-card flex-shrink-0 shadow-inner">
                     <button
                       onClick={() => setShowCompose(true)}
                       disabled={!getOtherParentId()}
                       className={`w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-3.5 rounded-xl border-2 transition-all duration-200 ${getOtherParentId()
-                        ? 'border-slate-200 hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer shadow-md hover:shadow-lg'
-                        : 'border-slate-200 bg-slate-50 cursor-not-allowed opacity-60'
+                        ? 'border-border hover:border-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/5 cursor-pointer shadow-md hover:shadow-lg'
+                        : 'border-border bg-muted cursor-not-allowed opacity-60'
                         }`}
                     >
                       <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-sm">
                         <Send className="h-4 w-4 text-[var(--portal-primary)]" />
                       </div>
-                      <span className="text-sm sm:text-base text-slate-600 font-medium">
+                      <span className="text-sm sm:text-base text-muted-foreground font-medium">
                         {getOtherParentId() ? 'Write a message...' : 'Waiting for co-parent to join'}
                       </span>
                     </button>

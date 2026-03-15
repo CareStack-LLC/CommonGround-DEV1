@@ -10,8 +10,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ARIASensitivitySlider, SensitivityLevel } from "./aria-sensitivity-slider";
-import { Phone, Video, Info } from "lucide-react";
+import type { SensitivityLevel } from "./aria-sensitivity-slider";
+import { Phone, Video } from "lucide-react";
 
 interface PreCallSettingsDialogProps {
   open: boolean;
@@ -31,10 +31,9 @@ export function PreCallSettingsDialog({
   isLoading = false,
 }: PreCallSettingsDialogProps) {
   const [callType, setCallType] = useState<"video" | "audio">(defaultCallType);
-  const [ariaSensitivity, setAriaSensitivity] = useState<SensitivityLevel>("moderate");
 
   const handleStartCall = () => {
-    onStartCall({ callType, ariaSensitivity });
+    onStartCall({ callType, ariaSensitivity: "moderate" as SensitivityLevel });
   };
 
   return (
@@ -57,7 +56,7 @@ export function PreCallSettingsDialog({
         <div className="space-y-6 py-4">
           {/* Call Type Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Call Type</label>
+            <label className="text-sm font-medium text-foreground">Call Type</label>
             <div className="flex gap-2">
               <Button
                 type="button"
@@ -80,26 +79,9 @@ export function PreCallSettingsDialog({
             </div>
           </div>
 
-          {/* ARIA Sensitivity */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">ARIA Monitoring</label>
-              <div className="group relative">
-                <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                <div className="absolute left-0 bottom-full mb-2 w-64 p-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                  ARIA monitors your conversation in real-time and can intervene if communication becomes hostile.
-                </div>
-              </div>
-            </div>
-            <ARIASensitivitySlider
-              value={ariaSensitivity}
-              onChange={setAriaSensitivity}
-            />
-          </div>
-
           {/* Recording Notice */}
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-            <p className="text-xs text-gray-600">
+          <div className="bg-muted border border-border rounded-lg p-3">
+            <p className="text-xs text-muted-foreground">
               <span className="font-medium">Recording Notice:</span> This call will be recorded
               and transcribed for court documentation purposes. Both participants will be
               notified when the call starts.

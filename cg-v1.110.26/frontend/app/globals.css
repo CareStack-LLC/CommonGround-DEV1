@@ -317,6 +317,30 @@
   --portal-font-body: 'DM Sans', system-ui, sans-serif;
 }
 
+/* Parent Portal - Dark Mode */
+.dark .parent-portal {
+  --portal-primary: #5BC4A0;
+  --portal-primary-hover: #7DD8B8;
+  --portal-primary-light: #3DAA8A;
+  --portal-secondary: #4BA8C8;
+  --portal-secondary-light: #2D6A8F;
+  --portal-accent: #F5A623;
+  --portal-accent-hover: #FFB84D;
+  --portal-background: #0D1B24;
+  --portal-surface: #162530;
+  --portal-surface-elevated: #1E3A4A;
+  --portal-border: #2D5060;
+  --portal-border-hover: #3D6878;
+  --portal-text: #CBD8E0;
+  --portal-text-light: #7A9CAD;
+  --portal-text-heading: #E8F0F4;
+
+  --portal-shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.3);
+  --portal-shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.4);
+  --portal-shadow-lg: 0 8px 24px -4px rgba(0, 0, 0, 0.5);
+  --portal-shadow-xl: 0 16px 32px -8px rgba(0, 0, 0, 0.6);
+}
+
 /* Professional Portal - "Corporate Authority" */
 .professional-portal {
   /* Colors */

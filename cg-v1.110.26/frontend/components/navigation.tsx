@@ -25,6 +25,7 @@ import {
   Mail,
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 /**
  * CommonGround Navigation Component - Warm Earth Tones
@@ -236,22 +237,22 @@ export function Navigation() {
 
                     {/* Dropdown Menu - CommonGround Styling */}
                     {userMenuOpen && (
-                      <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl border-2 border-slate-100 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+                      <div className="absolute right-0 mt-2 w-72 bg-card rounded-2xl border-2 border-border shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
                         {/* User Info */}
-                        <div className="px-5 py-4 border-b border-slate-100">
-                          <p className="font-bold text-slate-900 text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                        <div className="px-5 py-4 border-b border-border">
+                          <p className="font-bold text-foreground text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             {user?.first_name} {user?.last_name}
                           </p>
-                          <p className="text-sm text-slate-500 font-medium truncate">{user?.email}</p>
+                          <p className="text-sm text-muted-foreground font-medium truncate">{user?.email}</p>
                         </div>
 
                         {/* Menu Items */}
                         <div className="py-2 space-y-1 px-2">
                           <button
                             onClick={() => handleNavigation('/dashboard')}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-muted hover:text-foreground transition-all"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-white group-hover:shadow-sm">
+                            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-card group-hover:shadow-sm">
                               <Home className="h-4 w-4" />
                             </div>
                             Dashboard
@@ -260,7 +261,7 @@ export function Navigation() {
                           {profile?.is_professional && (
                             <button
                               onClick={() => handleNavigation('/professional')}
-                              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 rounded-xl hover:bg-emerald-50 hover:text-emerald-900 transition-all"
+                              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-emerald-50 hover:text-emerald-900 transition-all"
                             >
                               <div className="w-8 h-8 rounded-lg bg-emerald-100/50 flex items-center justify-center text-emerald-600">
                                 <Briefcase className="h-4 w-4" />
@@ -272,7 +273,7 @@ export function Navigation() {
                           {partnerAccess.length > 0 && (
                             <button
                               onClick={() => handleNavigation(`/dashboard/partners/${partnerAccess[0].partner_slug}`)}
-                              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 rounded-xl hover:bg-amber-50 hover:text-amber-900 transition-all"
+                              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-amber-50 hover:text-amber-900 transition-all"
                             >
                               <div className="w-8 h-8 rounded-lg bg-amber-100/50 flex items-center justify-center text-amber-600">
                                 <Users className="h-4 w-4" />
@@ -283,9 +284,9 @@ export function Navigation() {
 
                           <button
                             onClick={() => handleNavigation('/family-files')}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-muted hover:text-foreground transition-all"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+                            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                               <FolderHeart className="h-4 w-4" />
                             </div>
                             Family Files
@@ -293,9 +294,9 @@ export function Navigation() {
 
                           <button
                             onClick={() => handleNavigation('/settings')}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-muted hover:text-foreground transition-all"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+                            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                               <Settings className="h-4 w-4" />
                             </div>
                             Settings
@@ -303,17 +304,23 @@ export function Navigation() {
 
                           <button
                             onClick={() => handleNavigation('/help')}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-all"
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-muted hover:text-foreground transition-all"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+                            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                               <HelpCircle className="h-4 w-4" />
                             </div>
                             Help Center
                           </button>
                         </div>
 
+                        {/* Theme Toggle */}
+                        <div className="border-t border-border pt-2 mt-2 px-3">
+                          <p className="text-xs text-muted-foreground font-medium mb-2">Appearance</p>
+                          <ThemeToggle />
+                        </div>
+
                         {/* Logout */}
-                        <div className="border-t border-slate-100 pt-2 mt-2 px-2 pb-2">
+                        <div className="border-t border-border pt-2 mt-2 px-2 pb-2">
                           <button
                             onClick={handleLogout}
                             className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-all group"

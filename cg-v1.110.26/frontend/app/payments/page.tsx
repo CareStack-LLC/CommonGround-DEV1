@@ -8,6 +8,7 @@ import { familyFilesAPI, agreementsAPI, clearfundAPI, walletAPI, FamilyFile, Agr
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import ObligationCard from '@/components/clearfund/obligation-card';
+import { AgreementTermsCard } from '@/components/clearfund/agreement-terms-card';
 import { PayObligationModal } from '@/components/wallet';
 import {
   Wallet,
@@ -86,10 +87,10 @@ function NetBalanceCard({
 }) {
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-6 sm:p-8">
+      <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-6 sm:p-8">
         <div className="animate-pulse">
-          <div className="h-4 w-24 bg-slate-200 rounded mb-4" />
-          <div className="h-12 w-48 bg-slate-200 rounded" />
+          <div className="h-4 w-24 bg-muted rounded mb-4" />
+          <div className="h-12 w-48 bg-muted rounded" />
         </div>
       </div>
     );
@@ -116,7 +117,7 @@ function NetBalanceCard({
   const overdue = parseFloat(balance?.total_overdue || '0');
 
   return (
-    <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
+    <div className="bg-card rounded-2xl border-2 border-border shadow-lg overflow-hidden">
       <div className="h-2 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]" />
       <div className="p-5">
         <div className="flex items-start justify-between">
@@ -129,7 +130,7 @@ function NetBalanceCard({
                   ? 'bg-emerald-100 text-emerald-700'
                   : netBalance < 0
                   ? 'bg-red-100 text-red-700'
-                  : 'bg-slate-100 text-slate-600'
+                  : 'bg-muted text-muted-foreground'
               }`}>
                 {netBalance === 0 ? 'Balanced' : isOwed ? 'Owed to You' : 'You Owe'}
               </span>
@@ -140,21 +141,21 @@ function NetBalanceCard({
               ? 'bg-gradient-to-br from-emerald-100 to-emerald-50'
               : netBalance < 0
               ? 'bg-gradient-to-br from-red-100 to-red-50'
-              : 'bg-gradient-to-br from-slate-100 to-slate-50'
+              : 'bg-gradient-to-br from-muted to-muted/50'
           }`}>
             {isOwed ? (
               <TrendingUp className={`h-7 w-7 text-emerald-600`} />
             ) : netBalance < 0 ? (
               <TrendingDown className={`h-7 w-7 text-red-600`} />
             ) : (
-              <DollarSign className={`h-7 w-7 text-slate-600`} />
+              <DollarSign className={`h-7 w-7 text-muted-foreground`} />
             )}
           </div>
         </div>
       </div>
 
       {/* Balance Breakdown */}
-      <div className="border-t-2 border-slate-100 bg-slate-50/50 p-4 sm:p-5">
+      <div className="border-t-2 border-border bg-muted/50 p-4 sm:p-5">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
           <div>
             <p className="text-xs text-muted-foreground mb-1.5 font-semibold">Owed to You</p>
@@ -198,9 +199,9 @@ function MetricsRow({
     return (
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-4 animate-pulse">
-            <div className="h-4 w-16 bg-slate-200 rounded mb-2" />
-            <div className="h-7 w-12 bg-slate-200 rounded" />
+          <div key={i} className="bg-card rounded-2xl border-2 border-border shadow-lg p-4 animate-pulse">
+            <div className="h-4 w-16 bg-muted rounded mb-2" />
+            <div className="h-7 w-12 bg-muted rounded" />
           </div>
         ))}
       </div>
@@ -241,7 +242,7 @@ function MetricsRow({
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {stats.map((stat) => (
-        <div key={stat.label} className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-4 hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
+        <div key={stat.label} className="bg-card rounded-2xl border-2 border-border shadow-lg p-4 hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs text-muted-foreground mb-1.5 font-semibold">{stat.label}</p>
@@ -439,13 +440,13 @@ function PaymentsContent() {
   // Loading State
   if (isLoading && !selectedFamilyFile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
         <Navigation />
         <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
             <div className="text-center">
               <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
-              <p className="mt-4 text-slate-600 font-medium">Loading ClearFund...</p>
+              <p className="mt-4 text-muted-foreground font-medium">Loading ClearFund...</p>
             </div>
           </div>
         </main>
@@ -456,7 +457,7 @@ function PaymentsContent() {
   // Empty State
   if (!selectedFamilyFile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
         <Navigation />
         <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
@@ -487,7 +488,7 @@ function PaymentsContent() {
   const filteredObligations = getFilteredObligations();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-32 lg:pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted pb-32 lg:pb-8">
       <Navigation />
 
       <main className="max-w-3xl mx-auto px-4 py-6 space-y-6">
@@ -497,10 +498,10 @@ function PaymentsContent() {
             <div className="flex items-center gap-3 mb-2">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="p-2 -ml-2 rounded-xl hover:bg-slate-100 transition-colors"
+                className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
                 aria-label="Go back"
               >
-                <ChevronLeft className="h-5 w-5 text-slate-600" />
+                <ChevronLeft className="h-5 w-5 text-muted-foreground" />
               </button>
               <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
                 <Wallet className="w-6 h-6 text-[var(--portal-primary)]" />
@@ -516,7 +517,7 @@ function PaymentsContent() {
               <span className="font-medium">{selectedFamilyFile.title}</span>
               {selectedAgreement && (
                 <>
-                  <span className="text-slate-300">•</span>
+                  <span className="text-muted-foreground">•</span>
                   <FileText className="h-4 w-4" />
                   <span className="font-medium">{selectedAgreement.title}</span>
                 </>
@@ -542,7 +543,7 @@ function PaymentsContent() {
 
         {/* Wallet Banner */}
         {!wallet?.onboarding_completed && (
-          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-5 overflow-hidden">
+          <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5 overflow-hidden">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
                 <CreditCard className="w-6 h-6 text-[var(--portal-primary)]" />
@@ -572,7 +573,7 @@ function PaymentsContent() {
 
         {/* Wallet Quick Balance (if set up) */}
         {wallet?.onboarding_completed && (
-          <div className="flex items-center justify-between p-5 bg-white rounded-2xl border-2 border-slate-200 shadow-lg">
+          <div className="flex items-center justify-between p-5 bg-card rounded-2xl border-2 border-border shadow-lg">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-md">
                 <Wallet className="w-6 h-6 text-emerald-600" />
@@ -594,6 +595,11 @@ function PaymentsContent() {
           </div>
         )}
 
+        {/* Agreement Financial Terms */}
+        {selectedFamilyFile && (
+          <AgreementTermsCard familyFileId={selectedFamilyFile.id} />
+        )}
+
         {/* Net Balance Card */}
         <NetBalanceCard
           balance={balanceSummary}
@@ -606,7 +612,7 @@ function PaymentsContent() {
 
         {/* Overdue Warning */}
         {metrics && metrics.total_overdue > 0 && (
-          <div className="flex items-center gap-4 p-5 bg-white rounded-2xl border-2 border-red-200 shadow-lg">
+          <div className="flex items-center gap-4 p-5 bg-card rounded-2xl border-2 border-red-200 shadow-lg">
             <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center shadow-md">
               <AlertTriangle className="h-6 w-6 text-red-600" />
             </div>
@@ -622,7 +628,7 @@ function PaymentsContent() {
         )}
 
         {/* Tabs */}
-        <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-x-auto">
+        <div className="flex items-center gap-2 p-1.5 bg-card rounded-2xl border-2 border-border shadow-lg overflow-x-auto">
           <button
             onClick={() => setActiveTab('pending')}
             className={`
@@ -630,7 +636,7 @@ function PaymentsContent() {
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'pending'
                 ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
-                : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }
             `}
           >
@@ -638,7 +644,7 @@ function PaymentsContent() {
             <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Pending</span>
             {metrics && metrics.total_pending_funding > 0 && (
               <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
-                activeTab === 'pending' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                activeTab === 'pending' ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
               }`}>
                 {metrics.total_pending_funding}
               </span>
@@ -651,7 +657,7 @@ function PaymentsContent() {
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'active'
                 ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
-                : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }
             `}
           >
@@ -659,7 +665,7 @@ function PaymentsContent() {
             <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Active</span>
             {metrics && metrics.total_funded > 0 && (
               <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
-                activeTab === 'active' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                activeTab === 'active' ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
               }`}>
                 {metrics.total_funded}
               </span>
@@ -672,7 +678,7 @@ function PaymentsContent() {
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'completed'
                 ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-md'
-                : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }
             `}
           >
@@ -686,7 +692,7 @@ function PaymentsContent() {
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'ledger'
                 ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md'
-                : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }
             `}
           >
@@ -696,7 +702,7 @@ function PaymentsContent() {
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-4 sm:p-6">
+        <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-4 sm:p-6">
           {activeTab !== 'ledger' ? (
             <div className="space-y-4">
               {isLoading ? (
@@ -706,8 +712,8 @@ function PaymentsContent() {
                 </div>
               ) : filteredObligations.length === 0 ? (
                 <div className="p-12 text-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Receipt className="w-10 h-10 text-slate-400" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-muted to-muted/50 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <Receipt className="w-10 h-10 text-muted-foreground" />
                   </div>
                   <h3 className="font-bold text-foreground mb-2 text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     No {activeTab} expenses

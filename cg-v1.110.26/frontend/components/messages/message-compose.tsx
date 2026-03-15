@@ -416,13 +416,13 @@ export function MessageCompose({
 
           {/* Attachments Preview */}
           {attachments.length > 0 && (
-            <div className="flex flex-wrap gap-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <div className="flex flex-wrap gap-2 p-3 bg-muted rounded-lg border border-border">
               {attachments.map(attachment => {
                 const FileIconComponent = getFileIcon(attachment.file.type);
                 return (
                   <div
                     key={attachment.id}
-                    className="relative group bg-white border-2 border-slate-200 rounded-lg p-2 pr-8 hover:border-[#2C5F5D] transition-colors shadow-sm"
+                    className="relative group bg-card border-2 border-border rounded-lg p-2 pr-8 hover:border-[#2C5F5D] transition-colors shadow-sm"
                   >
                     <div className="flex items-center gap-2">
                       {attachment.preview ? (
@@ -432,15 +432,15 @@ export function MessageCompose({
                           className="w-12 h-12 object-cover rounded"
                         />
                       ) : (
-                        <div className="w-12 h-12 bg-slate-100 rounded flex items-center justify-center">
-                          <FileIconComponent className="w-6 h-6 text-slate-600" />
+                        <div className="w-12 h-12 bg-muted rounded flex items-center justify-center">
+                          <FileIconComponent className="w-6 h-6 text-muted-foreground" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-900 truncate max-w-[150px]">
+                        <p className="text-sm font-medium text-foreground truncate max-w-[150px]">
                           {attachment.file.name}
                         </p>
-                        <p className="text-xs text-slate-600">
+                        <p className="text-xs text-muted-foreground">
                           {formatFileSize(attachment.file.size)}
                         </p>
                         {attachment.uploading && (
@@ -461,9 +461,9 @@ export function MessageCompose({
                       <button
                         type="button"
                         onClick={() => removeAttachment(attachment.id)}
-                        className="absolute top-1 right-1 p-1 bg-white border border-slate-200 rounded-full hover:bg-red-50 hover:border-red-300 transition-colors"
+                        className="absolute top-1 right-1 p-1 bg-card border border-border rounded-full hover:bg-red-50 hover:border-red-300 transition-colors"
                       >
-                        <X className="w-3 h-3 text-slate-600 hover:text-red-600" />
+                        <X className="w-3 h-3 text-muted-foreground hover:text-red-600" />
                       </button>
                     )}
                   </div>
@@ -489,12 +489,12 @@ export function MessageCompose({
 
             {/* ARIA Mini-Guardian Splash (Analysis State) */}
             {isAnalyzing && (
-              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-[1px] rounded-xl">
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/50 backdrop-blur-[1px] rounded-xl">
                 <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
                   <div className="w-10 h-10 bg-gradient-to-br from-[#2C5F5D]/10 to-[#2C5F5D]/5 rounded-xl flex items-center justify-center shadow-sm mb-2">
                     <Shield className="h-5 w-5 text-[#2C5F5D] animate-pulse" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-800" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  <h4 className="text-lg font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     ARIA Checking...
                   </h4>
                   <div className="flex gap-1 mt-1">

@@ -126,12 +126,12 @@ export function DashboardCustodyCard({
 
     if (loading || !timelineData) {
         return (
-            <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm animate-pulse h-48">
+            <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-sm animate-pulse h-48">
                 <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-slate-200" />
+                    <div className="w-12 h-12 rounded-full bg-muted" />
                     <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-slate-200 w-1/3 rounded" />
-                        <div className="h-3 bg-slate-200 w-1/2 rounded" />
+                        <div className="h-4 bg-muted w-1/3 rounded" />
+                        <div className="h-3 bg-muted w-1/2 rounded" />
                     </div>
                 </div>
             </div>
@@ -241,7 +241,7 @@ export function DashboardCustodyCard({
 
 
     return (
-        <div className={`bg-white rounded-2xl border-2 ${!hasCurrentSession ? 'border-cg-amber/50' : 'border-slate-200'} shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-4`}>
+        <div className={`bg-card rounded-2xl border-2 ${!hasCurrentSession ? 'border-cg-amber/50' : 'border-border'} shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-4`}>
             {/* Top accent bar */}
             <div className={`h-2 ${statusColor}`} />
 
@@ -318,7 +318,7 @@ export function DashboardCustodyCard({
                 {/* Progress Bar - only show if exchange scheduled */}
                 {hasCurrentSession && hasNextExchange && (
                     <div className="relative mb-2">
-                        <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden">
                             <div
                                 className={`h-full rounded-full transition-all duration-500 ${isWithYou ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]' : 'bg-cg-slate/60'}`}
                                 style={{ width: `${progress}%` }}
@@ -328,27 +328,27 @@ export function DashboardCustodyCard({
                 )}
 
                 {/* Cumulative custody totals */}
-                <div className="mt-4 pt-4 border-t-2 border-slate-100">
+                <div className="mt-4 pt-4 border-t-2 border-border">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
-                            <span className="text-sm text-slate-700 font-semibold">
+                            <span className="text-sm text-foreground font-semibold">
                                 Your total days
                             </span>
                         </div>
                         <span className="text-2xl font-bold text-[var(--portal-primary)]">
-                            {formatDays(myStats.minutes)} <span className="text-xs font-medium text-slate-400">Days</span>
+                            {formatDays(myStats.minutes)} <span className="text-xs font-medium text-muted-foreground">Days</span>
                         </span>
                     </div>
                     <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 rounded-full bg-slate-400 shadow-sm" />
-                            <span className="text-sm text-slate-500 font-medium">
+                            <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground shadow-sm" />
+                            <span className="text-sm text-muted-foreground font-medium">
                                 {coparentName}&apos;s total
                             </span>
                         </div>
-                        <span className="text-xl font-semibold text-slate-500">
-                            {formatDays(theirStats.minutes)} <span className="text-xs font-medium text-slate-400">Days</span>
+                        <span className="text-xl font-semibold text-muted-foreground">
+                            {formatDays(theirStats.minutes)} <span className="text-xs font-medium text-muted-foreground">Days</span>
                         </span>
                     </div>
                 </div>

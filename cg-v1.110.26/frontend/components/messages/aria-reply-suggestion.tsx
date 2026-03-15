@@ -40,16 +40,16 @@ export function ARIAReplySuggestion({
                     ARIA suggests a reply
                 </span>
                 {isExpanded ? (
-                    <ChevronUp className="h-3.5 w-3.5 text-slate-400" />
+                    <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
                 ) : (
-                    <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                 )}
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
                         setDismissed(true);
                     }}
-                    className="text-xs text-slate-400 hover:text-slate-600 px-1"
+                    className="text-xs text-muted-foreground hover:text-foreground px-1"
                 >
                     Dismiss
                 </button>
@@ -61,9 +61,9 @@ export function ARIAReplySuggestion({
                     {suggestions.map((s, i) => (
                         <div
                             key={i}
-                            className="flex items-start gap-2 p-2.5 rounded-lg bg-white border border-teal-100 hover:border-teal-300 hover:bg-teal-50/40 transition-colors group"
+                            className="flex items-start gap-2 p-2.5 rounded-lg bg-card border border-teal-100 hover:border-teal-300 hover:bg-teal-50/40 transition-colors group"
                         >
-                            <p className="flex-1 text-xs text-slate-600 leading-relaxed">{s}</p>
+                            <p className="flex-1 text-xs text-muted-foreground leading-relaxed">{s}</p>
                             <button
                                 onClick={() => onUse(s, i)}
                                 className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-teal-600 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity hover:bg-teal-700"
@@ -73,7 +73,7 @@ export function ARIAReplySuggestion({
                             </button>
                         </div>
                     ))}
-                    <p className="text-xs text-slate-400 text-center pt-1">
+                    <p className="text-xs text-muted-foreground text-center pt-1">
                         Tap "Use" to fill your compose box with this reply
                     </p>
                 </div>

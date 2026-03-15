@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { ShieldAlert, Shield, ShieldCheck, ShieldOff } from "lucide-react";
+import { ShieldAlert, Shield, ShieldCheck } from "lucide-react";
 
-export type SensitivityLevel = "strict" | "moderate" | "relaxed" | "off";
+export type SensitivityLevel = "strict" | "moderate" | "relaxed";
 
 interface SensitivityOption {
   value: SensitivityLevel;
@@ -44,15 +44,6 @@ const sensitivityOptions: SensitivityOption[] = [
     bgColor: "bg-green-50",
     borderColor: "border-green-200",
   },
-  {
-    value: "off",
-    label: "Off",
-    description: "No ARIA monitoring during the call.",
-    icon: ShieldOff,
-    color: "text-gray-500",
-    bgColor: "bg-gray-50",
-    borderColor: "border-gray-200",
-  },
 ];
 
 interface ARIASensitivitySliderProps {
@@ -83,7 +74,7 @@ export function ARIASensitivitySlider({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <displayOption.icon className={cn("w-5 h-5", displayOption.color)} />
-          <span className="font-medium text-gray-900">ARIA Sensitivity</span>
+          <span className="font-medium text-foreground">ARIA Sensitivity</span>
         </div>
         <span className={cn("text-sm font-medium", displayOption.color)}>
           {displayOption.label}
@@ -93,7 +84,7 @@ export function ARIASensitivitySlider({
       {/* Slider Track */}
       <div className="relative">
         {/* Background track */}
-        <div className="h-2 bg-gray-100 rounded-full">
+        <div className="h-2 bg-muted rounded-full">
           {/* Colored fill - extends to the selected option position */}
           {/* Calculate fill width: each option at 0, 33, 66, 100% with 8% minimum */}
           <div
@@ -128,7 +119,7 @@ export function ARIASensitivitySlider({
                   "border-2 focus:outline-none focus:ring-2 focus:ring-offset-2",
                   isSelected
                     ? cn(option.bgColor, option.borderColor, option.color, "scale-110")
-                    : "bg-white border-gray-200 text-gray-400 hover:border-gray-300",
+                    : "bg-card border-border text-muted-foreground hover:border-border",
                   disabled && "opacity-50 cursor-not-allowed"
                 )}
                 aria-label={`Set ARIA sensitivity to ${option.label}`}
@@ -141,7 +132,7 @@ export function ARIASensitivitySlider({
       </div>
 
       {/* Labels */}
-      <div className="flex justify-between text-xs text-gray-500 -mx-1">
+      <div className="flex justify-between text-xs text-muted-foreground -mx-1">
         {sensitivityOptions.map((option) => (
           <span
             key={option.value}
@@ -163,12 +154,7 @@ export function ARIASensitivitySlider({
           displayOption.borderColor
         )}
       >
-        <p className="text-sm text-gray-700">{displayOption.description}</p>
-        {displayOption.value === "off" && (
-          <p className="text-xs text-gray-500 mt-1">
-            Calls without ARIA monitoring will not have sentiment analysis or intervention capabilities.
-          </p>
-        )}
+        <p className="text-sm text-foreground">{displayOption.description}</p>
       </div>
     </div>
   );

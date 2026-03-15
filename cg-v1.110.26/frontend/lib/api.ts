@@ -1298,7 +1298,42 @@ export const agreementsAPI = {
   async getQuickSummary(agreementId: string): Promise<AgreementQuickSummary> {
     return fetchAPI<AgreementQuickSummary>(`/agreements/${agreementId}/quick-summary`);
   },
+
+  /**
+   * Get exchange schedule summary from the active agreement for a family file
+   */
+  async getExchangeSummary(familyFileId: string): Promise<ExchangeSummaryResponse> {
+    return fetchAPI<ExchangeSummaryResponse>(`/agreements/family-file/${familyFileId}/exchange-summary`);
+  },
+
+  /**
+   * Get financial summary from the active agreement for a family file
+   */
+  async getFinancialSummary(familyFileId: string): Promise<FinancialSummaryResponse> {
+    return fetchAPI<FinancialSummaryResponse>(`/agreements/family-file/${familyFileId}/financial-summary`);
+  },
 };
+
+export interface ExchangeScheduleItem {
+  day_of_week: string | null;
+  time: string | null;
+  location: string | null;
+}
+
+export interface ExchangeSummaryResponse {
+  schedules: ExchangeScheduleItem[];
+  agreement_title: string | null;
+}
+
+export interface FinancialSummaryResponse {
+  child_support_amount: number | null;
+  child_support_frequency: string | null;
+  child_support_payer: string | null;
+  child_support_payee: string | null;
+  expense_split_percentage: Record<string, number> | null;
+  special_provisions: string[];
+  agreement_title: string | null;
+}
 
 export interface AgreementQuickSummary {
   summary: string;

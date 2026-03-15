@@ -75,6 +75,7 @@ export default function EventForm({
     check_in_window_before_minutes: 30,
     check_in_window_after_minutes: 30,
     qr_confirmation_required: false,
+    sync_to_kidspace: false,
   });
 
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -560,6 +561,35 @@ export default function EventForm({
                 </div>
               </div>
             </div>
+
+            {/* KidSpace Calendar Sync */}
+            {formData.visibility === 'co_parent' && formData.child_ids.length > 0 && (
+              <div className="p-4 bg-muted rounded-xl border border-border">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="font-medium">Sync to KidSpace Calendar</Label>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      This event will appear on the selected children&apos;s KidSpace calendars
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={formData.sync_to_kidspace}
+                    onClick={() => setFormData({ ...formData, sync_to_kidspace: !formData.sync_to_kidspace })}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      formData.sync_to_kidspace ? 'bg-[var(--portal-primary)]' : 'bg-muted-foreground/30'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        formData.sync_to_kidspace ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
