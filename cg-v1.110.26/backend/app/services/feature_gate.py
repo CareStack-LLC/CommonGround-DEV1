@@ -61,7 +61,7 @@ FEATURE_DEFINITIONS = {
 
     # Parent Calls (co-parent communication)
     "parent_voice_call": ["plus", "family_plus"],
-    "parent_video_call": ["family_plus"],
+    "parent_video_call": ["plus", "family_plus"],
 
     # Court & Reporting
     "court_reporting": ["family_plus"],
