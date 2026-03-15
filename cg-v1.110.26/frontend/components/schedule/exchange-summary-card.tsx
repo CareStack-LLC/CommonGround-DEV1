@@ -25,48 +25,89 @@ function extractExchangeFromSections(
 
   const schedules: ExchangeScheduleItem[] = [];
 
+  // Collect v2 flat fields across sections to merge into one exchange item
+  let v2TransitionDay: string | null = null;
+  let v2TransitionTime: string | null = null;
+  let v2ExchangeLocation: string | null = null;
+  let v2SchedulePattern: string | null = null;
+  let v2Transportation: string | null = null;
+
   for (const section of relevantSections) {
     const sd = section.structured_data;
+    if (!sd) continue;
 
-    if (sd) {
-      // Check for exchange schedules in structured data
-      if (sd.exchanges && Array.isArray(sd.exchanges)) {
-        for (const ex of sd.exchanges) {
-          schedules.push({
-            day_of_week: ex.day_of_week || ex.day || null,
-            time: ex.time || ex.pickup_time || ex.dropoff_time || null,
-            location: ex.location || ex.pickup_location || ex.dropoff_location || null,
-          });
-        }
-      }
+    // --- V1 array-based formats ---
 
-      // Check for exchange_schedule array
-      if (sd.exchange_schedule && Array.isArray(sd.exchange_schedule)) {
-        for (const ex of sd.exchange_schedule) {
-          schedules.push({
-            day_of_week: ex.day_of_week || ex.day || null,
-            time: ex.time || null,
-            location: ex.location || null,
-          });
-        }
-      }
-
-      // Check for pickup/dropoff fields directly on the section
-      if (sd.pickup_day || sd.dropoff_day || sd.exchange_day) {
+    // Check for exchange schedules array
+    if (sd.exchanges && Array.isArray(sd.exchanges)) {
+      for (const ex of sd.exchanges) {
         schedules.push({
-          day_of_week: sd.pickup_day || sd.dropoff_day || sd.exchange_day || null,
-          time: sd.pickup_time || sd.dropoff_time || sd.exchange_time || null,
-          location: sd.pickup_location || sd.dropoff_location || sd.exchange_location || sd.default_location || null,
+          day_of_week: ex.day_of_week || ex.day || null,
+          time: ex.time || ex.pickup_time || ex.dropoff_time || null,
+          location: ex.location || ex.pickup_location || ex.dropoff_location || null,
         });
       }
+    }
 
-      // Check for default exchange location
-      if (sd.default_exchange_location && schedules.length === 0) {
+    // Check for exchange_schedule array
+    if (sd.exchange_schedule && Array.isArray(sd.exchange_schedule)) {
+      for (const ex of sd.exchange_schedule) {
+        schedules.push({
+          day_of_week: ex.day_of_week || ex.day || null,
+          time: ex.time || null,
+          location: ex.location || null,
+        });
+      }
+    }
+
+    // V1 pickup/dropoff fields directly on the section
+    if (sd.pickup_day || sd.dropoff_day || sd.exchange_day) {
+      schedules.push({
+        day_of_week: sd.pickup_day || sd.dropoff_day || sd.exchange_day || null,
+        time: sd.pickup_time || sd.dropoff_time || sd.exchange_time || null,
+        location: sd.pickup_location || sd.dropoff_location || sd.exchange_location || sd.default_location || null,
+      });
+    }
+
+    // --- V2 flat field format (parenting_time + logistics_transitions) ---
+
+    // From parenting_time section (section_type: "schedule")
+    if (sd.transition_day) v2TransitionDay = sd.transition_day;
+    if (sd.transition_time) v2TransitionTime = sd.transition_time;
+    if (sd.schedule_pattern) v2SchedulePattern = sd.schedule_pattern;
+
+    // From logistics_transitions section (section_type: "logistics")
+    if (sd.exchange_location) {
+      // Use the address if available, otherwise format the location type
+      v2ExchangeLocation = sd.exchange_location_address || formatLocation(sd.exchange_location);
+    }
+    if (sd.transportation_responsibility) v2Transportation = sd.transportation_responsibility;
+  }
+
+  // If we found v2 flat fields but no array-based schedules, create an exchange item
+  if (schedules.length === 0 && (v2TransitionDay || v2ExchangeLocation || v2TransitionTime)) {
+    const locationDisplay = v2ExchangeLocation || null;
+    const dayDisplay = v2TransitionDay || null;
+    const timeDisplay = v2TransitionTime || null;
+
+    schedules.push({
+      day_of_week: dayDisplay ? `${dayDisplay}${v2SchedulePattern ? ` (${formatPattern(v2SchedulePattern)})` : ''}` : (v2SchedulePattern ? formatPattern(v2SchedulePattern) : null),
+      time: timeDisplay,
+      location: locationDisplay,
+    });
+  }
+
+  // V1 fallback: default exchange location
+  if (schedules.length === 0) {
+    for (const section of relevantSections) {
+      const sd = section.structured_data;
+      if (sd?.default_exchange_location) {
         schedules.push({
           day_of_week: null,
           time: null,
           location: sd.default_exchange_location,
         });
+        break;
       }
     }
   }
@@ -77,6 +118,28 @@ function extractExchangeFromSections(
     schedules,
     agreement_title: agreementTitle,
   };
+}
+
+/** Format exchange_location enum values into readable text */
+function formatLocation(loc: string): string {
+  const map: Record<string, string> = {
+    school: "School",
+    parent_a_home: "Parent A's Home",
+    parent_b_home: "Parent B's Home",
+    neutral_location: "Neutral Location",
+  };
+  return map[loc] || loc.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/** Format schedule_pattern enum values into readable text */
+function formatPattern(pattern: string): string {
+  const map: Record<string, string> = {
+    week_on_week_off: "Week on/Week off",
+    "2-2-3": "2-2-3 Rotation",
+    every_other_weekend: "Every Other Weekend",
+    custom: "Custom Schedule",
+  };
+  return map[pattern] || pattern.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 }
 
 export function ExchangeSummaryCard({ familyFileId, agreementId }: ExchangeSummaryCardProps) {

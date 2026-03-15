@@ -49,14 +49,42 @@ function extractFinancialFromSections(
       }
 
       // Expense split fields
-      if (sd.split_percentage || sd.expense_split || sd.split_ratio) {
-        expenseSplit = sd.split_percentage || sd.expense_split || sd.split_ratio;
+      if (sd.split_percentage || sd.expense_split) {
+        expenseSplit = sd.split_percentage || sd.expense_split;
+      }
+      // V2: split_ratio is a string like "50/50", "60/40", "income_based"
+      if (sd.split_ratio && typeof sd.split_ratio === "string") {
+        const ratioMatch = sd.split_ratio.match(/(\d+)\s*\/\s*(\d+)/);
+        if (ratioMatch) {
+          expenseSplit = {
+            "Parent A": parseInt(ratioMatch[1]),
+            "Parent B": parseInt(ratioMatch[2]),
+          };
+        } else if (sd.split_ratio !== "custom") {
+          // Display as a provision if it's a named split like "income_based"
+          specialProvisions.push(`Expense split: ${sd.split_ratio.replace(/_/g, " ")}`);
+        }
+        if (sd.custom_split_details) {
+          specialProvisions.push(sd.custom_split_details);
+        }
+      } else if (sd.split_ratio && typeof sd.split_ratio === "object") {
+        expenseSplit = sd.split_ratio;
       }
       if (sd.petitioner_percentage != null && sd.respondent_percentage != null) {
         expenseSplit = {
           "Parent A": sd.petitioner_percentage,
           "Parent B": sd.respondent_percentage,
         };
+      }
+
+      // V2: expense_categories as special provisions
+      if (sd.expense_categories && Array.isArray(sd.expense_categories) && sd.expense_categories.length > 0) {
+        specialProvisions.push(`Shared expenses: ${sd.expense_categories.join(", ")}`);
+      }
+
+      // V2: reimbursement_window
+      if (sd.reimbursement_window) {
+        specialProvisions.push(`Reimbursement window: ${sd.reimbursement_window.replace(/_/g, " ")}`);
       }
 
       // Special provisions
