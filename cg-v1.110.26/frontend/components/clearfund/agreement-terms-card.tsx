@@ -2,13 +2,98 @@
 
 import { useState, useEffect } from "react";
 import { FileText, DollarSign, PieChart, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
-import { agreementsAPI, FinancialSummaryResponse } from "@/lib/api";
+import { agreementsAPI, FinancialSummaryResponse, AgreementSection } from "@/lib/api";
 
 interface AgreementTermsCardProps {
   familyFileId: string;
+  agreementId?: string;
 }
 
-export function AgreementTermsCard({ familyFileId }: AgreementTermsCardProps) {
+/**
+ * Extract financial summary data from agreement sections.
+ * Looks at section_type "financial" sections (Child Support #14, Expense Sharing #15)
+ * and parses structured_data or content for financial terms.
+ */
+function extractFinancialFromSections(
+  sections: AgreementSection[],
+  agreementTitle: string
+): FinancialSummaryResponse | null {
+  const financialSections = sections.filter(s => s.section_type === "financial");
+  if (financialSections.length === 0) return null;
+
+  let childSupportAmount: number | null = null;
+  let childSupportFrequency: string | null = null;
+  let childSupportPayer: string | null = null;
+  let childSupportPayee: string | null = null;
+  let expenseSplit: Record<string, number> | null = null;
+  const specialProvisions: string[] = [];
+
+  for (const section of financialSections) {
+    const sd = section.structured_data;
+    const content = typeof section.content === "string" ? section.content : "";
+
+    // Check structured_data first (most reliable)
+    if (sd) {
+      // Child support fields
+      if (sd.monthly_amount || sd.child_support_amount || sd.amount) {
+        childSupportAmount = parseFloat(sd.monthly_amount || sd.child_support_amount || sd.amount) || null;
+      }
+      if (sd.frequency || sd.payment_frequency) {
+        childSupportFrequency = sd.frequency || sd.payment_frequency;
+      }
+      if (sd.payer || sd.paying_parent) {
+        childSupportPayer = sd.payer || sd.paying_parent;
+      }
+      if (sd.payee || sd.receiving_parent) {
+        childSupportPayee = sd.payee || sd.receiving_parent;
+      }
+
+      // Expense split fields
+      if (sd.split_percentage || sd.expense_split || sd.split_ratio) {
+        expenseSplit = sd.split_percentage || sd.expense_split || sd.split_ratio;
+      }
+      if (sd.petitioner_percentage != null && sd.respondent_percentage != null) {
+        expenseSplit = {
+          "Parent A": sd.petitioner_percentage,
+          "Parent B": sd.respondent_percentage,
+        };
+      }
+
+      // Special provisions
+      if (sd.special_provisions && Array.isArray(sd.special_provisions)) {
+        specialProvisions.push(...sd.special_provisions);
+      }
+      if (sd.notes) {
+        specialProvisions.push(sd.notes);
+      }
+    }
+
+    // Fallback: try to parse amounts from content text
+    if (!childSupportAmount && content) {
+      const amountMatch = content.match(/\$[\d,]+(?:\.\d{2})?/);
+      if (amountMatch && section.section_title?.toLowerCase().includes("child support")) {
+        childSupportAmount = parseFloat(amountMatch[0].replace(/[$,]/g, "")) || null;
+      }
+    }
+  }
+
+  // If we found nothing useful, return null
+  if (!childSupportAmount && !expenseSplit && specialProvisions.length === 0) {
+    return null;
+  }
+
+  return {
+    child_support_amount: childSupportAmount,
+    child_support_frequency: childSupportFrequency,
+    child_support_payer: childSupportPayer,
+    child_support_payee: childSupportPayee,
+    expense_split_percentage: expenseSplit,
+    special_provisions: specialProvisions,
+    agreement_title: agreementTitle,
+  };
+}
+
+export function AgreementTermsCard({ familyFileId, agreementId }: AgreementTermsCardProps) {
   const [data, setData] = useState<FinancialSummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(true);
@@ -16,16 +101,27 @@ export function AgreementTermsCard({ familyFileId }: AgreementTermsCardProps) {
   useEffect(() => {
     async function load() {
       try {
-        const summary = await agreementsAPI.getFinancialSummary(familyFileId);
-        setData(summary);
+        if (agreementId) {
+          // Fetch the full agreement with sections and extract financial data
+          const result = await agreementsAPI.get(agreementId);
+          const extracted = extractFinancialFromSections(
+            result.sections,
+            result.agreement.title
+          );
+          setData(extracted);
+        } else {
+          // Fallback: try the financial summary endpoint
+          const summary = await agreementsAPI.getFinancialSummary(familyFileId);
+          setData(summary);
+        }
       } catch {
         // No active agreement or no financial data
       } finally {
         setLoading(false);
       }
     }
-    if (familyFileId) load();
-  }, [familyFileId]);
+    if (familyFileId || agreementId) load();
+  }, [familyFileId, agreementId]);
 
   if (loading) {
     return (

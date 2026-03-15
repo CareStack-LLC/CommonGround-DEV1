@@ -332,7 +332,9 @@ function PaymentsContent() {
         if (firstWithAgreements) {
           setSelectedFamilyFile(firstWithAgreements.familyFile);
           if (firstWithAgreements.agreements.length > 0) {
-            setSelectedAgreement(firstWithAgreements.agreements[0]);
+            // Prefer the active agreement, fall back to first
+            const activeAgreement = firstWithAgreements.agreements.find(a => a.status === 'active');
+            setSelectedAgreement(activeAgreement || firstWithAgreements.agreements[0]);
           }
         } else {
           setSelectedFamilyFile(filesWithAgreements[0].familyFile);
@@ -396,7 +398,9 @@ function PaymentsContent() {
     if (item) {
       setSelectedFamilyFile(item.familyFile);
       if (item.agreements.length > 0) {
-        setSelectedAgreement(item.agreements[0]);
+        // Prefer the active agreement, fall back to first
+        const activeAgreement = item.agreements.find(a => a.status === 'active');
+        setSelectedAgreement(activeAgreement || item.agreements[0]);
       } else {
         setSelectedAgreement(null);
       }
@@ -597,7 +601,10 @@ function PaymentsContent() {
 
         {/* Agreement Financial Terms */}
         {selectedFamilyFile && (
-          <AgreementTermsCard familyFileId={selectedFamilyFile.id} />
+          <AgreementTermsCard
+            familyFileId={selectedFamilyFile.id}
+            agreementId={selectedAgreement?.id}
+          />
         )}
 
         {/* Net Balance Card */}
