@@ -303,7 +303,7 @@ function KidComsContent() {
                         </span>
                       </div>
                       {ff.children && ff.children.length > 0 && (
-                        <div className="mt-4 flex items-center gap-2 {0}
+                        <div className="mt-4 flex items-center gap-2">
                           <Users className="h-4 w-4" />
                           <span className="font-medium">
                             {ff.children.length} {ff.children.length === 1 ? 'child' : 'children'}
@@ -351,14 +351,14 @@ function KidComsContent() {
                 className="p-2 -ml-2 rounded-xl hover:bg-[var(--portal-primary)]/10 transition-colors"
                 aria-label="Go back"
               >
-                <ChevronLeft className="</ChevronLeft>
+                <ChevronLeft className="h-5 w-5" />
               </button>
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center shadow-md">
                 <Video className="h-5 w-5 text-white" />
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-foreground">KidSpace</h1>
-                <p className="{0}Safe video calls with your circle</p>
+                <p className="text-muted-foreground">Safe video calls with your circle</p>
               </div>
             </div>
             <button
@@ -488,7 +488,7 @@ function KidComsContent() {
                     <Users className="h-10 w-10 text-[var(--portal-primary)]" />
                   </div>
                   <p className="font-semibold text-foreground mb-1">No circle contacts yet</p>
-                  <p className="{0}
+                  <p className="text-muted-foreground">
                     Add trusted contacts to start video calls
                   </p>
                 </div>
@@ -546,7 +546,7 @@ function KidComsContent() {
                     <Clock className="h-10 w-10 text-[var(--portal-primary)]" />
                   </div>
                   <p className="font-semibold text-foreground mb-1">No sessions yet</p>
-                  <p className="{0}
+                  <p className="text-muted-foreground">
                     Start a video call to see it here
                   </p>
                 </div>
