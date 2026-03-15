@@ -1008,26 +1008,68 @@ function DashboardContent() {
                     </button>
                   </div>
                   <div className="space-y-3">
-                    {familyFilesWithData.slice(0, 2).map(({ familyFile }) => (
-                      <button
-                        key={familyFile.id}
-                        onClick={() => router.push(`/family-files/${familyFile.id}`)}
-                        className="group w-full bg-card rounded-2xl border-2 border-border p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
-                      >
-                        <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                          <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                            {familyFile.title}
-                          </p>
-                          <p className="text-sm text-muted-foreground font-medium">
-                            {familyFile.children?.length || 0} children
-                          </p>
-                        </div>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
-                      </button>
-                    ))}
+                    {familyFilesWithData.slice(0, 2).map(({ familyFile, agreements }) => {
+                      // Determine the co-parent (the other parent)
+                      const coParent = user?.id === familyFile.parent_a_id
+                        ? familyFile.parent_b_info
+                        : familyFile.parent_a_info;
+                      const coParentName = coParent
+                        ? [coParent.first_name, coParent.last_name].filter(Boolean).join(' ')
+                        : null;
+
+                      // Children names
+                      const childrenNames = familyFile.children?.map(c => c.first_name).join(', ');
+
+                      // Active agreement
+                      const activeAgreement = agreements.find(a => a.status === 'active');
+                      const pendingCount = agreements.filter(a => a.status === 'pending_approval' || a.status === 'draft').length;
+
+                      return (
+                        <button
+                          key={familyFile.id}
+                          onClick={() => router.push(`/family-files/${familyFile.id}`)}
+                          className="group w-full bg-card rounded-2xl border-2 border-border p-5 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                              <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                                {familyFile.title}
+                              </p>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+                          </div>
+                          <div className="mt-3 ml-16 space-y-1.5">
+                            {coParentName && (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Users className="w-3.5 h-3.5 flex-shrink-0" />
+                                <span className="font-medium">Co-parent: <span className="text-foreground">{coParentName}</span></span>
+                              </div>
+                            )}
+                            {childrenNames && (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Baby className="w-3.5 h-3.5 flex-shrink-0" />
+                                <span className="font-medium truncate">Children: <span className="text-foreground">{childrenNames}</span></span>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <FileText className="w-3.5 h-3.5 flex-shrink-0" />
+                              <span className="font-medium truncate">
+                                {activeAgreement ? (
+                                  <>Active: <span className="text-foreground">{activeAgreement.title}</span></>
+                                ) : pendingCount > 0 ? (
+                                  <span className="text-amber-600 dark:text-amber-400">{pendingCount} pending agreement{pendingCount > 1 ? 's' : ''}</span>
+                                ) : (
+                                  <span className="text-muted-foreground">No agreements</span>
+                                )}
+                              </span>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </section>
               )}
