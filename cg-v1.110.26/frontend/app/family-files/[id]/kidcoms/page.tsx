@@ -229,7 +229,7 @@ export default function KidComsPage() {
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
                   <Video className="h-6 w-6 text-purple-600" />
                 </div>
-                KidComs
+                KidSpace
               </h1>
               <p className="text-muted-foreground font-medium mt-1">
                 Safe video communication for {familyTitle}

@@ -206,7 +206,7 @@ function KidComsContent() {
       case 'active':
         return <Phone className="h-4 w-4 text-emerald-600 animate-pulse" />;
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-slate-400" />;
+        return <CheckCircle className="h-4 w-4 text-muted-foreground" />;
       case 'cancelled':
         return <XCircle className="h-4 w-4 text-red-600" />;
       default:
@@ -238,24 +238,24 @@ function KidComsContent() {
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Video className="h-10 w-10 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">KidSpace</h1>
-              <p className="text-slate-600">Safe video calls with your circle</p>
+              <h1 className="text-3xl font-bold text-foreground mb-2">KidSpace</h1>
+              <p className="text-muted-foreground">Safe video calls with your circle</p>
             </header>
 
             {error && (
-              <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl max-w-2xl mx-auto">
+              <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl max-w-2xl mx-auto">
                 <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
                 <p className="text-sm text-red-700 font-medium">{error}</p>
               </div>
             )}
 
             {/* Select Family File */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center max-w-4xl mx-auto">
+            <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-8 text-center max-w-4xl mx-auto">
               <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 flex items-center justify-center mx-auto mb-6">
                 <FolderHeart className="h-12 w-12 text-[var(--portal-primary)]" />
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Select a Family File</h2>
-              <p className="text-slate-600 mb-8">Choose a family file to access KidSpace features</p>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Select a Family File</h2>
+              <p className="text-muted-foreground mb-8">Choose a family file to access KidSpace features</p>
 
               {isLoading ? (
                 <div className="flex justify-center py-8">
@@ -263,7 +263,7 @@ function KidComsContent() {
                 </div>
               ) : familyFiles.length === 0 ? (
                 <div className="py-4">
-                  <p className="text-slate-600 mb-6">You don't have any family files yet.</p>
+                  <p className="text-muted-foreground mb-6">You don't have any family files yet.</p>
                   <button
                     onClick={() => router.push('/family-files/new')}
                     className="
@@ -284,26 +284,26 @@ function KidComsContent() {
                       key={ff.id}
                       onClick={() => selectFamilyFile(ff.id)}
                       className="
-                        bg-white border border-slate-200 rounded-2xl p-5 text-left
+                        bg-card border-2 border-border rounded-2xl p-5 text-left
                         hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all
                         group
                       "
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-[var(--portal-primary)] transition-colors">{ff.title}</h3>
-                          <p className="text-sm text-slate-500 font-medium">{ff.family_file_number}</p>
+                          <h3 className="font-semibold text-foreground mb-1 group-hover:text-[var(--portal-primary)] transition-colors">{ff.title}</h3>
+                          <p className="text-sm text-muted-foreground font-medium">{ff.family_file_number}</p>
                         </div>
                         <span className={`px-2.5 py-1 text-xs rounded-full font-semibold ${
                           ff.status === 'active'
                             ? 'bg-emerald-100 text-emerald-700'
-                            : 'bg-slate-100 text-slate-600'
+                            : 'bg-muted text-muted-foreground'
                         }`}>
                           {ff.status}
                         </span>
                       </div>
                       {ff.children && ff.children.length > 0 && (
-                        <div className="mt-4 flex items-center gap-2 text-sm text-slate-600">
+                        <div className="mt-4 flex items-center gap-2 {0}
                           <Users className="h-4 w-4" />
                           <span className="font-medium">
                             {ff.children.length} {ff.children.length === 1 ? 'child' : 'children'}
@@ -331,7 +331,7 @@ function KidComsContent() {
               <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
           </div>
-          <p className="mt-6 text-slate-600 font-medium">Loading KidSpace...</p>
+          <p className="mt-6 text-muted-foreground font-medium">Loading KidSpace...</p>
         </div>
       </div>
     );
@@ -342,7 +342,7 @@ function KidComsContent() {
       <Navigation />
 
       {/* Page Header */}
-      <header className="border-b border-[var(--portal-primary)]/20 bg-white/80 backdrop-blur-sm">
+      <header className="border-b border-[var(--portal-primary)]/20 bg-card/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -351,19 +351,19 @@ function KidComsContent() {
                 className="p-2 -ml-2 rounded-xl hover:bg-[var(--portal-primary)]/10 transition-colors"
                 aria-label="Go back"
               >
-                <ChevronLeft className="h-5 w-5 text-slate-600" />
+                <ChevronLeft className="</ChevronLeft>
               </button>
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center shadow-md">
                 <Video className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-slate-900">KidSpace</h1>
-                <p className="text-sm text-slate-600">Safe video calls with your circle</p>
+                <h1 className="text-3xl font-bold text-foreground">KidSpace</h1>
+                <p className="{0}Safe video calls with your circle</p>
               </div>
             </div>
             <button
               onClick={() => router.push(`/kidcoms/settings?case=${familyFileId}`)}
-              className="p-2.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors"
+              className="p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
               aria-label="Settings"
             >
               <Settings className="h-5 w-5" />
@@ -374,7 +374,7 @@ function KidComsContent() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl mb-6">
+          <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl mb-6">
             <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
             <p className="text-sm text-red-700 font-medium">{error}</p>
           </div>
@@ -385,8 +385,8 @@ function KidComsContent() {
           <div className="lg:col-span-1 space-y-6">
             {/* Child Selector */}
             {children.length > 0 && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                <h3 className="text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+                <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
                   <Shield className="h-4 w-4 text-[var(--portal-primary)]" />
                   Select Child
                 </h3>
@@ -399,14 +399,14 @@ function KidComsContent() {
                         w-full flex items-center gap-3 p-3 rounded-xl transition-all
                         ${selectedChild?.id === child.id
                           ? 'bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 border-2 border-[var(--portal-primary)]/40 shadow-sm'
-                          : 'bg-slate-50 hover:bg-slate-100 border-2 border-transparent'
+                          : 'bg-muted hover:bg-muted/80 border-2 border-transparent'
                         }
                       `}
                     >
                       <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center text-white font-bold shadow-md">
                         {(child.preferred_name || child.first_name)[0]}
                       </div>
-                      <span className="font-semibold text-slate-900">
+                      <span className="font-semibold text-foreground">
                         {child.preferred_name || child.first_name}
                       </span>
                     </button>
@@ -416,8 +416,8 @@ function KidComsContent() {
             )}
 
             {/* Quick Actions */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-              <h3 className="text-sm font-semibold text-slate-900 mb-4">Quick Actions</h3>
+            <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+              <h3 className="text-sm font-semibold text-foreground mb-4">Quick Actions</h3>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => startVideoCall()}
@@ -438,27 +438,27 @@ function KidComsContent() {
                 </button>
                 <button
                   disabled
-                  className="flex flex-col items-center p-4 bg-slate-100 rounded-xl opacity-50 cursor-not-allowed"
+                  className="flex flex-col items-center p-4 bg-muted rounded-xl opacity-50 cursor-not-allowed"
                 >
-                  <MessageCircle className="h-8 w-8 text-slate-400" />
-                  <span className="mt-2 text-sm font-medium text-slate-600">Chat</span>
-                  <span className="text-xs text-slate-500 mt-0.5">Soon</span>
+                  <MessageCircle className="h-8 w-8 text-muted-foreground" />
+                  <span className="mt-2 text-sm font-medium text-muted-foreground">Chat</span>
+                  <span className="text-xs text-muted-foreground mt-0.5">Soon</span>
                 </button>
                 <button
                   disabled
-                  className="flex flex-col items-center p-4 bg-slate-100 rounded-xl opacity-50 cursor-not-allowed"
+                  className="flex flex-col items-center p-4 bg-muted rounded-xl opacity-50 cursor-not-allowed"
                 >
-                  <Film className="h-8 w-8 text-slate-400" />
-                  <span className="mt-2 text-sm font-medium text-slate-600">Theater</span>
-                  <span className="text-xs text-slate-500 mt-0.5">Soon</span>
+                  <Film className="h-8 w-8 text-muted-foreground" />
+                  <span className="mt-2 text-sm font-medium text-muted-foreground">Theater</span>
+                  <span className="text-xs text-muted-foreground mt-0.5">Soon</span>
                 </button>
                 <button
                   disabled
-                  className="flex flex-col items-center p-4 bg-slate-100 rounded-xl opacity-50 cursor-not-allowed"
+                  className="flex flex-col items-center p-4 bg-muted rounded-xl opacity-50 cursor-not-allowed"
                 >
-                  <Gamepad2 className="h-8 w-8 text-slate-400" />
-                  <span className="mt-2 text-sm font-medium text-slate-600">Arcade</span>
-                  <span className="text-xs text-slate-500 mt-0.5">Soon</span>
+                  <Gamepad2 className="h-8 w-8 text-muted-foreground" />
+                  <span className="mt-2 text-sm font-medium text-muted-foreground">Arcade</span>
+                  <span className="text-xs text-muted-foreground mt-0.5">Soon</span>
                 </button>
               </div>
             </div>
@@ -466,9 +466,9 @@ function KidComsContent() {
 
           {/* Center Column - Circle Contacts */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+            <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-slate-900">My Circle</h3>
+                <h3 className="text-lg font-bold text-foreground">My Circle</h3>
                 <button
                   onClick={() => router.push(`/kidcoms/circle?case=${familyFileId}`)}
                   className="
@@ -487,8 +487,8 @@ function KidComsContent() {
                   <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 flex items-center justify-center mx-auto mb-4">
                     <Users className="h-10 w-10 text-[var(--portal-primary)]" />
                   </div>
-                  <p className="font-semibold text-slate-900 mb-1">No circle contacts yet</p>
-                  <p className="text-sm text-slate-600">
+                  <p className="font-semibold text-foreground mb-1">No circle contacts yet</p>
+                  <p className="{0}
                     Add trusted contacts to start video calls
                   </p>
                 </div>
@@ -497,15 +497,15 @@ function KidComsContent() {
                   {contacts.map((contact) => (
                     <div
                       key={contact.id}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-[var(--portal-primary)]/20 transition-colors"
+                      className="flex items-center justify-between p-3 bg-muted rounded-xl border border-border hover:border-[var(--portal-primary)]/20 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center text-white font-bold shadow-sm">
                           {contact.contact_name[0]}
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-900">{contact.contact_name}</p>
-                          <p className="text-xs text-slate-600 capitalize font-medium">
+                          <p className="font-semibold text-foreground">{contact.contact_name}</p>
+                          <p className="text-xs text-muted-foreground capitalize font-medium">
                             {contact.relationship_type.replace('_', ' ')}
                           </p>
                         </div>
@@ -537,16 +537,16 @@ function KidComsContent() {
 
           {/* Right Column - Recent Sessions */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Recent Sessions</h3>
+            <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+              <h3 className="text-lg font-bold text-foreground mb-4">Recent Sessions</h3>
 
               {sessions.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 flex items-center justify-center mx-auto mb-4">
                     <Clock className="h-10 w-10 text-[var(--portal-primary)]" />
                   </div>
-                  <p className="font-semibold text-slate-900 mb-1">No sessions yet</p>
-                  <p className="text-sm text-slate-600">
+                  <p className="font-semibold text-foreground mb-1">No sessions yet</p>
+                  <p className="{0}
                     Start a video call to see it here
                   </p>
                 </div>
@@ -564,7 +564,7 @@ function KidComsContent() {
                         w-full flex items-center justify-between p-3 rounded-xl transition-all
                         ${session.status === 'active' || session.status === 'waiting'
                           ? 'bg-[var(--portal-primary)]/5 hover:bg-[var(--portal-primary)]/10 cursor-pointer border border-[var(--portal-primary)]/20'
-                          : 'bg-slate-50 cursor-default border border-slate-100'
+                          : 'bg-muted cursor-default border border-border'
                         }
                       `}
                     >
@@ -573,10 +573,10 @@ function KidComsContent() {
                           {getSessionTypeIcon(session.session_type)}
                         </div>
                         <div className="text-left">
-                          <p className="font-semibold text-slate-900">
+                          <p className="font-semibold text-foreground">
                             {session.title || 'Video Call'}
                           </p>
-                          <p className="text-xs text-slate-600 font-medium">
+                          <p className="text-xs text-muted-foreground font-medium">
                             {session.started_at
                               ? new Date(session.started_at).toLocaleDateString()
                               : 'Scheduled'}
@@ -592,24 +592,24 @@ function KidComsContent() {
 
             {/* Feature Status */}
             {settings && (
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
-                <h3 className="text-sm font-semibold text-slate-900 mb-4">Enabled Features</h3>
+              <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+                <h3 className="text-sm font-semibold text-foreground mb-4">Enabled Features</h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="flex items-center gap-2">
-                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.video ? 'bg-emerald-500 shadow-sm' : 'bg-slate-300'}`} />
-                    <span className="text-slate-900 font-medium">Video</span>
+                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.video ? 'bg-emerald-500 shadow-sm' : 'bg-muted-foreground/40'}`} />
+                    <span className="text-foreground font-medium">Video</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.chat ? 'bg-emerald-500 shadow-sm' : 'bg-slate-300'}`} />
-                    <span className="text-slate-900 font-medium">Chat</span>
+                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.chat ? 'bg-emerald-500 shadow-sm' : 'bg-muted-foreground/40'}`} />
+                    <span className="text-foreground font-medium">Chat</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.theater ? 'bg-emerald-500 shadow-sm' : 'bg-slate-300'}`} />
-                    <span className="text-slate-900 font-medium">Theater</span>
+                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.theater ? 'bg-emerald-500 shadow-sm' : 'bg-muted-foreground/40'}`} />
+                    <span className="text-foreground font-medium">Theater</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.arcade ? 'bg-emerald-500 shadow-sm' : 'bg-slate-300'}`} />
-                    <span className="text-slate-900 font-medium">Arcade</span>
+                    <div className={`w-2.5 h-2.5 rounded-full ${settings.allowed_features.arcade ? 'bg-emerald-500 shadow-sm' : 'bg-muted-foreground/40'}`} />
+                    <span className="text-foreground font-medium">Arcade</span>
                   </div>
                 </div>
               </div>
@@ -631,7 +631,7 @@ export default function KidComsPage() {
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center shadow-lg">
               <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
-            <p className="mt-6 text-slate-600 font-medium">Loading KidSpace...</p>
+            <p className="mt-6 text-muted-foreground font-medium">Loading KidSpace...</p>
           </div>
         </div>
       }>
