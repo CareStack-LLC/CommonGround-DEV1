@@ -160,7 +160,7 @@ export default function KidComsSettingsPage() {
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
                   <Settings className="h-6 w-6 text-purple-600" />
                 </div>
-                KidComs Settings
+                KidSpace Settings
               </h1>
               <p className="text-muted-foreground font-medium mt-1">{familyTitle}</p>
             </div>
@@ -260,7 +260,7 @@ export default function KidComsSettingsPage() {
             </h2>
             <div>
               <p className="text-sm text-muted-foreground mb-4">
-                Enable or disable KidComs features for your family
+                Enable or disable KidSpace features for your family
               </p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {[

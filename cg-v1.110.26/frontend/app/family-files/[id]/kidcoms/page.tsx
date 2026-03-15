@@ -37,7 +37,7 @@ import { cn } from '@/lib/utils';
 import { FeatureGate } from '@/components/feature-gate';
 
 /* =============================================================================
-   KidComs Page - Video Communication Hub for Children
+   KidSpace Page - Video Communication Hub for Children
    Purple-accented design for the video/communication features
    ============================================================================= */
 
@@ -97,7 +97,7 @@ export default function KidComsPage() {
       setSessions(sessionsData.items);
     } catch (err) {
       console.error('Error loading KidComs data:', err);
-      setError('Failed to load KidComs data');
+      setError('Failed to load KidSpace data');
     } finally {
       setIsLoading(false);
     }
@@ -193,7 +193,7 @@ export default function KidComsPage() {
           <Navigation />
           <div className="flex flex-col items-center justify-center py-32">
             <div className="w-14 h-14 border-3 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-            <p className="mt-4 text-muted-foreground font-medium">Loading KidComs...</p>
+            <p className="mt-4 text-muted-foreground font-medium">Loading KidSpace...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -209,7 +209,7 @@ export default function KidComsPage() {
           {/* Feature Gate - Complete tier only */}
           <FeatureGate
             feature="kidcoms_access"
-            title="KidComs Video Calls"
+            title="KidSpace Video Calls"
             description="Connect with your children through secure video calls with ARIA monitoring, circle management, and theater mode. Available with Complete subscription."
             icon={Video}
           >

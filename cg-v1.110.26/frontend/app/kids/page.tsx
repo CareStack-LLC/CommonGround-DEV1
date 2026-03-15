@@ -405,7 +405,7 @@ function KidsHubPageContent() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => router.push('/kidcoms')}
+            onClick={() => router.push('/dashboard')}
             className="bg-white text-teal-600 font-bold text-lg px-8 py-4 rounded-full shadow-lg"
           >
             Go Back

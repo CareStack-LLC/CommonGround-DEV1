@@ -547,7 +547,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                             {/* Voice Call Button */}
                             <button
                               onClick={() => {
-                                // Navigate to KidComs to initiate a call
+                                // Navigate to KidSpace to initiate a call
                                 router.push(`/family-files/${familyFileId}/kidcoms`);
                               }}
                               disabled={!contact.can_communicate}

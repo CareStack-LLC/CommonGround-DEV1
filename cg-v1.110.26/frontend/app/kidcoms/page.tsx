@@ -50,7 +50,7 @@ interface FamilyFile {
 }
 
 /**
- * KidComs - Safe Child Communication
+ * KidSpace - Safe Child Communication
  *
  * Design Philosophy: Playful yet secure
  * - Friendly, approachable interface for child communication
@@ -130,7 +130,7 @@ function KidComsContent() {
   }
 
   function selectFamilyFile(id: string) {
-    router.push(`/kidcoms?case=${id}`);
+    router.push(`/family-files/${id}/kidcoms`);
   }
 
   async function loadData() {
@@ -159,7 +159,7 @@ function KidComsContent() {
       setSessions(sessionsData.items);
     } catch (err) {
       console.error('Error loading KidComs data:', err);
-      setError('Failed to load KidComs data');
+      setError('Failed to load KidSpace data');
     } finally {
       setIsLoading(false);
     }

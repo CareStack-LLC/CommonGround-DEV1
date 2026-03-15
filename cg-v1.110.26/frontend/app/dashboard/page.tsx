@@ -730,7 +730,14 @@ function DashboardContent() {
                   <QuickActionButton
                     icon={Shield}
                     label="KidSpace"
-                    onClick={() => router.push('/kidcoms')}
+                    onClick={() => {
+                      const activeFiles = familyFilesWithData.filter(f => f.familyFile.status === 'active');
+                      if (activeFiles.length === 1) {
+                        router.push(`/family-files/${activeFiles[0].familyFile.id}/kidcoms`);
+                      } else {
+                        router.push('/kidcoms');
+                      }
+                    }}
                   />
                   <QuickActionButton
                     icon={Handshake}
