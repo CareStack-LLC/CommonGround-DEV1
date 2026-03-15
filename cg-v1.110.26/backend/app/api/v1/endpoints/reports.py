@@ -37,7 +37,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class ProfessionalReportRequest(BaseModel):
     """Request to purchase a professional investigation report."""
     family_file_id: str = Field(..., description="Family file to generate report for")
-    report_type: str = Field(..., description="Type of report: court_investigation_package, communication_analysis, financial_compliance_report, custody_compliance_report")
+    report_type: str = Field(..., description="Type of report: court_investigation_package, communication_analysis, financial_compliance_report, custody_compliance_report, kidspace_court_communication")
     description: Optional[str] = Field(None, description="Description of what the parent needs")
     urgency: str = Field("standard", description="Delivery speed: standard, rush, urgent")
     date_range_start: Optional[str] = Field(None, description="Start date for report data")
@@ -81,6 +81,13 @@ REPORT_TYPES = {
         "base_price_cents": 9900,
         "stripe_price_id": "price_1T7WgqB3EXvvERPfyT0LGidv",  # Custody Compliance Report
         "stripe_product_id": "prod_U5i6FizFNRc51F",
+    },
+    "kidspace_court_communication": {
+        "name": "KidSpace Court Communication Report",
+        "description": "Court-ready KidSpace communication analysis with full session logs and ARIA flags",
+        "base_price_cents": 7900,
+        "stripe_price_id": "price_1TBOCNB3EXvvERPfgsjL8kHo",  # KidSpace Court Communication Report
+        "stripe_product_id": "",  # Will be resolved from price ID by Stripe
     },
 }
 
