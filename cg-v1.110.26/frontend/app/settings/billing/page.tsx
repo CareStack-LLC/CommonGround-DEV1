@@ -360,7 +360,7 @@ export default function BillingSettingsPage() {
       <div className="flex items-center justify-center h-[60vh]">
         <div className="text-center">
           <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
-          <p className="mt-4 text-slate-600 font-medium">Loading billing information...</p>
+          <p className="mt-4 text-muted-foreground font-medium">Loading billing information...</p>
         </div>
       </div>
     );
@@ -379,17 +379,17 @@ export default function BillingSettingsPage() {
             <CreditCard className="w-6 h-6 text-emerald-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+            <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               Billing & Subscription
             </h2>
-            <p className="text-sm text-slate-500 font-medium">
+            <p className="text-sm text-muted-foreground font-medium">
               Manage your subscription and payment information
             </p>
           </div>
         </div>
 
         {/* Current Plan */}
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
@@ -427,7 +427,7 @@ export default function BillingSettingsPage() {
         </Card>
 
         {/* Coming Soon Notice */}
-        <Alert className="bg-purple-50 border-purple-200 rounded-2xl shadow-lg">
+        <Alert className="bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/40 rounded-2xl shadow-lg">
           <Sparkles className="h-4 w-4 text-purple-600" />
           <AlertDescription className="text-purple-600 font-medium">
             <strong>Subscription management coming soon!</strong>
@@ -447,10 +447,10 @@ export default function BillingSettingsPage() {
           <CreditCard className="w-6 h-6 text-emerald-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Billing & Subscription
           </h2>
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-muted-foreground font-medium">
             Manage your subscription and payment information
           </p>
         </div>
@@ -458,14 +458,14 @@ export default function BillingSettingsPage() {
 
       {/* Success/Error Alerts */}
       {successMessage && (
-        <Alert className="bg-emerald-50 border-emerald-200 rounded-2xl shadow-lg">
+        <Alert className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 rounded-2xl shadow-lg">
           <CheckCircle className="h-4 w-4 text-emerald-600" />
           <AlertDescription className="text-emerald-600 font-medium">{successMessage}</AlertDescription>
         </Alert>
       )}
 
       {redeemSuccess && (
-        <Alert className="bg-emerald-50 border-emerald-200 rounded-2xl shadow-lg">
+        <Alert className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 rounded-2xl shadow-lg">
           <CheckCircle className="h-4 w-4 text-emerald-600" />
           <AlertDescription className="text-emerald-600 font-medium">{redeemSuccess}</AlertDescription>
         </Alert>
@@ -479,7 +479,7 @@ export default function BillingSettingsPage() {
       )}
 
       {/* Current Plan */}
-      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+      <Card className="border-2 border-border rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
@@ -564,7 +564,7 @@ export default function BillingSettingsPage() {
 
       {/* Plan Options */}
       {!isGrantUser && (
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl shadow-md">
@@ -743,7 +743,7 @@ export default function BillingSettingsPage() {
 
       {/* Grant Code Redemption */}
       {!isPaidUser && (
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
@@ -809,7 +809,7 @@ export default function BillingSettingsPage() {
 
       {/* Billing Information */}
       {isPaidUser && (
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">

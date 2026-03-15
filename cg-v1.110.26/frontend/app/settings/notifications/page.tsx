@@ -138,7 +138,7 @@ function Toggle({
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         ${checked
           ? 'bg-cg-primary border-cg-primary'
-          : 'bg-gray-300 border-gray-300'
+          : 'bg-muted-foreground/40 border-muted-foreground/40'
         }
       `}
     >
@@ -248,7 +248,7 @@ export default function NotificationSettingsPage() {
       <div className="flex items-center justify-center h-[60vh]">
         <div className="text-center">
           <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
-          <p className="mt-4 text-slate-600 font-medium">Loading notification preferences...</p>
+          <p className="mt-4 text-muted-foreground font-medium">Loading notification preferences...</p>
         </div>
       </div>
     );
@@ -262,10 +262,10 @@ export default function NotificationSettingsPage() {
           <Bell className="w-6 h-6 text-amber-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Notification Settings
           </h2>
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-muted-foreground font-medium">
             Choose how you want to be notified about important updates
           </p>
         </div>
@@ -273,7 +273,7 @@ export default function NotificationSettingsPage() {
 
       {/* Error Alert */}
       {error && (
-        <Alert className="bg-red-50 border-red-200 rounded-2xl shadow-lg">
+        <Alert className="bg-destructive/10 border-destructive/20 rounded-2xl shadow-lg">
           <AlertCircle className="h-4 w-4 text-red-600" />
           <AlertDescription className="text-red-600 font-medium">
             {error}
@@ -283,7 +283,7 @@ export default function NotificationSettingsPage() {
 
       {/* Success Alert */}
       {showSuccess && (
-        <Alert className="bg-emerald-50 border-emerald-200 rounded-2xl shadow-lg">
+        <Alert className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 rounded-2xl shadow-lg">
           <CheckCircle className="h-4 w-4 text-emerald-600" />
           <AlertDescription className="text-emerald-600 font-medium">
             Your notification preferences have been saved.
@@ -293,18 +293,18 @@ export default function NotificationSettingsPage() {
 
       {/* Push Notifications Status */}
       {pushSupported && (
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className={`p-2 rounded-xl shadow-md ${
                 pushSubscribed
                   ? 'bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5'
-                  : 'bg-gradient-to-br from-slate-500/10 to-slate-600/5'
+                  : 'bg-gradient-to-br from-muted-foreground/10 to-muted-foreground/5'
               }`}>
                 {pushSubscribed ? (
                   <Bell className="h-5 w-5 text-[var(--portal-primary)]" />
                 ) : (
-                  <BellOff className="h-5 w-5 text-slate-600" />
+                  <BellOff className="h-5 w-5 text-muted-foreground" />
                 )}
               </div>
               Browser Push Notifications
@@ -346,7 +346,7 @@ export default function NotificationSettingsPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Quick Actions */}
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               Quick Actions
@@ -368,7 +368,7 @@ export default function NotificationSettingsPage() {
         </Card>
 
         {/* Notification Categories */}
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <div>
@@ -379,7 +379,7 @@ export default function NotificationSettingsPage() {
                   Choose which notifications you'd like to receive
                 </CardDescription>
               </div>
-              <div className="hidden sm:flex gap-8 text-sm font-bold text-slate-600">
+              <div className="hidden sm:flex gap-8 text-sm font-bold text-muted-foreground">
                 <div className="flex items-center gap-2 w-16 justify-center">
                   <Mail className="h-4 w-4" />
                   Email
@@ -406,10 +406,10 @@ export default function NotificationSettingsPage() {
                           <Icon className="h-4 w-4 text-[var(--portal-primary)]" />
                         </div>
                         <div>
-                          <Label className="font-bold text-slate-900">
+                          <Label className="font-bold text-foreground">
                             {category.name}
                           </Label>
-                          <p className="text-sm text-slate-600 font-medium">
+                          <p className="text-sm text-muted-foreground font-medium">
                             {category.description}
                           </p>
                         </div>
@@ -452,10 +452,10 @@ export default function NotificationSettingsPage() {
         </Card>
 
         {/* Info Card */}
-        <Card className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="bg-muted border-2 border-border rounded-2xl shadow-lg">
           <CardContent className="py-4">
-            <p className="text-sm text-slate-600 font-medium">
-              <strong className="text-slate-900">Note:</strong> Some
+            <p className="text-sm text-muted-foreground font-medium">
+              <strong className="text-foreground">Note:</strong> Some
               notifications (like court-ordered communications) cannot be
               disabled and will always be delivered for legal compliance.
             </p>

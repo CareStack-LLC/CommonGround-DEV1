@@ -309,7 +309,7 @@ export default function ReportsSettingsPage() {
       <div className="flex items-center justify-center h-[60vh]">
         <div className="text-center">
           <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
-          <p className="mt-4 text-slate-600 font-medium">Loading reports...</p>
+          <p className="mt-4 text-muted-foreground font-medium">Loading reports...</p>
         </div>
       </div>
     );
@@ -320,14 +320,14 @@ export default function ReportsSettingsPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center shadow-md">
-            <FileText className="w-6 h-6 text-slate-400" />
+          <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center shadow-md">
+            <FileText className="w-6 h-6 text-muted-foreground" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-slate-500" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+            <h2 className="text-xl font-semibold text-muted-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               Reports & Documentation
             </h2>
-            <p className="text-sm text-slate-400">Download PDF reports and documentation</p>
+            <p className="text-sm text-muted-foreground">Download PDF reports and documentation</p>
           </div>
         </div>
         <LockedFeatureCard
@@ -349,10 +349,10 @@ export default function ReportsSettingsPage() {
           <FileText className="w-6 h-6 text-[var(--portal-primary)]" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Reports & Documentation
           </h2>
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-muted-foreground font-medium">
             Generate reports and request professional documentation for legal proceedings
           </p>
         </div>
@@ -368,7 +368,7 @@ export default function ReportsSettingsPage() {
 
       {/* Family File Selector */}
       {familyFiles.length > 0 && (
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
@@ -381,7 +381,7 @@ export default function ReportsSettingsPage() {
             <select
               value={selectedFamilyFile}
               onChange={(e) => setSelectedFamilyFile(e.target.value)}
-              className="flex h-10 w-full max-w-md rounded-lg border-2 border-slate-200 bg-white px-3 py-2 text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--portal-primary)]"
+              className="flex h-10 w-full max-w-md rounded-lg border-2 border-border bg-card px-3 py-2 text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--portal-primary)]"
             >
               {familyFiles.map((ff) => (
                 <option key={ff.id} value={ff.id}>
@@ -407,14 +407,14 @@ export default function ReportsSettingsPage() {
           <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
             <Download className="h-5 w-5 text-emerald-600" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Self-Service Reports
           </h3>
           <span className="text-xs bg-emerald-500/10 text-emerald-600 font-bold px-3 py-1 rounded-full shadow-sm">
             Free
           </span>
         </div>
-        <p className="text-sm text-slate-600 font-medium mb-4">
+        <p className="text-sm text-muted-foreground font-medium mb-4">
           Download PDF reports instantly. Data from the last 30 days.
         </p>
 
@@ -425,7 +425,7 @@ export default function ReportsSettingsPage() {
             const isSuccess = showSuccess === report.id;
 
             return (
-              <Card key={report.id} className="relative border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-[var(--portal-primary)]/30 transition-all duration-300">
+              <Card key={report.id} className="relative border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-[var(--portal-primary)]/30 transition-all duration-300">
                 {isSuccess && (
                   <div className="absolute inset-0 bg-emerald-500/10 rounded-2xl flex items-center justify-center z-10">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-xl flex items-center gap-2">
@@ -443,7 +443,7 @@ export default function ReportsSettingsPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pb-2">
-                  <p className="text-sm text-slate-600 font-medium">
+                  <p className="text-sm text-muted-foreground font-medium">
                     {report.description}
                   </p>
                 </CardContent>
@@ -483,14 +483,14 @@ export default function ReportsSettingsPage() {
           <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
             <Scale className="h-5 w-5 text-amber-600" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Professional Investigation Reports
           </h3>
         </div>
-        <p className="text-sm text-slate-600 font-medium mb-2">
+        <p className="text-sm text-muted-foreground font-medium mb-2">
           Court-ready documentation prepared by our team. Includes expert analysis, chain of custody verification, and branded formatting.
         </p>
-        <p className="text-xs text-slate-600 font-medium mb-4">
+        <p className="text-xs text-muted-foreground font-medium mb-4">
           Reports are typically delivered within 3-5 business days. Rush delivery available.
         </p>
 
@@ -502,7 +502,7 @@ export default function ReportsSettingsPage() {
             const showForm = showRequestForm === report.id;
 
             return (
-              <Card key={report.id} className="relative border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-amber-600/30 transition-all duration-300">
+              <Card key={report.id} className="relative border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-amber-600/30 transition-all duration-300">
                 {isSuccess && (
                   <div className="absolute inset-0 bg-emerald-500/10 rounded-2xl flex items-center justify-center z-10">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-xl flex items-center gap-2">
@@ -527,7 +527,7 @@ export default function ReportsSettingsPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-2xl font-bold text-slate-900">
+                      <span className="text-2xl font-bold text-foreground">
                         ${report.price}
                       </span>
                     </div>
@@ -535,8 +535,8 @@ export default function ReportsSettingsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <p className="text-sm font-bold text-slate-900">Includes:</p>
-                    <ul className="grid gap-2 text-sm text-slate-600">
+                    <p className="text-sm font-bold text-foreground">Includes:</p>
+                    <ul className="grid gap-2 text-sm text-muted-foreground">
                       {report.features.map((feature, idx) => (
                         <li key={idx} className="flex items-center gap-2 font-medium">
                           <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
@@ -679,7 +679,7 @@ export default function ReportsSettingsPage() {
       </div>
 
       {/* Help Section */}
-      <Card className="bg-gradient-to-br from-slate-50 to-white border-2 border-slate-200 rounded-2xl shadow-lg">
+      <Card className="bg-muted border-2 border-border rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
@@ -688,13 +688,13 @@ export default function ReportsSettingsPage() {
             About Our Reports
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm text-slate-600 font-medium">
+        <CardContent className="space-y-3 text-sm text-muted-foreground font-medium">
           <p>
-            <strong className="text-slate-900">Self-Service Reports</strong> are generated automatically from your CommonGround data.
+            <strong className="text-foreground">Self-Service Reports</strong> are generated automatically from your CommonGround data.
             They're perfect for personal records, attorney meetings, or mediation sessions.
           </p>
           <p>
-            <strong className="text-slate-900">Professional Investigation Reports</strong> are prepared by our documentation team.
+            <strong className="text-foreground">Professional Investigation Reports</strong> are prepared by our documentation team.
             They include expert analysis, are formatted for court submission, and come with a
             chain of custody certificate verifying data integrity.
           </p>

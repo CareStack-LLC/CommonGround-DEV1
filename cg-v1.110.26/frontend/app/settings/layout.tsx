@@ -60,7 +60,7 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
   const isSubpage = pathname !== '/settings';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       <PageContainer className="pb-32" background="transparent">
@@ -68,19 +68,19 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => router.back()}
-            className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+            className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
           >
-            <ArrowLeft className="w-5 h-5 text-slate-500" />
+            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
           </button>
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
               <Settings className="w-6 h-6 text-[var(--portal-primary)]" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Settings
               </h1>
-              <p className="text-sm text-slate-500 font-medium">
+              <p className="text-sm text-muted-foreground font-medium">
                 Manage your account preferences
               </p>
             </div>
@@ -91,7 +91,7 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Navigation - Always hidden on mobile, only show on desktop */}
           <nav className="w-full lg:w-64 flex-shrink-0 hidden lg:block">
-            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-2 space-y-1">
+            <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-2 space-y-1">
               {settingsNavItems.map((item) => {
                 const isActive = pathname === item.path;
                 const Icon = item.icon;
@@ -104,7 +104,7 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
                       'w-full flex items-start gap-3 px-3 py-3 rounded-xl text-left transition-all duration-200',
                       isActive
                         ? 'bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] border-2 border-[var(--portal-primary)]/20 shadow-md'
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-2 border-transparent'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground border-2 border-transparent'
                     )}
                   >
                     <Icon className="h-5 w-5 flex-shrink-0 mt-0.5" />

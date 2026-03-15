@@ -295,10 +295,10 @@ export default function SecuritySettingsPage() {
           <Shield className="w-6 h-6 text-red-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Security Settings
           </h2>
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-muted-foreground font-medium">
             Manage your password and account security
           </p>
         </div>
@@ -323,7 +323,7 @@ export default function SecuritySettingsPage() {
       )}
 
       {/* Change Password */}
-      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+      <Card className="border-2 border-border rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
@@ -417,7 +417,7 @@ export default function SecuritySettingsPage() {
       </Card>
 
       {/* Two-Factor Authentication */}
-      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+      <Card className="border-2 border-border rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-xl shadow-md">
@@ -547,7 +547,7 @@ export default function SecuritySettingsPage() {
       </Card>
 
       {/* Active Sessions */}
-      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+      <Card className="border-2 border-border rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl shadow-md">
@@ -564,14 +564,14 @@ export default function SecuritySettingsPage() {
             {sessions.map((session) => (
               <div
                 key={session.id}
-                className="flex items-center justify-between py-3 border-b border-slate-200 last:border-0"
+                className="flex items-center justify-between py-3 border-b border-border last:border-0"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-slate-500/10 to-slate-600/5 rounded-xl shadow-md">
-                    <Monitor className="h-4 w-4 text-slate-600" />
+                  <div className="p-2 bg-gradient-to-br from-muted-foreground/10 to-muted-foreground/5 rounded-xl shadow-md">
+                    <Monitor className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900 flex items-center gap-2">
+                    <p className="font-bold text-foreground flex items-center gap-2">
                       {session.device}
                       {session.isCurrent && (
                         <Badge variant="default" size="sm">
@@ -579,7 +579,7 @@ export default function SecuritySettingsPage() {
                         </Badge>
                       )}
                     </p>
-                    <p className="text-sm text-slate-600 font-medium">
+                    <p className="text-sm text-muted-foreground font-medium">
                       {session.location} • {session.lastActive}
                     </p>
                   </div>
@@ -597,7 +597,7 @@ export default function SecuritySettingsPage() {
             ))}
           </div>
 
-          <div className="mt-4 pt-4 border-t border-slate-200">
+          <div className="mt-4 pt-4 border-t border-border">
             <Button
               variant="destructive"
               onClick={handleLogoutAllDevices}
@@ -611,7 +611,7 @@ export default function SecuritySettingsPage() {
       </Card>
 
       {/* Account Email */}
-      <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+      <Card className="border-2 border-border rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
@@ -626,8 +626,8 @@ export default function SecuritySettingsPage() {
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-bold text-slate-900">{user?.email}</p>
-              <p className="text-sm text-slate-600 font-medium">
+              <p className="font-bold text-foreground">{user?.email}</p>
+              <p className="text-sm text-muted-foreground font-medium">
                 Contact support to change your email address
               </p>
             </div>

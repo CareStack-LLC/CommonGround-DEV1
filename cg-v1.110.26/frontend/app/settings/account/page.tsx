@@ -144,10 +144,10 @@ export default function AccountSettingsPage() {
           <User className="w-6 h-6 text-blue-600" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Account Settings
           </h2>
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-muted-foreground font-medium">
             Manage your profile and contact information
           </p>
         </div>
@@ -155,7 +155,7 @@ export default function AccountSettingsPage() {
 
       {/* Success Alert */}
       {showSuccess && (
-        <Alert className="bg-emerald-50 border-emerald-200 rounded-2xl shadow-lg">
+        <Alert className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 rounded-2xl shadow-lg">
           <CheckCircle className="h-4 w-4 text-emerald-600" />
           <AlertDescription className="text-emerald-600 font-medium">
             Your changes have been saved successfully.
@@ -172,7 +172,7 @@ export default function AccountSettingsPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Profile Information */}
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
@@ -230,7 +230,7 @@ export default function AccountSettingsPage() {
         </Card>
 
         {/* Contact Information */}
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
@@ -289,7 +289,7 @@ export default function AccountSettingsPage() {
                 name="timezone"
                 value={formData.timezone}
                 onChange={handleChange}
-                className="flex h-10 w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2 text-sm font-medium focus:border-[var(--portal-primary)] focus:outline-none focus:ring-0 transition-colors"
+                className="flex h-10 w-full rounded-xl border-2 border-border bg-card px-3 py-2 text-sm font-medium focus:border-[var(--portal-primary)] focus:outline-none focus:ring-0 transition-colors"
               >
                 {TIMEZONE_OPTIONS.map((tz) => (
                   <option key={tz.value} value={tz.value}>
@@ -305,7 +305,7 @@ export default function AccountSettingsPage() {
         </Card>
 
         {/* Address Information */}
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
@@ -418,7 +418,7 @@ export default function AccountSettingsPage() {
               setError(null);
               setShowSuccess(false);
             }}
-            className="px-6 py-2.5 bg-white border-2 border-slate-200 text-slate-700 rounded-xl font-bold hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+            className="px-6 py-2.5 bg-card border-2 border-border text-foreground rounded-xl font-bold hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
           >
             Cancel
           </button>

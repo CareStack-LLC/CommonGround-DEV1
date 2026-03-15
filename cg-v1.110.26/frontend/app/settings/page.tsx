@@ -80,7 +80,7 @@ export default function SettingsPage() {
             <button
               key={card.path}
               onClick={() => handleCardClick(card.path)}
-              className="group text-left bg-white rounded-2xl p-8 border-2 border-slate-200 shadow-lg
+              className="group text-left bg-card rounded-2xl p-8 border-2 border-border shadow-lg
                 hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300
                 hover:scale-[1.02] active:scale-[0.98]"
             >
@@ -92,16 +92,16 @@ export default function SettingsPage() {
                   <Icon className={`h-7 w-7 ${card.iconColor}`} />
                 </div>
 
-                <ArrowRight className="h-6 w-6 text-slate-400 group-hover:text-[var(--portal-primary)]
+                <ArrowRight className="h-6 w-6 text-muted-foreground group-hover:text-[var(--portal-primary)]
                   group-hover:translate-x-1 transition-all duration-300" />
               </div>
 
-              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-[var(--portal-primary)]
+              <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-[var(--portal-primary)]
                 transition-colors duration-300" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 {card.title}
               </h3>
 
-              <p className="text-sm text-slate-600 leading-relaxed font-medium">
+              <p className="text-sm text-muted-foreground leading-relaxed font-medium">
                 {card.description}
               </p>
             </button>
@@ -110,7 +110,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Help Section */}
-      <div className="bg-white rounded-2xl p-6 border-2 border-slate-200 shadow-lg">
+      <div className="bg-card rounded-2xl p-6 border-2 border-border shadow-lg">
         <div className="flex items-start gap-4">
           <div className="p-3 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl shadow-md">
             <svg
@@ -128,10 +128,10 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div className="flex-1">
-            <h4 className="text-base font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+            <h4 className="text-base font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               Need help with settings?
             </h4>
-            <p className="text-sm text-slate-600 font-medium">
+            <p className="text-sm text-muted-foreground font-medium">
               Visit our Help Center or contact support for assistance with your account configuration.
             </p>
           </div>
