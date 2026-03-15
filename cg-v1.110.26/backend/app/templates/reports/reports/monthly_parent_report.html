@@ -1,0 +1,453 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Monthly Parent Report - {{ month_name }} {{ year }}{% endblock %}
+
+{% block report_title %}Monthly Parent Report{% endblock %}
+{% block report_subtitle %}Comprehensive Co-Parenting Summary for {{ month_name }} {{ year }}{% endblock %}
+
+{% block content %}
+<!-- ================================================================== -->
+<!-- SECTION 1: Executive Summary                                       -->
+<!-- ================================================================== -->
+<section class="section">
+  <h2>Executive Summary</h2>
+
+  <!-- Overall Compliance Score -->
+  <div class="card keep-together" style="padding: var(--spacing-2xl); text-align: center; margin-bottom: var(--spacing-xl);">
+    <div class="text-sm text-muted uppercase tracking-wide font-bold" style="margin-bottom: var(--spacing-sm);">
+      Overall Compliance Score
+    </div>
+    <div style="font-size: 4.5rem; font-weight: 700; line-height: 1; color: {% if overall_compliance >= 90 %}var(--cg-sage){% elif overall_compliance >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %};">
+      {{ "%.0f"|format(overall_compliance) }}%
+    </div>
+    <div class="text-muted font-medium" style="margin-top: var(--spacing-sm);">
+      {{ month_name }} {{ year }}
+    </div>
+
+    <!-- Compliance breakdown bar -->
+    <div style="margin-top: var(--spacing-xl); max-width: 500px; margin-left: auto; margin-right: auto;">
+      <div style="height: 8px; background: var(--cg-border-light); border-radius: 4px; overflow: hidden;">
+        <div style="height: 100%; width: {{ overall_compliance }}%; background: {% if overall_compliance >= 90 %}var(--cg-sage){% elif overall_compliance >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %}; border-radius: 4px; transition: width 0.3s;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Highlights -->
+  {% if highlights %}
+  <div class="card" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+    <div class="card-header" style="border-bottom: none; padding-bottom: 0;">Key Highlights</div>
+    <ul style="margin: var(--spacing-md) 0 0 0; padding-left: 1.5rem;">
+      {% for highlight in highlights %}
+      <li style="padding: var(--spacing-xs) 0; color: var(--cg-text-secondary);">{{ highlight }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <!-- Summary Stat Cards -->
+  <div class="grid grid-4" style="gap: var(--spacing-lg);">
+    <div class="stat-card">
+      <div class="stat-value" style="font-size: 1.75rem;">{{ "%.0f"|format(exchange_stats.completion_rate) }}%</div>
+      <div class="stat-label">Exchange Rate</div>
+      <div class="stat-sublabel">{{ exchange_stats.completed }}/{{ exchange_stats.total }} completed</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value" style="font-size: 1.75rem;">{{ comm_stats.health_score }}</div>
+      <div class="stat-label">Comm. Health</div>
+      <div class="stat-sublabel">{{ comm_stats.total_messages }} messages</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value" style="font-size: 1.75rem;">{{ "%.0f"|format(expense_stats.compliance_rate) }}%</div>
+      <div class="stat-label">Financial</div>
+      <div class="stat-sublabel">{{ expense_stats.total_obligations }} obligations</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value" style="font-size: 1.75rem;">{{ "%.0f"|format(schedule_stats.gps_verification_rate) }}%</div>
+      <div class="stat-label">GPS Verified</div>
+      <div class="stat-sublabel">{{ schedule_stats.gps_verified }}/{{ schedule_stats.total_check_ins }} check-ins</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- SECTION 2: Custody Time                                            -->
+<!-- ================================================================== -->
+<section class="section" style="page-break-before: always;">
+  <h2>Custody Time</h2>
+
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: center;">
+      <!-- Parenting Time Split -->
+      <div>
+        <div class="text-sm text-muted uppercase tracking-wide font-bold" style="margin-bottom: var(--spacing-lg);">
+          Parenting Time Split
+        </div>
+
+        <div style="display: flex; gap: 3rem; margin-bottom: var(--spacing-xl);">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: #3B82F6;"></span>
+              <span class="font-bold text-primary">{{ parent_a_name }}</span>
+            </div>
+            <div style="font-size: 2rem; font-weight: 700; color: #3B82F6;">{{ "%.1f"|format(custody_stats.parent_a_percentage) }}%</div>
+            <div class="text-muted text-sm">{{ custody_stats.parent_a_days }} days</div>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: #F97316;"></span>
+              <span class="font-bold text-primary">{{ parent_b_name }}</span>
+            </div>
+            <div style="font-size: 2rem; font-weight: 700; color: #F97316;">{{ "%.1f"|format(custody_stats.parent_b_percentage) }}%</div>
+            <div class="text-muted text-sm">{{ custody_stats.parent_b_days }} days</div>
+          </div>
+        </div>
+
+        <!-- Split bar visualization -->
+        <div style="height: 12px; border-radius: 6px; overflow: hidden; display: flex;">
+          <div style="width: {{ custody_stats.parent_a_percentage }}%; background: #3B82F6;"></div>
+          <div style="width: {{ custody_stats.parent_b_percentage }}%; background: #F97316;"></div>
+        </div>
+      </div>
+
+      <!-- Exchange Compliance -->
+      <div>
+        <div class="text-sm text-muted uppercase tracking-wide font-bold" style="margin-bottom: var(--spacing-lg);">
+          Exchange Compliance
+        </div>
+
+        <div class="grid grid-3" style="gap: var(--spacing-md);">
+          <div class="stat-card" style="padding: var(--spacing-md);">
+            <div class="stat-value text-sage" style="font-size: 1.5rem;">{{ exchange_stats.completed }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">Completed</div>
+          </div>
+          <div class="stat-card" style="padding: var(--spacing-md);">
+            <div class="stat-value {% if exchange_stats.missed > 0 %}text-error{% else %}text-sage{% endif %}" style="font-size: 1.5rem;">{{ exchange_stats.missed }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">Missed</div>
+          </div>
+          <div class="stat-card" style="padding: var(--spacing-md);">
+            <div class="stat-value text-muted" style="font-size: 1.5rem;">{{ exchange_stats.cancelled }}</div>
+            <div class="stat-label" style="font-size: 0.7rem;">Cancelled</div>
+          </div>
+        </div>
+
+        <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-md); border-top: 1px solid var(--cg-border-light);">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span class="text-sm text-muted font-bold">Completion Rate</span>
+            <span style="font-size: 1.5rem; font-weight: 700; color: {% if exchange_stats.completion_rate >= 90 %}var(--cg-sage){% elif exchange_stats.completion_rate >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %};">
+              {{ "%.0f"|format(exchange_stats.completion_rate) }}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- SECTION 3: Communication                                           -->
+<!-- ================================================================== -->
+<section class="section" style="page-break-before: always;">
+  <h2>Communication</h2>
+
+  <div class="grid grid-3" style="gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+    <div class="stat-card">
+      <div class="stat-value">{{ comm_stats.total_messages }}</div>
+      <div class="stat-label">Total Messages</div>
+      <div class="stat-sublabel">this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value {% if comm_stats.flagged_messages > 0 %}text-error{% else %}text-sage{% endif %}">
+        {{ comm_stats.flagged_messages }}
+      </div>
+      <div class="stat-label">ARIA Interventions</div>
+      <div class="stat-sublabel">{{ "%.1f"|format(comm_stats.flag_rate) }}% flag rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: {% if comm_stats.health_score >= 80 %}var(--cg-sage){% elif comm_stats.health_score >= 60 %}var(--cg-amber){% else %}var(--cg-error){% endif %};">
+        {{ comm_stats.health_score }}
+      </div>
+      <div class="stat-label">Health Score</div>
+      <div class="stat-sublabel">
+        {% if comm_stats.trend == 'improving' %}Improving{% elif comm_stats.trend == 'worsening' %}Declining{% else %}Stable{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-parent communication scores -->
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div class="card-header" style="border-bottom: none; padding-bottom: var(--spacing-sm);">Communication Scores</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Parent</th>
+          <th>Messages Sent</th>
+          <th>Interventions</th>
+          <th>Good Faith Rate</th>
+          <th>Comm. Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>{{ parent_a_name }}</strong></td>
+          <td>{{ parent_a_comm.messages_sent }}</td>
+          <td>{{ parent_a_comm.interventions }}</td>
+          <td>{{ "%.0f"|format(parent_a_comm.good_faith_rate) }}%</td>
+          <td>
+            <span class="badge {% if parent_a_comm.communication_score >= 80 %}badge-success{% elif parent_a_comm.communication_score >= 60 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ parent_a_comm.communication_score }}
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>{{ parent_b_name }}</strong></td>
+          <td>{{ parent_b_comm.messages_sent }}</td>
+          <td>{{ parent_b_comm.interventions }}</td>
+          <td>{{ "%.0f"|format(parent_b_comm.good_faith_rate) }}%</td>
+          <td>
+            <span class="badge {% if parent_b_comm.communication_score >= 80 %}badge-success{% elif parent_b_comm.communication_score >= 60 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ parent_b_comm.communication_score }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- SECTION 4: Financial                                               -->
+<!-- ================================================================== -->
+<section class="section" style="page-break-before: always;">
+  <h2>Financial Summary</h2>
+
+  <div class="grid grid-3" style="gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+    <div class="stat-card">
+      <div class="stat-value">${{ "%.2f"|format(expense_stats.total_amount) }}</div>
+      <div class="stat-label">Total Obligations</div>
+      <div class="stat-sublabel">{{ expense_stats.total_obligations }} items</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value text-sage">${{ "%.2f"|format(expense_stats.funded_amount) }}</div>
+      <div class="stat-label">Amount Funded</div>
+      <div class="stat-sublabel">{{ "%.0f"|format(expense_stats.funding_rate) }}% funded</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: {% if expense_stats.compliance_rate >= 90 %}var(--cg-sage){% elif expense_stats.compliance_rate >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %};">
+        {{ "%.0f"|format(expense_stats.compliance_rate) }}%
+      </div>
+      <div class="stat-label">Compliance Rate</div>
+      <div class="stat-sublabel">
+        {% if expense_stats.overdue_count > 0 %}
+          {{ expense_stats.overdue_count }} overdue
+        {% else %}
+          all current
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Obligation status breakdown -->
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div class="card-header" style="border-bottom: none; padding-bottom: var(--spacing-sm);">Obligation Status</div>
+    <div class="grid grid-4" style="gap: var(--spacing-md); margin-top: var(--spacing-md);">
+      <div style="text-align: center; padding: var(--spacing-md); background: var(--cg-sage-subtle); border-radius: var(--radius-md);">
+        <div style="font-size: 1.5rem; font-weight: 700; color: var(--cg-sage-dark);">{{ expense_stats.completed_count }}</div>
+        <div class="text-sm text-muted">Completed</div>
+      </div>
+      <div style="text-align: center; padding: var(--spacing-md); background: #EFF6FF; border-radius: var(--radius-md);">
+        <div style="font-size: 1.5rem; font-weight: 700; color: var(--cg-info);">{{ expense_stats.funded_count }}</div>
+        <div class="text-sm text-muted">Funded</div>
+      </div>
+      <div style="text-align: center; padding: var(--spacing-md); background: var(--cg-amber-subtle); border-radius: var(--radius-md);">
+        <div style="font-size: 1.5rem; font-weight: 700; color: var(--cg-amber);">{{ expense_stats.open_count }}</div>
+        <div class="text-sm text-muted">Open</div>
+      </div>
+      <div style="text-align: center; padding: var(--spacing-md); background: #FEF2F2; border-radius: var(--radius-md);">
+        <div style="font-size: 1.5rem; font-weight: 700; color: var(--cg-error);">{{ expense_stats.overdue_count }}</div>
+        <div class="text-sm text-muted">Overdue</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- SECTION 5: Schedule & GPS                                          -->
+<!-- ================================================================== -->
+<section class="section" style="page-break-before: always;">
+  <h2>Schedule & Verification</h2>
+
+  <div class="grid grid-3" style="gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+    <div class="stat-card">
+      <div class="stat-value">{{ schedule_stats.total_exchanges }}</div>
+      <div class="stat-label">Total Exchanges</div>
+      <div class="stat-sublabel">{{ schedule_stats.total_days }} day period</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value text-sage">{{ schedule_stats.completed }}</div>
+      <div class="stat-label">Completed</div>
+      <div class="stat-sublabel">{{ "%.0f"|format(schedule_stats.completion_rate) }}% rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value {% if schedule_stats.missed > 0 %}text-error{% else %}text-sage{% endif %}">
+        {{ schedule_stats.missed }}
+      </div>
+      <div class="stat-label">Missed</div>
+      <div class="stat-sublabel">
+        {% if schedule_stats.cancelled > 0 %}{{ schedule_stats.cancelled }} cancelled{% else %}none cancelled{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- GPS Verification -->
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div class="card-header" style="border-bottom: none; padding-bottom: var(--spacing-sm);">GPS Verification</div>
+
+    <div class="grid grid-2" style="gap: var(--spacing-xl); margin-top: var(--spacing-md);">
+      <div>
+        <div class="text-sm text-muted uppercase tracking-wide font-bold" style="margin-bottom: var(--spacing-sm);">Verification Rate</div>
+        <div style="display: flex; align-items: baseline; gap: 0.75rem;">
+          <span style="font-size: 2.5rem; font-weight: 700; color: {% if schedule_stats.gps_verification_rate >= 90 %}var(--cg-sage){% elif schedule_stats.gps_verification_rate >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %};">
+            {{ "%.0f"|format(schedule_stats.gps_verification_rate) }}%
+          </span>
+          <span class="text-muted">of check-ins within geofence</span>
+        </div>
+
+        <!-- Progress bar -->
+        <div style="margin-top: var(--spacing-md); height: 8px; background: var(--cg-border-light); border-radius: 4px; overflow: hidden;">
+          <div style="height: 100%; width: {{ schedule_stats.gps_verification_rate }}%; background: {% if schedule_stats.gps_verification_rate >= 90 %}var(--cg-sage){% elif schedule_stats.gps_verification_rate >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %}; border-radius: 4px;"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="text-sm text-muted uppercase tracking-wide font-bold" style="margin-bottom: var(--spacing-sm);">Check-in Summary</div>
+        <table style="font-size: 13px;">
+          <tbody>
+            <tr>
+              <td class="text-muted">Total Check-ins</td>
+              <td style="text-align: right;"><strong>{{ schedule_stats.total_check_ins }}</strong></td>
+            </tr>
+            <tr>
+              <td class="text-muted">GPS Verified</td>
+              <td style="text-align: right;"><strong class="text-sage">{{ schedule_stats.gps_verified }}</strong></td>
+            </tr>
+            <tr>
+              <td class="text-muted">Avg. Distance</td>
+              <td style="text-align: right;"><strong>{{ "%.0f"|format(schedule_stats.avg_distance_meters) }}m</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================== -->
+<!-- SECTION 6: Monthly Trend Note                                      -->
+<!-- ================================================================== -->
+<section class="section">
+  <h2>Monthly Assessment</h2>
+
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div style="display: flex; align-items: flex-start; gap: var(--spacing-lg);">
+      <div style="min-width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;
+        background: {% if overall_compliance >= 90 %}var(--cg-sage-subtle){% elif overall_compliance >= 70 %}var(--cg-amber-subtle){% else %}#FEF2F2{% endif %};">
+        {% if overall_compliance >= 90 %}
+          <span style="color: var(--cg-sage-dark);">&#10003;</span>
+        {% elif overall_compliance >= 70 %}
+          <span style="color: var(--cg-amber);">&#9888;</span>
+        {% else %}
+          <span style="color: var(--cg-error);">&#9888;</span>
+        {% endif %}
+      </div>
+      <div>
+        <div class="font-bold text-primary" style="font-size: 1.1rem; margin-bottom: var(--spacing-sm);">
+          {% if overall_compliance >= 90 %}Excellent Month{% elif overall_compliance >= 75 %}Good Progress{% elif overall_compliance >= 60 %}Needs Attention{% else %}Action Required{% endif %}
+        </div>
+        <p class="text-secondary" style="margin: 0; line-height: 1.6;">
+          {{ trend_text }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compliance Weight Breakdown -->
+  <div class="card keep-together" style="padding: var(--spacing-xl); margin-top: var(--spacing-lg);">
+    <div class="card-header" style="border-bottom: none; padding-bottom: var(--spacing-sm);">Compliance Score Breakdown</div>
+    <table style="font-size: 13px; margin-top: var(--spacing-md);">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Score</th>
+          <th>Weight</th>
+          <th>Contribution</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Exchange Completion</td>
+          <td>
+            <span class="badge {% if exchange_stats.completion_rate >= 90 %}badge-success{% elif exchange_stats.completion_rate >= 70 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(exchange_stats.completion_rate) }}%
+            </span>
+          </td>
+          <td>35%</td>
+          <td class="font-mono">{{ "%.1f"|format(exchange_stats.completion_rate * 0.35) }}</td>
+        </tr>
+        <tr>
+          <td>Communication Health</td>
+          <td>
+            <span class="badge {% if comm_stats.health_score >= 80 %}badge-success{% elif comm_stats.health_score >= 60 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ comm_stats.health_score }}
+            </span>
+          </td>
+          <td>25%</td>
+          <td class="font-mono">{{ "%.1f"|format(comm_stats.health_score * 0.25) }}</td>
+        </tr>
+        <tr>
+          <td>Financial Compliance</td>
+          <td>
+            <span class="badge {% if expense_stats.compliance_rate >= 90 %}badge-success{% elif expense_stats.compliance_rate >= 70 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(expense_stats.compliance_rate) }}%
+            </span>
+          </td>
+          <td>25%</td>
+          <td class="font-mono">{{ "%.1f"|format(expense_stats.compliance_rate * 0.25) }}</td>
+        </tr>
+        <tr>
+          <td>GPS Verification</td>
+          <td>
+            <span class="badge {% if schedule_stats.gps_verification_rate >= 90 %}badge-success{% elif schedule_stats.gps_verification_rate >= 70 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(schedule_stats.gps_verification_rate) }}%
+            </span>
+          </td>
+          <td>15%</td>
+          <td class="font-mono">{{ "%.1f"|format(schedule_stats.gps_verification_rate * 0.15) }}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr style="border-top: 2px solid var(--cg-border); font-weight: 700;">
+          <td>Overall</td>
+          <td>
+            <span class="badge {% if overall_compliance >= 90 %}badge-success{% elif overall_compliance >= 70 %}badge-warning{% else %}badge-error{% endif %}">
+              {{ "%.0f"|format(overall_compliance) }}%
+            </span>
+          </td>
+          <td>100%</td>
+          <td class="font-mono">{{ "%.1f"|format(overall_compliance) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</section>
+
+<!-- Data Sources Note -->
+<div class="note info" style="margin-top: var(--spacing-3xl); background: white; border: 1px solid var(--cg-border);">
+  <strong class="text-primary">About This Report</strong><br>
+  This monthly report aggregates data from custody exchanges, ARIA-mediated messaging,
+  ClearFund financial obligations, and GPS-verified check-ins. All data is collected
+  automatically by the CommonGround platform and verified for accuracy.
+</div>
+{% endblock %}

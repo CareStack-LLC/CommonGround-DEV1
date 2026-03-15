@@ -3,9 +3,110 @@
 {% block title %}Schedule History - CommonGround{% endblock %}
 
 {% block report_title %}Events & Schedule Activity{% endblock %}
-{% block report_subtitle %}Calendar Events and Schedule Modifications{% endblock %}
+{% block report_subtitle %}Calendar Events, Exchange Compliance, and Schedule Modifications{% endblock %}
 
 {% block content %}
+
+<!-- Executive Summary Stats -->
+<section class="section">
+  <h2>Schedule Overview</h2>
+
+  <div class="grid grid-4" style="gap: var(--spacing-lg);">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_exchanges }}</div>
+      <div class="stat-label">Total Exchanges</div>
+      <div class="stat-sublabel">scheduled in period</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value text-sage">{{ stats.completed }}</div>
+      <div class="stat-label">Completed</div>
+      <div class="stat-sublabel">{{ "%.0f"|format(stats.completion_rate) }}% completion</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if stats.missed > 0 %}text-error{% else %}text-sage{% endif %}">
+        {{ stats.missed }}
+      </div>
+      <div class="stat-label">Missed</div>
+      <div class="stat-sublabel">no-show exchanges</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value slate">{{ stats.cancelled }}</div>
+      <div class="stat-label">Cancelled</div>
+      <div class="stat-sublabel">cancelled by parent</div>
+    </div>
+  </div>
+</section>
+
+<!-- Exchange Outcome Chart -->
+{% if outcome_donut %}
+<section class="section">
+  <h2>Exchange Outcomes</h2>
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div class="grid grid-2" style="align-items: center; gap: 3rem;">
+      <div style="text-align: center;">
+        {{ outcome_donut | safe }}
+      </div>
+      <div>
+        <h3 class="mt-0">Compliance Summary</h3>
+        <p style="color: var(--cg-text-secondary); margin-bottom: var(--spacing-lg);">
+          {% if stats.total_exchanges > 0 %}
+          {% set rate = (stats.completed / stats.total_exchanges * 100) %}
+          {% if rate >= 90 %}
+          Excellent exchange compliance at <strong class="text-sage">{{ "%.0f"|format(rate) }}%</strong>.
+          Both parents are maintaining a consistent schedule.
+          {% elif rate >= 70 %}
+          Good exchange compliance at <strong class="text-amber">{{ "%.0f"|format(rate) }}%</strong>.
+          Some missed exchanges may need attention.
+          {% else %}
+          Exchange compliance is at <strong class="text-error">{{ "%.0f"|format(rate) }}%</strong>.
+          Multiple missed exchanges may indicate scheduling difficulties.
+          {% endif %}
+          {% else %}
+          No exchanges were scheduled during this reporting period.
+          {% endif %}
+        </p>
+
+        {% if stats.missed > 0 %}
+        <div class="note warning" style="margin: 0;">
+          <strong>{{ stats.missed }} exchange{{ 's' if stats.missed > 1 }} missed</strong> during this period.
+          Missed exchanges are logged and impact compliance metrics.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- GPS Verification Comparison -->
+{% if parent_comparison_chart %}
+<section class="section">
+  <h2>GPS Verification Rate by Parent</h2>
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <p class="text-muted" style="margin-bottom: var(--spacing-lg);">
+      Percentage of exchanges where each parent checked in via GPS at the designated location.
+    </p>
+    <div style="text-align: center;">
+      {{ parent_comparison_chart | safe }}
+    </div>
+    <div class="grid grid-2" style="margin-top: var(--spacing-xl); gap: var(--spacing-xl);">
+      <div class="stat-card">
+        <div class="stat-value text-sage">{{ "%.0f"|format(parent_a_stats.geofence_rate) }}%</div>
+        <div class="stat-label">{{ parent_a_name }}</div>
+        <div class="stat-sublabel">{{ parent_a_stats.in_geofence }} of {{ parent_a_stats.check_ins }} verified</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value slate">{{ "%.0f"|format(parent_b_stats.geofence_rate) }}%</div>
+        <div class="stat-label">{{ parent_b_name }}</div>
+        <div class="stat-sublabel">{{ parent_b_stats.in_geofence }} of {{ parent_b_stats.check_ins }} verified</div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
 
 <!-- Calendar Events Section -->
 {% if calendar_events %}
@@ -99,7 +200,7 @@
           <td>
             {% if mod.modification_approved %}
             <div style="display: flex; align-items: center; font-size: 0.85rem; color: var(--cg-sage-dark);">
-              <span style="margin-right: 4px; font-weight: bold;">✓</span>
+              <span style="margin-right: 4px; font-weight: bold;">&#10003;</span>
               <span>Approved by {{ parent_a_name if mod.modification_approved_by == family_file.parent_a_id else
                 parent_b_name }}</span>
             </div>
@@ -113,6 +214,58 @@
         {% endfor %}
       </tbody>
     </table>
+  </div>
+</section>
+{% endif %}
+
+<!-- Exchange Detail Log -->
+{% if exchanges %}
+<section class="section">
+  <h2>Exchange Detail Log</h2>
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table class="full-width" style="font-size: 9pt;">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>Drop-off Check-in</th>
+          <th>Pick-up Check-in</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exchange in exchanges[:30] %}
+        <tr>
+          <td style="font-weight: 500;">{{ exchange.scheduled_time.strftime('%b %d, %Y') }}</td>
+          <td>{{ exchange.scheduled_time.strftime('%I:%M %p') if exchange.scheduled_time else 'N/A' }}</td>
+          <td>
+            <span class="badge {% if exchange.status == 'completed' %}badge-success{% elif exchange.status == 'missed' %}badge-error{% else %}badge-info{% endif %}">
+              {{ exchange.status|title }}
+            </span>
+          </td>
+          <td>
+            {% if exchange.from_parent_checked_in %}
+            <span class="text-sage font-bold">&#10003; Verified</span>
+            {% else %}
+            <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if exchange.to_parent_checked_in %}
+            <span class="text-sage font-bold">&#10003; Verified</span>
+            {% else %}
+            <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if exchanges|length > 30 %}
+    <p class="text-muted text-center" style="padding: var(--spacing-md); font-size: 9pt; font-style: italic;">
+      Showing 30 of {{ exchanges|length }} exchanges. Full log available in platform.
+    </p>
+    {% endif %}
   </div>
 </section>
 {% endif %}

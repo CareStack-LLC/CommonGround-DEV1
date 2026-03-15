@@ -1,0 +1,269 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}KidSpace Communication Report - CommonGround{% endblock %}
+
+{% block report_title %}KidSpace Communication Report{% endblock %}
+{% block report_subtitle %}Child Communication Activity and Circle Contact Summary{% endblock %}
+
+{% block content %}
+<!-- Executive Summary Section -->
+<section class="section">
+  <h2>Executive Summary</h2>
+
+  <div class="grid grid-4" style="gap: var(--spacing-lg);">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_sessions }}</div>
+      <div class="stat-label">Total Sessions</div>
+      <div class="stat-sublabel">in report period</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.total_duration_mins }}</div>
+      <div class="stat-label">Total Duration</div>
+      <div class="stat-sublabel">minutes</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value">{{ stats.unique_contacts }}</div>
+      <div class="stat-label">Unique Contacts</div>
+      <div class="stat-sublabel">circle members</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-value {% if stats.aria_flags > 0 %}text-error{% else %}text-sage{% endif %}">
+        {{ stats.aria_flags }}
+      </div>
+      <div class="stat-label">ARIA Flags</div>
+      <div class="stat-sublabel">flagged messages</div>
+    </div>
+  </div>
+</section>
+
+<!-- Session Type Distribution -->
+{% if session_type_chart %}
+<section class="section">
+  <h2>Session Type Distribution</h2>
+
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div style="text-align: center;">
+      {{ session_type_chart | safe }}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Session Breakdown Section -->
+<section class="section">
+  <h2>Session Breakdown</h2>
+
+  {% if sessions %}
+  <div class="card keep-together">
+    <div class="card-header">Communication Sessions Log</div>
+    <table style="font-size: 13px;">
+      <thead>
+        <tr style="background: var(--cg-slate-subtle);">
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Date</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Child</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Type</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Duration</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Contact</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for session in sessions[:30] %}
+        <tr style="{% if loop.index is odd %}background: #FCFCFC;{% endif %} border-bottom: 1px solid var(--cg-border-light);">
+          <td style="padding: 10px 16px; font-weight: 500;">
+            {{ session.started_at.strftime('%b %d, %Y') if session.started_at else 'Scheduled' }}
+          </td>
+          <td style="padding: 10px 16px; color: var(--cg-text-secondary);">
+            {{ session.child.first_name if session.child else 'N/A' }}
+          </td>
+          <td style="padding: 10px 16px;">
+            <span class="badge badge-info" style="font-size: 11px; padding: 3px 8px;">
+              {{ session.session_type | replace('_', ' ') | title }}
+            </span>
+          </td>
+          <td style="padding: 10px 16px; color: var(--cg-text-secondary);">
+            {% if session.duration_seconds %}
+              {{ (session.duration_seconds / 60) | round(0) | int }} min
+            {% else %}
+              --
+            {% endif %}
+          </td>
+          <td style="padding: 10px 16px; color: var(--cg-text-secondary);">
+            {% if session.circle_contact %}
+              {{ session.circle_contact.contact_name }}
+            {% else %}
+              Parent
+            {% endif %}
+          </td>
+          <td style="padding: 10px 16px;">
+            <span class="badge {% if session.status == 'completed' %}badge-success{% elif session.status == 'missed' %}badge-error{% elif session.status == 'active' %}badge-info{% else %}badge-warning{% endif %}"
+              style="font-size: 11px; padding: 3px 8px;">
+              {{ session.status | title }}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if sessions|length > 30 %}
+    <p class="text-muted text-center" style="margin-top: var(--spacing-md); font-size: 12px; font-style: italic;">
+      Showing recent 30 of {{ sessions|length }} sessions. Full history available in platform.
+    </p>
+    {% endif %}
+  </div>
+  {% else %}
+  <div class="card" style="padding: var(--spacing-xl); text-align: center;">
+    <p class="text-muted">No KidSpace communication sessions recorded during this period.</p>
+  </div>
+  {% endif %}
+</section>
+
+<!-- Circle Contact Activity Section -->
+{% if contact_activity %}
+<section class="section">
+  <h2>Circle Contact Activity</h2>
+
+  <div class="card keep-together">
+    <div class="card-header">Contact Communication Summary</div>
+    <table style="font-size: 13px;">
+      <thead>
+        <tr style="background: var(--cg-slate-subtle);">
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Contact</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border);">Relationship</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border); text-align: center;">Sessions</th>
+          <th style="padding: 10px 16px; border-bottom: 2px solid var(--cg-border); text-align: center;">Total Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contact in contact_activity %}
+        <tr style="{% if loop.index is odd %}background: #FCFCFC;{% endif %} border-bottom: 1px solid var(--cg-border-light);">
+          <td style="padding: 10px 16px; font-weight: 600; color: var(--cg-text-primary);">
+            {{ contact.contact_name }}
+          </td>
+          <td style="padding: 10px 16px; color: var(--cg-text-secondary);">
+            {{ contact.relationship | replace('_', ' ') | title }}
+          </td>
+          <td style="padding: 10px 16px; text-align: center;">
+            <span class="badge" style="background: var(--cg-slate-subtle);">{{ contact.sessions_count }}</span>
+          </td>
+          <td style="padding: 10px 16px; text-align: center; color: var(--cg-text-secondary);">
+            {{ contact.total_duration_mins }} min
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<!-- Communication Schedule Compliance Section -->
+<section class="section">
+  <h2>Communication Schedule Compliance</h2>
+
+  <div class="card keep-together" style="padding: var(--spacing-xl);">
+    <div class="grid grid-2" style="gap: var(--spacing-xl);">
+      <div style="text-align: center;">
+        <div style="font-size: 3rem; font-weight: 700; color: {% if stats.compliance_rate >= 90 %}var(--cg-sage){% elif stats.compliance_rate >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %};">
+          {{ "%.0f"|format(stats.compliance_rate) }}%
+        </div>
+        <div class="text-muted font-medium" style="margin-top: 0.5rem;">Schedule Compliance Rate</div>
+        <div class="text-muted text-sm" style="margin-top: 0.25rem;">
+          Sessions within allowed hours
+        </div>
+      </div>
+      <div>
+        <p style="color: var(--cg-text-secondary); margin-bottom: var(--spacing-lg);">
+          KidSpace monitors whether communication sessions occur within the allowed schedule
+          defined in the family settings. Sessions outside allowed hours are flagged for
+          parental review.
+        </p>
+        <div class="note {% if stats.compliance_rate >= 90 %}info{% elif stats.compliance_rate >= 70 %}warning{% else %}warning{% endif %}">
+          {% if stats.compliance_rate >= 90 %}
+          <strong class="text-sage">Excellent.</strong> Communication sessions are occurring within allowed hours consistently.
+          {% elif stats.compliance_rate >= 70 %}
+          <strong class="text-amber">Moderate.</strong> Most sessions are within schedule but some occurred outside allowed hours.
+          {% else %}
+          <strong class="text-error">Needs Attention.</strong> Multiple sessions occurred outside allowed communication hours.
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARIA Flags Section -->
+{% if flagged_messages %}
+<section class="section">
+  <h2>ARIA Flagged Messages</h2>
+
+  <div class="note warning mb-md">
+    ARIA monitors KidSpace communications for child safety. The following messages were flagged for parental review.
+  </div>
+
+  {% for msg in flagged_messages %}
+  <div class="card keep-together" style="margin-bottom: 1.5rem; border-left: 4px solid var(--cg-error);">
+    <!-- Metadata Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--cg-border-light);">
+      <div>
+        <span style="font-weight: 700; color: var(--cg-text-primary); font-size: 1.1em;">{{ msg.sender_name }}</span>
+        <span style="color: var(--cg-text-muted); font-size: 0.9em;"> &bull; {{ msg.sent_at.strftime('%b %d, %Y at %I:%M %p') }}</span>
+      </div>
+      <div>
+        {% if msg.aria_category %}
+        <span class="badge badge-error" style="font-size: 11px; padding: 3px 8px;">{{ msg.aria_category | replace('_', ' ') | title }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Flagged Content -->
+    <div style="padding: 1rem; background-color: #FEF2F2; border-radius: 6px; border: 1px solid #FEE2E2;">
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.75em; color: var(--cg-error); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Flagged Content</span>
+      </div>
+      <div style="color: var(--cg-text-primary); font-weight: 500;">"{{ msg.content }}"</div>
+      {% if msg.aria_reason %}
+      <div style="margin-top: 0.75rem; font-size: 0.85em; color: var(--cg-text-secondary); font-style: italic;">
+        Reason: {{ msg.aria_reason }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+<!-- Children Summary Section -->
+{% if children %}
+<section class="section">
+  <h2>Children in KidSpace</h2>
+
+  <div class="grid grid-3" style="gap: var(--spacing-lg);">
+    {% for child in children %}
+    <div class="card" style="padding: var(--spacing-lg); text-align: center;">
+      <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--cg-sage-subtle); color: var(--cg-sage-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; margin: 0 auto var(--spacing-md);">
+        {{ child.first_name[0] }}
+      </div>
+      <div class="font-bold text-primary" style="font-size: 1.1em;">{{ child.first_name }} {{ child.last_name }}</div>
+      {% if child.date_of_birth %}
+      <div class="text-muted text-sm" style="margin-top: 4px;">Age {{ child.age if child.age is defined else '' }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- Data Sources Note -->
+<div class="note info" style="margin-top: var(--spacing-3xl); background: white; border: 1px solid var(--cg-border);">
+  <strong class="text-primary">How This Data Was Collected</strong><br>
+  KidSpace communication data is recorded from video calls, chat sessions, and theater sessions
+  conducted through the CommonGround KidComs system. All sessions are monitored by ARIA for
+  child safety. Circle contact activity is tracked from approved contacts within the family's
+  communication circle. Session durations are calculated from start/end timestamps recorded
+  by the Daily.co video infrastructure.
+</div>
+{% endblock %}

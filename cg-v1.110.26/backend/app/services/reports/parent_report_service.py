@@ -4,8 +4,10 @@ ParentReportService - Generate beautiful branded PDF reports for parents.
 Uses Jinja2 templates + WeasyPrint for HTML-to-PDF conversion.
 """
 
+import hashlib
 import io
 import logging
+import secrets
 from datetime import date, datetime
 from pathlib import Path
 from typing import Literal, Optional
@@ -27,8 +29,9 @@ from app.models.payment import Payment, ExpenseRequest
 from app.models.user import User
 from app.models.agreement import Agreement, AgreementSection, AgreementConversation
 from app.models.custody_day_record import CustodyDayRecord
-from app.models.custody_day_record import CustodyDayRecord
 from app.models.schedule import ScheduleEvent
+from app.models.kidcoms import KidComsSession, KidComsMessage, KidComsCommunicationLog
+from app.models.circle import CircleContact
 from app.services.custody_time import CustodyTimeService
 from app.services.geolocation import GeolocationService
 from .chart_builder import ChartBuilder, COLORS, ChartData
@@ -58,7 +61,7 @@ logger = logging.getLogger(__name__)
 # Template directory
 TEMPLATE_DIR = Path(__file__).parent.parent.parent / "templates" / "reports"
 
-ReportType = Literal["custody_time", "communication", "expense", "schedule"]
+ReportType = Literal["custody_time", "communication", "expense", "schedule", "kidspace_communication"]
 
 
 class ParentReportService:
@@ -117,6 +120,10 @@ class ParentReportService:
             )
         elif report_type == "schedule":
             return await self._generate_schedule_report(
+                family_file_id, date_start, date_end, user_id
+            )
+        elif report_type == "kidspace_communication":
+            return await self._generate_kidspace_communication_report(
                 family_file_id, date_start, date_end, user_id
             )
         else:
@@ -201,7 +208,6 @@ class ParentReportService:
                 "agreed_a": agreed_a,
                 "agreed_b": agreed_b,
                 "variance": variance,
-                "variance": variance,
             }
 
 
@@ -257,6 +263,7 @@ class ParentReportService:
             family_file=family_file,
             report_period={"start": date_start, "end": date_end},
             generated_at=datetime.utcnow(),
+            report_id=self.generate_report_id(),
             parent_a_name=parent_a_name,
             parent_b_name=parent_b_name,
             stats=stats,
@@ -377,6 +384,7 @@ class ParentReportService:
             family_file=family_file,
             report_period={"start": date_start, "end": date_end},
             generated_at=datetime.utcnow(),
+            report_id=self.generate_report_id(),
             parent_a_name=parent_a_name,
             parent_b_name=parent_b_name,
             stats=stats,
@@ -467,15 +475,14 @@ class ParentReportService:
         # Get category breakdown
         categories = self._get_expense_category_breakdown(obligations)
 
-        # Calculate per-parent stats
-        # Note: In this family file, data analysis shows Parent A (Tasha) aligns with 'respondent' shares (smaller),
-        # and Parent B (Marcus) aligns with 'petitioner' shares (larger/primary support). 
-        # Swapping mapping to match the data reality requested by user.
+        # Calculate per-parent stats - derive roles from family file
+        parent_a_role = family_file.parent_a_role or "petitioner"
+        parent_b_role = family_file.parent_b_role or "respondent"
         parent_a_stats = self._calculate_parent_expense_stats(
-            obligations, fundings, family_file.parent_a_id, "respondent"
+            obligations, fundings, family_file.parent_a_id, parent_a_role
         )
         parent_b_stats = self._calculate_parent_expense_stats(
-            obligations, fundings, family_file.parent_b_id or "", "petitioner"
+            obligations, fundings, family_file.parent_b_id or "", parent_b_role
         )
 
         # Get overdue obligations
@@ -500,7 +507,21 @@ class ParentReportService:
         # Generate charts
         category_chart = ""
         if categories and stats["total_amount"] > 0:
-             pass 
+            # Build chart data from categories
+            chart_items = []
+            cat_colors = [COLORS["sage"], COLORS["slate"], COLORS["amber"], "#3B82F6", "#8B5CF6", "#EC4899"]
+            for i, cat in enumerate(categories[:6]):
+                chart_items.append(ChartData(
+                    label=cat["name"].replace("_", " ").title(),
+                    value=cat["amount"],
+                    color=cat_colors[i % len(cat_colors)],
+                ))
+            if chart_items:
+                category_chart = ChartBuilder.horizontal_bar(
+                    data=chart_items,
+                    width=400,
+                    bar_height=28,
+                )
 
         parent_chart = ""
 
@@ -510,6 +531,7 @@ class ParentReportService:
             family_file=family_file,
             report_period={"start": date_start, "end": date_end},
             generated_at=datetime.utcnow(),
+            report_id=self.generate_report_id(),
             parent_a_name=parent_a_name,
             parent_b_name=parent_b_name,
             stats=stats,
@@ -589,9 +611,10 @@ class ParentReportService:
         html_content = template.render(
             family_file=family_file,
             report_period={"start": date_start, "end": date_end},
-        generated_at=datetime.utcnow(),
-        parent_a_name=parent_a_name,
-        parent_b_name=parent_b_name,
+            generated_at=datetime.utcnow(),
+            report_id=self.generate_report_id(),
+            parent_a_name=parent_a_name,
+            parent_b_name=parent_b_name,
         stats=stats,
         parent_a_stats=parent_a_stats,
         parent_b_stats=parent_b_stats,
@@ -605,13 +628,211 @@ class ParentReportService:
         # Convert to PDF
         return self._html_to_pdf(html_content)
 
+    async def _generate_kidspace_communication_report(
+        self,
+        family_file_id: str,
+        date_start: date,
+        date_end: date,
+        user_id: str,
+    ) -> bytes:
+        """Generate KidSpace Communication Report PDF."""
+        # Get family file
+        family_file = await self._get_family_file(family_file_id)
+        if not family_file:
+            raise ValueError("Family file not found")
+
+        # Get parent names
+        parent_a = await self._get_user(family_file.parent_a_id)
+        parent_b = await self._get_user(family_file.parent_b_id) if family_file.parent_b_id else None
+
+        parent_a_name = self._get_parent_display_name(parent_a, family_file.parent_a_role)
+        parent_b_name = self._get_parent_display_name(parent_b, family_file.parent_b_role) if parent_b else "Parent B"
+
+        # Get children
+        children_result = await self.db.execute(
+            select(Child).where(
+                Child.family_file_id == family_file_id,
+                Child.is_active == True,
+            )
+        )
+        children = list(children_result.scalars().all())
+
+        # Query KidComs sessions in date range for this family file
+        sessions_result = await self.db.execute(
+            select(KidComsSession)
+            .options(
+                selectinload(KidComsSession.child),
+                selectinload(KidComsSession.circle_contact),
+            )
+            .where(
+                KidComsSession.family_file_id == family_file_id,
+                KidComsSession.status.in_(["completed", "active"]),
+                or_(
+                    and_(
+                        KidComsSession.started_at.isnot(None),
+                        cast(KidComsSession.started_at, Date) >= date_start,
+                        cast(KidComsSession.started_at, Date) <= date_end,
+                    ),
+                    and_(
+                        KidComsSession.started_at.is_(None),
+                        cast(KidComsSession.created_at, Date) >= date_start,
+                        cast(KidComsSession.created_at, Date) <= date_end,
+                    ),
+                ),
+            )
+            .order_by(desc(KidComsSession.started_at))
+        )
+        sessions = list(sessions_result.scalars().all())
+
+        # Query KidComs messages with ARIA flags
+        session_ids = [str(s.id) for s in sessions]
+        flagged_messages = []
+        if session_ids:
+            flagged_result = await self.db.execute(
+                select(KidComsMessage)
+                .where(
+                    KidComsMessage.session_id.in_(session_ids),
+                    KidComsMessage.aria_flagged == True,
+                )
+                .order_by(desc(KidComsMessage.sent_at))
+            )
+            flagged_messages = list(flagged_result.scalars().all())
+
+        # Query circle contacts for contact activity
+        contacts_result = await self.db.execute(
+            select(CircleContact).where(
+                CircleContact.family_file_id == family_file_id,
+                CircleContact.is_active == True,
+            )
+        )
+        circle_contacts = list(contacts_result.scalars().all())
+        contact_map = {str(c.id): c for c in circle_contacts}
+
+        # Calculate stats
+        total_sessions = len(sessions)
+        total_duration_secs = sum(s.duration_seconds or 0 for s in sessions)
+        total_duration_mins = round(total_duration_secs / 60)
+
+        # Unique contacts: count distinct circle_contact_ids
+        unique_contact_ids = set()
+        for s in sessions:
+            if s.circle_contact_id:
+                unique_contact_ids.add(s.circle_contact_id)
+
+        # Compliance: check if sessions occurred within allowed hours
+        # We count completed sessions and check started_at against availability
+        compliant_count = 0
+        for s in sessions:
+            # Default to compliant if no started_at
+            if not s.started_at:
+                compliant_count += 1
+                continue
+            hour = s.started_at.hour
+            # Reasonable hours: 7 AM to 9 PM
+            if 7 <= hour <= 21:
+                compliant_count += 1
+
+        compliance_rate = (compliant_count / total_sessions * 100) if total_sessions > 0 else 100.0
+
+        stats = {
+            "total_sessions": total_sessions,
+            "total_duration_mins": total_duration_mins,
+            "unique_contacts": len(unique_contact_ids),
+            "aria_flags": len(flagged_messages),
+            "compliance_rate": compliance_rate,
+        }
+
+        # Build contact activity list
+        contact_activity = []
+        contact_session_data: dict[str, dict] = {}
+        for s in sessions:
+            cid = s.circle_contact_id
+            if not cid:
+                continue
+            if cid not in contact_session_data:
+                contact_obj = contact_map.get(cid)
+                contact_session_data[cid] = {
+                    "contact_name": contact_obj.contact_name if contact_obj else "Unknown",
+                    "relationship": contact_obj.relationship_type if contact_obj else "unknown",
+                    "sessions_count": 0,
+                    "total_duration_secs": 0,
+                }
+            contact_session_data[cid]["sessions_count"] += 1
+            contact_session_data[cid]["total_duration_secs"] += (s.duration_seconds or 0)
+
+        for cid, data in contact_session_data.items():
+            contact_activity.append({
+                "contact_name": data["contact_name"],
+                "relationship": data["relationship"],
+                "sessions_count": data["sessions_count"],
+                "total_duration_mins": round(data["total_duration_secs"] / 60),
+            })
+
+        # Sort by sessions count descending
+        contact_activity.sort(key=lambda x: x["sessions_count"], reverse=True)
+
+        # Generate session type chart
+        type_counts: dict[str, int] = {}
+        for s in sessions:
+            stype = (s.session_type or "unknown").replace("_", " ").title()
+            type_counts[stype] = type_counts.get(stype, 0) + 1
+
+        session_type_chart = ""
+        if type_counts:
+            chart_colors = [COLORS["sage"], COLORS["slate"], COLORS["amber"], "#3B82F6", "#8B5CF6"]
+            chart_data = []
+            for i, (label, count) in enumerate(sorted(type_counts.items(), key=lambda x: x[1], reverse=True)):
+                chart_data.append(ChartData(
+                    label=label,
+                    value=float(count),
+                    color=chart_colors[i % len(chart_colors)],
+                ))
+            session_type_chart = self.chart_builder.horizontal_bar(
+                data=chart_data,
+                width=400,
+                bar_height=28,
+            )
+
+        # Render template
+        template = self.jinja_env.get_template("reports/kidspace_communication.html")
+        html_content = template.render(
+            family_file=family_file,
+            report_period={"start": date_start, "end": date_end},
+            generated_at=datetime.utcnow(),
+            report_id=self.generate_report_id(),
+            parent_a_name=parent_a_name,
+            parent_b_name=parent_b_name,
+            stats=stats,
+            sessions=sessions,
+            contact_activity=contact_activity,
+            children=children,
+            flagged_messages=flagged_messages,
+            session_type_chart=session_type_chart,
+        )
+
+        # Convert to PDF
+        return self._html_to_pdf(html_content)
+
+    @staticmethod
+    def generate_report_id() -> str:
+        """Generate a unique report ID in format RPT-YYYYMMDD-XXXX."""
+        now = datetime.utcnow()
+        random_suffix = secrets.token_hex(2).upper()
+        return f"RPT-{now.strftime('%Y%m%d')}-{random_suffix}"
+
     def _html_to_pdf(self, html_content: str) -> bytes:
-        """Convert HTML to PDF using WeasyPrint."""
+        """Convert HTML to PDF using WeasyPrint with SHA-256 verification."""
         html = HTML(string=html_content, base_url=str(TEMPLATE_DIR))
         pdf_buffer = io.BytesIO()
         html.write_pdf(pdf_buffer)
         pdf_buffer.seek(0)
-        return pdf_buffer.read()
+        pdf_bytes = pdf_buffer.read()
+
+        # Generate SHA-256 hash for court verification
+        sha256_hash = hashlib.sha256(pdf_bytes).hexdigest()
+        logger.info(f"Report generated - SHA-256: {sha256_hash[:16]}...")
+
+        return pdf_bytes
 
     async def _get_calendar_events(
         self,

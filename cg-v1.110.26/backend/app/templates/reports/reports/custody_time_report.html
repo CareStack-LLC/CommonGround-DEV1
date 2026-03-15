@@ -6,7 +6,45 @@
 {% block report_subtitle %}Parenting Time Analysis and Compliance Summary{% endblock %}
 
 {% block content %}
-<!-- Agreement Summary Section (Top) -->
+<!-- Executive Summary -->
+<section class="section">
+  <h2>Executive Summary</h2>
+  <div class="card keep-together" style="padding: var(--spacing-xl); background: var(--cg-sage-subtle); border: 1px solid var(--cg-sage-light);">
+    <div class="grid grid-3" style="gap: var(--spacing-xl); text-align: center;">
+      <div>
+        <div class="text-sm text-muted uppercase tracking-wide font-bold mb-xs">Custody Split</div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--cg-text-primary);">
+          {{ "%.0f"|format(stats.parent_a_percentage) }} / {{ "%.0f"|format(stats.parent_b_percentage) }}
+        </div>
+        <div class="text-sm text-muted">{{ parent_a_name }} / {{ parent_b_name }}</div>
+      </div>
+      <div>
+        <div class="text-sm text-muted uppercase tracking-wide font-bold mb-xs">Exchange Compliance</div>
+        <div style="font-size: 2rem; font-weight: 700; color: {% if exchange_stats.completion_rate >= 90 %}var(--cg-sage){% elif exchange_stats.completion_rate >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %};">
+          {{ "%.0f"|format(exchange_stats.completion_rate) }}%
+        </div>
+        <div class="text-sm text-muted">{{ exchange_stats.completed }}/{{ exchange_stats.total }} completed</div>
+      </div>
+      <div>
+        <div class="text-sm text-muted uppercase tracking-wide font-bold mb-xs">Report Period</div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--cg-text-primary);">{{ stats.total_days }}</div>
+        <div class="text-sm text-muted">days recorded</div>
+      </div>
+    </div>
+    {% if comparison and comparison.variance|abs > 5 %}
+    <div class="note {% if comparison.variance|abs > 10 %}warning{% else %}info{% endif %}" style="margin-top: var(--spacing-lg); margin-bottom: 0;">
+      <strong>Key Finding:</strong>
+      {% if comparison.variance > 0 %}
+      {{ parent_a_name }} had {{ "%.1f"|format(comparison.variance|abs) }}% more custody time than agreed.
+      {% else %}
+      {{ parent_a_name }} had {{ "%.1f"|format(comparison.variance|abs) }}% less custody time than agreed.
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Agreement Summary Section -->
 {% if agreement %}
 <section class="section">
   <h2>Agreement Summary</h2>
@@ -300,6 +338,54 @@
 </section>
 {% endif %}
 
+
+<!-- Per-Child Custody Breakdown -->
+{% if children and children|length > 1 %}
+<section class="section">
+  <h2>Per-Child Custody Breakdown</h2>
+  <div class="card keep-together" style="padding: 0; overflow: hidden;">
+    <table class="full-width">
+      <thead>
+        <tr>
+          <th>Child</th>
+          <th style="text-align: center; color: var(--cg-sage);">{{ parent_a_name }}</th>
+          <th style="text-align: center; color: var(--cg-slate);">{{ parent_b_name }}</th>
+          <th style="text-align: center;">Variance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for child in children %}
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="width: 28px; height: 28px; border-radius: 50%; background: var(--cg-sage-subtle); color: var(--cg-sage-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;">{{ child.first_name[0] }}</span>
+              <div>
+                <div style="font-weight: 600;">{{ child.first_name }} {{ child.last_name }}</div>
+                <div class="text-xs text-muted">{{ child.age }} years old</div>
+              </div>
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <div style="font-size: 1.2rem; font-weight: 700; color: var(--cg-sage);">{{ "%.1f"|format(child.parent_a_percentage) }}%</div>
+            <div class="text-xs text-muted">{{ child.parent_a_days }} days</div>
+          </td>
+          <td style="text-align: center;">
+            <div style="font-size: 1.2rem; font-weight: 700; color: var(--cg-slate);">{{ "%.1f"|format(child.parent_b_percentage) }}%</div>
+            <div class="text-xs text-muted">{{ child.parent_b_days }} days</div>
+          </td>
+          <td style="text-align: center;">
+            {% set diff = child.parent_a_percentage - 50 %}
+            <span class="badge {% if diff|abs <= 5 %}badge-success{% elif diff|abs <= 10 %}badge-warning{% else %}badge-error{% endif %}">
+              {% if diff > 0 %}+{% endif %}{{ "%.1f"|format(diff) }}%
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
 
 <!-- Data Sources Note -->
 <div class="note info" style="margin-top: var(--spacing-3xl); background: white; border: 1px solid var(--cg-border);">
