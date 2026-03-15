@@ -71,24 +71,37 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
       className={`flex items-center gap-2.5 cursor-pointer ${className}`}
       onClick={onClick}
     >
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center">
-        <svg
-          width="32"
-          height="32"
-          viewBox="0 0 32 32"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Left circle - Parent A */}
-          <circle cx="12" cy="16" r="9" stroke="white" strokeWidth="2" fill="none" opacity="0.8" />
-          {/* Right circle - Parent B */}
-          <circle cx="20" cy="16" r="9" stroke="white" strokeWidth="2" fill="none" opacity="0.8" />
-          {/* Common ground - intersection dot */}
-          <circle cx="16" cy="16" r="3" fill="white" />
-        </svg>
-      </div>
-      <span className="text-lg font-semibold text-white hidden sm:inline" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-        CommonGround
+      {/* Brand icon matching marketing pages */}
+      <svg width="36" height="36" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
+        <defs>
+          <linearGradient id="nav-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#E8F4F8" />
+            <stop offset="100%" stopColor="#D6ECE8" />
+          </linearGradient>
+          <linearGradient id="nav-lf" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#5BC4A0" />
+            <stop offset="100%" stopColor="#3DAA8A" />
+          </linearGradient>
+          <linearGradient id="nav-rf" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#4BA8C8" />
+            <stop offset="100%" stopColor="#2D6A8F" />
+          </linearGradient>
+        </defs>
+        <rect width="512" height="512" rx="120" fill="url(#nav-bg)" />
+        {/* Left parent */}
+        <circle cx="168" cy="148" r="48" fill="url(#nav-lf)" />
+        <path d="M118 218 Q168 258 218 218" stroke="url(#nav-lf)" strokeWidth="16" strokeLinecap="round" fill="none" />
+        {/* Right parent */}
+        <circle cx="344" cy="148" r="48" fill="url(#nav-rf)" />
+        <path d="M294 218 Q344 258 394 218" stroke="url(#nav-rf)" strokeWidth="16" strokeLinecap="round" fill="none" />
+        {/* Golden arch */}
+        <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+        {/* Child */}
+        <circle cx="256" cy="330" r="38" fill="#F5A623" />
+        <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
+      </svg>
+      <span className="text-lg text-white hidden sm:inline" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+        <span className="font-bold">Common</span><span className="font-normal opacity-90">Ground</span>
       </span>
     </div>
   );
