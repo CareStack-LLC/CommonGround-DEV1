@@ -302,11 +302,11 @@ export default function MyCircleManagementPage({ params }: PageParams) {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
+        <div className="min-h-screen bg-background pb-20 lg:pb-0">
           <Navigation />
           <div className="flex flex-col items-center justify-center py-32">
             <div className="w-14 h-14 border-3 border-teal-500/20 border-t-teal-500 rounded-full animate-spin" />
-            <p className="mt-4 text-slate-600 font-medium">Loading My Circle...</p>
+            <p className="mt-4 text-muted-foreground font-medium">Loading My Circle...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -315,7 +315,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
+      <div className="min-h-screen bg-background pb-20 lg:pb-0">
         <Navigation />
         <PageContainer background="transparent">
           <div className="space-y-8">
@@ -323,18 +323,18 @@ export default function MyCircleManagementPage({ params }: PageParams) {
             <div className="flex items-start gap-4">
               <button
                 onClick={() => router.back()}
-                className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors mt-1"
+                className="w-10 h-10 rounded-lg hover:bg-muted flex items-center justify-center transition-colors mt-1"
               >
-                <ArrowLeft className="h-5 w-5 text-slate-600" />
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                <h1 className="text-3xl font-bold text-foreground flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/10 to-teal-600/5 flex items-center justify-center shadow-md">
                     <Users className="h-6 w-6 text-teal-600" />
                   </div>
                   My Circle
                 </h1>
-                <p className="text-slate-600 font-medium mt-1">Manage trusted contacts who can communicate with your children</p>
+                <p className="text-muted-foreground font-medium mt-1">Manage trusted contacts who can communicate with your children</p>
               </div>
             </div>
 
@@ -369,14 +369,14 @@ export default function MyCircleManagementPage({ params }: PageParams) {
               {contactLimitGate.canAddMore ? (
                 <button
                   onClick={() => setShowInviteModal(true)}
-                  className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-teal-300 transition-all p-6 flex items-center gap-4 group"
+                  className="bg-card border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-teal-300 transition-all p-6 flex items-center gap-4 group"
                 >
                   <div className="p-3 bg-gradient-to-br from-teal-500/10 to-teal-600/5 rounded-xl group-hover:from-teal-500/20 group-hover:to-teal-600/10 transition-all">
                     <UserPlus className="h-6 w-6 text-teal-600" />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-bold text-slate-900">Invite Contact</h3>
-                    <p className="text-sm text-slate-600">
+                    <h3 className="font-bold text-foreground">Invite Contact</h3>
+                    <p className="text-sm text-muted-foreground">
                       {contactLimitGate.limit > 0
                         ? `${contacts.length}/${contactLimitGate.limit} contacts`
                         : 'Add someone to your circle'}
@@ -386,17 +386,17 @@ export default function MyCircleManagementPage({ params }: PageParams) {
               ) : (
                 <button
                   onClick={() => router.push('/settings/billing')}
-                  className="bg-slate-50 border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl transition-all p-6 flex items-center gap-4 group opacity-75"
+                  className="bg-muted border-2 border-border rounded-2xl shadow-lg hover:shadow-xl transition-all p-6 flex items-center gap-4 group opacity-75"
                 >
                   <div className="p-3 bg-gradient-to-br from-slate-200/50 to-slate-300/30 rounded-xl">
-                    <Lock className="h-6 w-6 text-slate-400" />
+                    <Lock className="h-6 w-6 text-muted-foreground" />
                   </div>
                   <div className="text-left flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-slate-500">Invite Contact</h3>
+                      <h3 className="font-bold text-muted-foreground">Invite Contact</h3>
                       <TierBadge tier={contactLimitGate.limit === 0 ? 'plus' : 'complete'} size="sm" />
                     </div>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-muted-foreground">
                       {contactLimitGate.limit === 0
                         ? 'Upgrade to add contacts'
                         : `Limit reached (${contacts.length}/${contactLimitGate.limit})`}
@@ -407,14 +407,14 @@ export default function MyCircleManagementPage({ params }: PageParams) {
 
               <button
                 onClick={() => setShowChildSetupModal(true)}
-                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-purple-300 transition-all p-6 flex items-center gap-4 group"
+                className="bg-card border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-purple-300 transition-all p-6 flex items-center gap-4 group"
               >
                 <div className="p-3 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl group-hover:from-purple-500/20 group-hover:to-purple-600/10 transition-all">
                   <Users className="h-6 w-6 text-purple-600" />
                 </div>
                 <div className="text-left">
-                  <h3 className="font-bold text-slate-900">Setup Child</h3>
-                  <p className="text-sm text-slate-600">Create child login account</p>
+                  <h3 className="font-bold text-foreground">Setup Child</h3>
+                  <p className="text-sm text-muted-foreground">Create child login account</p>
                 </div>
               </button>
 
@@ -423,14 +423,14 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                   navigator.clipboard.writeText(childLoginUrl);
                   alert('Child login link copied!');
                 }}
-                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-slate-300 transition-all p-6 flex items-center gap-4 group"
+                className="bg-card border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-border transition-all p-6 flex items-center gap-4 group"
               >
                 <div className="p-3 bg-gradient-to-br from-slate-500/10 to-slate-600/5 rounded-xl group-hover:from-slate-500/20 group-hover:to-slate-600/10 transition-all">
-                  <QrCode className="h-6 w-6 text-slate-600" />
+                  <QrCode className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <div className="text-left">
-                  <h3 className="font-bold text-slate-900">Child Login Link</h3>
-                  <p className="text-sm text-slate-600">Copy link for child device</p>
+                  <h3 className="font-bold text-foreground">Child Login Link</h3>
+                  <p className="text-sm text-muted-foreground">Copy link for child device</p>
                 </div>
               </button>
             </div>
@@ -438,17 +438,17 @@ export default function MyCircleManagementPage({ params }: PageParams) {
             {/* Circle Contacts */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Circle Contacts</h2>
-                <span className="text-sm text-slate-600 font-medium">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</span>
+                <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Circle Contacts</h2>
+                <span className="text-sm text-muted-foreground font-medium">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</span>
               </div>
 
               {contacts.length === 0 ? (
-                <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-12 text-center">
+                <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-12 text-center">
                   <div className="w-20 h-20 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-6">
                     <Users className="h-10 w-10 text-teal-500" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No contacts yet</h3>
-                  <p className="text-slate-600 mb-6">Invite trusted people to your circle</p>
+                  <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No contacts yet</h3>
+                  <p className="text-muted-foreground mb-6">Invite trusted people to your circle</p>
                   {contactLimitGate.canAddMore ? (
                     <button
                       onClick={() => setShowInviteModal(true)}
@@ -460,7 +460,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                   ) : (
                     <button
                       onClick={() => router.push('/settings/billing')}
-                      className="flex items-center gap-2 mx-auto px-4 py-2 rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-200 transition-colors"
+                      className="flex items-center gap-2 mx-auto px-4 py-2 rounded-xl bg-muted text-muted-foreground hover:bg-muted transition-colors"
                     >
                       <Lock className="h-4 w-4" />
                       Invite Contact
@@ -493,7 +493,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                     return (
                       <div
                         key={contact.id}
-                        className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-teal-300 transition-all p-6"
+                        className="bg-card border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-teal-300 transition-all p-6"
                       >
                         <div className="flex items-center gap-4">
                           {/* Avatar with Room Badge */}

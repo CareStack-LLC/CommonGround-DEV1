@@ -44,7 +44,7 @@ export function CGBottomNav({ items, familyFileId, className }: CGBottomNavProps
         { href: `/messages`, icon: MessageCircle, label: 'Chat' },
         { href: `/schedule`, icon: Calendar, label: 'Schedule' },
         { href: `/payments`, icon: Wallet, label: 'Finances' },
-        { href: `/family-files/${familyFileId}/kidcoms`, icon: Video, label: 'KidComs' },
+        { href: `/family-files/${familyFileId}/kidcoms`, icon: Video, label: 'KidSpace' },
       ]
     : [
         { href: '/family-files', icon: Home, label: 'Home' },

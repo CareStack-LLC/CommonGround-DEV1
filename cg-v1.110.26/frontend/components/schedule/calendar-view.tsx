@@ -285,9 +285,13 @@ export default function CalendarView({
                     const collection = calendarData?.my_collections.find(
                       c => c.id === event.collection_id
                     );
-                    const eventColor = event.is_owner
-                      ? collection?.color || '#3DAA8A'
-                      : '#64748B'; // Slate for shared events
+                    // Professional events get a distinct blue color
+                    const isProfessional = event.is_professional_event || !!event.professional_id;
+                    const eventColor = isProfessional
+                      ? '#2D6A8F' // Ocean blue for professional events
+                      : event.is_owner
+                        ? collection?.color || '#3DAA8A'
+                        : '#64748B'; // Slate for shared events
 
                     // RSVP indicator
                     const rsvpStatus = event.my_attendance?.rsvp_status;
@@ -304,8 +308,11 @@ export default function CalendarView({
                           backgroundColor: eventColor,
                           color: 'white',
                         }}
-                        title={`${event.title}${rsvpStatus ? ` (${rsvpStatus})` : ''}`}
+                        title={`${isProfessional ? '⚖ ' : ''}${event.title}${rsvpStatus ? ` (${rsvpStatus})` : ''}`}
                       >
+                        {isProfessional && (
+                          <span className="flex-shrink-0">⚖</span>
+                        )}
                         {rsvpIndicator && (
                           <span className={`flex-shrink-0 ${
                             rsvpStatus === 'going' ? 'text-green-200' :

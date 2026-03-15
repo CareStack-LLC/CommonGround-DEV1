@@ -105,7 +105,7 @@ function KidComsContent() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <LockedFeatureCard
             feature="kidcoms_access"
-            title="KidComs Video Calls"
+            title="KidSpace Video Calls"
             description="Connect with your children through secure video calls with ARIA monitoring, circle management, and theater mode. Available with Complete subscription."
             icon={Video}
             requiredTier="complete"
@@ -238,7 +238,7 @@ function KidComsContent() {
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Video className="h-10 w-10 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">KidComs</h1>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">KidSpace</h1>
               <p className="text-slate-600">Safe video calls with your circle</p>
             </header>
 
@@ -255,7 +255,7 @@ function KidComsContent() {
                 <FolderHeart className="h-12 w-12 text-[var(--portal-primary)]" />
               </div>
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Select a Family File</h2>
-              <p className="text-slate-600 mb-8">Choose a family file to access KidComs features</p>
+              <p className="text-slate-600 mb-8">Choose a family file to access KidSpace features</p>
 
               {isLoading ? (
                 <div className="flex justify-center py-8">
@@ -331,7 +331,7 @@ function KidComsContent() {
               <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
           </div>
-          <p className="mt-6 text-slate-600 font-medium">Loading KidComs...</p>
+          <p className="mt-6 text-slate-600 font-medium">Loading KidSpace...</p>
         </div>
       </div>
     );
@@ -357,7 +357,7 @@ function KidComsContent() {
                 <Video className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-slate-900">KidComs</h1>
+                <h1 className="text-3xl font-bold text-slate-900">KidSpace</h1>
                 <p className="text-sm text-slate-600">Safe video calls with your circle</p>
               </div>
             </div>
@@ -631,7 +631,7 @@ export default function KidComsPage() {
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center shadow-lg">
               <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
-            <p className="mt-6 text-slate-600 font-medium">Loading KidComs...</p>
+            <p className="mt-6 text-slate-600 font-medium">Loading KidSpace...</p>
           </div>
         </div>
       }>

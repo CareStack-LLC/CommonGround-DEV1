@@ -37,10 +37,25 @@ export function AgreementTermsCard({ familyFileId }: AgreementTermsCardProps) {
     );
   }
 
-  if (!data) return null;
-
-  const hasData = data.child_support_amount || data.expense_split_percentage || data.special_provisions.length > 0;
-  if (!hasData) return null;
+  if (!data || !(data.child_support_amount || data.expense_split_percentage || data.special_provisions?.length > 0)) {
+    return (
+      <div className="bg-card border border-border rounded-xl p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[var(--portal-primary)]/10 flex items-center justify-center">
+            <FileText className="w-4.5 h-4.5 text-[var(--portal-primary)]" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">
+              Agreement Financial Terms
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              No active agreement with financial terms found. Upload or create an agreement to see child support, expense splits, and provisions here.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden">

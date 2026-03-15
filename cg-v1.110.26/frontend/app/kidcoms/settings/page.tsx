@@ -152,7 +152,7 @@ function SettingsContent() {
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">KidComs Settings</h1>
+                <h1 className="text-xl font-bold text-gray-900">KidSpace Settings</h1>
                 <p className="text-sm text-gray-500">Parental controls and preferences</p>
               </div>
             </div>

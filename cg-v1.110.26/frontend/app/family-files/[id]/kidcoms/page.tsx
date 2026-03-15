@@ -163,7 +163,7 @@ export default function KidComsPage() {
       case 'active':
         return <span className="inline-flex items-center px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-200">Active</span>;
       case 'completed':
-        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200">Completed</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-muted text-foreground text-xs font-medium border border-border">Completed</span>;
       case 'cancelled':
         return <span className="inline-flex items-center px-2 py-1 rounded-md bg-red-50 text-red-700 text-xs font-medium border border-red-200">Cancelled</span>;
       default:
@@ -189,11 +189,11 @@ export default function KidComsPage() {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
+        <div className="min-h-screen bg-background pb-20 lg:pb-0">
           <Navigation />
           <div className="flex flex-col items-center justify-center py-32">
             <div className="w-14 h-14 border-3 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-            <p className="mt-4 text-slate-600 font-medium">Loading KidComs...</p>
+            <p className="mt-4 text-muted-foreground font-medium">Loading KidComs...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -202,7 +202,7 @@ export default function KidComsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
+      <div className="min-h-screen bg-background pb-20 lg:pb-0">
         <Navigation />
 
         <PageContainer background="transparent">
@@ -220,18 +220,18 @@ export default function KidComsPage() {
             <div className="flex items-start gap-4 mb-8">
             <button
               onClick={() => router.push(`/family-files/${familyFileId}`)}
-              className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors mt-1"
+              className="w-10 h-10 rounded-lg hover:bg-muted flex items-center justify-center transition-colors mt-1"
             >
-              <ArrowLeft className="h-5 w-5 text-slate-600" />
+              <ArrowLeft className="h-5 w-5 text-muted-foreground" />
             </button>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
                   <Video className="h-6 w-6 text-purple-600" />
                 </div>
                 KidComs
               </h1>
-              <p className="text-slate-600 font-medium mt-1">
+              <p className="text-muted-foreground font-medium mt-1">
                 Safe video communication for {familyTitle}
               </p>
             </div>
@@ -261,8 +261,8 @@ export default function KidComsPage() {
           <div className="lg:col-span-1 space-y-6">
             {/* Child Selector */}
             {children.length > 0 && (
-              <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-                <h2 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Select Child</h2>
+              <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
+                <h2 className="text-lg font-bold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Select Child</h2>
                 <div className="space-y-2">
                   {children.map((child) => (
                     <button
@@ -272,18 +272,18 @@ export default function KidComsPage() {
                         'w-full flex items-center gap-3 p-3 rounded-xl transition-all border-2',
                         selectedChild?.id === child.id
                           ? 'bg-purple-50 border-purple-300 shadow-sm'
-                          : 'bg-slate-50 border-slate-200 hover:border-slate-300'
+                          : 'bg-muted border-border hover:border-border'
                       )}
                     >
                       <div className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center font-bold",
                         selectedChild?.id === child.id
                           ? 'bg-purple-500 text-white'
-                          : 'bg-slate-200 text-slate-600'
+                          : 'bg-muted text-muted-foreground'
                       )}>
                         {(child.preferred_name || child.first_name).charAt(0)}
                       </div>
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-foreground">
                         {child.preferred_name || child.first_name}
                       </span>
                       {selectedChild?.id === child.id && (
@@ -296,8 +296,8 @@ export default function KidComsPage() {
             )}
 
             {/* Quick Actions */}
-            <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Quick Actions</h2>
+            <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
+              <h2 className="text-lg font-bold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Quick Actions</h2>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => startVideoCall()}
@@ -343,10 +343,10 @@ export default function KidComsPage() {
                 </button>
                 <button
                   disabled
-                  className="flex flex-col items-center p-4 border-2 border-slate-200 bg-slate-50 rounded-xl opacity-50 cursor-not-allowed"
+                  className="flex flex-col items-center p-4 border-2 border-border bg-muted rounded-xl opacity-50 cursor-not-allowed"
                 >
-                  <MessageCircle className="h-8 w-8 text-slate-400" />
-                  <span className="mt-2 text-sm font-bold text-slate-500">Chat</span>
+                  <MessageCircle className="h-8 w-8 text-muted-foreground" />
+                  <span className="mt-2 text-sm font-bold text-muted-foreground">Chat</span>
                 </button>
               </div>
             </div>
@@ -354,9 +354,9 @@ export default function KidComsPage() {
 
           {/* Center Column - Circle Contacts */}
           <div className="lg:col-span-1">
-            <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
+            <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   <Heart className="h-5 w-5 text-teal-500" />
                   My Circle
                 </h2>
@@ -373,8 +373,8 @@ export default function KidComsPage() {
                   <div className="w-16 h-16 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-4">
                     <Users className="h-8 w-8 text-teal-500" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No circle contacts yet</h3>
-                  <p className="text-slate-600 mb-4">Add trusted contacts to your circle</p>
+                  <h3 className="text-lg font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No circle contacts yet</h3>
+                  <p className="text-muted-foreground mb-4">Add trusted contacts to your circle</p>
                   <button
                     onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
                     className="cg-btn-primary flex items-center gap-2 mx-auto"
@@ -388,15 +388,15 @@ export default function KidComsPage() {
                   {contacts.map((contact) => (
                     <div
                       key={contact.id}
-                      className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors border border-slate-200"
+                      className="flex items-center justify-between p-3 rounded-xl bg-muted hover:bg-muted transition-colors border border-border"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-700">
                           {contact.contact_name.charAt(0)}
                         </div>
                         <div>
-                          <p className="font-bold text-slate-900">{contact.contact_name}</p>
-                          <p className="text-xs text-slate-600 capitalize">
+                          <p className="font-bold text-foreground">{contact.contact_name}</p>
+                          <p className="text-xs text-muted-foreground capitalize">
                             {contact.relationship_type.replace('_', ' ')}
                           </p>
                         </div>
@@ -423,18 +423,18 @@ export default function KidComsPage() {
 
           {/* Right Column - Recent Sessions */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                <Clock className="h-5 w-5 text-slate-600" />
+            <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
+              <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                <Clock className="h-5 w-5 text-muted-foreground" />
                 Recent Sessions
               </h2>
               {sessions.length === 0 ? (
                 <div className="text-center py-8">
-                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
-                    <Clock className="h-6 w-6 text-slate-400" />
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-3">
+                    <Clock className="h-6 w-6 text-muted-foreground" />
                   </div>
-                  <p className="text-sm text-slate-600 mb-1 font-medium">No sessions yet</p>
-                  <p className="text-xs text-slate-500">Start a video call to see it here</p>
+                  <p className="text-sm text-muted-foreground mb-1 font-medium">No sessions yet</p>
+                  <p className="text-xs text-muted-foreground">Start a video call to see it here</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -450,18 +450,18 @@ export default function KidComsPage() {
                         'w-full flex items-center justify-between p-3 rounded-xl transition-all border-2',
                         session.status === 'active' || session.status === 'waiting'
                           ? 'bg-purple-50 border-purple-200 hover:border-purple-300 cursor-pointer'
-                          : 'bg-slate-50 border-slate-200 cursor-default'
+                          : 'bg-muted border-border cursor-default'
                       )}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl bg-card border border-border flex items-center justify-center">
                           {getSessionTypeIcon(session.session_type)}
                         </div>
                         <div className="text-left">
-                          <p className="font-bold text-slate-900">
+                          <p className="font-bold text-foreground">
                             {session.title || 'Video Call'}
                           </p>
-                          <p className="text-xs text-slate-600">
+                          <p className="text-xs text-muted-foreground">
                             {session.started_at
                               ? new Date(session.started_at).toLocaleDateString()
                               : 'Scheduled'}
@@ -471,7 +471,7 @@ export default function KidComsPage() {
                       <div className="flex items-center gap-2">
                         {getSessionStatusBadge(session.status)}
                         {(session.status === 'active' || session.status === 'waiting') && (
-                          <ChevronRight className="h-4 w-4 text-slate-400" />
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
                         )}
                       </div>
                     </button>
@@ -482,36 +482,36 @@ export default function KidComsPage() {
 
             {/* Feature Status */}
             {settings && (
-              <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-                <h2 className="text-base font-bold text-slate-900 mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Enabled Features</h2>
+              <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
+                <h2 className="text-base font-bold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Enabled Features</h2>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       'w-3 h-3 rounded-full',
-                      settings.allowed_features.video ? 'bg-emerald-500' : 'bg-slate-300'
+                      settings.allowed_features.video ? 'bg-emerald-500' : 'bg-muted-foreground/30'
                     )} />
-                    <span className="text-sm text-slate-700 font-medium">Video</span>
+                    <span className="text-sm text-foreground font-medium">Video</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       'w-3 h-3 rounded-full',
-                      settings.allowed_features.chat ? 'bg-emerald-500' : 'bg-slate-300'
+                      settings.allowed_features.chat ? 'bg-emerald-500' : 'bg-muted-foreground/30'
                     )} />
-                    <span className="text-sm text-slate-700 font-medium">Chat</span>
+                    <span className="text-sm text-foreground font-medium">Chat</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       'w-3 h-3 rounded-full',
-                      settings.allowed_features.theater ? 'bg-emerald-500' : 'bg-slate-300'
+                      settings.allowed_features.theater ? 'bg-emerald-500' : 'bg-muted-foreground/30'
                     )} />
-                    <span className="text-sm text-slate-700 font-medium">Theater</span>
+                    <span className="text-sm text-foreground font-medium">Theater</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       'w-3 h-3 rounded-full',
-                      settings.allowed_features.arcade ? 'bg-emerald-500' : 'bg-slate-300'
+                      settings.allowed_features.arcade ? 'bg-emerald-500' : 'bg-muted-foreground/30'
                     )} />
-                    <span className="text-sm text-slate-700 font-medium">Arcade</span>
+                    <span className="text-sm text-foreground font-medium">Arcade</span>
                   </div>
                 </div>
               </div>

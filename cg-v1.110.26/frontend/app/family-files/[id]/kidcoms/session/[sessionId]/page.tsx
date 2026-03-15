@@ -320,7 +320,7 @@ export default function SessionPage() {
             onClick={() => router.push(`/family-files/${familyFileId}/kidcoms`)}
             className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage-light"
           >
-            Back to KidComs
+            Back to KidSpace
           </button>
         </div>
       </div>

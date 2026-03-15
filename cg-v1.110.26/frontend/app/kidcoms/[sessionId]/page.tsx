@@ -318,7 +318,7 @@ function SessionContent() {
             onClick={() => router.push(familyFileId ? `/family-files/${familyFileId}/kidcoms` : '/kidcoms')}
             className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage-light"
           >
-            Back to KidComs
+            Back to KidSpace
           </button>
         </div>
       </div>

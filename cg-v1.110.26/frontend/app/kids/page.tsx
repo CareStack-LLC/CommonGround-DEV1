@@ -397,7 +397,7 @@ function KidsHubPageContent() {
         >
           <span className="text-8xl block mb-6">🎮</span>
           <h1 className="text-3xl font-bold text-white mb-4 drop-shadow-lg">
-            Welcome to KidComs!
+            Welcome to KidSpace!
           </h1>
           <p className="text-white/90 text-lg mb-8">
             Ask a parent to help you get started

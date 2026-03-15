@@ -51,7 +51,7 @@ export default function FeaturesPage() {
       icon: Video,
       problem: "Calling the kids means coordinating with your ex",
       solution: "Video call your kids directly, no middleman",
-      detail: "KidsCom gives you a direct line to your children. Schedule calls on your parenting time or with approval. High-quality video, recording for safety, and logs for your records.",
+      detail: "KidSpace gives you a direct line to your children. Schedule calls on your parenting time or with approval. High-quality video, recording for safety, and logs for your records.",
       benefit: "Stay connected on your terms",
       color: "var(--portal-primary)"
     },

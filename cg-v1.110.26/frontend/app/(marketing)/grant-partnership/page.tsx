@@ -238,7 +238,7 @@ export default function GrantPartnershipPage() {
                             },
                             {
                                 icon: Users,
-                                title: "KidsComs Protection",
+                                title: "KidSpace Protection",
                                 desc: "Age-appropriate messaging that keeps children out of adult conflict",
                             },
                             {

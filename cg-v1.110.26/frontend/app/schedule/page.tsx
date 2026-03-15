@@ -90,7 +90,7 @@ function QuickActionCard({
 // Custody Legend with dashboard-matching styling
 function CustodyLegend() {
   return (
-    <div className="flex items-center gap-4 text-xs bg-card px-4 py-3 rounded-2xl border-2 border-border shadow-lg">
+    <div className="flex items-center gap-4 text-xs bg-card px-4 py-3 rounded-2xl border-2 border-border shadow-lg flex-wrap">
       <span className="text-muted-foreground font-semibold mr-1">Legend:</span>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
@@ -103,6 +103,10 @@ function CustodyLegend() {
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-sm" />
         <span className="text-foreground font-semibold whitespace-nowrap">Exchange</span>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-2.5 h-2.5 rounded-full bg-[#2D6A8F] shadow-sm" />
+        <span className="text-foreground font-semibold whitespace-nowrap">Professional</span>
       </div>
     </div>
   );
@@ -420,9 +424,9 @@ function ScheduleContent() {
         </div>
 
         {error && (
-          <div className="mb-6 flex items-center gap-3 p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
-            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-            <p className="text-sm text-red-700 font-medium">{error}</p>
+          <div className="mb-6 flex items-center gap-3 p-4 bg-destructive/10 border-2 border-destructive/20 rounded-2xl">
+            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
+            <p className="text-sm text-destructive font-medium">{error}</p>
           </div>
         )}
 

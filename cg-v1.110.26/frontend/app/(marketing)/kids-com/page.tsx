@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/accordion';
 
 /**
- * KidsCom Landing Page
+ * KidSpace Landing Page
  * 
  * A child-centered feature for bonding during co-parenting transitions.
  * Theme: Warm Earth, Soft Cream, Rounded, Calm.
@@ -62,12 +62,12 @@ export default function KidsComPage() {
                             </h1>
 
                             <p className="text-lg md:text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                                KidsCom helps families stay connected through stories, movies, and games—built to protect peace during hard transitions.
+                                KidSpace helps families stay connected through stories, movies, and games—built to protect peace during hard transitions.
                             </p>
 
                             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                                 <Button size="lg" className="rounded-full px-8 py-6 text-lg bg-cg-sage hover:bg-cg-sage-dark shadow-lg shadow-emerald-900/10 transition-all hover:scale-105" asChild>
-                                    <Link href="#pricing">See KidsCom</Link>
+                                    <Link href="#pricing">See KidSpace</Link>
                                 </Button>
                                 <Button size="lg" variant="outline" className="rounded-full px-8 py-6 text-lg border-cg-sage text-cg-sage hover:bg-cg-sage/5 bg-transparent" asChild>
                                     <Link href="#pricing">View Plans</Link>
@@ -75,7 +75,7 @@ export default function KidsComPage() {
                             </div>
 
                             <p className="mt-4 text-xs text-slate-500 font-medium">
-                                KidsCom included with Plus and above (from $17/mo).
+                                KidSpace included with Plus and above (from $17/mo).
                             </p>
                         </div>
 
@@ -159,7 +159,7 @@ export default function KidsComPage() {
                             A bridge for bonding
                         </h2>
                         <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                            KidsCom gives you safe tools to connect, play, and share moments—even when apart.
+                            KidSpace gives you safe tools to connect, play, and share moments—even when apart.
                         </p>
                     </div>
 
@@ -252,10 +252,10 @@ export default function KidsComPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 mb-4">
-                            How KidsCom works
+                            How KidSpace works
                         </h2>
                         <p className="text-sm text-slate-500 font-medium bg-slate-100 inline-block px-4 py-2 rounded-full">
-                            KidsCom experiences focus on bonding—not legal stress.
+                            KidSpace experiences focus on bonding—not legal stress.
                         </p>
                     </div>
 
@@ -293,7 +293,7 @@ export default function KidsComPage() {
                             </div>
                             <h3 className="text-xl font-bold text-slate-900 mb-3">Bond with child</h3>
                             <p className="text-slate-600">
-                                Enjoy the KidsCom experience. Records stay clean and positive.
+                                Enjoy the KidSpace experience. Records stay clean and positive.
                             </p>
                         </div>
 
@@ -382,17 +382,17 @@ export default function KidsComPage() {
                     </div>
 
                     <p className="text-white/70 text-sm font-medium">
-                        Safety tools run across CommonGround. KidsCom builds the bonding layer.
+                        Safety tools run across CommonGround. KidSpace builds the bonding layer.
                     </p>
                 </div>
             </section>
 
-            {/* 7. PRICING GATE ("KidsCom starts with Plus") */}
+            {/* 7. PRICING GATE ("KidSpace starts with Plus") */}
             <section id="pricing" className="py-16 md:py-24 bg-[#F4F8F7]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold font-serif text-slate-900 mb-4">
-                            KidsCom starts with Plus
+                            KidSpace starts with Plus
                         </h2>
                         <p className="text-lg text-slate-600">
                             Invest in peace of mind and happier memories.
@@ -409,7 +409,7 @@ export default function KidsComPage() {
                                 <div className="py-6 border-t border-slate-200">
                                     <span className="inline-flex items-center gap-2 text-slate-500 font-medium">
                                         <span className="w-2 h-2 rounded-full bg-slate-300"></span>
-                                        No KidsCom
+                                        No KidSpace
                                     </span>
                                 </div>
                             </CardContent>
@@ -426,7 +426,7 @@ export default function KidsComPage() {
                                 <div className="py-6 border-t border-slate-100 mt-4 space-y-3">
                                     <div className="flex items-center gap-3 justify-center text-slate-800 font-medium bg-emerald-50 py-2 px-4 rounded-full">
                                         <Check className="w-5 h-5 text-emerald-600" />
-                                        Includes KidsCom
+                                        Includes KidSpace
                                     </div>
                                     <div className="flex items-center gap-3 justify-center text-slate-600 text-sm">
                                         <Check className="w-4 h-4 text-emerald-600" />
@@ -447,7 +447,7 @@ export default function KidsComPage() {
                                 <div className="py-6 border-t border-slate-100 mt-4 space-y-3">
                                     <div className="flex items-center gap-3 justify-center text-slate-800 font-medium">
                                         <Check className="w-5 h-5 text-emerald-600" />
-                                        Includes KidsCom
+                                        Includes KidSpace
                                     </div>
                                     <div className="flex items-center gap-3 justify-center text-slate-600 text-sm">
                                         <Check className="w-4 h-4 text-emerald-600" />
@@ -464,7 +464,7 @@ export default function KidsComPage() {
 
                     <div className="text-center mt-8">
                         <p className="text-sm text-slate-500">
-                            KidsCom is not available on the free plan.
+                            KidSpace is not available on the free plan.
                         </p>
                     </div>
                 </div>
@@ -491,7 +491,7 @@ export default function KidsComPage() {
                         <div className="bg-[#F4F8F7] p-8 rounded-3xl relative">
                             <div className="text-amber-400 text-4xl font-serif absolute top-6 left-6 opacity-30">"</div>
                             <p className="text-slate-700 italic mb-4 relative z-10 font-medium leading-relaxed">
-                                Scheduling movie night used to start arguments. Now we just tap a button in KidsCom and it's handled.
+                                Scheduling movie night used to start arguments. Now we just tap a button in KidSpace and it's handled.
                             </p>
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 font-bold text-xs">DJ</div>
@@ -513,10 +513,10 @@ export default function KidsComPage() {
                     <Accordion type="single" collapsible className="w-full space-y-4">
                         <AccordionItem value="item-1" className="bg-white rounded-2xl px-6 border-none shadow-sm data-[state=open]:pb-4">
                             <AccordionTrigger className="text-lg font-medium text-slate-900 hover:no-underline py-6">
-                                Is KidsCom for toddlers or older kids?
+                                Is KidSpace for toddlers or older kids?
                             </AccordionTrigger>
                             <AccordionContent className="text-slate-600 leading-relaxed">
-                                KidsCom creates content suitable for ages 3-10. Stories are simpler for younger ones, while games and episodes can engage older children.
+                                KidSpace creates content suitable for ages 3-10. Stories are simpler for younger ones, while games and episodes can engage older children.
                             </AccordionContent>
                         </AccordionItem>
 
@@ -567,7 +567,7 @@ export default function KidsComPage() {
                     </div>
 
                     <p className="text-sm text-slate-500">
-                        KidsCom included with Plus and above (from $17/mo).
+                        KidSpace included with Plus and above (from $17/mo).
                     </p>
                 </div>
             </section>

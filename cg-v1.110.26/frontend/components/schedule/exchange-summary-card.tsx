@@ -36,7 +36,25 @@ export function ExchangeSummaryCard({ familyFileId }: ExchangeSummaryCardProps) 
     );
   }
 
-  if (!data || data.schedules.length === 0) return null;
+  if (!data || data.schedules.length === 0) {
+    return (
+      <div className="bg-card border border-border rounded-xl p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-[var(--portal-primary)]/10 flex items-center justify-center">
+            <FileText className="w-4.5 h-4.5 text-[var(--portal-primary)]" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">
+              Exchange Schedule
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              No exchange schedule found. Once an agreement with custody exchange terms is active, schedule details will appear here.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden">

@@ -57,7 +57,7 @@ export default function PricingPage() {
         'Everything in Plus',
         'Silent Handoff GPS verification',
         'Custody analytics & tracking',
-        'KidsCom video calls',
+        'KidSpace video calls',
         'Court-ready evidence packages',
         'Priority support'
       ],

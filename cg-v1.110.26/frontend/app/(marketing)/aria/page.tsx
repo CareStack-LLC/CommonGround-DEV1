@@ -17,7 +17,7 @@ import {
 /**
  * ARIA Feature Page
  *
- * Matches homepage design with ARIA mascot for KidComs section
+ * Matches homepage design with ARIA mascot for KidSpace section
  */
 
 const features = [
@@ -228,7 +228,7 @@ export default function ARIAPage() {
         </div>
       </section>
 
-      {/* ARIA for Kids (KidComs) - with mascot */}
+      {/* ARIA for Kids (KidSpace) - with mascot */}
       <section className="py-16 sm:py-24 bg-gradient-to-br from-[#F4F8F7] to-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -244,7 +244,7 @@ export default function ARIAPage() {
                 ARIA keeps kids <span className="text-[#F5A623]">protected</span>
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                When children use KidComs to talk with their other parent, ARIA provides gentle, age-appropriate
+                When children use KidSpace to talk with their other parent, ARIA provides gentle, age-appropriate
                 guardrails. Children stay protected and supported in a safe space.
               </p>
               <ul className="space-y-3">

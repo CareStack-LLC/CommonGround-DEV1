@@ -117,11 +117,11 @@ export default function KidComsSettingsPage() {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
+        <div className="min-h-screen bg-background pb-20 lg:pb-0">
           <Navigation />
           <div className="flex flex-col items-center justify-center py-32">
             <div className="w-14 h-14 border-3 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-            <p className="mt-4 text-slate-600 font-medium">Loading Settings...</p>
+            <p className="mt-4 text-muted-foreground font-medium">Loading Settings...</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -131,10 +131,10 @@ export default function KidComsSettingsPage() {
   if (!settings) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
+        <div className="min-h-screen bg-background pb-20 lg:pb-0">
           <Navigation />
           <div className="flex flex-col items-center justify-center py-32">
-            <p className="text-slate-600 font-medium">Failed to load settings</p>
+            <p className="text-muted-foreground font-medium">Failed to load settings</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -143,7 +143,7 @@ export default function KidComsSettingsPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
+      <div className="min-h-screen bg-background pb-20 lg:pb-0">
         <Navigation />
 
         <PageContainer background="transparent">
@@ -151,18 +151,18 @@ export default function KidComsSettingsPage() {
           <div className="flex items-start gap-4 mb-8">
             <button
               onClick={() => router.push(`/family-files/${familyFileId}/kidcoms`)}
-              className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors mt-1"
+              className="w-10 h-10 rounded-lg hover:bg-muted flex items-center justify-center transition-colors mt-1"
             >
-              <ChevronLeft className="h-5 w-5 text-slate-600" />
+              <ChevronLeft className="h-5 w-5 text-muted-foreground" />
             </button>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
                   <Settings className="h-6 w-6 text-purple-600" />
                 </div>
                 KidComs Settings
               </h1>
-              <p className="text-slate-600 font-medium mt-1">{familyTitle}</p>
+              <p className="text-muted-foreground font-medium mt-1">{familyTitle}</p>
             </div>
             <button
               onClick={handleSave}
@@ -208,8 +208,8 @@ export default function KidComsSettingsPage() {
           <div className="space-y-6">
 
           {/* Circle Approval */}
-          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/5 flex items-center justify-center">
                 <Users className="h-4 w-4 text-blue-600" />
               </div>
@@ -251,8 +251,8 @@ export default function KidComsSettingsPage() {
           </div>
 
           {/* Features */}
-          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center">
                 <Video className="h-4 w-4 text-purple-600" />
               </div>
@@ -293,8 +293,8 @@ export default function KidComsSettingsPage() {
           </div>
 
           {/* Session Limits */}
-          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
                 <Clock className="h-4 w-4 text-amber-600" />
               </div>
@@ -346,8 +346,8 @@ export default function KidComsSettingsPage() {
           </div>
 
           {/* Parental Controls */}
-          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center">
                 <Shield className="h-4 w-4 text-emerald-600" />
               </div>
@@ -396,8 +396,8 @@ export default function KidComsSettingsPage() {
           </div>
 
           {/* Notifications */}
-          <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
+            <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500/10 to-teal-600/5 flex items-center justify-center">
                 <Bell className="h-4 w-4 text-teal-600" />
               </div>

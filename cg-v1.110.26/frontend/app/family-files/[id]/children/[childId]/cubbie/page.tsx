@@ -91,7 +91,7 @@ function ChildCubbiePageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <PageContainer className="pb-32">
           <div className="flex items-center justify-center min-h-[400px]">
@@ -104,7 +104,7 @@ function ChildCubbiePageContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <PageContainer className="pb-32">
           <Card className="bg-card border-border">
@@ -123,7 +123,7 @@ function ChildCubbiePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <PageContainer className="pb-32">
         {/* Back Button */}
@@ -156,7 +156,7 @@ function ChildCubbiePageContent() {
 
         {/* Summary */}
         {items.length > 0 && (
-          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg mb-8 p-6">
+          <div className="bg-card rounded-2xl border-2 border-border shadow-lg mb-8 p-6">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div className="flex items-center justify-center gap-2 mb-2">
@@ -199,12 +199,12 @@ function ChildCubbiePageContent() {
             {items.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-2xl border-2 border-slate-200 shadow-md hover:shadow-xl hover:border-[var(--portal-primary)]/30 transition-all duration-300 cursor-pointer overflow-hidden group"
+                className="bg-card rounded-2xl border-2 border-border shadow-md hover:shadow-xl hover:border-[var(--portal-primary)]/30 transition-all duration-300 cursor-pointer overflow-hidden group"
                 onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie/${item.id}`)}
               >
                 <div className="p-5">
                   {/* Item Photo */}
-                  <div className="aspect-square bg-slate-50 rounded-xl mb-4 flex items-center justify-center overflow-hidden border border-slate-100 group-hover:scale-[1.02] transition-transform duration-300">
+                  <div className="aspect-square bg-muted rounded-xl mb-4 flex items-center justify-center overflow-hidden border border-border group-hover:scale-[1.02] transition-transform duration-300">
                     {item.photo_url ? (
                       <img
                         src={item.photo_url}
@@ -224,14 +224,14 @@ function ChildCubbiePageContent() {
                     {CATEGORY_LABELS[item.category]}
                   </p>
 
-                  <div className="flex justify-between items-center pt-3 border-t border-slate-100">
+                  <div className="flex justify-between items-center pt-3 border-t border-border">
                     <span className="font-bold text-foreground">
                       {formatCurrency(item.estimated_value)}
                     </span>
                     <span
                       className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full ${item.current_location === 'child_traveling'
                         ? 'bg-amber-100 text-amber-700'
-                        : 'bg-slate-100 text-slate-600'
+                        : 'bg-muted text-muted-foreground'
                         }`}
                     >
                       {item.current_location === 'child_traveling' ? 'Traveling' : 'Home'}
@@ -242,7 +242,7 @@ function ChildCubbiePageContent() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-10 text-center">
+          <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-10 text-center">
             <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
               <Package className="h-10 w-10 text-[var(--portal-primary)]" />
             </div>

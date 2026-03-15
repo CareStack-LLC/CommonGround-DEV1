@@ -4,19 +4,20 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Phone, PhoneIncoming, X, Video, User } from 'lucide-react';
 import { kidcomsAPI, KidComsSession } from '@/lib/api';
+import { useWebSocket } from '@/contexts/websocket-context';
 
 interface IncomingCallBannerProps {
   familyFileId: string;
-  pollInterval?: number; // ms, default 5000
+  pollInterval?: number; // ms, default 30000 (fallback polling)
 }
 
 export function IncomingCallBanner({
   familyFileId,
-  pollInterval = 5000,
+  pollInterval = 30000,
 }: IncomingCallBannerProps) {
   const router = useRouter();
+  const { onKidComsCallIncoming, isConnected } = useWebSocket();
   const [incomingSession, setIncomingSession] = useState<KidComsSession | null>(null);
-  const [isDismissed, setIsDismissed] = useState(false);
   const [dismissedSessionIds, setDismissedSessionIds] = useState<Set<string>>(new Set());
 
   const checkForIncomingCalls = useCallback(async () => {
@@ -28,22 +29,44 @@ export function IncomingCallBanner({
         (session) => !dismissedSessionIds.has(session.id)
       );
 
-      if (availableSession && !isDismissed) {
+      if (availableSession) {
         setIncomingSession(availableSession);
-      } else if (!availableSession) {
+      } else {
         setIncomingSession(null);
       }
     } catch (error) {
       // Silently fail - user might not be authenticated or endpoint unavailable
       console.debug('Error checking for incoming calls:', error);
     }
-  }, [familyFileId, dismissedSessionIds, isDismissed]);
+  }, [familyFileId, dismissedSessionIds]);
 
+  // WebSocket: real-time incoming call notifications
+  useEffect(() => {
+    const unsubscribe = onKidComsCallIncoming((data) => {
+      if (data.family_file_id === familyFileId && !dismissedSessionIds.has(data.session_id)) {
+        // Create a lightweight session object from the WS event
+        setIncomingSession({
+          id: data.session_id,
+          family_file_id: data.family_file_id,
+          session_type: data.session_type,
+          initiated_by_id: data.caller_id,
+          title: `${data.child_name} - Video Call`,
+          participants: [
+            { id: data.caller_id, name: data.caller_name } as any,
+          ],
+        } as KidComsSession);
+      }
+    });
+
+    return unsubscribe;
+  }, [onKidComsCallIncoming, familyFileId, dismissedSessionIds]);
+
+  // Fallback HTTP polling (reduced frequency since WebSocket handles real-time)
   useEffect(() => {
     // Initial check
     checkForIncomingCalls();
 
-    // Set up polling
+    // Set up fallback polling
     const interval = setInterval(checkForIncomingCalls, pollInterval);
 
     return () => clearInterval(interval);

@@ -22,7 +22,7 @@ export function KidComsLogo({ className, showText = true, size = 'md' }: KidComs
       {/* CommonGround Logo Icon */}
       <div
         className={cn(
-          'bg-white rounded-xl flex items-center justify-center shadow-md',
+          'bg-card rounded-xl flex items-center justify-center shadow-md',
           sizeClasses.container
         )}
       >
@@ -49,16 +49,16 @@ export function KidComsLogo({ className, showText = true, size = 'md' }: KidComs
         </svg>
       </div>
 
-      {/* KidsCom Text */}
+      {/* KidSpace Text */}
       {showText && (
         <span
           className={cn(
-            'font-bold text-gray-800 tracking-tight',
+            'font-bold text-foreground tracking-tight',
             sizeClasses.text
           )}
           style={{ fontFamily: 'DM Sans, sans-serif' }}
         >
-          KidsCom
+          KidSpace
         </span>
       )}
     </div>

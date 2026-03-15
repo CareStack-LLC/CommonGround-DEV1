@@ -81,11 +81,11 @@ export default function IncomingCallAlert({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
-      <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95">
+      <div className="bg-card rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95">
         {/* Dismiss button */}
         <button
           onClick={onDismiss}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100"
+          className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted"
         >
           <X className="h-5 w-5" />
         </button>
@@ -101,16 +101,16 @@ export default function IncomingCallAlert({
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-800 mb-1">Incoming Call</h2>
-          <p className="text-lg text-gray-600 mb-2">
+          <h2 className="text-2xl font-bold text-foreground mb-1">Incoming Call</h2>
+          <p className="text-lg text-muted-foreground mb-2">
             {call.caller_name}
           </p>
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
             <CallIcon className="h-4 w-4" />
             <span>{isVideoCall ? 'Video Call' : 'Voice Call'}</span>
           </div>
           {ringingSince > 0 && (
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               Calling for {ringingSince}s...
             </p>
           )}
@@ -152,7 +152,7 @@ export default function IncomingCallAlert({
         </div>
 
         {/* Info text */}
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="text-center text-xs text-muted-foreground mt-6">
           Call will end automatically if not answered
         </p>
       </div>

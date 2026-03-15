@@ -5,9 +5,7 @@ import { AlertTriangle, Navigation, QrCode, Loader2 } from 'lucide-react';
 import {
   eventsAPI,
   exchangesAPI,
-  collectionsAPI,
   casesAPI,
-  MyTimeCollection,
   CreateEventRequest,
   ConflictWarning,
   Child,
@@ -35,7 +33,6 @@ interface EventFormProps {
   onClose: () => void;
   onSuccess?: () => void;
   initialDate?: Date;
-  initialCollection?: MyTimeCollection;
 }
 
 export default function EventForm({
@@ -44,9 +41,7 @@ export default function EventForm({
   onClose,
   onSuccess,
   initialDate,
-  initialCollection,
 }: EventFormProps) {
-  const [collections, setCollections] = useState<MyTimeCollection[]>([]);
   const [children, setChildren] = useState<Child[]>([]);
   const [conflicts, setConflicts] = useState<ConflictWarning[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +50,6 @@ export default function EventForm({
 
   // Form state
   const [formData, setFormData] = useState({
-    collection_id: initialCollection?.id || '',
     title: '',
     start_time: initialDate ? formatDateTime(initialDate) : '',
     end_time: '',
@@ -93,16 +87,6 @@ export default function EventForm({
 
   const loadInitialData = async () => {
     try {
-      // Load user's collections
-      const collectionsData = await collectionsAPI.listForCase(caseId, false);
-      setCollections(collectionsData);
-
-      // Set default collection if none selected
-      if (!formData.collection_id && collectionsData.length > 0) {
-        const defaultCollection = collectionsData.find(c => c.is_default) || collectionsData[0];
-        setFormData(prev => ({ ...prev, collection_id: defaultCollection.id }));
-      }
-
       // Load children
       const caseData = await casesAPI.get(caseId);
       setChildren(caseData.children || []);
@@ -158,7 +142,6 @@ export default function EventForm({
 
     try {
       const eventData: CreateEventRequest = {
-        collection_id: formData.collection_id,
         title: formData.title,
         start_time: new Date(formData.start_time).toISOString(),
         end_time: new Date(formData.end_time).toISOString(),
@@ -178,6 +161,7 @@ export default function EventForm({
         check_in_window_before_minutes: formData.check_in_window_before_minutes,
         check_in_window_after_minutes: formData.check_in_window_after_minutes,
         qr_confirmation_required: formData.qr_confirmation_required,
+        sync_to_kidspace: formData.sync_to_kidspace || undefined,
       };
 
       await eventsAPI.create(eventData);
@@ -210,25 +194,25 @@ export default function EventForm({
         <div className="py-2">
 
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="mb-4 bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
 
           {/* ARIA Conflict Warnings */}
           {conflicts.length > 0 && (
-            <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded p-4">
+            <div className="mb-4 bg-[var(--cg-warning-subtle)] border border-[var(--cg-warning)]/20 rounded-lg p-4">
               <div className="flex items-start gap-2">
-                <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                <AlertTriangle className="h-5 w-5 text-[var(--cg-warning)] mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-semibold text-yellow-800 mb-2">Scheduling Conflict</p>
+                  <p className="font-semibold text-foreground mb-2">Scheduling Conflict</p>
                   {conflicts.map((conflict, i) => (
-                    <div key={i} className="text-sm text-yellow-700 mb-2">
+                    <div key={i} className="text-sm text-muted-foreground mb-2">
                       <p>{conflict.message}</p>
                       <p className="text-xs mt-1">{conflict.suggestion}</p>
                     </div>
                   ))}
-                  <p className="text-xs text-yellow-600 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     You can still create this event, but consider choosing a different time.
                   </p>
                 </div>
@@ -237,25 +221,6 @@ export default function EventForm({
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Collection */}
-            <div>
-              <Label htmlFor="collection">Collection</Label>
-              <select
-                id="collection"
-                value={formData.collection_id}
-                onChange={(e) => setFormData({ ...formData, collection_id: e.target.value })}
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md"
-                required
-              >
-                <option value="">Select a collection</option>
-                {collections.map((collection) => (
-                  <option key={collection.id} value={collection.id}>
-                    {collection.name} {collection.is_default && '(Default)'}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {/* Event Category */}
             <div>
               <Label htmlFor="event_category">Event Type</Label>
@@ -267,7 +232,7 @@ export default function EventForm({
                   event_category: e.target.value as EventCategory,
                   category_data: {} // Reset category data when type changes
                 })}
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full mt-1 px-3 py-2 border border-border rounded-md bg-card text-foreground"
               >
                 <option value="general">General Event</option>
                 <option value="medical">Medical/Doctor Appointment</option>
@@ -388,7 +353,7 @@ export default function EventForm({
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Add details about this event..."
                 rows={3}
-                className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full mt-1 px-3 py-2 border border-border rounded-md bg-card text-foreground"
               />
             </div>
 
@@ -422,7 +387,7 @@ export default function EventForm({
             </div>
 
             {/* Silent Handoff Section */}
-            <div className="pt-4 border-t border-gray-100">
+            <div className="pt-4 border-t border-border">
               <div className="flex items-start gap-3">
                 <div className="mt-1">
                   <input
@@ -430,12 +395,12 @@ export default function EventForm({
                     id="silent_handoff"
                     checked={formData.silent_handoff_enabled}
                     onChange={(e) => setFormData({ ...formData, silent_handoff_enabled: e.target.checked })}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
+                    className="rounded border-border text-[var(--portal-primary)] focus:ring-[var(--portal-primary)] h-5 w-5"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="silent_handoff" className="font-semibold text-gray-900">Enable Silent Handoff</Label>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <Label htmlFor="silent_handoff" className="font-semibold text-foreground">Enable Silent Handoff</Label>
+                  <p className="text-sm text-muted-foreground mt-1">
                     GPS-verified check-ins for custody exchanges. Location is captured only at check-in moment.
                   </p>
                 </div>
@@ -444,9 +409,9 @@ export default function EventForm({
               {formData.silent_handoff_enabled && (
                 <div className="mt-4 pl-8 space-y-4">
                   {/* Geolocation Status */}
-                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                  <div className="bg-muted p-4 rounded-lg border border-border">
                     <div className="flex items-center justify-between mb-3">
-                      <Label className="text-sm font-medium text-slate-700">Event Location GPS</Label>
+                      <Label className="text-sm font-medium text-foreground">Event Location GPS</Label>
                       {formData.location_lat && formData.location_lng ? (
                         <span className="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-green-200">
                           <Navigation className="w-3.5 h-3.5" />
@@ -461,7 +426,7 @@ export default function EventForm({
                     </div>
 
                     {formData.location_lat && formData.location_lng && (
-                      <div className="text-xs text-slate-500 mb-3 font-mono bg-white p-2 rounded border border-slate-100">
+                      <div className="text-xs text-muted-foreground mb-3 font-mono bg-card p-2 rounded border border-border">
                         {formData.location_lat.toFixed(6)}, {formData.location_lng.toFixed(6)}
                       </div>
                     )}
@@ -472,13 +437,13 @@ export default function EventForm({
                       size="sm"
                       onClick={handleGeocodeAddress}
                       disabled={isGeocoding || !formData.location}
-                      className="w-full text-xs bg-white hover:bg-slate-50 border-slate-300 text-slate-700"
+                      className="w-full text-xs bg-card hover:bg-muted border-border text-foreground"
                     >
                       {isGeocoding ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : <Navigation className="w-3.5 h-3.5 mr-2" />}
                       {formData.location_lat ? 'Update GPS Coordinates' : 'Verify Address for GPS'}
                     </Button>
                     {!formData.location && (
-                      <p className="text-xs text-amber-600 mt-2">
+                      <p className="text-xs text-[var(--cg-warning)] mt-2">
                         Please enter a location address above first.
                       </p>
                     )}
@@ -486,12 +451,12 @@ export default function EventForm({
 
                   {/* Geofence Radius */}
                   <div>
-                    <Label htmlFor="geofence_radius" className="text-xs font-medium text-gray-500 uppercase tracking-wide">Geofence Radius</Label>
+                    <Label htmlFor="geofence_radius" className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Geofence Radius</Label>
                     <select
                       id="geofence_radius"
                       value={formData.geofence_radius_meters}
                       onChange={(e) => setFormData({ ...formData, geofence_radius_meters: parseInt(e.target.value) })}
-                      className="w-full mt-1.5 text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      className="w-full mt-1.5 text-sm border-border rounded-md shadow-sm bg-card text-foreground focus:border-[var(--portal-primary)] focus:ring-[var(--portal-primary)]"
                     >
                       <option value="50">50m (Strict - Good for buildings)</option>
                       <option value="100">100m (Standard - Recommended)</option>
@@ -501,22 +466,22 @@ export default function EventForm({
                   </div>
 
                   {/* QR Code Toggle */}
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                  <div className="flex items-center gap-3 p-3 bg-muted rounded-lg border border-border">
                     <div className="flex items-center h-5">
                       <input
                         type="checkbox"
                         id="qr_required"
                         checked={formData.qr_confirmation_required}
                         onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
+                        className="rounded border-border text-[var(--portal-primary)] focus:ring-[var(--portal-primary)] h-4 w-4"
                       />
                     </div>
                     <div className="flex-1">
-                      <Label htmlFor="qr_required" className="text-sm font-medium text-gray-700 flex items-center gap-2 cursor-pointer">
-                        <QrCode className="w-4 h-4 text-gray-500" />
+                      <Label htmlFor="qr_required" className="text-sm font-medium text-foreground flex items-center gap-2 cursor-pointer">
+                        <QrCode className="w-4 h-4 text-muted-foreground" />
                         Require QR Code Check-in
                       </Label>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         Co-parent must scan a code on your device to confirm transfer.
                       </p>
                     </div>
@@ -541,7 +506,7 @@ export default function EventForm({
                   />
                   <Label htmlFor="visibility_coparent" className="cursor-pointer">
                     <div className="font-medium">Shared with co-parent</div>
-                    <div className="text-xs text-gray-500">Both parents can see this event</div>
+                    <div className="text-xs text-muted-foreground">Both parents can see this event</div>
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
@@ -556,7 +521,7 @@ export default function EventForm({
                   />
                   <Label htmlFor="visibility_private" className="cursor-pointer">
                     <div className="font-medium">Private</div>
-                    <div className="text-xs text-gray-500">Only you can see this event</div>
+                    <div className="text-xs text-muted-foreground">Only you can see this event</div>
                   </Label>
                 </div>
               </div>

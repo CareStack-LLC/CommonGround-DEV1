@@ -31,7 +31,7 @@ export const FEATURE_DISPLAY_NAMES: Record<string, string> = {
   custody_dashboard: 'Custody Dashboard',
   pdf_summaries: 'PDF Exports',
   circle_contacts_limit: 'My Circle Contacts',
-  kidcoms_access: 'KidsCom Video Calls',
+  kidcoms_access: 'KidSpace Video Calls',
   theater_mode: 'Theater Mode',
   court_reporting: 'Court Reporting',
 };

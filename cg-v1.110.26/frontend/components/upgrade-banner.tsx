@@ -124,7 +124,7 @@ export function UpgradeBanner({
             <p className="text-sm text-slate-600">
               {isFree()
                 ? 'Get auto-scheduling, PDF exports, QuickAccords & more'
-                : 'Get KidsCom video calls, court exports & theater mode'}
+                : 'Get KidSpace video calls, court exports & theater mode'}
             </p>
           </div>
         </div>
@@ -186,7 +186,7 @@ export function UpgradeBanner({
                 </>
               ) : (
                 <>
-                  <FeatureHighlight icon={Video} text="KidsCom video calls with children" />
+                  <FeatureHighlight icon={Video} text="KidSpace video calls with children" />
                   <FeatureHighlight icon={FileText} text="Court-ready evidence exports" />
                   <FeatureHighlight icon={Sparkles} text="Theater mode for watch parties" />
                 </>

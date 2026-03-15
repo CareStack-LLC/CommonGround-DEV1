@@ -63,14 +63,14 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
   function getStatusColor(status: string, hasFlags: boolean): string {
     if (hasFlags) return 'text-amber-600 bg-amber-50';
     if (status === 'completed') return 'text-green-600 bg-green-50';
-    if (status === 'missed') return 'text-gray-500 bg-gray-100';
+    if (status === 'missed') return 'text-muted-foreground bg-muted';
     if (status === 'terminated') return 'text-red-600 bg-red-50';
     return 'text-blue-600 bg-blue-50';
   }
 
   if (isLoading) {
     return (
-      <div className={cn('bg-white rounded-2xl border border-gray-200 p-6', className)}>
+      <div className={cn('bg-card rounded-2xl border border-border p-6', className)}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Phone className="h-5 w-5 text-purple-500" />
@@ -79,11 +79,11 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
         </div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="animate-pulse flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 bg-gray-200 rounded-full" />
+            <div key={i} className="animate-pulse flex items-center gap-3 p-3 bg-muted rounded-xl">
+              <div className="w-10 h-10 bg-muted rounded-full" />
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className="h-4 bg-muted rounded w-3/4" />
+                <div className="h-3 bg-muted rounded w-1/2" />
               </div>
             </div>
           ))}
@@ -94,7 +94,7 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
 
   if (error) {
     return (
-      <div className={cn('bg-white rounded-2xl border border-gray-200 p-6', className)}>
+      <div className={cn('bg-card rounded-2xl border border-border p-6', className)}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Phone className="h-5 w-5 text-purple-500" />
@@ -110,7 +110,7 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
 
   if (calls.length === 0) {
     return (
-      <div className={cn('bg-white rounded-2xl border border-gray-200 p-6', className)}>
+      <div className={cn('bg-card rounded-2xl border border-border p-6', className)}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Phone className="h-5 w-5 text-purple-500" />
@@ -122,7 +122,7 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
             <Phone className="h-8 w-8 text-purple-400" />
           </div>
           <p className="text-sm text-muted-foreground">No circle calls yet</p>
-          <p className="text-xs text-gray-500 mt-1">Circle contacts can call your children</p>
+          <p className="text-xs text-muted-foreground mt-1">Circle contacts can call your children</p>
         </div>
       </div>
     );
@@ -134,7 +134,7 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
   const flaggedCalls = calls.filter(c => c.aria_intervention_count > 0).length;
 
   return (
-    <div className={cn('bg-white rounded-2xl border border-gray-200 p-6', className)}>
+    <div className={cn('bg-card rounded-2xl border border-border p-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -176,18 +176,18 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
           <button
             key={call.id}
             onClick={() => router.push(`/family-files/${familyFileId}/circle-calls/${call.id}`)}
-            className="w-full p-3 rounded-xl hover:bg-gray-50 transition-colors border border-gray-100 hover:border-gray-200"
+            className="w-full p-3 rounded-xl hover:bg-muted transition-colors border border-border hover:border-border"
           >
             <div className="flex items-center gap-3">
               {/* Call Type Icon */}
               <div className={cn(
                 'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
-                call.call_type === 'video' ? 'bg-purple-100' : 'bg-slate-100'
+                call.call_type === 'video' ? 'bg-purple-100' : 'bg-muted'
               )}>
                 {call.call_type === 'video' ? (
                   <Video className="h-5 w-5 text-purple-600" />
                 ) : (
-                  <Phone className="h-5 w-5 text-slate-600" />
+                  <Phone className="h-5 w-5 text-muted-foreground" />
                 )}
               </div>
 
@@ -213,7 +213,7 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
                   </span>
                   {call.duration_seconds && (
                     <>
-                      <span className="text-xs text-gray-300">•</span>
+                      <span className="text-xs text-muted-foreground">•</span>
                       <span className="text-xs text-muted-foreground">
                         {formatDuration(call.duration_seconds)}
                       </span>

@@ -1609,10 +1609,18 @@ export interface EventV2 {
   created_at: string;
   updated_at: string;
   event_type?: string;
+
+  // Professional event fields
+  professional_id?: string;
+  professional_event_type?: string; // meeting, court_hearing, video_call, document_deadline, consultation, deposition, mediation
+  professional_name?: string;
+  professional_role?: string;
+  parent_visibility?: 'none' | 'required_parent' | 'both_parents';
+  is_professional_event?: boolean;
 }
 
 export interface CreateEventRequest {
-  collection_id: string;
+  collection_id?: string;
   title: string;
   start_time: string;
   end_time: string;
@@ -1636,6 +1644,7 @@ export interface CreateEventRequest {
   }>;
   event_category?: EventCategory; // V2: category-specific forms
   category_data?: CategoryData; // V2: category-specific fields
+  sync_to_kidspace?: boolean; // Sync event to children's KidSpace calendars
 }
 
 export interface UpdateEventRequest {

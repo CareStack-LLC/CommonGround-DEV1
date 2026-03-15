@@ -93,7 +93,7 @@ const PLAN_DETAILS: Record<string, {
       'SharedCare Agreements (formal custody plans)',
       'Silent Handoff with GPS verification',
       'Mandatory event check-ins (school, medical, court)',
-      'KidsCom access (child video calls)',
+      'KidSpace access (child video calls)',
       'Watch Together theater mode',
       'My Circle: +5 trusted contacts',
       'Court-ready export bundles',
@@ -111,7 +111,7 @@ const PLAN_DETAILS: Record<string, {
       'SharedCare Agreements (formal custody plans)',
       'Silent Handoff with GPS verification',
       'Mandatory event check-ins (school, medical, court)',
-      'KidsCom access (child video calls)',
+      'KidSpace access (child video calls)',
       'Watch Together theater mode',
       'My Circle: +5 trusted contacts',
       'Court-ready export bundles',
@@ -706,7 +706,7 @@ export default function BillingSettingsPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-3 w-3 text-cg-sage" />
-                    KidsCom video calls
+                    KidSpace video calls
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-3 w-3 text-cg-sage" />

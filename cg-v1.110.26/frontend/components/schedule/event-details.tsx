@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, MapPin, Clock, Users, Calendar, Check, X as XIcon, HelpCircle, Stethoscope, GraduationCap, Trophy, RefreshCw, Smartphone } from 'lucide-react';
+import { X, MapPin, Clock, Users, Calendar, Check, X as XIcon, HelpCircle, Stethoscope, GraduationCap, Trophy, RefreshCw, Smartphone, Gavel } from 'lucide-react';
 import { eventsAPI, scheduleAPI, EventV2, EventAttendance, UpdateRSVPRequest, MedicalCategoryData, SchoolCategoryData, SportsCategoryData, ExchangeCategoryData, SwapResponseAction, ExchangeCheckIn } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -159,24 +159,51 @@ export default function EventDetails({
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold">{event.title}</h2>
-              {event.is_owner && (
-                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                  Your Event
-                </span>
-              )}
+              <h2 className="text-xl font-bold text-foreground">{event.title}</h2>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                {event.is_owner && (
+                  <span className="text-xs bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] px-2 py-0.5 rounded-full font-medium">
+                    Your Event
+                  </span>
+                )}
+                {(event.is_professional_event || event.professional_id) && (
+                  <span className="text-xs bg-[var(--portal-secondary)]/10 text-[var(--portal-secondary)] px-2 py-0.5 rounded-full font-medium">
+                    Professional Event
+                  </span>
+                )}
+              </div>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-muted-foreground hover:text-foreground"
               aria-label="Close"
             >
               <X className="h-6 w-6" />
             </button>
           </div>
 
+          {/* Professional Event Info */}
+          {(event.is_professional_event || event.professional_id) && (
+            <div className="mb-4 p-3 bg-[var(--portal-secondary)]/5 border border-[var(--portal-secondary)]/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <Gavel className="h-4 w-4 text-[var(--portal-secondary)]" />
+                <span className="text-sm font-semibold text-foreground">
+                  {event.professional_event_type
+                    ? event.professional_event_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                    : 'Professional Event'}
+                </span>
+              </div>
+              {event.professional_name && (
+                <p className="text-xs text-muted-foreground ml-6">
+                  Added by: {event.professional_name}
+                  {event.professional_role && ` (${event.professional_role})`}
+                </p>
+              )}
+            </div>
+          )}
+
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+            <div className="mb-4 bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
           )}
@@ -185,10 +212,10 @@ export default function EventDetails({
           <div className="space-y-4 mb-6">
             {/* Date & Time */}
             <div className="flex items-start gap-3">
-              <Calendar className="h-5 w-5 text-gray-400 mt-0.5" />
+              <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
-                <div className="font-medium">{formatDateTime(event.start_time)}</div>
-                <div className="text-sm text-gray-600">
+                <div className="font-medium text-foreground">{formatDateTime(event.start_time)}</div>
+                <div className="text-sm text-muted-foreground">
                   to {formatTime(event.end_time)}
                 </div>
               </div>

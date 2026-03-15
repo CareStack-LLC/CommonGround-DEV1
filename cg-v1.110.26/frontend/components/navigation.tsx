@@ -64,35 +64,27 @@ const marketingLinks: TopNavLink[] = [
   { name: 'Contact', path: '/contact', icon: Mail },
 ];
 
-// Logo component
+// Logo component - Two overlapping circles representing two parents finding common ground
 function Logo({ className = '', onClick }: { className?: string; onClick?: () => void }) {
   return (
     <div
-      className={`flex items-center gap-2 cursor-pointer ${className}`}
+      className={`flex items-center gap-2.5 cursor-pointer ${className}`}
       onClick={onClick}
     >
-      <div className="w-9 h-9 bg-white rounded-xl flex items-center justify-center">
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center">
         <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path
-            d="M12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20"
-            stroke="#2C5F5D"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <path
-            d="M12 4C16.42 4 20 7.58 20 12C20 16.42 16.42 20 12 20"
-            stroke="#2C5F5D"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeDasharray="4 4"
-          />
-          <circle cx="12" cy="12" r="2.5" fill="#2C5F5D" />
+          {/* Left circle - Parent A */}
+          <circle cx="12" cy="16" r="9" stroke="white" strokeWidth="2" fill="none" opacity="0.8" />
+          {/* Right circle - Parent B */}
+          <circle cx="20" cy="16" r="9" stroke="white" strokeWidth="2" fill="none" opacity="0.8" />
+          {/* Common ground - intersection dot */}
+          <circle cx="16" cy="16" r="3" fill="white" />
         </svg>
       </div>
       <span className="text-lg font-semibold text-white hidden sm:inline" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -174,8 +166,8 @@ export function Navigation() {
 
   return (
     <>
-      {/* Top Navigation Bar - Portal-aware background */}
-      <header className="bg-[var(--portal-primary)] border-b border-white/10 sticky top-0 z-50">
+      {/* Top Navigation Bar - Portal-aware background with dark mode support */}
+      <header className="bg-[var(--portal-primary)] dark:bg-[#0F1D27] border-b border-white/10 dark:border-[var(--portal-border)] sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -261,9 +253,9 @@ export function Navigation() {
                           {profile?.is_professional && (
                             <button
                               onClick={() => handleNavigation('/professional')}
-                              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-emerald-50 hover:text-emerald-900 transition-all"
+                              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-muted hover:text-foreground transition-all"
                             >
-                              <div className="w-8 h-8 rounded-lg bg-emerald-100/50 flex items-center justify-center text-emerald-600">
+                              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-[var(--portal-primary)]">
                                 <Briefcase className="h-4 w-4" />
                               </div>
                               Professional Portal
@@ -273,9 +265,9 @@ export function Navigation() {
                           {partnerAccess.length > 0 && (
                             <button
                               onClick={() => handleNavigation(`/dashboard/partners/${partnerAccess[0].partner_slug}`)}
-                              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-amber-50 hover:text-amber-900 transition-all"
+                              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-foreground rounded-xl hover:bg-muted hover:text-foreground transition-all"
                             >
-                              <div className="w-8 h-8 rounded-lg bg-amber-100/50 flex items-center justify-center text-amber-600">
+                              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-[var(--portal-accent)]">
                                 <Users className="h-4 w-4" />
                               </div>
                               Partner Dashboard
@@ -323,9 +315,9 @@ export function Navigation() {
                         <div className="border-t border-border pt-2 mt-2 px-2 pb-2">
                           <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-all group"
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-destructive rounded-xl hover:bg-destructive/10 transition-all group"
                           >
-                            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500 group-hover:bg-red-100 group-hover:text-red-600 transition-colors">
+                            <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center text-destructive group-hover:bg-destructive/20 transition-colors">
                               <LogOut className="h-4 w-4" />
                             </div>
                             Sign out
