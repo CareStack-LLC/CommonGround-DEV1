@@ -251,6 +251,11 @@ from app.models.invitation import (
     InvitationSource,
     CaseEventType,
 )
+from app.models.report_request import (
+    ReportRequest,
+    REPORT_REQUEST_STATUSES,
+    URGENCY_LEVELS,
+)
 
 __all__ = [
     "Base",
@@ -496,4 +501,8 @@ __all__ = [
     "InvitationStatus",
     "InvitationSource",
     "CaseEventType",
+    # Report Requests (Paid Report Pipeline)
+    "ReportRequest",
+    "REPORT_REQUEST_STATUSES",
+    "URGENCY_LEVELS",
 ]

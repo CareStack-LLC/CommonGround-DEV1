@@ -5,6 +5,7 @@ This module provides endpoints for generating self-service parent reports
 with real data from the CommonGround platform.
 """
 
+import calendar
 import io
 import logging
 from datetime import date, datetime, timedelta
@@ -20,11 +21,12 @@ from app.core.security import get_current_user
 from app.models.user import User
 from app.models.family_file import FamilyFile
 from app.services.reports import ParentReportService
+from app.services.reports.monthly_report_service import MonthlyReportService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-ReportType = Literal["custody_time", "communication", "expense", "schedule"]
+ReportType = Literal["custody_time", "communication", "expense", "schedule", "kidspace_communication"]
 
 
 async def verify_family_file_access(
@@ -79,6 +81,7 @@ async def generate_parent_report(
     - **communication**: Message patterns and ARIA interventions
     - **expense**: ClearFund obligations and financial compliance
     - **schedule**: Exchange history and GPS verification
+    - **kidspace_communication**: KidSpace child communication activity
 
     Returns the PDF file as a streaming response for immediate download.
     """
@@ -118,9 +121,82 @@ async def generate_parent_report(
         "communication": "Communication-Summary",
         "expense": "Expense-Summary",
         "schedule": "Schedule-History",
+        "kidspace_communication": "KidSpace-Communication",
     }
     report_name = report_names.get(report_type, "Report")
     filename = f"CommonGround-{report_name}-{date.today().isoformat()}.pdf"
+
+    return StreamingResponse(
+        io.BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Content-Length": str(len(pdf_bytes)),
+        }
+    )
+
+
+@router.post(
+    "/generate/monthly",
+    summary="Generate monthly parent report",
+    description="Generate a comprehensive monthly PDF combining all report types.",
+    responses={
+        200: {
+            "description": "PDF report file",
+            "content": {"application/pdf": {}},
+        }
+    },
+)
+async def generate_monthly_report(
+    family_file_id: str = Query(..., description="Family file ID"),
+    month: int = Query(..., ge=1, le=12, description="Month (1-12)"),
+    year: int = Query(..., ge=2024, le=2030, description="Year"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> StreamingResponse:
+    """
+    Generate a comprehensive monthly PDF report for a parent.
+
+    Aggregates all 4 report types (custody time, communication, expense,
+    schedule) into a single branded PDF with an executive summary and
+    overall compliance score.
+
+    Returns the PDF file as a streaming response for immediate download.
+    """
+    # Verify access
+    await verify_family_file_access(db, str(current_user.id), family_file_id)
+
+    # Validate the requested month is not in the future
+    now = datetime.utcnow()
+    if year > now.year or (year == now.year and month > now.month):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot generate a report for a future month."
+        )
+
+    # Generate report
+    try:
+        service = MonthlyReportService(db)
+        pdf_bytes, _ = await service.generate_monthly_report(
+            family_file_id=family_file_id,
+            month=month,
+            year=year,
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        logger.error(f"Error generating monthly report: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate monthly report. Please try again."
+        )
+
+    # Generate filename
+    month_name = calendar.month_name[month]
+    filename = f"CommonGround-Monthly-Report-{month_name}-{year}.pdf"
 
     return StreamingResponse(
         io.BytesIO(pdf_bytes),

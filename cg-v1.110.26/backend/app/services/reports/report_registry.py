@@ -1,8 +1,8 @@
 """
 Report Registry - Maps GTM spec report codes to implementations.
 
-The GTM spec defines 15 reports:
-- P-1 through P-7: Parent self-service reports
+The GTM spec defines 17 reports:
+- P-1 through P-9: Parent self-service reports
 - A-1 through A-8: Attorney/professional reports
 
 This registry maps each code to its implementation details,
@@ -13,7 +13,7 @@ from typing import Optional
 
 
 # =============================================================================
-# Parent Reports (P-1 through P-7)
+# Parent Reports (P-1 through P-9)
 # =============================================================================
 
 PARENT_REPORTS = {
@@ -95,6 +95,30 @@ PARENT_REPORTS = {
         "court_ready": True,
         "pdf_export": True,
         "available": False,  # Not yet implemented
+    },
+    "P-8": {
+        "code": "P-8",
+        "name": "KidSpace Communication Snapshot",
+        "description": "30-day snapshot of child communication activity through KidSpace including video calls, chats, and circle contact activity.",
+        "internal_type": "kidspace_communication",
+        "tier_required": "starter",
+        "sha256_verified": False,
+        "court_ready": False,
+        "pdf_export": True,
+        "available": True,
+    },
+    "P-9": {
+        "code": "P-9",
+        "name": "KidSpace Court Communication Report",
+        "description": "Detailed court-ready child communication report with full session logs, ARIA analysis, and SHA-256 verification.",
+        "internal_type": "kidspace_communication_court",
+        "tier_required": "complete",
+        "sha256_verified": True,
+        "court_ready": True,
+        "pdf_export": True,
+        "paid": True,
+        "base_price_cents": 7900,
+        "available": True,
     },
 }
 

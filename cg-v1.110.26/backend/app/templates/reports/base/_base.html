@@ -12,21 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    {
-      % include 'base/_brand.css' %
-    }
-
-    {
-      % include 'base/_print.css' %
-    }
-
-    {
-      % block extra_styles %
-    }
-
-    {
-      % endblock %
-    }
+    {% include 'base/_brand.css' %}
+    {% include 'base/_print.css' %}
+    {% block extra_styles %}{% endblock %}
   </style>
 </head>
 
@@ -36,9 +24,16 @@
     {% block cover %}
     <div class="cover-header">
       <div class="logo-area">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#4A6C58"/>
-          <path d="M12 6C8.69 6 6 8.69 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12C18 8.69 15.31 6 12 6ZM12 16C9.79 16 8 14.21 8 12C8 9.79 9.79 8 12 8C14.21 8 16 9.79 16 12C16 14.21 14.21 16 12 16Z" fill="#4A6C58"/>
+        <!-- CommonGround Logo: Two overlapping leaves forming common ground -->
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Left leaf -->
+          <path d="M20 44C20 44 12 36 12 26C12 16 20 10 28 10C28 10 20 18 20 28C20 38 24 42 20 44Z" fill="#4A6C58" opacity="0.7"/>
+          <!-- Right leaf -->
+          <path d="M44 44C44 44 52 36 52 26C52 16 44 10 36 10C36 10 44 18 44 28C44 38 40 42 44 44Z" fill="#4A6C58" opacity="0.7"/>
+          <!-- Center overlap / bridge -->
+          <path d="M28 10C28 10 32 16 32 26C32 36 28 44 32 48C36 44 32 36 32 26C32 16 36 10 36 10C34 8 30 8 28 10Z" fill="#2C4034"/>
+          <!-- Ground line -->
+          <rect x="16" y="48" width="32" height="2" rx="1" fill="#4A6C58"/>
         </svg>
       </div>
       <div class="report-badge">
@@ -65,8 +60,14 @@
         </div>
         <div class="meta-item">
           <span class="meta-label">Generated On</span>
-          <span class="meta-value">{{ generated_at.strftime('%B %d, %Y') }}</span>
+          <span class="meta-value">{{ generated_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
         </div>
+        {% if report_id %}
+        <div class="meta-item">
+          <span class="meta-label">Report ID</span>
+          <span class="meta-value font-mono" style="font-size: 0.85rem;">{{ report_id }}</span>
+        </div>
+        {% endif %}
       </div>
     </div>
 

@@ -548,6 +548,65 @@ class EmailService:
 
         return await self._send_email(to_email, subject, html_body)
 
+    async def send_monthly_report(
+        self,
+        to_email: str,
+        to_name: str,
+        month_name: str,
+        year: int,
+        family_file_name: str,
+        compliance_rate: float,
+        total_exchanges: int,
+        on_time_count: int,
+        completed_exchanges: int,
+        missed_exchanges: int,
+        gps_verified_count: int,
+        message_count: int,
+        full_report_url: str,
+    ) -> bool:
+        """
+        Send monthly parent report email notification.
+
+        Uses the compliance_monthly.html email template to notify parents
+        that their comprehensive monthly report is ready.
+
+        Args:
+            to_email: Recipient email
+            to_name: Recipient name
+            month_name: Month name (e.g. "January")
+            year: Year (e.g. 2026)
+            family_file_name: Name of the family file
+            compliance_rate: Overall compliance percentage (0-100)
+            total_exchanges: Total exchanges in the month
+            on_time_count: Number of on-time/completed exchanges
+            completed_exchanges: Number of completed exchanges
+            missed_exchanges: Number of missed exchanges
+            gps_verified_count: Number of GPS verified check-ins
+            message_count: Number of messages exchanged
+            full_report_url: Link to download/view the full PDF report
+
+        Returns:
+            Success status
+        """
+        subject = f"Your Monthly Report is Ready - {month_name} {year}"
+
+        html_body = self._render_template('reports/compliance_monthly.html', {
+            'to_name': to_name,
+            'family_file_name': family_file_name,
+            'compliance_rate': int(compliance_rate),
+            'total_exchanges': total_exchanges,
+            'full_report_url': full_report_url,
+            'month_name': month_name,
+            'year': year,
+            'on_time_count': on_time_count,
+            'completed_exchanges': completed_exchanges,
+            'missed_exchanges': missed_exchanges,
+            'gps_verified_count': gps_verified_count,
+            'message_count': message_count,
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
     # ==================== ClearFund Emails ====================
 
     async def send_expense_request(

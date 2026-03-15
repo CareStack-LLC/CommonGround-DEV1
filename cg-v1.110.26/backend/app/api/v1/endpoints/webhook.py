@@ -650,14 +650,23 @@ async def handle_checkout_completed(db: AsyncSession, event_data: dict) -> None:
     """
     Handle completed checkout session.
 
-    Logs checkout completion for subscription payments.
-    The actual subscription sync happens via subscription.created webhook.
+    Routes to:
+    - Subscription: logs completion (actual sync via subscription.created)
+    - Professional report: creates/updates ReportRequest with status='paid'
     """
+    from datetime import datetime
+
     session_id = event_data.get("session_id")
     customer_id = event_data.get("customer_id")
     subscription_id = event_data.get("subscription_id")
     mode = event_data.get("mode")
     payment_status = event_data.get("payment_status")
+    metadata = event_data.get("metadata", {})
+
+    # Handle professional report purchases
+    if metadata.get("type") == "professional_report":
+        await _handle_professional_report_checkout(db, event_data)
+        return
 
     if mode != "subscription":
         return
@@ -665,6 +674,87 @@ async def handle_checkout_completed(db: AsyncSession, event_data: dict) -> None:
     logger.info(
         f"Checkout completed: session={session_id}, customer={customer_id}, "
         f"subscription={subscription_id}, payment_status={payment_status}"
+    )
+
+
+async def _handle_professional_report_checkout(db: AsyncSession, event_data: dict) -> None:
+    """
+    Handle professional report checkout completion.
+
+    Creates or updates a ReportRequest record with status='paid',
+    linking the Stripe session and payment intent.
+    """
+    from datetime import datetime, date as date_type
+    from app.models.report_request import ReportRequest
+
+    metadata = event_data.get("metadata", {})
+    session_id = event_data.get("session_id")
+    payment_intent_id = event_data.get("payment_intent_id")
+    amount_total = event_data.get("amount_total")
+
+    family_file_id = metadata.get("family_file_id")
+    requested_by_id = metadata.get("requested_by_id")
+    report_type = metadata.get("report_type")
+    urgency = metadata.get("urgency", "standard")
+    report_request_id = metadata.get("report_request_id")
+
+    if not family_file_id or not requested_by_id or not report_type:
+        logger.warning(
+            f"Professional report checkout missing required metadata: "
+            f"session={session_id}, metadata={metadata}"
+        )
+        return
+
+    # Check if there's an existing report request (pre-created at checkout init)
+    if report_request_id:
+        result = await db.execute(
+            select(ReportRequest).where(ReportRequest.id == report_request_id)
+        )
+        report_request = result.scalar_one_or_none()
+    else:
+        report_request = None
+
+    if report_request:
+        # Update existing request
+        report_request.status = "paid"
+        report_request.stripe_checkout_session_id = session_id
+        report_request.stripe_payment_intent_id = payment_intent_id
+        report_request.price_cents = amount_total
+    else:
+        # Create new request
+        report_request = ReportRequest(
+            family_file_id=family_file_id,
+            requested_by_id=requested_by_id,
+            report_type=report_type,
+            status="paid",
+            stripe_checkout_session_id=session_id,
+            stripe_payment_intent_id=payment_intent_id,
+            urgency=urgency,
+            price_cents=amount_total,
+        )
+
+        # Parse date range from metadata if provided
+        if metadata.get("date_range_start"):
+            try:
+                report_request.date_range_start = date_type.fromisoformat(
+                    metadata["date_range_start"]
+                )
+            except ValueError:
+                pass
+        if metadata.get("date_range_end"):
+            try:
+                report_request.date_range_end = date_type.fromisoformat(
+                    metadata["date_range_end"]
+                )
+            except ValueError:
+                pass
+
+        db.add(report_request)
+
+    logger.info(
+        f"Professional report checkout completed: session={session_id}, "
+        f"type={report_type}, family_file={family_file_id}, "
+        f"amount={amount_total}"
     )
 
 

@@ -97,3 +97,17 @@ h1, h2, h3, h4, h5, h6 {
 .bg-sage-subtle { background-color: var(--cg-sage-subtle); }
 .bg-cream { background-color: var(--cg-cream); }
 
+/* Font-face fallbacks for WeasyPrint */
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Crimson Text'), local('Georgia'), local('Times New Roman');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Inter'), local('Helvetica Neue'), local('Arial');
+}
+

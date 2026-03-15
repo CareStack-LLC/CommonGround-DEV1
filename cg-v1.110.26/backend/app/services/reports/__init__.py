@@ -6,6 +6,7 @@ Includes the GTM report registry (P-1..P-7, A-1..A-8).
 """
 
 from .chart_builder import ChartBuilder
+from .monthly_report_service import MonthlyReportService
 from .parent_report_service import ParentReportService
 from .report_registry import (
     ALL_REPORTS,
@@ -19,6 +20,7 @@ from .report_registry import (
 
 __all__ = [
     "ChartBuilder",
+    "MonthlyReportService",
     "ParentReportService",
     "ALL_REPORTS",
     "PARENT_REPORTS",
