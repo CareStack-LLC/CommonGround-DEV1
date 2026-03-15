@@ -24,18 +24,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { parent } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
+import { useTheme } from "@/theme";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
 
 type TimePeriod = "week" | "month" | "quarter";
 
@@ -58,6 +49,7 @@ interface CustodyStats {
 }
 
 export default function CustodyStatsScreen() {
+  const { colors } = useTheme();
   const { user } = useAuth();
   const { familyFile, children } = useFamilyFile();
 
@@ -165,10 +157,10 @@ export default function CustodyStatsScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>
           Loading statistics...
         </Text>
       </SafeAreaView>
@@ -191,16 +183,16 @@ export default function CustodyStatsScreen() {
     : complianceStats?.parent_a_compliance;
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 16 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.sage} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         {/* Period Selector */}
-        <View className="flex-row mb-6 p-1 rounded-xl" style={{ backgroundColor: colors.sand }}>
+        <View className="flex-row mb-6 p-1 rounded-xl" style={{ backgroundColor: colors.backgroundSecondary }}>
           {(["week", "month", "quarter"] as TimePeriod[]).map((p) => (
             <TouchableOpacity
               key={p}
@@ -212,7 +204,7 @@ export default function CustodyStatsScreen() {
             >
               <Text
                 className="font-medium"
-                style={{ color: period === p ? colors.sage : colors.slate }}
+                style={{ color: period === p ? colors.primary : colors.secondary }}
               >
                 {getPeriodLabel(p)}
               </Text>
@@ -221,8 +213,8 @@ export default function CustodyStatsScreen() {
         </View>
 
         {/* Custody Distribution */}
-        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: "white" }}>
-          <Text className="font-semibold text-lg mb-4" style={{ color: colors.slate }}>
+        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: colors.background }}>
+          <Text className="font-semibold text-lg mb-4" style={{ color: colors.secondary }}>
             Custody Time Distribution
           </Text>
 
@@ -232,13 +224,13 @@ export default function CustodyStatsScreen() {
               <View
                 style={{
                   flex: yourPercentage || 50,
-                  backgroundColor: colors.sage,
+                  backgroundColor: colors.primary,
                 }}
               />
               <View
                 style={{
                   flex: theirPercentage || 50,
-                  backgroundColor: colors.slate,
+                  backgroundColor: colors.secondary,
                 }}
               />
             </View>
@@ -248,29 +240,29 @@ export default function CustodyStatsScreen() {
           <View className="flex-row justify-between">
             <View className="flex-1">
               <View className="flex-row items-center mb-2">
-                <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colors.sage }} />
-                <Text className="text-sm" style={{ color: colors.slate }}>
+                <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colors.primary }} />
+                <Text className="text-sm" style={{ color: colors.secondary }}>
                   Your Time
                 </Text>
               </View>
-              <Text className="text-2xl font-bold" style={{ color: colors.sage }}>
+              <Text className="text-2xl font-bold" style={{ color: colors.primary }}>
                 {yourDays} days
               </Text>
-              <Text className="text-sm" style={{ color: "#9CA3AF" }}>
+              <Text className="text-sm" style={{ color: colors.textMuted }}>
                 {yourPercentage}%
               </Text>
             </View>
             <View className="flex-1 items-end">
               <View className="flex-row items-center mb-2">
-                <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colors.slate }} />
-                <Text className="text-sm" style={{ color: colors.slate }}>
+                <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colors.secondary }} />
+                <Text className="text-sm" style={{ color: colors.secondary }}>
                   Co-Parent's Time
                 </Text>
               </View>
-              <Text className="text-2xl font-bold" style={{ color: colors.slate }}>
+              <Text className="text-2xl font-bold" style={{ color: colors.secondary }}>
                 {theirDays} days
               </Text>
-              <Text className="text-sm" style={{ color: "#9CA3AF" }}>
+              <Text className="text-sm" style={{ color: colors.textMuted }}>
                 {theirPercentage}%
               </Text>
             </View>
@@ -278,8 +270,8 @@ export default function CustodyStatsScreen() {
         </View>
 
         {/* Exchange Compliance */}
-        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: "white" }}>
-          <Text className="font-semibold text-lg mb-4" style={{ color: colors.slate }}>
+        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: colors.background }}>
+          <Text className="font-semibold text-lg mb-4" style={{ color: colors.secondary }}>
             Exchange Compliance
           </Text>
 
@@ -288,15 +280,15 @@ export default function CustodyStatsScreen() {
             <View
               className="w-32 h-32 rounded-full items-center justify-center"
               style={{
-                backgroundColor: `${colors.sage}15`,
+                backgroundColor: `${colors.primary}15`,
                 borderWidth: 8,
-                borderColor: colors.sage,
+                borderColor: colors.primary,
               }}
             >
-              <Text className="text-3xl font-bold" style={{ color: colors.sage }}>
+              <Text className="text-3xl font-bold" style={{ color: colors.primary }}>
                 {complianceStats ? Math.round(complianceStats.on_time_rate * 100) : 0}%
               </Text>
-              <Text className="text-xs" style={{ color: colors.slate }}>
+              <Text className="text-xs" style={{ color: colors.secondary }}>
                 On-Time Rate
               </Text>
             </View>
@@ -305,53 +297,53 @@ export default function CustodyStatsScreen() {
           {/* Stats Grid */}
           <View className="flex-row flex-wrap -mx-2">
             <View className="w-1/2 px-2 mb-4">
-              <View className="rounded-xl p-3" style={{ backgroundColor: colors.sand }}>
+              <View className="rounded-xl p-3" style={{ backgroundColor: colors.backgroundSecondary }}>
                 <View className="flex-row items-center mb-1">
-                  <Ionicons name="checkmark-circle" size={16} color={colors.sage} />
-                  <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
+                  <Ionicons name="checkmark-circle" size={16} color={colors.primary} />
+                  <Text className="ml-1 text-xs" style={{ color: colors.secondary }}>
                     Completed
                   </Text>
                 </View>
-                <Text className="text-xl font-bold" style={{ color: colors.slate }}>
+                <Text className="text-xl font-bold" style={{ color: colors.secondary }}>
                   {complianceStats?.completed_exchanges || 0}
                 </Text>
               </View>
             </View>
             <View className="w-1/2 px-2 mb-4">
-              <View className="rounded-xl p-3" style={{ backgroundColor: colors.sand }}>
+              <View className="rounded-xl p-3" style={{ backgroundColor: colors.backgroundSecondary }}>
                 <View className="flex-row items-center mb-1">
-                  <Ionicons name="swap-horizontal" size={16} color={colors.amber} />
-                  <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
+                  <Ionicons name="swap-horizontal" size={16} color={colors.accent} />
+                  <Text className="ml-1 text-xs" style={{ color: colors.secondary }}>
                     Total Exchanges
                   </Text>
                 </View>
-                <Text className="text-xl font-bold" style={{ color: colors.slate }}>
+                <Text className="text-xl font-bold" style={{ color: colors.secondary }}>
                   {complianceStats?.total_exchanges || 0}
                 </Text>
               </View>
             </View>
             <View className="w-1/2 px-2">
-              <View className="rounded-xl p-3" style={{ backgroundColor: colors.sand }}>
+              <View className="rounded-xl p-3" style={{ backgroundColor: colors.backgroundSecondary }}>
                 <View className="flex-row items-center mb-1">
                   <Ionicons name="close-circle" size={16} color="#DC2626" />
-                  <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
+                  <Text className="ml-1 text-xs" style={{ color: colors.secondary }}>
                     Missed
                   </Text>
                 </View>
-                <Text className="text-xl font-bold" style={{ color: colors.slate }}>
+                <Text className="text-xl font-bold" style={{ color: colors.secondary }}>
                   {complianceStats?.missed_exchanges || 0}
                 </Text>
               </View>
             </View>
             <View className="w-1/2 px-2">
-              <View className="rounded-xl p-3" style={{ backgroundColor: colors.sand }}>
+              <View className="rounded-xl p-3" style={{ backgroundColor: colors.backgroundSecondary }}>
                 <View className="flex-row items-center mb-1">
-                  <Ionicons name="alert-circle" size={16} color={colors.amber} />
-                  <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
+                  <Ionicons name="alert-circle" size={16} color={colors.accent} />
+                  <Text className="ml-1 text-xs" style={{ color: colors.secondary }}>
                     Disputed
                   </Text>
                 </View>
-                <Text className="text-xl font-bold" style={{ color: colors.slate }}>
+                <Text className="text-xl font-bold" style={{ color: colors.secondary }}>
                   {complianceStats?.disputed_exchanges || 0}
                 </Text>
               </View>
@@ -360,8 +352,8 @@ export default function CustodyStatsScreen() {
         </View>
 
         {/* Individual Compliance */}
-        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: "white" }}>
-          <Text className="font-semibold text-lg mb-4" style={{ color: colors.slate }}>
+        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: colors.background }}>
+          <Text className="font-semibold text-lg mb-4" style={{ color: colors.secondary }}>
             Individual Compliance Rates
           </Text>
 
@@ -369,20 +361,20 @@ export default function CustodyStatsScreen() {
           <View className="mb-4">
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-row items-center">
-                <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colors.sage }} />
-                <Text className="font-medium" style={{ color: colors.slate }}>
+                <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colors.primary }} />
+                <Text className="font-medium" style={{ color: colors.secondary }}>
                   You
                 </Text>
               </View>
-              <Text className="font-semibold" style={{ color: colors.sage }}>
+              <Text className="font-semibold" style={{ color: colors.primary }}>
                 {yourCompliance ? Math.round(yourCompliance * 100) : 0}%
               </Text>
             </View>
-            <View className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: colors.sand }}>
+            <View className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: colors.backgroundSecondary }}>
               <View
                 className="h-full rounded-full"
                 style={{
-                  backgroundColor: colors.sage,
+                  backgroundColor: colors.primary,
                   width: `${yourCompliance ? yourCompliance * 100 : 0}%`,
                 }}
               />
@@ -393,20 +385,20 @@ export default function CustodyStatsScreen() {
           <View>
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-row items-center">
-                <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colors.slate }} />
-                <Text className="font-medium" style={{ color: colors.slate }}>
+                <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colors.secondary }} />
+                <Text className="font-medium" style={{ color: colors.secondary }}>
                   Co-Parent
                 </Text>
               </View>
-              <Text className="font-semibold" style={{ color: colors.slate }}>
+              <Text className="font-semibold" style={{ color: colors.secondary }}>
                 {theirCompliance ? Math.round(theirCompliance * 100) : 0}%
               </Text>
             </View>
-            <View className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: colors.sand }}>
+            <View className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: colors.backgroundSecondary }}>
               <View
                 className="h-full rounded-full"
                 style={{
-                  backgroundColor: colors.slate,
+                  backgroundColor: colors.secondary,
                   width: `${theirCompliance ? theirCompliance * 100 : 0}%`,
                 }}
               />
@@ -416,8 +408,8 @@ export default function CustodyStatsScreen() {
 
         {/* Children Info */}
         {children.length > 0 && (
-          <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: "white" }}>
-            <Text className="font-semibold text-lg mb-4" style={{ color: colors.slate }}>
+          <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: colors.background }}>
+            <Text className="font-semibold text-lg mb-4" style={{ color: colors.secondary }}>
               Children
             </Text>
             <View className="space-y-3">
@@ -425,14 +417,14 @@ export default function CustodyStatsScreen() {
                 <View key={child.id} className="flex-row items-center">
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center"
-                    style={{ backgroundColor: colors.sand }}
+                    style={{ backgroundColor: colors.backgroundSecondary }}
                   >
-                    <Text className="font-bold" style={{ color: colors.sage }}>
+                    <Text className="font-bold" style={{ color: colors.primary }}>
                       {child.first_name?.charAt(0) || "?"}
                     </Text>
                   </View>
                   <View className="flex-1 ml-3">
-                    <Text className="font-medium" style={{ color: colors.slate }}>
+                    <Text className="font-medium" style={{ color: colors.secondary }}>
                       {child.first_name} {child.last_name}
                     </Text>
                   </View>
@@ -443,14 +435,14 @@ export default function CustodyStatsScreen() {
         )}
 
         {/* Info Note */}
-        <View className="rounded-xl p-4" style={{ backgroundColor: colors.sand }}>
+        <View className="rounded-xl p-4" style={{ backgroundColor: colors.backgroundSecondary }}>
           <View className="flex-row items-start">
-            <Ionicons name="information-circle" size={20} color={colors.sage} />
+            <Ionicons name="information-circle" size={20} color={colors.primary} />
             <View className="flex-1 ml-3">
-              <Text className="font-medium mb-1" style={{ color: colors.slate }}>
+              <Text className="font-medium mb-1" style={{ color: colors.secondary }}>
                 About These Statistics
               </Text>
-              <Text className="text-sm" style={{ color: colors.slate }}>
+              <Text className="text-sm" style={{ color: colors.secondary }}>
                 These statistics are based on custody records logged through exchanges
                 and manual updates. Data may be shared with professionals (attorneys,
                 mediators) who have access to your family file.

@@ -1,9 +1,10 @@
 import "../global.css";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
+import { useFonts } from "expo-font";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -12,7 +13,7 @@ import { AuthProvider, useAuth } from "@/providers/AuthProvider";
 import { NotificationProvider } from "@/providers/NotificationProvider";
 import { RealtimeProvider } from "@/providers/RealtimeProvider";
 import { IncomingCallProvider } from "@/providers/IncomingCallProvider";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { ThemeProvider, useTheme } from "@/theme";
 import { configureAPI, videoAPIAdapter } from "@/lib/api";
 
 // Configure API on app start
@@ -23,7 +24,7 @@ SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
   const { isLoading, isAuthenticated } = useAuth();
-  const colorScheme = useColorScheme();
+  const { colors, isDark } = useTheme();
 
   useEffect(() => {
     if (!isLoading) {
@@ -37,12 +38,12 @@ function RootLayoutNav() {
 
   return (
     <>
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+      <StatusBar style={isDark ? "light" : "dark"} />
       <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: {
-            backgroundColor: colorScheme === "dark" ? "#0f172a" : "#ffffff",
+            backgroundColor: colors.background,
           },
         }}
       >
@@ -80,20 +81,33 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    "DMSans-Regular": require("../assets/fonts/DMSans-Regular.ttf"),
+    "DMSans-Medium": require("../assets/fonts/DMSans-Medium.ttf"),
+    "DMSans-SemiBold": require("../assets/fonts/DMSans-SemiBold.ttf"),
+    "DMSans-Bold": require("../assets/fonts/DMSans-Bold.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <AuthProvider>
-          <NotificationProvider>
-            <RealtimeProvider>
-              <IncomingCallProvider>
-                <DailyCallProvider userType="parent" videoAPI={videoAPIAdapter}>
-                  <RootLayoutNav />
-                </DailyCallProvider>
-              </IncomingCallProvider>
-            </RealtimeProvider>
-          </NotificationProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <NotificationProvider>
+              <RealtimeProvider>
+                <IncomingCallProvider>
+                  <DailyCallProvider userType="parent" videoAPI={videoAPIAdapter}>
+                    <RootLayoutNav />
+                  </DailyCallProvider>
+                </IncomingCallProvider>
+              </RealtimeProvider>
+            </NotificationProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

@@ -24,17 +24,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { parent, type LedgerEntry, type BalanceSummary } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  sageLight: "#6B9B7A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 interface PaymentMethod {
   id: string;
@@ -54,6 +44,7 @@ interface WalletStatus {
 }
 
 export default function WalletScreen() {
+  const { colors } = useTheme();
   const { user } = useAuth();
   const { familyFile } = useFamilyFile();
   const [loading, setLoading] = useState(true);
@@ -181,13 +172,13 @@ export default function WalletScreen() {
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case "funding":
-        return { name: "arrow-up-circle", color: colors.sage };
+        return { name: "arrow-up-circle", color: colors.primary };
       case "spending":
-        return { name: "arrow-down-circle", color: colors.amber };
+        return { name: "arrow-down-circle", color: colors.accent };
       case "refund":
         return { name: "refresh-circle", color: "#3B82F6" };
       default:
-        return { name: "swap-horizontal", color: colors.slate };
+        return { name: "swap-horizontal", color: colors.secondary };
     }
   };
 
@@ -208,10 +199,10 @@ export default function WalletScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>
           Loading wallet...
         </Text>
       </SafeAreaView>
@@ -219,18 +210,18 @@ export default function WalletScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.sage} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         {/* Balance Card */}
         <View
           className="rounded-3xl p-6 mb-6"
-          style={{ backgroundColor: colors.sage }}
+          style={{ backgroundColor: colors.primary }}
         >
           <View className="flex-row items-center justify-between mb-4">
             <Text className="text-white/70 text-sm">ClearFund Balance</Text>
@@ -265,41 +256,41 @@ export default function WalletScreen() {
         {!walletStatus.isOnboarded ? (
           <TouchableOpacity
             className="rounded-2xl p-5 mb-6 flex-row items-center"
-            style={{ backgroundColor: `${colors.amber}15` }}
+            style={{ backgroundColor: `${colors.accent}15` }}
             onPress={() => router.push("/wallet/onboarding")}
           >
             <View
               className="w-12 h-12 rounded-full items-center justify-center"
-              style={{ backgroundColor: colors.amber }}
+              style={{ backgroundColor: colors.accent }}
             >
-              <Ionicons name="flash" size={24} color="white" />
+              <Ionicons name="flash" size={24} color={colors.textInverse} />
             </View>
             <View className="flex-1 ml-4">
-              <Text className="font-semibold" style={{ color: colors.slate }}>
+              <Text className="font-semibold" style={{ color: colors.secondary }}>
                 Set Up Payments
               </Text>
-              <Text className="text-sm mt-1" style={{ color: colors.slate }}>
+              <Text className="text-sm mt-1" style={{ color: colors.secondary }}>
                 Connect with Stripe to send and receive payments
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.slate} />
+            <Ionicons name="chevron-forward" size={20} color={colors.secondary} />
           </TouchableOpacity>
         ) : (
           <View
             className="rounded-2xl p-4 mb-6 flex-row items-center"
-            style={{ backgroundColor: `${colors.sage}10` }}
+            style={{ backgroundColor: `${colors.primary}10` }}
           >
             <View
               className="w-10 h-10 rounded-full items-center justify-center"
-              style={{ backgroundColor: colors.sage }}
+              style={{ backgroundColor: colors.primary }}
             >
-              <Ionicons name="checkmark" size={20} color="white" />
+              <Ionicons name="checkmark" size={20} color={colors.textInverse} />
             </View>
             <View className="flex-1 ml-3">
-              <Text className="font-medium" style={{ color: colors.sage }}>
+              <Text className="font-medium" style={{ color: colors.primary }}>
                 Payments Enabled
               </Text>
-              <Text className="text-xs" style={{ color: colors.slate }}>
+              <Text className="text-xs" style={{ color: colors.secondary }}>
                 Stripe Connect active
               </Text>
             </View>
@@ -309,15 +300,15 @@ export default function WalletScreen() {
         {/* Payment Methods */}
         <View className="mb-6">
           <View className="flex-row items-center justify-between mb-3">
-            <Text className="font-semibold text-lg" style={{ color: colors.slate }}>
+            <Text className="font-semibold text-lg" style={{ color: colors.secondary }}>
               Payment Methods
             </Text>
             <TouchableOpacity
               className="flex-row items-center"
               onPress={() => router.push("/wallet/add-card")}
             >
-              <Ionicons name="add-circle" size={20} color={colors.sage} />
-              <Text className="ml-1 font-medium" style={{ color: colors.sage }}>
+              <Ionicons name="add-circle" size={20} color={colors.primary} />
+              <Text className="ml-1 font-medium" style={{ color: colors.primary }}>
                 Add
               </Text>
             </TouchableOpacity>
@@ -326,14 +317,14 @@ export default function WalletScreen() {
           {paymentMethods.length === 0 ? (
             <TouchableOpacity
               className="rounded-xl p-5 items-center"
-              style={{ backgroundColor: "white" }}
+              style={{ backgroundColor: colors.background }}
               onPress={() => router.push("/wallet/add-card")}
             >
-              <Ionicons name="card-outline" size={32} color={colors.slate} />
-              <Text className="mt-2 font-medium" style={{ color: colors.slate }}>
+              <Ionicons name="card-outline" size={32} color={colors.secondary} />
+              <Text className="mt-2 font-medium" style={{ color: colors.secondary }}>
                 Add a payment method
               </Text>
-              <Text className="text-sm mt-1" style={{ color: "#9CA3AF" }}>
+              <Text className="text-sm mt-1" style={{ color: colors.textMuted }}>
                 Use a card or bank account to fund expenses
               </Text>
             </TouchableOpacity>
@@ -343,41 +334,41 @@ export default function WalletScreen() {
                 <View
                   key={method.id}
                   className="rounded-xl p-4 flex-row items-center"
-                  style={{ backgroundColor: "white" }}
+                  style={{ backgroundColor: colors.background }}
                 >
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center"
-                    style={{ backgroundColor: colors.sand }}
+                    style={{ backgroundColor: colors.backgroundSecondary }}
                   >
                     <Ionicons
                       name={getCardBrandIcon(method.brand) as any}
                       size={20}
-                      color={colors.slate}
+                      color={colors.secondary}
                     />
                   </View>
                   <View className="flex-1 ml-3">
                     <View className="flex-row items-center">
-                      <Text className="font-medium" style={{ color: colors.slate }}>
+                      <Text className="font-medium" style={{ color: colors.secondary }}>
                         {method.brand || "Card"} ••••{method.last4}
                       </Text>
                       {method.isDefault && (
                         <View
                           className="ml-2 px-2 py-0.5 rounded-full"
-                          style={{ backgroundColor: `${colors.sage}20` }}
+                          style={{ backgroundColor: `${colors.primary}20` }}
                         >
-                          <Text className="text-xs" style={{ color: colors.sage }}>
+                          <Text className="text-xs" style={{ color: colors.primary }}>
                             Default
                           </Text>
                         </View>
                       )}
                     </View>
                     {method.expMonth && method.expYear && (
-                      <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+                      <Text className="text-xs" style={{ color: colors.textMuted }}>
                         Expires {method.expMonth}/{method.expYear}
                       </Text>
                     )}
                   </View>
-                  <Ionicons name="ellipsis-vertical" size={18} color={colors.slate} />
+                  <Ionicons name="ellipsis-vertical" size={18} color={colors.secondary} />
                 </View>
               ))}
             </View>
@@ -387,32 +378,32 @@ export default function WalletScreen() {
         {/* Recent Transactions */}
         <View>
           <View className="flex-row items-center justify-between mb-3">
-            <Text className="font-semibold text-lg" style={{ color: colors.slate }}>
+            <Text className="font-semibold text-lg" style={{ color: colors.secondary }}>
               Recent Activity
             </Text>
             <TouchableOpacity
               className="flex-row items-center"
               onPress={() => router.push("/wallet/transactions")}
             >
-              <Text className="font-medium" style={{ color: colors.sage }}>
+              <Text className="font-medium" style={{ color: colors.primary }}>
                 See All
               </Text>
-              <Ionicons name="chevron-forward" size={16} color={colors.sage} />
+              <Ionicons name="chevron-forward" size={16} color={colors.primary} />
             </TouchableOpacity>
           </View>
 
           {transactions.length === 0 ? (
             <View
               className="rounded-xl p-5 items-center"
-              style={{ backgroundColor: "white" }}
+              style={{ backgroundColor: colors.background }}
             >
-              <Ionicons name="receipt-outline" size={32} color={colors.slate} />
-              <Text className="mt-2" style={{ color: colors.slate }}>
+              <Ionicons name="receipt-outline" size={32} color={colors.secondary} />
+              <Text className="mt-2" style={{ color: colors.secondary }}>
                 No transactions yet
               </Text>
             </View>
           ) : (
-            <View className="rounded-xl overflow-hidden" style={{ backgroundColor: "white" }}>
+            <View className="rounded-xl overflow-hidden" style={{ backgroundColor: colors.background }}>
               {transactions.map((transaction, index) => {
                 const icon = getTransactionIcon(transaction.entry_type);
                 const isLast = index === transactions.length - 1;
@@ -423,7 +414,7 @@ export default function WalletScreen() {
                     className="p-4 flex-row items-center"
                     style={{
                       borderBottomWidth: isLast ? 0 : 1,
-                      borderBottomColor: colors.sand,
+                      borderBottomColor: colors.backgroundSecondary,
                     }}
                   >
                     <View
@@ -433,17 +424,17 @@ export default function WalletScreen() {
                       <Ionicons name={icon.name as any} size={20} color={icon.color} />
                     </View>
                     <View className="flex-1 ml-3">
-                      <Text className="font-medium" style={{ color: colors.slate }}>
+                      <Text className="font-medium" style={{ color: colors.secondary }}>
                         {transaction.obligation_description || transaction.description}
                       </Text>
-                      <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+                      <Text className="text-xs" style={{ color: colors.textMuted }}>
                         {transaction.parent_name} • {new Date(transaction.created_at).toLocaleDateString()}
                       </Text>
                     </View>
                     <Text
                       className="font-semibold"
                       style={{
-                        color: transaction.entry_type === "funding" ? colors.sage : colors.slate,
+                        color: transaction.entry_type === "funding" ? colors.primary : colors.secondary,
                       }}
                     >
                       {transaction.entry_type === "funding" ? "+" : "-"}
@@ -460,10 +451,10 @@ export default function WalletScreen() {
         <View className="flex-row mt-6 space-x-3">
           <TouchableOpacity
             className="flex-1 rounded-xl py-4 items-center flex-row justify-center"
-            style={{ backgroundColor: colors.sage }}
+            style={{ backgroundColor: colors.primary }}
             onPress={() => router.push("/expenses")}
           >
-            <Ionicons name="receipt" size={20} color="white" />
+            <Ionicons name="receipt" size={20} color={colors.textInverse} />
             <Text className="font-semibold text-white ml-2">View Expenses</Text>
           </TouchableOpacity>
         </View>

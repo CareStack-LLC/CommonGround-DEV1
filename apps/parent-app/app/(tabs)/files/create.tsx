@@ -15,17 +15,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
-
-const SAGE = "#4A6C58";
-const SLATE = "#475569";
-const SLATE_LIGHT = "#94A3B8";
-const SAND = "#F5F0E8";
-const CREAM = "#FFFBF5";
-const WHITE = "#FFFFFF";
+import { useTheme } from "@/theme";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com";
 
 export default function CreateFamilyFileScreen() {
+  const { colors } = useTheme();
   const { token } = useAuth();
   const [title, setTitle] = useState("");
   const [state, setState] = useState("");
@@ -69,62 +64,62 @@ export default function CreateFamilyFileScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: CREAM }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["top"]}>
       <View style={{
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 20,
         paddingVertical: 16,
-        backgroundColor: WHITE,
+        backgroundColor: colors.background,
         borderBottomWidth: 1,
-        borderBottomColor: SAND,
+        borderBottomColor: colors.backgroundSecondary,
       }}>
         <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
-          <Ionicons name="arrow-back" size={24} color={SLATE} />
+          <Ionicons name="arrow-back" size={24} color={colors.secondary} />
         </TouchableOpacity>
-        <Text style={{ fontSize: 20, fontWeight: "700", color: SLATE }}>
+        <Text style={{ fontSize: 20, fontWeight: "700", color: colors.secondary }}>
           New Family File
         </Text>
       </View>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 14, fontWeight: "600", color: SLATE, marginBottom: 8 }}>
+          <Text style={{ fontSize: 14, fontWeight: "600", color: colors.secondary, marginBottom: 8 }}>
             Family Name *
           </Text>
           <TextInput
             style={{
-              backgroundColor: WHITE,
+              backgroundColor: colors.inputBackground,
               borderRadius: 12,
               padding: 16,
               fontSize: 16,
-              color: SLATE,
+              color: colors.secondary,
               borderWidth: 1,
-              borderColor: SAND,
+              borderColor: colors.backgroundSecondary,
             }}
             placeholder="e.g., Smith Family"
-            placeholderTextColor={SLATE_LIGHT}
+            placeholderTextColor={colors.textMuted}
             value={title}
             onChangeText={setTitle}
           />
         </View>
 
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontSize: 14, fontWeight: "600", color: SLATE, marginBottom: 8 }}>
+          <Text style={{ fontSize: 14, fontWeight: "600", color: colors.secondary, marginBottom: 8 }}>
             State
           </Text>
           <TextInput
             style={{
-              backgroundColor: WHITE,
+              backgroundColor: colors.inputBackground,
               borderRadius: 12,
               padding: 16,
               fontSize: 16,
-              color: SLATE,
+              color: colors.secondary,
               borderWidth: 1,
-              borderColor: SAND,
+              borderColor: colors.backgroundSecondary,
             }}
             placeholder="e.g., CA"
-            placeholderTextColor={SLATE_LIGHT}
+            placeholderTextColor={colors.textMuted}
             value={state}
             onChangeText={setState}
             autoCapitalize="characters"
@@ -148,7 +143,7 @@ export default function CreateFamilyFileScreen() {
 
         <TouchableOpacity
           style={{
-            backgroundColor: SAGE,
+            backgroundColor: colors.primary,
             borderRadius: 12,
             padding: 16,
             alignItems: "center",
@@ -158,9 +153,9 @@ export default function CreateFamilyFileScreen() {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color={WHITE} />
+            <ActivityIndicator color={colors.textInverse} />
           ) : (
-            <Text style={{ color: WHITE, fontSize: 16, fontWeight: "600" }}>Create Family File</Text>
+            <Text style={{ color: colors.textInverse, fontSize: 16, fontWeight: "600" }}>Create Family File</Text>
           )}
         </TouchableOpacity>
       </ScrollView>

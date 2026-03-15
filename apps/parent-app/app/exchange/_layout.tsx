@@ -4,16 +4,19 @@
  */
 
 import { Stack } from "expo-router";
+import { useTheme } from "@/theme";
 
 export default function ExchangeLayout() {
+  const { colors } = useTheme();
+
   return (
     <Stack
       screenOptions={{
         headerShown: true,
         headerBackTitle: "Back",
-        headerTintColor: "#4A6C58", // Sage
-        headerStyle: { backgroundColor: "#FFFBF5" }, // Cream
-        headerTitleStyle: { color: "#475569" }, // Slate
+        headerTintColor: colors.primary,
+        headerStyle: { backgroundColor: colors.surfaceElevated },
+        headerTitleStyle: { color: colors.secondary },
       }}
     >
       <Stack.Screen

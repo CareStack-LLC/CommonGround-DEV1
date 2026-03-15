@@ -24,12 +24,14 @@ import {
 } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
+import { useTheme } from "@/theme";
 
 type FilterType = "all" | "pending" | "funded" | "completed";
 
 export default function ExpensesScreen() {
   const { user } = useAuth();
   const { familyFile } = useFamilyFile();
+  const { colors } = useTheme();
   const [obligations, setObligations] = useState<Obligation[]>([]);
   const [balance, setBalance] = useState<BalanceSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -172,7 +174,7 @@ export default function ExpensesScreen() {
   };
 
   const getPurposeColor = (purpose: ObligationPurpose) => {
-    const colors: Record<ObligationPurpose, string> = {
+    const purposeColors: Record<ObligationPurpose, string> = {
       medical: "#ef4444",
       education: "#3b82f6",
       sports: "#22c55e",
@@ -185,11 +187,10 @@ export default function ExpensesScreen() {
       childcare: "#14b8a6",
       other: "#6b7280",
     };
-    return colors[purpose] || "#6b7280";
+    return purposeColors[purpose] || "#6b7280";
   };
 
   const getStatusBadge = (status: string) => {
-    // Using web design system colors: Sage for success, Amber for pending, Slate for neutral
     const badges: Record<string, { bg: string; text: string; label: string }> = {
       pending_funding: { bg: "bg-amber-50", text: "text-amber-600", label: "Needs Funding" },
       partially_funded: { bg: "bg-slate-100", text: "text-slate-600", label: "Partial" },
@@ -210,17 +211,10 @@ export default function ExpensesScreen() {
     }).format(amount);
   };
 
-  // Web design system colors
-  const SAGE = "#4A6C58";
-  const SAGE_LIGHT = "#6B9B7A";
-  const SAGE_SUBTLE = "#E8F0EC";
-  const AMBER = "#D4A574";
-  const AMBER_SUBTLE = "#FEF7ED";
-
   if (isLoading) {
     return (
       <SafeAreaView className="flex-1 bg-sand-200 dark:bg-slate-900 items-center justify-center">
-        <ActivityIndicator size="large" color={SAGE} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </SafeAreaView>
     );
   }
@@ -231,14 +225,14 @@ export default function ExpensesScreen() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={SAGE} />
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.primary} />
         }
       >
         {/* Balance Summary Card - Sage Green Gradient */}
         {balance && (
           <View
             className="mx-4 mt-4 rounded-3xl p-5"
-            style={{ backgroundColor: SAGE }}
+            style={{ backgroundColor: colors.primary }}
           >
             <View className="flex-row items-center justify-between">
               <View>
@@ -285,9 +279,9 @@ export default function ExpensesScreen() {
             <View className="flex-row items-center">
               <View
                 className="w-11 h-11 rounded-full items-center justify-center"
-                style={{ backgroundColor: AMBER_SUBTLE }}
+                style={{ backgroundColor: colors.accentLight }}
               >
-                <Ionicons name="hourglass" size={20} color={AMBER} />
+                <Ionicons name="hourglass" size={20} color={colors.accent} />
               </View>
               <View className="ml-3">
                 <Text className="text-2xl font-bold text-slate-800 dark:text-white">
@@ -301,9 +295,9 @@ export default function ExpensesScreen() {
             <View className="flex-row items-center">
               <View
                 className="w-11 h-11 rounded-full items-center justify-center"
-                style={{ backgroundColor: SAGE_SUBTLE }}
+                style={{ backgroundColor: colors.primaryLight }}
               >
-                <Ionicons name="checkmark-circle" size={20} color={SAGE} />
+                <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
               </View>
               <View className="ml-3">
                 <Text className="text-2xl font-bold text-slate-800 dark:text-white">
@@ -328,14 +322,14 @@ export default function ExpensesScreen() {
                 key={tab.id}
                 className="mr-2 px-5 py-2.5 rounded-full"
                 style={{
-                  backgroundColor: filter === tab.id ? SAGE : "#FFFBF5",
+                  backgroundColor: filter === tab.id ? colors.primary : colors.surfaceElevated,
                 }}
                 onPress={() => setFilter(tab.id as FilterType)}
               >
                 <Text
                   className="font-medium"
                   style={{
-                    color: filter === tab.id ? "white" : "#475569",
+                    color: filter === tab.id ? colors.textInverse : colors.secondary,
                   }}
                 >
                   {tab.label}
@@ -424,14 +418,14 @@ export default function ExpensesScreen() {
                           <View className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                             <View
                               className="h-full rounded-full"
-                              style={{ width: `${fundedPercent}%`, backgroundColor: SAGE }}
+                              style={{ width: `${fundedPercent}%`, backgroundColor: colors.primary }}
                             />
                           </View>
                         </View>
 
                         {obligation.due_date && (
                           <View className="flex-row items-center mt-2">
-                            <Ionicons name="calendar-outline" size={12} color={AMBER} />
+                            <Ionicons name="calendar-outline" size={12} color={colors.accent} />
                             <Text className="text-amber-500 text-xs ml-1">
                               Due {new Date(obligation.due_date).toLocaleDateString()}
                             </Text>
@@ -450,7 +444,7 @@ export default function ExpensesScreen() {
       {/* FAB - Sage Green Matching Web */}
       <TouchableOpacity
         className="absolute bottom-6 right-6 w-14 h-14 rounded-full items-center justify-center shadow-elevated"
-        style={{ backgroundColor: SAGE }}
+        style={{ backgroundColor: colors.primary }}
         onPress={() => router.push("/expenses/create")}
       >
         <Ionicons name="add" size={28} color="white" />

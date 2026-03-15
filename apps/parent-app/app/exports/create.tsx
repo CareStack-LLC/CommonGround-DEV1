@@ -32,19 +32,13 @@ import {
   getSectionDescription,
   getDefaultSections,
 } from "@commonground/api-client/src/api/parent/exports";
-
-// Design colors
-const SAGE = "#4A6C58";
-const SAGE_LIGHT = "#E8F0EB";
-const CREAM = "#FFFBF5";
-const WHITE = "#FFFFFF";
-const SAND = "#F5F0E8";
-const SLATE = "#475569";
+import { useTheme } from "@/theme";
 
 type Step = "type" | "dates" | "claim" | "sections" | "options" | "review";
 
 export default function CreateExportScreen() {
   const { familyFile } = useFamilyFile();
+  const { colors } = useTheme();
   const [step, setStep] = useState<Step>("type");
   const [isCreating, setIsCreating] = useState(false);
 
@@ -131,7 +125,7 @@ export default function CreateExportScreen() {
     const currentIndex = steps.indexOf(step);
 
     return (
-      <View style={{ flexDirection: "row", justifyContent: "center", paddingVertical: 16, backgroundColor: WHITE }}>
+      <View style={{ flexDirection: "row", justifyContent: "center", paddingVertical: 16, backgroundColor: colors.cardBackground }}>
         {steps.map((s, i) => (
           <View key={s} style={{ flexDirection: "row", alignItems: "center" }}>
             <View
@@ -139,21 +133,21 @@ export default function CreateExportScreen() {
                 width: 24,
                 height: 24,
                 borderRadius: 12,
-                backgroundColor: i <= currentIndex ? SAGE : SAND,
+                backgroundColor: i <= currentIndex ? colors.primary : colors.backgroundSecondary,
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
               {i < currentIndex ? (
-                <Ionicons name="checkmark" size={14} color={WHITE} />
+                <Ionicons name="checkmark" size={14} color={colors.textInverse} />
               ) : (
-                <Text style={{ color: i === currentIndex ? WHITE : SLATE, fontSize: 12, fontWeight: "600" }}>
+                <Text style={{ color: i === currentIndex ? colors.textInverse : colors.secondary, fontSize: 12, fontWeight: "600" }}>
                   {i + 1}
                 </Text>
               )}
             </View>
             {i < steps.length - 1 && (
-              <View style={{ width: 24, height: 2, backgroundColor: i < currentIndex ? SAGE : SAND }} />
+              <View style={{ width: 24, height: 2, backgroundColor: i < currentIndex ? colors.primary : colors.backgroundSecondary }} />
             )}
           </View>
         ))}
@@ -163,29 +157,29 @@ export default function CreateExportScreen() {
 
   const renderTypeStep = () => (
     <View style={{ padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: "600", color: "#1e293b", marginBottom: 8 }}>
+      <Text style={{ fontSize: 20, fontWeight: "600", color: colors.textPrimary, marginBottom: 8 }}>
         Select Package Type
       </Text>
-      <Text style={{ fontSize: 14, color: SLATE, marginBottom: 24 }}>
+      <Text style={{ fontSize: 14, color: colors.secondary, marginBottom: 24 }}>
         Choose the type of documentation you need
       </Text>
 
       <TouchableOpacity
         style={{
-          backgroundColor: WHITE,
+          backgroundColor: colors.cardBackground,
           borderRadius: 12,
           padding: 16,
           marginBottom: 12,
           borderWidth: 2,
-          borderColor: packageType === PackageType.COURT ? SAGE : SAND,
+          borderColor: packageType === PackageType.COURT ? colors.primary : colors.backgroundSecondary,
         }}
         onPress={() => handlePackageTypeSelect(PackageType.COURT)}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Ionicons name="briefcase" size={24} color={SAGE} />
+          <Ionicons name="briefcase" size={24} color={colors.primary} />
           <View style={{ marginLeft: 12, flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b" }}>Court Package</Text>
-            <Text style={{ fontSize: 13, color: SLATE, marginTop: 4 }}>
+            <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary }}>Court Package</Text>
+            <Text style={{ fontSize: 13, color: colors.secondary, marginTop: 4 }}>
               Comprehensive summary of all co-parenting data for court proceedings
             </Text>
           </View>
@@ -194,19 +188,19 @@ export default function CreateExportScreen() {
 
       <TouchableOpacity
         style={{
-          backgroundColor: WHITE,
+          backgroundColor: colors.cardBackground,
           borderRadius: 12,
           padding: 16,
           borderWidth: 2,
-          borderColor: packageType === PackageType.INVESTIGATION ? SAGE : SAND,
+          borderColor: packageType === PackageType.INVESTIGATION ? colors.primary : colors.backgroundSecondary,
         }}
         onPress={() => handlePackageTypeSelect(PackageType.INVESTIGATION)}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Ionicons name="search" size={24} color={SAGE} />
+          <Ionicons name="search" size={24} color={colors.primary} />
           <View style={{ marginLeft: 12, flex: 1 }}>
-            <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b" }}>Investigation</Text>
-            <Text style={{ fontSize: 13, color: SLATE, marginTop: 4 }}>
+            <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary }}>Investigation</Text>
+            <Text style={{ fontSize: 13, color: colors.secondary, marginTop: 4 }}>
               Focused report on a specific concern or claim
             </Text>
           </View>
@@ -217,10 +211,10 @@ export default function CreateExportScreen() {
 
   const renderClaimStep = () => (
     <View style={{ padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: "600", color: "#1e293b", marginBottom: 8 }}>
+      <Text style={{ fontSize: 20, fontWeight: "600", color: colors.textPrimary, marginBottom: 8 }}>
         Claim Details
       </Text>
-      <Text style={{ fontSize: 14, color: SLATE, marginBottom: 24 }}>
+      <Text style={{ fontSize: 14, color: colors.secondary, marginBottom: 24 }}>
         What concern are you documenting?
       </Text>
 
@@ -228,16 +222,16 @@ export default function CreateExportScreen() {
         <TouchableOpacity
           key={type}
           style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.cardBackground,
             borderRadius: 8,
             padding: 12,
             marginBottom: 8,
             borderWidth: 2,
-            borderColor: claimType === type ? SAGE : SAND,
+            borderColor: claimType === type ? colors.primary : colors.backgroundSecondary,
           }}
           onPress={() => setClaimType(type)}
         >
-          <Text style={{ fontSize: 14, fontWeight: claimType === type ? "600" : "400", color: "#1e293b" }}>
+          <Text style={{ fontSize: 14, fontWeight: claimType === type ? "600" : "400", color: colors.textPrimary }}>
             {type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
           </Text>
         </TouchableOpacity>
@@ -245,17 +239,18 @@ export default function CreateExportScreen() {
 
       <TextInput
         style={{
-          backgroundColor: WHITE,
+          backgroundColor: colors.cardBackground,
           borderRadius: 8,
           padding: 12,
           marginTop: 16,
           minHeight: 80,
           textAlignVertical: "top",
           borderWidth: 1,
-          borderColor: SAND,
+          borderColor: colors.backgroundSecondary,
+          color: colors.textPrimary,
         }}
         placeholder="Describe the concern (optional)"
-        placeholderTextColor={SLATE}
+        placeholderTextColor={colors.secondary}
         value={claimDescription}
         onChangeText={setClaimDescription}
         multiline
@@ -263,23 +258,23 @@ export default function CreateExportScreen() {
 
       <View style={{ flexDirection: "row", marginTop: 24 }}>
         <TouchableOpacity
-          style={{ flex: 1, padding: 12, backgroundColor: SAND, borderRadius: 8, marginRight: 8 }}
+          style={{ flex: 1, padding: 12, backgroundColor: colors.backgroundSecondary, borderRadius: 8, marginRight: 8 }}
           onPress={() => setStep("type")}
         >
-          <Text style={{ textAlign: "center", color: SLATE, fontWeight: "500" }}>Back</Text>
+          <Text style={{ textAlign: "center", color: colors.secondary, fontWeight: "500" }}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
             flex: 1,
             padding: 12,
-            backgroundColor: claimType ? SAGE : SAND,
+            backgroundColor: claimType ? colors.primary : colors.backgroundSecondary,
             borderRadius: 8,
             marginLeft: 8,
           }}
           onPress={() => claimType && setStep("dates")}
           disabled={!claimType}
         >
-          <Text style={{ textAlign: "center", color: claimType ? WHITE : SLATE, fontWeight: "500" }}>
+          <Text style={{ textAlign: "center", color: claimType ? colors.textInverse : colors.secondary, fontWeight: "500" }}>
             Continue
           </Text>
         </TouchableOpacity>
@@ -289,16 +284,16 @@ export default function CreateExportScreen() {
 
   const renderDatesStep = () => (
     <View style={{ padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: "600", color: "#1e293b", marginBottom: 8 }}>
+      <Text style={{ fontSize: 20, fontWeight: "600", color: colors.textPrimary, marginBottom: 8 }}>
         Date Range
       </Text>
-      <Text style={{ fontSize: 14, color: SLATE, marginBottom: 24 }}>
+      <Text style={{ fontSize: 14, color: colors.secondary, marginBottom: 24 }}>
         Select the time period to include
       </Text>
 
       <TouchableOpacity
         style={{
-          backgroundColor: WHITE,
+          backgroundColor: colors.cardBackground,
           borderRadius: 8,
           padding: 12,
           marginBottom: 12,
@@ -308,13 +303,13 @@ export default function CreateExportScreen() {
         }}
         onPress={() => setShowStartPicker(true)}
       >
-        <Text style={{ color: SLATE }}>Start Date</Text>
-        <Text style={{ fontWeight: "600", color: "#1e293b" }}>{formatDate(startDate)}</Text>
+        <Text style={{ color: colors.secondary }}>Start Date</Text>
+        <Text style={{ fontWeight: "600", color: colors.textPrimary }}>{formatDate(startDate)}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={{
-          backgroundColor: WHITE,
+          backgroundColor: colors.cardBackground,
           borderRadius: 8,
           padding: 12,
           marginBottom: 24,
@@ -324,12 +319,12 @@ export default function CreateExportScreen() {
         }}
         onPress={() => setShowEndPicker(true)}
       >
-        <Text style={{ color: SLATE }}>End Date</Text>
-        <Text style={{ fontWeight: "600", color: "#1e293b" }}>{formatDate(endDate)}</Text>
+        <Text style={{ color: colors.secondary }}>End Date</Text>
+        <Text style={{ fontWeight: "600", color: colors.textPrimary }}>{formatDate(endDate)}</Text>
       </TouchableOpacity>
 
       {(showStartPicker || showEndPicker) && Platform.OS === "ios" && (
-        <View style={{ backgroundColor: WHITE, borderRadius: 8, marginBottom: 16, padding: 8 }}>
+        <View style={{ backgroundColor: colors.cardBackground, borderRadius: 8, marginBottom: 16, padding: 8 }}>
           <DateTimePicker
             value={showStartPicker ? startDate : endDate}
             mode="date"
@@ -348,7 +343,7 @@ export default function CreateExportScreen() {
               setShowEndPicker(false);
             }}
           >
-            <Text style={{ color: SAGE, fontWeight: "600" }}>Done</Text>
+            <Text style={{ color: colors.primary, fontWeight: "600" }}>Done</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -377,16 +372,16 @@ export default function CreateExportScreen() {
 
       <View style={{ flexDirection: "row" }}>
         <TouchableOpacity
-          style={{ flex: 1, padding: 12, backgroundColor: SAND, borderRadius: 8, marginRight: 8 }}
+          style={{ flex: 1, padding: 12, backgroundColor: colors.backgroundSecondary, borderRadius: 8, marginRight: 8 }}
           onPress={() => setStep(packageType === PackageType.INVESTIGATION ? "claim" : "type")}
         >
-          <Text style={{ textAlign: "center", color: SLATE, fontWeight: "500" }}>Back</Text>
+          <Text style={{ textAlign: "center", color: colors.secondary, fontWeight: "500" }}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={{ flex: 1, padding: 12, backgroundColor: SAGE, borderRadius: 8, marginLeft: 8 }}
+          style={{ flex: 1, padding: 12, backgroundColor: colors.primary, borderRadius: 8, marginLeft: 8 }}
           onPress={() => setStep("sections")}
         >
-          <Text style={{ textAlign: "center", color: WHITE, fontWeight: "500" }}>Continue</Text>
+          <Text style={{ textAlign: "center", color: colors.textInverse, fontWeight: "500" }}>Continue</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -394,15 +389,15 @@ export default function CreateExportScreen() {
 
   const renderSectionsStep = () => (
     <View style={{ padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: "600", color: "#1e293b", marginBottom: 8 }}>
+      <Text style={{ fontSize: 20, fontWeight: "600", color: colors.textPrimary, marginBottom: 8 }}>
         Select Sections
       </Text>
       <View style={{ flexDirection: "row", marginBottom: 16 }}>
         <TouchableOpacity onPress={selectAllSections} style={{ marginRight: 16 }}>
-          <Text style={{ color: SAGE, fontWeight: "500" }}>Select All</Text>
+          <Text style={{ color: colors.primary, fontWeight: "500" }}>Select All</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={clearAllSections}>
-          <Text style={{ color: SLATE, fontWeight: "500" }}>Clear All</Text>
+          <Text style={{ color: colors.secondary, fontWeight: "500" }}>Clear All</Text>
         </TouchableOpacity>
       </View>
 
@@ -411,14 +406,14 @@ export default function CreateExportScreen() {
           <TouchableOpacity
             key={section}
             style={{
-              backgroundColor: WHITE,
+              backgroundColor: colors.cardBackground,
               borderRadius: 8,
               padding: 12,
               marginBottom: 8,
               flexDirection: "row",
               alignItems: "center",
               borderWidth: 2,
-              borderColor: selectedSections.includes(section) ? SAGE : SAND,
+              borderColor: selectedSections.includes(section) ? colors.primary : colors.backgroundSecondary,
             }}
             onPress={() => toggleSection(section)}
           >
@@ -428,22 +423,22 @@ export default function CreateExportScreen() {
                 height: 20,
                 borderRadius: 4,
                 borderWidth: 2,
-                borderColor: selectedSections.includes(section) ? SAGE : SLATE,
-                backgroundColor: selectedSections.includes(section) ? SAGE : "transparent",
+                borderColor: selectedSections.includes(section) ? colors.primary : colors.secondary,
+                backgroundColor: selectedSections.includes(section) ? colors.primary : "transparent",
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 12,
               }}
             >
               {selectedSections.includes(section) && (
-                <Ionicons name="checkmark" size={14} color={WHITE} />
+                <Ionicons name="checkmark" size={14} color={colors.textInverse} />
               )}
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 14, fontWeight: "500", color: "#1e293b" }}>
+              <Text style={{ fontSize: 14, fontWeight: "500", color: colors.textPrimary }}>
                 {getSectionDisplayName(section)}
               </Text>
-              <Text style={{ fontSize: 12, color: SLATE, marginTop: 2 }}>
+              <Text style={{ fontSize: 12, color: colors.secondary, marginTop: 2 }}>
                 {getSectionDescription(section)}
               </Text>
             </View>
@@ -453,23 +448,23 @@ export default function CreateExportScreen() {
 
       <View style={{ flexDirection: "row", marginTop: 16 }}>
         <TouchableOpacity
-          style={{ flex: 1, padding: 12, backgroundColor: SAND, borderRadius: 8, marginRight: 8 }}
+          style={{ flex: 1, padding: 12, backgroundColor: colors.backgroundSecondary, borderRadius: 8, marginRight: 8 }}
           onPress={() => setStep("dates")}
         >
-          <Text style={{ textAlign: "center", color: SLATE, fontWeight: "500" }}>Back</Text>
+          <Text style={{ textAlign: "center", color: colors.secondary, fontWeight: "500" }}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
             flex: 1,
             padding: 12,
-            backgroundColor: selectedSections.length > 0 ? SAGE : SAND,
+            backgroundColor: selectedSections.length > 0 ? colors.primary : colors.backgroundSecondary,
             borderRadius: 8,
             marginLeft: 8,
           }}
           onPress={() => selectedSections.length > 0 && setStep("options")}
           disabled={selectedSections.length === 0}
         >
-          <Text style={{ textAlign: "center", color: selectedSections.length > 0 ? WHITE : SLATE, fontWeight: "500" }}>
+          <Text style={{ textAlign: "center", color: selectedSections.length > 0 ? colors.textInverse : colors.secondary, fontWeight: "500" }}>
             Continue
           </Text>
         </TouchableOpacity>
@@ -479,30 +474,30 @@ export default function CreateExportScreen() {
 
   const renderOptionsStep = () => (
     <View style={{ padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: "600", color: "#1e293b", marginBottom: 8 }}>
+      <Text style={{ fontSize: 20, fontWeight: "600", color: colors.textPrimary, marginBottom: 8 }}>
         Privacy Options
       </Text>
-      <Text style={{ fontSize: 14, color: SLATE, marginBottom: 24 }}>
+      <Text style={{ fontSize: 14, color: colors.secondary, marginBottom: 24 }}>
         Configure redaction settings
       </Text>
 
-      <Text style={{ fontSize: 14, fontWeight: "600", color: "#1e293b", marginBottom: 8 }}>
+      <Text style={{ fontSize: 14, fontWeight: "600", color: colors.textPrimary, marginBottom: 8 }}>
         Redaction Level
       </Text>
       {Object.values(RedactionLevel).map((level) => (
         <TouchableOpacity
           key={level}
           style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.cardBackground,
             borderRadius: 8,
             padding: 12,
             marginBottom: 8,
             borderWidth: 2,
-            borderColor: redactionLevel === level ? SAGE : SAND,
+            borderColor: redactionLevel === level ? colors.primary : colors.backgroundSecondary,
           }}
           onPress={() => setRedactionLevel(level)}
         >
-          <Text style={{ fontSize: 14, fontWeight: redactionLevel === level ? "600" : "400", color: "#1e293b" }}>
+          <Text style={{ fontSize: 14, fontWeight: redactionLevel === level ? "600" : "400", color: colors.textPrimary }}>
             {level === RedactionLevel.NONE ? "None - Full data" :
              level === RedactionLevel.STANDARD ? "Standard - SSN, addresses masked" :
              "Enhanced - All PII masked"}
@@ -514,32 +509,32 @@ export default function CreateExportScreen() {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        backgroundColor: WHITE,
+        backgroundColor: colors.cardBackground,
         borderRadius: 8,
         padding: 12,
         marginTop: 16,
       }}>
-        <Text style={{ fontSize: 14, color: "#1e293b" }}>Redact message content</Text>
+        <Text style={{ fontSize: 14, color: colors.textPrimary }}>Redact message content</Text>
         <Switch
           value={redactMessages}
           onValueChange={setRedactMessages}
-          trackColor={{ false: SAND, true: SAGE }}
-          thumbColor={WHITE}
+          trackColor={{ false: colors.backgroundSecondary, true: colors.primary }}
+          thumbColor={colors.background}
         />
       </View>
 
       <View style={{ flexDirection: "row", marginTop: 24 }}>
         <TouchableOpacity
-          style={{ flex: 1, padding: 12, backgroundColor: SAND, borderRadius: 8, marginRight: 8 }}
+          style={{ flex: 1, padding: 12, backgroundColor: colors.backgroundSecondary, borderRadius: 8, marginRight: 8 }}
           onPress={() => setStep("sections")}
         >
-          <Text style={{ textAlign: "center", color: SLATE, fontWeight: "500" }}>Back</Text>
+          <Text style={{ textAlign: "center", color: colors.secondary, fontWeight: "500" }}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={{ flex: 1, padding: 12, backgroundColor: SAGE, borderRadius: 8, marginLeft: 8 }}
+          style={{ flex: 1, padding: 12, backgroundColor: colors.primary, borderRadius: 8, marginLeft: 8 }}
           onPress={() => setStep("review")}
         >
-          <Text style={{ textAlign: "center", color: WHITE, fontWeight: "500" }}>Review</Text>
+          <Text style={{ textAlign: "center", color: colors.textInverse, fontWeight: "500" }}>Review</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -547,72 +542,72 @@ export default function CreateExportScreen() {
 
   const renderReviewStep = () => (
     <View style={{ padding: 16 }}>
-      <Text style={{ fontSize: 20, fontWeight: "600", color: "#1e293b", marginBottom: 16 }}>
+      <Text style={{ fontSize: 20, fontWeight: "600", color: colors.textPrimary, marginBottom: 16 }}>
         Review & Generate
       </Text>
 
-      <View style={{ backgroundColor: WHITE, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+      <View style={{ backgroundColor: colors.cardBackground, borderRadius: 12, padding: 16, marginBottom: 16 }}>
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ fontSize: 12, color: SLATE }}>Package Type</Text>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b" }}>
+          <Text style={{ fontSize: 12, color: colors.secondary }}>Package Type</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary }}>
             {packageType === PackageType.COURT ? "Court Package" : "Investigation"}
           </Text>
         </View>
 
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ fontSize: 12, color: SLATE }}>Date Range</Text>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b" }}>
+          <Text style={{ fontSize: 12, color: colors.secondary }}>Date Range</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary }}>
             {formatDate(startDate)} - {formatDate(endDate)}
           </Text>
         </View>
 
         {claimType && (
           <View style={{ marginBottom: 12 }}>
-            <Text style={{ fontSize: 12, color: SLATE }}>Claim Type</Text>
-            <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b" }}>
+            <Text style={{ fontSize: 12, color: colors.secondary }}>Claim Type</Text>
+            <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary }}>
               {claimType.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
             </Text>
           </View>
         )}
 
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ fontSize: 12, color: SLATE }}>Sections</Text>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b" }}>
+          <Text style={{ fontSize: 12, color: colors.secondary }}>Sections</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary }}>
             {selectedSections.length} sections selected
           </Text>
         </View>
 
         <View>
-          <Text style={{ fontSize: 12, color: SLATE }}>Redaction</Text>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b" }}>
+          <Text style={{ fontSize: 12, color: colors.secondary }}>Redaction</Text>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary }}>
             {redactionLevel.charAt(0).toUpperCase() + redactionLevel.slice(1)}
             {redactMessages ? " + Message content" : ""}
           </Text>
         </View>
       </View>
 
-      <View style={{ backgroundColor: SAGE_LIGHT, borderRadius: 8, padding: 12, marginBottom: 24 }}>
-        <Text style={{ fontSize: 13, color: SAGE, textAlign: "center" }}>
+      <View style={{ backgroundColor: colors.primaryLight, borderRadius: 8, padding: 12, marginBottom: 24 }}>
+        <Text style={{ fontSize: 13, color: colors.primary, textAlign: "center" }}>
           Your report will include SHA-256 integrity verification for court admissibility.
         </Text>
       </View>
 
       <View style={{ flexDirection: "row" }}>
         <TouchableOpacity
-          style={{ flex: 1, padding: 12, backgroundColor: SAND, borderRadius: 8, marginRight: 8 }}
+          style={{ flex: 1, padding: 12, backgroundColor: colors.backgroundSecondary, borderRadius: 8, marginRight: 8 }}
           onPress={() => setStep("options")}
         >
-          <Text style={{ textAlign: "center", color: SLATE, fontWeight: "500" }}>Back</Text>
+          <Text style={{ textAlign: "center", color: colors.secondary, fontWeight: "500" }}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={{ flex: 1, padding: 12, backgroundColor: SAGE, borderRadius: 8, marginLeft: 8 }}
+          style={{ flex: 1, padding: 12, backgroundColor: colors.primary, borderRadius: 8, marginLeft: 8 }}
           onPress={handleCreate}
           disabled={isCreating}
         >
           {isCreating ? (
-            <ActivityIndicator color={WHITE} />
+            <ActivityIndicator color={colors.textInverse} />
           ) : (
-            <Text style={{ textAlign: "center", color: WHITE, fontWeight: "600" }}>
+            <Text style={{ textAlign: "center", color: colors.textInverse, fontWeight: "600" }}>
               Generate Report
             </Text>
           )}
@@ -622,7 +617,7 @@ export default function CreateExportScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: CREAM }} edges={["bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       {renderStepIndicator()}
       <ScrollView>
         {step === "type" && renderTypeStep()}

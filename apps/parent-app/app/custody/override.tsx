@@ -25,16 +25,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { parent, type CustodyParent } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 const OVERRIDE_REASONS = [
   { id: "schedule_change", label: "Schedule change", icon: "calendar-outline" },
@@ -46,6 +37,7 @@ const OVERRIDE_REASONS = [
 ];
 
 export default function CustodyOverrideScreen() {
+  const { colors } = useTheme();
   const { date: initialDate } = useLocalSearchParams<{ date?: string }>();
   const { user } = useAuth();
   const { familyFile, children } = useFamilyFile();
@@ -117,17 +109,17 @@ export default function CustodyOverrideScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 16 }}>
         {/* Header Info */}
-        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: `${colors.sage}10` }}>
+        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: `${colors.primary}10` }}>
           <View className="flex-row items-start">
-            <Ionicons name="information-circle" size={20} color={colors.sage} />
+            <Ionicons name="information-circle" size={20} color={colors.primary} />
             <View className="flex-1 ml-3">
-              <Text className="font-medium mb-1" style={{ color: colors.slate }}>
+              <Text className="font-medium mb-1" style={{ color: colors.secondary }}>
                 Manual Custody Update
               </Text>
-              <Text className="text-sm" style={{ color: colors.slate }}>
+              <Text className="text-sm" style={{ color: colors.secondary }}>
                 Record that the children are currently with you. This will be logged
                 in the custody history and may be visible to professionals with
                 access to your family file.
@@ -138,19 +130,19 @@ export default function CustodyOverrideScreen() {
 
         {/* Date Selection */}
         <View className="mb-6">
-          <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+          <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
             Date
           </Text>
-          <View className="rounded-xl p-4" style={{ backgroundColor: "white" }}>
+          <View className="rounded-xl p-4" style={{ backgroundColor: colors.background }}>
             <View className="flex-row items-center">
               <View
                 className="w-10 h-10 rounded-full items-center justify-center"
-                style={{ backgroundColor: `${colors.sage}20` }}
+                style={{ backgroundColor: `${colors.primary}20` }}
               >
-                <Ionicons name="calendar" size={20} color={colors.sage} />
+                <Ionicons name="calendar" size={20} color={colors.primary} />
               </View>
               <View className="flex-1 ml-3">
-                <Text className="font-medium" style={{ color: colors.slate }}>
+                <Text className="font-medium" style={{ color: colors.secondary }}>
                   {new Date(selectedDate).toLocaleDateString("en-US", {
                     weekday: "long",
                     month: "long",
@@ -158,7 +150,7 @@ export default function CustodyOverrideScreen() {
                     year: "numeric",
                   })}
                 </Text>
-                <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+                <Text className="text-xs" style={{ color: colors.textMuted }}>
                   Today
                 </Text>
               </View>
@@ -168,7 +160,7 @@ export default function CustodyOverrideScreen() {
 
         {/* Children Selection */}
         <View className="mb-6">
-          <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+          <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
             Which children are with you?
           </Text>
           <View className="space-y-2">
@@ -177,9 +169,9 @@ export default function CustodyOverrideScreen() {
                 key={child.id}
                 className="rounded-xl p-4 flex-row items-center"
                 style={{
-                  backgroundColor: selectedChildren.includes(child.id) ? `${colors.sage}15` : "white",
+                  backgroundColor: selectedChildren.includes(child.id) ? `${colors.primary}15` : "white",
                   borderWidth: selectedChildren.includes(child.id) ? 2 : 0,
-                  borderColor: colors.sage,
+                  borderColor: colors.primary,
                 }}
                 onPress={() => toggleChild(child.id)}
               >
@@ -187,8 +179,8 @@ export default function CustodyOverrideScreen() {
                   className="w-10 h-10 rounded-full items-center justify-center"
                   style={{
                     backgroundColor: selectedChildren.includes(child.id)
-                      ? colors.sage
-                      : colors.sand,
+                      ? colors.primary
+                      : colors.backgroundSecondary,
                   }}
                 >
                   {selectedChildren.includes(child.id) ? (
@@ -196,14 +188,14 @@ export default function CustodyOverrideScreen() {
                   ) : (
                     <Text
                       className="font-bold"
-                      style={{ color: colors.slate }}
+                      style={{ color: colors.secondary }}
                     >
                       {child.first_name?.charAt(0) || "?"}
                     </Text>
                   )}
                 </View>
                 <View className="flex-1 ml-3">
-                  <Text className="font-medium" style={{ color: colors.slate }}>
+                  <Text className="font-medium" style={{ color: colors.secondary }}>
                     {child.first_name} {child.last_name}
                   </Text>
                 </View>
@@ -211,15 +203,15 @@ export default function CustodyOverrideScreen() {
             ))}
           </View>
           {children.length === 0 && (
-            <View className="rounded-xl p-4 items-center" style={{ backgroundColor: "white" }}>
-              <Text style={{ color: colors.slate }}>No children found</Text>
+            <View className="rounded-xl p-4 items-center" style={{ backgroundColor: colors.background }}>
+              <Text style={{ color: colors.secondary }}>No children found</Text>
             </View>
           )}
         </View>
 
         {/* Reason Selection */}
         <View className="mb-6">
-          <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+          <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
             Reason for update
           </Text>
           <View className="space-y-2">
@@ -228,9 +220,9 @@ export default function CustodyOverrideScreen() {
                 key={reason.id}
                 className="rounded-xl p-4 flex-row items-center"
                 style={{
-                  backgroundColor: selectedReason === reason.id ? `${colors.sage}15` : "white",
+                  backgroundColor: selectedReason === reason.id ? `${colors.primary}15` : "white",
                   borderWidth: selectedReason === reason.id ? 2 : 0,
-                  borderColor: colors.sage,
+                  borderColor: colors.primary,
                 }}
                 onPress={() => setSelectedReason(reason.id)}
               >
@@ -238,21 +230,21 @@ export default function CustodyOverrideScreen() {
                   className="w-10 h-10 rounded-full items-center justify-center"
                   style={{
                     backgroundColor: selectedReason === reason.id
-                      ? colors.sage
-                      : colors.sand,
+                      ? colors.primary
+                      : colors.backgroundSecondary,
                   }}
                 >
                   <Ionicons
                     name={reason.icon as any}
                     size={20}
-                    color={selectedReason === reason.id ? "white" : colors.slate}
+                    color={selectedReason === reason.id ? "white" : colors.secondary}
                   />
                 </View>
-                <Text className="flex-1 ml-3 font-medium" style={{ color: colors.slate }}>
+                <Text className="flex-1 ml-3 font-medium" style={{ color: colors.secondary }}>
                   {reason.label}
                 </Text>
                 {selectedReason === reason.id && (
-                  <Ionicons name="checkmark-circle" size={20} color={colors.sage} />
+                  <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
                 )}
               </TouchableOpacity>
             ))}
@@ -262,19 +254,19 @@ export default function CustodyOverrideScreen() {
         {/* Custom Reason Input */}
         {selectedReason === "other" && (
           <View className="mb-6">
-            <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+            <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
               Please explain
             </Text>
             <TextInput
               className="rounded-xl p-4"
               style={{
-                backgroundColor: "white",
-                color: colors.slate,
+                backgroundColor: colors.background,
+                color: colors.secondary,
                 minHeight: 100,
                 textAlignVertical: "top",
               }}
               placeholder="Enter reason for custody change..."
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.inputPlaceholder}
               multiline
               value={customReason}
               onChangeText={setCustomReason}
@@ -288,8 +280,8 @@ export default function CustodyOverrideScreen() {
           style={{
             backgroundColor:
               selectedChildren.length > 0 && selectedReason
-                ? colors.sage
-                : colors.sand,
+                ? colors.primary
+                : colors.backgroundSecondary,
           }}
           onPress={handleSubmit}
           disabled={selectedChildren.length === 0 || !selectedReason || submitting}
@@ -301,13 +293,13 @@ export default function CustodyOverrideScreen() {
               <Ionicons
                 name="checkmark-circle"
                 size={20}
-                color={selectedChildren.length > 0 && selectedReason ? "white" : colors.slate}
+                color={selectedChildren.length > 0 && selectedReason ? "white" : colors.secondary}
               />
               <Text
                 className="font-semibold text-lg ml-2"
                 style={{
                   color:
-                    selectedChildren.length > 0 && selectedReason ? "white" : colors.slate,
+                    selectedChildren.length > 0 && selectedReason ? "white" : colors.secondary,
                 }}
               >
                 Confirm - Children With Me

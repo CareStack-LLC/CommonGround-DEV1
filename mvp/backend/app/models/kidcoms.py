@@ -95,7 +95,8 @@ class KidComsSettings(Base, UUIDMixin, TimestampMixin):
     # Parental controls
     require_parent_in_call: Mapped[bool] = mapped_column(Boolean, default=False)
     allow_child_to_initiate: Mapped[bool] = mapped_column(Boolean, default=True)
-    record_sessions: Mapped[bool] = mapped_column(Boolean, default=False)
+    # ARIA lockdown: recording is always-on for child safety (cannot be disabled by parents)
+    record_sessions: Mapped[bool] = mapped_column(Boolean, default=True)
 
     # Relationships
     family_file = relationship("FamilyFile", back_populates="kidcoms_settings")

@@ -23,21 +23,13 @@ import QRCode from "react-native-qrcode-svg";
 
 import { parent } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
+import { useTheme } from "@/theme";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const QR_SIZE = SCREEN_WIDTH * 0.7;
 
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
-
 export default function QRShowScreen() {
+  const { colors } = useTheme();
   const { instanceId, exchangeId } = useLocalSearchParams<{
     instanceId: string;
     exchangeId: string;
@@ -109,10 +101,10 @@ export default function QRShowScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>
           Generating QR code...
         </Text>
       </SafeAreaView>
@@ -123,7 +115,7 @@ export default function QRShowScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center px-6"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
         <View
           className="w-20 h-20 rounded-full items-center justify-center mb-4"
@@ -131,10 +123,10 @@ export default function QRShowScreen() {
         >
           <Ionicons name="alert-circle" size={40} color="#DC2626" />
         </View>
-        <Text className="text-lg font-semibold mb-2" style={{ color: colors.slate }}>
+        <Text className="text-lg font-semibold mb-2" style={{ color: colors.secondary }}>
           Error
         </Text>
-        <Text className="text-center" style={{ color: colors.slate }}>
+        <Text className="text-center" style={{ color: colors.secondary }}>
           {error}
         </Text>
       </SafeAreaView>
@@ -142,20 +134,20 @@ export default function QRShowScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }}>
       <View className="flex-1 items-center justify-center px-6">
         {/* Header */}
         <View className="items-center mb-8">
           <View
             className="w-16 h-16 rounded-full items-center justify-center mb-4"
-            style={{ backgroundColor: `${colors.sage}20` }}
+            style={{ backgroundColor: `${colors.primary}20` }}
           >
-            <Ionicons name="qr-code" size={32} color={colors.sage} />
+            <Ionicons name="qr-code" size={32} color={colors.primary} />
           </View>
-          <Text className="text-xl font-bold mb-2" style={{ color: colors.slate }}>
+          <Text className="text-xl font-bold mb-2" style={{ color: colors.secondary }}>
             Exchange Confirmation
           </Text>
-          <Text className="text-center" style={{ color: colors.slate }}>
+          <Text className="text-center" style={{ color: colors.secondary }}>
             Have your co-parent scan this code to confirm the custody exchange
           </Text>
         </View>
@@ -163,7 +155,7 @@ export default function QRShowScreen() {
         {/* QR Code Container */}
         <View
           className="rounded-3xl p-6 mb-6 shadow-lg"
-          style={{ backgroundColor: "white" }}
+          style={{ backgroundColor: colors.background }}
         >
           {qrToken ? (
             <QRCode
@@ -173,15 +165,15 @@ export default function QRShowScreen() {
                 token: qrToken,
               })}
               size={QR_SIZE}
-              color={colors.slate}
-              backgroundColor="white"
+              color={colors.secondary}
+              backgroundColor={colors.background}
             />
           ) : (
             <View
               style={{ width: QR_SIZE, height: QR_SIZE }}
               className="items-center justify-center"
             >
-              <ActivityIndicator size="large" color={colors.sage} />
+              <ActivityIndicator size="large" color={colors.primary} />
             </View>
           )}
         </View>
@@ -190,17 +182,17 @@ export default function QRShowScreen() {
         <View
           className="flex-row items-center px-4 py-2 rounded-full"
           style={{
-            backgroundColor: timeRemaining <= 60 ? "#FEF3C7" : `${colors.sage}20`,
+            backgroundColor: timeRemaining <= 60 ? "#FEF3C7" : `${colors.primary}20`,
           }}
         >
           <Ionicons
             name="time"
             size={18}
-            color={timeRemaining <= 60 ? colors.amber : colors.sage}
+            color={timeRemaining <= 60 ? colors.accent : colors.primary}
           />
           <Text
             className="ml-2 font-semibold"
-            style={{ color: timeRemaining <= 60 ? colors.amber : colors.sage }}
+            style={{ color: timeRemaining <= 60 ? colors.accent : colors.primary }}
           >
             {timeRemaining > 0
               ? `Expires in ${formatTime(timeRemaining)}`
@@ -209,14 +201,14 @@ export default function QRShowScreen() {
         </View>
 
         {/* Instructions */}
-        <View className="mt-8 px-4" style={{ backgroundColor: colors.sand }} className="rounded-xl p-4">
+        <View className="mt-8 rounded-xl p-4" style={{ backgroundColor: colors.backgroundSecondary }}>
           <View className="flex-row items-start">
-            <Ionicons name="information-circle" size={20} color={colors.sage} />
+            <Ionicons name="information-circle" size={20} color={colors.primary} />
             <View className="flex-1 ml-3">
-              <Text className="font-medium mb-1" style={{ color: colors.slate }}>
+              <Text className="font-medium mb-1" style={{ color: colors.secondary }}>
                 How it works
               </Text>
-              <Text className="text-sm" style={{ color: colors.slate }}>
+              <Text className="text-sm" style={{ color: colors.secondary }}>
                 1. Both parents should be at the exchange location{"\n"}
                 2. The receiving parent scans this QR code{"\n"}
                 3. Exchange is confirmed and logged automatically

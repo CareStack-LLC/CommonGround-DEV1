@@ -2,12 +2,15 @@
 Agreement endpoints for custody agreement management.
 """
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, Body, status, Response
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from pydantic import BaseModel
 
 from app.core.database import get_db
+from app.models.agreement import Agreement, AgreementSection
 from app.core.security import get_current_user
 from app.models.user import User
 from app.schemas.agreement import (
@@ -324,6 +327,206 @@ async def download_agreement_pdf(
         headers={
             "Content-Disposition": f'attachment; filename="agreement_{agreement_id}.pdf"'
         }
+    )
+
+
+# ============================================================================
+# Family File Summary Endpoints
+# ============================================================================
+
+
+class ExchangeScheduleItem(BaseModel):
+    """A single exchange schedule entry."""
+    day_of_week: Optional[str] = None
+    time: Optional[str] = None
+    location: Optional[str] = None
+
+
+class ExchangeSummaryResponse(BaseModel):
+    """Response model for exchange schedule summary."""
+    schedules: List[ExchangeScheduleItem]
+    agreement_title: Optional[str] = None
+
+
+class FinancialSummaryResponse(BaseModel):
+    """Response model for financial summary."""
+    child_support_amount: Optional[float] = None
+    child_support_frequency: Optional[str] = None
+    child_support_payer: Optional[str] = None
+    child_support_payee: Optional[str] = None
+    expense_split_percentage: Optional[Dict[str, float]] = None
+    special_provisions: List[str] = []
+    agreement_title: Optional[str] = None
+
+
+async def _get_active_agreement_for_family(
+    db: AsyncSession, family_file_id: str, current_user
+) -> Optional[Agreement]:
+    """
+    Find the active agreement for a family file.
+
+    Falls back to the most recent approved/pending/draft agreement
+    if no active agreement exists.
+    """
+    # Try active agreement first
+    result = await db.execute(
+        select(Agreement)
+        .options(selectinload(Agreement.sections))
+        .where(Agreement.family_file_id == family_file_id)
+        .where(Agreement.status == "active")
+        .order_by(Agreement.version.desc())
+        .limit(1)
+    )
+    agreement = result.scalars().first()
+    if agreement:
+        return agreement
+
+    # Fall back to most recent non-inactive agreement
+    result = await db.execute(
+        select(Agreement)
+        .options(selectinload(Agreement.sections))
+        .where(Agreement.family_file_id == family_file_id)
+        .where(Agreement.status.in_(["approved", "pending_approval", "draft"]))
+        .order_by(Agreement.version.desc())
+        .limit(1)
+    )
+    return result.scalars().first()
+
+
+@router.get(
+    "/family-file/{family_file_id}/exchange-summary",
+    response_model=ExchangeSummaryResponse,
+)
+async def get_exchange_summary(
+    family_file_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get exchange schedule summary for a family file's active agreement.
+
+    Extracts exchange/custody schedule information from agreement sections
+    with section_type 'schedule' or 'custody'.
+
+    Args:
+        family_file_id: ID of the family file
+
+    Returns:
+        Exchange schedule summary with locations and times
+    """
+    agreement = await _get_active_agreement_for_family(db, family_file_id, current_user)
+
+    if not agreement:
+        return ExchangeSummaryResponse(schedules=[], agreement_title=None)
+
+    schedules: List[ExchangeScheduleItem] = []
+
+    for section in agreement.sections:
+        if section.section_type not in ("schedule", "custody"):
+            continue
+        if not section.structured_data:
+            continue
+
+        data = section.structured_data
+
+        # Handle structured_data that contains a list of exchanges directly
+        exchange_list = data.get("exchanges") or data.get("exchange_schedule") or []
+        if isinstance(exchange_list, list):
+            for entry in exchange_list:
+                if isinstance(entry, dict):
+                    schedules.append(ExchangeScheduleItem(
+                        day_of_week=entry.get("day_of_week") or entry.get("day"),
+                        time=entry.get("time"),
+                        location=entry.get("location"),
+                    ))
+
+        # Also check for a single exchange record at the top level
+        if data.get("day_of_week") or data.get("day"):
+            schedules.append(ExchangeScheduleItem(
+                day_of_week=data.get("day_of_week") or data.get("day"),
+                time=data.get("time"),
+                location=data.get("location"),
+            ))
+
+    return ExchangeSummaryResponse(
+        schedules=schedules,
+        agreement_title=agreement.title,
+    )
+
+
+@router.get(
+    "/family-file/{family_file_id}/financial-summary",
+    response_model=FinancialSummaryResponse,
+)
+async def get_financial_summary(
+    family_file_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get financial summary for a family file's active agreement.
+
+    Extracts financial information from agreement sections
+    with section_type 'financial'.
+
+    Args:
+        family_file_id: ID of the family file
+
+    Returns:
+        Financial summary including child support and expense split details
+    """
+    agreement = await _get_active_agreement_for_family(db, family_file_id, current_user)
+
+    if not agreement:
+        return FinancialSummaryResponse(agreement_title=None)
+
+    # Collect financial data from all financial sections
+    child_support_amount: Optional[float] = None
+    child_support_frequency: Optional[str] = None
+    child_support_payer: Optional[str] = None
+    child_support_payee: Optional[str] = None
+    expense_split_percentage: Optional[Dict[str, float]] = None
+    special_provisions: List[str] = []
+
+    for section in agreement.sections:
+        if section.section_type != "financial":
+            continue
+        if not section.structured_data:
+            continue
+
+        data = section.structured_data
+
+        # Extract child support details
+        if data.get("child_support_amount") is not None:
+            child_support_amount = float(data["child_support_amount"])
+        if data.get("child_support_frequency"):
+            child_support_frequency = data["child_support_frequency"]
+        if data.get("child_support_payer"):
+            child_support_payer = data["child_support_payer"]
+        if data.get("child_support_payee"):
+            child_support_payee = data["child_support_payee"]
+
+        # Extract expense split
+        if data.get("expense_split_percentage"):
+            expense_split_percentage = data["expense_split_percentage"]
+        elif data.get("expense_split"):
+            expense_split_percentage = data["expense_split"]
+
+        # Extract special provisions
+        provisions = data.get("special_provisions") or data.get("provisions") or []
+        if isinstance(provisions, list):
+            special_provisions.extend(provisions)
+        elif isinstance(provisions, str):
+            special_provisions.append(provisions)
+
+    return FinancialSummaryResponse(
+        child_support_amount=child_support_amount,
+        child_support_frequency=child_support_frequency,
+        child_support_payer=child_support_payer,
+        child_support_payee=child_support_payee,
+        expense_split_percentage=expense_split_percentage,
+        special_provisions=special_provisions,
+        agreement_title=agreement.title,
     )
 
 

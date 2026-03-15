@@ -3,25 +3,22 @@
  */
 
 import { Stack } from "expo-router";
-
-// CommonGround Design System Colors
-const SAGE = "#4A6C58";
-const SLATE = "#475569";
-const WHITE = "#FFFFFF";
-const SAND = "#F5F0E8";
+import { useTheme } from "@/theme";
 
 export default function SettingsLayout() {
+  const { colors } = useTheme();
+
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: WHITE,
+          backgroundColor: colors.background,
         },
         headerTitleStyle: {
-          color: SLATE,
+          color: colors.textSecondary,
           fontWeight: "600",
         },
-        headerTintColor: SAGE,
+        headerTintColor: colors.primary,
         headerBackTitle: "Back",
         headerShadowVisible: false,
       }}

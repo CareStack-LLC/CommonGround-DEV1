@@ -1,27 +1,24 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/theme";
 
 type IconName = keyof typeof Ionicons.glyphMap;
-
-// CommonGround Design System Colors
-const SAGE = "#4A6C58";
-const SLATE_LIGHT = "#94A3B8";
-const WHITE = "#FFFFFF";
-const SAND = "#F5F0E8";
 
 function TabBarIcon({ name, color }: { name: IconName; color: string }) {
   return <Ionicons size={22} name={name} color={color} />;
 }
 
 export default function TabLayout() {
+  const { colors } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: SAGE,
-        tabBarInactiveTintColor: SLATE_LIGHT,
+        tabBarActiveTintColor: colors.tabBarActive,
+        tabBarInactiveTintColor: colors.tabBarInactive,
         tabBarStyle: {
-          backgroundColor: WHITE,
-          borderTopColor: SAND,
+          backgroundColor: colors.tabBarBackground,
+          borderTopColor: colors.tabBarBorder,
           borderTopWidth: 1,
           paddingTop: 8,
           paddingBottom: 28,

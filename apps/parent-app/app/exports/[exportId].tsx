@@ -27,17 +27,11 @@ import {
   getStatusDisplay,
   ExportStatus,
 } from "@commonground/api-client/src/api/parent/exports";
-
-// Design colors
-const SAGE = "#4A6C58";
-const SAGE_LIGHT = "#E8F0EB";
-const CREAM = "#FFFBF5";
-const WHITE = "#FFFFFF";
-const SAND = "#F5F0E8";
-const SLATE = "#475569";
+import { useTheme } from "@/theme";
 
 export default function ExportDetailsScreen() {
   const { exportId } = useLocalSearchParams<{ exportId: string }>();
+  const { colors } = useTheme();
   const [exportData, setExportData] = useState<CaseExport | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -168,9 +162,9 @@ export default function ExportDetailsScreen() {
 
   if (isLoading || !exportData) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: CREAM, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size="large" color={SAGE} />
-        <Text style={{ marginTop: 16, color: SLATE }}>Loading report...</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={{ marginTop: 16, color: colors.secondary }}>Loading report...</Text>
       </SafeAreaView>
     );
   }
@@ -179,7 +173,7 @@ export default function ExportDetailsScreen() {
   const isReady = exportData.status === ExportStatus.COMPLETED || exportData.status === ExportStatus.DOWNLOADED;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: CREAM }} edges={["bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         {/* Status Banner */}
         <View
@@ -219,32 +213,32 @@ export default function ExportDetailsScreen() {
         )}
 
         {/* Main Info Card */}
-        <View style={{ backgroundColor: WHITE, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+        <View style={{ backgroundColor: colors.cardBackground, borderRadius: 12, padding: 16, marginBottom: 16 }}>
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
             <Ionicons
               name={exportData.package_type === "court" ? "briefcase" : "search"}
               size={24}
-              color={SAGE}
+              color={colors.primary}
             />
             <View style={{ marginLeft: 12 }}>
-              <Text style={{ fontSize: 18, fontWeight: "600", color: "#1e293b" }}>
+              <Text style={{ fontSize: 18, fontWeight: "600", color: colors.textPrimary }}>
                 {exportData.package_type === "court" ? "Court Package" : "Investigation Report"}
               </Text>
-              <Text style={{ fontSize: 13, color: SLATE }}>#{exportData.export_number}</Text>
+              <Text style={{ fontSize: 13, color: colors.secondary }}>#{exportData.export_number}</Text>
             </View>
           </View>
 
-          <View style={{ borderTopWidth: 1, borderTopColor: SAND, paddingTop: 16 }}>
+          <View style={{ borderTopWidth: 1, borderTopColor: colors.backgroundSecondary, paddingTop: 16 }}>
             <View style={{ flexDirection: "row", marginBottom: 12 }}>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 12, color: SLATE }}>Date Range</Text>
-                <Text style={{ fontSize: 14, fontWeight: "500", color: "#1e293b" }}>
+                <Text style={{ fontSize: 12, color: colors.secondary }}>Date Range</Text>
+                <Text style={{ fontSize: 14, fontWeight: "500", color: colors.textPrimary }}>
                   {formatDate(exportData.date_range_start)} - {formatDate(exportData.date_range_end)}
                 </Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 12, color: SLATE }}>Created</Text>
-                <Text style={{ fontSize: 14, fontWeight: "500", color: "#1e293b" }}>
+                <Text style={{ fontSize: 12, color: colors.secondary }}>Created</Text>
+                <Text style={{ fontSize: 14, fontWeight: "500", color: colors.textPrimary }}>
                   {formatDateTime(exportData.created_at)}
                 </Text>
               </View>
@@ -252,8 +246,8 @@ export default function ExportDetailsScreen() {
 
             {exportData.claim_type && (
               <View style={{ marginBottom: 12 }}>
-                <Text style={{ fontSize: 12, color: SLATE }}>Claim Type</Text>
-                <Text style={{ fontSize: 14, fontWeight: "500", color: "#1e293b" }}>
+                <Text style={{ fontSize: 12, color: colors.secondary }}>Claim Type</Text>
+                <Text style={{ fontSize: 14, fontWeight: "500", color: colors.textPrimary }}>
                   {exportData.claim_type.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                 </Text>
               </View>
@@ -262,20 +256,20 @@ export default function ExportDetailsScreen() {
             {isReady && (
               <View style={{ flexDirection: "row", marginTop: 8 }}>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 12, color: SLATE }}>Pages</Text>
-                  <Text style={{ fontSize: 14, fontWeight: "500", color: "#1e293b" }}>
+                  <Text style={{ fontSize: 12, color: colors.secondary }}>Pages</Text>
+                  <Text style={{ fontSize: 14, fontWeight: "500", color: colors.textPrimary }}>
                     {exportData.page_count || "N/A"}
                   </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 12, color: SLATE }}>File Size</Text>
-                  <Text style={{ fontSize: 14, fontWeight: "500", color: "#1e293b" }}>
+                  <Text style={{ fontSize: 12, color: colors.secondary }}>File Size</Text>
+                  <Text style={{ fontSize: 14, fontWeight: "500", color: colors.textPrimary }}>
                     {formatFileSize(exportData.file_size_bytes)}
                   </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 12, color: SLATE }}>Downloads</Text>
-                  <Text style={{ fontSize: 14, fontWeight: "500", color: "#1e293b" }}>
+                  <Text style={{ fontSize: 12, color: colors.secondary }}>Downloads</Text>
+                  <Text style={{ fontSize: 14, fontWeight: "500", color: colors.textPrimary }}>
                     {exportData.download_count}
                   </Text>
                 </View>
@@ -285,8 +279,8 @@ export default function ExportDetailsScreen() {
         </View>
 
         {/* Sections Card */}
-        <View style={{ backgroundColor: WHITE, borderRadius: 12, padding: 16, marginBottom: 16 }}>
-          <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b", marginBottom: 12 }}>
+        <View style={{ backgroundColor: colors.cardBackground, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+          <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary, marginBottom: 12 }}>
             Sections Included ({exportData.sections_included.length})
           </Text>
           {exportData.sections_included.map((section, index) => (
@@ -297,11 +291,11 @@ export default function ExportDetailsScreen() {
                 alignItems: "center",
                 paddingVertical: 8,
                 borderTopWidth: index > 0 ? 1 : 0,
-                borderTopColor: SAND,
+                borderTopColor: colors.backgroundSecondary,
               }}
             >
-              <Ionicons name="checkmark-circle" size={16} color={SAGE} />
-              <Text style={{ marginLeft: 8, fontSize: 14, color: "#1e293b" }}>
+              <Ionicons name="checkmark-circle" size={16} color={colors.primary} />
+              <Text style={{ marginLeft: 8, fontSize: 14, color: colors.textPrimary }}>
                 {getSectionDisplayName(section)}
               </Text>
             </View>
@@ -310,20 +304,20 @@ export default function ExportDetailsScreen() {
 
         {/* Integrity Card */}
         {isReady && exportData.content_hash && (
-          <View style={{ backgroundColor: WHITE, borderRadius: 12, padding: 16, marginBottom: 16 }}>
-            <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b", marginBottom: 12 }}>
+          <View style={{ backgroundColor: colors.cardBackground, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary, marginBottom: 12 }}>
               Integrity Verification
             </Text>
             <View style={{ marginBottom: 8 }}>
-              <Text style={{ fontSize: 12, color: SLATE }}>SHA-256 Hash</Text>
-              <Text style={{ fontSize: 11, color: "#1e293b", fontFamily: "monospace" }} numberOfLines={2}>
+              <Text style={{ fontSize: 12, color: colors.secondary }}>SHA-256 Hash</Text>
+              <Text style={{ fontSize: 11, color: colors.textPrimary, fontFamily: "monospace" }} numberOfLines={2}>
                 {exportData.content_hash}
               </Text>
             </View>
             {exportData.chain_hash && (
               <View>
-                <Text style={{ fontSize: 12, color: SLATE }}>Chain Hash</Text>
-                <Text style={{ fontSize: 11, color: "#1e293b", fontFamily: "monospace" }} numberOfLines={2}>
+                <Text style={{ fontSize: 12, color: colors.secondary }}>Chain Hash</Text>
+                <Text style={{ fontSize: 11, color: colors.textPrimary, fontFamily: "monospace" }} numberOfLines={2}>
                   {exportData.chain_hash}
                 </Text>
               </View>
@@ -336,7 +330,7 @@ export default function ExportDetailsScreen() {
           <View style={{ marginBottom: 16 }}>
             <TouchableOpacity
               style={{
-                backgroundColor: SAGE,
+                backgroundColor: colors.primary,
                 borderRadius: 8,
                 padding: 16,
                 flexDirection: "row",
@@ -348,11 +342,11 @@ export default function ExportDetailsScreen() {
               disabled={isDownloading}
             >
               {isDownloading ? (
-                <ActivityIndicator color={WHITE} />
+                <ActivityIndicator color={colors.textInverse} />
               ) : (
                 <>
-                  <Ionicons name="download" size={20} color={WHITE} />
-                  <Text style={{ color: WHITE, fontWeight: "600", marginLeft: 8 }}>Download PDF</Text>
+                  <Ionicons name="download" size={20} color={colors.textInverse} />
+                  <Text style={{ color: colors.textInverse, fontWeight: "600", marginLeft: 8 }}>Download PDF</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -361,7 +355,7 @@ export default function ExportDetailsScreen() {
               <TouchableOpacity
                 style={{
                   flex: 1,
-                  backgroundColor: SAGE_LIGHT,
+                  backgroundColor: colors.primaryLight,
                   borderRadius: 8,
                   padding: 12,
                   flexDirection: "row",
@@ -371,14 +365,14 @@ export default function ExportDetailsScreen() {
                 }}
                 onPress={handleShare}
               >
-                <Ionicons name="share-outline" size={18} color={SAGE} />
-                <Text style={{ color: SAGE, fontWeight: "500", marginLeft: 6 }}>Share</Text>
+                <Ionicons name="share-outline" size={18} color={colors.primary} />
+                <Text style={{ color: colors.primary, fontWeight: "500", marginLeft: 6 }}>Share</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={{
                   flex: 1,
-                  backgroundColor: SAGE_LIGHT,
+                  backgroundColor: colors.primaryLight,
                   borderRadius: 8,
                   padding: 12,
                   flexDirection: "row",
@@ -390,11 +384,11 @@ export default function ExportDetailsScreen() {
                 disabled={isVerifying}
               >
                 {isVerifying ? (
-                  <ActivityIndicator size="small" color={SAGE} />
+                  <ActivityIndicator size="small" color={colors.primary} />
                 ) : (
                   <>
-                    <Ionicons name="shield-checkmark-outline" size={18} color={SAGE} />
-                    <Text style={{ color: SAGE, fontWeight: "500", marginLeft: 6 }}>Verify</Text>
+                    <Ionicons name="shield-checkmark-outline" size={18} color={colors.primary} />
+                    <Text style={{ color: colors.primary, fontWeight: "500", marginLeft: 6 }}>Verify</Text>
                   </>
                 )}
               </TouchableOpacity>
@@ -418,7 +412,7 @@ export default function ExportDetailsScreen() {
 
         {/* Expiry Info */}
         {exportData.expires_at && !exportData.is_permanent && (
-          <Text style={{ fontSize: 12, color: SLATE, textAlign: "center", marginTop: 16 }}>
+          <Text style={{ fontSize: 12, color: colors.secondary, textAlign: "center", marginTop: 16 }}>
             This report expires on {formatDateTime(exportData.expires_at)}
           </Text>
         )}

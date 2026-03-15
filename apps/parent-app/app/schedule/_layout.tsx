@@ -1,35 +1,23 @@
 /**
  * Schedule Stack Layout
- * Navigation for schedule management screens
+ * Simplified — collections and time blocks have been removed
  */
 
 import { Stack } from "expo-router";
-
-const colors = {
-  sage: "#4A6C58",
-  slate: "#475569",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 export default function ScheduleLayout() {
+  const { colors } = useTheme();
+
   return (
     <Stack
       screenOptions={{
         headerShown: true,
         headerBackTitle: "Back",
-        headerTintColor: colors.sage,
-        headerStyle: { backgroundColor: colors.cream },
-        headerTitleStyle: { color: colors.slate },
+        headerTintColor: colors.primary,
+        headerStyle: { backgroundColor: colors.surface },
+        headerTitleStyle: { color: colors.textPrimary },
       }}
-    >
-      <Stack.Screen
-        name="collections"
-        options={{ title: "My Time Collections" }}
-      />
-      <Stack.Screen
-        name="time-blocks"
-        options={{ title: "Time Blocks" }}
-      />
-    </Stack>
+    />
   );
 }

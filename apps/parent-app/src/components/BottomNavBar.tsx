@@ -6,12 +6,7 @@
 import { View, TouchableOpacity, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router, usePathname } from "expo-router";
-
-// CommonGround Design System Colors
-const SAGE = "#4A6C58";
-const SLATE_LIGHT = "#94A3B8";
-const WHITE = "#FFFFFF";
-const SAND = "#F5F0E8";
+import { useTheme } from "@/theme";
 
 type TabItem = {
   name: string;
@@ -31,6 +26,7 @@ const TABS: TabItem[] = [
 
 export function BottomNavBar() {
   const pathname = usePathname();
+  const { colors } = useTheme();
 
   // Determine which tab is active based on current path
   const getActiveTab = () => {
@@ -47,8 +43,8 @@ export function BottomNavBar() {
     <View
       style={{
         flexDirection: "row",
-        backgroundColor: WHITE,
-        borderTopColor: SAND,
+        backgroundColor: colors.tabBarBackground,
+        borderTopColor: colors.tabBarBorder,
         borderTopWidth: 1,
         paddingTop: 8,
         paddingBottom: 28,
@@ -70,14 +66,14 @@ export function BottomNavBar() {
             <Ionicons
               name={isActive ? tab.iconFocused : tab.icon}
               size={22}
-              color={isActive ? SAGE : SLATE_LIGHT}
+              color={isActive ? colors.tabBarActive : colors.tabBarInactive}
             />
             <Text
               style={{
                 fontSize: 11,
                 fontWeight: "500",
                 marginTop: 4,
-                color: isActive ? SAGE : SLATE_LIGHT,
+                color: isActive ? colors.tabBarActive : colors.tabBarInactive,
               }}
             >
               {tab.label}

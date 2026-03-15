@@ -25,17 +25,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams, Stack } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 interface AgreementSection {
   id: string;
@@ -142,6 +132,7 @@ This agreement may be modified by mutual written consent of both parents.`,
 };
 
 export default function SectionEditorScreen() {
+  const { colors } = useTheme();
   const { id: agreementId, sectionId } = useLocalSearchParams<{
     id: string;
     sectionId: string;
@@ -358,10 +349,10 @@ export default function SectionEditorScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>
           Loading section...
         </Text>
       </SafeAreaView>
@@ -372,33 +363,33 @@ export default function SectionEditorScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <Text style={{ color: colors.slate }}>Section not found.</Text>
+        <Text style={{ color: colors.secondary }}>Section not found.</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <Stack.Screen
         options={{
           title: section.section_title,
           headerLeft: () => (
             <TouchableOpacity onPress={handleBack} className="mr-4">
-              <Ionicons name="arrow-back" size={24} color={colors.sage} />
+              <Ionicons name="arrow-back" size={24} color={colors.primary} />
             </TouchableOpacity>
           ),
           headerRight: () => (
             <View className="flex-row items-center">
-              {saving && <ActivityIndicator size="small" color={colors.sage} className="mr-2" />}
+              {saving && <ActivityIndicator size="small" color={colors.primary} className="mr-2" />}
               {hasChanges && !saving && (
-                <View className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: colors.amber }} />
+                <View className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: colors.accent }} />
               )}
               <TouchableOpacity onPress={() => saveSection(false)} disabled={!hasChanges || saving}>
                 <Text
                   className="font-semibold"
-                  style={{ color: hasChanges && !saving ? colors.sage : "#9CA3AF" }}
+                  style={{ color: hasChanges && !saving ? colors.primary : colors.textMuted }}
                 >
                   Save
                 </Text>
@@ -415,30 +406,30 @@ export default function SectionEditorScreen() {
       >
         <ScrollView className="flex-1" contentContainerStyle={{ padding: 16 }}>
           {/* Section Header */}
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
+          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.background }}>
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
                 <View
                   className="w-8 h-8 rounded-full items-center justify-center mr-3"
-                  style={{ backgroundColor: `${colors.sage}20` }}
+                  style={{ backgroundColor: `${colors.primary}20` }}
                 >
-                  <Text className="font-bold" style={{ color: colors.sage }}>
+                  <Text className="font-bold" style={{ color: colors.primary }}>
                     {section.section_number}
                   </Text>
                 </View>
-                <Text className="font-semibold" style={{ color: colors.slate }}>
+                <Text className="font-semibold" style={{ color: colors.secondary }}>
                   {section.section_title}
                 </Text>
               </View>
               <View
                 className="px-2 py-1 rounded-full"
                 style={{
-                  backgroundColor: section.is_completed ? `${colors.sage}20` : `${colors.amber}20`,
+                  backgroundColor: section.is_completed ? `${colors.primary}20` : `${colors.accent}20`,
                 }}
               >
                 <Text
                   className="text-xs font-medium"
-                  style={{ color: section.is_completed ? colors.sage : colors.amber }}
+                  style={{ color: section.is_completed ? colors.primary : colors.accent }}
                 >
                   {section.is_completed ? "Complete" : "Incomplete"}
                 </Text>
@@ -450,21 +441,21 @@ export default function SectionEditorScreen() {
           <View className="flex-row mb-4 space-x-2">
             <TouchableOpacity
               className="flex-1 flex-row items-center justify-center py-3 rounded-xl"
-              style={{ backgroundColor: `${colors.sage}20` }}
+              style={{ backgroundColor: `${colors.primary}20` }}
               onPress={getARIASuggestion}
             >
-              <Ionicons name="sparkles" size={18} color={colors.sage} />
-              <Text className="ml-2 font-medium" style={{ color: colors.sage }}>
+              <Ionicons name="sparkles" size={18} color={colors.primary} />
+              <Text className="ml-2 font-medium" style={{ color: colors.primary }}>
                 Ask ARIA
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-1 flex-row items-center justify-center py-3 rounded-xl"
-              style={{ backgroundColor: colors.sand }}
+              style={{ backgroundColor: colors.backgroundSecondary }}
               onPress={useTemplate}
             >
-              <Ionicons name="document-text" size={18} color={colors.slate} />
-              <Text className="ml-2 font-medium" style={{ color: colors.slate }}>
+              <Ionicons name="document-text" size={18} color={colors.secondary} />
+              <Text className="ml-2 font-medium" style={{ color: colors.secondary }}>
                 Use Template
               </Text>
             </TouchableOpacity>
@@ -472,34 +463,34 @@ export default function SectionEditorScreen() {
 
           {/* ARIA Suggestion Panel */}
           {showARIA && (
-            <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: `${colors.sage}10` }}>
+            <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: `${colors.primary}10` }}>
               <View className="flex-row items-center justify-between mb-3">
                 <View className="flex-row items-center">
-                  <Ionicons name="sparkles" size={20} color={colors.sage} />
-                  <Text className="ml-2 font-semibold" style={{ color: colors.sage }}>
+                  <Ionicons name="sparkles" size={20} color={colors.primary} />
+                  <Text className="ml-2 font-semibold" style={{ color: colors.primary }}>
                     ARIA Suggestion
                   </Text>
                 </View>
                 <TouchableOpacity onPress={() => setShowARIA(false)}>
-                  <Ionicons name="close" size={20} color={colors.slate} />
+                  <Ionicons name="close" size={20} color={colors.secondary} />
                 </TouchableOpacity>
               </View>
 
               {ariaLoading ? (
                 <View className="items-center py-4">
-                  <ActivityIndicator size="small" color={colors.sage} />
-                  <Text className="mt-2 text-sm" style={{ color: colors.slate }}>
+                  <ActivityIndicator size="small" color={colors.primary} />
+                  <Text className="mt-2 text-sm" style={{ color: colors.secondary }}>
                     Getting suggestion...
                   </Text>
                 </View>
               ) : ariaSuggestion ? (
                 <>
-                  <Text className="text-sm mb-3" style={{ color: colors.slate }}>
+                  <Text className="text-sm mb-3" style={{ color: colors.secondary }}>
                     {ariaSuggestion}
                   </Text>
                   <TouchableOpacity
                     className="py-2 rounded-lg items-center"
-                    style={{ backgroundColor: colors.sage }}
+                    style={{ backgroundColor: colors.primary }}
                     onPress={() => {
                       setContent(ariaSuggestion);
                       setShowARIA(false);
@@ -513,12 +504,12 @@ export default function SectionEditorScreen() {
           )}
 
           {/* Content Editor */}
-          <View className="rounded-xl" style={{ backgroundColor: "white" }}>
+          <View className="rounded-xl" style={{ backgroundColor: colors.background }}>
             <TextInput
               className="p-4 text-base min-h-[300px]"
-              style={{ color: colors.slate, textAlignVertical: "top" }}
+              style={{ color: colors.secondary, textAlignVertical: "top" }}
               placeholder="Enter the content for this section...&#10;&#10;Use clear, specific language that both parents can understand and follow. Include dates, times, and locations where applicable."
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.inputPlaceholder}
               multiline
               value={content}
               onChangeText={setContent}
@@ -526,14 +517,14 @@ export default function SectionEditorScreen() {
           </View>
 
           {/* Tips */}
-          <View className="mt-4 rounded-xl p-4" style={{ backgroundColor: colors.sand }}>
+          <View className="mt-4 rounded-xl p-4" style={{ backgroundColor: colors.backgroundSecondary }}>
             <View className="flex-row items-start">
-              <Ionicons name="bulb" size={18} color={colors.amber} />
+              <Ionicons name="bulb" size={18} color={colors.accent} />
               <View className="flex-1 ml-3">
-                <Text className="font-medium mb-1" style={{ color: colors.slate }}>
+                <Text className="font-medium mb-1" style={{ color: colors.secondary }}>
                   Writing Tips
                 </Text>
-                <Text className="text-sm" style={{ color: colors.slate }}>
+                <Text className="text-sm" style={{ color: colors.secondary }}>
                   {section.section_type === "parenting_schedule" &&
                     "Be specific about days, times, and locations. Include provisions for schedule changes."}
                   {section.section_type === "decision_making" &&
@@ -557,10 +548,10 @@ export default function SectionEditorScreen() {
 
           {/* Character count */}
           <View className="flex-row justify-between mt-4 px-2">
-            <Text className="text-xs" style={{ color: colors.slate }}>
+            <Text className="text-xs" style={{ color: colors.secondary }}>
               {content.length} characters
             </Text>
-            <Text className="text-xs" style={{ color: content.length >= 50 ? colors.sage : colors.amber }}>
+            <Text className="text-xs" style={{ color: content.length >= 50 ? colors.primary : colors.accent }}>
               {content.length >= 50 ? "Meets minimum length" : "Minimum 50 characters to mark complete"}
             </Text>
           </View>

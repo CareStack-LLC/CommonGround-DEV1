@@ -14,17 +14,7 @@ import { router, useLocalSearchParams } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
 import { BottomNavBar } from "@/components/BottomNavBar";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 interface AgreementSection {
   id: string;
@@ -66,12 +56,7 @@ interface Agreement {
   };
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  draft: colors.slate,
-  pending_approval: colors.amber,
-  active: colors.sage,
-  superseded: "#9CA3AF",
-};
+// STATUS_COLORS moved inside component to access theme colors
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -101,8 +86,16 @@ const SECTION_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
 };
 
 export default function AgreementDetailScreen() {
+  const { colors } = useTheme();
   const { id, familyId } = useLocalSearchParams<{ id: string; familyId: string }>();
   const { token, user } = useAuth();
+
+  const STATUS_COLORS: Record<string, string> = {
+    draft: colors.secondary,
+    pending_approval: colors.accent,
+    active: colors.primary,
+    superseded: "#9CA3AF",
+  };
   const [agreement, setAgreement] = useState<Agreement | null>(null);
   const [ariaSummary, setAriaSummary] = useState<AriaSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -389,17 +382,17 @@ export default function AgreementDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>Loading agreement...</Text>
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.surfaceElevated }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>Loading agreement...</Text>
       </SafeAreaView>
     );
   }
 
   if (!agreement) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
-        <Text style={{ color: colors.slate }}>Agreement not found.</Text>
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.surfaceElevated }}>
+        <Text style={{ color: colors.secondary }}>Agreement not found.</Text>
       </SafeAreaView>
     );
   }
@@ -407,7 +400,7 @@ export default function AgreementDetailScreen() {
   const sections = agreement.sections?.sort((a, b) => a.display_order - b.display_order) || [];
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["top", "bottom"]}>
       {/* Custom Header */}
       <View
         style={{
@@ -417,22 +410,22 @@ export default function AgreementDetailScreen() {
           paddingHorizontal: 16,
           paddingVertical: 12,
           borderBottomWidth: 1,
-          borderBottomColor: colors.sand,
-          backgroundColor: "white",
+          borderBottomColor: colors.backgroundSecondary,
+          backgroundColor: colors.background,
         }}
       >
         <TouchableOpacity
           onPress={() => router.back()}
           style={{ flexDirection: "row", alignItems: "center" }}
         >
-          <Ionicons name="chevron-back" size={24} color={colors.sage} />
-          <Text style={{ color: colors.sage, fontSize: 16, marginLeft: 4 }}>Back</Text>
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+          <Text style={{ color: colors.primary, fontSize: 16, marginLeft: 4 }}>Back</Text>
         </TouchableOpacity>
-        <Text style={{ fontSize: 17, fontWeight: "600", color: colors.slate }}>
+        <Text style={{ fontSize: 17, fontWeight: "600", color: colors.secondary }}>
           Agreement
         </Text>
         <TouchableOpacity onPress={showMenu} style={{ padding: 4 }}>
-          <Ionicons name="ellipsis-horizontal" size={24} color={colors.slate} />
+          <Ionicons name="ellipsis-horizontal" size={24} color={colors.secondary} />
         </TouchableOpacity>
       </View>
 
@@ -440,14 +433,14 @@ export default function AgreementDetailScreen() {
         className="flex-1"
         contentContainerStyle={{ padding: 16 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.sage} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         {/* Header Card */}
-        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: "white" }}>
+        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: colors.background }}>
           <View className="flex-row items-start justify-between mb-3">
             <View className="flex-1">
-              <Text className="text-xl font-bold mb-1" style={{ color: colors.slate }}>
+              <Text className="text-xl font-bold mb-1" style={{ color: colors.secondary }}>
                 {agreement.title}
               </Text>
               <View
@@ -465,21 +458,21 @@ export default function AgreementDetailScreen() {
             {agreement.status === "active" && (
               <View
                 className="w-12 h-12 rounded-full items-center justify-center"
-                style={{ backgroundColor: `${colors.sage}20` }}
+                style={{ backgroundColor: `${colors.primary}20` }}
               >
-                <Ionicons name="shield-checkmark" size={24} color={colors.sage} />
+                <Ionicons name="shield-checkmark" size={24} color={colors.primary} />
               </View>
             )}
           </View>
 
-          <Text className="text-xs mb-2" style={{ color: "#9CA3AF" }}>
+          <Text className="text-xs mb-2" style={{ color: colors.textMuted }}>
             {agreement.agreement_number}
           </Text>
 
           {agreement.court_ordered && (
             <View className="flex-row items-center mt-2">
-              <Ionicons name="business" size={14} color={colors.amber} />
-              <Text className="ml-2 text-sm font-medium" style={{ color: colors.amber }}>
+              <Ionicons name="business" size={14} color={colors.accent} />
+              <Text className="ml-2 text-sm font-medium" style={{ color: colors.accent }}>
                 Court Ordered
               </Text>
             </View>
@@ -487,8 +480,8 @@ export default function AgreementDetailScreen() {
 
           {agreement.effective_date && (
             <View className="flex-row items-center mt-2">
-              <Ionicons name="calendar" size={14} color={colors.slate} />
-              <Text className="ml-2 text-sm" style={{ color: colors.slate }}>
+              <Ionicons name="calendar" size={14} color={colors.secondary} />
+              <Text className="ml-2 text-sm" style={{ color: colors.secondary }}>
                 Effective: {formatDate(agreement.effective_date)}
               </Text>
             </View>
@@ -497,28 +490,28 @@ export default function AgreementDetailScreen() {
 
         {/* ARIA Summary - Always show for active or pending agreements */}
         {(agreement.status === "active" || agreement.status === "pending_approval" || ariaSummary?.summary) && (
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: `${colors.sage}10` }}>
+          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: `${colors.primary}10` }}>
             <View className="flex-row items-center mb-3">
               <View
                 className="w-8 h-8 rounded-full items-center justify-center mr-3"
-                style={{ backgroundColor: `${colors.sage}20` }}
+                style={{ backgroundColor: `${colors.primary}20` }}
               >
-                <Ionicons name="sparkles" size={16} color={colors.sage} />
+                <Ionicons name="sparkles" size={16} color={colors.primary} />
               </View>
-              <Text className="font-semibold text-lg" style={{ color: colors.sage }}>
+              <Text className="font-semibold text-lg" style={{ color: colors.primary }}>
                 ARIA Summary
               </Text>
             </View>
 
             {/* Summary Text */}
-            <Text className="mb-4" style={{ color: colors.slate, lineHeight: 22 }}>
+            <Text className="mb-4" style={{ color: colors.secondary, lineHeight: 22 }}>
               {ariaSummary?.summary ||
                 `This ${agreement.title.toLowerCase()} allows both parents to be involved in decision-making while establishing a clear schedule for the children's time with each parent. The agreement covers custody arrangements, parenting schedules, holidays, financial responsibilities, and communication guidelines.`}
             </Text>
 
             {/* Key Terms - show extracted ones or default based on sections */}
             <View>
-              <Text className="font-medium mb-2" style={{ color: colors.slate }}>
+              <Text className="font-medium mb-2" style={{ color: colors.secondary }}>
                 Key Terms:
               </Text>
               {agreement.sections && extractKeyTerms(agreement.sections).length > 0 ? (
@@ -526,22 +519,22 @@ export default function AgreementDetailScreen() {
                   <View key={index} className="flex-row items-center mb-2">
                     <View
                       className="w-2 h-2 rounded-full mr-3"
-                      style={{ backgroundColor: colors.sage }}
+                      style={{ backgroundColor: colors.primary }}
                     />
-                    <Text style={{ color: colors.slate }}>{term}</Text>
+                    <Text style={{ color: colors.secondary }}>{term}</Text>
                   </View>
                 ))
               ) : (
                 <>
                   <View className="flex-row items-center mb-2">
-                    <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.sage }} />
-                    <Text style={{ color: colors.slate }}>
+                    <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary }} />
+                    <Text style={{ color: colors.secondary }}>
                       {agreement.sections?.length || 7} sections covering all custody aspects
                     </Text>
                   </View>
                   <View className="flex-row items-center mb-2">
-                    <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.sage }} />
-                    <Text style={{ color: colors.slate }}>
+                    <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary }} />
+                    <Text style={{ color: colors.secondary }}>
                       {agreement.petitioner_approved && agreement.respondent_approved
                         ? "Both parents have approved"
                         : "Awaiting parent approval"}
@@ -549,8 +542,8 @@ export default function AgreementDetailScreen() {
                   </View>
                   {agreement.effective_date && (
                     <View className="flex-row items-center mb-2">
-                      <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.sage }} />
-                      <Text style={{ color: colors.slate }}>
+                      <View className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: colors.primary }} />
+                      <Text style={{ color: colors.secondary }}>
                         Effective since {formatDate(agreement.effective_date)}
                       </Text>
                     </View>
@@ -563,22 +556,22 @@ export default function AgreementDetailScreen() {
 
         {/* Completion Progress (for drafts) */}
         {agreement.status === "draft" && agreement.completion_percentage !== undefined && (
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
+          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.background }}>
             <View className="flex-row items-center justify-between mb-2">
-              <Text className="font-medium" style={{ color: colors.slate }}>
+              <Text className="font-medium" style={{ color: colors.secondary }}>
                 Completion Progress
               </Text>
-              <Text className="font-semibold" style={{ color: colors.sage }}>
+              <Text className="font-semibold" style={{ color: colors.primary }}>
                 {agreement.completion_percentage}%
               </Text>
             </View>
-            <View className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: colors.sand }}>
+            <View className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: colors.backgroundSecondary }}>
               <View
                 className="h-full rounded-full"
-                style={{ backgroundColor: colors.sage, width: `${agreement.completion_percentage}%` }}
+                style={{ backgroundColor: colors.primary, width: `${agreement.completion_percentage}%` }}
               />
             </View>
-            <Text className="text-xs mt-2" style={{ color: colors.slate }}>
+            <Text className="text-xs mt-2" style={{ color: colors.secondary }}>
               Complete at least 50% to submit for approval
             </Text>
           </View>
@@ -586,8 +579,8 @@ export default function AgreementDetailScreen() {
 
         {/* Approval Status */}
         {(agreement.status === "pending_approval" || agreement.status === "active") && (
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
-            <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.background }}>
+            <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
               Approval Status
             </Text>
 
@@ -597,21 +590,21 @@ export default function AgreementDetailScreen() {
                 <View className="flex-row items-center">
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center"
-                    style={{ backgroundColor: agreement.petitioner_approved ? `${colors.sage}20` : colors.sand }}
+                    style={{ backgroundColor: agreement.petitioner_approved ? `${colors.primary}20` : colors.backgroundSecondary }}
                   >
                     <Ionicons
                       name={agreement.petitioner_approved ? "checkmark" : "time"}
                       size={20}
-                      color={agreement.petitioner_approved ? colors.sage : colors.slate}
+                      color={agreement.petitioner_approved ? colors.primary : colors.secondary}
                     />
                   </View>
                   <View className="ml-3">
-                    <Text className="font-medium" style={{ color: colors.slate }}>
+                    <Text className="font-medium" style={{ color: colors.secondary }}>
                       {agreement.family_file?.parent_a?.first_name || "Parent A"}
                       {isParentA && " (You)"}
                     </Text>
                     {agreement.petitioner_approved_at && (
-                      <Text className="text-xs" style={{ color: colors.slate }}>
+                      <Text className="text-xs" style={{ color: colors.secondary }}>
                         Approved {formatDate(agreement.petitioner_approved_at)}
                       </Text>
                     )}
@@ -619,7 +612,7 @@ export default function AgreementDetailScreen() {
                 </View>
                 <Text
                   className="font-medium"
-                  style={{ color: agreement.petitioner_approved ? colors.sage : colors.amber }}
+                  style={{ color: agreement.petitioner_approved ? colors.primary : colors.accent }}
                 >
                   {agreement.petitioner_approved ? "Approved" : "Pending"}
                 </Text>
@@ -630,21 +623,21 @@ export default function AgreementDetailScreen() {
                 <View className="flex-row items-center">
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center"
-                    style={{ backgroundColor: agreement.respondent_approved ? `${colors.sage}20` : colors.sand }}
+                    style={{ backgroundColor: agreement.respondent_approved ? `${colors.primary}20` : colors.backgroundSecondary }}
                   >
                     <Ionicons
                       name={agreement.respondent_approved ? "checkmark" : "time"}
                       size={20}
-                      color={agreement.respondent_approved ? colors.sage : colors.slate}
+                      color={agreement.respondent_approved ? colors.primary : colors.secondary}
                     />
                   </View>
                   <View className="ml-3">
-                    <Text className="font-medium" style={{ color: colors.slate }}>
+                    <Text className="font-medium" style={{ color: colors.secondary }}>
                       {agreement.family_file?.parent_b?.first_name || "Parent B"}
                       {!isParentA && " (You)"}
                     </Text>
                     {agreement.respondent_approved_at && (
-                      <Text className="text-xs" style={{ color: colors.slate }}>
+                      <Text className="text-xs" style={{ color: colors.secondary }}>
                         Approved {formatDate(agreement.respondent_approved_at)}
                       </Text>
                     )}
@@ -652,7 +645,7 @@ export default function AgreementDetailScreen() {
                 </View>
                 <Text
                   className="font-medium"
-                  style={{ color: agreement.respondent_approved ? colors.sage : colors.amber }}
+                  style={{ color: agreement.respondent_approved ? colors.primary : colors.accent }}
                 >
                   {agreement.respondent_approved ? "Approved" : "Pending"}
                 </Text>
@@ -662,20 +655,20 @@ export default function AgreementDetailScreen() {
         )}
 
         {/* Sections */}
-        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
-          <Text className="font-semibold mb-4" style={{ color: colors.slate }}>
+        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.background }}>
+          <Text className="font-semibold mb-4" style={{ color: colors.secondary }}>
             Agreement Sections
           </Text>
 
           {sections.length === 0 ? (
-            <Text style={{ color: colors.slate }}>No sections found.</Text>
+            <Text style={{ color: colors.secondary }}>No sections found.</Text>
           ) : (
             <View className="space-y-2">
               {sections.map((section) => (
                 <TouchableOpacity
                   key={section.id}
                   className="flex-row items-center p-3 rounded-xl"
-                  style={{ backgroundColor: colors.sand }}
+                  style={{ backgroundColor: colors.backgroundSecondary }}
                   onPress={() => {
                     if (agreement?.status === "draft") {
                       router.push(`/agreements/${id}/sections/${section.id}`);
@@ -686,32 +679,32 @@ export default function AgreementDetailScreen() {
                 >
                   <View
                     className="w-8 h-8 rounded-full items-center justify-center"
-                    style={{ backgroundColor: section.is_completed ? `${colors.sage}20` : "white" }}
+                    style={{ backgroundColor: section.is_completed ? `${colors.primary}20` : "white" }}
                   >
                     <Ionicons
                       name={section.is_completed ? "checkmark" : (SECTION_ICONS[section.section_type] || "document-text")}
                       size={16}
-                      color={section.is_completed ? colors.sage : colors.slate}
+                      color={section.is_completed ? colors.primary : colors.secondary}
                     />
                   </View>
                   <View className="flex-1 ml-3">
-                    <Text className="font-medium" style={{ color: colors.slate }}>
+                    <Text className="font-medium" style={{ color: colors.secondary }}>
                       {section.section_number}. {section.section_title}
                     </Text>
                   </View>
                   <View
                     className="px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: section.is_completed ? `${colors.sage}20` : `${colors.amber}20` }}
+                    style={{ backgroundColor: section.is_completed ? `${colors.primary}20` : `${colors.accent}20` }}
                   >
                     <Text
                       className="text-xs"
-                      style={{ color: section.is_completed ? colors.sage : colors.amber }}
+                      style={{ color: section.is_completed ? colors.primary : colors.accent }}
                     >
                       {section.is_completed ? "Complete" : "Incomplete"}
                     </Text>
                   </View>
                   {agreement?.status === "draft" && (
-                    <Ionicons name="chevron-forward" size={16} color={colors.slate} className="ml-2" />
+                    <Ionicons name="chevron-forward" size={16} color={colors.secondary} className="ml-2" />
                   )}
                 </TouchableOpacity>
               ))}
@@ -725,7 +718,7 @@ export default function AgreementDetailScreen() {
           {needsMyApproval && (
             <TouchableOpacity
               className="py-4 rounded-xl items-center flex-row justify-center"
-              style={{ backgroundColor: colors.sage }}
+              style={{ backgroundColor: colors.primary }}
               onPress={handleApprove}
               disabled={actionLoading}
             >
@@ -744,7 +737,7 @@ export default function AgreementDetailScreen() {
           {canSubmit && (
             <TouchableOpacity
               className="py-4 rounded-xl items-center flex-row justify-center"
-              style={{ backgroundColor: colors.sage }}
+              style={{ backgroundColor: colors.primary }}
               onPress={handleSubmit}
               disabled={actionLoading}
             >
@@ -782,11 +775,11 @@ export default function AgreementDetailScreen() {
           {agreement.status === "active" && (
             <TouchableOpacity
               className="py-4 rounded-xl items-center flex-row justify-center border-2"
-              style={{ borderColor: colors.sage }}
+              style={{ borderColor: colors.primary }}
               onPress={handleDownloadPDF}
             >
-              <Ionicons name="download" size={20} color={colors.sage} />
-              <Text className="font-semibold ml-2" style={{ color: colors.sage }}>
+              <Ionicons name="download" size={20} color={colors.primary} />
+              <Text className="font-semibold ml-2" style={{ color: colors.primary }}>
                 Download PDF
               </Text>
             </TouchableOpacity>
@@ -795,11 +788,11 @@ export default function AgreementDetailScreen() {
           {/* Preview Agreement */}
           <TouchableOpacity
             className="py-4 rounded-xl items-center flex-row justify-center border-2 mb-3"
-            style={{ borderColor: colors.slate }}
+            style={{ borderColor: colors.secondary }}
             onPress={() => router.push(`/agreements/${id}/preview`)}
           >
-            <Ionicons name="eye" size={20} color={colors.slate} />
-            <Text className="font-semibold ml-2" style={{ color: colors.slate }}>
+            <Ionicons name="eye" size={20} color={colors.secondary} />
+            <Text className="font-semibold ml-2" style={{ color: colors.secondary }}>
               Preview Full Agreement
             </Text>
           </TouchableOpacity>
@@ -808,11 +801,11 @@ export default function AgreementDetailScreen() {
           {agreement.status === "draft" && (
             <TouchableOpacity
               className="py-4 rounded-xl items-center flex-row justify-center border-2"
-              style={{ borderColor: colors.sage }}
+              style={{ borderColor: colors.primary }}
               onPress={() => router.push(`/agreements/create?familyId=${familyId}&continue=${id}`)}
             >
-              <Ionicons name="chatbubbles" size={20} color={colors.sage} />
-              <Text className="font-semibold ml-2" style={{ color: colors.sage }}>
+              <Ionicons name="chatbubbles" size={20} color={colors.primary} />
+              <Text className="font-semibold ml-2" style={{ color: colors.primary }}>
                 Continue with ARIA
               </Text>
             </TouchableOpacity>

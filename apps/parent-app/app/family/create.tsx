@@ -15,17 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 const US_STATES = [
   "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado",
@@ -49,6 +39,7 @@ interface ChildInfo {
 }
 
 export default function CreateFamilyFileScreen() {
+  const { colors } = useTheme();
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -153,74 +144,74 @@ export default function CreateFamilyFileScreen() {
   const renderStep1 = () => (
     <View className="space-y-4">
       <View className="mb-6">
-        <Text className="text-2xl font-bold mb-2" style={{ color: colors.slate }}>
+        <Text className="text-2xl font-bold mb-2" style={{ color: colors.secondary }}>
           Create Family File
         </Text>
-        <Text style={{ color: colors.slate }}>
+        <Text style={{ color: colors.secondary }}>
           A family file contains all your co-parenting information in one place.
         </Text>
       </View>
 
       {/* Family Name */}
       <View>
-        <Text className="text-sm font-medium mb-2" style={{ color: colors.slate }}>
+        <Text className="text-sm font-medium mb-2" style={{ color: colors.secondary }}>
           Family Name *
         </Text>
         <TextInput
           className="rounded-xl px-4 py-3 text-base"
-          style={{ backgroundColor: colors.sand, color: colors.slate }}
+          style={{ backgroundColor: colors.backgroundSecondary, color: colors.secondary }}
           placeholder="e.g., Smith-Johnson Family"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor={colors.inputPlaceholder}
           value={familyName}
           onChangeText={setFamilyName}
         />
-        <Text className="text-xs mt-1" style={{ color: colors.slate }}>
+        <Text className="text-xs mt-1" style={{ color: colors.secondary }}>
           This helps identify your family file.
         </Text>
       </View>
 
       {/* State */}
       <View className="mt-4">
-        <Text className="text-sm font-medium mb-2" style={{ color: colors.slate }}>
+        <Text className="text-sm font-medium mb-2" style={{ color: colors.secondary }}>
           State (Optional)
         </Text>
         <TouchableOpacity
           className="rounded-xl px-4 py-3 flex-row items-center justify-between"
-          style={{ backgroundColor: colors.sand }}
+          style={{ backgroundColor: colors.backgroundSecondary }}
           onPress={() => setShowStateDropdown(!showStateDropdown)}
         >
-          <Text style={{ color: state ? colors.slate : "#94a3b8" }}>
+          <Text style={{ color: state ? colors.secondary : colors.inputPlaceholder }}>
             {state || "Select state"}
           </Text>
           <Ionicons
             name={showStateDropdown ? "chevron-up" : "chevron-down"}
             size={20}
-            color={colors.slate}
+            color={colors.secondary}
           />
         </TouchableOpacity>
         {showStateDropdown && (
           <View
             className="mt-2 rounded-xl max-h-48 overflow-hidden"
-            style={{ backgroundColor: "white", borderWidth: 1, borderColor: colors.sand }}
+            style={{ backgroundColor: colors.background, borderWidth: 1, borderColor: colors.backgroundSecondary }}
           >
             <ScrollView nestedScrollEnabled>
               {US_STATES.map((s) => (
                 <TouchableOpacity
                   key={s}
                   className="px-4 py-3 border-b"
-                  style={{ borderBottomColor: colors.sand }}
+                  style={{ borderBottomColor: colors.backgroundSecondary }}
                   onPress={() => {
                     setState(s);
                     setShowStateDropdown(false);
                   }}
                 >
-                  <Text style={{ color: colors.slate }}>{s}</Text>
+                  <Text style={{ color: colors.secondary }}>{s}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
         )}
-        <Text className="text-xs mt-1" style={{ color: colors.slate }}>
+        <Text className="text-xs mt-1" style={{ color: colors.secondary }}>
           Helps tailor custody information to your jurisdiction.
         </Text>
       </View>
@@ -228,13 +219,13 @@ export default function CreateFamilyFileScreen() {
       {/* Next Button */}
       <TouchableOpacity
         className="mt-6 py-4 rounded-xl items-center"
-        style={{ backgroundColor: familyName.trim() ? colors.sage : "#E2E8F0" }}
+        style={{ backgroundColor: familyName.trim() ? colors.primary : colors.border }}
         onPress={() => setStep(2)}
         disabled={!familyName.trim()}
       >
         <Text
           className="font-semibold text-lg"
-          style={{ color: familyName.trim() ? "white" : "#94A3B8" }}
+          style={{ color: familyName.trim() ? colors.textInverse : colors.textMuted }}
         >
           Continue
         </Text>
@@ -245,10 +236,10 @@ export default function CreateFamilyFileScreen() {
   const renderStep2 = () => (
     <View className="space-y-4">
       <View className="mb-6">
-        <Text className="text-2xl font-bold mb-2" style={{ color: colors.slate }}>
+        <Text className="text-2xl font-bold mb-2" style={{ color: colors.secondary }}>
           Add Children
         </Text>
-        <Text style={{ color: colors.slate }}>
+        <Text style={{ color: colors.secondary }}>
           Add the children in your family (you can add more later).
         </Text>
       </View>
@@ -260,23 +251,23 @@ export default function CreateFamilyFileScreen() {
             <View
               key={child.id}
               className="flex-row items-center justify-between rounded-xl p-3"
-              style={{ backgroundColor: colors.sand }}
+              style={{ backgroundColor: colors.backgroundSecondary }}
             >
               <View className="flex-row items-center">
                 <View
                   className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                  style={{ backgroundColor: colors.sage }}
+                  style={{ backgroundColor: colors.primary }}
                 >
                   <Text className="text-white font-semibold">
                     {child.first_name.charAt(0)}
                   </Text>
                 </View>
                 <View>
-                  <Text className="font-medium" style={{ color: colors.slate }}>
+                  <Text className="font-medium" style={{ color: colors.secondary }}>
                     {child.first_name} {child.last_name}
                   </Text>
                   {child.date_of_birth && (
-                    <Text className="text-xs" style={{ color: colors.slate }}>
+                    <Text className="text-xs" style={{ color: colors.secondary }}>
                       DOB: {child.date_of_birth}
                     </Text>
                   )}
@@ -291,8 +282,8 @@ export default function CreateFamilyFileScreen() {
       )}
 
       {/* Add Child Form */}
-      <View className="rounded-xl p-4" style={{ backgroundColor: "white", borderWidth: 1, borderColor: colors.sand }}>
-        <Text className="font-medium mb-3" style={{ color: colors.sage }}>
+      <View className="rounded-xl p-4" style={{ backgroundColor: colors.background, borderWidth: 1, borderColor: colors.backgroundSecondary }}>
+        <Text className="font-medium mb-3" style={{ color: colors.primary }}>
           Add Child
         </Text>
 
@@ -300,9 +291,9 @@ export default function CreateFamilyFileScreen() {
           <View className="flex-1">
             <TextInput
               className="rounded-lg px-3 py-2"
-              style={{ backgroundColor: colors.sand, color: colors.slate }}
+              style={{ backgroundColor: colors.backgroundSecondary, color: colors.secondary }}
               placeholder="First Name"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.inputPlaceholder}
               value={newChild.first_name}
               onChangeText={(text) => setNewChild({ ...newChild, first_name: text })}
             />
@@ -310,9 +301,9 @@ export default function CreateFamilyFileScreen() {
           <View className="flex-1">
             <TextInput
               className="rounded-lg px-3 py-2"
-              style={{ backgroundColor: colors.sand, color: colors.slate }}
+              style={{ backgroundColor: colors.backgroundSecondary, color: colors.secondary }}
               placeholder="Last Name"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.inputPlaceholder}
               value={newChild.last_name}
               onChangeText={(text) => setNewChild({ ...newChild, last_name: text })}
             />
@@ -323,9 +314,9 @@ export default function CreateFamilyFileScreen() {
           <View className="flex-1">
             <TextInput
               className="rounded-lg px-3 py-2"
-              style={{ backgroundColor: colors.sand, color: colors.slate }}
+              style={{ backgroundColor: colors.backgroundSecondary, color: colors.secondary }}
               placeholder="Date of Birth (YYYY-MM-DD)"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.inputPlaceholder}
               value={newChild.date_of_birth}
               onChangeText={(text) => setNewChild({ ...newChild, date_of_birth: text })}
             />
@@ -333,9 +324,9 @@ export default function CreateFamilyFileScreen() {
           <View className="flex-1">
             <TextInput
               className="rounded-lg px-3 py-2"
-              style={{ backgroundColor: colors.sand, color: colors.slate }}
+              style={{ backgroundColor: colors.backgroundSecondary, color: colors.secondary }}
               placeholder="Gender (optional)"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.inputPlaceholder}
               value={newChild.gender}
               onChangeText={(text) => setNewChild({ ...newChild, gender: text })}
             />
@@ -344,10 +335,10 @@ export default function CreateFamilyFileScreen() {
 
         <TouchableOpacity
           className="flex-row items-center justify-center py-2 rounded-lg"
-          style={{ backgroundColor: colors.sage }}
+          style={{ backgroundColor: colors.primary }}
           onPress={addChild}
         >
-          <Ionicons name="add" size={20} color="white" />
+          <Ionicons name="add" size={20} color={colors.textInverse} />
           <Text className="text-white font-medium ml-1">Add Child</Text>
         </TouchableOpacity>
       </View>
@@ -356,16 +347,16 @@ export default function CreateFamilyFileScreen() {
       <View className="flex-row space-x-3 mt-6">
         <TouchableOpacity
           className="flex-1 py-4 rounded-xl items-center border-2"
-          style={{ borderColor: colors.sage }}
+          style={{ borderColor: colors.primary }}
           onPress={() => setStep(1)}
         >
-          <Text className="font-semibold" style={{ color: colors.sage }}>
+          <Text className="font-semibold" style={{ color: colors.primary }}>
             Back
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           className="flex-1 py-4 rounded-xl items-center"
-          style={{ backgroundColor: colors.sage }}
+          style={{ backgroundColor: colors.primary }}
           onPress={() => setStep(3)}
         >
           <Text className="font-semibold text-white">
@@ -379,43 +370,43 @@ export default function CreateFamilyFileScreen() {
   const renderStep3 = () => (
     <View className="space-y-4">
       <View className="mb-6">
-        <Text className="text-2xl font-bold mb-2" style={{ color: colors.slate }}>
+        <Text className="text-2xl font-bold mb-2" style={{ color: colors.secondary }}>
           Invite Co-Parent
         </Text>
-        <Text style={{ color: colors.slate }}>
+        <Text style={{ color: colors.secondary }}>
           Invite your co-parent to join this family file. They'll receive an email invitation.
         </Text>
       </View>
 
       {/* Co-Parent Email */}
       <View>
-        <Text className="text-sm font-medium mb-2" style={{ color: colors.slate }}>
+        <Text className="text-sm font-medium mb-2" style={{ color: colors.secondary }}>
           Co-Parent Email (Optional)
         </Text>
         <TextInput
           className="rounded-xl px-4 py-3 text-base"
-          style={{ backgroundColor: colors.sand, color: colors.slate }}
+          style={{ backgroundColor: colors.backgroundSecondary, color: colors.secondary }}
           placeholder="coparent@email.com"
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor={colors.inputPlaceholder}
           value={coParentEmail}
           onChangeText={setCoParentEmail}
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        <Text className="text-xs mt-1" style={{ color: colors.slate }}>
+        <Text className="text-xs mt-1" style={{ color: colors.secondary }}>
           You can invite your co-parent later from the family file settings.
         </Text>
       </View>
 
       {/* Info Box */}
-      <View className="rounded-xl p-4 mt-4" style={{ backgroundColor: `${colors.amber}20` }}>
+      <View className="rounded-xl p-4 mt-4" style={{ backgroundColor: `${colors.accent}20` }}>
         <View className="flex-row items-start">
-          <Ionicons name="information-circle" size={24} color={colors.amber} />
+          <Ionicons name="information-circle" size={24} color={colors.accent} />
           <View className="flex-1 ml-3">
-            <Text className="font-medium mb-1" style={{ color: colors.slate }}>
+            <Text className="font-medium mb-1" style={{ color: colors.secondary }}>
               What happens next?
             </Text>
-            <Text className="text-sm" style={{ color: colors.slate }}>
+            <Text className="text-sm" style={{ color: colors.secondary }}>
               {coParentEmail
                 ? "Your co-parent will receive an email with a link to join this family file. Once they accept, you'll both have access to shared schedules, expenses, and communication tools."
                 : "You can start using the family file immediately. Invite your co-parent anytime from settings."}
@@ -425,31 +416,31 @@ export default function CreateFamilyFileScreen() {
       </View>
 
       {/* Summary */}
-      <View className="rounded-xl p-4 mt-4" style={{ backgroundColor: "white", borderWidth: 1, borderColor: colors.sand }}>
-        <Text className="font-medium mb-3" style={{ color: colors.sage }}>
+      <View className="rounded-xl p-4 mt-4" style={{ backgroundColor: colors.background, borderWidth: 1, borderColor: colors.backgroundSecondary }}>
+        <Text className="font-medium mb-3" style={{ color: colors.primary }}>
           Summary
         </Text>
         <View className="space-y-2">
           <View className="flex-row justify-between">
-            <Text style={{ color: colors.slate }}>Family Name:</Text>
-            <Text className="font-medium" style={{ color: colors.slate }}>{familyName}</Text>
+            <Text style={{ color: colors.secondary }}>Family Name:</Text>
+            <Text className="font-medium" style={{ color: colors.secondary }}>{familyName}</Text>
           </View>
           {state && (
             <View className="flex-row justify-between">
-              <Text style={{ color: colors.slate }}>State:</Text>
-              <Text className="font-medium" style={{ color: colors.slate }}>{state}</Text>
+              <Text style={{ color: colors.secondary }}>State:</Text>
+              <Text className="font-medium" style={{ color: colors.secondary }}>{state}</Text>
             </View>
           )}
           <View className="flex-row justify-between">
-            <Text style={{ color: colors.slate }}>Children:</Text>
-            <Text className="font-medium" style={{ color: colors.slate }}>
+            <Text style={{ color: colors.secondary }}>Children:</Text>
+            <Text className="font-medium" style={{ color: colors.secondary }}>
               {children.length > 0 ? children.map((c) => c.first_name).join(", ") : "None added"}
             </Text>
           </View>
           {coParentEmail && (
             <View className="flex-row justify-between">
-              <Text style={{ color: colors.slate }}>Co-Parent Invite:</Text>
-              <Text className="font-medium" style={{ color: colors.slate }}>{coParentEmail}</Text>
+              <Text style={{ color: colors.secondary }}>Co-Parent Invite:</Text>
+              <Text className="font-medium" style={{ color: colors.secondary }}>{coParentEmail}</Text>
             </View>
           )}
         </View>
@@ -459,24 +450,24 @@ export default function CreateFamilyFileScreen() {
       <View className="flex-row space-x-3 mt-6">
         <TouchableOpacity
           className="flex-1 py-4 rounded-xl items-center border-2"
-          style={{ borderColor: colors.sage }}
+          style={{ borderColor: colors.primary }}
           onPress={() => setStep(2)}
         >
-          <Text className="font-semibold" style={{ color: colors.sage }}>
+          <Text className="font-semibold" style={{ color: colors.primary }}>
             Back
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           className="flex-1 py-4 rounded-xl items-center flex-row justify-center"
-          style={{ backgroundColor: colors.sage }}
+          style={{ backgroundColor: colors.primary }}
           onPress={handleCreate}
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color={colors.textInverse} />
           ) : (
             <>
-              <Ionicons name="checkmark-circle" size={20} color="white" />
+              <Ionicons name="checkmark-circle" size={20} color={colors.textInverse} />
               <Text className="font-semibold text-white ml-2">Create Family File</Text>
             </>
           )}
@@ -486,7 +477,7 @@ export default function CreateFamilyFileScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -503,12 +494,12 @@ export default function CreateFamilyFileScreen() {
                 <View
                   className="w-8 h-8 rounded-full items-center justify-center"
                   style={{
-                    backgroundColor: step >= s ? colors.sage : colors.sand,
+                    backgroundColor: step >= s ? colors.primary : colors.backgroundSecondary,
                   }}
                 >
                   <Text
                     className="font-semibold"
-                    style={{ color: step >= s ? "white" : colors.slate }}
+                    style={{ color: step >= s ? colors.textInverse : colors.secondary }}
                   >
                     {s}
                   </Text>
@@ -516,7 +507,7 @@ export default function CreateFamilyFileScreen() {
                 {s < 3 && (
                   <View
                     className="w-12 h-1 mx-1"
-                    style={{ backgroundColor: step > s ? colors.sage : colors.sand }}
+                    style={{ backgroundColor: step > s ? colors.primary : colors.backgroundSecondary }}
                   />
                 )}
               </View>

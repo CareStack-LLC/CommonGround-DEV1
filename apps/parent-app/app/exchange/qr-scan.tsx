@@ -9,7 +9,7 @@
  * - Auto-close on success
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -25,28 +25,162 @@ import { router, useLocalSearchParams } from "expo-router";
 import { CameraView, useCameraPermissions } from "expo-camera";
 
 import { parent } from "@commonground/api-client";
+import { useTheme } from "@/theme";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SCAN_AREA_SIZE = SCREEN_WIDTH * 0.75;
 
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
-
 type ScanStatus = "scanning" | "processing" | "success" | "error";
 
 export default function QRScanScreen() {
+  const { colors } = useTheme();
   const { instanceId } = useLocalSearchParams<{ instanceId: string }>();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanStatus, setScanStatus] = useState<ScanStatus>("scanning");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [scanned, setScanned] = useState(false);
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: "#000",
+        },
+        overlay: {
+          flex: 1,
+          backgroundColor: "transparent",
+        },
+        topSection: {
+          flex: 0.25,
+          backgroundColor: "rgba(0,0,0,0.6)",
+          paddingHorizontal: 20,
+        },
+        closeButton: {
+          position: "absolute",
+          top: 60,
+          left: 20,
+          padding: 8,
+          zIndex: 10,
+        },
+        header: {
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingTop: 40,
+        },
+        headerTitle: {
+          color: "white",
+          fontSize: 24,
+          fontWeight: "bold",
+          marginBottom: 8,
+        },
+        headerSubtitle: {
+          color: "rgba(255,255,255,0.8)",
+          fontSize: 14,
+          textAlign: "center",
+          paddingHorizontal: 40,
+        },
+        scanAreaContainer: {
+          flex: 0.5,
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        scanArea: {
+          width: SCAN_AREA_SIZE,
+          height: SCAN_AREA_SIZE,
+          position: "relative",
+        },
+        corner: {
+          position: "absolute",
+          width: 30,
+          height: 30,
+          borderColor: colors.primary,
+          borderWidth: 4,
+        },
+        topLeft: {
+          top: 0,
+          left: 0,
+          borderRightWidth: 0,
+          borderBottomWidth: 0,
+          borderTopLeftRadius: 12,
+        },
+        topRight: {
+          top: 0,
+          right: 0,
+          borderLeftWidth: 0,
+          borderBottomWidth: 0,
+          borderTopRightRadius: 12,
+        },
+        bottomLeft: {
+          bottom: 0,
+          left: 0,
+          borderRightWidth: 0,
+          borderTopWidth: 0,
+          borderBottomLeftRadius: 12,
+        },
+        bottomRight: {
+          bottom: 0,
+          right: 0,
+          borderLeftWidth: 0,
+          borderTopWidth: 0,
+          borderBottomRightRadius: 12,
+        },
+        statusOverlay: {
+          ...StyleSheet.absoluteFillObject,
+          backgroundColor: "rgba(255,255,255,0.95)",
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: 12,
+        },
+        statusText: {
+          marginTop: 16,
+          fontSize: 18,
+          fontWeight: "600",
+          color: colors.secondary,
+        },
+        successIcon: {
+          width: 80,
+          height: 80,
+          borderRadius: 40,
+          backgroundColor: colors.primary,
+          justifyContent: "center",
+          alignItems: "center",
+        },
+        bottomSection: {
+          flex: 0.25,
+          backgroundColor: "rgba(0,0,0,0.6)",
+          paddingHorizontal: 20,
+          paddingTop: 20,
+        },
+        helpCard: {
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: "rgba(255,255,255,0.9)",
+          padding: 16,
+          borderRadius: 12,
+          marginBottom: 16,
+        },
+        helpText: {
+          flex: 1,
+          marginLeft: 12,
+          color: colors.secondary,
+          fontSize: 14,
+        },
+        manualButton: {
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 12,
+        },
+        manualButtonText: {
+          color: "rgba(255,255,255,0.8)",
+          marginLeft: 8,
+          fontSize: 14,
+        },
+      }),
+    [colors]
+  );
 
   // Request permission on mount
   useEffect(() => {
@@ -130,7 +264,7 @@ export default function QRScanScreen() {
         className="flex-1 items-center justify-center"
         style={{ backgroundColor: "#000" }}
       >
-        <ActivityIndicator size="large" color={colors.sage} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </SafeAreaView>
     );
   }
@@ -140,29 +274,29 @@ export default function QRScanScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center px-6"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
         <View
           className="w-20 h-20 rounded-full items-center justify-center mb-4"
-          style={{ backgroundColor: `${colors.amber}20` }}
+          style={{ backgroundColor: `${colors.accent}20` }}
         >
-          <Ionicons name="camera-outline" size={40} color={colors.amber} />
+          <Ionicons name="camera-outline" size={40} color={colors.accent} />
         </View>
-        <Text className="text-xl font-bold mb-2" style={{ color: colors.slate }}>
+        <Text className="text-xl font-bold mb-2" style={{ color: colors.secondary }}>
           Camera Permission Required
         </Text>
-        <Text className="text-center mb-6" style={{ color: colors.slate }}>
+        <Text className="text-center mb-6" style={{ color: colors.secondary }}>
           We need access to your camera to scan the QR code from your co-parent's phone.
         </Text>
         <TouchableOpacity
           className="py-4 px-8 rounded-xl"
-          style={{ backgroundColor: colors.sage }}
+          style={{ backgroundColor: colors.primary }}
           onPress={requestPermission}
         >
           <Text className="text-white font-semibold">Grant Permission</Text>
         </TouchableOpacity>
         <TouchableOpacity className="mt-4 py-2" onPress={() => router.back()}>
-          <Text style={{ color: colors.slate }}>Cancel</Text>
+          <Text style={{ color: colors.secondary }}>Cancel</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
@@ -209,7 +343,7 @@ export default function QRScanScreen() {
             {/* Status indicator */}
             {scanStatus === "processing" && (
               <View style={styles.statusOverlay}>
-                <ActivityIndicator size="large" color={colors.sage} />
+                <ActivityIndicator size="large" color={colors.primary} />
                 <Text style={styles.statusText}>Verifying...</Text>
               </View>
             )}
@@ -219,7 +353,7 @@ export default function QRScanScreen() {
                 <View style={styles.successIcon}>
                   <Ionicons name="checkmark" size={48} color="white" />
                 </View>
-                <Text style={[styles.statusText, { color: colors.sage }]}>
+                <Text style={[styles.statusText, { color: colors.primary }]}>
                   Confirmed!
                 </Text>
               </View>
@@ -241,7 +375,7 @@ export default function QRScanScreen() {
         {/* Bottom section */}
         <View style={styles.bottomSection}>
           <View style={styles.helpCard}>
-            <Ionicons name="information-circle" size={20} color={colors.sage} />
+            <Ionicons name="information-circle" size={20} color={colors.primary} />
             <Text style={styles.helpText}>
               Make sure the QR code is well-lit and within the frame
             </Text>
@@ -257,7 +391,7 @@ export default function QRScanScreen() {
               );
             }}
           >
-            <Ionicons name="hand-left-outline" size={20} color={colors.slate} />
+            <Ionicons name="hand-left-outline" size={20} color={colors.secondary} />
             <Text style={styles.manualButtonText}>Can't scan? Use manual confirmation</Text>
           </TouchableOpacity>
         </View>
@@ -265,141 +399,3 @@ export default function QRScanScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#000",
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: "transparent",
-  },
-  topSection: {
-    flex: 0.25,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    paddingHorizontal: 20,
-  },
-  closeButton: {
-    position: "absolute",
-    top: 60,
-    left: 20,
-    padding: 8,
-    zIndex: 10,
-  },
-  header: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 40,
-  },
-  headerTitle: {
-    color: "white",
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    color: "rgba(255,255,255,0.8)",
-    fontSize: 14,
-    textAlign: "center",
-    paddingHorizontal: 40,
-  },
-  scanAreaContainer: {
-    flex: 0.5,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  scanArea: {
-    width: SCAN_AREA_SIZE,
-    height: SCAN_AREA_SIZE,
-    position: "relative",
-  },
-  corner: {
-    position: "absolute",
-    width: 30,
-    height: 30,
-    borderColor: colors.sage,
-    borderWidth: 4,
-  },
-  topLeft: {
-    top: 0,
-    left: 0,
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-    borderTopLeftRadius: 12,
-  },
-  topRight: {
-    top: 0,
-    right: 0,
-    borderLeftWidth: 0,
-    borderBottomWidth: 0,
-    borderTopRightRadius: 12,
-  },
-  bottomLeft: {
-    bottom: 0,
-    left: 0,
-    borderRightWidth: 0,
-    borderTopWidth: 0,
-    borderBottomLeftRadius: 12,
-  },
-  bottomRight: {
-    bottom: 0,
-    right: 0,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    borderBottomRightRadius: 12,
-  },
-  statusOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255,255,255,0.95)",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 12,
-  },
-  statusText: {
-    marginTop: 16,
-    fontSize: 18,
-    fontWeight: "600",
-    color: colors.slate,
-  },
-  successIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.sage,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  bottomSection: {
-    flex: 0.25,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  helpCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  helpText: {
-    flex: 1,
-    marginLeft: 12,
-    color: colors.slate,
-    fontSize: 14,
-  },
-  manualButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 12,
-  },
-  manualButtonText: {
-    color: "rgba(255,255,255,0.8)",
-    marginLeft: 8,
-    fontSize: 14,
-  },
-});

@@ -20,10 +20,12 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
 import { useDailyCall, VideoView } from '@commonground/daily-video';
+import { useTheme } from '@/theme';
 
 const { width, height } = Dimensions.get('window');
 
 export default function CallScreen() {
+  const { colors } = useTheme();
   const { sessionId, recipientId, recipientType, familyFileId, recipientName, callType } =
     useLocalSearchParams<{
       sessionId?: string;
@@ -206,7 +208,7 @@ export default function CallScreen() {
           />
         ) : (
           <View style={styles.waitingContainer}>
-            <View style={[styles.avatarPlaceholder, isAudioOnly && styles.avatarPlaceholderAudio]}>
+            <View style={[styles.avatarPlaceholder, isAudioOnly && [styles.avatarPlaceholderAudio, { backgroundColor: colors.primary }]]}>
               {isAudioOnly ? (
                 <Ionicons name="volume-high" size={60} color="white" />
               ) : (
@@ -379,7 +381,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 75,
-    backgroundColor: '#4A6C58', // SAGE color
+    backgroundColor: '#4A6C58', // Overridden by theme colors.primary inline
   },
   avatarEmoji: {
     fontSize: 60,

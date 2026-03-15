@@ -16,17 +16,7 @@ import { router, useLocalSearchParams } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
 import { BottomNavBar } from "@/components/BottomNavBar";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 interface QuickAccord {
   id: string;
@@ -81,14 +71,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  draft: colors.slate,
-  pending_approval: colors.amber,
-  active: colors.sage,
-  completed: "#22C55E",
-  revoked: "#EF4444",
-  expired: "#9CA3AF",
-};
+// STATUS_COLORS moved inside component to access theme colors
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -100,8 +83,18 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function QuickAccordDetailScreen() {
+  const { colors } = useTheme();
   const { id, familyId } = useLocalSearchParams<{ id: string; familyId: string }>();
   const { token, user } = useAuth();
+
+  const STATUS_COLORS: Record<string, string> = {
+    draft: colors.secondary,
+    pending_approval: colors.accent,
+    active: colors.primary,
+    completed: "#22C55E",
+    revoked: "#EF4444",
+    expired: "#9CA3AF",
+  };
   const [accord, setAccord] = useState<QuickAccord | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -359,23 +352,23 @@ export default function QuickAccordDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>Loading accord...</Text>
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.surfaceElevated }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>Loading accord...</Text>
       </SafeAreaView>
     );
   }
 
   if (!accord) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
-        <Text style={{ color: colors.slate }}>Accord not found.</Text>
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.surfaceElevated }}>
+        <Text style={{ color: colors.secondary }}>Accord not found.</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["top", "bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["top", "bottom"]}>
       {/* Custom Header */}
       <View
         style={{
@@ -385,22 +378,22 @@ export default function QuickAccordDetailScreen() {
           paddingHorizontal: 16,
           paddingVertical: 12,
           borderBottomWidth: 1,
-          borderBottomColor: colors.sand,
-          backgroundColor: "white",
+          borderBottomColor: colors.backgroundSecondary,
+          backgroundColor: colors.background,
         }}
       >
         <TouchableOpacity
           onPress={() => router.back()}
           style={{ flexDirection: "row", alignItems: "center" }}
         >
-          <Ionicons name="chevron-back" size={24} color={colors.sage} />
-          <Text style={{ color: colors.sage, fontSize: 16, marginLeft: 4 }}>Back</Text>
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+          <Text style={{ color: colors.primary, fontSize: 16, marginLeft: 4 }}>Back</Text>
         </TouchableOpacity>
-        <Text style={{ fontSize: 17, fontWeight: "600", color: colors.slate }}>
+        <Text style={{ fontSize: 17, fontWeight: "600", color: colors.secondary }}>
           Quick Accord
         </Text>
         <TouchableOpacity onPress={showMenu} style={{ padding: 4 }}>
-          <Ionicons name="ellipsis-horizontal" size={24} color={colors.slate} />
+          <Ionicons name="ellipsis-horizontal" size={24} color={colors.secondary} />
         </TouchableOpacity>
       </View>
 
@@ -408,31 +401,31 @@ export default function QuickAccordDetailScreen() {
         className="flex-1"
         contentContainerStyle={{ padding: 16 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.sage} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         {/* Header Card */}
-        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: "white" }}>
+        <View className="rounded-xl p-5 mb-4" style={{ backgroundColor: colors.background }}>
           <View className="flex-row items-start mb-4">
             <View
               className="w-14 h-14 rounded-full items-center justify-center"
-              style={{ backgroundColor: `${colors.sage}20` }}
+              style={{ backgroundColor: `${colors.primary}20` }}
             >
               <Ionicons
                 name={CATEGORY_ICONS[accord.purpose_category] || "document-text"}
                 size={28}
-                color={colors.sage}
+                color={colors.primary}
               />
             </View>
             <View className="flex-1 ml-4">
-              <Text className="text-xl font-bold mb-1" style={{ color: colors.slate }}>
+              <Text className="text-xl font-bold mb-1" style={{ color: colors.secondary }}>
                 {accord.title}
               </Text>
               <View className="flex-row items-center">
-                <Text className="text-sm" style={{ color: colors.slate }}>
+                <Text className="text-sm" style={{ color: colors.secondary }}>
                   {CATEGORY_LABELS[accord.purpose_category]}
                 </Text>
-                <View className="mx-2 w-1 h-1 rounded-full" style={{ backgroundColor: colors.slate }} />
+                <View className="mx-2 w-1 h-1 rounded-full" style={{ backgroundColor: colors.secondary }} />
                 <View
                   className="px-2 py-0.5 rounded-full"
                   style={{ backgroundColor: `${STATUS_COLORS[accord.status]}20` }}
@@ -445,23 +438,23 @@ export default function QuickAccordDetailScreen() {
             </View>
           </View>
 
-          <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+          <Text className="text-xs" style={{ color: colors.textMuted }}>
             {accord.accord_number}
           </Text>
         </View>
 
         {/* Details Section */}
-        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.sand }}>
-          <Text className="font-bold text-lg mb-3" style={{ color: colors.slate }}>
+        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.backgroundSecondary }}>
+          <Text className="font-bold text-lg mb-3" style={{ color: colors.secondary }}>
             Details
           </Text>
 
           {/* Date & Time */}
           <View className="mb-4">
-            <Text className="text-sm font-medium mb-1" style={{ color: colors.slate }}>
+            <Text className="text-sm font-medium mb-1" style={{ color: colors.secondary }}>
               Date & Time
             </Text>
-            <Text style={{ color: colors.slate }}>
+            <Text style={{ color: colors.secondary }}>
               {accord.is_single_event
                 ? accord.event_date
                   ? formatDate(accord.event_date)
@@ -475,30 +468,30 @@ export default function QuickAccordDetailScreen() {
           {/* Description */}
           {accord.purpose_description && (
             <View>
-              <Text className="text-sm font-medium mb-1" style={{ color: colors.slate }}>
+              <Text className="text-sm font-medium mb-1" style={{ color: colors.secondary }}>
                 Description
               </Text>
-              <Text style={{ color: colors.slate }}>{accord.purpose_description}</Text>
+              <Text style={{ color: colors.secondary }}>{accord.purpose_description}</Text>
             </View>
           )}
 
           {/* AI Summary */}
           {accord.ai_summary && (
-            <View className="mt-4 p-3 rounded-lg" style={{ backgroundColor: `${colors.sage}15` }}>
+            <View className="mt-4 p-3 rounded-lg" style={{ backgroundColor: `${colors.primary}15` }}>
               <View className="flex-row items-center mb-2">
-                <Ionicons name="sparkles" size={14} color={colors.sage} />
-                <Text className="ml-2 text-sm font-medium" style={{ color: colors.sage }}>
+                <Ionicons name="sparkles" size={14} color={colors.primary} />
+                <Text className="ml-2 text-sm font-medium" style={{ color: colors.primary }}>
                   ARIA Summary
                 </Text>
               </View>
-              <Text className="text-sm" style={{ color: colors.slate }}>{accord.ai_summary}</Text>
+              <Text className="text-sm" style={{ color: colors.secondary }}>{accord.ai_summary}</Text>
             </View>
           )}
         </View>
 
         {/* Logistics Section */}
-        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.sand }}>
-          <Text className="font-bold text-lg mb-3" style={{ color: colors.slate }}>
+        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.backgroundSecondary }}>
+          <Text className="font-bold text-lg mb-3" style={{ color: colors.secondary }}>
             Logistics
           </Text>
 
@@ -506,8 +499,8 @@ export default function QuickAccordDetailScreen() {
             <>
               {accord.location && (
                 <View className="flex-row items-center mb-3">
-                  <Ionicons name="location" size={18} color={colors.sage} />
-                  <Text className="ml-3" style={{ color: colors.slate }}>
+                  <Ionicons name="location" size={18} color={colors.primary} />
+                  <Text className="ml-3" style={{ color: colors.secondary }}>
                     {accord.location}
                   </Text>
                 </View>
@@ -515,8 +508,8 @@ export default function QuickAccordDetailScreen() {
 
               {accord.pickup_responsibility && (
                 <View className="flex-row items-center mb-3">
-                  <Ionicons name="arrow-up-circle" size={18} color={colors.amber} />
-                  <Text className="ml-3" style={{ color: colors.slate }}>
+                  <Ionicons name="arrow-up-circle" size={18} color={colors.accent} />
+                  <Text className="ml-3" style={{ color: colors.secondary }}>
                     Pickup: {accord.pickup_responsibility}
                   </Text>
                 </View>
@@ -524,37 +517,37 @@ export default function QuickAccordDetailScreen() {
 
               {accord.dropoff_responsibility && (
                 <View className="flex-row items-center mb-3">
-                  <Ionicons name="arrow-down-circle" size={18} color={colors.amber} />
-                  <Text className="ml-3" style={{ color: colors.slate }}>
+                  <Ionicons name="arrow-down-circle" size={18} color={colors.accent} />
+                  <Text className="ml-3" style={{ color: colors.secondary }}>
                     Dropoff: {accord.dropoff_responsibility}
                   </Text>
                 </View>
               )}
 
               {accord.transportation_notes && (
-                <View className="p-3 rounded-lg" style={{ backgroundColor: "white" }}>
-                  <Text className="text-sm" style={{ color: colors.slate }}>
+                <View className="p-3 rounded-lg" style={{ backgroundColor: colors.background }}>
+                  <Text className="text-sm" style={{ color: colors.secondary }}>
                     {accord.transportation_notes}
                   </Text>
                 </View>
               )}
             </>
           ) : (
-            <Text style={{ color: colors.slate }}>No logistics specified</Text>
+            <Text style={{ color: colors.secondary }}>No logistics specified</Text>
           )}
         </View>
 
         {/* Expense Details */}
         {accord.has_shared_expense && (
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.sand }}>
-            <Text className="font-bold text-lg mb-3" style={{ color: colors.slate }}>
+          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.backgroundSecondary }}>
+            <Text className="font-bold text-lg mb-3" style={{ color: colors.secondary }}>
               Shared Expense
             </Text>
 
             {accord.estimated_amount && (
               <View className="flex-row items-center mb-3">
-                <Ionicons name="cash" size={18} color={colors.sage} />
-                <Text className="ml-3 font-medium" style={{ color: colors.slate }}>
+                <Ionicons name="cash" size={18} color={colors.primary} />
+                <Text className="ml-3 font-medium" style={{ color: colors.secondary }}>
                   {formatCurrency(accord.estimated_amount)}
                 </Text>
               </View>
@@ -562,8 +555,8 @@ export default function QuickAccordDetailScreen() {
 
             {accord.expense_category && (
               <View className="flex-row items-center mb-3">
-                <Ionicons name="pricetag" size={18} color={colors.amber} />
-                <Text className="ml-3" style={{ color: colors.slate }}>
+                <Ionicons name="pricetag" size={18} color={colors.accent} />
+                <Text className="ml-3" style={{ color: colors.secondary }}>
                   Category: {accord.expense_category}
                 </Text>
               </View>
@@ -571,8 +564,8 @@ export default function QuickAccordDetailScreen() {
 
             {accord.receipt_required && (
               <View className="flex-row items-center">
-                <Ionicons name="receipt" size={18} color={colors.slate} />
-                <Text className="ml-3 text-sm" style={{ color: colors.slate }}>
+                <Ionicons name="receipt" size={18} color={colors.secondary} />
+                <Text className="ml-3 text-sm" style={{ color: colors.secondary }}>
                   Receipt required
                 </Text>
               </View>
@@ -581,8 +574,8 @@ export default function QuickAccordDetailScreen() {
         )}
 
         {/* Approval Status */}
-        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.sand }}>
-          <Text className="font-bold text-lg mb-4" style={{ color: colors.slate }}>
+        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.backgroundSecondary }}>
+          <Text className="font-bold text-lg mb-4" style={{ color: colors.secondary }}>
             Approval Status
           </Text>
 
@@ -590,24 +583,24 @@ export default function QuickAccordDetailScreen() {
             {/* Parent A Card */}
             <View
               className="rounded-xl p-4 flex-row items-center"
-              style={{ backgroundColor: `${colors.sage}15` }}
+              style={{ backgroundColor: `${colors.primary}15` }}
             >
               <View
                 className="w-12 h-12 rounded-full items-center justify-center"
-                style={{ backgroundColor: accord.parent_a_approved ? `${colors.sage}30` : "white" }}
+                style={{ backgroundColor: accord.parent_a_approved ? `${colors.primary}30` : "white" }}
               >
                 <Ionicons
                   name={accord.parent_a_approved ? "checkmark-circle" : "time-outline"}
                   size={24}
-                  color={accord.parent_a_approved ? colors.sage : colors.slate}
+                  color={accord.parent_a_approved ? colors.primary : colors.secondary}
                 />
               </View>
               <View className="ml-4 flex-1">
-                <Text className="font-semibold" style={{ color: colors.slate }}>
+                <Text className="font-semibold" style={{ color: colors.secondary }}>
                   {accord.family_file?.parent_a?.first_name || "Parent A"}
                   {isParentA && " (You)"}
                 </Text>
-                <Text className="text-sm" style={{ color: accord.parent_a_approved ? colors.sage : colors.slate }}>
+                <Text className="text-sm" style={{ color: accord.parent_a_approved ? colors.primary : colors.secondary }}>
                   {accord.parent_a_approved ? "Approved" : "Pending"}
                 </Text>
               </View>
@@ -616,24 +609,24 @@ export default function QuickAccordDetailScreen() {
             {/* Parent B Card */}
             <View
               className="rounded-xl p-4 flex-row items-center"
-              style={{ backgroundColor: `${colors.sage}15` }}
+              style={{ backgroundColor: `${colors.primary}15` }}
             >
               <View
                 className="w-12 h-12 rounded-full items-center justify-center"
-                style={{ backgroundColor: accord.parent_b_approved ? `${colors.sage}30` : "white" }}
+                style={{ backgroundColor: accord.parent_b_approved ? `${colors.primary}30` : "white" }}
               >
                 <Ionicons
                   name={accord.parent_b_approved ? "checkmark-circle" : "time-outline"}
                   size={24}
-                  color={accord.parent_b_approved ? colors.sage : colors.slate}
+                  color={accord.parent_b_approved ? colors.primary : colors.secondary}
                 />
               </View>
               <View className="ml-4 flex-1">
-                <Text className="font-semibold" style={{ color: colors.slate }}>
+                <Text className="font-semibold" style={{ color: colors.secondary }}>
                   {accord.family_file?.parent_b?.first_name || "Parent B"}
                   {!isParentA && " (You)"}
                 </Text>
-                <Text className="text-sm" style={{ color: accord.parent_b_approved ? colors.sage : colors.slate }}>
+                <Text className="text-sm" style={{ color: accord.parent_b_approved ? colors.primary : colors.secondary }}>
                   {accord.parent_b_approved ? "Approved" : "Pending"}
                 </Text>
               </View>
@@ -659,7 +652,7 @@ export default function QuickAccordDetailScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 className="flex-1 py-4 rounded-xl items-center flex-row justify-center"
-                style={{ backgroundColor: colors.sage }}
+                style={{ backgroundColor: colors.primary }}
                 onPress={handleApprove}
                 disabled={actionLoading}
               >
@@ -679,7 +672,7 @@ export default function QuickAccordDetailScreen() {
           {canSubmit && (
             <TouchableOpacity
               className="py-4 rounded-xl items-center flex-row justify-center"
-              style={{ backgroundColor: colors.sage }}
+              style={{ backgroundColor: colors.primary }}
               onPress={handleSubmit}
               disabled={actionLoading}
             >
@@ -741,19 +734,19 @@ export default function QuickAccordDetailScreen() {
         onRequestClose={() => setShowRejectModal(false)}
       >
         <View className="flex-1 items-center justify-center px-6" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
-          <View className="w-full rounded-2xl p-6" style={{ backgroundColor: "white" }}>
-            <Text className="text-xl font-bold mb-2" style={{ color: colors.slate }}>
+          <View className="w-full rounded-2xl p-6" style={{ backgroundColor: colors.background }}>
+            <Text className="text-xl font-bold mb-2" style={{ color: colors.secondary }}>
               Decline Accord
             </Text>
-            <Text className="mb-4" style={{ color: colors.slate }}>
+            <Text className="mb-4" style={{ color: colors.secondary }}>
               Would you like to provide a reason? (optional)
             </Text>
 
             <TextInput
               className="rounded-xl px-4 py-3 mb-4"
-              style={{ backgroundColor: colors.sand, color: colors.slate, minHeight: 100 }}
+              style={{ backgroundColor: colors.backgroundSecondary, color: colors.secondary, minHeight: 100 }}
               placeholder="Enter reason..."
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.inputPlaceholder}
               value={rejectReason}
               onChangeText={setRejectReason}
               multiline
@@ -763,13 +756,13 @@ export default function QuickAccordDetailScreen() {
             <View className="flex-row space-x-3">
               <TouchableOpacity
                 className="flex-1 py-3 rounded-xl items-center border-2"
-                style={{ borderColor: colors.sage }}
+                style={{ borderColor: colors.primary }}
                 onPress={() => {
                   setShowRejectModal(false);
                   setRejectReason("");
                 }}
               >
-                <Text className="font-semibold" style={{ color: colors.sage }}>
+                <Text className="font-semibold" style={{ color: colors.primary }}>
                   Cancel
                 </Text>
               </TouchableOpacity>

@@ -33,15 +33,7 @@ import {
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
 import { useRealtime } from "@/providers/RealtimeProvider";
-
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 // Category configuration
 const CATEGORIES: { key: ActivityCategory | "all"; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
@@ -66,8 +58,8 @@ const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
   info: "information-circle",
 };
 
-// Map categories to colors
-const categoryColors: Record<string, { bg: string; text: string }> = {
+// Map activity categories to colors (distinct from theme categoryColors)
+const activityCategoryColors: Record<string, { bg: string; text: string }> = {
   communication: { bg: "#E0E7FF", text: "#3730A3" },
   custody: { bg: "#D1FAE5", text: "#065F46" },
   schedule: { bg: "#FEF3C7", text: "#92400E" },
@@ -76,6 +68,7 @@ const categoryColors: Record<string, { bg: string; text: string }> = {
 };
 
 export default function ActivityScreen() {
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const { user } = useAuth();
   const { familyFile } = useFamilyFile();
@@ -115,7 +108,7 @@ export default function ActivityScreen() {
           />
           {unreadCount > 0 && (
             <TouchableOpacity onPress={handleMarkAllRead}>
-              <Text style={{ color: colors.sage }} className="font-medium">
+              <Text style={{ color: colors.primary }} className="font-medium">
                 Mark All Read
               </Text>
             </TouchableOpacity>
@@ -342,14 +335,14 @@ export default function ActivityScreen() {
 
   const renderActivity = ({ item }: { item: ActivityFeedItem }) => {
     const Icon = iconMap[item.icon] || "information-circle";
-    const catColors = categoryColors[item.category] || categoryColors.system;
+    const catColors = activityCategoryColors[item.category] || activityCategoryColors.system;
 
     return (
       <TouchableOpacity
         className="flex-row items-center p-4 bg-white mb-2 rounded-xl"
         style={{
           borderLeftWidth: item.is_read ? 0 : 3,
-          borderLeftColor: colors.sage,
+          borderLeftColor: colors.primary,
         }}
         onPress={() => handleActivityPress(item)}
       >
@@ -362,7 +355,7 @@ export default function ActivityScreen() {
         <View className="flex-1 ml-3">
           <Text
             className={`${item.is_read ? "font-medium" : "font-semibold"}`}
-            style={{ color: colors.slate }}
+            style={{ color: colors.secondary }}
             numberOfLines={1}
           >
             {item.title}
@@ -376,14 +369,14 @@ export default function ActivityScreen() {
 
   if (isLoading && activities.length === 0) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
-        <ActivityIndicator size="large" color={colors.sage} />
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.surfaceElevated }}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       {/* Category Filter */}
       <View className="px-4 py-3">
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -393,19 +386,19 @@ export default function ActivityScreen() {
                 key={cat.key}
                 className="flex-row items-center px-3 py-2 rounded-full"
                 style={{
-                  backgroundColor: selectedCategory === cat.key ? colors.sage : "white",
+                  backgroundColor: selectedCategory === cat.key ? colors.primary : "white",
                 }}
                 onPress={() => setSelectedCategory(cat.key)}
               >
                 <Ionicons
                   name={cat.icon}
                   size={16}
-                  color={selectedCategory === cat.key ? "white" : colors.slate}
+                  color={selectedCategory === cat.key ? "white" : colors.secondary}
                 />
                 <Text
                   className="ml-1.5 font-medium"
                   style={{
-                    color: selectedCategory === cat.key ? "white" : colors.slate,
+                    color: selectedCategory === cat.key ? "white" : colors.secondary,
                   }}
                 >
                   {cat.label}
@@ -423,13 +416,13 @@ export default function ActivityScreen() {
         renderItem={renderActivity}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.sage} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
         onEndReached={onLoadMore}
         onEndReachedThreshold={0.5}
         ListEmptyComponent={
           <View className="items-center py-12">
-            <Ionicons name="notifications-off-outline" size={48} color="#94a3b8" />
+            <Ionicons name="notifications-off-outline" size={48} color={colors.textMuted} />
             <Text className="text-slate-500 mt-3">No activity yet</Text>
             <Text className="text-sm text-slate-400 mt-1">
               Activity from your family file will appear here
@@ -439,7 +432,7 @@ export default function ActivityScreen() {
         ListFooterComponent={
           loadingMore ? (
             <View className="py-4">
-              <ActivityIndicator size="small" color={colors.sage} />
+              <ActivityIndicator size="small" color={colors.primary} />
             </View>
           ) : null
         }

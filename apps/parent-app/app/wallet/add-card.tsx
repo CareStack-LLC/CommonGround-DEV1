@@ -21,20 +21,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 type PaymentType = "card" | "bank";
 
 export default function AddCardScreen() {
+  const { colors } = useTheme();
   const [paymentType, setPaymentType] = useState<PaymentType>("card");
   const [loading, setLoading] = useState(false);
 
@@ -115,29 +107,29 @@ export default function AddCardScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView className="flex-1" contentContainerStyle={{ padding: 16 }}>
           {/* Payment Type Selector */}
-          <View className="flex-row mb-6 p-1 rounded-xl" style={{ backgroundColor: colors.sand }}>
+          <View className="flex-row mb-6 p-1 rounded-xl" style={{ backgroundColor: colors.backgroundSecondary }}>
             <TouchableOpacity
               className="flex-1 py-3 rounded-lg items-center flex-row justify-center"
               style={{
-                backgroundColor: paymentType === "card" ? "white" : "transparent",
+                backgroundColor: paymentType === "card" ? colors.background : "transparent",
               }}
               onPress={() => setPaymentType("card")}
             >
               <Ionicons
                 name="card"
                 size={18}
-                color={paymentType === "card" ? colors.sage : colors.slate}
+                color={paymentType === "card" ? colors.primary : colors.secondary}
               />
               <Text
                 className="font-medium ml-2"
-                style={{ color: paymentType === "card" ? colors.sage : colors.slate }}
+                style={{ color: paymentType === "card" ? colors.primary : colors.secondary }}
               >
                 Card
               </Text>
@@ -145,18 +137,18 @@ export default function AddCardScreen() {
             <TouchableOpacity
               className="flex-1 py-3 rounded-lg items-center flex-row justify-center"
               style={{
-                backgroundColor: paymentType === "bank" ? "white" : "transparent",
+                backgroundColor: paymentType === "bank" ? colors.background : "transparent",
               }}
               onPress={() => setPaymentType("bank")}
             >
               <Ionicons
                 name="business"
                 size={18}
-                color={paymentType === "bank" ? colors.sage : colors.slate}
+                color={paymentType === "bank" ? colors.primary : colors.secondary}
               />
               <Text
                 className="font-medium ml-2"
-                style={{ color: paymentType === "bank" ? colors.sage : colors.slate }}
+                style={{ color: paymentType === "bank" ? colors.primary : colors.secondary }}
               >
                 Bank Account
               </Text>
@@ -164,20 +156,20 @@ export default function AddCardScreen() {
           </View>
 
           {paymentType === "card" ? (
-            <View className="rounded-xl p-5" style={{ backgroundColor: "white" }}>
+            <View className="rounded-xl p-5" style={{ backgroundColor: colors.background }}>
               {/* Cardholder Name */}
               <View className="mb-4">
-                <Text className="font-medium mb-2" style={{ color: colors.slate }}>
+                <Text className="font-medium mb-2" style={{ color: colors.secondary }}>
                   Cardholder Name
                 </Text>
                 <TextInput
                   className="rounded-xl px-4 py-3"
                   style={{
-                    backgroundColor: colors.sand,
-                    color: colors.slate,
+                    backgroundColor: colors.backgroundSecondary,
+                    color: colors.secondary,
                   }}
                   placeholder="Name on card"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={colors.inputPlaceholder}
                   value={cardholderName}
                   onChangeText={setCardholderName}
                   autoCapitalize="words"
@@ -186,16 +178,16 @@ export default function AddCardScreen() {
 
               {/* Card Number */}
               <View className="mb-4">
-                <Text className="font-medium mb-2" style={{ color: colors.slate }}>
+                <Text className="font-medium mb-2" style={{ color: colors.secondary }}>
                   Card Number
                 </Text>
-                <View className="flex-row items-center rounded-xl px-4" style={{ backgroundColor: colors.sand }}>
-                  <Ionicons name="card-outline" size={20} color="#9CA3AF" />
+                <View className="flex-row items-center rounded-xl px-4" style={{ backgroundColor: colors.backgroundSecondary }}>
+                  <Ionicons name="card-outline" size={20} color={colors.textMuted} />
                   <TextInput
                     className="flex-1 py-3 ml-2"
-                    style={{ color: colors.slate }}
+                    style={{ color: colors.secondary }}
                     placeholder="1234 5678 9012 3456"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.inputPlaceholder}
                     value={cardNumber}
                     onChangeText={(text) => setCardNumber(formatCardNumber(text))}
                     keyboardType="number-pad"
@@ -207,17 +199,17 @@ export default function AddCardScreen() {
               {/* Expiry and CVC */}
               <View className="flex-row space-x-3">
                 <View className="flex-1">
-                  <Text className="font-medium mb-2" style={{ color: colors.slate }}>
+                  <Text className="font-medium mb-2" style={{ color: colors.secondary }}>
                     Expiry
                   </Text>
                   <TextInput
                     className="rounded-xl px-4 py-3"
                     style={{
-                      backgroundColor: colors.sand,
-                      color: colors.slate,
+                      backgroundColor: colors.backgroundSecondary,
+                      color: colors.secondary,
                     }}
                     placeholder="MM/YY"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.inputPlaceholder}
                     value={expiry}
                     onChangeText={(text) => setExpiry(formatExpiry(text))}
                     keyboardType="number-pad"
@@ -225,17 +217,17 @@ export default function AddCardScreen() {
                   />
                 </View>
                 <View className="flex-1">
-                  <Text className="font-medium mb-2" style={{ color: colors.slate }}>
+                  <Text className="font-medium mb-2" style={{ color: colors.secondary }}>
                     CVC
                   </Text>
                   <TextInput
                     className="rounded-xl px-4 py-3"
                     style={{
-                      backgroundColor: colors.sand,
-                      color: colors.slate,
+                      backgroundColor: colors.backgroundSecondary,
+                      color: colors.secondary,
                     }}
                     placeholder="123"
-                    placeholderTextColor="#9CA3AF"
+                    placeholderTextColor={colors.inputPlaceholder}
                     value={cvc}
                     onChangeText={(text) => setCvc(text.replace(/\D/g, "").substring(0, 4))}
                     keyboardType="number-pad"
@@ -246,28 +238,28 @@ export default function AddCardScreen() {
               </View>
 
               {/* Security Note */}
-              <View className="flex-row items-center mt-4 pt-4 border-t" style={{ borderColor: colors.sand }}>
-                <Ionicons name="lock-closed" size={14} color="#9CA3AF" />
-                <Text className="ml-2 text-xs" style={{ color: "#9CA3AF" }}>
+              <View className="flex-row items-center mt-4 pt-4 border-t" style={{ borderColor: colors.backgroundSecondary }}>
+                <Ionicons name="lock-closed" size={14} color={colors.textMuted} />
+                <Text className="ml-2 text-xs" style={{ color: colors.textMuted }}>
                   Your card info is encrypted and processed securely by Stripe
                 </Text>
               </View>
             </View>
           ) : (
-            <View className="rounded-xl p-5" style={{ backgroundColor: "white" }}>
+            <View className="rounded-xl p-5" style={{ backgroundColor: colors.background }}>
               {/* Account Holder Name */}
               <View className="mb-4">
-                <Text className="font-medium mb-2" style={{ color: colors.slate }}>
+                <Text className="font-medium mb-2" style={{ color: colors.secondary }}>
                   Account Holder Name
                 </Text>
                 <TextInput
                   className="rounded-xl px-4 py-3"
                   style={{
-                    backgroundColor: colors.sand,
-                    color: colors.slate,
+                    backgroundColor: colors.backgroundSecondary,
+                    color: colors.secondary,
                   }}
                   placeholder="Name on account"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={colors.inputPlaceholder}
                   value={accountName}
                   onChangeText={setAccountName}
                   autoCapitalize="words"
@@ -276,17 +268,17 @@ export default function AddCardScreen() {
 
               {/* Routing Number */}
               <View className="mb-4">
-                <Text className="font-medium mb-2" style={{ color: colors.slate }}>
+                <Text className="font-medium mb-2" style={{ color: colors.secondary }}>
                   Routing Number
                 </Text>
                 <TextInput
                   className="rounded-xl px-4 py-3"
                   style={{
-                    backgroundColor: colors.sand,
-                    color: colors.slate,
+                    backgroundColor: colors.backgroundSecondary,
+                    color: colors.secondary,
                   }}
                   placeholder="9 digit routing number"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={colors.inputPlaceholder}
                   value={routingNumber}
                   onChangeText={(text) => setRoutingNumber(text.replace(/\D/g, "").substring(0, 9))}
                   keyboardType="number-pad"
@@ -296,17 +288,17 @@ export default function AddCardScreen() {
 
               {/* Account Number */}
               <View className="mb-4">
-                <Text className="font-medium mb-2" style={{ color: colors.slate }}>
+                <Text className="font-medium mb-2" style={{ color: colors.secondary }}>
                   Account Number
                 </Text>
                 <TextInput
                   className="rounded-xl px-4 py-3"
                   style={{
-                    backgroundColor: colors.sand,
-                    color: colors.slate,
+                    backgroundColor: colors.backgroundSecondary,
+                    color: colors.secondary,
                   }}
                   placeholder="Account number"
-                  placeholderTextColor="#9CA3AF"
+                  placeholderTextColor={colors.inputPlaceholder}
                   value={accountNumber}
                   onChangeText={(text) => setAccountNumber(text.replace(/\D/g, ""))}
                   keyboardType="number-pad"
@@ -315,9 +307,9 @@ export default function AddCardScreen() {
               </View>
 
               {/* Account Type */}
-              <View className="flex-row items-center mt-2 p-3 rounded-xl" style={{ backgroundColor: `${colors.amber}10` }}>
-                <Ionicons name="information-circle" size={18} color={colors.amber} />
-                <Text className="ml-2 text-sm flex-1" style={{ color: colors.slate }}>
+              <View className="flex-row items-center mt-2 p-3 rounded-xl" style={{ backgroundColor: `${colors.accent}10` }}>
+                <Ionicons name="information-circle" size={18} color={colors.accent} />
+                <Text className="ml-2 text-sm flex-1" style={{ color: colors.secondary }}>
                   Bank account verification takes 1-2 business days via micro-deposits.
                 </Text>
               </View>
@@ -325,14 +317,14 @@ export default function AddCardScreen() {
           )}
 
           {/* Test Card Info (Demo Mode) */}
-          <View className="rounded-xl p-4 mt-6" style={{ backgroundColor: colors.sand }}>
+          <View className="rounded-xl p-4 mt-6" style={{ backgroundColor: colors.backgroundSecondary }}>
             <View className="flex-row items-start">
-              <Ionicons name="flask" size={18} color={colors.amber} />
+              <Ionicons name="flask" size={18} color={colors.accent} />
               <View className="flex-1 ml-3">
-                <Text className="font-medium text-sm" style={{ color: colors.slate }}>
+                <Text className="font-medium text-sm" style={{ color: colors.secondary }}>
                   Demo Mode
                 </Text>
-                <Text className="text-xs mt-1" style={{ color: "#9CA3AF" }}>
+                <Text className="text-xs mt-1" style={{ color: colors.textMuted }}>
                   Use test card: 4242 4242 4242 4242, any future expiry, any CVC
                 </Text>
               </View>
@@ -342,15 +334,15 @@ export default function AddCardScreen() {
           {/* Submit Button */}
           <TouchableOpacity
             className="py-4 rounded-xl items-center mt-6 flex-row justify-center"
-            style={{ backgroundColor: colors.sage }}
+            style={{ backgroundColor: colors.primary }}
             onPress={paymentType === "card" ? handleAddCard : handleAddBank}
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="white" />
+              <ActivityIndicator color={colors.textInverse} />
             ) : (
               <>
-                <Ionicons name="add-circle" size={22} color="white" />
+                <Ionicons name="add-circle" size={22} color={colors.textInverse} />
                 <Text className="font-semibold text-lg text-white ml-2">
                   Add {paymentType === "card" ? "Card" : "Bank Account"}
                 </Text>
@@ -363,7 +355,7 @@ export default function AddCardScreen() {
             className="py-3 items-center mt-2"
             onPress={() => router.back()}
           >
-            <Text style={{ color: colors.slate }}>Cancel</Text>
+            <Text style={{ color: colors.secondary }}>Cancel</Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>

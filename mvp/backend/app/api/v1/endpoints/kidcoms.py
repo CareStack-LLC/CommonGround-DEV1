@@ -162,6 +162,16 @@ async def update_kidcoms_settings(
     settings = await get_or_create_settings(db, family_file_id)
 
     update_fields = update_data.model_dump(exclude_unset=True)
+
+    # ARIA lockdown: record_sessions cannot be disabled by parents.
+    # Recording and ARIA monitoring are always-on for child safety.
+    if "record_sessions" in update_fields and update_fields["record_sessions"] is False:
+        update_fields["record_sessions"] = True
+        logger.info(
+            f"Blocked attempt to disable record_sessions for family {family_file_id} "
+            f"by user {current_user.id}. Recording is always-on for child safety."
+        )
+
     for field, value in update_fields.items():
         setattr(settings, field, value)
 
@@ -238,6 +248,8 @@ async def create_session(
     room_name = generate_room_name()
 
     # Create room via Daily.co API
+    # ARIA lockdown: recording and ARIA monitoring are always-on for parent-initiated calls
+    # Parents cannot disable these settings for child safety
     try:
         # Handle case where allowed_features might be None for older records
         enable_chat = settings.allowed_features.get("chat", True) if settings.allowed_features else True
@@ -247,7 +259,7 @@ async def create_session(
             exp_minutes=settings.max_session_duration_minutes + 30,  # Add buffer
             max_participants=settings.max_participants_per_session,
             enable_chat=enable_chat,
-            enable_recording=settings.record_sessions,
+            enable_recording=True,  # Always-on for parent calls (cannot be disabled)
         )
         room_url = room_data.get("url", f"https://{daily_service.domain}/{room_name}")
     except Exception as e:

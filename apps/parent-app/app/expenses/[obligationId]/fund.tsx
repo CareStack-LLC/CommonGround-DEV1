@@ -25,16 +25,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { parent, type Obligation } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 interface PaymentMethod {
   id: string;
@@ -47,6 +38,7 @@ interface PaymentMethod {
 }
 
 export default function FundObligationScreen() {
+  const { colors } = useTheme();
   const { obligationId } = useLocalSearchParams<{ obligationId: string }>();
   const { user } = useAuth();
 
@@ -234,10 +226,10 @@ export default function FundObligationScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>
           Loading...
         </Text>
       </SafeAreaView>
@@ -248,9 +240,9 @@ export default function FundObligationScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <Text style={{ color: colors.slate }}>Expense not found</Text>
+        <Text style={{ color: colors.secondary }}>Expense not found</Text>
       </SafeAreaView>
     );
   }
@@ -259,41 +251,41 @@ export default function FundObligationScreen() {
   const isValidAmount = payAmount > 0 && payAmount <= myShare;
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 16 }}>
         {/* Expense Summary */}
-        <View className="rounded-xl p-5 mb-6" style={{ backgroundColor: "white" }}>
-          <Text className="text-sm" style={{ color: "#9CA3AF" }}>
+        <View className="rounded-xl p-5 mb-6" style={{ backgroundColor: colors.background }}>
+          <Text className="text-sm" style={{ color: colors.textMuted }}>
             Funding
           </Text>
-          <Text className="text-xl font-bold mt-1" style={{ color: colors.slate }}>
+          <Text className="text-xl font-bold mt-1" style={{ color: colors.secondary }}>
             {obligation.description}
           </Text>
           <View className="flex-row items-center mt-2">
             {obligation.child_name && (
               <>
-                <Ionicons name="person" size={14} color="#9CA3AF" />
-                <Text className="ml-1 text-sm" style={{ color: "#9CA3AF" }}>
+                <Ionicons name="person" size={14} color={colors.textMuted} />
+                <Text className="ml-1 text-sm" style={{ color: colors.textMuted }}>
                   {obligation.child_name}
                 </Text>
               </>
             )}
           </View>
 
-          <View className="flex-row mt-4 pt-4 border-t" style={{ borderColor: colors.sand }}>
+          <View className="flex-row mt-4 pt-4 border-t" style={{ borderColor: colors.backgroundSecondary }}>
             <View className="flex-1">
-              <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+              <Text className="text-xs" style={{ color: colors.textMuted }}>
                 Total Amount
               </Text>
-              <Text className="font-semibold" style={{ color: colors.slate }}>
+              <Text className="font-semibold" style={{ color: colors.secondary }}>
                 {formatCurrency(obligation.total_amount)}
               </Text>
             </View>
             <View className="flex-1">
-              <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+              <Text className="text-xs" style={{ color: colors.textMuted }}>
                 Your Share
               </Text>
-              <Text className="font-semibold" style={{ color: colors.sage }}>
+              <Text className="font-semibold" style={{ color: colors.primary }}>
                 {formatCurrency(myShare)}
               </Text>
             </View>
@@ -302,7 +294,7 @@ export default function FundObligationScreen() {
 
         {/* Amount Selection */}
         <View className="mb-6">
-          <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+          <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
             Amount to Fund
           </Text>
 
@@ -311,16 +303,16 @@ export default function FundObligationScreen() {
             <TouchableOpacity
               className="flex-1 py-3 rounded-xl items-center"
               style={{
-                backgroundColor: !customAmount && amount === myShare.toFixed(2) ? colors.sage : "white",
+                backgroundColor: !customAmount && amount === myShare.toFixed(2) ? colors.primary : colors.background,
                 borderWidth: 1,
-                borderColor: !customAmount && amount === myShare.toFixed(2) ? colors.sage : colors.sand,
+                borderColor: !customAmount && amount === myShare.toFixed(2) ? colors.primary : colors.backgroundSecondary,
               }}
               onPress={() => handleQuickAmount(1)}
             >
               <Text
                 className="font-medium"
                 style={{
-                  color: !customAmount && amount === myShare.toFixed(2) ? "white" : colors.slate,
+                  color: !customAmount && amount === myShare.toFixed(2) ? colors.textInverse : colors.secondary,
                 }}
               >
                 Full Share
@@ -328,7 +320,7 @@ export default function FundObligationScreen() {
               <Text
                 className="text-xs mt-0.5"
                 style={{
-                  color: !customAmount && amount === myShare.toFixed(2) ? "white" : "#9CA3AF",
+                  color: !customAmount && amount === myShare.toFixed(2) ? colors.textInverse : colors.textMuted,
                 }}
               >
                 {formatCurrency(myShare)}
@@ -338,16 +330,16 @@ export default function FundObligationScreen() {
             <TouchableOpacity
               className="flex-1 py-3 rounded-xl items-center"
               style={{
-                backgroundColor: !customAmount && amount === (myShare * 0.5).toFixed(2) ? colors.sage : "white",
+                backgroundColor: !customAmount && amount === (myShare * 0.5).toFixed(2) ? colors.primary : colors.background,
                 borderWidth: 1,
-                borderColor: !customAmount && amount === (myShare * 0.5).toFixed(2) ? colors.sage : colors.sand,
+                borderColor: !customAmount && amount === (myShare * 0.5).toFixed(2) ? colors.primary : colors.backgroundSecondary,
               }}
               onPress={() => handleQuickAmount(0.5)}
             >
               <Text
                 className="font-medium"
                 style={{
-                  color: !customAmount && amount === (myShare * 0.5).toFixed(2) ? "white" : colors.slate,
+                  color: !customAmount && amount === (myShare * 0.5).toFixed(2) ? colors.textInverse : colors.secondary,
                 }}
               >
                 Half
@@ -355,7 +347,7 @@ export default function FundObligationScreen() {
               <Text
                 className="text-xs mt-0.5"
                 style={{
-                  color: !customAmount && amount === (myShare * 0.5).toFixed(2) ? "white" : "#9CA3AF",
+                  color: !customAmount && amount === (myShare * 0.5).toFixed(2) ? colors.textInverse : colors.textMuted,
                 }}
               >
                 {formatCurrency(myShare * 0.5)}
@@ -367,29 +359,29 @@ export default function FundObligationScreen() {
           <View
             className="rounded-xl p-4 flex-row items-center"
             style={{
-              backgroundColor: "white",
+              backgroundColor: colors.background,
               borderWidth: customAmount ? 2 : 0,
-              borderColor: colors.sage,
+              borderColor: colors.primary,
             }}
           >
-            <Text className="text-2xl font-bold mr-1" style={{ color: colors.slate }}>
+            <Text className="text-2xl font-bold mr-1" style={{ color: colors.secondary }}>
               $
             </Text>
             <TextInput
               className="flex-1 text-2xl font-bold"
-              style={{ color: colors.slate }}
+              style={{ color: colors.secondary }}
               value={amount}
               onChangeText={handleAmountChange}
               keyboardType="decimal-pad"
               placeholder="0.00"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.inputPlaceholder}
             />
           </View>
 
           {payAmount > myShare && (
             <View className="flex-row items-center mt-2">
-              <Ionicons name="warning" size={14} color={colors.amber} />
-              <Text className="ml-1 text-sm" style={{ color: colors.amber }}>
+              <Ionicons name="warning" size={14} color={colors.accent} />
+              <Text className="ml-1 text-sm" style={{ color: colors.accent }}>
                 Amount exceeds your remaining share
               </Text>
             </View>
@@ -399,15 +391,15 @@ export default function FundObligationScreen() {
         {/* Payment Method */}
         <View className="mb-6">
           <View className="flex-row items-center justify-between mb-3">
-            <Text className="font-semibold" style={{ color: colors.slate }}>
+            <Text className="font-semibold" style={{ color: colors.secondary }}>
               Payment Method
             </Text>
             <TouchableOpacity
               className="flex-row items-center"
               onPress={() => router.push("/wallet/add-card")}
             >
-              <Ionicons name="add" size={18} color={colors.sage} />
-              <Text className="ml-1" style={{ color: colors.sage }}>
+              <Ionicons name="add" size={18} color={colors.primary} />
+              <Text className="ml-1" style={{ color: colors.primary }}>
                 Add New
               </Text>
             </TouchableOpacity>
@@ -416,11 +408,11 @@ export default function FundObligationScreen() {
           {paymentMethods.length === 0 ? (
             <TouchableOpacity
               className="rounded-xl p-5 items-center"
-              style={{ backgroundColor: "white" }}
+              style={{ backgroundColor: colors.background }}
               onPress={() => router.push("/wallet/add-card")}
             >
-              <Ionicons name="card-outline" size={32} color="#9CA3AF" />
-              <Text className="mt-2" style={{ color: colors.slate }}>
+              <Ionicons name="card-outline" size={32} color={colors.textMuted} />
+              <Text className="mt-2" style={{ color: colors.secondary }}>
                 Add a payment method to continue
               </Text>
             </TouchableOpacity>
@@ -431,36 +423,36 @@ export default function FundObligationScreen() {
                   key={method.id}
                   className="rounded-xl p-4 flex-row items-center"
                   style={{
-                    backgroundColor: selectedMethod === method.id ? `${colors.sage}10` : "white",
+                    backgroundColor: selectedMethod === method.id ? `${colors.primary}10` : colors.background,
                     borderWidth: selectedMethod === method.id ? 2 : 0,
-                    borderColor: colors.sage,
+                    borderColor: colors.primary,
                   }}
                   onPress={() => setSelectedMethod(method.id)}
                 >
                   <View
                     className="w-10 h-10 rounded-full items-center justify-center"
                     style={{
-                      backgroundColor: selectedMethod === method.id ? colors.sage : colors.sand,
+                      backgroundColor: selectedMethod === method.id ? colors.primary : colors.backgroundSecondary,
                     }}
                   >
                     <Ionicons
                       name={getCardIcon(method.brand) as any}
                       size={20}
-                      color={selectedMethod === method.id ? "white" : colors.slate}
+                      color={selectedMethod === method.id ? colors.textInverse : colors.secondary}
                     />
                   </View>
                   <View className="flex-1 ml-3">
-                    <Text className="font-medium" style={{ color: colors.slate }}>
+                    <Text className="font-medium" style={{ color: colors.secondary }}>
                       {method.brand} ••••{method.last4}
                     </Text>
                     {method.expMonth && method.expYear && (
-                      <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+                      <Text className="text-xs" style={{ color: colors.textMuted }}>
                         Expires {method.expMonth}/{method.expYear}
                       </Text>
                     )}
                   </View>
                   {selectedMethod === method.id && (
-                    <Ionicons name="checkmark-circle" size={22} color={colors.sage} />
+                    <Ionicons name="checkmark-circle" size={22} color={colors.primary} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -469,22 +461,22 @@ export default function FundObligationScreen() {
         </View>
 
         {/* Summary */}
-        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: colors.sand }}>
+        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: colors.backgroundSecondary }}>
           <View className="flex-row justify-between mb-2">
-            <Text style={{ color: colors.slate }}>Payment Amount</Text>
-            <Text className="font-semibold" style={{ color: colors.slate }}>
+            <Text style={{ color: colors.secondary }}>Payment Amount</Text>
+            <Text className="font-semibold" style={{ color: colors.secondary }}>
               {formatCurrency(payAmount)}
             </Text>
           </View>
           <View className="flex-row justify-between mb-2">
-            <Text style={{ color: colors.slate }}>Processing Fee</Text>
-            <Text style={{ color: "#9CA3AF" }}>$0.00</Text>
+            <Text style={{ color: colors.secondary }}>Processing Fee</Text>
+            <Text style={{ color: colors.textMuted }}>$0.00</Text>
           </View>
-          <View className="flex-row justify-between pt-2 border-t" style={{ borderColor: "white" }}>
-            <Text className="font-semibold" style={{ color: colors.slate }}>
+          <View className="flex-row justify-between pt-2 border-t" style={{ borderColor: colors.background }}>
+            <Text className="font-semibold" style={{ color: colors.secondary }}>
               Total
             </Text>
-            <Text className="font-bold text-lg" style={{ color: colors.sage }}>
+            <Text className="font-bold text-lg" style={{ color: colors.primary }}>
               {formatCurrency(payAmount)}
             </Text>
           </View>
@@ -494,24 +486,24 @@ export default function FundObligationScreen() {
         <TouchableOpacity
           className="py-4 rounded-xl items-center flex-row justify-center"
           style={{
-            backgroundColor: isValidAmount && selectedMethod ? colors.sage : colors.sand,
+            backgroundColor: isValidAmount && selectedMethod ? colors.primary : colors.backgroundSecondary,
           }}
           onPress={handlePay}
           disabled={!isValidAmount || !selectedMethod || processing}
         >
           {processing ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color={colors.textInverse} />
           ) : (
             <>
               <Ionicons
                 name="shield-checkmark"
                 size={22}
-                color={isValidAmount && selectedMethod ? "white" : colors.slate}
+                color={isValidAmount && selectedMethod ? colors.textInverse : colors.secondary}
               />
               <Text
                 className="font-semibold text-lg ml-2"
                 style={{
-                  color: isValidAmount && selectedMethod ? "white" : colors.slate,
+                  color: isValidAmount && selectedMethod ? colors.textInverse : colors.secondary,
                 }}
               >
                 Pay {formatCurrency(payAmount)}
@@ -522,8 +514,8 @@ export default function FundObligationScreen() {
 
         {/* Security Note */}
         <View className="flex-row items-center justify-center mt-4">
-          <Ionicons name="lock-closed" size={14} color="#9CA3AF" />
-          <Text className="ml-1 text-xs" style={{ color: "#9CA3AF" }}>
+          <Ionicons name="lock-closed" size={14} color={colors.textMuted} />
+          <Text className="ml-1 text-xs" style={{ color: colors.textMuted }}>
             Secured by Stripe
           </Text>
         </View>

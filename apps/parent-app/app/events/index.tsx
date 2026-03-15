@@ -31,39 +31,11 @@ import {
 } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
+import { useTheme, categoryColors, categoryIcons } from "@/theme";
 
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+const CATEGORY_COLORS: Record<EventCategory, string> = categoryColors;
 
-const CATEGORY_COLORS: Record<EventCategory, string> = {
-  medical: "#EF4444",
-  school: "#3B82F6",
-  sports: "#22C55E",
-  therapy: "#EC4899",
-  extracurricular: "#8B5CF6",
-  social: "#F97316",
-  travel: "#06B6D4",
-  exchange: "#D4A574",
-  other: "#6B7280",
-};
-
-const CATEGORY_ICONS: Record<EventCategory, string> = {
-  medical: "medkit",
-  school: "school",
-  sports: "football",
-  therapy: "heart",
-  extracurricular: "musical-notes",
-  social: "people",
-  travel: "airplane",
-  exchange: "swap-horizontal",
-  other: "calendar",
-};
+const CATEGORY_ICONS: Record<EventCategory, string> = categoryIcons;
 
 const CATEGORIES: Array<{ id: EventCategory | "all"; label: string }> = [
   { id: "all", label: "All" },
@@ -78,6 +50,7 @@ const CATEGORIES: Array<{ id: EventCategory | "all"; label: string }> = [
 ];
 
 export default function EventsListScreen() {
+  const { colors } = useTheme();
   const { user } = useAuth();
   const { familyFile, children } = useFamilyFile();
 
@@ -240,8 +213,8 @@ export default function EventsListScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
-        <ActivityIndicator size="large" color={colors.sage} />
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.surfaceElevated }}>
+        <ActivityIndicator size="large" color={colors.primary} />
       </SafeAreaView>
     );
   }
@@ -256,28 +229,28 @@ export default function EventsListScreen() {
               className="mr-2"
               onPress={() => router.push("/events/create")}
             >
-              <Ionicons name="add-circle" size={28} color={colors.sage} />
+              <Ionicons name="add-circle" size={28} color={colors.primary} />
             </TouchableOpacity>
           ),
         }}
       />
 
-      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
         {/* Search Bar */}
         <View className="px-4 pt-2 pb-3">
           <View className="flex-row items-center bg-white rounded-xl px-3 py-2">
-            <Ionicons name="search" size={20} color="#94a3b8" />
+            <Ionicons name="search" size={20} color={colors.textMuted} />
             <TextInput
               className="flex-1 ml-2"
-              style={{ color: colors.slate, fontSize: 16 }}
+              style={{ color: colors.secondary, fontSize: 16 }}
               placeholder="Search events..."
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.inputPlaceholder}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery("")}>
-                <Ionicons name="close-circle" size={20} color="#94a3b8" />
+                <Ionicons name="close-circle" size={20} color={colors.textMuted} />
               </TouchableOpacity>
             )}
           </View>
@@ -299,16 +272,16 @@ export default function EventsListScreen() {
                     backgroundColor:
                       selectedCategory === cat.id
                         ? cat.id === "all"
-                          ? colors.sage
+                          ? colors.primary
                           : CATEGORY_COLORS[cat.id as EventCategory]
-                        : "white",
+                        : colors.background,
                   }}
                   onPress={() => setSelectedCategory(cat.id)}
                 >
                   <Text
                     className="text-sm font-medium"
                     style={{
-                      color: selectedCategory === cat.id ? "white" : colors.slate,
+                      color: selectedCategory === cat.id ? colors.textInverse : colors.secondary,
                     }}
                   >
                     {cat.label}
@@ -331,14 +304,14 @@ export default function EventsListScreen() {
                 <TouchableOpacity
                   className="px-3 py-1.5 rounded-full border"
                   style={{
-                    backgroundColor: !selectedChildId ? colors.sand : "white",
-                    borderColor: colors.sand,
+                    backgroundColor: !selectedChildId ? colors.backgroundSecondary : colors.background,
+                    borderColor: colors.backgroundSecondary,
                   }}
                   onPress={() => setSelectedChildId(null)}
                 >
                   <Text
                     className="text-sm"
-                    style={{ color: !selectedChildId ? colors.sage : colors.slate }}
+                    style={{ color: !selectedChildId ? colors.primary : colors.secondary }}
                   >
                     All Children
                   </Text>
@@ -348,14 +321,14 @@ export default function EventsListScreen() {
                     key={child.id}
                     className="px-3 py-1.5 rounded-full border"
                     style={{
-                      backgroundColor: selectedChildId === child.id ? colors.sand : "white",
-                      borderColor: colors.sand,
+                      backgroundColor: selectedChildId === child.id ? colors.backgroundSecondary : colors.background,
+                      borderColor: colors.backgroundSecondary,
                     }}
                     onPress={() => setSelectedChildId(child.id)}
                   >
                     <Text
                       className="text-sm"
-                      style={{ color: selectedChildId === child.id ? colors.sage : colors.slate }}
+                      style={{ color: selectedChildId === child.id ? colors.primary : colors.secondary }}
                     >
                       {child.first_name}
                     </Text>
@@ -371,18 +344,18 @@ export default function EventsListScreen() {
           className="flex-1"
           contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.sage} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
           }
         >
           {sortedDates.length === 0 ? (
             <View className="bg-white rounded-2xl items-center py-12 mt-4">
-              <Ionicons name="calendar-outline" size={64} color="#94a3b8" />
+              <Ionicons name="calendar-outline" size={64} color={colors.textMuted} />
               <Text className="text-slate-500 mt-4 text-center">
                 {searchQuery ? "No events match your search" : "No upcoming events"}
               </Text>
               <TouchableOpacity
                 className="mt-4 px-4 py-2 rounded-xl"
-                style={{ backgroundColor: colors.sage }}
+                style={{ backgroundColor: colors.primary }}
                 onPress={() => router.push("/events/create")}
               >
                 <Text className="text-white font-medium">Create Event</Text>
@@ -391,7 +364,7 @@ export default function EventsListScreen() {
           ) : (
             sortedDates.map((dateStr) => (
               <View key={dateStr} className="mt-4">
-                <Text className="font-semibold mb-2" style={{ color: colors.slate }}>
+                <Text className="font-semibold mb-2" style={{ color: colors.secondary }}>
                   {formatDateHeader(dateStr)}
                 </Text>
                 <View className="space-y-2">
@@ -428,6 +401,7 @@ function formatDateHeader(dateStr: string): string {
 }
 
 function EventCard({ event }: { event: ScheduleEvent }) {
+  const { colors } = useTheme();
   const categoryColor = event.event_category ? CATEGORY_COLORS[event.event_category] : "#6B7280";
   const categoryIcon = event.event_category ? CATEGORY_ICONS[event.event_category] : "calendar";
 
@@ -445,7 +419,7 @@ function EventCard({ event }: { event: ScheduleEvent }) {
         </View>
 
         <View className="flex-1 ml-3">
-          <Text className="font-semibold" style={{ color: colors.slate }}>
+          <Text className="font-semibold" style={{ color: colors.secondary }}>
             {event.title}
           </Text>
           {event.children_names && event.children_names.length > 0 && (
@@ -454,7 +428,7 @@ function EventCard({ event }: { event: ScheduleEvent }) {
             </Text>
           )}
           <View className="flex-row items-center mt-1">
-            <Ionicons name="time" size={14} color="#94a3b8" />
+            <Ionicons name="time" size={14} color={colors.textMuted} />
             <Text className="text-sm text-slate-500 ml-1">
               {event.all_day
                 ? "All day"
@@ -508,9 +482,9 @@ function EventCard({ event }: { event: ScheduleEvent }) {
           {event.my_rsvp_status === "no_response" && (
             <View
               className="px-2 py-1 rounded-full"
-              style={{ backgroundColor: colors.sand }}
+              style={{ backgroundColor: colors.backgroundSecondary }}
             >
-              <Text className="text-xs font-medium" style={{ color: colors.slate }}>
+              <Text className="text-xs font-medium" style={{ color: colors.secondary }}>
                 RSVP
               </Text>
             </View>

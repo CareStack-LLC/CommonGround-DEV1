@@ -36,16 +36,7 @@ import {
 } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme, categoryColors, categoryIcons } from "@/theme";
 
 const EVENT_CATEGORIES: Array<{
   id: EventCategory;
@@ -64,6 +55,7 @@ const EVENT_CATEGORIES: Array<{
 ];
 
 export default function CreateEventScreen() {
+  const { colors } = useTheme();
   const { user } = useAuth();
   const { familyFile, children } = useFamilyFile();
 
@@ -82,6 +74,8 @@ export default function CreateEventScreen() {
   const [location, setLocation] = useState("");
   const [shareLocation, setShareLocation] = useState(true);
   const [shareWithCoParent, setShareWithCoParent] = useState(true);
+  const [syncToKidSpace, setSyncToKidSpace] = useState(false);
+  const [kidSpaceChildIds, setKidSpaceChildIds] = useState<string[]>([]);
   const [selectedChildren, setSelectedChildren] = useState<string[]>([]);
   const [categoryData, setCategoryData] = useState<CategoryData>({});
 
@@ -210,7 +204,7 @@ export default function CreateEventScreen() {
   };
 
   const getCategoryColor = () => {
-    return EVENT_CATEGORIES.find((c) => c.id === category)?.color || colors.sage;
+    return EVENT_CATEGORIES.find((c) => c.id === category)?.color || colors.primary;
   };
 
   const formatDate = (date: Date) => {
@@ -229,7 +223,7 @@ export default function CreateEventScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -237,18 +231,18 @@ export default function CreateEventScreen() {
         <ScrollView className="flex-1" contentContainerStyle={{ padding: 16 }}>
           {/* Title */}
           <View className="mb-6">
-            <Text className="font-semibold mb-2" style={{ color: colors.slate }}>
+            <Text className="font-semibold mb-2" style={{ color: colors.secondary }}>
               Event Title *
             </Text>
             <TextInput
               className="rounded-xl px-4 py-3"
               style={{
-                backgroundColor: "white",
-                color: colors.slate,
+                backgroundColor: colors.background,
+                color: colors.secondary,
                 fontSize: 16,
               }}
               placeholder="e.g., Emma's Soccer Practice"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.inputPlaceholder}
               value={title}
               onChangeText={setTitle}
             />
@@ -256,7 +250,7 @@ export default function CreateEventScreen() {
 
           {/* Category Selection */}
           <View className="mb-6">
-            <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+            <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
               Category *
             </Text>
             <View className="flex-row flex-wrap -mx-1">
@@ -269,24 +263,24 @@ export default function CreateEventScreen() {
                   <View
                     className="rounded-xl py-3 items-center"
                     style={{
-                      backgroundColor: category === cat.id ? `${cat.color}20` : "white",
+                      backgroundColor: category === cat.id ? `${cat.color}20` : colors.background,
                       borderWidth: category === cat.id ? 2 : 0,
                       borderColor: cat.color,
                     }}
                   >
                     <View
                       className="w-10 h-10 rounded-full items-center justify-center mb-1"
-                      style={{ backgroundColor: category === cat.id ? cat.color : colors.sand }}
+                      style={{ backgroundColor: category === cat.id ? cat.color : colors.backgroundSecondary }}
                     >
                       <Ionicons
                         name={cat.icon as any}
                         size={20}
-                        color={category === cat.id ? "white" : colors.slate}
+                        color={category === cat.id ? colors.textInverse : colors.secondary}
                       />
                     </View>
                     <Text
                       className="text-xs text-center"
-                      style={{ color: category === cat.id ? cat.color : colors.slate }}
+                      style={{ color: category === cat.id ? cat.color : colors.secondary }}
                     >
                       {cat.label}
                     </Text>
@@ -298,40 +292,40 @@ export default function CreateEventScreen() {
 
           {/* Date & Time */}
           <View className="mb-6">
-            <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+            <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
               Date & Time
             </Text>
 
-            <View className="rounded-xl p-4" style={{ backgroundColor: "white" }}>
+            <View className="rounded-xl p-4" style={{ backgroundColor: colors.background }}>
               {/* Date */}
               <TouchableOpacity
                 className="flex-row items-center justify-between py-2"
                 onPress={() => setShowDatePicker(true)}
               >
                 <View className="flex-row items-center">
-                  <Ionicons name="calendar" size={20} color={colors.sage} />
-                  <Text className="ml-3" style={{ color: colors.slate }}>
+                  <Ionicons name="calendar" size={20} color={colors.primary} />
+                  <Text className="ml-3" style={{ color: colors.secondary }}>
                     Date
                   </Text>
                 </View>
-                <Text style={{ color: colors.sage }}>{formatDate(startDate)}</Text>
+                <Text style={{ color: colors.primary }}>{formatDate(startDate)}</Text>
               </TouchableOpacity>
 
               {/* All Day Toggle */}
               <View
                 className="flex-row items-center justify-between py-2 border-t"
-                style={{ borderColor: colors.sand }}
+                style={{ borderColor: colors.backgroundSecondary }}
               >
                 <View className="flex-row items-center">
-                  <Ionicons name="sunny" size={20} color={colors.sage} />
-                  <Text className="ml-3" style={{ color: colors.slate }}>
+                  <Ionicons name="sunny" size={20} color={colors.primary} />
+                  <Text className="ml-3" style={{ color: colors.secondary }}>
                     All Day
                   </Text>
                 </View>
                 <Switch
                   value={allDay}
                   onValueChange={setAllDay}
-                  trackColor={{ false: colors.sand, true: colors.sage }}
+                  trackColor={{ false: colors.backgroundSecondary, true: colors.primary }}
                 />
               </View>
 
@@ -340,31 +334,31 @@ export default function CreateEventScreen() {
                 <>
                   <TouchableOpacity
                     className="flex-row items-center justify-between py-2 border-t"
-                    style={{ borderColor: colors.sand }}
+                    style={{ borderColor: colors.backgroundSecondary }}
                     onPress={() => setShowTimePicker(true)}
                   >
                     <View className="flex-row items-center">
-                      <Ionicons name="time" size={20} color={colors.sage} />
-                      <Text className="ml-3" style={{ color: colors.slate }}>
+                      <Ionicons name="time" size={20} color={colors.primary} />
+                      <Text className="ml-3" style={{ color: colors.secondary }}>
                         Start
                       </Text>
                     </View>
-                    <Text style={{ color: colors.sage }}>{formatTime(startDate)}</Text>
+                    <Text style={{ color: colors.primary }}>{formatTime(startDate)}</Text>
                   </TouchableOpacity>
 
                   {/* End Time */}
                   <TouchableOpacity
                     className="flex-row items-center justify-between py-2 border-t"
-                    style={{ borderColor: colors.sand }}
+                    style={{ borderColor: colors.backgroundSecondary }}
                     onPress={() => setShowEndTimePicker(true)}
                   >
                     <View className="flex-row items-center">
-                      <Ionicons name="time-outline" size={20} color={colors.sage} />
-                      <Text className="ml-3" style={{ color: colors.slate }}>
+                      <Ionicons name="time-outline" size={20} color={colors.primary} />
+                      <Text className="ml-3" style={{ color: colors.secondary }}>
                         End
                       </Text>
                     </View>
-                    <Text style={{ color: colors.sage }}>{formatTime(endDate)}</Text>
+                    <Text style={{ color: colors.primary }}>{formatTime(endDate)}</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -398,17 +392,17 @@ export default function CreateEventScreen() {
 
           {/* Location */}
           <View className="mb-6">
-            <Text className="font-semibold mb-2" style={{ color: colors.slate }}>
+            <Text className="font-semibold mb-2" style={{ color: colors.secondary }}>
               Location
             </Text>
             <TextInput
               className="rounded-xl px-4 py-3"
               style={{
-                backgroundColor: "white",
-                color: colors.slate,
+                backgroundColor: colors.background,
+                color: colors.secondary,
               }}
               placeholder="Add location"
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.inputPlaceholder}
               value={location}
               onChangeText={setLocation}
             />
@@ -416,13 +410,13 @@ export default function CreateEventScreen() {
               <View
                 className="flex-row items-center justify-between mt-2 px-2"
               >
-                <Text className="text-sm" style={{ color: colors.slate }}>
+                <Text className="text-sm" style={{ color: colors.secondary }}>
                   Share location with co-parent
                 </Text>
                 <Switch
                   value={shareLocation}
                   onValueChange={setShareLocation}
-                  trackColor={{ false: colors.sand, true: colors.sage }}
+                  trackColor={{ false: colors.backgroundSecondary, true: colors.primary }}
                 />
               </View>
             )}
@@ -431,7 +425,7 @@ export default function CreateEventScreen() {
           {/* Children Selection */}
           {children.length > 0 && (
             <View className="mb-6">
-              <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+              <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
                 Children
               </Text>
               <View className="flex-row flex-wrap -mx-1">
@@ -445,19 +439,19 @@ export default function CreateEventScreen() {
                       className="rounded-full px-4 py-2 flex-row items-center"
                       style={{
                         backgroundColor: selectedChildren.includes(child.id)
-                          ? colors.sage
-                          : "white",
+                          ? colors.primary
+                          : colors.background,
                       }}
                     >
                       <Text
                         style={{
-                          color: selectedChildren.includes(child.id) ? "white" : colors.slate,
+                          color: selectedChildren.includes(child.id) ? colors.textInverse : colors.secondary,
                         }}
                       >
                         {child.first_name}
                       </Text>
                       {selectedChildren.includes(child.id) && (
-                        <Ionicons name="checkmark" size={16} color="white" className="ml-1" />
+                        <Ionicons name="checkmark" size={16} color={colors.textInverse} className="ml-1" />
                       )}
                     </View>
                   </TouchableOpacity>
@@ -468,19 +462,19 @@ export default function CreateEventScreen() {
 
           {/* Description */}
           <View className="mb-6">
-            <Text className="font-semibold mb-2" style={{ color: colors.slate }}>
+            <Text className="font-semibold mb-2" style={{ color: colors.secondary }}>
               Notes
             </Text>
             <TextInput
               className="rounded-xl px-4 py-3"
               style={{
-                backgroundColor: "white",
-                color: colors.slate,
+                backgroundColor: colors.background,
+                color: colors.secondary,
                 minHeight: 80,
                 textAlignVertical: "top",
               }}
               placeholder="Add any additional details..."
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.inputPlaceholder}
               multiline
               value={description}
               onChangeText={setDescription}
@@ -488,24 +482,24 @@ export default function CreateEventScreen() {
           </View>
 
           {/* Visibility */}
-          <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: "white" }}>
+          <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: colors.background }}>
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center flex-1">
                 <View
                   className="w-10 h-10 rounded-full items-center justify-center"
-                  style={{ backgroundColor: shareWithCoParent ? `${colors.sage}20` : colors.sand }}
+                  style={{ backgroundColor: shareWithCoParent ? `${colors.primary}20` : colors.backgroundSecondary }}
                 >
                   <Ionicons
                     name={shareWithCoParent ? "people" : "person"}
                     size={20}
-                    color={shareWithCoParent ? colors.sage : colors.slate}
+                    color={shareWithCoParent ? colors.primary : colors.secondary}
                   />
                 </View>
                 <View className="ml-3 flex-1">
-                  <Text className="font-medium" style={{ color: colors.slate }}>
+                  <Text className="font-medium" style={{ color: colors.secondary }}>
                     {shareWithCoParent ? "Visible to Co-Parent" : "Private Event"}
                   </Text>
-                  <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+                  <Text className="text-xs" style={{ color: colors.textMuted }}>
                     {shareWithCoParent
                       ? "Co-parent can see this event and RSVP"
                       : "Only you can see this event"}
@@ -515,33 +509,115 @@ export default function CreateEventScreen() {
               <Switch
                 value={shareWithCoParent}
                 onValueChange={setShareWithCoParent}
-                trackColor={{ false: colors.sand, true: colors.sage }}
+                trackColor={{ false: colors.backgroundSecondary, true: colors.primary }}
               />
             </View>
+          </View>
+
+          {/* Add to Children's KidSpace Calendar */}
+          <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: colors.background }}>
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center flex-1">
+                <View
+                  className="w-10 h-10 rounded-full items-center justify-center"
+                  style={{ backgroundColor: syncToKidSpace ? "#8B5CF620" : colors.backgroundSecondary }}
+                >
+                  <Ionicons
+                    name={syncToKidSpace ? "happy" : "happy-outline"}
+                    size={20}
+                    color={syncToKidSpace ? "#8B5CF6" : colors.secondary}
+                  />
+                </View>
+                <View className="ml-3 flex-1">
+                  <Text className="font-medium" style={{ color: colors.secondary }}>
+                    {syncToKidSpace ? "Synced to KidSpace" : "Add to Children's Calendar"}
+                  </Text>
+                  <Text className="text-xs" style={{ color: colors.textMuted }}>
+                    {syncToKidSpace
+                      ? "This event will appear on selected children's KidSpace calendars"
+                      : "Show this event on your children's KidSpace calendar"}
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={syncToKidSpace}
+                onValueChange={(val) => {
+                  setSyncToKidSpace(val);
+                  if (val && kidSpaceChildIds.length === 0) {
+                    setKidSpaceChildIds(selectedChildren);
+                  }
+                }}
+                trackColor={{ false: colors.backgroundSecondary, true: "#8B5CF6" }}
+              />
+            </View>
+
+            {/* Child selection for KidSpace sync */}
+            {syncToKidSpace && children.length > 0 && (
+              <View className="mt-3 pt-3" style={{ borderTopWidth: 1, borderTopColor: colors.backgroundSecondary }}>
+                <Text className="text-xs font-medium mb-2" style={{ color: colors.textMuted }}>
+                  Select children's calendars:
+                </Text>
+                <View className="flex-row flex-wrap" style={{ gap: 8 }}>
+                  {children.map((child) => {
+                    const isSelected = kidSpaceChildIds.includes(child.id);
+                    return (
+                      <TouchableOpacity
+                        key={child.id}
+                        className="flex-row items-center px-3 py-2 rounded-full"
+                        style={{
+                          backgroundColor: isSelected ? "#8B5CF620" : colors.backgroundSecondary,
+                          borderWidth: 1,
+                          borderColor: isSelected ? "#8B5CF6" : "transparent",
+                        }}
+                        onPress={() => {
+                          setKidSpaceChildIds((prev) =>
+                            prev.includes(child.id)
+                              ? prev.filter((id) => id !== child.id)
+                              : [...prev, child.id]
+                          );
+                        }}
+                      >
+                        <Ionicons
+                          name={isSelected ? "checkmark-circle" : "ellipse-outline"}
+                          size={16}
+                          color={isSelected ? "#8B5CF6" : colors.secondary}
+                        />
+                        <Text
+                          className="ml-1 text-sm font-medium"
+                          style={{ color: isSelected ? "#8B5CF6" : colors.secondary }}
+                        >
+                          {child.first_name}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
           </View>
 
           {/* Submit Button */}
           <TouchableOpacity
             className="py-4 rounded-xl items-center flex-row justify-center mb-6"
             style={{
-              backgroundColor: title && category ? getCategoryColor() : colors.sand,
+              backgroundColor: title && category ? getCategoryColor() : colors.backgroundSecondary,
             }}
             onPress={handleSubmit}
             disabled={!title || !category || submitting}
           >
             {submitting ? (
-              <ActivityIndicator color="white" />
+              <ActivityIndicator color={colors.textInverse} />
             ) : (
               <>
                 <Ionicons
                   name="add-circle"
                   size={22}
-                  color={title && category ? "white" : colors.slate}
+                  color={title && category ? colors.textInverse : colors.secondary}
                 />
                 <Text
                   className="font-semibold text-lg ml-2"
                   style={{
-                    color: title && category ? "white" : colors.slate,
+                    color: title && category ? colors.textInverse : colors.secondary,
                   }}
                 >
                   Create Event

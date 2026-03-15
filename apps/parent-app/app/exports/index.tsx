@@ -21,17 +21,11 @@ import { router } from "expo-router";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
 import { parent } from "@commonground/api-client";
 import type { CaseExport } from "@commonground/api-client/src/api/parent/exports";
-
-// Design colors
-const SAGE = "#4A6C58";
-const SAGE_LIGHT = "#E8F0EB";
-const CREAM = "#FFFBF5";
-const WHITE = "#FFFFFF";
-const SAND = "#F5F0E8";
-const SLATE = "#475569";
+import { useTheme } from "@/theme";
 
 export default function ExportsListScreen() {
   const { familyFile } = useFamilyFile();
+  const { colors } = useTheme();
   const [exports, setExports] = useState<CaseExport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -91,7 +85,7 @@ export default function ExportsListScreen() {
       case "failed":
         return "#EF4444";
       default:
-        return SLATE;
+        return colors.secondary;
     }
   };
 
@@ -121,7 +115,7 @@ export default function ExportsListScreen() {
   const renderExportItem = ({ item }: { item: CaseExport }) => (
     <TouchableOpacity
       style={{
-        backgroundColor: WHITE,
+        backgroundColor: colors.cardBackground,
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
@@ -140,26 +134,26 @@ export default function ExportsListScreen() {
             <Ionicons
               name={item.package_type === "court" ? "briefcase" : "search"}
               size={16}
-              color={SAGE}
+              color={colors.primary}
             />
-            <Text style={{ fontSize: 16, fontWeight: "600", color: "#1e293b", marginLeft: 8 }}>
+            <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textPrimary, marginLeft: 8 }}>
               {item.package_type === "court" ? "Court Package" : "Investigation"}
             </Text>
           </View>
-          <Text style={{ fontSize: 13, color: SLATE, marginBottom: 8 }}>
+          <Text style={{ fontSize: 13, color: colors.secondary, marginBottom: 8 }}>
             {formatDate(item.date_range_start)} - {formatDate(item.date_range_end)}
           </Text>
           {item.claim_type && (
-            <Text style={{ fontSize: 12, color: SLATE, fontStyle: "italic", marginBottom: 4 }}>
+            <Text style={{ fontSize: 12, color: colors.secondary, fontStyle: "italic", marginBottom: 4 }}>
               {item.claim_type.replace(/_/g, " ")}
             </Text>
           )}
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ fontSize: 12, color: SLATE }}>
+            <Text style={{ fontSize: 12, color: colors.secondary }}>
               {item.sections_included.length} sections
             </Text>
             {item.page_count && (
-              <Text style={{ fontSize: 12, color: SLATE, marginLeft: 12 }}>
+              <Text style={{ fontSize: 12, color: colors.secondary, marginLeft: 12 }}>
                 {item.page_count} pages
               </Text>
             )}
@@ -178,7 +172,7 @@ export default function ExportsListScreen() {
               {getStatusLabel(item.status)}
             </Text>
           </View>
-          <Text style={{ fontSize: 11, color: SLATE, marginTop: 8 }}>
+          <Text style={{ fontSize: 11, color: colors.secondary, marginTop: 8 }}>
             #{item.export_number}
           </Text>
         </View>
@@ -188,34 +182,34 @@ export default function ExportsListScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: CREAM, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size="large" color={SAGE} />
-        <Text style={{ marginTop: 16, color: SLATE }}>Loading reports...</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={{ marginTop: 16, color: colors.secondary }}>Loading reports...</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: CREAM }} edges={["bottom"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       {/* Header Info */}
-      <View style={{ padding: 16, backgroundColor: SAGE_LIGHT, borderBottomWidth: 1, borderBottomColor: SAND }}>
-        <Text style={{ fontSize: 14, color: SAGE, textAlign: "center" }}>
+      <View style={{ padding: 16, backgroundColor: colors.primaryLight, borderBottomWidth: 1, borderBottomColor: colors.backgroundSecondary }}>
+        <Text style={{ fontSize: 14, color: colors.primary, textAlign: "center" }}>
           Generate court-ready documentation packages with SHA-256 integrity verification
         </Text>
       </View>
 
       {exports.length === 0 ? (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 32 }}>
-          <Ionicons name="document-text-outline" size={64} color={SAGE} />
-          <Text style={{ fontSize: 18, fontWeight: "600", color: "#1e293b", marginTop: 16 }}>
+          <Ionicons name="document-text-outline" size={64} color={colors.primary} />
+          <Text style={{ fontSize: 18, fontWeight: "600", color: colors.textPrimary, marginTop: 16 }}>
             No Reports Yet
           </Text>
-          <Text style={{ fontSize: 14, color: SLATE, textAlign: "center", marginTop: 8 }}>
+          <Text style={{ fontSize: 14, color: colors.secondary, textAlign: "center", marginTop: 8 }}>
             Create your first court-ready evidence package to document your co-parenting journey.
           </Text>
           <TouchableOpacity
             style={{
-              backgroundColor: SAGE,
+              backgroundColor: colors.primary,
               paddingHorizontal: 24,
               paddingVertical: 12,
               borderRadius: 8,
@@ -223,7 +217,7 @@ export default function ExportsListScreen() {
             }}
             onPress={() => router.push("/exports/create")}
           >
-            <Text style={{ color: WHITE, fontWeight: "600" }}>Create Report</Text>
+            <Text style={{ color: colors.textInverse, fontWeight: "600" }}>Create Report</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -233,7 +227,7 @@ export default function ExportsListScreen() {
           renderItem={renderExportItem}
           contentContainerStyle={{ padding: 16 }}
           refreshControl={
-            <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor={SAGE} />
+            <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor={colors.primary} />
           }
         />
       )}
@@ -248,7 +242,7 @@ export default function ExportsListScreen() {
             width: 56,
             height: 56,
             borderRadius: 28,
-            backgroundColor: SAGE,
+            backgroundColor: colors.primary,
             alignItems: "center",
             justifyContent: "center",
             shadowColor: "#000",
@@ -259,7 +253,7 @@ export default function ExportsListScreen() {
           }}
           onPress={() => router.push("/exports/create")}
         >
-          <Ionicons name="add" size={28} color={WHITE} />
+          <Ionicons name="add" size={28} color={colors.textInverse} />
         </TouchableOpacity>
       )}
     </SafeAreaView>

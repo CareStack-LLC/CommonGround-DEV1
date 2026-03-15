@@ -23,17 +23,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams, Stack } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 interface AgreementSection {
   id: string;
@@ -68,6 +58,7 @@ interface Agreement {
 }
 
 export default function AgreementPreviewScreen() {
+  const { colors } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { token } = useAuth();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -181,10 +172,10 @@ export default function AgreementPreviewScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>
           Loading preview...
         </Text>
       </SafeAreaView>
@@ -195,9 +186,9 @@ export default function AgreementPreviewScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <Text style={{ color: colors.slate }}>Agreement not found.</Text>
+        <Text style={{ color: colors.secondary }}>Agreement not found.</Text>
       </SafeAreaView>
     );
   }
@@ -206,13 +197,13 @@ export default function AgreementPreviewScreen() {
   const completedCount = sections.filter((s) => s.is_completed).length;
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <Stack.Screen
         options={{
           title: "Preview",
           headerRight: () => (
             <TouchableOpacity onPress={handleShare} className="mr-4">
-              <Ionicons name="share-outline" size={24} color={colors.sage} />
+              <Ionicons name="share-outline" size={24} color={colors.primary} />
             </TouchableOpacity>
           ),
         }}
@@ -223,7 +214,7 @@ export default function AgreementPreviewScreen() {
         horizontal
         showsHorizontalScrollIndicator={false}
         className="max-h-12 border-b"
-        style={{ borderBottomColor: colors.sand }}
+        style={{ borderBottomColor: colors.backgroundSecondary }}
         contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
       >
         {sections.map((section, index) => (
@@ -231,14 +222,14 @@ export default function AgreementPreviewScreen() {
             key={section.id}
             className="px-3 py-1 rounded-full mr-2"
             style={{
-              backgroundColor: selectedSectionIndex === index ? colors.sage : colors.sand,
+              backgroundColor: selectedSectionIndex === index ? colors.primary : colors.backgroundSecondary,
             }}
             onPress={() => setSelectedSectionIndex(index)}
           >
             <Text
               className="font-medium text-sm"
               style={{
-                color: selectedSectionIndex === index ? "white" : colors.slate,
+                color: selectedSectionIndex === index ? "white" : colors.secondary,
               }}
             >
               {section.section_number}
@@ -253,30 +244,30 @@ export default function AgreementPreviewScreen() {
         contentContainerStyle={{ padding: 16 }}
       >
         {/* Header */}
-        <View className="rounded-xl p-5 mb-6" style={{ backgroundColor: "white" }}>
-          <Text className="text-2xl font-bold mb-2" style={{ color: colors.slate }}>
+        <View className="rounded-xl p-5 mb-6" style={{ backgroundColor: colors.background }}>
+          <Text className="text-2xl font-bold mb-2" style={{ color: colors.secondary }}>
             {agreement.title}
           </Text>
-          <Text className="text-sm mb-3" style={{ color: "#9CA3AF" }}>
+          <Text className="text-sm mb-3" style={{ color: colors.textMuted }}>
             {agreement.agreement_number}
           </Text>
 
           <View className="flex-row items-center mb-4">
             <View
               className="px-3 py-1 rounded-full mr-2"
-              style={{ backgroundColor: `${colors.sage}20` }}
+              style={{ backgroundColor: `${colors.primary}20` }}
             >
-              <Text className="font-medium" style={{ color: colors.sage }}>
+              <Text className="font-medium" style={{ color: colors.primary }}>
                 {agreement.status.replace("_", " ")}
               </Text>
             </View>
             {agreement.court_ordered && (
               <View
                 className="px-3 py-1 rounded-full flex-row items-center"
-                style={{ backgroundColor: `${colors.amber}20` }}
+                style={{ backgroundColor: `${colors.accent}20` }}
               >
-                <Ionicons name="business" size={12} color={colors.amber} />
-                <Text className="font-medium ml-1" style={{ color: colors.amber }}>
+                <Ionicons name="business" size={12} color={colors.accent} />
+                <Text className="font-medium ml-1" style={{ color: colors.accent }}>
                   Court Ordered
                 </Text>
               </View>
@@ -285,14 +276,14 @@ export default function AgreementPreviewScreen() {
 
           {/* Progress */}
           <View className="flex-row items-center">
-            <Text className="text-sm" style={{ color: colors.slate }}>
+            <Text className="text-sm" style={{ color: colors.secondary }}>
               {completedCount} of {sections.length} sections complete
             </Text>
-            <View className="flex-1 h-2 rounded-full ml-3" style={{ backgroundColor: colors.sand }}>
+            <View className="flex-1 h-2 rounded-full ml-3" style={{ backgroundColor: colors.backgroundSecondary }}>
               <View
                 className="h-full rounded-full"
                 style={{
-                  backgroundColor: colors.sage,
+                  backgroundColor: colors.primary,
                   width: `${(completedCount / sections.length) * 100}%`,
                 }}
               />
@@ -302,25 +293,25 @@ export default function AgreementPreviewScreen() {
 
         {/* Parties */}
         {agreement.family_file && (
-          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: "white" }}>
-            <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+          <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.background }}>
+            <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
               Parties to this Agreement
             </Text>
             <View className="flex-row">
               <View className="flex-1">
-                <Text className="text-xs mb-1" style={{ color: "#9CA3AF" }}>
+                <Text className="text-xs mb-1" style={{ color: colors.textMuted }}>
                   PARENT A
                 </Text>
-                <Text className="font-medium" style={{ color: colors.slate }}>
+                <Text className="font-medium" style={{ color: colors.secondary }}>
                   {agreement.family_file.parent_a?.first_name}{" "}
                   {agreement.family_file.parent_a?.last_name}
                 </Text>
               </View>
               <View className="flex-1">
-                <Text className="text-xs mb-1" style={{ color: "#9CA3AF" }}>
+                <Text className="text-xs mb-1" style={{ color: colors.textMuted }}>
                   PARENT B
                 </Text>
-                <Text className="font-medium" style={{ color: colors.slate }}>
+                <Text className="font-medium" style={{ color: colors.secondary }}>
                   {agreement.family_file.parent_b?.first_name}{" "}
                   {agreement.family_file.parent_b?.last_name}
                 </Text>
@@ -335,30 +326,30 @@ export default function AgreementPreviewScreen() {
             key={section.id}
             className="rounded-xl p-4 mb-4"
             style={{
-              backgroundColor: "white",
+              backgroundColor: colors.background,
               borderWidth: selectedSectionIndex === index ? 2 : 0,
-              borderColor: colors.sage,
+              borderColor: colors.primary,
             }}
           >
             {/* Section Header */}
-            <View className="flex-row items-center justify-between mb-3 pb-3 border-b" style={{ borderBottomColor: colors.sand }}>
+            <View className="flex-row items-center justify-between mb-3 pb-3 border-b" style={{ borderBottomColor: colors.backgroundSecondary }}>
               <View className="flex-row items-center">
                 <View
                   className="w-8 h-8 rounded-full items-center justify-center mr-3"
-                  style={{ backgroundColor: section.is_completed ? `${colors.sage}20` : colors.sand }}
+                  style={{ backgroundColor: section.is_completed ? `${colors.primary}20` : colors.backgroundSecondary }}
                 >
                   <Text
                     className="font-bold"
-                    style={{ color: section.is_completed ? colors.sage : colors.slate }}
+                    style={{ color: section.is_completed ? colors.primary : colors.secondary }}
                   >
                     {section.section_number}
                   </Text>
                 </View>
                 <View>
-                  <Text className="font-semibold" style={{ color: colors.slate }}>
+                  <Text className="font-semibold" style={{ color: colors.secondary }}>
                     {section.section_title}
                   </Text>
-                  <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+                  <Text className="text-xs" style={{ color: colors.textMuted }}>
                     {section.section_type.replace(/_/g, " ")}
                   </Text>
                 </View>
@@ -366,12 +357,12 @@ export default function AgreementPreviewScreen() {
               <View
                 className="px-2 py-1 rounded-full"
                 style={{
-                  backgroundColor: section.is_completed ? `${colors.sage}20` : `${colors.amber}20`,
+                  backgroundColor: section.is_completed ? `${colors.primary}20` : `${colors.accent}20`,
                 }}
               >
                 <Text
                   className="text-xs font-medium"
-                  style={{ color: section.is_completed ? colors.sage : colors.amber }}
+                  style={{ color: section.is_completed ? colors.primary : colors.accent }}
                 >
                   {section.is_completed ? "Complete" : "Incomplete"}
                 </Text>
@@ -380,19 +371,19 @@ export default function AgreementPreviewScreen() {
 
             {/* Section Content */}
             {section.content ? (
-              <Text className="leading-6" style={{ color: colors.slate }}>
+              <Text className="leading-6" style={{ color: colors.secondary }}>
                 {section.content}
               </Text>
             ) : (
               <View className="py-4 items-center">
-                <Ionicons name="document-text-outline" size={32} color="#9CA3AF" />
-                <Text className="mt-2 text-sm" style={{ color: "#9CA3AF" }}>
+                <Ionicons name="document-text-outline" size={32} color={colors.textMuted} />
+                <Text className="mt-2 text-sm" style={{ color: colors.textMuted }}>
                   No content added yet
                 </Text>
                 {agreement.status === "draft" && (
                   <TouchableOpacity
                     className="mt-3 px-4 py-2 rounded-lg"
-                    style={{ backgroundColor: colors.sage }}
+                    style={{ backgroundColor: colors.primary }}
                     onPress={() => router.push(`/agreements/${id}/sections/${section.id}`)}
                   >
                     <Text className="text-white font-medium">Add Content</Text>
@@ -404,14 +395,14 @@ export default function AgreementPreviewScreen() {
         ))}
 
         {/* Footer */}
-        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: colors.sand }}>
+        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: colors.backgroundSecondary }}>
           <View className="flex-row items-start">
-            <Ionicons name="information-circle" size={20} color={colors.sage} />
+            <Ionicons name="information-circle" size={20} color={colors.primary} />
             <View className="flex-1 ml-3">
-              <Text className="font-medium mb-1" style={{ color: colors.slate }}>
+              <Text className="font-medium mb-1" style={{ color: colors.secondary }}>
                 About This Agreement
               </Text>
-              <Text className="text-sm" style={{ color: colors.slate }}>
+              <Text className="text-sm" style={{ color: colors.secondary }}>
                 This agreement was created on {formatDate(agreement.created_at)}.
                 {agreement.effective_date &&
                   ` It becomes effective on ${formatDate(agreement.effective_date)}.`}
@@ -426,7 +417,7 @@ export default function AgreementPreviewScreen() {
         {agreement.status === "draft" && (
           <TouchableOpacity
             className="py-4 rounded-xl items-center flex-row justify-center mb-6"
-            style={{ backgroundColor: colors.sage }}
+            style={{ backgroundColor: colors.primary }}
             onPress={() => router.back()}
           >
             <Ionicons name="create" size={20} color="white" />

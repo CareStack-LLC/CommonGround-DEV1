@@ -3,26 +3,22 @@
  */
 
 import { Stack } from "expo-router";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  slate: "#475569",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 export default function AgreementDetailLayout() {
+  const { colors } = useTheme();
+
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: cream,
+          backgroundColor: colors.surfaceElevated,
         },
         headerTitleStyle: {
-          color: colors.slate,
+          color: colors.secondary,
           fontWeight: "600",
         },
-        headerTintColor: colors.sage,
+        headerTintColor: colors.primary,
         headerShadowVisible: false,
       }}
     >
@@ -49,5 +45,3 @@ export default function AgreementDetailLayout() {
     </Stack>
   );
 }
-
-const cream = "#FFFBF5";

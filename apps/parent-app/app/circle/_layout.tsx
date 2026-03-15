@@ -3,15 +3,10 @@
  */
 
 import { Stack } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useTheme } from "@/theme";
 
 export default function CircleLayout() {
-  const colorScheme = useColorScheme();
-
-  const colors = {
-    background: colorScheme === "dark" ? "#0f172a" : "#ffffff",
-    text: colorScheme === "dark" ? "#ffffff" : "#0f172a",
-  };
+  const { colors } = useTheme();
 
   return (
     <Stack
@@ -23,7 +18,7 @@ export default function CircleLayout() {
           color: colors.text,
           fontWeight: "600",
         },
-        headerTintColor: "#2563eb",
+        headerTintColor: colors.primary,
         headerBackTitle: "Back",
       }}
     >

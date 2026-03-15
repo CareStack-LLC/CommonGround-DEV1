@@ -1,15 +1,18 @@
 import { Stack } from "expo-router";
+import { useTheme } from "@/theme";
 
 export default function FamilyLayout() {
+  const { colors } = useTheme();
+
   return (
     <Stack
       screenOptions={{
-        headerTintColor: "#4A6C58", // Sage
+        headerTintColor: colors.primary,
         headerStyle: {
-          backgroundColor: "#FFFBF5", // Cream
+          backgroundColor: colors.surfaceElevated,
         },
         headerTitleStyle: {
-          color: "#475569", // Slate
+          color: colors.secondary,
           fontWeight: "600",
         },
         headerShadowVisible: false,

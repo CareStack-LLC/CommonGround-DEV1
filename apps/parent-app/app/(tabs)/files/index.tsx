@@ -8,19 +8,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 
 import { useFamilyFile } from "@/hooks/useFamilyFile";
-
-// CommonGround Design System Colors
-const SAGE = "#4A6C58";
-const SAGE_LIGHT = "#E8F0EB";
-const SLATE = "#475569";
-const SLATE_LIGHT = "#94A3B8";
-const AMBER = "#D4A574";
-const AMBER_LIGHT = "#FEF3E2";
-const SAND = "#F5F0E8";
-const CREAM = "#FFFBF5";
-const WHITE = "#FFFFFF";
+import { useTheme } from "@/theme";
 
 export default function FamilyFilesScreen() {
+  const { colors } = useTheme();
   const { familyFile, children, isLoading, error, refresh } = useFamilyFile();
 
   // Convert single family file to array for display
@@ -58,31 +49,31 @@ export default function FamilyFilesScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: CREAM, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size="large" color={SAGE} />
-        <Text style={{ marginTop: 16, color: SLATE, fontWeight: "500" }}>Loading your family files...</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={{ marginTop: 16, color: colors.secondary, fontWeight: "500" }}>Loading your family files...</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: CREAM }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["top"]}>
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
-          <RefreshControl refreshing={false} onRefresh={refresh} tintColor={SAGE} />
+          <RefreshControl refreshing={false} onRefresh={refresh} tintColor={colors.primary} />
         }
       >
         {/* Header */}
         <View style={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 8 }}>
-          <Text style={{ fontSize: 14, color: SLATE_LIGHT, marginBottom: 4, fontWeight: "500" }}>
+          <Text style={{ fontSize: 14, color: colors.textMuted, marginBottom: 4, fontWeight: "500" }}>
             {getGreeting()}
           </Text>
-          <Text style={{ fontSize: 32, fontWeight: "700", color: SLATE, marginBottom: 4 }}>
+          <Text style={{ fontSize: 32, fontWeight: "700", color: colors.secondary, marginBottom: 4 }}>
             Family Files
           </Text>
-          <Text style={{ fontSize: 15, color: SLATE_LIGHT, fontWeight: "500" }}>
+          <Text style={{ fontSize: 15, color: colors.textMuted, fontWeight: "500" }}>
             Manage your co-parenting arrangements
           </Text>
         </View>
@@ -91,13 +82,13 @@ export default function FamilyFilesScreen() {
         <View style={{ paddingHorizontal: 20, paddingVertical: 16 }}>
           <TouchableOpacity
             style={{
-              backgroundColor: SAGE,
+              backgroundColor: colors.primary,
               borderRadius: 12,
               paddingVertical: 16,
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              shadowColor: SAGE,
+              shadowColor: colors.primary,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.3,
               shadowRadius: 8,
@@ -105,8 +96,8 @@ export default function FamilyFilesScreen() {
             }}
             onPress={() => router.push("/(tabs)/files/create")}
           >
-            <Ionicons name="add" size={20} color={WHITE} />
-            <Text style={{ color: WHITE, fontSize: 16, fontWeight: "600", marginLeft: 8 }}>
+            <Ionicons name="add" size={20} color={colors.textInverse} />
+            <Text style={{ color: colors.textInverse, fontSize: 16, fontWeight: "600", marginLeft: 8 }}>
               New Family File
             </Text>
           </TouchableOpacity>
@@ -135,21 +126,21 @@ export default function FamilyFilesScreen() {
               width: 40,
               height: 40,
               borderRadius: 12,
-              backgroundColor: SAGE_LIGHT,
+              backgroundColor: colors.primaryLight,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 12,
             }}>
-              <Ionicons name="folder-open-outline" size={20} color={SAGE} />
+              <Ionicons name="folder-open-outline" size={20} color={colors.primary} />
             </View>
-            <Text style={{ fontSize: 20, fontWeight: "600", color: SLATE }}>
+            <Text style={{ fontSize: 20, fontWeight: "600", color: colors.secondary }}>
               Your Family Files
             </Text>
           </View>
 
           {familyFiles.length === 0 ? (
             <View style={{
-              backgroundColor: WHITE,
+              backgroundColor: colors.cardBackground,
               borderRadius: 16,
               padding: 32,
               alignItems: "center",
@@ -163,17 +154,17 @@ export default function FamilyFilesScreen() {
                 width: 64,
                 height: 64,
                 borderRadius: 32,
-                backgroundColor: SAND,
+                backgroundColor: colors.backgroundSecondary,
                 alignItems: "center",
                 justifyContent: "center",
                 marginBottom: 16,
               }}>
-                <Ionicons name="folder-outline" size={32} color={SAGE} />
+                <Ionicons name="folder-outline" size={32} color={colors.primary} />
               </View>
-              <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE, marginBottom: 8 }}>
+              <Text style={{ fontSize: 18, fontWeight: "600", color: colors.secondary, marginBottom: 8 }}>
                 No Family Files Yet
               </Text>
-              <Text style={{ fontSize: 14, color: SLATE_LIGHT, textAlign: "center", paddingHorizontal: 16 }}>
+              <Text style={{ fontSize: 14, color: colors.textMuted, textAlign: "center", paddingHorizontal: 16 }}>
                 Create a family file to start managing custody schedules, expenses, and communication.
               </Text>
             </View>
@@ -183,11 +174,11 @@ export default function FamilyFilesScreen() {
                 <TouchableOpacity
                   key={file.id}
                   style={{
-                    backgroundColor: WHITE,
+                    backgroundColor: colors.cardBackground,
                     borderRadius: 16,
                     padding: 16,
                     borderWidth: 2,
-                    borderColor: SAND,
+                    borderColor: colors.backgroundSecondary,
                     shadowColor: "#000",
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.08,
@@ -203,19 +194,19 @@ export default function FamilyFilesScreen() {
                       width: 48,
                       height: 48,
                       borderRadius: 12,
-                      backgroundColor: SAGE_LIGHT,
+                      backgroundColor: colors.primaryLight,
                       borderWidth: 2,
-                      borderColor: SAGE,
+                      borderColor: colors.primary,
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
-                      <Ionicons name="folder-open-outline" size={24} color={SAGE} />
+                      <Ionicons name="folder-open-outline" size={24} color={colors.primary} />
                     </View>
                     <View style={{ flex: 1, marginLeft: 12 }}>
-                      <Text style={{ fontSize: 18, fontWeight: "700", color: SLATE }}>
+                      <Text style={{ fontSize: 18, fontWeight: "700", color: colors.secondary }}>
                         {getDisplayName(file)}
                       </Text>
-                      <Text style={{ fontSize: 13, color: SLATE_LIGHT, marginTop: 2, fontWeight: "500" }}>
+                      <Text style={{ fontSize: 13, color: colors.textMuted, marginTop: 2, fontWeight: "500" }}>
                         {file.family_file_number || "FF-000000"}
                       </Text>
                     </View>
@@ -226,17 +217,17 @@ export default function FamilyFilesScreen() {
                       paddingHorizontal: 10,
                       paddingVertical: 4,
                       borderRadius: 20,
-                      backgroundColor: isActive(file) ? SAGE_LIGHT : AMBER_LIGHT,
+                      backgroundColor: isActive(file) ? colors.primaryLight : colors.accentLight,
                     }}>
                       <Ionicons
                         name={isActive(file) ? "checkmark-circle" : "time"}
                         size={14}
-                        color={isActive(file) ? SAGE : AMBER}
+                        color={isActive(file) ? colors.primary : colors.accent}
                       />
                       <Text style={{
                         fontSize: 12,
                         fontWeight: "600",
-                        color: isActive(file) ? SAGE : AMBER,
+                        color: isActive(file) ? colors.primary : colors.accent,
                         marginLeft: 4,
                       }}>
                         {isActive(file) ? "Active" : "Pending"}
@@ -250,10 +241,10 @@ export default function FamilyFilesScreen() {
                     alignItems: "center",
                     paddingBottom: 12,
                     borderBottomWidth: 1,
-                    borderBottomColor: SAND,
+                    borderBottomColor: colors.backgroundSecondary,
                   }}>
-                    <Ionicons name="people-outline" size={16} color={SLATE_LIGHT} />
-                    <Text style={{ fontSize: 14, color: SLATE, marginLeft: 8, fontWeight: "500" }}>
+                    <Ionicons name="people-outline" size={16} color={colors.textMuted} />
+                    <Text style={{ fontSize: 14, color: colors.secondary, marginLeft: 8, fontWeight: "500" }}>
                       {getRoleName(file.parent_a_role)}
                       {file.parent_b_id && ` & ${getRoleName(file.parent_b_role)}`}
                     </Text>
@@ -266,8 +257,8 @@ export default function FamilyFilesScreen() {
                       alignItems: "center",
                       marginTop: 12,
                     }}>
-                      <Ionicons name="location-outline" size={16} color={SLATE_LIGHT} />
-                      <Text style={{ fontSize: 14, color: SLATE_LIGHT, marginLeft: 8, fontWeight: "500" }}>
+                      <Ionicons name="location-outline" size={16} color={colors.textMuted} />
+                      <Text style={{ fontSize: 14, color: colors.textMuted, marginLeft: 8, fontWeight: "500" }}>
                         {file.county && `${file.county}, `}{file.state}
                       </Text>
                     </View>
@@ -282,10 +273,10 @@ export default function FamilyFilesScreen() {
                         paddingHorizontal: 10,
                         paddingVertical: 6,
                         borderRadius: 8,
-                        backgroundColor: SAGE_LIGHT,
+                        backgroundColor: colors.primaryLight,
                       }}>
-                        <Ionicons name="document-text" size={14} color={SAGE} />
-                        <Text style={{ fontSize: 12, fontWeight: "600", color: SAGE, marginLeft: 4 }}>
+                        <Ionicons name="document-text" size={14} color={colors.primary} />
+                        <Text style={{ fontSize: 12, fontWeight: "600", color: colors.primary, marginLeft: 4 }}>
                           SharedCare
                         </Text>
                       </View>
@@ -296,10 +287,10 @@ export default function FamilyFilesScreen() {
                       paddingHorizontal: 10,
                       paddingVertical: 6,
                       borderRadius: 8,
-                      backgroundColor: AMBER_LIGHT,
+                      backgroundColor: colors.accentLight,
                     }}>
-                      <Ionicons name="flash" size={14} color={AMBER} />
-                      <Text style={{ fontSize: 12, fontWeight: "600", color: AMBER, marginLeft: 4 }}>
+                      <Ionicons name="flash" size={14} color={colors.accent} />
+                      <Text style={{ fontSize: 12, fontWeight: "600", color: colors.accent, marginLeft: 4 }}>
                         QuickAccord
                       </Text>
                     </View>

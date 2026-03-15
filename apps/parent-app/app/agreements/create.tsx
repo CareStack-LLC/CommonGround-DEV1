@@ -15,17 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 interface Message {
   role: "user" | "assistant";
@@ -50,6 +40,7 @@ const AGREEMENT_TYPES = [
 ];
 
 export default function CreateAgreementScreen() {
+  const { colors } = useTheme();
   const { familyId } = useLocalSearchParams<{ familyId: string }>();
   const { token } = useAuth();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -237,13 +228,13 @@ export default function CreateAgreementScreen() {
   // Type Selection Screen
   if (step === "type") {
     return (
-      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
         <ScrollView className="flex-1" contentContainerStyle={{ padding: 20 }}>
           <View className="mb-6">
-            <Text className="text-2xl font-bold mb-2" style={{ color: colors.slate }}>
+            <Text className="text-2xl font-bold mb-2" style={{ color: colors.secondary }}>
               Choose Agreement Type
             </Text>
-            <Text style={{ color: colors.slate }}>
+            <Text style={{ color: colors.secondary }}>
               Select the type of agreement that best fits your situation.
               ARIA will guide you through creating it conversationally.
             </Text>
@@ -254,45 +245,45 @@ export default function CreateAgreementScreen() {
               <TouchableOpacity
                 key={type.id}
                 className="rounded-xl p-5"
-                style={{ backgroundColor: "white" }}
+                style={{ backgroundColor: colors.background }}
                 onPress={() => startAgreement(type.id)}
               >
                 <View className="flex-row items-start">
                   <View
                     className="w-14 h-14 rounded-full items-center justify-center"
-                    style={{ backgroundColor: `${colors.sage}20` }}
+                    style={{ backgroundColor: `${colors.primary}20` }}
                   >
-                    <Ionicons name={type.icon as any} size={28} color={colors.sage} />
+                    <Ionicons name={type.icon as any} size={28} color={colors.primary} />
                   </View>
                   <View className="flex-1 ml-4">
-                    <Text className="font-semibold text-lg mb-1" style={{ color: colors.slate }}>
+                    <Text className="font-semibold text-lg mb-1" style={{ color: colors.secondary }}>
                       {type.title}
                     </Text>
-                    <Text className="text-sm mb-2" style={{ color: colors.slate }}>
+                    <Text className="text-sm mb-2" style={{ color: colors.secondary }}>
                       {type.description}
                     </Text>
                     <View className="flex-row items-center">
-                      <Ionicons name="layers-outline" size={14} color={colors.sage} />
-                      <Text className="ml-1 text-xs font-medium" style={{ color: colors.sage }}>
+                      <Ionicons name="layers-outline" size={14} color={colors.primary} />
+                      <Text className="ml-1 text-xs font-medium" style={{ color: colors.primary }}>
                         {type.sections} sections
                       </Text>
                     </View>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color={colors.slate} />
+                  <Ionicons name="chevron-forward" size={20} color={colors.secondary} />
                 </View>
               </TouchableOpacity>
             ))}
           </View>
 
           {/* Info Box */}
-          <View className="rounded-xl p-4 mt-6" style={{ backgroundColor: `${colors.amber}20` }}>
+          <View className="rounded-xl p-4 mt-6" style={{ backgroundColor: `${colors.accent}20` }}>
             <View className="flex-row items-start">
-              <Ionicons name="information-circle" size={20} color={colors.amber} />
+              <Ionicons name="information-circle" size={20} color={colors.accent} />
               <View className="flex-1 ml-3">
-                <Text className="font-medium mb-1" style={{ color: colors.slate }}>
+                <Text className="font-medium mb-1" style={{ color: colors.secondary }}>
                   How it works
                 </Text>
-                <Text className="text-sm" style={{ color: colors.slate }}>
+                <Text className="text-sm" style={{ color: colors.secondary }}>
                   ARIA will have a natural conversation with you about your co-parenting
                   arrangement. Based on your discussion, it will automatically populate
                   the agreement sections. You can always edit sections manually afterward.
@@ -307,7 +298,7 @@ export default function CreateAgreementScreen() {
 
   // Chat Screen
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -315,19 +306,19 @@ export default function CreateAgreementScreen() {
       >
         {/* Progress Bar */}
         {completionPercentage > 0 && (
-          <View className="px-4 py-2 border-b" style={{ borderBottomColor: colors.sand }}>
+          <View className="px-4 py-2 border-b" style={{ borderBottomColor: colors.backgroundSecondary }}>
             <View className="flex-row items-center justify-between mb-1">
-              <Text className="text-sm font-medium" style={{ color: colors.slate }}>
+              <Text className="text-sm font-medium" style={{ color: colors.secondary }}>
                 Agreement Progress
               </Text>
-              <Text className="text-sm font-medium" style={{ color: colors.sage }}>
+              <Text className="text-sm font-medium" style={{ color: colors.primary }}>
                 {completionPercentage}%
               </Text>
             </View>
-            <View className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: colors.sand }}>
+            <View className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: colors.backgroundSecondary }}>
               <View
                 className="h-full rounded-full"
-                style={{ backgroundColor: colors.sage, width: `${completionPercentage}%` }}
+                style={{ backgroundColor: colors.primary, width: `${completionPercentage}%` }}
               />
             </View>
           </View>
@@ -341,8 +332,8 @@ export default function CreateAgreementScreen() {
         >
           {loading && messages.length === 0 ? (
             <View className="items-center py-12">
-              <ActivityIndicator size="large" color={colors.sage} />
-              <Text className="mt-4" style={{ color: colors.slate }}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text className="mt-4" style={{ color: colors.secondary }}>
                 Starting conversation with ARIA...
               </Text>
             </View>
@@ -352,14 +343,14 @@ export default function CreateAgreementScreen() {
               <View className="items-center mb-6">
                 <View
                   className="w-16 h-16 rounded-full items-center justify-center mb-3"
-                  style={{ backgroundColor: colors.sage }}
+                  style={{ backgroundColor: colors.primary }}
                 >
                   <Text className="text-white text-2xl font-bold">A</Text>
                 </View>
-                <Text className="font-semibold" style={{ color: colors.slate }}>
+                <Text className="font-semibold" style={{ color: colors.secondary }}>
                   ARIA
                 </Text>
-                <Text className="text-xs text-center px-8" style={{ color: colors.slate }}>
+                <Text className="text-xs text-center px-8" style={{ color: colors.secondary }}>
                   I'll help you create your agreement through conversation
                 </Text>
               </View>
@@ -373,12 +364,12 @@ export default function CreateAgreementScreen() {
                   <View
                     className="rounded-2xl px-4 py-3 max-w-[85%]"
                     style={{
-                      backgroundColor: msg.role === "user" ? colors.sage : "white",
+                      backgroundColor: msg.role === "user" ? colors.primary : "white",
                       borderBottomRightRadius: msg.role === "user" ? 4 : 16,
                       borderBottomLeftRadius: msg.role === "assistant" ? 4 : 16,
                     }}
                   >
-                    <Text style={{ color: msg.role === "user" ? "white" : colors.slate }}>
+                    <Text style={{ color: msg.role === "user" ? "white" : colors.secondary }}>
                       {msg.content}
                     </Text>
                   </View>
@@ -388,7 +379,7 @@ export default function CreateAgreementScreen() {
               {/* Typing Indicator */}
               {sending && (
                 <View className="items-start mb-3">
-                  <View className="rounded-2xl px-4 py-3" style={{ backgroundColor: "white" }}>
+                  <View className="rounded-2xl px-4 py-3" style={{ backgroundColor: colors.background }}>
                     <View className="flex-row items-center">
                       <View className="w-2 h-2 rounded-full bg-gray-400 mr-1" />
                       <View className="w-2 h-2 rounded-full bg-gray-400 mr-1" />
@@ -406,7 +397,7 @@ export default function CreateAgreementScreen() {
           <View className="px-4 py-2">
             <TouchableOpacity
               className="py-4 rounded-xl items-center flex-row justify-center"
-              style={{ backgroundColor: colors.sage }}
+              style={{ backgroundColor: colors.primary }}
               onPress={finalizeAgreement}
               disabled={loading}
             >
@@ -421,7 +412,7 @@ export default function CreateAgreementScreen() {
                 </>
               )}
             </TouchableOpacity>
-            <Text className="text-xs text-center mt-2" style={{ color: colors.slate }}>
+            <Text className="text-xs text-center mt-2" style={{ color: colors.secondary }}>
               You can continue chatting or create the draft now
             </Text>
           </View>
@@ -430,13 +421,13 @@ export default function CreateAgreementScreen() {
         {/* Input Area */}
         <View
           className="flex-row items-end px-4 py-3 border-t"
-          style={{ backgroundColor: "white", borderTopColor: colors.sand }}
+          style={{ backgroundColor: colors.background, borderTopColor: colors.backgroundSecondary }}
         >
           <TextInput
             className="flex-1 rounded-2xl px-4 py-3 mr-2"
-            style={{ backgroundColor: colors.sand, color: colors.slate, maxHeight: 100 }}
+            style={{ backgroundColor: colors.backgroundSecondary, color: colors.secondary, maxHeight: 100 }}
             placeholder="Describe your situation..."
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={colors.inputPlaceholder}
             value={inputText}
             onChangeText={setInputText}
             multiline
@@ -444,14 +435,14 @@ export default function CreateAgreementScreen() {
           />
           <TouchableOpacity
             className="w-12 h-12 rounded-full items-center justify-center"
-            style={{ backgroundColor: inputText.trim() ? colors.sage : colors.sand }}
+            style={{ backgroundColor: inputText.trim() ? colors.primary : colors.backgroundSecondary }}
             onPress={sendMessage}
             disabled={!inputText.trim() || loading || sending}
           >
             <Ionicons
               name="send"
               size={20}
-              color={inputText.trim() ? "white" : colors.slate}
+              color={inputText.trim() ? "white" : colors.secondary}
             />
           </TouchableOpacity>
         </View>

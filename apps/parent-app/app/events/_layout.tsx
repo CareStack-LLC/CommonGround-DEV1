@@ -4,23 +4,19 @@
  */
 
 import { Stack } from "expo-router";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  slate: "#475569",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 export default function EventsLayout() {
+  const { colors } = useTheme();
+
   return (
     <Stack
       screenOptions={{
         headerShown: true,
         headerBackTitle: "Back",
-        headerTintColor: colors.sage,
-        headerStyle: { backgroundColor: colors.cream },
-        headerTitleStyle: { color: colors.slate },
+        headerTintColor: colors.primary,
+        headerStyle: { backgroundColor: colors.surfaceElevated },
+        headerTitleStyle: { color: colors.secondary },
       }}
     >
       <Stack.Screen

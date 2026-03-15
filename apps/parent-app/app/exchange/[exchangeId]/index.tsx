@@ -32,24 +32,10 @@ import {
   type CustodyExchange,
 } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  amberLight: "#FEF7ED",
-  amberBorder: "#E8C4A0",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-  white: "#FFFFFF",
-  green: "#22C55E",
-  red: "#EF4444",
-  yellow: "#F59E0B",
-};
+import { useTheme } from "@/theme";
 
 export default function ExchangeDetailScreen() {
+  const { colors } = useTheme();
   const { exchangeId } = useLocalSearchParams<{ exchangeId: string }>();
   const { user } = useAuth();
 
@@ -210,8 +196,8 @@ export default function ExchangeDetailScreen() {
     if (!exchange) return null;
 
     const status = exchange.status;
-    let bgColor = colors.sand;
-    let textColor = colors.slate;
+    let bgColor = colors.backgroundSecondary;
+    let textColor = colors.secondary;
     let label = "Scheduled";
 
     switch (status) {
@@ -257,12 +243,37 @@ export default function ExchangeDetailScreen() {
     );
   };
 
+  const ExchangeHeader = () => (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.backgroundSecondary,
+        backgroundColor: colors.background,
+      }}
+    >
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={{ flexDirection: "row", alignItems: "center" }}
+      >
+        <Ionicons name="chevron-back" size={24} color={colors.primary} />
+        <Text style={{ color: colors.primary, fontSize: 16, marginLeft: 4 }}>Back</Text>
+      </TouchableOpacity>
+      <Text style={{ fontSize: 17, fontWeight: "600", color: colors.secondary }}>Exchange</Text>
+      <View style={{ width: 60 }} />
+    </View>
+  );
+
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.cream }} edges={["top"]}>
-        <Header />
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["top"]}>
+        <ExchangeHeader />
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <ActivityIndicator size="large" color={colors.sage} />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </SafeAreaView>
     );
@@ -270,25 +281,25 @@ export default function ExchangeDetailScreen() {
 
   if (!exchange) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.cream }} edges={["top"]}>
-        <Header />
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["top"]}>
+        <ExchangeHeader />
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-          <Ionicons name="swap-horizontal-outline" size={64} color="#94a3b8" />
-          <Text style={{ color: "#64748B", marginTop: 16 }}>Exchange not found</Text>
+          <Ionicons name="swap-horizontal-outline" size={64} color={colors.textMuted} />
+          <Text style={{ color: colors.textMuted, marginTop: 16 }}>Exchange not found</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.cream }} edges={["top"]}>
-      <Header />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["top"]}>
+      <ExchangeHeader />
 
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 40 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.sage} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         {/* Header Banner */}
@@ -298,7 +309,7 @@ export default function ExchangeDetailScreen() {
             marginTop: 16,
             padding: 20,
             borderRadius: 20,
-            backgroundColor: colors.amber,
+            backgroundColor: colors.accent,
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
@@ -351,7 +362,7 @@ export default function ExchangeDetailScreen() {
           style={{
             marginHorizontal: 16,
             marginTop: 16,
-            backgroundColor: colors.white,
+            backgroundColor: colors.background,
             borderRadius: 16,
             padding: 16,
           }}
@@ -362,16 +373,16 @@ export default function ExchangeDetailScreen() {
                 width: 48,
                 height: 48,
                 borderRadius: 12,
-                backgroundColor: colors.amberLight,
+                backgroundColor: colors.accentLight,
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <Ionicons name="calendar" size={24} color={colors.amber} />
+              <Ionicons name="calendar" size={24} color={colors.accent} />
             </View>
             <View style={{ flex: 1, marginLeft: 16 }}>
-              <Text style={{ color: "#64748B", fontSize: 13 }}>When</Text>
-              <Text style={{ color: colors.slate, fontSize: 16, fontWeight: "600", marginTop: 2 }}>
+              <Text style={{ color: colors.textMuted, fontSize: 13 }}>When</Text>
+              <Text style={{ color: colors.secondary, fontSize: 16, fontWeight: "600", marginTop: 2 }}>
                 {formatDateTime(exchange.scheduled_at)}
               </Text>
             </View>
@@ -386,11 +397,11 @@ export default function ExchangeDetailScreen() {
                 marginTop: 12,
                 paddingTop: 12,
                 borderTopWidth: 1,
-                borderTopColor: colors.sand,
+                borderTopColor: colors.backgroundSecondary,
               }}
             >
-              <Ionicons name="time" size={16} color="#64748B" />
-              <Text style={{ color: "#64748B", fontSize: 13, marginLeft: 8 }}>
+              <Ionicons name="time" size={16} color={colors.textMuted} />
+              <Text style={{ color: colors.textMuted, fontSize: 13, marginLeft: 8 }}>
                 Check-in window: {exchange.check_in_window_before_minutes || 30} min before to{" "}
                 {exchange.check_in_window_after_minutes || 30} min after
               </Text>
@@ -404,7 +415,7 @@ export default function ExchangeDetailScreen() {
             style={{
               marginHorizontal: 16,
               marginTop: 12,
-              backgroundColor: colors.white,
+              backgroundColor: colors.background,
               borderRadius: 16,
               padding: 16,
             }}
@@ -415,20 +426,20 @@ export default function ExchangeDetailScreen() {
                   width: 48,
                   height: 48,
                   borderRadius: 12,
-                  backgroundColor: colors.amberLight,
+                  backgroundColor: colors.accentLight,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <Ionicons name="location" size={24} color={colors.amber} />
+                <Ionicons name="location" size={24} color={colors.accent} />
               </View>
               <View style={{ flex: 1, marginLeft: 16 }}>
-                <Text style={{ color: "#64748B", fontSize: 13 }}>Where</Text>
-                <Text style={{ color: colors.slate, fontSize: 16, fontWeight: "600", marginTop: 2 }}>
+                <Text style={{ color: colors.textMuted, fontSize: 13 }}>Where</Text>
+                <Text style={{ color: colors.secondary, fontSize: 16, fontWeight: "600", marginTop: 2 }}>
                   {exchange.location_name}
                 </Text>
                 {exchange.location_address && (
-                  <Text style={{ color: "#64748B", fontSize: 14, marginTop: 4 }}>
+                  <Text style={{ color: colors.textMuted, fontSize: 14, marginTop: 4 }}>
                     {exchange.location_address}
                   </Text>
                 )}
@@ -437,13 +448,13 @@ export default function ExchangeDetailScreen() {
                 <TouchableOpacity
                   onPress={openInMaps}
                   style={{
-                    backgroundColor: colors.sand,
+                    backgroundColor: colors.backgroundSecondary,
                     paddingHorizontal: 12,
                     paddingVertical: 8,
                     borderRadius: 10,
                   }}
                 >
-                  <Ionicons name="navigate" size={20} color={colors.sage} />
+                  <Ionicons name="navigate" size={20} color={colors.primary} />
                 </TouchableOpacity>
               )}
             </View>
@@ -457,11 +468,11 @@ export default function ExchangeDetailScreen() {
                   marginTop: 12,
                   paddingTop: 12,
                   borderTopWidth: 1,
-                  borderTopColor: colors.sand,
+                  borderTopColor: colors.backgroundSecondary,
                 }}
               >
-                <Ionicons name="radio-button-on" size={16} color={colors.sage} />
-                <Text style={{ color: "#64748B", fontSize: 13, marginLeft: 8 }}>
+                <Ionicons name="radio-button-on" size={16} color={colors.primary} />
+                <Text style={{ color: colors.textMuted, fontSize: 13, marginLeft: 8 }}>
                   GPS verification radius: {exchange.geofence_radius_meters}m
                 </Text>
               </View>
@@ -475,7 +486,7 @@ export default function ExchangeDetailScreen() {
             style={{
               marginHorizontal: 16,
               marginTop: 12,
-              backgroundColor: colors.white,
+              backgroundColor: colors.background,
               borderRadius: 16,
               padding: 16,
             }}
@@ -486,16 +497,16 @@ export default function ExchangeDetailScreen() {
                   width: 48,
                   height: 48,
                   borderRadius: 12,
-                  backgroundColor: "#E8F0EC",
+                  backgroundColor: colors.primaryLight,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
               >
-                <Ionicons name="repeat" size={24} color={colors.sage} />
+                <Ionicons name="repeat" size={24} color={colors.primary} />
               </View>
               <View style={{ flex: 1, marginLeft: 16 }}>
-                <Text style={{ color: "#64748B", fontSize: 13 }}>Recurrence</Text>
-                <Text style={{ color: colors.slate, fontSize: 16, fontWeight: "600", marginTop: 2 }}>
+                <Text style={{ color: colors.textMuted, fontSize: 13 }}>Recurrence</Text>
+                <Text style={{ color: colors.secondary, fontSize: 16, fontWeight: "600", marginTop: 2 }}>
                   {exchange.recurrence_pattern === "weekly"
                     ? "Every week"
                     : exchange.recurrence_pattern === "biweekly"
@@ -511,15 +522,15 @@ export default function ExchangeDetailScreen() {
 
         {/* Features */}
         <View style={{ marginHorizontal: 16, marginTop: 16 }}>
-          <Text style={{ color: colors.slate, fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
+          <Text style={{ color: colors.secondary, fontSize: 16, fontWeight: "600", marginBottom: 12 }}>
             Exchange Features
           </Text>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
             {exchange.silent_handoff_enabled && (
-              <FeatureBadge icon="navigate" label="Silent Drop GPS" color={colors.sage} />
+              <FeatureBadge icon="navigate" label="Silent Drop GPS" color={colors.primary} />
             )}
             {exchange.qr_confirmation_required && (
-              <FeatureBadge icon="qr-code" label="QR Confirmation" color={colors.amber} />
+              <FeatureBadge icon="qr-code" label="QR Confirmation" color={colors.accent} />
             )}
             {exchange.is_recurring && (
               <FeatureBadge icon="repeat" label="Recurring" color="#8B5CF6" />
@@ -537,7 +548,7 @@ export default function ExchangeDetailScreen() {
                   onPress={handleCheckIn}
                   disabled={checkingIn}
                   style={{
-                    backgroundColor: colors.sage,
+                    backgroundColor: colors.primary,
                     paddingVertical: 16,
                     borderRadius: 14,
                     flexDirection: "row",
@@ -546,11 +557,11 @@ export default function ExchangeDetailScreen() {
                   }}
                 >
                   {checkingIn ? (
-                    <ActivityIndicator color="white" size="small" />
+                    <ActivityIndicator color={colors.textInverse} size="small" />
                   ) : (
                     <>
-                      <Ionicons name="navigate" size={20} color="white" />
-                      <Text style={{ color: "white", fontSize: 16, fontWeight: "600", marginLeft: 8 }}>
+                      <Ionicons name="navigate" size={20} color={colors.textInverse} />
+                      <Text style={{ color: colors.textInverse, fontSize: 16, fontWeight: "600", marginLeft: 8 }}>
                         Check In at Location
                       </Text>
                     </>
@@ -567,14 +578,14 @@ export default function ExchangeDetailScreen() {
                         paddingVertical: 14,
                         borderRadius: 12,
                         borderWidth: 2,
-                        borderColor: colors.sage,
+                        borderColor: colors.primary,
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <Ionicons name="qr-code" size={18} color={colors.sage} />
-                      <Text style={{ color: colors.sage, fontSize: 15, fontWeight: "600", marginLeft: 8 }}>
+                      <Ionicons name="qr-code" size={18} color={colors.primary} />
+                      <Text style={{ color: colors.primary, fontSize: 15, fontWeight: "600", marginLeft: 8 }}>
                         Show QR
                       </Text>
                     </TouchableOpacity>
@@ -585,14 +596,14 @@ export default function ExchangeDetailScreen() {
                         paddingVertical: 14,
                         borderRadius: 12,
                         borderWidth: 2,
-                        borderColor: colors.sage,
+                        borderColor: colors.primary,
                         flexDirection: "row",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <Ionicons name="scan" size={18} color={colors.sage} />
-                      <Text style={{ color: colors.sage, fontSize: 15, fontWeight: "600", marginLeft: 8 }}>
+                      <Ionicons name="scan" size={18} color={colors.primary} />
+                      <Text style={{ color: colors.primary, fontSize: 15, fontWeight: "600", marginLeft: 8 }}>
                         Scan QR
                       </Text>
                     </TouchableOpacity>
@@ -602,7 +613,7 @@ export default function ExchangeDetailScreen() {
             ) : (
               <View
                 style={{
-                  backgroundColor: colors.sand,
+                  backgroundColor: colors.backgroundSecondary,
                   paddingVertical: 16,
                   borderRadius: 14,
                   flexDirection: "row",
@@ -610,8 +621,8 @@ export default function ExchangeDetailScreen() {
                   justifyContent: "center",
                 }}
               >
-                <Ionicons name="time" size={20} color="#64748B" />
-                <Text style={{ color: "#64748B", fontSize: 15, fontWeight: "500", marginLeft: 8 }}>
+                <Ionicons name="time" size={20} color={colors.textMuted} />
+                <Text style={{ color: colors.textMuted, fontSize: 15, fontWeight: "500", marginLeft: 8 }}>
                   Check-in opens {exchange.check_in_window_before_minutes || 30} min before
                 </Text>
               </View>
@@ -626,51 +637,24 @@ export default function ExchangeDetailScreen() {
             style={{
               marginHorizontal: 16,
               marginTop: 16,
-              backgroundColor: colors.white,
+              backgroundColor: colors.background,
               paddingVertical: 16,
               borderRadius: 14,
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
               borderWidth: 1,
-              borderColor: colors.sand,
+              borderColor: colors.backgroundSecondary,
             }}
           >
-            <Ionicons name="navigate-outline" size={20} color={colors.slate} />
-            <Text style={{ color: colors.slate, fontSize: 16, fontWeight: "600", marginLeft: 8 }}>
+            <Ionicons name="navigate-outline" size={20} color={colors.secondary} />
+            <Text style={{ color: colors.secondary, fontSize: 16, fontWeight: "600", marginLeft: 8 }}>
               Get Directions
             </Text>
           </TouchableOpacity>
         )}
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function Header() {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.sand,
-        backgroundColor: colors.white,
-      }}
-    >
-      <TouchableOpacity
-        onPress={() => router.back()}
-        style={{ flexDirection: "row", alignItems: "center" }}
-      >
-        <Ionicons name="chevron-back" size={24} color={colors.sage} />
-        <Text style={{ color: colors.sage, fontSize: 16, marginLeft: 4 }}>Back</Text>
-      </TouchableOpacity>
-      <Text style={{ fontSize: 17, fontWeight: "600", color: colors.slate }}>Exchange</Text>
-      <View style={{ width: 60 }} />
-    </View>
   );
 }
 

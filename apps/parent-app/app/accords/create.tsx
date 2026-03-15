@@ -15,17 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 interface Message {
   role: "user" | "assistant";
@@ -59,6 +49,7 @@ const CATEGORIES = [
 ];
 
 export default function CreateQuickAccordScreen() {
+  const { colors } = useTheme();
   const { familyId } = useLocalSearchParams<{ familyId: string }>();
   const { token, user } = useAuth();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -221,13 +212,13 @@ export default function CreateQuickAccordScreen() {
   // Category Selection Screen
   if (step === "category") {
     return (
-      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
         <ScrollView className="flex-1" contentContainerStyle={{ padding: 20 }}>
           <View className="mb-6">
-            <Text className="text-2xl font-bold mb-2" style={{ color: colors.slate }}>
+            <Text className="text-2xl font-bold mb-2" style={{ color: colors.secondary }}>
               What type of arrangement?
             </Text>
-            <Text style={{ color: colors.slate }}>
+            <Text style={{ color: colors.secondary }}>
               Select a category and ARIA will help you create a Quick Accord.
             </Text>
           </View>
@@ -237,24 +228,24 @@ export default function CreateQuickAccordScreen() {
               <TouchableOpacity
                 key={cat.id}
                 className="rounded-xl p-4 flex-row items-center"
-                style={{ backgroundColor: "white" }}
+                style={{ backgroundColor: colors.background }}
                 onPress={() => startConversation(cat.id)}
               >
                 <View
                   className="w-12 h-12 rounded-full items-center justify-center"
-                  style={{ backgroundColor: `${colors.sage}20` }}
+                  style={{ backgroundColor: `${colors.primary}20` }}
                 >
-                  <Ionicons name={cat.icon as any} size={24} color={colors.sage} />
+                  <Ionicons name={cat.icon as any} size={24} color={colors.primary} />
                 </View>
                 <View className="flex-1 ml-4">
-                  <Text className="font-semibold text-lg" style={{ color: colors.slate }}>
+                  <Text className="font-semibold text-lg" style={{ color: colors.secondary }}>
                     {cat.label}
                   </Text>
-                  <Text className="text-sm" style={{ color: colors.slate }}>
+                  <Text className="text-sm" style={{ color: colors.secondary }}>
                     {cat.description}
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.slate} />
+                <Ionicons name="chevron-forward" size={20} color={colors.secondary} />
               </TouchableOpacity>
             ))}
           </View>
@@ -265,7 +256,7 @@ export default function CreateQuickAccordScreen() {
 
   // Chat Screen
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -275,31 +266,31 @@ export default function CreateQuickAccordScreen() {
         {extractedData && Object.keys(extractedData).length > 0 && (
           <View
             className="px-4 py-3 border-b"
-            style={{ backgroundColor: `${colors.sage}10`, borderBottomColor: colors.sand }}
+            style={{ backgroundColor: `${colors.primary}10`, borderBottomColor: colors.backgroundSecondary }}
           >
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="document-text" size={16} color={colors.sage} />
-                <Text className="ml-2 font-medium text-sm" style={{ color: colors.sage }}>
+                <Ionicons name="document-text" size={16} color={colors.primary} />
+                <Text className="ml-2 font-medium text-sm" style={{ color: colors.primary }}>
                   {extractedData.title || "Quick Accord"}
                 </Text>
               </View>
               {isReadyToCreate && (
                 <View className="flex-row items-center">
-                  <Ionicons name="checkmark-circle" size={16} color={colors.sage} />
-                  <Text className="ml-1 text-xs font-medium" style={{ color: colors.sage }}>
+                  <Ionicons name="checkmark-circle" size={16} color={colors.primary} />
+                  <Text className="ml-1 text-xs font-medium" style={{ color: colors.primary }}>
                     Ready
                   </Text>
                 </View>
               )}
             </View>
             {extractedData.event_date && (
-              <Text className="text-xs mt-1" style={{ color: colors.slate }}>
+              <Text className="text-xs mt-1" style={{ color: colors.secondary }}>
                 Date: {extractedData.event_date}
               </Text>
             )}
             {extractedData.start_date && extractedData.end_date && (
-              <Text className="text-xs mt-1" style={{ color: colors.slate }}>
+              <Text className="text-xs mt-1" style={{ color: colors.secondary }}>
                 {extractedData.start_date} - {extractedData.end_date}
               </Text>
             )}
@@ -314,8 +305,8 @@ export default function CreateQuickAccordScreen() {
         >
           {loading ? (
             <View className="items-center py-12">
-              <ActivityIndicator size="large" color={colors.sage} />
-              <Text className="mt-4" style={{ color: colors.slate }}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text className="mt-4" style={{ color: colors.secondary }}>
                 Starting conversation with ARIA...
               </Text>
             </View>
@@ -325,14 +316,14 @@ export default function CreateQuickAccordScreen() {
               <View className="items-center mb-6">
                 <View
                   className="w-16 h-16 rounded-full items-center justify-center mb-3"
-                  style={{ backgroundColor: colors.sage }}
+                  style={{ backgroundColor: colors.primary }}
                 >
                   <Text className="text-white text-2xl font-bold">A</Text>
                 </View>
-                <Text className="font-semibold" style={{ color: colors.slate }}>
+                <Text className="font-semibold" style={{ color: colors.secondary }}>
                   ARIA
                 </Text>
-                <Text className="text-xs" style={{ color: colors.slate }}>
+                <Text className="text-xs" style={{ color: colors.secondary }}>
                   Your co-parenting assistant
                 </Text>
               </View>
@@ -346,13 +337,13 @@ export default function CreateQuickAccordScreen() {
                   <View
                     className="rounded-2xl px-4 py-3 max-w-[85%]"
                     style={{
-                      backgroundColor: msg.role === "user" ? colors.sage : "white",
+                      backgroundColor: msg.role === "user" ? colors.primary : "white",
                       borderBottomRightRadius: msg.role === "user" ? 4 : 16,
                       borderBottomLeftRadius: msg.role === "assistant" ? 4 : 16,
                     }}
                   >
                     <Text
-                      style={{ color: msg.role === "user" ? "white" : colors.slate }}
+                      style={{ color: msg.role === "user" ? "white" : colors.secondary }}
                     >
                       {msg.content}
                     </Text>
@@ -365,7 +356,7 @@ export default function CreateQuickAccordScreen() {
                 <View className="items-start mb-3">
                   <View
                     className="rounded-2xl px-4 py-3"
-                    style={{ backgroundColor: "white" }}
+                    style={{ backgroundColor: colors.background }}
                   >
                     <View className="flex-row items-center">
                       <View className="w-2 h-2 rounded-full bg-gray-400 mr-1 animate-pulse" />
@@ -384,7 +375,7 @@ export default function CreateQuickAccordScreen() {
           <View className="px-4 py-2">
             <TouchableOpacity
               className="py-4 rounded-xl items-center flex-row justify-center"
-              style={{ backgroundColor: colors.sage }}
+              style={{ backgroundColor: colors.primary }}
               onPress={createAccord}
               disabled={creating}
             >
@@ -405,13 +396,13 @@ export default function CreateQuickAccordScreen() {
         {/* Input Area */}
         <View
           className="flex-row items-end px-4 py-3 border-t"
-          style={{ backgroundColor: "white", borderTopColor: colors.sand }}
+          style={{ backgroundColor: colors.background, borderTopColor: colors.backgroundSecondary }}
         >
           <TextInput
             className="flex-1 rounded-2xl px-4 py-3 mr-2"
-            style={{ backgroundColor: colors.sand, color: colors.slate, maxHeight: 100 }}
+            style={{ backgroundColor: colors.backgroundSecondary, color: colors.secondary, maxHeight: 100 }}
             placeholder="Type your message..."
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor={colors.inputPlaceholder}
             value={inputText}
             onChangeText={setInputText}
             multiline
@@ -419,14 +410,14 @@ export default function CreateQuickAccordScreen() {
           />
           <TouchableOpacity
             className="w-12 h-12 rounded-full items-center justify-center"
-            style={{ backgroundColor: inputText.trim() ? colors.sage : colors.sand }}
+            style={{ backgroundColor: inputText.trim() ? colors.primary : colors.backgroundSecondary }}
             onPress={sendMessage}
             disabled={!inputText.trim() || loading || sending}
           >
             <Ionicons
               name="send"
               size={20}
-              color={inputText.trim() ? "white" : colors.slate}
+              color={inputText.trim() ? "white" : colors.secondary}
             />
           </TouchableOpacity>
         </View>

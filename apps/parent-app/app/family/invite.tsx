@@ -13,19 +13,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 export default function InviteCoParentScreen() {
+  const { colors } = useTheme();
   const { token } = useAuth();
   const { familyId, familyName } = useLocalSearchParams<{ familyId: string; familyName: string }>();
 
@@ -80,24 +71,24 @@ export default function InviteCoParentScreen() {
 
   if (sent) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center px-8" style={{ backgroundColor: colors.cream }}>
+      <SafeAreaView className="flex-1 items-center justify-center px-8" style={{ backgroundColor: colors.surfaceElevated }}>
         <View
           className="w-24 h-24 rounded-full items-center justify-center mb-6"
-          style={{ backgroundColor: `${colors.sage}20` }}
+          style={{ backgroundColor: `${colors.primary}20` }}
         >
-          <Ionicons name="mail" size={48} color={colors.sage} />
+          <Ionicons name="mail" size={48} color={colors.primary} />
         </View>
-        <Text className="text-2xl font-bold text-center mb-2" style={{ color: colors.slate }}>
+        <Text className="text-2xl font-bold text-center mb-2" style={{ color: colors.secondary }}>
           Invitation Sent!
         </Text>
-        <Text className="text-center mb-8" style={{ color: colors.slate }}>
+        <Text className="text-center mb-8" style={{ color: colors.secondary }}>
           We've sent an invitation to {email}. They'll receive an email with a link to join your family file.
         </Text>
 
-        <View className="w-full rounded-xl p-4 mb-6" style={{ backgroundColor: colors.sand }}>
+        <View className="w-full rounded-xl p-4 mb-6" style={{ backgroundColor: colors.backgroundSecondary }}>
           <View className="flex-row items-start">
-            <Ionicons name="information-circle" size={20} color={colors.amber} />
-            <Text className="flex-1 ml-2 text-sm" style={{ color: colors.slate }}>
+            <Ionicons name="information-circle" size={20} color={colors.accent} />
+            <Text className="flex-1 ml-2 text-sm" style={{ color: colors.secondary }}>
               The invitation link will expire in 7 days. If they don't see the email, ask them to check their spam folder.
             </Text>
           </View>
@@ -105,7 +96,7 @@ export default function InviteCoParentScreen() {
 
         <TouchableOpacity
           className="w-full py-4 rounded-xl items-center"
-          style={{ backgroundColor: colors.sage }}
+          style={{ backgroundColor: colors.primary }}
           onPress={() => router.back()}
         >
           <Text className="text-white font-semibold text-lg">Done</Text>
@@ -115,7 +106,7 @@ export default function InviteCoParentScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 20 }}
@@ -125,14 +116,14 @@ export default function InviteCoParentScreen() {
         <View className="mb-8">
           <View
             className="w-16 h-16 rounded-full items-center justify-center mb-4"
-            style={{ backgroundColor: `${colors.sage}20` }}
+            style={{ backgroundColor: `${colors.primary}20` }}
           >
-            <Ionicons name="person-add" size={32} color={colors.sage} />
+            <Ionicons name="person-add" size={32} color={colors.primary} />
           </View>
-          <Text className="text-2xl font-bold mb-2" style={{ color: colors.slate }}>
+          <Text className="text-2xl font-bold mb-2" style={{ color: colors.secondary }}>
             Invite Co-Parent
           </Text>
-          <Text style={{ color: colors.slate }}>
+          <Text style={{ color: colors.secondary }}>
             Invite your co-parent to join {familyName ? `the ${familyName}` : "your family file"}.
             They'll be able to view and manage shared schedules, expenses, and communication.
           </Text>
@@ -140,16 +131,16 @@ export default function InviteCoParentScreen() {
 
         {/* Email Input */}
         <View className="mb-6">
-          <Text className="text-sm font-medium mb-2" style={{ color: colors.slate }}>
+          <Text className="text-sm font-medium mb-2" style={{ color: colors.secondary }}>
             Co-Parent Email Address
           </Text>
-          <View className="flex-row items-center rounded-xl px-4" style={{ backgroundColor: colors.sand }}>
-            <Ionicons name="mail-outline" size={20} color={colors.slate} />
+          <View className="flex-row items-center rounded-xl px-4" style={{ backgroundColor: colors.backgroundSecondary }}>
+            <Ionicons name="mail-outline" size={20} color={colors.secondary} />
             <TextInput
               className="flex-1 py-4 ml-3 text-base"
-              style={{ color: colors.slate }}
+              style={{ color: colors.secondary }}
               placeholder="coparent@email.com"
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor={colors.inputPlaceholder}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -161,8 +152,8 @@ export default function InviteCoParentScreen() {
         </View>
 
         {/* What They'll Get Access To */}
-        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: "white", borderWidth: 1, borderColor: colors.sand }}>
-          <Text className="font-medium mb-3" style={{ color: colors.sage }}>
+        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: colors.background, borderWidth: 1, borderColor: colors.backgroundSecondary }}>
+          <Text className="font-medium mb-3" style={{ color: colors.primary }}>
             What they'll get access to:
           </Text>
           <View className="space-y-3">
@@ -176,11 +167,11 @@ export default function InviteCoParentScreen() {
               <View key={index} className="flex-row items-center">
                 <View
                   className="w-8 h-8 rounded-full items-center justify-center"
-                  style={{ backgroundColor: colors.sand }}
+                  style={{ backgroundColor: colors.backgroundSecondary }}
                 >
-                  <Ionicons name={item.icon as any} size={16} color={colors.sage} />
+                  <Ionicons name={item.icon as any} size={16} color={colors.primary} />
                 </View>
-                <Text className="ml-3 flex-1" style={{ color: colors.slate }}>
+                <Text className="ml-3 flex-1" style={{ color: colors.secondary }}>
                   {item.label}
                 </Text>
               </View>
@@ -189,14 +180,14 @@ export default function InviteCoParentScreen() {
         </View>
 
         {/* Privacy Note */}
-        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: `${colors.amber}15` }}>
+        <View className="rounded-xl p-4 mb-6" style={{ backgroundColor: `${colors.accent}15` }}>
           <View className="flex-row items-start">
-            <Ionicons name="shield-checkmark" size={20} color={colors.amber} />
+            <Ionicons name="shield-checkmark" size={20} color={colors.accent} />
             <View className="flex-1 ml-3">
-              <Text className="font-medium mb-1" style={{ color: colors.slate }}>
+              <Text className="font-medium mb-1" style={{ color: colors.secondary }}>
                 Privacy Protection
               </Text>
-              <Text className="text-sm" style={{ color: colors.slate }}>
+              <Text className="text-sm" style={{ color: colors.secondary }}>
                 Your personal information (phone, address, etc.) remains private unless you choose to share it.
                 Messages are analyzed for tone but content is never shared with third parties.
               </Text>
@@ -207,18 +198,18 @@ export default function InviteCoParentScreen() {
         {/* Send Button */}
         <TouchableOpacity
           className="py-4 rounded-xl items-center flex-row justify-center"
-          style={{ backgroundColor: email.trim() && validateEmail(email) ? colors.sage : "#E2E8F0" }}
+          style={{ backgroundColor: email.trim() && validateEmail(email) ? colors.primary : colors.border }}
           onPress={handleInvite}
           disabled={loading || !email.trim() || !validateEmail(email)}
         >
           {loading ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color={colors.textInverse} />
           ) : (
             <>
-              <Ionicons name="send" size={20} color={email.trim() && validateEmail(email) ? "white" : "#94A3B8"} />
+              <Ionicons name="send" size={20} color={email.trim() && validateEmail(email) ? colors.textInverse : colors.textMuted} />
               <Text
                 className="font-semibold text-lg ml-2"
-                style={{ color: email.trim() && validateEmail(email) ? "white" : "#94A3B8" }}
+                style={{ color: email.trim() && validateEmail(email) ? colors.textInverse : colors.textMuted }}
               >
                 Send Invitation
               </Text>
@@ -231,7 +222,7 @@ export default function InviteCoParentScreen() {
           className="mt-4 py-3 items-center"
           onPress={() => router.back()}
         >
-          <Text style={{ color: colors.slate }}>Cancel</Text>
+          <Text style={{ color: colors.secondary }}>Cancel</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

@@ -12,17 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  slateDark: "#334155",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 // Backend status values differ from mobile display statuses
 type BackendAccordStatus = "draft" | "pending" | "approved" | "completed" | "revoked" | "expired" | "pending_approval" | "active";
@@ -80,14 +70,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  draft: colors.slate,
-  pending_approval: colors.amber,
-  active: colors.sage,
-  completed: "#22C55E",
-  revoked: "#EF4444",
-  expired: "#9CA3AF",
-};
+// STATUS_COLORS moved inside component to access theme colors
 
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft",
@@ -99,7 +82,17 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function QuickAccordsScreen() {
+  const { colors } = useTheme();
   const { token } = useAuth();
+
+  const STATUS_COLORS: Record<string, string> = {
+    draft: colors.secondary,
+    pending_approval: colors.accent,
+    active: colors.primary,
+    completed: "#22C55E",
+    revoked: "#EF4444",
+    expired: "#9CA3AF",
+  };
   const [accords, setAccords] = useState<QuickAccord[]>([]);
   const [familyFiles, setFamilyFiles] = useState<FamilyFile[]>([]);
   const [selectedFamilyId, setSelectedFamilyId] = useState<string | null>(null);
@@ -209,31 +202,31 @@ export default function QuickAccordsScreen() {
 
   if (loading && familyFiles.length === 0) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.cream }}>
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>Loading...</Text>
+      <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: colors.surfaceElevated }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>Loading...</Text>
       </SafeAreaView>
     );
   }
 
   if (familyFiles.length === 0) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center p-6" style={{ backgroundColor: colors.cream }}>
+      <SafeAreaView className="flex-1 items-center justify-center p-6" style={{ backgroundColor: colors.surfaceElevated }}>
         <View
           className="w-20 h-20 rounded-full items-center justify-center mb-4"
-          style={{ backgroundColor: colors.sand }}
+          style={{ backgroundColor: colors.backgroundSecondary }}
         >
-          <Ionicons name="folder-outline" size={40} color={colors.sage} />
+          <Ionicons name="folder-outline" size={40} color={colors.primary} />
         </View>
-        <Text className="text-lg font-semibold mb-2" style={{ color: colors.slate }}>
+        <Text className="text-lg font-semibold mb-2" style={{ color: colors.secondary }}>
           No Family File
         </Text>
-        <Text className="text-center mb-6" style={{ color: colors.slate }}>
+        <Text className="text-center mb-6" style={{ color: colors.secondary }}>
           Create a family file first to start using Quick Accords.
         </Text>
         <TouchableOpacity
           className="px-6 py-3 rounded-xl"
-          style={{ backgroundColor: colors.sage }}
+          style={{ backgroundColor: colors.primary }}
           onPress={() => router.push("/family/create")}
         >
           <Text className="text-white font-semibold">Create Family File</Text>
@@ -243,14 +236,14 @@ export default function QuickAccordsScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       {/* Family File Selector */}
       {familyFiles.length > 1 && (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           className="max-h-14 border-b"
-          style={{ borderBottomColor: colors.sand }}
+          style={{ borderBottomColor: colors.backgroundSecondary }}
           contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 8 }}
         >
           {familyFiles.map((file) => (
@@ -258,13 +251,13 @@ export default function QuickAccordsScreen() {
               key={file.id}
               className="px-4 py-2 rounded-full mr-2"
               style={{
-                backgroundColor: selectedFamilyId === file.id ? colors.sage : colors.sand,
+                backgroundColor: selectedFamilyId === file.id ? colors.primary : colors.backgroundSecondary,
               }}
               onPress={() => setSelectedFamilyId(file.id)}
             >
               <Text
                 className="font-medium"
-                style={{ color: selectedFamilyId === file.id ? "white" : colors.slate }}
+                style={{ color: selectedFamilyId === file.id ? "white" : colors.secondary }}
               >
                 {file.family_name}
               </Text>
@@ -274,17 +267,17 @@ export default function QuickAccordsScreen() {
       )}
 
       {/* Tab Bar */}
-      <View className="flex-row px-4 py-3 border-b" style={{ borderBottomColor: colors.sand }}>
+      <View className="flex-row px-4 py-3 border-b" style={{ borderBottomColor: colors.backgroundSecondary }}>
         {(["active", "pending", "past"] as const).map((tab) => (
           <TouchableOpacity
             key={tab}
             className="flex-1 py-2 items-center rounded-lg mx-1"
-            style={{ backgroundColor: activeTab === tab ? colors.sage : "transparent" }}
+            style={{ backgroundColor: activeTab === tab ? colors.primary : "transparent" }}
             onPress={() => setActiveTab(tab)}
           >
             <Text
               className="font-medium capitalize"
-              style={{ color: activeTab === tab ? "white" : colors.slate }}
+              style={{ color: activeTab === tab ? "white" : colors.secondary }}
             >
               {tab}
             </Text>
@@ -300,19 +293,19 @@ export default function QuickAccordsScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.sage}
+            tintColor={colors.primary}
           />
         }
       >
         {/* Info Box */}
-        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.sand }}>
+        <View className="rounded-xl p-4 mb-4" style={{ backgroundColor: colors.backgroundSecondary }}>
           <View className="flex-row items-start">
-            <Ionicons name="flash" size={20} color={colors.sage} />
+            <Ionicons name="flash" size={20} color={colors.primary} />
             <View className="flex-1 ml-3">
-              <Text className="font-medium mb-1" style={{ color: colors.slate }}>
+              <Text className="font-medium mb-1" style={{ color: colors.secondary }}>
                 Quick Accords
               </Text>
-              <Text className="text-sm" style={{ color: colors.slate }}>
+              <Text className="text-sm" style={{ color: colors.secondary }}>
                 Lightweight agreements for schedule swaps, travel, special events, and one-off arrangements.
               </Text>
             </View>
@@ -321,28 +314,28 @@ export default function QuickAccordsScreen() {
 
         {loading ? (
           <View className="items-center py-8">
-            <ActivityIndicator size="large" color={colors.sage} />
+            <ActivityIndicator size="large" color={colors.primary} />
           </View>
         ) : filteredAccords.length === 0 ? (
           <View className="items-center py-12">
             <View
               className="w-16 h-16 rounded-full items-center justify-center mb-4"
-              style={{ backgroundColor: colors.sand }}
+              style={{ backgroundColor: colors.backgroundSecondary }}
             >
               <Ionicons
                 name={activeTab === "active" ? "checkmark-circle-outline" : "document-text-outline"}
                 size={32}
-                color={colors.sage}
+                color={colors.primary}
               />
             </View>
-            <Text className="text-lg font-medium mb-1" style={{ color: colors.slate }}>
+            <Text className="text-lg font-medium mb-1" style={{ color: colors.secondary }}>
               {activeTab === "active"
                 ? "No Active Accords"
                 : activeTab === "pending"
                   ? "No Pending Accords"
                   : "No Past Accords"}
             </Text>
-            <Text className="text-center" style={{ color: colors.slate }}>
+            <Text className="text-center" style={{ color: colors.secondary }}>
               {activeTab === "active"
                 ? "Create a Quick Accord to handle schedule changes or special arrangements."
                 : activeTab === "pending"
@@ -358,26 +351,26 @@ export default function QuickAccordsScreen() {
                 <TouchableOpacity
                   key={accord.id}
                   className="rounded-xl p-4"
-                  style={{ backgroundColor: "white" }}
+                  style={{ backgroundColor: colors.background }}
                   onPress={() => router.push(`/accords/${accord.id}?familyId=${selectedFamilyId}`)}
                 >
                   <View className="flex-row items-start justify-between mb-2">
                     <View className="flex-row items-center flex-1">
                       <View
                         className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                        style={{ backgroundColor: `${colors.sage}20` }}
+                        style={{ backgroundColor: `${colors.primary}20` }}
                       >
                         <Ionicons
                           name={CATEGORY_ICONS[accord.purpose_category] || "document-text"}
                           size={20}
-                          color={colors.sage}
+                          color={colors.primary}
                         />
                       </View>
                       <View className="flex-1">
-                        <Text className="font-semibold" style={{ color: colors.slate }}>
+                        <Text className="font-semibold" style={{ color: colors.secondary }}>
                           {accord.title}
                         </Text>
-                        <Text className="text-sm" style={{ color: colors.slate }}>
+                        <Text className="text-sm" style={{ color: colors.secondary }}>
                           {CATEGORY_LABELS[accord.purpose_category] || accord.purpose_category}
                         </Text>
                       </View>
@@ -397,8 +390,8 @@ export default function QuickAccordsScreen() {
 
                   {/* Date Info */}
                   <View className="flex-row items-center mt-2">
-                    <Ionicons name="calendar-outline" size={14} color={colors.slate} />
-                    <Text className="ml-2 text-sm" style={{ color: colors.slate }}>
+                    <Ionicons name="calendar-outline" size={14} color={colors.secondary} />
+                    <Text className="ml-2 text-sm" style={{ color: colors.secondary }}>
                       {accord.is_single_event
                         ? accord.event_date
                           ? formatDate(accord.event_date)
@@ -411,14 +404,14 @@ export default function QuickAccordsScreen() {
 
                   {/* Approval Status */}
                   {displayStatus === "pending_approval" && (
-                    <View className="flex-row items-center mt-2 pt-2 border-t" style={{ borderTopColor: colors.sand }}>
+                    <View className="flex-row items-center mt-2 pt-2 border-t" style={{ borderTopColor: colors.backgroundSecondary }}>
                       <View className="flex-row items-center mr-4">
                         <Ionicons
                           name={accord.parent_a_approved ? "checkmark-circle" : "ellipse-outline"}
                           size={16}
-                          color={accord.parent_a_approved ? colors.sage : colors.slate}
+                          color={accord.parent_a_approved ? colors.primary : colors.secondary}
                         />
-                        <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
+                        <Text className="ml-1 text-xs" style={{ color: colors.secondary }}>
                           Parent A
                         </Text>
                       </View>
@@ -426,9 +419,9 @@ export default function QuickAccordsScreen() {
                         <Ionicons
                           name={accord.parent_b_approved ? "checkmark-circle" : "ellipse-outline"}
                           size={16}
-                          color={accord.parent_b_approved ? colors.sage : colors.slate}
+                          color={accord.parent_b_approved ? colors.primary : colors.secondary}
                         />
-                        <Text className="ml-1 text-xs" style={{ color: colors.slate }}>
+                        <Text className="ml-1 text-xs" style={{ color: colors.secondary }}>
                           Parent B
                         </Text>
                       </View>
@@ -436,7 +429,7 @@ export default function QuickAccordsScreen() {
                   )}
 
                   {/* Accord Number */}
-                  <Text className="text-xs mt-2" style={{ color: "#9CA3AF" }}>
+                  <Text className="text-xs mt-2" style={{ color: colors.textMuted }}>
                     {accord.accord_number}
                   </Text>
                 </TouchableOpacity>
@@ -449,7 +442,7 @@ export default function QuickAccordsScreen() {
       {/* FAB - Create New Accord */}
       <TouchableOpacity
         className="absolute bottom-6 right-6 w-14 h-14 rounded-full items-center justify-center shadow-lg"
-        style={{ backgroundColor: colors.sage }}
+        style={{ backgroundColor: colors.primary }}
         onPress={() => router.push(`/accords/create?familyId=${selectedFamilyId}`)}
       >
         <Ionicons name="add" size={28} color="white" />

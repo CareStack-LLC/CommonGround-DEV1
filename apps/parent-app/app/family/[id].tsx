@@ -16,18 +16,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { format } from "date-fns";
 
 import { useAuth } from "@/providers/AuthProvider";
-
-// CommonGround Design System Colors
-const SAGE = "#4A6C58";
-const SAGE_LIGHT = "#E8F0EB";
-const SLATE = "#475569";
-const SLATE_LIGHT = "#94A3B8";
-const AMBER = "#D4A574";
-const AMBER_LIGHT = "#FEF3E2";
-const SAND = "#F5F0E8";
-const CREAM = "#FFFBF5";
-const WHITE = "#FFFFFF";
-const GRAY = "#9CA3AF";
+import { useTheme } from "@/theme";
 
 interface QuickAccord {
   id: string;
@@ -81,6 +70,7 @@ interface FamilyFileDetail {
 export default function FamilyFileDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user, token } = useAuth();
+  const { colors } = useTheme();
   const [familyFile, setFamilyFile] = useState<FamilyFileDetail | null>(null);
   const [quickAccords, setQuickAccords] = useState<QuickAccord[]>([]);
   const [agreements, setAgreements] = useState<Agreement[]>([]);
@@ -151,57 +141,57 @@ export default function FamilyFileDetailScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: CREAM, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size="large" color={SAGE} />
-        <Text style={{ marginTop: 16, color: SLATE }}>Loading...</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={{ marginTop: 16, color: colors.secondary }}>Loading...</Text>
       </SafeAreaView>
     );
   }
 
   if (!familyFile) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: CREAM, alignItems: "center", justifyContent: "center" }}>
-        <Text style={{ color: SLATE }}>Family file not found</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated, alignItems: "center", justifyContent: "center" }}>
+        <Text style={{ color: colors.secondary }}>Family file not found</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: CREAM }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["top"]}>
       {/* Header */}
       <View style={{
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 16,
         paddingVertical: 12,
-        backgroundColor: WHITE,
+        backgroundColor: colors.cardBackground,
         borderBottomWidth: 1,
-        borderBottomColor: SAND,
+        borderBottomColor: colors.backgroundSecondary,
       }}>
         <TouchableOpacity onPress={() => router.back()} style={{ padding: 4 }}>
-          <Ionicons name="arrow-back" size={24} color={SLATE} />
+          <Ionicons name="arrow-back" size={24} color={colors.secondary} />
         </TouchableOpacity>
         <View style={{
           width: 40,
           height: 40,
           borderRadius: 20,
-          backgroundColor: SAGE,
+          backgroundColor: colors.primary,
           alignItems: "center",
           justifyContent: "center",
           marginLeft: 12,
         }}>
-          <Ionicons name="people" size={20} color={WHITE} />
+          <Ionicons name="people" size={20} color={colors.textInverse} />
         </View>
         <View style={{ flex: 1, marginLeft: 12 }}>
-          <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE }}>
+          <Text style={{ fontSize: 18, fontWeight: "600", color: colors.secondary }}>
             {getDisplayName()}
           </Text>
-          <Text style={{ fontSize: 13, color: SLATE_LIGHT }}>
+          <Text style={{ fontSize: 13, color: colors.textMuted }}>
             {familyFile.family_file_number || "FF-000000"}
           </Text>
         </View>
         <TouchableOpacity style={{ padding: 8 }}>
-          <Ionicons name="settings-outline" size={22} color={SLATE} />
+          <Ionicons name="settings-outline" size={22} color={colors.secondary} />
         </TouchableOpacity>
       </View>
 
@@ -209,16 +199,16 @@ export default function FamilyFileDetailScreen() {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 100 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={SAGE} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         {/* Quick Actions Section */}
         <View style={{ padding: 20 }}>
-          <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE, marginBottom: 16 }}>
+          <Text style={{ fontSize: 18, fontWeight: "600", color: colors.secondary, marginBottom: 16 }}>
             Quick Actions
           </Text>
           <View style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.cardBackground,
             borderRadius: 16,
             overflow: "hidden",
             shadowColor: "#000",
@@ -229,33 +219,37 @@ export default function FamilyFileDetailScreen() {
           }}>
             <QuickActionRow
               icon="wallet"
-              iconColor={SAGE}
+              iconColor={colors.primary}
               title="ClearFund Request"
               subtitle="Request expense reimbursement"
               onPress={() => router.push(`/expenses/create?familyFileId=${id}`)}
+              colors={colors}
             />
             <QuickActionRow
               icon="calendar"
-              iconColor={AMBER}
+              iconColor={colors.accent}
               title="New Event"
               subtitle="Add to shared calendar"
               onPress={() => router.push(`/events/create?familyFileId=${id}`)}
+              colors={colors}
             />
             <QuickActionRow
               icon="chatbubble"
-              iconColor={SLATE}
+              iconColor={colors.secondary}
               title="Messages"
               subtitle="Chat with your co-parent"
               onPress={() => router.push(`/messages?familyFileId=${id}`)}
+              colors={colors}
             />
             <QuickActionRow
               icon="videocam"
-              iconColor={GRAY}
+              iconColor={colors.textMuted}
               title="KidComs"
               subtitle="Video calls for kids"
               badge="Complete"
               onPress={() => router.push(`/recordings?familyFileId=${id}`)}
               isLast
+              colors={colors}
             />
           </View>
         </View>
@@ -267,14 +261,14 @@ export default function FamilyFileDetailScreen() {
               width: 32,
               height: 32,
               borderRadius: 16,
-              backgroundColor: AMBER,
+              backgroundColor: colors.accent,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 10,
             }}>
-              <Ionicons name="flash" size={16} color={WHITE} />
+              <Ionicons name="flash" size={16} color={colors.textInverse} />
             </View>
-            <Text style={{ flex: 1, fontSize: 18, fontWeight: "600", color: SLATE }}>
+            <Text style={{ flex: 1, fontSize: 18, fontWeight: "600", color: colors.secondary }}>
               QuickAccords
             </Text>
             <TouchableOpacity
@@ -285,20 +279,20 @@ export default function FamilyFileDetailScreen() {
                 paddingVertical: 6,
                 borderRadius: 20,
                 borderWidth: 1,
-                borderColor: SAGE,
+                borderColor: colors.primary,
               }}
               onPress={() => router.push(`/accords/create?familyId=${id}`)}
             >
-              <Ionicons name="add" size={16} color={SAGE} />
-              <Text style={{ fontSize: 13, fontWeight: "600", color: SAGE, marginLeft: 4 }}>New</Text>
+              <Ionicons name="add" size={16} color={colors.primary} />
+              <Text style={{ fontSize: 13, fontWeight: "600", color: colors.primary, marginLeft: 4 }}>New</Text>
             </TouchableOpacity>
           </View>
-          <Text style={{ fontSize: 13, color: SLATE_LIGHT, marginBottom: 12 }}>
+          <Text style={{ fontSize: 13, color: colors.textMuted, marginBottom: 12 }}>
             Situational agreements
           </Text>
 
           <View style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.cardBackground,
             borderRadius: 16,
             overflow: "hidden",
             shadowColor: "#000",
@@ -317,7 +311,7 @@ export default function FamilyFileDetailScreen() {
                       alignItems: "center",
                       padding: 16,
                       borderBottomWidth: index < Math.min(quickAccords.length, 3) - 1 ? 1 : 0,
-                      borderBottomColor: SAND,
+                      borderBottomColor: colors.backgroundSecondary,
                     }}
                     onPress={() => router.push(`/accords/${accord.id}?familyId=${id}`)}
                   >
@@ -325,17 +319,17 @@ export default function FamilyFileDetailScreen() {
                       width: 36,
                       height: 36,
                       borderRadius: 10,
-                      backgroundColor: SAGE_LIGHT,
+                      backgroundColor: colors.primaryLight,
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
-                      <Ionicons name="swap-horizontal" size={18} color={SAGE} />
+                      <Ionicons name="swap-horizontal" size={18} color={colors.primary} />
                     </View>
                     <View style={{ flex: 1, marginLeft: 12 }}>
-                      <Text style={{ fontSize: 15, fontWeight: "500", color: SLATE }}>
+                      <Text style={{ fontSize: 15, fontWeight: "500", color: colors.secondary }}>
                         {accord.title}
                       </Text>
-                      <Text style={{ fontSize: 12, color: SLATE_LIGHT, marginTop: 2 }}>
+                      <Text style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
                         {accord.accord_number}
                       </Text>
                     </View>
@@ -343,31 +337,31 @@ export default function FamilyFileDetailScreen() {
                       paddingHorizontal: 10,
                       paddingVertical: 4,
                       borderRadius: 12,
-                      backgroundColor: mapAccordStatus(accord.status) === "approved" ? SAGE_LIGHT : SAND,
+                      backgroundColor: mapAccordStatus(accord.status) === "approved" ? colors.primaryLight : colors.backgroundSecondary,
                     }}>
                       <Text style={{
                         fontSize: 12,
                         fontWeight: "500",
-                        color: mapAccordStatus(accord.status) === "approved" ? SAGE : SLATE_LIGHT,
+                        color: mapAccordStatus(accord.status) === "approved" ? colors.primary : colors.textMuted,
                       }}>
                         {mapAccordStatus(accord.status)}
                       </Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={18} color={SLATE_LIGHT} style={{ marginLeft: 8 }} />
+                    <Ionicons name="chevron-forward" size={18} color={colors.textMuted} style={{ marginLeft: 8 }} />
                   </TouchableOpacity>
                 ))}
                 <TouchableOpacity
                   style={{ padding: 14, alignItems: "center" }}
                   onPress={() => router.push("/accords")}
                 >
-                  <Text style={{ fontSize: 14, color: SLATE_LIGHT }}>
+                  <Text style={{ fontSize: 14, color: colors.textMuted }}>
                     View All QuickAccords ({quickAccords.length})
                   </Text>
                 </TouchableOpacity>
               </>
             ) : (
               <View style={{ padding: 24, alignItems: "center" }}>
-                <Text style={{ fontSize: 14, color: SLATE_LIGHT }}>No quick accords yet</Text>
+                <Text style={{ fontSize: 14, color: colors.textMuted }}>No quick accords yet</Text>
               </View>
             )}
           </View>
@@ -380,18 +374,18 @@ export default function FamilyFileDetailScreen() {
               width: 32,
               height: 32,
               borderRadius: 16,
-              backgroundColor: SAGE,
+              backgroundColor: colors.primary,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 10,
             }}>
-              <Ionicons name="document-text" size={16} color={WHITE} />
+              <Ionicons name="document-text" size={16} color={colors.textInverse} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE }}>
+              <Text style={{ fontSize: 18, fontWeight: "600", color: colors.secondary }}>
                 SharedCare Agreements
               </Text>
-              <Text style={{ fontSize: 13, color: SLATE_LIGHT }}>
+              <Text style={{ fontSize: 13, color: colors.textMuted }}>
                 Comprehensive co-parenting agreements
               </Text>
             </View>
@@ -403,17 +397,17 @@ export default function FamilyFileDetailScreen() {
                 paddingVertical: 6,
                 borderRadius: 20,
                 borderWidth: 1,
-                borderColor: SAGE,
+                borderColor: colors.primary,
               }}
               onPress={() => router.push(`/agreements/create?familyId=${id}`)}
             >
-              <Ionicons name="add" size={16} color={SAGE} />
-              <Text style={{ fontSize: 13, fontWeight: "600", color: SAGE, marginLeft: 4 }}>New</Text>
+              <Ionicons name="add" size={16} color={colors.primary} />
+              <Text style={{ fontSize: 13, fontWeight: "600", color: colors.primary, marginLeft: 4 }}>New</Text>
             </TouchableOpacity>
           </View>
 
           <View style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.cardBackground,
             borderRadius: 16,
             overflow: "hidden",
             shadowColor: "#000",
@@ -432,7 +426,7 @@ export default function FamilyFileDetailScreen() {
                       alignItems: "center",
                       padding: 16,
                       borderBottomWidth: index < Math.min(agreements.length, 3) - 1 ? 1 : 0,
-                      borderBottomColor: SAND,
+                      borderBottomColor: colors.backgroundSecondary,
                     }}
                     onPress={() => router.push(`/agreements/${agreement.id}?familyId=${id}`)}
                   >
@@ -440,14 +434,14 @@ export default function FamilyFileDetailScreen() {
                       width: 4,
                       height: 36,
                       borderRadius: 2,
-                      backgroundColor: agreement.status === "active" ? SAGE : SLATE_LIGHT,
+                      backgroundColor: agreement.status === "active" ? colors.primary : colors.textMuted,
                       marginRight: 12,
                     }} />
                     <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: 15, fontWeight: "500", color: SLATE }}>
+                      <Text style={{ fontSize: 15, fontWeight: "500", color: colors.secondary }}>
                         {agreement.title}
                       </Text>
-                      <Text style={{ fontSize: 12, color: SLATE_LIGHT, marginTop: 2 }}>
+                      <Text style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
                         {format(new Date(agreement.created_at), "M/d/yyyy")}
                       </Text>
                     </View>
@@ -455,32 +449,32 @@ export default function FamilyFileDetailScreen() {
                       paddingHorizontal: 10,
                       paddingVertical: 4,
                       borderRadius: 12,
-                      backgroundColor: agreement.status === "active" ? SAGE_LIGHT : SAND,
+                      backgroundColor: agreement.status === "active" ? colors.primaryLight : colors.backgroundSecondary,
                     }}>
                       <Text style={{
                         fontSize: 12,
                         fontWeight: "500",
-                        color: agreement.status === "active" ? SAGE : SLATE_LIGHT,
+                        color: agreement.status === "active" ? colors.primary : colors.textMuted,
                         textTransform: "capitalize",
                       }}>
                         {agreement.status}
                       </Text>
                     </View>
-                    <Ionicons name="chevron-forward" size={18} color={SLATE_LIGHT} style={{ marginLeft: 8 }} />
+                    <Ionicons name="chevron-forward" size={18} color={colors.textMuted} style={{ marginLeft: 8 }} />
                   </TouchableOpacity>
                 ))}
                 <TouchableOpacity
                   style={{ padding: 14, alignItems: "center" }}
                   onPress={() => router.push("/agreements")}
                 >
-                  <Text style={{ fontSize: 14, color: SLATE_LIGHT }}>
+                  <Text style={{ fontSize: 14, color: colors.textMuted }}>
                     View All Agreements ({agreements.length})
                   </Text>
                 </TouchableOpacity>
               </>
             ) : (
               <View style={{ padding: 24, alignItems: "center" }}>
-                <Text style={{ fontSize: 14, color: SLATE_LIGHT }}>No agreements yet</Text>
+                <Text style={{ fontSize: 14, color: colors.textMuted }}>No agreements yet</Text>
               </View>
             )}
           </View>
@@ -493,20 +487,20 @@ export default function FamilyFileDetailScreen() {
               width: 32,
               height: 32,
               borderRadius: 16,
-              backgroundColor: SAGE_LIGHT,
+              backgroundColor: colors.primaryLight,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 10,
             }}>
-              <Ionicons name="people" size={16} color={SAGE} />
+              <Ionicons name="people" size={16} color={colors.primary} />
             </View>
-            <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE }}>
+            <Text style={{ fontSize: 18, fontWeight: "600", color: colors.secondary }}>
               Parents
             </Text>
           </View>
 
           <View style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.cardBackground,
             borderRadius: 16,
             padding: 16,
             shadowColor: "#000",
@@ -521,17 +515,17 @@ export default function FamilyFileDetailScreen() {
                 width: 44,
                 height: 44,
                 borderRadius: 22,
-                backgroundColor: SAGE,
+                backgroundColor: colors.primary,
                 alignItems: "center",
                 justifyContent: "center",
               }}>
-                <Text style={{ color: WHITE, fontWeight: "600", fontSize: 14 }}>PA</Text>
+                <Text style={{ color: colors.textInverse, fontWeight: "600", fontSize: 14 }}>PA</Text>
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={{ fontSize: 15, fontWeight: "500", color: SLATE }}>
+                <Text style={{ fontSize: 15, fontWeight: "500", color: colors.secondary }}>
                   {familyFile.parent_a_info?.first_name || "Parent A"}
                 </Text>
-                <Text style={{ fontSize: 13, color: SLATE_LIGHT }}>
+                <Text style={{ fontSize: 13, color: colors.textMuted }}>
                   {isUserParentA ? "You" : "Co-parent"}
                 </Text>
               </View>
@@ -540,9 +534,9 @@ export default function FamilyFileDetailScreen() {
                   paddingHorizontal: 10,
                   paddingVertical: 4,
                   borderRadius: 12,
-                  backgroundColor: SAGE_LIGHT,
+                  backgroundColor: colors.primaryLight,
                 }}>
-                  <Text style={{ fontSize: 12, fontWeight: "500", color: SAGE }}>You</Text>
+                  <Text style={{ fontSize: 12, fontWeight: "500", color: colors.primary }}>You</Text>
                 </View>
               )}
             </View>
@@ -553,19 +547,19 @@ export default function FamilyFileDetailScreen() {
                 width: 44,
                 height: 44,
                 borderRadius: 22,
-                backgroundColor: familyFile.parent_b_info ? AMBER : SAND,
+                backgroundColor: familyFile.parent_b_info ? colors.accent : colors.backgroundSecondary,
                 alignItems: "center",
                 justifyContent: "center",
               }}>
-                <Text style={{ color: familyFile.parent_b_info ? WHITE : SLATE_LIGHT, fontWeight: "600", fontSize: 14 }}>
+                <Text style={{ color: familyFile.parent_b_info ? colors.textInverse : colors.textMuted, fontWeight: "600", fontSize: 14 }}>
                   {familyFile.parent_b_info?.first_name?.charAt(0) || "P"}
                 </Text>
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={{ fontSize: 15, fontWeight: "500", color: SLATE }}>
+                <Text style={{ fontSize: 15, fontWeight: "500", color: colors.secondary }}>
                   {familyFile.parent_b_info?.first_name || "Parent"}
                 </Text>
-                <Text style={{ fontSize: 13, color: SLATE_LIGHT }}>
+                <Text style={{ fontSize: 13, color: colors.textMuted }}>
                   {familyFile.parent_b_info ? (!isUserParentA ? "You" : "Co-parent") : "Not invited"}
                 </Text>
               </View>
@@ -574,9 +568,9 @@ export default function FamilyFileDetailScreen() {
                   paddingHorizontal: 10,
                   paddingVertical: 4,
                   borderRadius: 12,
-                  backgroundColor: SAGE_LIGHT,
+                  backgroundColor: colors.primaryLight,
                 }}>
-                  <Text style={{ fontSize: 12, fontWeight: "500", color: SAGE }}>You</Text>
+                  <Text style={{ fontSize: 12, fontWeight: "500", color: colors.primary }}>You</Text>
                 </View>
               )}
             </View>
@@ -590,23 +584,23 @@ export default function FamilyFileDetailScreen() {
               width: 32,
               height: 32,
               borderRadius: 16,
-              backgroundColor: AMBER_LIGHT,
+              backgroundColor: colors.warningLight,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 10,
             }}>
-              <Ionicons name="heart" size={16} color={AMBER} />
+              <Ionicons name="heart" size={16} color={colors.accent} />
             </View>
-            <Text style={{ flex: 1, fontSize: 18, fontWeight: "600", color: SLATE }}>
+            <Text style={{ flex: 1, fontSize: 18, fontWeight: "600", color: colors.secondary }}>
               Children
             </Text>
             <TouchableOpacity style={{ padding: 4 }}>
-              <Ionicons name="add" size={22} color={SAGE} />
+              <Ionicons name="add" size={22} color={colors.primary} />
             </TouchableOpacity>
           </View>
 
           <View style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.cardBackground,
             borderRadius: 16,
             overflow: "hidden",
             shadowColor: "#000",
@@ -624,27 +618,27 @@ export default function FamilyFileDetailScreen() {
                     alignItems: "center",
                     padding: 16,
                     borderBottomWidth: index < familyFile.children!.length - 1 ? 1 : 0,
-                    borderBottomColor: SAND,
+                    borderBottomColor: colors.backgroundSecondary,
                   }}
                 >
                   <View style={{
                     width: 40,
                     height: 40,
                     borderRadius: 20,
-                    backgroundColor: SAGE,
+                    backgroundColor: colors.primary,
                     alignItems: "center",
                     justifyContent: "center",
                   }}>
-                    <Text style={{ color: WHITE, fontWeight: "600", fontSize: 14 }}>
+                    <Text style={{ color: colors.textInverse, fontWeight: "600", fontSize: 14 }}>
                       {child.first_name.charAt(0)}
                     </Text>
                   </View>
                   <View style={{ flex: 1, marginLeft: 12 }}>
-                    <Text style={{ fontSize: 15, fontWeight: "500", color: SLATE }}>
+                    <Text style={{ fontSize: 15, fontWeight: "500", color: colors.secondary }}>
                       {child.first_name} {child.last_name || ""}
                     </Text>
                     {child.date_of_birth && (
-                      <Text style={{ fontSize: 12, color: SLATE_LIGHT, marginTop: 2 }}>
+                      <Text style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>
                         {child.date_of_birth}
                       </Text>
                     )}
@@ -654,23 +648,23 @@ export default function FamilyFileDetailScreen() {
                       paddingHorizontal: 10,
                       paddingVertical: 4,
                       borderRadius: 12,
-                      backgroundColor: child.status === "approved" ? SAGE_LIGHT : AMBER_LIGHT,
+                      backgroundColor: child.status === "approved" ? colors.primaryLight : colors.warningLight,
                     }}>
                       <Text style={{
                         fontSize: 11,
                         fontWeight: "500",
-                        color: child.status === "approved" ? SAGE : AMBER,
+                        color: child.status === "approved" ? colors.primary : colors.accent,
                       }}>
                         {child.status.replace("_", " ")}
                       </Text>
                     </View>
                   )}
-                  <Ionicons name="chevron-forward" size={18} color={SLATE_LIGHT} style={{ marginLeft: 8 }} />
+                  <Ionicons name="chevron-forward" size={18} color={colors.textMuted} style={{ marginLeft: 8 }} />
                 </View>
               ))
             ) : (
               <View style={{ padding: 24, alignItems: "center" }}>
-                <Text style={{ fontSize: 14, color: SLATE_LIGHT }}>No children added yet</Text>
+                <Text style={{ fontSize: 14, color: colors.textMuted }}>No children added yet</Text>
               </View>
             )}
           </View>
@@ -678,11 +672,11 @@ export default function FamilyFileDetailScreen() {
 
         {/* Details Section */}
         <View style={{ paddingHorizontal: 20, paddingBottom: 20 }}>
-          <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE, marginBottom: 16 }}>
+          <Text style={{ fontSize: 18, fontWeight: "600", color: colors.secondary, marginBottom: 16 }}>
             Details
           </Text>
           <View style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.cardBackground,
             borderRadius: 16,
             padding: 16,
             shadowColor: "#000",
@@ -691,16 +685,18 @@ export default function FamilyFileDetailScreen() {
             shadowRadius: 4,
             elevation: 2,
           }}>
-            <DetailRow label="Location" value={familyFile.state || "—"} />
+            <DetailRow label="Location" value={familyFile.state || "\u2014"} colors={colors} />
             <DetailRow
               label="ARIA"
               value={familyFile.aria_enabled ? "Enabled" : "Disabled"}
-              valueColor={familyFile.aria_enabled ? SAGE : SLATE_LIGHT}
+              valueColor={familyFile.aria_enabled ? colors.primary : colors.textMuted}
+              colors={colors}
             />
             <DetailRow
               label="Created"
               value={format(new Date(familyFile.created_at), "M/d/yyyy")}
               isLast
+              colors={colors}
             />
           </View>
         </View>
@@ -712,23 +708,23 @@ export default function FamilyFileDetailScreen() {
               width: 32,
               height: 32,
               borderRadius: 16,
-              backgroundColor: SAGE_LIGHT,
+              backgroundColor: colors.primaryLight,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 10,
             }}>
-              <Ionicons name="briefcase" size={16} color={SAGE} />
+              <Ionicons name="briefcase" size={16} color={colors.primary} />
             </View>
-            <Text style={{ flex: 1, fontSize: 18, fontWeight: "600", color: SLATE }}>
+            <Text style={{ flex: 1, fontSize: 18, fontWeight: "600", color: colors.secondary }}>
               Legal Team
             </Text>
             <TouchableOpacity style={{ padding: 4 }}>
-              <Ionicons name="add" size={22} color={SAGE} />
+              <Ionicons name="add" size={22} color={colors.primary} />
             </TouchableOpacity>
           </View>
 
           <View style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.cardBackground,
             borderRadius: 16,
             padding: 24,
             alignItems: "center",
@@ -738,15 +734,15 @@ export default function FamilyFileDetailScreen() {
             shadowRadius: 4,
             elevation: 2,
           }}>
-            <Ionicons name="briefcase-outline" size={40} color={SLATE_LIGHT} />
-            <Text style={{ fontSize: 16, fontWeight: "500", color: SLATE, marginTop: 12 }}>
+            <Ionicons name="briefcase-outline" size={40} color={colors.textMuted} />
+            <Text style={{ fontSize: 16, fontWeight: "500", color: colors.secondary, marginTop: 12 }}>
               No professionals yet
             </Text>
-            <Text style={{ fontSize: 13, color: SLATE_LIGHT, marginTop: 4 }}>
+            <Text style={{ fontSize: 13, color: colors.textMuted, marginTop: 4 }}>
               Invite your attorney or mediator
             </Text>
             <TouchableOpacity style={{ marginTop: 16 }}>
-              <Text style={{ fontSize: 14, color: SAGE, fontWeight: "500" }}>
+              <Text style={{ fontSize: 14, color: colors.primary, fontWeight: "500" }}>
                 <Ionicons name="search" size={14} /> Browse Firm Directory
               </Text>
             </TouchableOpacity>
@@ -766,6 +762,7 @@ function QuickActionRow({
   badge,
   onPress,
   isLast = false,
+  colors,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   iconColor: string;
@@ -774,6 +771,7 @@ function QuickActionRow({
   badge?: string;
   onPress: () => void;
   isLast?: boolean;
+  colors: any;
 }) {
   return (
     <TouchableOpacity
@@ -782,7 +780,7 @@ function QuickActionRow({
         alignItems: "center",
         padding: 16,
         borderBottomWidth: isLast ? 0 : 1,
-        borderBottomColor: SAND,
+        borderBottomColor: colors.backgroundSecondary,
       }}
       onPress={onPress}
     >
@@ -794,11 +792,11 @@ function QuickActionRow({
         alignItems: "center",
         justifyContent: "center",
       }}>
-        <Ionicons name={icon} size={20} color={WHITE} />
+        <Ionicons name={icon} size={20} color={colors.textInverse} />
       </View>
       <View style={{ flex: 1, marginLeft: 12 }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ fontSize: 15, fontWeight: "500", color: SLATE }}>
+          <Text style={{ fontSize: 15, fontWeight: "500", color: colors.secondary }}>
             {title}
           </Text>
           {badge && (
@@ -807,17 +805,17 @@ function QuickActionRow({
               paddingHorizontal: 8,
               paddingVertical: 2,
               borderRadius: 10,
-              backgroundColor: SAGE_LIGHT,
+              backgroundColor: colors.primaryLight,
             }}>
-              <Text style={{ fontSize: 10, fontWeight: "600", color: SAGE }}>{badge}</Text>
+              <Text style={{ fontSize: 10, fontWeight: "600", color: colors.primary }}>{badge}</Text>
             </View>
           )}
         </View>
-        <Text style={{ fontSize: 13, color: SLATE_LIGHT, marginTop: 2 }}>
+        <Text style={{ fontSize: 13, color: colors.textMuted, marginTop: 2 }}>
           {subtitle}
         </Text>
       </View>
-      <Ionicons name="chevron-forward" size={18} color={SLATE_LIGHT} />
+      <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
     </TouchableOpacity>
   );
 }
@@ -826,13 +824,15 @@ function QuickActionRow({
 function DetailRow({
   label,
   value,
-  valueColor = SLATE,
+  valueColor,
   isLast = false,
+  colors,
 }: {
   label: string;
   value: string;
   valueColor?: string;
   isLast?: boolean;
+  colors: any;
 }) {
   return (
     <View style={{
@@ -841,10 +841,10 @@ function DetailRow({
       alignItems: "center",
       paddingVertical: 12,
       borderBottomWidth: isLast ? 0 : 1,
-      borderBottomColor: SAND,
+      borderBottomColor: colors.backgroundSecondary,
     }}>
-      <Text style={{ fontSize: 14, color: SLATE_LIGHT }}>{label}</Text>
-      <Text style={{ fontSize: 14, fontWeight: "500", color: valueColor }}>{value}</Text>
+      <Text style={{ fontSize: 14, color: colors.textMuted }}>{label}</Text>
+      <Text style={{ fontSize: 14, fontWeight: "500", color: valueColor || colors.secondary }}>{value}</Text>
     </View>
   );
 }

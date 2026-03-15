@@ -35,40 +35,11 @@ import {
 } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { BottomNavBar } from "@/components/BottomNavBar";
+import { useTheme, categoryColors, categoryIcons } from "@/theme";
 
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+const CATEGORY_COLORS: Record<EventCategory, string> = categoryColors;
 
-const CATEGORY_COLORS: Record<EventCategory, string> = {
-  medical: "#EF4444",
-  school: "#3B82F6",
-  sports: "#22C55E",
-  therapy: "#EC4899",
-  extracurricular: "#8B5CF6",
-  social: "#F97316",
-  travel: "#06B6D4",
-  exchange: "#D4A574",
-  other: "#6B7280",
-};
-
-const CATEGORY_ICONS: Record<EventCategory, string> = {
-  medical: "medkit",
-  school: "school",
-  sports: "football",
-  therapy: "heart",
-  extracurricular: "musical-notes",
-  social: "people",
-  travel: "airplane",
-  exchange: "swap-horizontal",
-  other: "calendar",
-};
+const CATEGORY_ICONS: Record<EventCategory, string> = categoryIcons;
 
 const RSVP_OPTIONS: Array<{ status: RSVPStatus; label: string; icon: string; color: string }> = [
   { status: "going", label: "Going", icon: "checkmark-circle", color: "#22C55E" },
@@ -77,6 +48,7 @@ const RSVP_OPTIONS: Array<{ status: RSVPStatus; label: string; icon: string; col
 ];
 
 export default function EventDetailScreen() {
+  const { colors } = useTheme();
   const { eventId } = useLocalSearchParams<{ eventId: string }>();
   const { user } = useAuth();
 
@@ -264,7 +236,7 @@ export default function EventDetailScreen() {
   };
 
   const getCategoryColor = () => {
-    return event?.event_category ? CATEGORY_COLORS[event.event_category] : colors.sage;
+    return event?.event_category ? CATEGORY_COLORS[event.event_category] : colors.primary;
   };
 
   const getCategoryIcon = () => {
@@ -275,7 +247,7 @@ export default function EventDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["top"]}>
+      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["top"]}>
         {/* Custom Header */}
         <View
           style={{
@@ -285,24 +257,24 @@ export default function EventDetailScreen() {
             paddingHorizontal: 16,
             paddingVertical: 12,
             borderBottomWidth: 1,
-            borderBottomColor: colors.sand,
-            backgroundColor: "white",
+            borderBottomColor: colors.backgroundSecondary,
+            backgroundColor: colors.background,
           }}
         >
           <TouchableOpacity
             onPress={() => router.back()}
             style={{ flexDirection: "row", alignItems: "center" }}
           >
-            <Ionicons name="chevron-back" size={24} color={colors.sage} />
-            <Text style={{ color: colors.sage, fontSize: 16, marginLeft: 4 }}>Back</Text>
+            <Ionicons name="chevron-back" size={24} color={colors.primary} />
+            <Text style={{ color: colors.primary, fontSize: 16, marginLeft: 4 }}>Back</Text>
           </TouchableOpacity>
-          <Text style={{ fontSize: 17, fontWeight: "600", color: colors.slate }}>
+          <Text style={{ fontSize: 17, fontWeight: "600", color: colors.secondary }}>
             Event
           </Text>
           <View style={{ width: 32 }} />
         </View>
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.sage} />
+          <ActivityIndicator size="large" color={colors.primary} />
         </View>
         <BottomNavBar />
       </SafeAreaView>
@@ -311,7 +283,7 @@ export default function EventDetailScreen() {
 
   if (!event) {
     return (
-      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["top"]}>
+      <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["top"]}>
         {/* Custom Header */}
         <View
           style={{
@@ -321,24 +293,24 @@ export default function EventDetailScreen() {
             paddingHorizontal: 16,
             paddingVertical: 12,
             borderBottomWidth: 1,
-            borderBottomColor: colors.sand,
-            backgroundColor: "white",
+            borderBottomColor: colors.backgroundSecondary,
+            backgroundColor: colors.background,
           }}
         >
           <TouchableOpacity
             onPress={() => router.back()}
             style={{ flexDirection: "row", alignItems: "center" }}
           >
-            <Ionicons name="chevron-back" size={24} color={colors.sage} />
-            <Text style={{ color: colors.sage, fontSize: 16, marginLeft: 4 }}>Back</Text>
+            <Ionicons name="chevron-back" size={24} color={colors.primary} />
+            <Text style={{ color: colors.primary, fontSize: 16, marginLeft: 4 }}>Back</Text>
           </TouchableOpacity>
-          <Text style={{ fontSize: 17, fontWeight: "600", color: colors.slate }}>
+          <Text style={{ fontSize: 17, fontWeight: "600", color: colors.secondary }}>
             Event
           </Text>
           <View style={{ width: 32 }} />
         </View>
         <View className="flex-1 items-center justify-center">
-          <Ionicons name="calendar-outline" size={64} color="#94a3b8" />
+          <Ionicons name="calendar-outline" size={64} color={colors.textMuted} />
           <Text className="text-slate-500 mt-4">Event not found</Text>
         </View>
         <BottomNavBar />
@@ -365,7 +337,7 @@ export default function EventDetailScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["top"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["top"]}>
       {/* Custom Header */}
       <View
         style={{
@@ -375,22 +347,22 @@ export default function EventDetailScreen() {
           paddingHorizontal: 16,
           paddingVertical: 12,
           borderBottomWidth: 1,
-          borderBottomColor: colors.sand,
-          backgroundColor: "white",
+          borderBottomColor: colors.backgroundSecondary,
+          backgroundColor: colors.background,
         }}
       >
         <TouchableOpacity
           onPress={() => router.back()}
           style={{ flexDirection: "row", alignItems: "center" }}
         >
-          <Ionicons name="chevron-back" size={24} color={colors.sage} />
-          <Text style={{ color: colors.sage, fontSize: 16, marginLeft: 4 }}>Back</Text>
+          <Ionicons name="chevron-back" size={24} color={colors.primary} />
+          <Text style={{ color: colors.primary, fontSize: 16, marginLeft: 4 }}>Back</Text>
         </TouchableOpacity>
-        <Text style={{ fontSize: 17, fontWeight: "600", color: colors.slate }}>
+        <Text style={{ fontSize: 17, fontWeight: "600", color: colors.secondary }}>
           Event
         </Text>
         <TouchableOpacity onPress={showMenu} style={{ padding: 4 }}>
-          <Ionicons name="ellipsis-horizontal" size={24} color={colors.slate} />
+          <Ionicons name="ellipsis-horizontal" size={24} color={colors.secondary} />
         </TouchableOpacity>
       </View>
 
@@ -398,7 +370,7 @@ export default function EventDetailScreen() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 20 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.sage} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         {/* Header Banner */}
@@ -435,7 +407,7 @@ export default function EventDetailScreen() {
             </View>
             <View className="ml-4 flex-1">
               <Text className="text-slate-500 text-sm">When</Text>
-              <Text className="font-semibold" style={{ color: colors.slate }}>
+              <Text className="font-semibold" style={{ color: colors.secondary }}>
                 {formatDateTime(event.start_time, !event.all_day)}
               </Text>
               {event.end_time && !event.all_day && (
@@ -460,21 +432,21 @@ export default function EventDetailScreen() {
               </View>
               <View className="ml-4 flex-1">
                 <Text className="text-slate-500 text-sm">Where</Text>
-                <Text className="font-semibold" style={{ color: colors.slate }}>
+                <Text className="font-semibold" style={{ color: colors.secondary }}>
                   {event.location}
                 </Text>
               </View>
               {event.location_lat && event.location_lng && (
                 <TouchableOpacity
                   className="px-3 py-2 rounded-lg"
-                  style={{ backgroundColor: colors.sand }}
+                  style={{ backgroundColor: colors.backgroundSecondary }}
                   onPress={handleCheckIn}
                   disabled={checkingIn}
                 >
                   {checkingIn ? (
-                    <ActivityIndicator size="small" color={colors.sage} />
+                    <ActivityIndicator size="small" color={colors.primary} />
                   ) : (
-                    <Ionicons name="navigate" size={20} color={colors.sage} />
+                    <Ionicons name="navigate" size={20} color={colors.primary} />
                   )}
                 </TouchableOpacity>
               )}
@@ -486,7 +458,7 @@ export default function EventDetailScreen() {
         {event.description && (
           <View className="mx-4 mt-3 rounded-xl bg-white p-4">
             <Text className="text-slate-500 text-sm mb-2">Notes</Text>
-            <Text style={{ color: colors.slate }}>{event.description}</Text>
+            <Text style={{ color: colors.secondary }}>{event.description}</Text>
           </View>
         )}
 
@@ -533,7 +505,7 @@ export default function EventDetailScreen() {
 
         {/* RSVP Section */}
         <View className="mx-4 mt-4">
-          <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+          <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
             Your Response
           </Text>
           <View className="flex-row space-x-2">
@@ -544,13 +516,13 @@ export default function EventDetailScreen() {
                 style={{
                   backgroundColor: event.my_rsvp_status === option.status ? option.color : "white",
                   borderWidth: event.my_rsvp_status === option.status ? 0 : 2,
-                  borderColor: colors.sand,
+                  borderColor: colors.backgroundSecondary,
                 }}
                 onPress={() => handleRSVP(option.status)}
                 disabled={updatingRSVP}
               >
                 {updatingRSVP && event.my_rsvp_status !== option.status ? (
-                  <ActivityIndicator size="small" color={colors.slate} />
+                  <ActivityIndicator size="small" color={colors.secondary} />
                 ) : (
                   <>
                     <Ionicons
@@ -561,7 +533,7 @@ export default function EventDetailScreen() {
                     <Text
                       className="text-sm mt-1 font-medium"
                       style={{
-                        color: event.my_rsvp_status === option.status ? "white" : colors.slate,
+                        color: event.my_rsvp_status === option.status ? "white" : colors.secondary,
                       }}
                     >
                       {option.label}
@@ -576,21 +548,21 @@ export default function EventDetailScreen() {
         {/* Attendance Summary */}
         {attendance.length > 0 && (
           <View className="mx-4 mt-4 rounded-xl bg-white p-4">
-            <Text className="font-semibold mb-3" style={{ color: colors.slate }}>
+            <Text className="font-semibold mb-3" style={{ color: colors.secondary }}>
               Responses ({attendance.length})
             </Text>
             {attendance.map((att) => (
               <View key={att.id} className="flex-row items-center py-2 border-b border-slate-100 last:border-0">
                 <View
                   className="w-10 h-10 rounded-full items-center justify-center"
-                  style={{ backgroundColor: colors.sand }}
+                  style={{ backgroundColor: colors.backgroundSecondary }}
                 >
-                  <Text className="font-semibold" style={{ color: colors.slate }}>
+                  <Text className="font-semibold" style={{ color: colors.secondary }}>
                     {att.parent_name?.charAt(0) || "?"}
                   </Text>
                 </View>
                 <View className="flex-1 ml-3">
-                  <Text className="font-medium" style={{ color: colors.slate }}>
+                  <Text className="font-medium" style={{ color: colors.secondary }}>
                     {att.parent_name || "Unknown"}
                   </Text>
                   {att.rsvp_note && (
@@ -607,7 +579,7 @@ export default function EventDetailScreen() {
                         ? "#FEE2E2"
                         : att.rsvp_status === "maybe"
                         ? "#FEF3C7"
-                        : colors.sand,
+                        : colors.backgroundSecondary,
                   }}
                 >
                   <Text
@@ -620,7 +592,7 @@ export default function EventDetailScreen() {
                           ? "#991B1B"
                           : att.rsvp_status === "maybe"
                           ? "#92400E"
-                          : colors.slate,
+                          : colors.secondary,
                     }}
                   >
                     {att.rsvp_status === "no_response"
@@ -640,11 +612,11 @@ export default function EventDetailScreen() {
           <View className="mx-4 mt-4 flex-row space-x-2">
             <TouchableOpacity
               className="flex-1 py-3 rounded-xl flex-row items-center justify-center border-2"
-              style={{ borderColor: colors.sage }}
+              style={{ borderColor: colors.primary }}
               onPress={() => router.push(`/events/${eventId}/edit`)}
             >
-              <Ionicons name="pencil" size={18} color={colors.sage} />
-              <Text className="font-semibold ml-2" style={{ color: colors.sage }}>
+              <Ionicons name="pencil" size={18} color={colors.primary} />
+              <Text className="font-semibold ml-2" style={{ color: colors.primary }}>
                 Edit
               </Text>
             </TouchableOpacity>
@@ -662,7 +634,7 @@ export default function EventDetailScreen() {
         )}
 
         {/* Created By */}
-        <View className="mx-4 mt-4 pt-4 border-t" style={{ borderColor: colors.sand }}>
+        <View className="mx-4 mt-4 pt-4 border-t" style={{ borderColor: colors.backgroundSecondary }}>
           <Text className="text-center text-sm text-slate-400">
             Created by {event.creator_name || "Unknown"}
             {event.visibility === "private" && " (Private)"}
@@ -677,11 +649,12 @@ export default function EventDetailScreen() {
 }
 
 function DetailRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+  const { colors } = useTheme();
   return (
     <View className="flex-row items-center py-2 border-b border-slate-100 last:border-0">
-      <Ionicons name={icon as any} size={18} color="#94a3b8" />
+      <Ionicons name={icon as any} size={18} color={colors.textMuted} />
       <Text className="text-slate-500 ml-2 w-20">{label}</Text>
-      <Text className="flex-1 font-medium" style={{ color: "#475569" }}>
+      <Text className="flex-1 font-medium" style={{ color: colors.secondary }}>
         {value}
       </Text>
     </View>

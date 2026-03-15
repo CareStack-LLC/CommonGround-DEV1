@@ -23,16 +23,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { parent, type CustodyParent } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
-
-// CommonGround Design System Colors
-const SAGE = "#4A6C58";
-const SAGE_LIGHT = "#6B9B7A";
-const SAGE_SUBTLE = "#E8F0EC";
-const SLATE = "#475569";
-const AMBER = "#D4A574";
-const AMBER_SUBTLE = "#FEF7ED";
-const SAND = "#F5F0E8";
-const CREAM = "#FFFBF5";
+import { useTheme } from "@/theme";
 
 const RECURRENCE_OPTIONS = [
   { id: "none", label: "One-time" },
@@ -44,6 +35,7 @@ const RECURRENCE_OPTIONS = [
 export default function CreateExchangeScreen() {
   const { user } = useAuth();
   const { familyFile, children } = useFamilyFile();
+  const { colors } = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form state
@@ -136,7 +128,7 @@ export default function CreateExchangeScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: SAND }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.backgroundSecondary }} edges={["bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 120 }}
@@ -144,15 +136,15 @@ export default function CreateExchangeScreen() {
       >
         {/* Direction Selection */}
         <View className="px-4 pt-4">
-          <Text className="text-lg font-semibold mb-3" style={{ color: SLATE }}>
+          <Text className="text-lg font-semibold mb-3" style={{ color: colors.secondary }}>
             Exchange Direction
           </Text>
-          <View className="rounded-2xl p-4" style={{ backgroundColor: CREAM }}>
+          <View className="rounded-2xl p-4" style={{ backgroundColor: colors.surfaceElevated }}>
             <View className="flex-row items-center justify-between">
               <TouchableOpacity
                 className="flex-1 py-3 rounded-xl items-center"
                 style={{
-                  backgroundColor: fromParent === "parent_a" ? SAGE : "transparent",
+                  backgroundColor: fromParent === "parent_a" ? colors.primary : "transparent",
                 }}
                 onPress={() => {
                   setFromParent("parent_a");
@@ -161,18 +153,18 @@ export default function CreateExchangeScreen() {
               >
                 <Text
                   className="font-medium"
-                  style={{ color: fromParent === "parent_a" ? "white" : SLATE }}
+                  style={{ color: fromParent === "parent_a" ? colors.textInverse : colors.secondary }}
                 >
                   From You
                 </Text>
               </TouchableOpacity>
               <View className="mx-3">
-                <Ionicons name="arrow-forward" size={20} color={AMBER} />
+                <Ionicons name="arrow-forward" size={20} color={colors.accent} />
               </View>
               <TouchableOpacity
                 className="flex-1 py-3 rounded-xl items-center"
                 style={{
-                  backgroundColor: fromParent === "parent_b" ? SAGE : "transparent",
+                  backgroundColor: fromParent === "parent_b" ? colors.primary : "transparent",
                 }}
                 onPress={() => {
                   setFromParent("parent_b");
@@ -181,7 +173,7 @@ export default function CreateExchangeScreen() {
               >
                 <Text
                   className="font-medium"
-                  style={{ color: fromParent === "parent_b" ? "white" : SLATE }}
+                  style={{ color: fromParent === "parent_b" ? colors.textInverse : colors.secondary }}
                 >
                   To You
                 </Text>
@@ -192,24 +184,24 @@ export default function CreateExchangeScreen() {
 
         {/* Date & Time */}
         <View className="px-4 mt-6">
-          <Text className="text-lg font-semibold mb-3" style={{ color: SLATE }}>
+          <Text className="text-lg font-semibold mb-3" style={{ color: colors.secondary }}>
             Date & Time
           </Text>
           <View className="flex-row gap-3">
             <TouchableOpacity
               className="flex-1 rounded-2xl p-4 flex-row items-center"
-              style={{ backgroundColor: CREAM }}
+              style={{ backgroundColor: colors.surfaceElevated }}
               onPress={() => setShowDatePicker(true)}
             >
               <View
                 className="w-10 h-10 rounded-xl items-center justify-center"
-                style={{ backgroundColor: AMBER_SUBTLE }}
+                style={{ backgroundColor: colors.accentLight }}
               >
-                <Ionicons name="calendar" size={20} color={AMBER} />
+                <Ionicons name="calendar" size={20} color={colors.accent} />
               </View>
               <View className="ml-3">
-                <Text className="text-xs" style={{ color: `${SLATE}99` }}>Date</Text>
-                <Text className="font-medium" style={{ color: SLATE }}>
+                <Text className="text-xs" style={{ color: colors.textMuted }}>Date</Text>
+                <Text className="font-medium" style={{ color: colors.secondary }}>
                   {exchangeDate.toLocaleDateString("en-US", {
                     weekday: "short",
                     month: "short",
@@ -221,18 +213,18 @@ export default function CreateExchangeScreen() {
 
             <TouchableOpacity
               className="flex-1 rounded-2xl p-4 flex-row items-center"
-              style={{ backgroundColor: CREAM }}
+              style={{ backgroundColor: colors.surfaceElevated }}
               onPress={() => setShowTimePicker(true)}
             >
               <View
                 className="w-10 h-10 rounded-xl items-center justify-center"
-                style={{ backgroundColor: SAGE_SUBTLE }}
+                style={{ backgroundColor: colors.primaryLight }}
               >
-                <Ionicons name="time" size={20} color={SAGE} />
+                <Ionicons name="time" size={20} color={colors.primary} />
               </View>
               <View className="ml-3">
-                <Text className="text-xs" style={{ color: `${SLATE}99` }}>Time</Text>
-                <Text className="font-medium" style={{ color: SLATE }}>
+                <Text className="text-xs" style={{ color: colors.textMuted }}>Time</Text>
+                <Text className="font-medium" style={{ color: colors.secondary }}>
                   {exchangeTime.toLocaleTimeString("en-US", {
                     hour: "numeric",
                     minute: "2-digit",
@@ -264,31 +256,31 @@ export default function CreateExchangeScreen() {
 
         {/* Location */}
         <View className="px-4 mt-6">
-          <Text className="text-lg font-semibold mb-3" style={{ color: SLATE }}>
+          <Text className="text-lg font-semibold mb-3" style={{ color: colors.secondary }}>
             Exchange Location
           </Text>
-          <View className="rounded-2xl p-4" style={{ backgroundColor: CREAM }}>
+          <View className="rounded-2xl p-4" style={{ backgroundColor: colors.surfaceElevated }}>
             <View className="flex-row items-center mb-3">
               <View
                 className="w-10 h-10 rounded-xl items-center justify-center"
-                style={{ backgroundColor: AMBER_SUBTLE }}
+                style={{ backgroundColor: colors.accentLight }}
               >
-                <Ionicons name="location" size={20} color={AMBER} />
+                <Ionicons name="location" size={20} color={colors.accent} />
               </View>
               <TextInput
                 className="flex-1 ml-3 text-base"
-                style={{ color: SLATE }}
+                style={{ color: colors.secondary }}
                 placeholder="Location name (e.g., School parking lot)"
-                placeholderTextColor={`${SLATE}66`}
+                placeholderTextColor={colors.textMuted}
                 value={locationName}
                 onChangeText={setLocationName}
               />
             </View>
             <TextInput
               className="text-base pl-13"
-              style={{ color: SLATE, marginLeft: 52 }}
+              style={{ color: colors.secondary, marginLeft: 52 }}
               placeholder="Full address (optional)"
-              placeholderTextColor={`${SLATE}66`}
+              placeholderTextColor={colors.textMuted}
               value={locationAddress}
               onChangeText={setLocationAddress}
             />
@@ -298,20 +290,20 @@ export default function CreateExchangeScreen() {
         {/* Children Selection */}
         {children && children.length > 0 && (
           <View className="px-4 mt-6">
-            <Text className="text-lg font-semibold mb-3" style={{ color: SLATE }}>
+            <Text className="text-lg font-semibold mb-3" style={{ color: colors.secondary }}>
               Children
             </Text>
             <View className="flex-row flex-wrap gap-2">
               <TouchableOpacity
                 className="px-4 py-2.5 rounded-full"
                 style={{
-                  backgroundColor: selectedChildren.length === 0 ? SAGE : CREAM,
+                  backgroundColor: selectedChildren.length === 0 ? colors.primary : colors.surfaceElevated,
                 }}
                 onPress={() => setSelectedChildren([])}
               >
                 <Text
                   className="font-medium"
-                  style={{ color: selectedChildren.length === 0 ? "white" : SLATE }}
+                  style={{ color: selectedChildren.length === 0 ? colors.textInverse : colors.secondary }}
                 >
                   All Children
                 </Text>
@@ -321,14 +313,14 @@ export default function CreateExchangeScreen() {
                   key={child.id}
                   className="px-4 py-2.5 rounded-full"
                   style={{
-                    backgroundColor: selectedChildren.includes(child.id) ? SAGE : CREAM,
+                    backgroundColor: selectedChildren.includes(child.id) ? colors.primary : colors.surfaceElevated,
                   }}
                   onPress={() => toggleChild(child.id)}
                 >
                   <Text
                     className="font-medium"
                     style={{
-                      color: selectedChildren.includes(child.id) ? "white" : SLATE,
+                      color: selectedChildren.includes(child.id) ? colors.textInverse : colors.secondary,
                     }}
                   >
                     {child.first_name}
@@ -341,7 +333,7 @@ export default function CreateExchangeScreen() {
 
         {/* Recurrence */}
         <View className="px-4 mt-6">
-          <Text className="text-lg font-semibold mb-3" style={{ color: SLATE }}>
+          <Text className="text-lg font-semibold mb-3" style={{ color: colors.secondary }}>
             Repeat
           </Text>
           <View className="flex-row flex-wrap gap-2">
@@ -350,13 +342,13 @@ export default function CreateExchangeScreen() {
                 key={option.id}
                 className="px-4 py-2.5 rounded-full"
                 style={{
-                  backgroundColor: recurrence === option.id ? SAGE : CREAM,
+                  backgroundColor: recurrence === option.id ? colors.primary : colors.surfaceElevated,
                 }}
                 onPress={() => setRecurrence(option.id)}
               >
                 <Text
                   className="font-medium"
-                  style={{ color: recurrence === option.id ? "white" : SLATE }}
+                  style={{ color: recurrence === option.id ? colors.textInverse : colors.secondary }}
                 >
                   {option.label}
                 </Text>
@@ -367,24 +359,24 @@ export default function CreateExchangeScreen() {
 
         {/* Silent Drop Options */}
         <View className="px-4 mt-6">
-          <Text className="text-lg font-semibold mb-3" style={{ color: SLATE }}>
+          <Text className="text-lg font-semibold mb-3" style={{ color: colors.secondary }}>
             Verification Options
           </Text>
-          <View className="rounded-2xl p-4" style={{ backgroundColor: CREAM }}>
+          <View className="rounded-2xl p-4" style={{ backgroundColor: colors.surfaceElevated }}>
             {/* Silent Handoff Toggle */}
             <View className="flex-row items-center justify-between py-2">
               <View className="flex-row items-center flex-1">
                 <View
                   className="w-10 h-10 rounded-xl items-center justify-center"
-                  style={{ backgroundColor: SAGE_SUBTLE }}
+                  style={{ backgroundColor: colors.primaryLight }}
                 >
-                  <Ionicons name="navigate" size={20} color={SAGE} />
+                  <Ionicons name="navigate" size={20} color={colors.primary} />
                 </View>
                 <View className="ml-3 flex-1">
-                  <Text className="font-medium" style={{ color: SLATE }}>
+                  <Text className="font-medium" style={{ color: colors.secondary }}>
                     Silent Drop GPS
                   </Text>
-                  <Text className="text-xs" style={{ color: `${SLATE}99` }}>
+                  <Text className="text-xs" style={{ color: colors.textMuted }}>
                     Verify location at exchange
                   </Text>
                 </View>
@@ -392,8 +384,8 @@ export default function CreateExchangeScreen() {
               <Switch
                 value={silentHandoff}
                 onValueChange={setSilentHandoff}
-                trackColor={{ false: "#e2e8f0", true: SAGE_LIGHT }}
-                thumbColor={silentHandoff ? SAGE : "#f4f4f5"}
+                trackColor={{ false: "#e2e8f0", true: colors.primary }}
+                thumbColor={silentHandoff ? colors.background : "#f4f4f5"}
               />
             </View>
 
@@ -402,15 +394,15 @@ export default function CreateExchangeScreen() {
               <View className="flex-row items-center flex-1">
                 <View
                   className="w-10 h-10 rounded-xl items-center justify-center"
-                  style={{ backgroundColor: AMBER_SUBTLE }}
+                  style={{ backgroundColor: colors.accentLight }}
                 >
-                  <Ionicons name="qr-code" size={20} color={AMBER} />
+                  <Ionicons name="qr-code" size={20} color={colors.accent} />
                 </View>
                 <View className="ml-3 flex-1">
-                  <Text className="font-medium" style={{ color: SLATE }}>
+                  <Text className="font-medium" style={{ color: colors.secondary }}>
                     QR Confirmation
                   </Text>
-                  <Text className="text-xs" style={{ color: `${SLATE}99` }}>
+                  <Text className="text-xs" style={{ color: colors.textMuted }}>
                     Scan to confirm handoff
                   </Text>
                 </View>
@@ -418,20 +410,20 @@ export default function CreateExchangeScreen() {
               <Switch
                 value={qrConfirmation}
                 onValueChange={setQrConfirmation}
-                trackColor={{ false: "#e2e8f0", true: SAGE_LIGHT }}
-                thumbColor={qrConfirmation ? SAGE : "#f4f4f5"}
+                trackColor={{ false: "#e2e8f0", true: colors.primary }}
+                thumbColor={qrConfirmation ? colors.background : "#f4f4f5"}
               />
             </View>
 
             {/* Check-in Window */}
             {silentHandoff && (
               <View className="mt-4 pt-4 border-t border-slate-200">
-                <Text className="text-sm font-medium mb-3" style={{ color: SLATE }}>
+                <Text className="text-sm font-medium mb-3" style={{ color: colors.secondary }}>
                   Check-in Window
                 </Text>
                 <View className="flex-row gap-3">
                   <View className="flex-1">
-                    <Text className="text-xs mb-1" style={{ color: `${SLATE}99` }}>
+                    <Text className="text-xs mb-1" style={{ color: colors.textMuted }}>
                       Before (min)
                     </Text>
                     <View className="flex-row items-center">
@@ -440,13 +432,13 @@ export default function CreateExchangeScreen() {
                           key={mins}
                           className="flex-1 py-2 rounded-lg items-center mr-1"
                           style={{
-                            backgroundColor: checkInWindowBefore === mins ? SAGE : SAGE_SUBTLE,
+                            backgroundColor: checkInWindowBefore === mins ? colors.primary : colors.primaryLight,
                           }}
                           onPress={() => setCheckInWindowBefore(mins)}
                         >
                           <Text
                             className="text-sm font-medium"
-                            style={{ color: checkInWindowBefore === mins ? "white" : SAGE }}
+                            style={{ color: checkInWindowBefore === mins ? colors.textInverse : colors.primary }}
                           >
                             {mins}
                           </Text>
@@ -455,7 +447,7 @@ export default function CreateExchangeScreen() {
                     </View>
                   </View>
                   <View className="flex-1">
-                    <Text className="text-xs mb-1" style={{ color: `${SLATE}99` }}>
+                    <Text className="text-xs mb-1" style={{ color: colors.textMuted }}>
                       After (min)
                     </Text>
                     <View className="flex-row items-center">
@@ -464,13 +456,13 @@ export default function CreateExchangeScreen() {
                           key={mins}
                           className="flex-1 py-2 rounded-lg items-center mr-1"
                           style={{
-                            backgroundColor: checkInWindowAfter === mins ? SAGE : SAGE_SUBTLE,
+                            backgroundColor: checkInWindowAfter === mins ? colors.primary : colors.primaryLight,
                           }}
                           onPress={() => setCheckInWindowAfter(mins)}
                         >
                           <Text
                             className="text-sm font-medium"
-                            style={{ color: checkInWindowAfter === mins ? "white" : SAGE }}
+                            style={{ color: checkInWindowAfter === mins ? colors.textInverse : colors.primary }}
                           >
                             {mins}
                           </Text>
@@ -486,14 +478,14 @@ export default function CreateExchangeScreen() {
 
         {/* Notes */}
         <View className="px-4 mt-6">
-          <Text className="text-lg font-semibold mb-3" style={{ color: SLATE }}>
+          <Text className="text-lg font-semibold mb-3" style={{ color: colors.secondary }}>
             Notes (optional)
           </Text>
           <TextInput
             className="rounded-2xl px-4 py-3 text-base"
-            style={{ backgroundColor: CREAM, color: SLATE, minHeight: 80, textAlignVertical: "top" }}
+            style={{ backgroundColor: colors.surfaceElevated, color: colors.secondary, minHeight: 80, textAlignVertical: "top" }}
             placeholder="Any special instructions or notes..."
-            placeholderTextColor={`${SLATE}66`}
+            placeholderTextColor={colors.textMuted}
             value={notes}
             onChangeText={setNotes}
             multiline
@@ -504,11 +496,11 @@ export default function CreateExchangeScreen() {
       {/* Submit Button */}
       <View
         className="absolute bottom-0 left-0 right-0 p-4 pb-8 border-t"
-        style={{ backgroundColor: CREAM, borderColor: "#e2e8f0" }}
+        style={{ backgroundColor: colors.surfaceElevated, borderColor: colors.border }}
       >
         <TouchableOpacity
           className="py-4 rounded-xl items-center"
-          style={{ backgroundColor: isSubmitting ? SAGE_LIGHT : SAGE }}
+          style={{ backgroundColor: isSubmitting ? colors.textMuted : colors.primary }}
           onPress={handleSubmit}
           disabled={isSubmitting}
         >

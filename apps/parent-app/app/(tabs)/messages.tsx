@@ -28,6 +28,7 @@ import * as DocumentPicker from "expo-document-picker";
 
 import { useFamilyFile } from "@/hooks/useFamilyFile";
 import { useAuth } from "@/providers/AuthProvider";
+import { useTheme } from "@/theme";
 import {
   createFamilyFileChannel,
   subscribeToMessages,
@@ -38,15 +39,6 @@ import {
   type TypingPayload,
 } from "@/lib/supabase";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-
-// Design System Colors
-const SAGE = "#4A6C58";
-const SAGE_LIGHT = "#E8F0EB";
-const SLATE = "#475569";
-const SLATE_LIGHT = "#94A3B8";
-const CREAM = "#FFFBF5";
-const WHITE = "#FFFFFF";
-const SAND = "#F5F0E8";
 
 const TOKEN_KEY = "auth_token";
 const API_URL = process.env.EXPO_PUBLIC_API_URL || "https://commonground-api-gdxg.onrender.com";
@@ -105,6 +97,7 @@ interface ARIAAnalysis {
 }
 
 export default function MessagesScreen() {
+  const { colors } = useTheme();
   const { familyFile } = useFamilyFile();
   const { user } = useAuth();
   const flatListRef = useRef<FlatList>(null);
@@ -698,7 +691,7 @@ export default function MessagesScreen() {
         {/* Timestamp */}
         <Text style={{
           textAlign: isOwnMessage ? "right" : "left",
-          color: SLATE_LIGHT,
+          color: colors.textMuted,
           fontSize: 12,
           marginBottom: 4,
           marginLeft: isOwnMessage ? 0 : 48,
@@ -717,25 +710,25 @@ export default function MessagesScreen() {
               width: 36,
               height: 36,
               borderRadius: 18,
-              backgroundColor: SAGE_LIGHT,
+              backgroundColor: colors.primaryLight,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 8,
             }}>
-              <Ionicons name="person" size={18} color={SAGE} />
+              <Ionicons name="person" size={18} color={colors.primary} />
             </View>
           )}
 
           <View style={{ maxWidth: "75%" }}>
             {/* Message Bubble */}
             <View style={{
-              backgroundColor: isOwnMessage ? SAGE : WHITE,
+              backgroundColor: isOwnMessage ? colors.primary : colors.background,
               borderRadius: 16,
               borderBottomRightRadius: isOwnMessage ? 4 : 16,
               borderBottomLeftRadius: isOwnMessage ? 16 : 4,
               padding: 12,
               borderWidth: isOwnMessage ? 0 : 1,
-              borderColor: SAND,
+              borderColor: colors.backgroundSecondary,
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 1 },
               shadowOpacity: 0.05,
@@ -763,45 +756,45 @@ export default function MessagesScreen() {
                         <TouchableOpacity
                           onPress={() => Linking.openURL(att.storage_url)}
                           style={{
-                            backgroundColor: isOwnMessage ? "rgba(255,255,255,0.2)" : SAND,
+                            backgroundColor: isOwnMessage ? "rgba(255,255,255,0.2)" : colors.backgroundSecondary,
                             borderRadius: 8,
                             padding: 12,
                             flexDirection: "row",
                             alignItems: "center",
                           }}
                         >
-                          <Ionicons name="videocam" size={24} color={isOwnMessage ? WHITE : SAGE} />
+                          <Ionicons name="videocam" size={24} color={isOwnMessage ? colors.textInverse : colors.primary} />
                           <View style={{ marginLeft: 12, flex: 1 }}>
-                            <Text style={{ color: isOwnMessage ? WHITE : SLATE, fontWeight: "500" }} numberOfLines={1}>
+                            <Text style={{ color: isOwnMessage ? colors.textInverse : colors.secondary, fontWeight: "500" }} numberOfLines={1}>
                               {att.file_name}
                             </Text>
-                            <Text style={{ color: isOwnMessage ? "rgba(255,255,255,0.7)" : SLATE_LIGHT, fontSize: 12 }}>
+                            <Text style={{ color: isOwnMessage ? "rgba(255,255,255,0.7)" : colors.textMuted, fontSize: 12 }}>
                               Tap to play
                             </Text>
                           </View>
-                          <Ionicons name="play-circle" size={32} color={isOwnMessage ? WHITE : SAGE} />
+                          <Ionicons name="play-circle" size={32} color={isOwnMessage ? colors.textInverse : colors.primary} />
                         </TouchableOpacity>
                       ) : (
                         <TouchableOpacity
                           onPress={() => Linking.openURL(att.storage_url)}
                           style={{
-                            backgroundColor: isOwnMessage ? "rgba(255,255,255,0.2)" : SAND,
+                            backgroundColor: isOwnMessage ? "rgba(255,255,255,0.2)" : colors.backgroundSecondary,
                             borderRadius: 8,
                             padding: 12,
                             flexDirection: "row",
                             alignItems: "center",
                           }}
                         >
-                          <Ionicons name={getFileIconName(att.file_type)} size={24} color={isOwnMessage ? WHITE : SAGE} />
+                          <Ionicons name={getFileIconName(att.file_type)} size={24} color={isOwnMessage ? colors.textInverse : colors.primary} />
                           <View style={{ marginLeft: 12, flex: 1 }}>
-                            <Text style={{ color: isOwnMessage ? WHITE : SLATE, fontWeight: "500" }} numberOfLines={1}>
+                            <Text style={{ color: isOwnMessage ? colors.textInverse : colors.secondary, fontWeight: "500" }} numberOfLines={1}>
                               {att.file_name}
                             </Text>
-                            <Text style={{ color: isOwnMessage ? "rgba(255,255,255,0.7)" : SLATE_LIGHT, fontSize: 12 }}>
+                            <Text style={{ color: isOwnMessage ? "rgba(255,255,255,0.7)" : colors.textMuted, fontSize: 12 }}>
                               {formatFileSize(att.file_size)} • Tap to open
                             </Text>
                           </View>
-                          <Ionicons name="download" size={20} color={isOwnMessage ? WHITE : SAGE} />
+                          <Ionicons name="download" size={20} color={isOwnMessage ? colors.textInverse : colors.primary} />
                         </TouchableOpacity>
                       )}
                     </View>
@@ -832,7 +825,7 @@ export default function MessagesScreen() {
               {/* Message Content - hide if just "(Attachment)" and we have attachments */}
               {item.content && item.content !== "(Attachment)" && (
                 <Text style={{
-                  color: isOwnMessage ? WHITE : SLATE,
+                  color: isOwnMessage ? colors.textInverse : colors.secondary,
                   fontSize: 15,
                   lineHeight: 22,
                 }}>
@@ -843,9 +836,9 @@ export default function MessagesScreen() {
               {/* Show placeholder if no content and no attachments rendered */}
               {item.content === "(Attachment)" && (!item.attachments || item.attachments.length === 0) && (!item.attachment_urls || item.attachment_urls.length === 0) && (
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Ionicons name="attach" size={16} color={isOwnMessage ? "rgba(255,255,255,0.7)" : SLATE_LIGHT} />
+                  <Ionicons name="attach" size={16} color={isOwnMessage ? "rgba(255,255,255,0.7)" : colors.textMuted} />
                   <Text style={{
-                    color: isOwnMessage ? "rgba(255,255,255,0.7)" : SLATE_LIGHT,
+                    color: isOwnMessage ? "rgba(255,255,255,0.7)" : colors.textMuted,
                     fontSize: 14,
                     marginLeft: 4,
                     fontStyle: "italic",
@@ -866,13 +859,13 @@ export default function MessagesScreen() {
                   marginTop: 4,
                   paddingVertical: 4,
                   paddingHorizontal: 8,
-                  backgroundColor: SAND,
+                  backgroundColor: colors.backgroundSecondary,
                   borderRadius: 12,
                   alignSelf: "flex-start",
                 }}
               >
-                <Ionicons name="thumbs-up-outline" size={14} color={SAGE} />
-                <Text style={{ color: SAGE, fontSize: 12, marginLeft: 4, fontWeight: "500" }}>
+                <Ionicons name="thumbs-up-outline" size={14} color={colors.primary} />
+                <Text style={{ color: colors.primary, fontSize: 12, marginLeft: 4, fontWeight: "500" }}>
                   Acknowledge
                 </Text>
               </TouchableOpacity>
@@ -880,8 +873,8 @@ export default function MessagesScreen() {
 
             {isAcknowledged && (
               <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
-                <Ionicons name="thumbs-up" size={12} color={SAGE} />
-                <Text style={{ color: SAGE, fontSize: 11, marginLeft: 4 }}>
+                <Ionicons name="thumbs-up" size={12} color={colors.primary} />
+                <Text style={{ color: colors.primary, fontSize: 11, marginLeft: 4 }}>
                   Acknowledged
                 </Text>
               </View>
@@ -891,7 +884,7 @@ export default function MessagesScreen() {
             {isOwnMessage && (
               <Text style={{
                 textAlign: "right",
-                color: SAGE,
+                color: colors.primary,
                 fontSize: 11,
                 marginTop: 2,
                 fontWeight: "500",
@@ -921,30 +914,30 @@ export default function MessagesScreen() {
       case "green":
       case "none":
       default:
-        return SAGE; // Green - no toxicity
+        return colors.primary; // Green - no toxicity
     }
   };
 
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: CREAM, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size="large" color={SAGE} />
-        <Text style={{ marginTop: 16, color: SLATE }}>Loading messages...</Text>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={{ marginTop: 16, color: colors.secondary }}>Loading messages...</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: CREAM }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceElevated }} edges={["top"]}>
       {/* Header */}
       <View style={{
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 16,
         paddingVertical: 12,
-        backgroundColor: SAGE,
+        backgroundColor: colors.primary,
         borderBottomWidth: 1,
-        borderBottomColor: SAND,
+        borderBottomColor: colors.backgroundSecondary,
       }}>
         {/* Family Icon */}
         <View style={{
@@ -956,12 +949,12 @@ export default function MessagesScreen() {
           justifyContent: "center",
           marginRight: 12,
         }}>
-          <Ionicons name="people" size={20} color={WHITE} />
+          <Ionicons name="people" size={20} color={colors.textInverse} />
         </View>
 
         {/* Title */}
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 18, fontWeight: "700", color: WHITE }}>
+          <Text style={{ fontSize: 18, fontWeight: "700", color: colors.textInverse }}>
             {familyFile?.title || familyFile?.family_name || "Family Messages"}
           </Text>
           <TouchableOpacity onPress={() => router.push("/agreements")}>
@@ -969,6 +962,21 @@ export default function MessagesScreen() {
               Shared Care Agreement <Ionicons name="chevron-forward" size={12} />
             </Text>
           </TouchableOpacity>
+        </View>
+
+        {/* ARIA Monitoring Indicator */}
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: "rgba(255,255,255,0.15)",
+          borderRadius: 12,
+          paddingHorizontal: 8,
+          paddingVertical: 4,
+          marginLeft: 8,
+          gap: 4,
+        }}>
+          <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#4ade80" }} />
+          <Text style={{ fontSize: 10, color: "rgba(255,255,255,0.9)", fontWeight: "600" }}>ARIA</Text>
         </View>
 
         {/* Action Buttons */}
@@ -1000,7 +1008,7 @@ export default function MessagesScreen() {
             });
           }}
         >
-          <Ionicons name="call" size={18} color={WHITE} />
+          <Ionicons name="call" size={18} color={colors.textInverse} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -1031,7 +1039,7 @@ export default function MessagesScreen() {
             });
           }}
         >
-          <Ionicons name="videocam" size={18} color={WHITE} />
+          <Ionicons name="videocam" size={18} color={colors.textInverse} />
         </TouchableOpacity>
 
         {/* ARIA Badge */}
@@ -1048,10 +1056,10 @@ export default function MessagesScreen() {
             width: 6,
             height: 6,
             borderRadius: 3,
-            backgroundColor: WHITE,
+            backgroundColor: colors.textInverse,
             marginRight: 4
           }} />
-          <Text style={{ color: WHITE, fontSize: 12, fontWeight: "600" }}>ARIA</Text>
+          <Text style={{ color: colors.textInverse, fontSize: 12, fontWeight: "600" }}>ARIA</Text>
         </View>
       </View>
 
@@ -1072,11 +1080,11 @@ export default function MessagesScreen() {
           }}
           ListEmptyComponent={
             <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 40 }}>
-              <Ionicons name="chatbubbles-outline" size={64} color={SLATE_LIGHT} />
-              <Text style={{ fontSize: 18, fontWeight: "600", color: SLATE, marginTop: 16 }}>
+              <Ionicons name="chatbubbles-outline" size={64} color={colors.textMuted} />
+              <Text style={{ fontSize: 18, fontWeight: "600", color: colors.secondary, marginTop: 16 }}>
                 No messages yet
               </Text>
-              <Text style={{ fontSize: 14, color: SLATE_LIGHT, marginTop: 8, textAlign: "center" }}>
+              <Text style={{ fontSize: 14, color: colors.textMuted, marginTop: 8, textAlign: "center" }}>
                 Start a conversation with your co-parent
               </Text>
             </View>
@@ -1089,7 +1097,7 @@ export default function MessagesScreen() {
         {/* Typing Indicator */}
         {otherUserTyping && (
           <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
-            <Text style={{ color: SLATE_LIGHT, fontSize: 12, fontStyle: "italic" }}>
+            <Text style={{ color: colors.textMuted, fontSize: 12, fontStyle: "italic" }}>
               {coParentName} is typing...
             </Text>
           </View>
@@ -1100,14 +1108,14 @@ export default function MessagesScreen() {
           <View style={{
             paddingHorizontal: 16,
             paddingVertical: 8,
-            backgroundColor: WHITE,
+            backgroundColor: colors.background,
             borderTopWidth: 1,
-            borderTopColor: SAND,
+            borderTopColor: colors.backgroundSecondary,
           }}>
             {isAnalyzing ? (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <ActivityIndicator size="small" color={SAGE} />
-                <Text style={{ color: SLATE_LIGHT, fontSize: 13, marginLeft: 8 }}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={{ color: colors.textMuted, fontSize: 13, marginLeft: 8 }}>
                   ARIA is analyzing...
                 </Text>
               </View>
@@ -1137,14 +1145,14 @@ export default function MessagesScreen() {
                     style={{
                       marginTop: 8,
                       padding: 8,
-                      backgroundColor: SAGE_LIGHT,
+                      backgroundColor: colors.primaryLight,
                       borderRadius: 8,
                     }}
                   >
-                    <Text style={{ color: SAGE, fontSize: 12 }}>
+                    <Text style={{ color: colors.primary, fontSize: 12 }}>
                       Suggestion: {analysis.suggestion}
                     </Text>
-                    <Text style={{ color: SAGE, fontSize: 11, fontWeight: "600", marginTop: 4 }}>
+                    <Text style={{ color: colors.primary, fontSize: 11, fontWeight: "600", marginTop: 4 }}>
                       Tap to use this instead
                     </Text>
                   </TouchableOpacity>
@@ -1157,9 +1165,9 @@ export default function MessagesScreen() {
         {/* Attachment Preview */}
         {attachments.length > 0 && (
           <View style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.background,
             borderTopWidth: 1,
-            borderTopColor: SAND,
+            borderTopColor: colors.backgroundSecondary,
             paddingHorizontal: 16,
             paddingVertical: 8,
           }}>
@@ -1171,7 +1179,7 @@ export default function MessagesScreen() {
                     marginRight: 8,
                     borderRadius: 8,
                     borderWidth: 2,
-                    borderColor: attachment.error ? "#DC2626" : attachment.uploaded ? SAGE : SAND,
+                    borderColor: attachment.error ? "#DC2626" : attachment.uploaded ? colors.primary : colors.backgroundSecondary,
                     overflow: "hidden",
                     position: "relative",
                   }}
@@ -1186,12 +1194,12 @@ export default function MessagesScreen() {
                     <View style={{
                       width: 80,
                       height: 80,
-                      backgroundColor: SAND,
+                      backgroundColor: colors.backgroundSecondary,
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
-                      <Ionicons name={getFileIconName(attachment.type)} size={28} color={SAGE} />
-                      <Text style={{ color: SLATE_LIGHT, fontSize: 10, marginTop: 4 }} numberOfLines={1}>
+                      <Ionicons name={getFileIconName(attachment.type)} size={28} color={colors.primary} />
+                      <Text style={{ color: colors.textMuted, fontSize: 10, marginTop: 4 }} numberOfLines={1}>
                         {attachment.name.slice(0, 10)}...
                       </Text>
                     </View>
@@ -1209,7 +1217,7 @@ export default function MessagesScreen() {
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
-                      <ActivityIndicator size="small" color={WHITE} />
+                      <ActivityIndicator size="small" color={colors.textInverse} />
                     </View>
                   )}
 
@@ -1229,7 +1237,7 @@ export default function MessagesScreen() {
                         justifyContent: "center",
                       }}
                     >
-                      <Ionicons name="close" size={14} color={WHITE} />
+                      <Ionicons name="close" size={14} color={colors.textInverse} />
                     </TouchableOpacity>
                   )}
 
@@ -1242,11 +1250,11 @@ export default function MessagesScreen() {
                       width: 18,
                       height: 18,
                       borderRadius: 9,
-                      backgroundColor: SAGE,
+                      backgroundColor: colors.primary,
                       alignItems: "center",
                       justifyContent: "center",
                     }}>
-                      <Ionicons name="checkmark" size={12} color={WHITE} />
+                      <Ionicons name="checkmark" size={12} color={colors.textInverse} />
                     </View>
                   )}
                 </View>
@@ -1261,9 +1269,9 @@ export default function MessagesScreen() {
           alignItems: "flex-end",
           paddingHorizontal: 16,
           paddingVertical: 12,
-          backgroundColor: WHITE,
+          backgroundColor: colors.background,
           borderTopWidth: attachments.length > 0 ? 0 : 1,
-          borderTopColor: SAND,
+          borderTopColor: colors.backgroundSecondary,
         }}>
           {/* Attachment Button */}
           <TouchableOpacity
@@ -1273,20 +1281,20 @@ export default function MessagesScreen() {
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: SAGE_LIGHT,
+              backgroundColor: colors.primaryLight,
               alignItems: "center",
               justifyContent: "center",
               marginRight: 8,
               opacity: isSending || isUploading ? 0.5 : 1,
             }}
           >
-            <Ionicons name="attach" size={20} color={SAGE} />
+            <Ionicons name="attach" size={20} color={colors.primary} />
           </TouchableOpacity>
 
           {/* Text Input */}
           <View style={{
             flex: 1,
-            backgroundColor: SAND,
+            backgroundColor: colors.backgroundSecondary,
             borderRadius: 20,
             paddingHorizontal: 16,
             paddingVertical: 10,
@@ -1294,13 +1302,13 @@ export default function MessagesScreen() {
           }}>
             <TextInput
               placeholder="Write a message..."
-              placeholderTextColor={SLATE_LIGHT}
+              placeholderTextColor={colors.textMuted}
               value={messageText}
               onChangeText={handleTextChange}
               multiline
               editable={!isSending && !isUploading}
               style={{
-                color: SLATE,
+                color: colors.secondary,
                 fontSize: 15,
                 maxHeight: 80,
               }}
@@ -1346,7 +1354,7 @@ export default function MessagesScreen() {
               width: 36,
               height: 36,
               borderRadius: 18,
-              backgroundColor: messageText.trim() && !isSending ? "#F97316" : SLATE_LIGHT,
+              backgroundColor: messageText.trim() && !isSending ? "#F97316" : colors.textMuted,
               alignItems: "center",
               justifyContent: "center",
               marginLeft: 8,
@@ -1354,9 +1362,9 @@ export default function MessagesScreen() {
             }}
           >
             {isAnalyzing ? (
-              <ActivityIndicator size="small" color={WHITE} />
+              <ActivityIndicator size="small" color={colors.textInverse} />
             ) : (
-              <Ionicons name="sparkles" size={16} color={WHITE} />
+              <Ionicons name="sparkles" size={16} color={colors.textInverse} />
             )}
           </TouchableOpacity>
 
@@ -1368,16 +1376,16 @@ export default function MessagesScreen() {
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: (messageText.trim() || attachments.length > 0) && !analysis?.block_send ? SAGE : SLATE_LIGHT,
+              backgroundColor: (messageText.trim() || attachments.length > 0) && !analysis?.block_send ? colors.primary : colors.textMuted,
               alignItems: "center",
               justifyContent: "center",
               marginLeft: 8,
             }}
           >
             {isSending || isUploading ? (
-              <ActivityIndicator size="small" color={WHITE} />
+              <ActivityIndicator size="small" color={colors.textInverse} />
             ) : (
-              <Ionicons name="send" size={18} color={WHITE} />
+              <Ionicons name="send" size={18} color={colors.textInverse} />
             )}
           </TouchableOpacity>
         </View>
@@ -1395,7 +1403,7 @@ export default function MessagesScreen() {
           onPress={() => setShowAttachmentPicker(false)}
         >
           <View style={{
-            backgroundColor: WHITE,
+            backgroundColor: colors.background,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             paddingTop: 20,
@@ -1405,13 +1413,13 @@ export default function MessagesScreen() {
             <View style={{
               width: 36,
               height: 4,
-              backgroundColor: SLATE_LIGHT,
+              backgroundColor: colors.textMuted,
               borderRadius: 2,
               alignSelf: "center",
               marginBottom: 20,
             }} />
 
-            <Text style={{ fontSize: 18, fontWeight: "700", color: SLATE, marginBottom: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: "700", color: colors.secondary, marginBottom: 20 }}>
               Add Attachment
             </Text>
 
@@ -1423,22 +1431,22 @@ export default function MessagesScreen() {
                 alignItems: "center",
                 paddingVertical: 16,
                 borderBottomWidth: 1,
-                borderBottomColor: SAND,
+                borderBottomColor: colors.backgroundSecondary,
               }}
             >
               <View style={{
                 width: 48,
                 height: 48,
                 borderRadius: 24,
-                backgroundColor: SAGE_LIGHT,
+                backgroundColor: colors.primaryLight,
                 alignItems: "center",
                 justifyContent: "center",
               }}>
-                <Ionicons name="camera" size={24} color={SAGE} />
+                <Ionicons name="camera" size={24} color={colors.primary} />
               </View>
               <View style={{ marginLeft: 16 }}>
-                <Text style={{ fontSize: 16, fontWeight: "600", color: SLATE }}>Camera</Text>
-                <Text style={{ fontSize: 13, color: SLATE_LIGHT }}>Take a photo or video</Text>
+                <Text style={{ fontSize: 16, fontWeight: "600", color: colors.secondary }}>Camera</Text>
+                <Text style={{ fontSize: 13, color: colors.textMuted }}>Take a photo or video</Text>
               </View>
             </TouchableOpacity>
 
@@ -1450,22 +1458,22 @@ export default function MessagesScreen() {
                 alignItems: "center",
                 paddingVertical: 16,
                 borderBottomWidth: 1,
-                borderBottomColor: SAND,
+                borderBottomColor: colors.backgroundSecondary,
               }}
             >
               <View style={{
                 width: 48,
                 height: 48,
                 borderRadius: 24,
-                backgroundColor: SAGE_LIGHT,
+                backgroundColor: colors.primaryLight,
                 alignItems: "center",
                 justifyContent: "center",
               }}>
-                <Ionicons name="images" size={24} color={SAGE} />
+                <Ionicons name="images" size={24} color={colors.primary} />
               </View>
               <View style={{ marginLeft: 16 }}>
-                <Text style={{ fontSize: 16, fontWeight: "600", color: SLATE }}>Photo Library</Text>
-                <Text style={{ fontSize: 13, color: SLATE_LIGHT }}>Choose from your photos</Text>
+                <Text style={{ fontSize: 16, fontWeight: "600", color: colors.secondary }}>Photo Library</Text>
+                <Text style={{ fontSize: 13, color: colors.textMuted }}>Choose from your photos</Text>
               </View>
             </TouchableOpacity>
 
@@ -1482,15 +1490,15 @@ export default function MessagesScreen() {
                 width: 48,
                 height: 48,
                 borderRadius: 24,
-                backgroundColor: SAGE_LIGHT,
+                backgroundColor: colors.primaryLight,
                 alignItems: "center",
                 justifyContent: "center",
               }}>
-                <Ionicons name="document" size={24} color={SAGE} />
+                <Ionicons name="document" size={24} color={colors.primary} />
               </View>
               <View style={{ marginLeft: 16 }}>
-                <Text style={{ fontSize: 16, fontWeight: "600", color: SLATE }}>Document</Text>
-                <Text style={{ fontSize: 13, color: SLATE_LIGHT }}>PDF, Word, or other files</Text>
+                <Text style={{ fontSize: 16, fontWeight: "600", color: colors.secondary }}>Document</Text>
+                <Text style={{ fontSize: 13, color: colors.textMuted }}>PDF, Word, or other files</Text>
               </View>
             </TouchableOpacity>
 
@@ -1500,12 +1508,12 @@ export default function MessagesScreen() {
               style={{
                 marginTop: 20,
                 paddingVertical: 14,
-                backgroundColor: SAND,
+                backgroundColor: colors.backgroundSecondary,
                 borderRadius: 12,
                 alignItems: "center",
               }}
             >
-              <Text style={{ fontSize: 16, fontWeight: "600", color: SLATE }}>Cancel</Text>
+              <Text style={{ fontSize: 16, fontWeight: "600", color: colors.secondary }}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </Pressable>
@@ -1536,7 +1544,7 @@ export default function MessagesScreen() {
                 justifyContent: "center",
               }}
             >
-              <Ionicons name="close" size={24} color={WHITE} />
+              <Ionicons name="close" size={24} color={colors.textInverse} />
             </TouchableOpacity>
 
             {/* Image */}

@@ -57,7 +57,8 @@ class KidComsSettingsCreate(BaseModel):
     # Parental controls
     require_parent_in_call: bool = False
     allow_child_to_initiate: bool = True
-    record_sessions: bool = False
+    # ARIA lockdown: recording defaults to True and cannot be disabled by parents
+    record_sessions: bool = True
 
 
 class KidComsSettingsUpdate(BaseModel):

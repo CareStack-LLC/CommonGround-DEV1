@@ -23,20 +23,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { parent, type LedgerEntry } from "@commonground/api-client";
 import { useAuth } from "@/providers/AuthProvider";
 import { useFamilyFile } from "@/hooks/useFamilyFile";
-
-// CommonGround Design System Colors
-const colors = {
-  sage: "#4A6C58",
-  sageDark: "#3D5A4A",
-  slate: "#475569",
-  amber: "#D4A574",
-  sand: "#F5F0E8",
-  cream: "#FFFBF5",
-};
+import { useTheme } from "@/theme";
 
 type FilterType = "all" | "funding" | "spending" | "refund";
 
 export default function TransactionsScreen() {
+  const { colors } = useTheme();
   const { user } = useAuth();
   const { familyFile } = useFamilyFile();
   const [loading, setLoading] = useState(true);
@@ -152,13 +144,13 @@ export default function TransactionsScreen() {
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case "funding":
-        return { name: "arrow-up-circle", color: colors.sage, bg: `${colors.sage}15` };
+        return { name: "arrow-up-circle", color: colors.primary, bg: `${colors.primary}15` };
       case "spending":
-        return { name: "arrow-down-circle", color: colors.amber, bg: `${colors.amber}15` };
+        return { name: "arrow-down-circle", color: colors.accent, bg: `${colors.accent}15` };
       case "refund":
         return { name: "refresh-circle", color: "#3B82F6", bg: "#3B82F615" };
       default:
-        return { name: "swap-horizontal", color: colors.slate, bg: colors.sand };
+        return { name: "swap-horizontal", color: colors.secondary, bg: colors.backgroundSecondary };
     }
   };
 
@@ -194,10 +186,10 @@ export default function TransactionsScreen() {
     return (
       <SafeAreaView
         className="flex-1 items-center justify-center"
-        style={{ backgroundColor: colors.cream }}
+        style={{ backgroundColor: colors.surfaceElevated }}
       >
-        <ActivityIndicator size="large" color={colors.sage} />
-        <Text className="mt-4" style={{ color: colors.slate }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text className="mt-4" style={{ color: colors.secondary }}>
           Loading transactions...
         </Text>
       </SafeAreaView>
@@ -205,29 +197,29 @@ export default function TransactionsScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.cream }} edges={["bottom"]}>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.surfaceElevated }} edges={["bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 16 }}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.sage} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         {/* Summary Cards */}
         <View className="flex-row mb-6 space-x-3">
-          <View className="flex-1 rounded-xl p-4" style={{ backgroundColor: `${colors.sage}15` }}>
-            <Text className="text-xs" style={{ color: colors.sage }}>
+          <View className="flex-1 rounded-xl p-4" style={{ backgroundColor: `${colors.primary}15` }}>
+            <Text className="text-xs" style={{ color: colors.primary }}>
               Total Funded
             </Text>
-            <Text className="text-xl font-bold mt-1" style={{ color: colors.sage }}>
+            <Text className="text-xl font-bold mt-1" style={{ color: colors.primary }}>
               {formatCurrency(totalFunded)}
             </Text>
           </View>
-          <View className="flex-1 rounded-xl p-4" style={{ backgroundColor: `${colors.amber}15` }}>
-            <Text className="text-xs" style={{ color: colors.amber }}>
+          <View className="flex-1 rounded-xl p-4" style={{ backgroundColor: `${colors.accent}15` }}>
+            <Text className="text-xs" style={{ color: colors.accent }}>
               Total Spent
             </Text>
-            <Text className="text-xl font-bold mt-1" style={{ color: colors.amber }}>
+            <Text className="text-xl font-bold mt-1" style={{ color: colors.accent }}>
               {formatCurrency(totalSpent)}
             </Text>
           </View>
@@ -246,19 +238,19 @@ export default function TransactionsScreen() {
                 key={tab.id}
                 className="mr-2 px-4 py-2 rounded-full flex-row items-center"
                 style={{
-                  backgroundColor: filter === tab.id ? colors.sage : "white",
+                  backgroundColor: filter === tab.id ? colors.primary : colors.background,
                 }}
                 onPress={() => setFilter(tab.id as FilterType)}
               >
                 <Ionicons
                   name={tab.icon as any}
                   size={16}
-                  color={filter === tab.id ? "white" : colors.slate}
+                  color={filter === tab.id ? colors.textInverse : colors.secondary}
                 />
                 <Text
                   className="ml-1 font-medium"
                   style={{
-                    color: filter === tab.id ? "white" : colors.slate,
+                    color: filter === tab.id ? colors.textInverse : colors.secondary,
                   }}
                 >
                   {tab.label}
@@ -270,20 +262,20 @@ export default function TransactionsScreen() {
 
         {/* Transactions List */}
         {filteredTransactions.length === 0 ? (
-          <View className="rounded-xl p-8 items-center" style={{ backgroundColor: "white" }}>
-            <Ionicons name="receipt-outline" size={48} color="#9CA3AF" />
-            <Text className="mt-4 text-center" style={{ color: colors.slate }}>
+          <View className="rounded-xl p-8 items-center" style={{ backgroundColor: colors.background }}>
+            <Ionicons name="receipt-outline" size={48} color={colors.textMuted} />
+            <Text className="mt-4 text-center" style={{ color: colors.secondary }}>
               No transactions found
             </Text>
           </View>
         ) : (
           groupedTransactions.map(([date, items]) => (
             <View key={date} className="mb-6">
-              <Text className="font-medium text-sm mb-3" style={{ color: "#9CA3AF" }}>
+              <Text className="font-medium text-sm mb-3" style={{ color: colors.textMuted }}>
                 {date}
               </Text>
 
-              <View className="rounded-xl overflow-hidden" style={{ backgroundColor: "white" }}>
+              <View className="rounded-xl overflow-hidden" style={{ backgroundColor: colors.background }}>
                 {items.map((transaction, index) => {
                   const icon = getTransactionIcon(transaction.entry_type);
                   const isLast = index === items.length - 1;
@@ -294,7 +286,7 @@ export default function TransactionsScreen() {
                       className="p-4 flex-row items-center"
                       style={{
                         borderBottomWidth: isLast ? 0 : 1,
-                        borderBottomColor: colors.sand,
+                        borderBottomColor: colors.backgroundSecondary,
                       }}
                     >
                       <View
@@ -305,10 +297,10 @@ export default function TransactionsScreen() {
                       </View>
 
                       <View className="flex-1 ml-3">
-                        <Text className="font-medium" style={{ color: colors.slate }}>
+                        <Text className="font-medium" style={{ color: colors.secondary }}>
                           {transaction.obligation_description || transaction.description}
                         </Text>
-                        <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+                        <Text className="text-xs" style={{ color: colors.textMuted }}>
                           {transaction.parent_name} •{" "}
                           {new Date(transaction.created_at).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -323,16 +315,16 @@ export default function TransactionsScreen() {
                           style={{
                             color:
                               transaction.entry_type === "funding"
-                                ? colors.sage
+                                ? colors.primary
                                 : transaction.entry_type === "refund"
                                 ? "#3B82F6"
-                                : colors.slate,
+                                : colors.secondary,
                           }}
                         >
                           {transaction.entry_type === "spending" ? "-" : "+"}
                           {formatCurrency(transaction.amount)}
                         </Text>
-                        <Text className="text-xs" style={{ color: "#9CA3AF" }}>
+                        <Text className="text-xs" style={{ color: colors.textMuted }}>
                           Balance: {formatCurrency(transaction.running_balance)}
                         </Text>
                       </View>
