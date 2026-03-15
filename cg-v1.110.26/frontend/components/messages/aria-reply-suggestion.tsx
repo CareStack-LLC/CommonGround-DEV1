@@ -27,16 +27,16 @@ export function ARIAReplySuggestion({
     if (dismissed || suggestions.length === 0) return null;
 
     return (
-        <div className="mt-2 rounded-xl border border-teal-200/80 bg-gradient-to-b from-teal-50/80 to-white overflow-hidden text-sm shadow-sm animate-in fade-in slide-in-from-bottom-1 duration-200">
+        <div className="mt-2 rounded-xl border border-teal-200/80 dark:border-teal-900/60 bg-gradient-to-b from-teal-50/80 to-white dark:from-teal-950/30 dark:to-card overflow-hidden text-sm shadow-sm animate-in fade-in slide-in-from-bottom-1 duration-200">
             {/* Header */}
             <button
-                className="w-full flex items-center gap-2 px-3 py-2 hover:bg-teal-50 transition-colors"
+                className="w-full flex items-center gap-2 px-3 py-2 hover:bg-teal-50 dark:hover:bg-teal-950/30 transition-colors"
                 onClick={() => setIsExpanded((v) => !v)}
             >
                 <div className="p-1 bg-teal-500/10 rounded-lg">
                     <Shield className="h-3.5 w-3.5 text-teal-600" />
                 </div>
-                <span className="flex-1 text-left text-xs font-semibold text-teal-700">
+                <span className="flex-1 text-left text-xs font-semibold text-teal-700 dark:text-teal-400">
                     ARIA suggests a reply
                 </span>
                 {isExpanded ? (
@@ -61,7 +61,7 @@ export function ARIAReplySuggestion({
                     {suggestions.map((s, i) => (
                         <div
                             key={i}
-                            className="flex items-start gap-2 p-2.5 rounded-lg bg-card border border-teal-100 hover:border-teal-300 hover:bg-teal-50/40 transition-colors group"
+                            className="flex items-start gap-2 p-2.5 rounded-lg bg-card border border-teal-100 dark:border-teal-900/40 hover:border-teal-300 dark:hover:border-teal-700 hover:bg-teal-50/40 dark:hover:bg-teal-950/20 transition-colors group"
                         >
                             <p className="flex-1 text-xs text-muted-foreground leading-relaxed">{s}</p>
                             <button

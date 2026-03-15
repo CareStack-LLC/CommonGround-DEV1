@@ -39,9 +39,9 @@ export function ARIAIntervention({
   const getLevelConfig = (level: string, isBlocked: boolean) => {
     if (isBlocked) {
       return {
-        bg: 'bg-gradient-to-br from-red-50 to-white',
-        border: 'border-red-200',
-        iconBg: 'bg-red-100',
+        bg: 'bg-gradient-to-br from-red-50 to-white dark:from-red-950/30 dark:to-card',
+        border: 'border-red-200 dark:border-red-900/60',
+        iconBg: 'bg-red-100 dark:bg-red-950/40',
         iconColor: 'text-red-500',
         icon: <XCircle className="h-6 w-6 text-red-500" />,
         title: 'Message Blocked',
@@ -53,9 +53,9 @@ export function ARIAIntervention({
     switch (level) {
       case 'green':
         return {
-          bg: 'bg-gradient-to-br from-emerald-50 to-white',
-          border: 'border-emerald-200',
-          iconBg: 'bg-emerald-100',
+          bg: 'bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/30 dark:to-card',
+          border: 'border-emerald-200 dark:border-emerald-900/60',
+          iconBg: 'bg-emerald-100 dark:bg-emerald-950/40',
           iconColor: 'text-emerald-500',
           icon: <CheckCircle className="h-6 w-6 text-emerald-500" />,
           title: 'Communication Verified',
@@ -64,9 +64,9 @@ export function ARIAIntervention({
         };
       case 'yellow':
         return {
-          bg: 'bg-gradient-to-br from-amber-50 to-white',
-          border: 'border-amber-200',
-          iconBg: 'bg-amber-100',
+          bg: 'bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/30 dark:to-card',
+          border: 'border-amber-200 dark:border-amber-900/60',
+          iconBg: 'bg-amber-100 dark:bg-amber-950/40',
           iconColor: 'text-amber-500',
           icon: <Sparkles className="h-6 w-6 text-amber-500" />,
           title: 'Tone Calibration',
@@ -75,9 +75,9 @@ export function ARIAIntervention({
         };
       case 'orange':
         return {
-          bg: 'bg-gradient-to-br from-orange-50 to-white',
-          border: 'border-orange-200',
-          iconBg: 'bg-orange-100',
+          bg: 'bg-gradient-to-br from-orange-50 to-white dark:from-orange-950/30 dark:to-card',
+          border: 'border-orange-200 dark:border-orange-900/60',
+          iconBg: 'bg-orange-100 dark:bg-orange-950/40',
           iconColor: 'text-orange-500',
           icon: <AlertTriangle className="h-6 w-6 text-orange-500" />,
           title: 'Conflict Risk',
@@ -86,9 +86,9 @@ export function ARIAIntervention({
         };
       default:
         return {
-          bg: 'bg-gradient-to-br from-amber-50 to-white',
-          border: 'border-amber-200',
-          iconBg: 'bg-amber-100',
+          bg: 'bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/30 dark:to-card',
+          border: 'border-amber-200 dark:border-amber-900/60',
+          iconBg: 'bg-amber-100 dark:bg-amber-950/40',
           iconColor: 'text-amber-500',
           icon: <Sparkles className="h-6 w-6 text-amber-500" />,
           title: 'ARIA Review',
@@ -128,12 +128,12 @@ export function ARIAIntervention({
           {/* Title & Subtitle */}
           <div className="flex-1 min-w-0 pt-1">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 {config.title}
               </h3>
               {/* Optional: Add 'Guardian Active' badge? */}
             </div>
-            <p className="text-slate-500 font-medium text-sm leading-relaxed">
+            <p className="text-muted-foreground font-medium text-sm leading-relaxed">
               {config.subtitle}
             </p>
           </div>
@@ -141,7 +141,7 @@ export function ARIAIntervention({
           {/* Close Button */}
           <button
             onClick={onCancel}
-            className="p-2 rounded-xl hover:bg-black/5 text-slate-400 hover:text-slate-600 transition-colors"
+            className="p-2 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -149,7 +149,7 @@ export function ARIAIntervention({
 
         {/* AI Explanation */}
         {analysis.explanation && (
-          <div className="mt-5 text-slate-700 text-sm leading-relaxed bg-white/60 p-4 rounded-xl border border-slate-100 italic">
+          <div className="mt-5 text-foreground text-sm leading-relaxed bg-card/60 p-4 rounded-xl border border-border italic">
             &quot;{analysis.explanation}&quot;
           </div>
         )}
@@ -157,18 +157,18 @@ export function ARIAIntervention({
         {/* Categories (Guardian Steps Style) */}
         {analysis.categories && analysis.categories.length > 0 && (
           <div className="mt-6">
-            <div className="bg-white/80 rounded-xl p-4 border border-slate-200/60 shadow-sm space-y-3">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Detailed Analysis</p>
+            <div className="bg-card/80 rounded-xl p-4 border border-border shadow-sm space-y-3">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Detailed Analysis</p>
               {analysis.categories.map((category, idx) => (
                 <div key={idx} className="flex items-center gap-3 text-sm">
                   <div className={`w-6 h-6 rounded-full ${getCategoryColor(category).replace('500', '100')} flex items-center justify-center flex-shrink-0`}>
                     <div className={`w-2.5 h-2.5 rounded-full ${getCategoryColor(category)}`}></div>
                   </div>
-                  <span className="text-slate-700 font-medium capitalize">
+                  <span className="text-foreground font-medium capitalize">
                     {category.replace(/_/g, ' ')}
                   </span>
                   {analysis.triggers && analysis.triggers[idx] && (
-                    <span className="text-slate-400 text-xs ml-auto truncate max-w-[150px]">
+                    <span className="text-muted-foreground text-xs ml-auto truncate max-w-[150px]">
                       Detected: &quot;{analysis.triggers[idx]}&quot;
                     </span>
                   )}
@@ -185,7 +185,7 @@ export function ARIAIntervention({
           {/* Edit Message Button (Primary) */}
           <button
             onClick={onCancel}
-            className="flex-1 px-6 py-3.5 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-bold rounded-xl transition-all shadow-sm hover:shadow-md"
+            className="flex-1 px-6 py-3.5 bg-card border-2 border-border hover:border-muted-foreground/30 text-foreground font-bold rounded-xl transition-all shadow-sm hover:shadow-md"
           >
             Edit Message
           </button>
@@ -203,7 +203,7 @@ export function ARIAIntervention({
 
           {/* Blocked - Cannot Send */}
           {!canSendAnyway && (
-            <div className="flex-1 px-6 py-3.5 bg-red-100 text-red-700 font-bold rounded-xl text-center border-2 border-red-200 cursor-not-allowed">
+            <div className="flex-1 px-6 py-3.5 bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-400 font-bold rounded-xl text-center border-2 border-red-200 dark:border-red-900/60 cursor-not-allowed">
               Message Restricted
             </div>
           )}
@@ -211,7 +211,7 @@ export function ARIAIntervention({
 
         {/* Disclaimer */}
         {canSendAnyway && analysis.toxicity_level !== 'green' && (
-          <p className="mt-4 text-xs text-center text-slate-400 font-medium">
+          <p className="mt-4 text-xs text-center text-muted-foreground font-medium">
             <Shield className="w-3 h-3 inline mr-1 mb-0.5" />
             Guardian active. Messages are logged for court review.
           </p>
