@@ -361,7 +361,7 @@ export default function ExchangeForm({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
-      <Card className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-slate-50">
+      <Card className="w-full max-w-2xl max-h-[95vh] overflow-y-auto bg-card">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -406,7 +406,7 @@ export default function ExchangeForm({
                 </div>
                 <div className="space-y-2">
                   {children.map((child) => (
-                    <div key={child.id} className="flex items-center gap-3 p-3 rounded-lg bg-white dark:bg-card border border-border shadow-sm">
+                    <div key={child.id} className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border shadow-sm">
                       <div className="w-10 h-10 rounded-full bg-cg-sage/20 flex items-center justify-center flex-shrink-0">
                         <span className="text-sm font-bold text-cg-sage">
                           {child.first_name.charAt(0)}
@@ -557,7 +557,7 @@ export default function ExchangeForm({
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-slate-400" />
+                    <Lock className="h-4 w-4 text-muted-foreground" />
                     <TierBadge tier="plus" size="sm" />
                   </div>
                 </div>

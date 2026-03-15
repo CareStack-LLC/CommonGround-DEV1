@@ -82,14 +82,14 @@ export default function SwapRequestModal({
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-            <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-slate-50 border-slate-200 shadow-xl rounded-2xl">
+            <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-card border-border shadow-xl rounded-2xl">
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-xl font-bold flex items-center gap-2">
                             <ArrowLeftRight className="h-5 w-5 text-[var(--portal-primary)]" />
                             Request Schedule Swap
                         </h2>
-                        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                        <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
                             <X className="h-6 w-6" />
                         </button>
                     </div>
@@ -128,7 +128,7 @@ export default function SwapRequestModal({
                                                 id={`child_${child.id}`}
                                                 checked={formData.child_ids.includes(child.id)}
                                                 onChange={() => toggleChild(child.id)}
-                                                className="rounded border-gray-300 text-[var(--portal-primary)] focus:ring-[var(--portal-primary)]"
+                                                className="rounded border-border text-[var(--portal-primary)] focus:ring-[var(--portal-primary)]"
                                             />
                                             <Label htmlFor={`child_${child.id}`} className="cursor-pointer font-normal">
                                                 {child.first_name} {child.last_name}

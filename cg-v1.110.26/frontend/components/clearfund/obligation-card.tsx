@@ -51,11 +51,11 @@ const categoryColors: Record<ObligationCategory, string> = {
   device: 'bg-purple-100 text-purple-700 border-purple-200',
   camp: 'bg-orange-100 text-orange-700 border-orange-200',
   clothing: 'bg-pink-100 text-pink-700 border-pink-200',
-  transportation: 'bg-gray-100 text-gray-700 border-gray-200',
+  transportation: 'bg-muted text-foreground border-border',
   child_support: 'bg-rose-100 text-rose-700 border-rose-200',
   extracurricular: 'bg-indigo-100 text-indigo-700 border-indigo-200',
   childcare: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-  other: 'bg-slate-100 text-slate-700 border-slate-200',
+  other: 'bg-muted text-foreground border-border',
 };
 
 const statusConfig: Record<ObligationStatus, { label: string; className: string; icon: React.ReactNode }> = {
@@ -65,7 +65,7 @@ const statusConfig: Record<ObligationStatus, { label: string; className: string;
   pending_verification: { label: 'Pending Verification', className: 'bg-purple-100 text-purple-800', icon: <Clock className="h-3 w-3" /> },
   verified: { label: 'Verified', className: 'bg-green-100 text-green-800', icon: <CheckCircle className="h-3 w-3" /> },
   completed: { label: 'Completed', className: 'bg-emerald-100 text-emerald-800', icon: <CheckCircle className="h-3 w-3" /> },
-  expired: { label: 'Expired', className: 'bg-gray-100 text-gray-800', icon: <XCircle className="h-3 w-3" /> },
+  expired: { label: 'Expired', className: 'bg-muted text-foreground', icon: <XCircle className="h-3 w-3" /> },
   cancelled: { label: 'Cancelled', className: 'bg-red-100 text-red-800', icon: <XCircle className="h-3 w-3" /> },
 };
 
@@ -114,13 +114,13 @@ export default function ObligationCard({
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
             <div>
-              <h3 className="font-semibold text-gray-900 truncate">{obligation.title}</h3>
+              <h3 className="font-semibold text-foreground truncate">{obligation.title}</h3>
               <div className="flex flex-wrap items-center gap-2 mt-1">
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${status.className}`}>
                   {status.icon}
                   {status.label}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">
                   {capitalizeFirst(category)}
                 </span>
                 {obligation.is_overdue && (
@@ -132,17 +132,17 @@ export default function ObligationCard({
               </div>
             </div>
             <div className="text-right">
-              <p className="text-lg font-bold text-gray-900">
+              <p className="text-lg font-bold text-foreground">
                 {formatCurrency(obligation.total_amount)}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 {obligation.petitioner_percentage}/{100 - obligation.petitioner_percentage} split
               </p>
             </div>
           </div>
 
           {obligation.description && (
-            <p className="text-sm text-gray-600 mt-2 line-clamp-2">{obligation.description}</p>
+            <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{obligation.description}</p>
           )}
 
           {/* Funding Progress */}
@@ -156,7 +156,7 @@ export default function ObligationCard({
 
           {/* Footer */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-3">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               {obligation.due_date ? (
                 <span className={obligation.is_overdue ? 'text-red-600 font-medium' : ''}>
                   Due: {formatDate(obligation.due_date)}
