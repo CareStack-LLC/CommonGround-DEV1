@@ -10,7 +10,7 @@ import { useAuth } from '@/lib/auth-context';
  */
 const FEATURE_TIERS: Record<string, 'plus' | 'complete'> = {
   // Plus tier features
-  aria_advanced: 'plus',
+  aria_advanced: 'complete',
   quick_accords: 'plus',
   auto_scheduling: 'plus',
   custody_dashboard: 'plus',

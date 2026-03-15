@@ -522,7 +522,7 @@ async def create_checkout_session(
 
 class UpgradeRequest(BaseModel):
     """Request to upgrade/change subscription plan."""
-    plan_code: str = Field(..., description="Plan to switch to: 'plus' or 'family_plus'")
+    plan_code: str = Field(..., description="Plan to switch to: 'plus' or 'complete'")
     period: str = Field(default="monthly", description="Billing period: 'monthly' or 'annual'")
 
 
@@ -734,7 +734,7 @@ async def cancel_subscription(
     # Update local status
     if request.immediate:
         profile.subscription_status = "cancelled"
-        profile.subscription_tier = "starter"
+        profile.subscription_tier = "web_starter"
     # Note: If cancelling at period end, Stripe webhook will update status
 
     await db.commit()
@@ -1015,7 +1015,7 @@ async def sync_subscription_from_stripe(
             for sub in subscriptions:
                 if sub["status"] in ("canceled", "cancelled"):
                     # Subscription was cancelled
-                    profile.subscription_tier = "starter"
+                    profile.subscription_tier = "web_starter"
                     profile.subscription_status = "cancelled"
                     profile.stripe_subscription_id = None
                     await db.commit()
@@ -1033,10 +1033,10 @@ async def sync_subscription_from_stripe(
                 )
             )
             plan = result.scalar_one_or_none()
-            tier = plan.plan_code if plan else "starter"
+            tier = plan.plan_code if plan else "web_starter"
             logger.info(f"Sync: Found plan {plan.plan_code if plan else 'None'}, tier={tier}")
         else:
-            tier = "starter"
+            tier = "web_starter"
             logger.info("Sync: No price_id, defaulting to starter")
 
         # Update profile
@@ -1144,12 +1144,12 @@ async def debug_sync_subscription(
                 )
             )
             plan = plan_result.scalar_one_or_none()
-            tier = plan.plan_code if plan else "starter"
+            tier = plan.plan_code if plan else "web_starter"
             result["plan_found"] = plan is not None
             result["tier"] = tier
             result["steps"].append(f"5. Mapped to tier: {tier}")
         else:
-            tier = "starter"
+            tier = "web_starter"
             result["tier"] = tier
             result["steps"].append("5. No price_id, defaulting to starter")
 

@@ -768,7 +768,7 @@ async def create_partner(
                 code=code_string,
                 partner_id=partner.id,
                 nonprofit_name=partner.display_name,
-                granted_plan_code="family_plus",  # Defaulting to highest tier for MVP
+                granted_plan_code="complete",  # Defaulting to highest tier for MVP
                 is_active=True,
                 valid_from=datetime.utcnow(),
                 grant_duration_days=365,  # 1 year by default

@@ -32,62 +32,73 @@ if TYPE_CHECKING:
 # Keys are feature names, values are either:
 # - List of tiers that have access (boolean features)
 # - Dict mapping tier to limit value (numeric limits)
+#
+# Current Stripe tiers: web_starter, plus, complete
+# Legacy tiers (kept for backward compat): starter, family_plus
 FEATURE_DEFINITIONS = {
     # ARIA Features
-    "aria_manual_sentiment": ["starter", "plus", "family_plus"],  # All tiers
-    "aria_advanced": ["family_plus"],  # Premium only
+    "aria_manual_sentiment": ["web_starter", "starter", "plus", "complete", "family_plus"],  # All tiers
+    "aria_advanced": ["complete", "family_plus"],  # Complete tier only
 
     # ClearFund Features
-    "clearfund_fee_exempt": ["plus", "family_plus"],  # Paid tiers exempt from $1.50 fee
+    "clearfund_fee_exempt": ["plus", "complete", "family_plus"],  # Paid tiers exempt from $1.50 fee
 
     # QuickAccords
-    "quick_accords": ["plus", "family_plus"],
+    "quick_accords": ["plus", "complete", "family_plus"],
 
     # Scheduling & Automation
-    "auto_scheduling": ["plus", "family_plus"],
-    "custody_dashboard": ["plus", "family_plus"],
-    "pdf_summaries": ["plus", "family_plus"],
+    "auto_scheduling": ["plus", "complete", "family_plus"],
+    "custody_dashboard": ["plus", "complete", "family_plus"],
+    "pdf_summaries": ["plus", "complete", "family_plus"],
 
     # Circle / Trusted Contacts (numeric limit)
     "circle_contacts_limit": {
+        "web_starter": 0,
         "starter": 0,
         "plus": 1,
+        "complete": 5,
         "family_plus": 5,
     },
 
-    # KidsCom Features
-    "kidcoms_access": ["family_plus"],
-    "theater_mode": ["family_plus"],
+    # KidSpace Features
+    "kidcoms_access": ["complete", "family_plus"],
+    "theater_mode": ["complete", "family_plus"],
 
     # Parent Calls (co-parent communication)
-    "parent_voice_call": ["plus", "family_plus"],
-    "parent_video_call": ["plus", "family_plus"],
+    "parent_voice_call": ["plus", "complete", "family_plus"],
+    "parent_video_call": ["plus", "complete", "family_plus"],
 
     # Court & Reporting
-    "court_reporting": ["family_plus"],
+    "court_reporting": ["complete", "family_plus"],
 
     # TimeBridge / Calendar
-    "silent_handoff_gps": ["starter", "plus", "family_plus"],  # All tiers
-    "timebridge_calendar": ["starter", "plus", "family_plus"],  # All tiers
+    "silent_handoff_gps": ["web_starter", "starter", "plus", "complete", "family_plus"],  # All tiers
+    "timebridge_calendar": ["web_starter", "starter", "plus", "complete", "family_plus"],  # All tiers
     "timebridge_manual_only": {  # True = manual only, False = auto features
+        "web_starter": True,
         "starter": True,
         "plus": False,
+        "complete": False,
         "family_plus": False,
     },
 }
 
 # Tier hierarchy for comparison
 TIER_HIERARCHY = {
-    "starter": 0,
+    "web_starter": 0,
+    "starter": 0,  # Legacy
     "plus": 1,
-    "family_plus": 2,
+    "complete": 2,
+    "family_plus": 2,  # Legacy
 }
 
 # Human-readable tier names for error messages
 TIER_DISPLAY_NAMES = {
-    "starter": "Starter",
+    "web_starter": "Web Starter",
+    "starter": "Web Starter",
     "plus": "Plus",
-    "family_plus": "Family+",
+    "complete": "Complete",
+    "family_plus": "Complete",
 }
 
 
@@ -119,7 +130,7 @@ class FeatureGate:
         """
         profile = user.profile
         if not profile:
-            return "starter"
+            return "web_starter"
 
         # Check for active grant first
         if profile.subscription_status == "grant" and profile.active_grant_id:
@@ -132,13 +143,13 @@ class FeatureGate:
         if profile.subscription_status in ("active", "trial", "trialing", "cancelling"):
             return profile.subscription_tier
 
-        # Past due or cancelled - revert to starter
+        # Past due or cancelled - revert to web_starter
         if profile.subscription_status in ("past_due", "cancelled"):
             # Grace period: allow 3 days of past_due before downgrade
             if profile.subscription_status == "past_due":
                 # Could implement grace period logic here
                 pass
-            return "starter"
+            return "web_starter"
 
         return profile.subscription_tier
 
@@ -232,7 +243,7 @@ class FeatureGate:
 
         # For numeric features, find lowest tier with positive value
         if isinstance(feature_def, dict):
-            for tier in ["starter", "plus", "family_plus"]:
+            for tier in ["web_starter", "plus", "complete"]:
                 value = feature_def.get(tier, 0)
                 if isinstance(value, bool):
                     if value:
@@ -261,9 +272,9 @@ class FeatureGate:
         tier_name = TIER_DISPLAY_NAMES.get(required_tier, required_tier)
 
         if required_tier == "plus":
-            return f"Upgrade to {tier_name} ($12/month) to access this feature."
-        elif required_tier == "family_plus":
-            return f"Upgrade to {tier_name} ($25/month) to access this feature."
+            return f"Upgrade to {tier_name} ($17.99/month) to access this feature."
+        elif required_tier in ("complete", "family_plus"):
+            return f"Upgrade to {tier_name} ($34.99/month) to access this feature."
 
         return f"This feature requires {tier_name} subscription."
 
@@ -286,8 +297,8 @@ class FeatureGate:
 
     @staticmethod
     def is_paid_tier(tier: str) -> bool:
-        """Check if tier is a paid tier (Plus or Family+)."""
-        return tier in ("plus", "family_plus")
+        """Check if tier is a paid tier (Plus or Complete)."""
+        return tier in ("plus", "complete", "family_plus")
 
     @staticmethod
     async def check_feature_or_raise(

@@ -105,20 +105,20 @@ async def initiate_call(
             detail="Call type must be 'video' or 'audio'"
         )
 
-    # Tier-gate: voice and video calls require Plus or Family+
+    # Tier-gate: voice and video calls require Plus or Complete
     from app.services.feature_gate import feature_gate
     if call_create.call_type == "video":
         if not feature_gate.has_feature(current_user, "parent_video_call"):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Video calls require a Plus or Family+ subscription. "
+                detail="Video calls require a Plus or Complete subscription. "
                        "Upgrade your plan to enable parent-to-parent video calling."
             )
     else:
         if not feature_gate.has_feature(current_user, "parent_voice_call"):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Voice calls require a Plus or Family+ subscription. "
+                detail="Voice calls require a Plus or Complete subscription. "
                        "Upgrade your plan to enable parent-to-parent calling."
             )
 
