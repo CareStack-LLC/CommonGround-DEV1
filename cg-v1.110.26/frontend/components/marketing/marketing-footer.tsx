@@ -26,6 +26,7 @@ const footerLinks = {
     links: [
       { label: 'For Parents', href: '/pricing' },
       { label: 'For Professionals', href: '/professionals' },
+      { label: 'Nonprofit Support', href: '/partners' },
     ],
   },
   company: {
@@ -45,12 +46,6 @@ const footerLinks = {
       { label: 'Security', href: '/security' },
     ],
   },
-  partners: {
-    title: 'Partners',
-    links: [
-      { label: 'Partner Directory', href: '/partners' },
-    ],
-  },
   support: {
     title: 'Support',
     links: [
@@ -63,31 +58,7 @@ const footerLinks = {
 
 function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2.5">
-      <svg width="40" height="40" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="ftr-bg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#1E3A4A" />
-            <stop offset="100%" stopColor="#2D6A8F" />
-          </linearGradient>
-          <linearGradient id="ftr-lf" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#5BC4A0" />
-            <stop offset="100%" stopColor="#3DAA8A" />
-          </linearGradient>
-          <linearGradient id="ftr-rf" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#4BA8C8" />
-            <stop offset="100%" stopColor="#2D6A8F" />
-          </linearGradient>
-        </defs>
-        <rect width="512" height="512" rx="120" fill="url(#ftr-bg)" />
-        <circle cx="168" cy="148" r="48" fill="url(#ftr-lf)" />
-        <path d="M118 218 Q168 258 218 218" stroke="url(#ftr-lf)" strokeWidth="16" strokeLinecap="round" fill="none" />
-        <circle cx="344" cy="148" r="48" fill="url(#ftr-rf)" />
-        <path d="M294 218 Q344 258 394 218" stroke="url(#ftr-rf)" strokeWidth="16" strokeLinecap="round" fill="none" />
-        <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
-        <circle cx="256" cy="330" r="38" fill="#F5A623" />
-        <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
-      </svg>
+    <Link href="/" className="flex items-center">
       <span className="text-xl text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
         <span className="font-bold">Common</span><span className="font-normal text-[#3DAA8A]">Ground</span>
       </span>
@@ -102,7 +73,7 @@ export function MarketingFooter() {
     <footer className="bg-card border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         {/* Main Footer Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-10">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
             <Logo />
