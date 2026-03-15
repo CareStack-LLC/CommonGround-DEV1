@@ -137,11 +137,11 @@ class EventService:
 
             event_case_id = collection.case_id
             event_family_file_id = collection.family_file_id or family_file_id
-        elif professional_id and family_file_id:
-            # Professional event with direct family_file_id
+        elif family_file_id:
+            # Parent or professional event with direct family_file_id (no collection needed)
             event_family_file_id = family_file_id
         elif not professional_id:
-            raise ValueError("Collection is required for parent events")
+            raise ValueError("Either collection_id or family_file_id is required for parent events")
 
         # Validate times
         if end_time <= start_time:

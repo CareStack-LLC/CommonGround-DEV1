@@ -70,7 +70,8 @@ async def create_event(
             all_day=event_data.all_day,
             attendance_invites=event_data.attendance_invites,
             event_category=event_data.event_category,
-            category_data=event_data.category_data
+            category_data=event_data.category_data,
+            family_file_id=event_data.family_file_id,
         )
 
         # Log activity for co-parent visible events

@@ -258,7 +258,7 @@ export default function CalendarView({
               <div
                 key={date.toISOString()}
                 className={`border-r border-b border-cg-sand-dark p-1 sm:p-2 min-h-[70px] sm:min-h-[100px] hover:bg-cg-sage-subtle/50 transition-colors ${
-                  isTodayDate ? 'bg-cg-sage-subtle' : 'bg-white dark:bg-card'
+                  isTodayDate ? 'bg-cg-sage-subtle' : 'bg-cg-cream'
                 }`}
               >
                 {/* Day Number */}

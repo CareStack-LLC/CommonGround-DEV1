@@ -1621,6 +1621,7 @@ export interface EventV2 {
 
 export interface CreateEventRequest {
   collection_id?: string;
+  family_file_id?: string;
   title: string;
   start_time: string;
   end_time: string;

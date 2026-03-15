@@ -5,10 +5,10 @@ import { AlertTriangle, Navigation, QrCode, Loader2 } from 'lucide-react';
 import {
   eventsAPI,
   exchangesAPI,
-  casesAPI,
+  familyFilesAPI,
   CreateEventRequest,
   ConflictWarning,
-  Child,
+  FamilyFileChild,
   EventCategory,
   CategoryData,
   MedicalCategoryData,
@@ -42,7 +42,7 @@ export default function EventForm({
   onSuccess,
   initialDate,
 }: EventFormProps) {
-  const [children, setChildren] = useState<Child[]>([]);
+  const [children, setChildren] = useState<FamilyFileChild[]>([]);
   const [conflicts, setConflicts] = useState<ConflictWarning[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
@@ -87,9 +87,9 @@ export default function EventForm({
 
   const loadInitialData = async () => {
     try {
-      // Load children
-      const caseData = await casesAPI.get(caseId);
-      setChildren(caseData.children || []);
+      // Load children from family file
+      const familyFileData = await familyFilesAPI.get(caseId);
+      setChildren(familyFileData.children || []);
     } catch (err: any) {
       setError(err.message || 'Failed to load data');
       console.error('Error loading data:', err);
@@ -142,6 +142,7 @@ export default function EventForm({
 
     try {
       const eventData: CreateEventRequest = {
+        family_file_id: caseId,
         title: formData.title,
         start_time: new Date(formData.start_time).toISOString(),
         end_time: new Date(formData.end_time).toISOString(),
