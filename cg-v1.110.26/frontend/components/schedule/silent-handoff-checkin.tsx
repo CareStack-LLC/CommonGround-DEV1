@@ -127,16 +127,22 @@ export default function SilentHandoffCheckIn({
 
   const formatMinutesHumanReadable = (totalMinutes: number) => {
     const mins = Math.round(totalMinutes);
-    if (mins < 60) {
-      return `${mins} minute${mins !== 1 ? 's' : ''}`;
-    }
-    const hours = Math.floor(mins / 60);
+    if (mins < 1) return 'less than a minute';
+
+    const months = Math.floor(mins / (30 * 24 * 60));
+    const weeks = Math.floor((mins % (30 * 24 * 60)) / (7 * 24 * 60));
+    const days = Math.floor((mins % (7 * 24 * 60)) / (24 * 60));
+    const hours = Math.floor((mins % (24 * 60)) / 60);
     const remainingMins = mins % 60;
-    const hourStr = `${hours} hour${hours !== 1 ? 's' : ''}`;
-    if (remainingMins === 0) {
-      return hourStr;
-    }
-    return `${hourStr} ${remainingMins} minute${remainingMins !== 1 ? 's' : ''}`;
+
+    const parts: string[] = [];
+    if (months > 0) parts.push(`${months} month${months !== 1 ? 's' : ''}`);
+    if (weeks > 0) parts.push(`${weeks} week${weeks !== 1 ? 's' : ''}`);
+    if (days > 0) parts.push(`${days} day${days !== 1 ? 's' : ''}`);
+    if (hours > 0) parts.push(`${hours} hour${hours !== 1 ? 's' : ''}`);
+    if (remainingMins > 0) parts.push(`${remainingMins} minute${remainingMins !== 1 ? 's' : ''}`);
+
+    return parts.join(', ');
   };
 
   // Success state
@@ -283,7 +289,7 @@ export default function SilentHandoffCheckIn({
 
           {/* Window Status */}
           {windowStatus && (
-            <div className="mb-6">
+            <div className="mb-6 space-y-3">
               {windowStatus.is_within_window ? (
                 <div className="bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg p-3">
                   <p className="text-green-800 dark:text-green-300 font-medium">
@@ -292,20 +298,36 @@ export default function SilentHandoffCheckIn({
                   <p className="text-sm text-green-700 dark:text-green-400">
                     {formatMinutesHumanReadable(windowStatus.minutes_remaining)} remaining
                   </p>
+                  <p className="text-xs text-green-700/80 dark:text-green-400/80 mt-1">
+                    You can check in now to confirm your arrival at the exchange location.
+                  </p>
                 </div>
               ) : windowStatus.is_before_window ? (
                 <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-lg p-3">
                   <p className="text-amber-800 dark:text-amber-300 font-medium">
-                    Check-in window opens soon
+                    Check-in window opens in {formatMinutesHumanReadable(windowStatus.minutes_until_window)}
                   </p>
-                  <p className="text-sm text-amber-700 dark:text-amber-400">
-                    In {formatMinutesHumanReadable(windowStatus.minutes_until_window)}
+                  <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-1">
+                    The check-in window is a set time frame around your scheduled exchange when GPS check-in becomes available. You&apos;ll be able to confirm your arrival once the window opens.
                   </p>
                 </div>
               ) : (
                 <div className="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg p-3">
                   <p className="text-red-800 dark:text-red-300 font-medium">
                     Check-in window has closed
+                  </p>
+                  <p className="text-xs text-red-700/80 dark:text-red-400/80 mt-1">
+                    The time frame for GPS check-in has passed. If you need to record this exchange, please contact your co-parent or legal professional.
+                  </p>
+                </div>
+              )}
+
+              {/* What is the check-in window? - only show within 12 hours */}
+              {windowStatus.minutes_until_window != null && windowStatus.minutes_until_window <= 720 && (
+                <div className="bg-muted rounded-lg p-3">
+                  <p className="text-xs font-medium text-foreground mb-1">What is the check-in window?</p>
+                  <p className="text-xs text-muted-foreground">
+                    The check-in window is a scheduled time period before and after your custody exchange when you can use GPS to verify your arrival at the designated meeting point. Both parents check in to confirm the handoff happened on time and at the right place — creating a reliable record for everyone&apos;s peace of mind.
                   </p>
                 </div>
               )}

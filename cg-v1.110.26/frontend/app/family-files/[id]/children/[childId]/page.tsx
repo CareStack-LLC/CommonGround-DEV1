@@ -8,7 +8,7 @@ import { childrenAPI, ChildProfile, getImageUrl, familyFilesAPI, FamilyFileDetai
 // ... existing imports ...
 
 
-import { CustodyTimeline } from '@/components/schedule/custody-timeline';
+import { CustodyDashboard } from '@/components/schedule/custody-dashboard';
 import { useAuth } from '@/lib/auth-context';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
@@ -905,7 +905,9 @@ function ChildProfileContent() {
         title="Real-Time Custody"
         icon={<Clock className="h-4 w-4 text-cg-sage" />}
       >
-        <CustodyTimeline childId={childId} className="border-0 shadow-none p-0" compact />
+        {familyFile && (
+          <CustodyDashboard childId={childId} familyFileId={familyFileId} familyFile={familyFile} />
+        )}
       </SectionCard>
 
       {/* Tabs */}

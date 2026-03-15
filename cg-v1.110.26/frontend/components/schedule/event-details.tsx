@@ -129,13 +129,13 @@ export default function EventDetails({
   const getRsvpBadgeColor = (status: string) => {
     switch (status) {
       case 'going':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
       case 'not_going':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
       case 'maybe':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -224,23 +224,23 @@ export default function EventDetails({
             {/* Location */}
             {event.location && (
               <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-gray-400 mt-0.5" />
-                <div className="text-gray-700">{event.location}</div>
+                <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <div className="text-foreground">{event.location}</div>
               </div>
             )}
 
             {/* Description */}
             {event.description && (
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-gray-700">{event.description}</p>
+              <div className="bg-muted p-3 rounded-lg">
+                <p className="text-foreground">{event.description}</p>
               </div>
             )}
 
             {/* Children */}
             {event.child_ids && event.child_ids.length > 0 && (
               <div className="flex items-start gap-3">
-                <Users className="h-5 w-5 text-gray-400 mt-0.5" />
-                <div className="text-sm text-gray-600">
+                <Users className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <div className="text-sm text-muted-foreground">
                   {event.child_ids.length} child{event.child_ids.length !== 1 ? 'ren' : ''} involved
                 </div>
               </div>
@@ -249,8 +249,8 @@ export default function EventDetails({
             {/* Visibility */}
             <div className="flex items-center gap-2">
               <span className={`text-xs px-2 py-1 rounded-full ${event.visibility === 'private'
-                ? 'bg-gray-100 text-gray-600'
-                : 'bg-green-100 text-green-700'
+                ? 'bg-muted text-muted-foreground'
+                : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                 }`}>
                 {event.visibility === 'private' ? 'Private' : 'Shared with Co-parent'}
               </span>
@@ -258,10 +258,10 @@ export default function EventDetails({
 
             {/* Category-specific details */}
             {event.event_category && event.event_category !== 'general' && event.category_data && (
-              <div className={`p-3 rounded-lg border ${event.event_category === 'medical' ? 'bg-blue-50 border-blue-200' :
-                event.event_category === 'school' ? 'bg-green-50 border-green-200' :
-                  event.event_category === 'sports' ? 'bg-orange-50 border-orange-200' :
-                    'bg-purple-50 border-purple-200'
+              <div className={`p-3 rounded-lg border ${event.event_category === 'medical' ? 'bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40' :
+                event.event_category === 'school' ? 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900/40' :
+                  event.event_category === 'sports' ? 'bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900/40' :
+                    'bg-purple-50 border-purple-200 dark:bg-purple-950/20 dark:border-purple-900/40'
                 }`}>
                 <div className="flex items-center gap-2 mb-2">
                   {event.event_category === 'medical' && <Stethoscope className="h-4 w-4" />}
@@ -280,12 +280,12 @@ export default function EventDetails({
                     const data = event.category_data as MedicalCategoryData;
                     return (
                       <>
-                        {data.provider_name && <p><span className="text-gray-500">Provider:</span> {data.provider_name}</p>}
-                        {data.provider_specialty && <p><span className="text-gray-500">Specialty:</span> {data.provider_specialty}</p>}
-                        {data.appointment_reason && <p><span className="text-gray-500">Reason:</span> {data.appointment_reason}</p>}
-                        {data.address && <p><span className="text-gray-500">Address:</span> {data.address}</p>}
-                        {data.phone && <p><span className="text-gray-500">Phone:</span> {data.phone}</p>}
-                        {data.follow_up_needed && <p className="text-blue-700">Follow-up needed</p>}
+                        {data.provider_name && <p><span className="text-muted-foreground">Provider:</span> {data.provider_name}</p>}
+                        {data.provider_specialty && <p><span className="text-muted-foreground">Specialty:</span> {data.provider_specialty}</p>}
+                        {data.appointment_reason && <p><span className="text-muted-foreground">Reason:</span> {data.appointment_reason}</p>}
+                        {data.address && <p><span className="text-muted-foreground">Address:</span> {data.address}</p>}
+                        {data.phone && <p><span className="text-muted-foreground">Phone:</span> {data.phone}</p>}
+                        {data.follow_up_needed && <p className="text-blue-700 dark:text-blue-400">Follow-up needed</p>}
                       </>
                     );
                   })()}
@@ -293,11 +293,11 @@ export default function EventDetails({
                     const data = event.category_data as SchoolCategoryData;
                     return (
                       <>
-                        {data.school_name && <p><span className="text-gray-500">School:</span> {data.school_name}</p>}
-                        {data.activity_type && <p><span className="text-gray-500">Activity:</span> {data.activity_type}</p>}
-                        {data.teacher_name && <p><span className="text-gray-500">Teacher:</span> {data.teacher_name}</p>}
-                        {data.teacher_contact && <p><span className="text-gray-500">Contact:</span> {data.teacher_contact}</p>}
-                        {data.is_required && <p className="text-green-700">Required attendance</p>}
+                        {data.school_name && <p><span className="text-muted-foreground">School:</span> {data.school_name}</p>}
+                        {data.activity_type && <p><span className="text-muted-foreground">Activity:</span> {data.activity_type}</p>}
+                        {data.teacher_name && <p><span className="text-muted-foreground">Teacher:</span> {data.teacher_name}</p>}
+                        {data.teacher_contact && <p><span className="text-muted-foreground">Contact:</span> {data.teacher_contact}</p>}
+                        {data.is_required && <p className="text-green-700 dark:text-green-400">Required attendance</p>}
                       </>
                     );
                   })()}
@@ -305,12 +305,12 @@ export default function EventDetails({
                     const data = event.category_data as SportsCategoryData;
                     return (
                       <>
-                        {data.activity_name && <p><span className="text-gray-500">Activity:</span> {data.activity_name}</p>}
-                        {data.organization && <p><span className="text-gray-500">Organization:</span> {data.organization}</p>}
-                        {data.coach_name && <p><span className="text-gray-500">Coach:</span> {data.coach_name}</p>}
-                        {data.venue && <p><span className="text-gray-500">Venue:</span> {data.venue}</p>}
-                        {data.equipment_needed && <p><span className="text-gray-500">Equipment:</span> {data.equipment_needed}</p>}
-                        {data.cost && <p><span className="text-gray-500">Cost:</span> ${data.cost}</p>}
+                        {data.activity_name && <p><span className="text-muted-foreground">Activity:</span> {data.activity_name}</p>}
+                        {data.organization && <p><span className="text-muted-foreground">Organization:</span> {data.organization}</p>}
+                        {data.coach_name && <p><span className="text-muted-foreground">Coach:</span> {data.coach_name}</p>}
+                        {data.venue && <p><span className="text-muted-foreground">Venue:</span> {data.venue}</p>}
+                        {data.equipment_needed && <p><span className="text-muted-foreground">Equipment:</span> {data.equipment_needed}</p>}
+                        {data.cost && <p><span className="text-muted-foreground">Cost:</span> ${data.cost}</p>}
                       </>
                     );
                   })()}
@@ -318,12 +318,12 @@ export default function EventDetails({
                     const data = event.category_data as ExchangeCategoryData;
                     return (
                       <>
-                        {data.exchange_type && <p><span className="text-gray-500">Type:</span> {data.exchange_type}</p>}
-                        {data.exchange_location && <p><span className="text-gray-500">Location:</span> {data.exchange_location}</p>}
-                        {data.transition_from && <p><span className="text-gray-500">From:</span> {data.transition_from}</p>}
-                        {data.transition_to && <p><span className="text-gray-500">To:</span> {data.transition_to}</p>}
-                        {data.items_to_bring && <p><span className="text-gray-500">Items:</span> {data.items_to_bring}</p>}
-                        {data.special_instructions && <p><span className="text-gray-500">Instructions:</span> {data.special_instructions}</p>}
+                        {data.exchange_type && <p><span className="text-muted-foreground">Type:</span> {data.exchange_type}</p>}
+                        {data.exchange_location && <p><span className="text-muted-foreground">Location:</span> {data.exchange_location}</p>}
+                        {data.transition_from && <p><span className="text-muted-foreground">From:</span> {data.transition_from}</p>}
+                        {data.transition_to && <p><span className="text-muted-foreground">To:</span> {data.transition_to}</p>}
+                        {data.items_to_bring && <p><span className="text-muted-foreground">Items:</span> {data.items_to_bring}</p>}
+                        {data.special_instructions && <p><span className="text-muted-foreground">Instructions:</span> {data.special_instructions}</p>}
                       </>
                     );
                   })()}
@@ -333,14 +333,14 @@ export default function EventDetails({
 
             {/* Silent Handoff Check-In */}
             {event.silent_handoff_enabled && (
-              <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg">
+              <div className="mt-4 p-3 bg-muted border border-border rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Smartphone className="h-4 w-4 text-blue-600" />
-                    <h3 className="font-semibold text-sm">Check-in Required</h3>
+                    <Smartphone className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <h3 className="font-semibold text-sm text-foreground">Check-in Required</h3>
                   </div>
                   {myCheckIn && (
-                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full flex items-center">
+                    <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded-full flex items-center">
                       <Check className="h-3 w-3 mr-1" />
                       Checked In
                     </span>
@@ -348,13 +348,13 @@ export default function EventDetails({
                 </div>
 
                 {myCheckIn ? (
-                  <div className="text-sm text-slate-600">
+                  <div className="text-sm text-muted-foreground">
                     <p>Checked in at {new Date(myCheckIn.checked_in_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                    {myCheckIn.location_lat && <p className="text-xs text-slate-500 mt-1">Location verified via GPS</p>}
+                    {myCheckIn.location_lat && <p className="text-xs text-muted-foreground mt-1">Location verified via GPS</p>}
                   </div>
                 ) : (
                   <div>
-                    <p className="text-sm text-slate-600 mb-3">
+                    <p className="text-sm text-muted-foreground mb-3">
                       Please check in when you arrive at the location.
                     </p>
                     <Button
@@ -372,10 +372,10 @@ export default function EventDetails({
           </div>
 
           {/* Divider */}
-          <div className="border-t pt-6">
+          <div className="border-t border-border pt-6">
             {/* Current RSVP Status */}
             <div className="mb-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Your Response</h3>
+              <h3 className="font-semibold text-foreground mb-2">Your Response</h3>
               <div className={`inline-flex items-center px-3 py-1.5 rounded-full ${getRsvpBadgeColor(currentRsvp)}`}>
                 {currentRsvp === 'going' && <Check className="h-4 w-4 mr-1" />}
                 {currentRsvp === 'not_going' && <XIcon className="h-4 w-4 mr-1" />}
@@ -387,13 +387,13 @@ export default function EventDetails({
             {/* RSVP Buttons / Swap Actions */}
             {!event.is_owner && (
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">
+                <h3 className="font-semibold text-foreground">
                   {event.event_type === 'swap_request' ? 'Respond to Request' : 'Update Your Response'}
                 </h3>
 
                 {/* Response Note */}
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">
+                  <label className="block text-sm text-muted-foreground mb-1">
                     Note (optional)
                   </label>
                   <input
@@ -401,7 +401,7 @@ export default function EventDetails({
                     value={rsvpNote}
                     onChange={(e) => setRsvpNote(e.target.value)}
                     placeholder="Add a note..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    className="w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground placeholder:text-muted-foreground"
                   />
                 </div>
 
@@ -433,7 +433,7 @@ export default function EventDetails({
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'going'
                         ? 'bg-green-600 hover:bg-green-700'
-                        : 'bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-700'
+                        : ''
                         }`}
                       variant={currentRsvp === 'going' ? 'default' : 'outline'}
                     >
@@ -472,14 +472,14 @@ export default function EventDetails({
             {/* Attendance List (for event owner) */}
             {event.is_owner && attendance.length > 0 && (
               <div className="mt-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Responses</h3>
+                <h3 className="font-semibold text-foreground mb-2">Responses</h3>
                 <div className="space-y-2">
                   {attendance.map((att) => (
                     <div
                       key={att.id}
-                      className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                      className="flex items-center justify-between p-2 bg-muted rounded"
                     >
-                      <span className="text-sm text-gray-700">Co-parent</span>
+                      <span className="text-sm text-foreground">Co-parent</span>
                       <span className={`text-xs px-2 py-1 rounded-full ${getRsvpBadgeColor(att.rsvp_status)}`}>
                         {getRsvpLabel(att.rsvp_status)}
                       </span>
