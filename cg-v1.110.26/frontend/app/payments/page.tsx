@@ -556,9 +556,9 @@ function PaymentsContent() {
           </button>
         </div>
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
-            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-            <p className="text-sm text-red-700 font-medium">{error}</p>
+          <div className="flex items-center gap-3 p-4 bg-destructive/10 border-2 border-destructive/20 rounded-2xl">
+            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
+            <p className="text-sm text-destructive font-medium">{error}</p>
           </div>
         )}
 
@@ -636,15 +636,15 @@ function PaymentsContent() {
 
         {/* Overdue Warning */}
         {metrics && metrics.total_overdue > 0 && (
-          <div className="flex items-center gap-4 p-5 bg-card rounded-2xl border-2 border-red-200 shadow-lg">
-            <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center shadow-md">
-              <AlertTriangle className="h-6 w-6 text-red-600" />
+          <div className="flex items-center gap-4 p-5 bg-card rounded-2xl border-2 border-destructive/20 shadow-lg">
+            <div className="w-14 h-14 bg-destructive/10 rounded-2xl flex items-center justify-center shadow-md">
+              <AlertTriangle className="h-6 w-6 text-destructive" />
             </div>
             <div>
-              <p className="font-bold text-red-700" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              <p className="font-bold text-destructive" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 {metrics.total_overdue} Overdue Obligation{metrics.total_overdue > 1 ? 's' : ''}
               </p>
-              <p className="text-sm text-red-600 font-medium">
+              <p className="text-sm text-destructive font-medium">
                 Please address overdue items to maintain compliance.
               </p>
             </div>

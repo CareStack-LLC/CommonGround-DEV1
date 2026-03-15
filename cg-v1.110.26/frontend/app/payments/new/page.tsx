@@ -154,7 +154,7 @@ function NewExpenseContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
           <p className="mt-4 text-muted-foreground font-medium">Loading...</p>
@@ -165,12 +165,12 @@ function NewExpenseContent() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <div className="max-w-2xl mx-auto px-6 py-8">
-          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-8 text-center">
-            <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
-              <DollarSign className="h-7 w-7 text-slate-500" />
+          <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-8 text-center">
+            <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+              <DollarSign className="h-7 w-7 text-muted-foreground" />
             </div>
             <h2 className="text-2xl font-semibold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No Active Cases or Family Files</h2>
             <p className="text-muted-foreground mb-6 font-medium">
@@ -194,11 +194,11 @@ function NewExpenseContent() {
   const respondentShare = amount - petitionerShare;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b-2 border-slate-200">
+      <div className="bg-card/80 backdrop-blur-sm border-b-2 border-border">
         <div className="max-w-2xl mx-auto px-6 py-4">
           <button
             onClick={() => router.push('/payments')}
@@ -228,7 +228,7 @@ function NewExpenseContent() {
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-6">
+          <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-6">
             <div className="space-y-6">
               {/* Case/Family File Selection */}
               {items.length > 1 && (
@@ -239,7 +239,7 @@ function NewExpenseContent() {
                   <select
                     value={selectedCaseId}
                     onChange={(e) => setSelectedCaseId(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white text-foreground focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
+                    className="w-full px-4 py-3 border-2 border-border rounded-xl bg-card text-foreground focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
                     required
                   >
                     {items.map(item => (
@@ -261,7 +261,7 @@ function NewExpenseContent() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g., Emma's Dental Visit"
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl bg-card text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
                   required
                   maxLength={200}
                 />
@@ -281,7 +281,7 @@ function NewExpenseContent() {
                       className={`p-3 rounded-xl border-2 text-left transition-all duration-300 ${
                         category === cat.value
                           ? 'border-[var(--portal-primary)] bg-[var(--portal-primary)]/5 shadow-md'
-                          : 'border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-md bg-white'
+                          : 'border-border hover:border-[var(--portal-primary)]/30 hover:shadow-md bg-card'
                       }`}
                     >
                       <p className={`font-bold text-sm ${category === cat.value ? 'text-[var(--portal-primary)]' : 'text-foreground'}`}>{cat.label}</p>
@@ -305,7 +305,7 @@ function NewExpenseContent() {
                     value={totalAmount}
                     onChange={(e) => setTotalAmount(e.target.value)}
                     placeholder="0.00"
-                    className="w-full pl-8 pr-4 py-3 border-2 border-slate-200 rounded-xl bg-white text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
+                    className="w-full pl-8 pr-4 py-3 border-2 border-border rounded-xl bg-card text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
                     required
                   />
                 </div>
@@ -334,7 +334,7 @@ function NewExpenseContent() {
                   </div>
                 </div>
                 {amount > 0 && (
-                  <div className="flex justify-between text-sm mt-2 p-3 bg-slate-50 rounded-xl border-2 border-slate-200">
+                  <div className="flex justify-between text-sm mt-2 p-3 bg-muted rounded-xl border-2 border-border">
                     <span className="text-foreground font-bold">Petitioner: ${petitionerShare.toFixed(2)}</span>
                     <span className="text-foreground font-bold">Respondent: ${respondentShare.toFixed(2)}</span>
                   </div>
@@ -350,7 +350,7 @@ function NewExpenseContent() {
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white text-foreground focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl bg-card text-foreground focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
                 />
               </div>
 
@@ -364,7 +364,7 @@ function NewExpenseContent() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Provide details about this expense..."
                   rows={3}
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white text-foreground placeholder:text-muted-foreground resize-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl bg-card text-foreground placeholder:text-muted-foreground resize-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
                   maxLength={2000}
                 />
               </div>
@@ -374,21 +374,21 @@ function NewExpenseContent() {
                 <label className="block text-sm font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Requirements
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-all duration-300">
+                <label className="flex items-center gap-3 cursor-pointer p-3 bg-muted rounded-xl border-2 border-border hover:border-[var(--portal-primary)]/30 transition-all duration-300">
                   <input
                     type="checkbox"
                     checked={verificationRequired}
                     onChange={(e) => setVerificationRequired(e.target.checked)}
-                    className="w-5 h-5 rounded border-slate-300 accent-[var(--portal-primary)]"
+                    className="w-5 h-5 rounded border-border accent-[var(--portal-primary)]"
                   />
                   <span className="text-sm text-foreground font-medium">Require verification (proof of payment)</span>
                 </label>
-                <label className="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 transition-all duration-300">
+                <label className="flex items-center gap-3 cursor-pointer p-3 bg-muted rounded-xl border-2 border-border hover:border-[var(--portal-primary)]/30 transition-all duration-300">
                   <input
                     type="checkbox"
                     checked={receiptRequired}
                     onChange={(e) => setReceiptRequired(e.target.checked)}
-                    className="w-5 h-5 rounded border-slate-300 accent-[var(--portal-primary)]"
+                    className="w-5 h-5 rounded border-border accent-[var(--portal-primary)]"
                   />
                   <span className="text-sm text-foreground font-medium">Require receipt upload</span>
                 </label>
@@ -404,7 +404,7 @@ function NewExpenseContent() {
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Any additional notes..."
                   rows={2}
-                  className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-white text-foreground placeholder:text-muted-foreground resize-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
+                  className="w-full px-4 py-3 border-2 border-border rounded-xl bg-card text-foreground placeholder:text-muted-foreground resize-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300"
                   maxLength={2000}
                 />
               </div>
@@ -416,7 +416,7 @@ function NewExpenseContent() {
             <button
               type="button"
               onClick={() => router.push('/payments')}
-              className="flex-1 px-6 py-3 bg-white border-2 border-slate-200 text-foreground rounded-xl font-bold hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+              className="flex-1 px-6 py-3 bg-card border-2 border-border text-foreground rounded-xl font-bold hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
             >
               Cancel
             </button>

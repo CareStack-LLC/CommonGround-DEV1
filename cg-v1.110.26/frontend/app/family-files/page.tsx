@@ -134,7 +134,7 @@ function FamilyFilesContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
-        <p className="mt-4 text-slate-600 font-medium">Loading your family files...</p>
+        <p className="mt-4 text-muted-foreground font-medium">Loading your family files...</p>
       </div>
     );
   }
@@ -144,9 +144,9 @@ function FamilyFilesContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-600 font-medium mb-1">{getGreeting()}</p>
-          <h1 className="text-3xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Family Files</h1>
-          <p className="text-slate-600 font-medium mt-1">
+          <p className="text-sm text-muted-foreground font-medium mb-1">{getGreeting()}</p>
+          <h1 className="text-3xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Family Files</h1>
+          <p className="text-muted-foreground font-medium mt-1">
             Manage your co-parenting arrangements
           </p>
         </div>
@@ -178,13 +178,13 @@ function FamilyFilesContent() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-md">
               <Mail className="h-5 w-5 text-[var(--portal-primary)]" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Pending Invitations</h2>
+            <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Pending Invitations</h2>
           </div>
           <div className="space-y-3">
             {invitations.map((invitation) => (
               <div
                 key={invitation.id}
-                className="bg-white border-2 border-[var(--portal-primary)]/30 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 p-6"
+                className="bg-card border-2 border-[var(--portal-primary)]/30 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 p-6"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
@@ -192,8 +192,8 @@ function FamilyFilesContent() {
                       <FolderHeart className="h-6 w-6 text-[var(--portal-primary)]" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900">{invitation.title}</h3>
-                      <p className="text-sm text-slate-600 font-medium">
+                      <h3 className="font-bold text-foreground">{invitation.title}</h3>
+                      <p className="text-sm text-muted-foreground font-medium">
                         {invitation.family_file_number} - Invited as {getRoleName(invitation.your_role)}
                       </p>
                     </div>
@@ -236,17 +236,17 @@ function FamilyFilesContent() {
       ) : familyFiles.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-500/10 to-slate-600/5 flex items-center justify-center shadow-md">
-              <FolderHeart className="h-5 w-5 text-slate-600" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center shadow-md">
+              <FolderHeart className="h-5 w-5 text-muted-foreground" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Your Family Files</h2>
+            <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Your Family Files</h2>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {familyFiles.map((file) => (
               <div
                 key={file.id}
                 onClick={() => router.push(`/family-files/${file.id}`)}
-                className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-[var(--portal-primary)]/30 hover:scale-[1.02] transition-all duration-300 cursor-pointer p-6"
+                className="bg-card border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-[var(--portal-primary)]/30 hover:scale-[1.02] transition-all duration-300 cursor-pointer p-6"
               >
                 <div className="space-y-4">
                   <div className="flex items-start justify-between gap-2">
@@ -255,8 +255,8 @@ function FamilyFilesContent() {
                         <FolderHeart className="h-6 w-6 text-[var(--portal-primary)]" />
                       </div>
                       <div className="min-w-0">
-                        <h3 className="text-lg font-bold text-slate-900 truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{file.title}</h3>
-                        <p className="text-xs text-slate-600 font-medium">
+                        <h3 className="text-lg font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{file.title}</h3>
+                        <p className="text-xs text-muted-foreground font-medium">
                           {file.family_file_number}
                         </p>
                       </div>
@@ -321,7 +321,7 @@ function FamilyFilesContent() {
 export default function FamilyFilesPage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-20 lg:pb-0">
+      <div className="min-h-screen bg-background pb-20 lg:pb-0">
         <Navigation />
         <PageContainer background="transparent">
           <FamilyFilesContent />

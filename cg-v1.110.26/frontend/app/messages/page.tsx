@@ -171,7 +171,7 @@ function MessageBubble({
     <div className={`flex gap-2 sm:gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}>
       {/* Avatar */}
       {showAvatar && (
-        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isOwn ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F]' : 'bg-gradient-to-br from-slate-400 to-slate-500'
+        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isOwn ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F]' : 'bg-muted-foreground'
           }`}>
           <span className="text-xs font-bold text-white">
             {isOwn ? 'You' : (userName?.charAt(0) || 'P')}
@@ -925,7 +925,7 @@ function MessagesContent() {
   };
 
   return (
-    <div className="h-[100dvh] bg-gradient-to-br from-slate-50 via-white to-slate-50 flex flex-col overflow-hidden">
+    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
       <Navigation />
 
       <div className="flex-1 max-w-7xl mx-auto w-full overflow-hidden">
@@ -978,7 +978,7 @@ function MessagesContent() {
           {/* Main Chat Area */}
           <main className={`
             ${!showSidebar || selectedAgreement ? 'flex' : 'hidden lg:flex'}
-            flex-1 flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-50 overflow-hidden
+            flex-1 flex flex-col bg-background overflow-hidden
           `}>
             {!selectedAgreement ? (
               /* No Agreement Selected */

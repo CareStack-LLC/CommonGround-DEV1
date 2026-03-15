@@ -160,7 +160,7 @@ I'll ask questions to make sure we cover everything important, and at the end, I
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       <Navigation />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -168,8 +168,8 @@ I'll ask questions to make sure we cover everything important, and at the end, I
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Talk to ARIA</h1>
-              <p className="text-gray-600 mt-2">
+              <h1 className="text-3xl font-bold text-foreground">Talk to ARIA</h1>
+              <p className="text-muted-foreground mt-2">
                 Build your custody agreement through conversation
               </p>
             </div>
@@ -231,15 +231,15 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                   <div className="space-y-4">
                     {Object.entries(extractionPreview).map(([sectionName, fields]: [string, any]) => (
                       <div key={sectionName} className="border-l-4 border-green-500 pl-4">
-                        <h4 className="font-semibold text-gray-900 mb-2">{sectionName}</h4>
+                        <h4 className="font-semibold text-foreground mb-2">{sectionName}</h4>
                         <div className="space-y-1">
                           {Array.isArray(fields) ? fields.map((item: any, idx: number) => (
                             <div key={idx} className="text-sm">
-                              <span className="text-gray-600">{item.field}:</span>{' '}
-                              <span className="font-medium text-gray-900">{item.value}</span>
+                              <span className="text-muted-foreground">{item.field}:</span>{' '}
+                              <span className="font-medium text-foreground">{item.value}</span>
                             </div>
                           )) : (
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-muted-foreground">
                               {typeof fields === 'object' ? JSON.stringify(fields) : String(fields)}
                             </div>
                           )}
@@ -300,7 +300,7 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                     className={`max-w-[80%] rounded-lg px-4 py-3 ${
                       message.role === 'user'
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-900'
+                        : 'bg-muted text-foreground'
                     }`}
                   >
                     {message.role === 'assistant' && (
@@ -308,7 +308,7 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                         <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                           A
                         </div>
-                        <span className="text-xs font-semibold text-gray-600">ARIA</span>
+                        <span className="text-xs font-semibold text-muted-foreground">ARIA</span>
                       </div>
                     )}
                     <p className="whitespace-pre-wrap">{message.content}</p>
@@ -318,11 +318,11 @@ I'll ask questions to make sure we cover everything important, and at the end, I
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-100 rounded-lg px-4 py-3">
+                  <div className="bg-muted rounded-lg px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
                     </div>
                   </div>
                 </div>
@@ -351,7 +351,7 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                   Send
                 </Button>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-muted-foreground mt-2">
                 Speak naturally - ARIA understands casual language and will help organize everything.
               </p>
             </div>
