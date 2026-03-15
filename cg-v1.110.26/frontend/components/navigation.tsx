@@ -44,9 +44,9 @@ interface NavItem {
 const appNavItems: NavItem[] = [
   { name: 'Dashboard', path: '/dashboard', icon: Home },
   { name: 'Chat', path: '/messages', icon: MessageSquare },
-  { name: 'Calendar', path: '/schedule', icon: Calendar },
-  { name: 'Clearfund', path: '/payments', icon: Wallet },
   { name: 'Files', path: '/family-files', icon: FolderHeart },
+  { name: 'Clearfund', path: '/payments', icon: Wallet },
+  { name: 'Calendar', path: '/schedule', icon: Calendar },
 ];
 
 // Marketing/public page links for top nav

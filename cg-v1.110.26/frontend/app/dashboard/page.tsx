@@ -647,50 +647,6 @@ function DashboardContent() {
           </h2>
         </div>
 
-        {/* Status Bar — At-a-glance counts */}
-        {!needsSetup && dashboardSummary && (
-          <div className="grid grid-cols-4 gap-2 sm:gap-3 mb-6">
-            {[
-              {
-                icon: Baby,
-                label: 'Children',
-                value: familyFilesWithData.reduce((sum, f) => sum + (f.familyFile.children?.length || 0), 0),
-                color: 'text-[var(--portal-primary)]',
-                bg: 'bg-[var(--portal-primary)]/10',
-              },
-              {
-                icon: Calendar,
-                label: 'Events',
-                value: dashboardSummary.upcoming_events?.length || 0,
-                color: 'text-cg-amber',
-                bg: 'bg-cg-amber-subtle',
-              },
-              {
-                icon: MessageSquare,
-                label: 'Unread',
-                value: dashboardSummary.unread_messages_count || 0,
-                color: 'text-cg-slate',
-                bg: 'bg-cg-slate-subtle',
-              },
-              {
-                icon: Wallet,
-                label: 'Pending',
-                value: dashboardSummary.pending_expenses_count || 0,
-                color: 'text-cg-error',
-                bg: 'bg-cg-error-subtle',
-              },
-            ].map(({ icon: Icon, label, value, color, bg }) => (
-              <div key={label} className="bg-card rounded-xl border border-border p-3 text-center">
-                <div className={`w-8 h-8 ${bg} rounded-lg flex items-center justify-center mx-auto mb-1.5`}>
-                  <Icon className={`w-4 h-4 ${color}`} />
-                </div>
-                <p className="text-lg font-bold text-foreground">{value}</p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground font-medium">{label}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
         {/* Upgrade Banner for Free Users */}
         {isFree() && !needsSetup && (
           <div className="mb-6">
@@ -745,6 +701,45 @@ function DashboardContent() {
             </div>
           ) : (
             <div className="space-y-6">
+              {/* Quick Actions */}
+              <section>
+                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  Quick Actions
+                </h3>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                  <QuickActionButton
+                    icon={MessageSquare}
+                    label="Message"
+                    onClick={() => router.push('/messages')}
+                  />
+                  <QuickActionButton
+                    icon={Calendar}
+                    label="Schedule"
+                    onClick={() => router.push('/schedule')}
+                  />
+                  <QuickActionButton
+                    icon={Wallet}
+                    label="Expense"
+                    onClick={() => router.push('/payments/new')}
+                  />
+                  <QuickActionButton
+                    icon={FolderOpen}
+                    label="Files"
+                    onClick={() => router.push('/family-files')}
+                  />
+                  <QuickActionButton
+                    icon={Shield}
+                    label="KidSpace"
+                    onClick={() => router.push('/kidcoms')}
+                  />
+                  <QuickActionButton
+                    icon={Handshake}
+                    label="Agreements"
+                    onClick={() => router.push('/agreements')}
+                  />
+                </div>
+              </section>
+
               {/* Custody Status Cards - Grid layout for at-a-glance view */}
               {familyFilesWithData.some(f => f.familyFile.children && f.familyFile.children.length > 0) && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -951,45 +946,6 @@ function DashboardContent() {
                   Coming Up
                 </h3>
                 <UpcomingEventsList events={dashboardSummary?.upcoming_events} />
-              </section>
-
-              {/* Quick Actions */}
-              <section>
-                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  Quick Actions
-                </h3>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  <QuickActionButton
-                    icon={MessageSquare}
-                    label="Message"
-                    onClick={() => router.push('/messages')}
-                  />
-                  <QuickActionButton
-                    icon={Calendar}
-                    label="Schedule"
-                    onClick={() => router.push('/schedule')}
-                  />
-                  <QuickActionButton
-                    icon={Wallet}
-                    label="Expense"
-                    onClick={() => router.push('/payments/new')}
-                  />
-                  <QuickActionButton
-                    icon={FolderOpen}
-                    label="Files"
-                    onClick={() => router.push('/family-files')}
-                  />
-                  <QuickActionButton
-                    icon={Shield}
-                    label="KidSpace"
-                    onClick={() => router.push('/kidcoms')}
-                  />
-                  <QuickActionButton
-                    icon={Handshake}
-                    label="Agreements"
-                    onClick={() => router.push('/agreements')}
-                  />
-                </div>
               </section>
 
               {/* Family Files Summary */}
