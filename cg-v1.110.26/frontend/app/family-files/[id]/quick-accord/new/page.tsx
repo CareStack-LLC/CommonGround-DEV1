@@ -187,7 +187,7 @@ function NewQuickAccordContent() {
       <div className="flex items-center gap-4">
         <button
           onClick={() => router.back()}
-          className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+          className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
         >
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </button>
@@ -215,7 +215,7 @@ function NewQuickAccordContent() {
 
       {/* Category Selector (before conversation starts) */}
       {!conversationId && (
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               What type of arrangement do you need?
@@ -227,58 +227,58 @@ function NewQuickAccordContent() {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-white border-2 border-slate-200 rounded-xl hover:border-blue-500/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-blue-500/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('travel')}
               >
                 <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
                   <Plane className="h-5 w-5 text-blue-500" />
                 </div>
-                <span className="font-bold text-sm text-slate-700">Travel</span>
+                <span className="font-bold text-sm text-foreground">Travel</span>
               </button>
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-white border-2 border-slate-200 rounded-xl hover:border-emerald-500/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-emerald-500/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('schedule_swap')}
               >
                 <div className="p-2.5 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
                   <CalendarSync className="h-5 w-5 text-emerald-500" />
                 </div>
-                <span className="font-bold text-sm text-slate-700">Schedule Swap</span>
+                <span className="font-bold text-sm text-foreground">Schedule Swap</span>
               </button>
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-white border-2 border-slate-200 rounded-xl hover:border-purple-500/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-purple-500/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('special_event')}
               >
                 <div className="p-2.5 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
                   <PartyPopper className="h-5 w-5 text-purple-500" />
                 </div>
-                <span className="font-bold text-sm text-slate-700">Special Event</span>
+                <span className="font-bold text-sm text-foreground">Special Event</span>
               </button>
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-white border-2 border-slate-200 rounded-xl hover:border-indigo-500/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-indigo-500/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('overnight')}
               >
                 <div className="p-2.5 bg-gradient-to-br from-indigo-500/10 to-indigo-600/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
                   <Moon className="h-5 w-5 text-indigo-500" />
                 </div>
-                <span className="font-bold text-sm text-slate-700">Overnight</span>
+                <span className="font-bold text-sm text-foreground">Overnight</span>
               </button>
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-white border-2 border-slate-200 rounded-xl hover:border-emerald-500/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-emerald-500/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('expense')}
               >
                 <div className="p-2.5 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
                   <DollarSign className="h-5 w-5 text-emerald-500" />
                 </div>
-                <span className="font-bold text-sm text-slate-700">Expense</span>
+                <span className="font-bold text-sm text-foreground">Expense</span>
               </button>
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-white border-2 border-slate-200 rounded-xl hover:border-slate-400/50 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-muted-foreground/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('other')}
               >
-                <div className="p-2.5 bg-gradient-to-br from-slate-500/10 to-slate-600/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
-                  <MoreHorizontal className="h-5 w-5 text-slate-500" />
+                <div className="p-2.5 bg-gradient-to-br from-muted-foreground/10 to-muted-foreground/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                  <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
                 </div>
-                <span className="font-bold text-sm text-slate-700">Other</span>
+                <span className="font-bold text-sm text-foreground">Other</span>
               </button>
             </div>
           </CardContent>
@@ -286,8 +286,8 @@ function NewQuickAccordContent() {
       )}
 
       {/* Chat Interface */}
-      <Card className="flex flex-col h-[500px] border-2 border-slate-200 rounded-2xl shadow-lg overflow-hidden">
-        <CardHeader className="border-b-2 border-slate-100 pb-4">
+      <Card className="flex flex-col h-[500px] border-2 border-border rounded-2xl shadow-lg overflow-hidden">
+        <CardHeader className="border-b-2 border-border pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-xl shadow-md">
               <Bot className="h-5 w-5 text-[var(--portal-primary)]" />
@@ -304,7 +304,7 @@ function NewQuickAccordContent() {
         </CardHeader>
 
         {/* Messages */}
-        <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-slate-50/50 to-white">
+        <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-muted/50 to-card">
           {messages.length === 0 && !conversationId && (
             <div className="text-center text-muted-foreground py-8">
               <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
@@ -328,7 +328,7 @@ function NewQuickAccordContent() {
                 className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-md ${
                   message.role === 'user'
                     ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white'
-                    : 'bg-white border-2 border-slate-200 text-foreground'
+                    : 'bg-card border-2 border-border text-foreground'
                 }`}
               >
                 <p className="whitespace-pre-wrap text-sm font-medium">{message.content}</p>
@@ -346,7 +346,7 @@ function NewQuickAccordContent() {
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center shadow-sm">
                 <Bot className="h-4 w-4 text-[var(--portal-primary)] animate-pulse" />
               </div>
-              <div className="bg-white border-2 border-slate-200 rounded-2xl px-4 py-3 shadow-md">
+              <div className="bg-card border-2 border-border rounded-2xl px-4 py-3 shadow-md">
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-[var(--portal-primary)] rounded-full animate-bounce" />
                   <div className="w-2 h-2 bg-[var(--portal-primary)] rounded-full animate-bounce delay-100" />
@@ -360,11 +360,11 @@ function NewQuickAccordContent() {
         </CardContent>
 
         {/* Input */}
-        <div className="border-t-2 border-slate-100 p-4 bg-white">
+        <div className="border-t-2 border-border p-4 bg-card">
           {isReady && (
-            <Alert className="mb-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl">
-              <CheckCircle className="h-4 w-4 text-emerald-600" />
-              <AlertDescription className="text-emerald-700 font-medium">
+            <Alert className="mb-4 bg-emerald-50 dark:bg-emerald-950/20 border-2 border-emerald-200 dark:border-emerald-900/40 rounded-xl">
+              <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <AlertDescription className="text-emerald-700 dark:text-emerald-300 font-medium">
                 Ready to create! Review the summary above and click "Create QuickAccord" when you're satisfied.
               </AlertDescription>
             </Alert>
@@ -377,7 +377,7 @@ function NewQuickAccordContent() {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
               disabled={isSending || isCreating}
-              className="flex-1 border-2 border-slate-200 rounded-xl focus:border-[var(--portal-primary)]/50"
+              className="flex-1 border-2 border-border rounded-xl focus:border-[var(--portal-primary)]/50"
             />
             {!conversationId ? (
               <Button
@@ -410,11 +410,11 @@ function NewQuickAccordContent() {
 
       {/* Extracted Data Preview */}
       {extractedData && Object.keys(extractedData).length > 0 && (
-        <Card className="border-2 border-slate-200 rounded-2xl shadow-lg">
+        <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
-                <CheckCircle className="h-5 w-5 text-emerald-600" />
+                <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               Extracted Information
             </CardTitle>
@@ -425,55 +425,55 @@ function NewQuickAccordContent() {
           <CardContent>
             <div className="grid gap-3 text-sm">
               {extractedData.title && (
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-muted-foreground font-medium">Title</span>
-                  <span className="font-bold text-slate-900">{extractedData.title}</span>
+                  <span className="font-bold text-foreground">{extractedData.title}</span>
                 </div>
               )}
               {extractedData.purpose_category && (
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-muted-foreground font-medium">Category</span>
-                  <span className="font-bold text-slate-900 capitalize">{extractedData.purpose_category.replace('_', ' ')}</span>
+                  <span className="font-bold text-foreground capitalize">{extractedData.purpose_category.replace('_', ' ')}</span>
                 </div>
               )}
               {extractedData.event_date && (
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-muted-foreground font-medium">Date</span>
-                  <span className="font-bold text-slate-900">{extractedData.event_date}</span>
+                  <span className="font-bold text-foreground">{extractedData.event_date}</span>
                 </div>
               )}
               {(extractedData.start_date || extractedData.end_date) && (
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-muted-foreground font-medium">Date Range</span>
-                  <span className="font-bold text-slate-900">
+                  <span className="font-bold text-foreground">
                     {extractedData.start_date} - {extractedData.end_date}
                   </span>
                 </div>
               )}
               {extractedData.child_names?.length > 0 && (
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-muted-foreground font-medium">Children</span>
-                  <span className="font-bold text-slate-900">{extractedData.child_names.join(', ')}</span>
+                  <span className="font-bold text-foreground">{extractedData.child_names.join(', ')}</span>
                 </div>
               )}
               {extractedData.location && (
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-muted-foreground font-medium">Location</span>
-                  <span className="font-bold text-slate-900">{extractedData.location}</span>
+                  <span className="font-bold text-foreground">{extractedData.location}</span>
                 </div>
               )}
               {extractedData.has_shared_expense && (
-                <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-muted-foreground font-medium">Shared Expense</span>
-                  <span className="font-bold text-emerald-600">
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">
                     ${extractedData.estimated_amount || 'TBD'}
                   </span>
                 </div>
               )}
               {extractedData.missing_info?.length > 0 && (
-                <div className="mt-2 pt-3 border-t-2 border-amber-100 bg-amber-50/50 -mx-6 px-6 pb-2 rounded-b-xl">
+                <div className="mt-2 pt-3 border-t-2 border-amber-100 dark:border-amber-900/40 bg-amber-50/50 dark:bg-amber-950/20 -mx-6 px-6 pb-2 rounded-b-xl">
                   <span className="text-muted-foreground font-medium">Still needed: </span>
-                  <span className="text-amber-600 font-bold">{extractedData.missing_info.join(', ')}</span>
+                  <span className="text-amber-600 dark:text-amber-400 font-bold">{extractedData.missing_info.join(', ')}</span>
                 </div>
               )}
             </div>
@@ -487,7 +487,7 @@ function NewQuickAccordContent() {
 export default function NewQuickAccordPage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
         <Navigation />
         <PageContainer className="pb-32">
           <NewQuickAccordContent />
