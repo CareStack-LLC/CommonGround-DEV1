@@ -23,9 +23,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 function formatDays(minutes: number): string {
-    const days = minutes / (60 * 24);
-    const rounded = Math.round(days * 10) / 10;
-    return rounded.toString();
+    return Math.round(minutes / (60 * 24)).toString();
 }
 
 // =============================================================================
@@ -184,12 +182,17 @@ export function DashboardCustodyCard({
         statusText = 'Pending Check-in';
     }
 
-    // Current streak
+    // Current streak — count full calendar days (inclusive)
+    // Pickup Sunday = Day 1, Monday = Day 2, Tuesday = Day 3, etc.
     const currentStreakDays = (() => {
         if (!currentSession) return 0;
         const start = new Date(currentSession.start_time);
-        const diffMs = Math.abs(new Date().getTime() - start.getTime());
-        return Math.round((diffMs / (1000 * 60 * 60 * 24)) * 10) / 10;
+        const now = new Date();
+        // Zero out times to compare calendar dates
+        const startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+        const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const diffDays = Math.round((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        return diffDays + 1; // +1 because pickup day counts as Day 1
     })();
 
     // Next exchange — use real data from custody status API
@@ -309,21 +312,17 @@ export function DashboardCustodyCard({
                     </div>
                 </div>
 
-                {/* Status + streak below bar */}
-                <p className="text-xs text-center text-muted-foreground mb-3">
-                    <span className={isWithYou ? 'text-[var(--portal-primary)] font-semibold' : hasCurrentSession ? 'text-cg-slate font-medium' : 'text-cg-amber font-medium'}>
-                        {statusText}
-                    </span>
-                    {hasCurrentSession && currentStreakDays > 0 && (
-                        <span className="text-foreground font-medium"> · {currentStreakDays} Days</span>
-                    )}
-                </p>
-
-                {/* Total days - your time only */}
+                {/* Bottom stats */}
                 <div className="pt-3 border-t border-border flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Your total time</span>
+                    {hasCurrentSession && currentStreakDays > 0 ? (
+                        <span className="text-xs text-muted-foreground">
+                            Day <span className="font-bold text-foreground">{currentStreakDays}</span> with you
+                        </span>
+                    ) : (
+                        <span className="text-xs text-muted-foreground">{statusText}</span>
+                    )}
                     <span className="text-lg font-bold text-[var(--portal-primary)]">
-                        {formatDays(myStats.minutes)} <span className="text-xs font-medium text-muted-foreground">Days</span>
+                        {formatDays(myStats.minutes)} <span className="text-xs font-medium text-muted-foreground">Total Days</span>
                     </span>
                 </div>
             </div>
