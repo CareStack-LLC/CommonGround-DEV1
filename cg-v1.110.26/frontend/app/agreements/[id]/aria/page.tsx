@@ -8,11 +8,22 @@ import { agreementsAPI } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProtectedRoute } from '@/components/protected-route';
+import { Paperclip, FileText } from 'lucide-react';
+
+interface MessageAttachment {
+  filename: string;
+  file_type: string;
+  file_size: number;
+  storage_url: string;
+  text_length: number;
+}
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: string;
+  type?: 'document_upload';
+  attachment?: MessageAttachment;
 }
 
 function AriaBuilderContent() {
@@ -29,7 +40,9 @@ function AriaBuilderContent() {
   const [extractionPreview, setExtractionPreview] = useState<any>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadConversation();
@@ -51,6 +64,8 @@ function AriaBuilderContent() {
         role: msg.role as 'user' | 'assistant',
         content: msg.content,
         timestamp: msg.timestamp,
+        type: msg.type as 'document_upload' | undefined,
+        attachment: msg.attachment as MessageAttachment | undefined,
       }));
       setMessages(typedMessages);
       setSummary(conversation.summary);
@@ -157,6 +172,95 @@ I'll ask questions to make sure we cover everything important, and at the end, I
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset input so the same file can be re-selected
+    e.target.value = '';
+
+    // Validate file type
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+    const allowedExtensions = ['.pdf', '.docx'];
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(ext)) {
+      alert('Please upload a PDF (.pdf) or Word document (.docx).');
+      return;
+    }
+
+    // Validate file size (20MB max)
+    const maxSize = 20 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('File is too large. Maximum size is 20 MB.');
+      return;
+    }
+
+    // Add a placeholder user message with document card
+    const uploadMessage: Message = {
+      role: 'user',
+      content: `Uploaded document: ${file.name}`,
+      timestamp: new Date().toISOString(),
+      type: 'document_upload',
+      attachment: {
+        filename: file.name,
+        file_type: file.type || (ext === '.pdf' ? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+        file_size: file.size,
+        storage_url: '',
+        text_length: 0,
+      },
+    };
+
+    setMessages((prev) => [...prev, uploadMessage]);
+    setIsUploading(true);
+
+    try {
+      const response = await agreementsAPI.uploadAriaDocument(agreementId, file);
+
+      // Update the user message with real attachment data
+      setMessages((prev) => {
+        const updated = [...prev];
+        const lastUserIdx = updated.length - 1;
+        if (updated[lastUserIdx]?.type === 'document_upload') {
+          updated[lastUserIdx] = {
+            ...updated[lastUserIdx],
+            attachment: response.document,
+          };
+        }
+        return updated;
+      });
+
+      // Add ARIA's response
+      const assistantMessage: Message = {
+        role: 'assistant',
+        content: response.response,
+        timestamp: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error: any) {
+      console.error('Error uploading document:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `I'm sorry, I couldn't process your document: ${error.message || 'Please try again.'}`,
+          timestamp: new Date().toISOString(),
+        },
+      ]);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   return (
@@ -311,12 +415,42 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                         <span className="text-xs font-semibold text-muted-foreground">ARIA</span>
                       </div>
                     )}
-                    <p className="whitespace-pre-wrap">{message.content}</p>
+                    {/* Document upload card */}
+                    {message.type === 'document_upload' && message.attachment ? (
+                      <div className={`flex items-center gap-3 p-3 rounded-lg ${
+                        message.role === 'user' ? 'bg-blue-700/50' : 'bg-background'
+                      }`}>
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                          message.role === 'user' ? 'bg-blue-500' : 'bg-blue-100'
+                        }`}>
+                          <FileText className={`w-5 h-5 ${
+                            message.role === 'user' ? 'text-white' : 'text-blue-600'
+                          }`} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className={`text-sm font-medium truncate ${
+                            message.role === 'user' ? 'text-white' : 'text-foreground'
+                          }`}>
+                            {message.attachment.filename}
+                          </p>
+                          <p className={`text-xs ${
+                            message.role === 'user' ? 'text-blue-200' : 'text-muted-foreground'
+                          }`}>
+                            {formatFileSize(message.attachment.file_size)}
+                            {message.attachment.text_length > 0 && (
+                              <> &middot; {message.attachment.text_length.toLocaleString()} chars extracted</>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    )}
                   </div>
                 </div>
               ))}
 
-              {isLoading && (
+              {(isLoading || isUploading) && (
                 <div className="flex justify-start">
                   <div className="bg-muted rounded-lg px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -324,6 +458,9 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                       <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                       <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
                     </div>
+                    {isUploading && (
+                      <p className="text-xs text-muted-foreground mt-1">Reading your document...</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -333,7 +470,24 @@ I'll ask questions to make sure we cover everything important, and at the end, I
 
             {/* Input Area */}
             <div className="border-t p-4">
-              <div className="flex gap-3">
+              <div className="flex gap-3 items-end">
+                {/* Upload button */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading || isUploading}
+                  className="flex-shrink-0 p-3 rounded-lg border hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Upload an existing agreement (PDF or Word)"
+                >
+                  <Paperclip className="w-5 h-5 text-muted-foreground" />
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -341,18 +495,18 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                   placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
                   className="flex-1 px-4 py-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows={3}
-                  disabled={isLoading}
+                  disabled={isLoading || isUploading}
                 />
                 <Button
                   onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
+                  disabled={!input.trim() || isLoading || isUploading}
                   className="self-end"
                 >
                   Send
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                Speak naturally - ARIA understands casual language and will help organize everything.
+                Speak naturally — or <button type="button" onClick={() => fileInputRef.current?.click()} className="text-blue-600 hover:underline" disabled={isLoading || isUploading}>upload an existing agreement</button> for ARIA to review.
               </p>
             </div>
           </Card>

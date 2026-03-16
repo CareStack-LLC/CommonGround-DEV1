@@ -3,7 +3,7 @@ Agreement endpoints for custody agreement management.
 """
 
 from typing import List, Dict, Any, Optional
-from fastapi import APIRouter, Depends, Body, status, Response
+from fastapi import APIRouter, Depends, Body, File, UploadFile, HTTPException, status, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
@@ -37,6 +37,14 @@ class AriaChatResponse(BaseModel):
     conversation_id: str
     message_count: int
     is_finalized: bool
+
+
+class AriaDocumentUploadResponse(BaseModel):
+    response: str
+    conversation_id: str
+    message_count: int
+    is_finalized: bool
+    document: dict
 
 # Note: Case-specific agreement endpoints (create, get by case_id) are in cases.py router
 
@@ -517,6 +525,127 @@ async def send_aria_message(
     )
 
     return AriaChatResponse(**result)
+
+
+@router.post("/{agreement_id}/aria/upload", response_model=AriaDocumentUploadResponse)
+async def upload_aria_document(
+    agreement_id: str,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Upload a document (PDF or DOCX) for ARIA to analyze.
+
+    ARIA will extract text from the document, use it as a starting point
+    for the custody agreement conversation, identify covered topics, and
+    ask about anything missing or unclear.
+
+    Args:
+        agreement_id: ID of the agreement being built
+        file: PDF or DOCX file upload
+
+    Returns:
+        ARIA's analysis of the document and conversation state
+    """
+    from app.services.document_text_extractor import extract_text
+    from app.services.storage import (
+        SupabaseStorageService,
+        StorageBucket,
+        build_aria_document_path,
+    )
+    from sqlalchemy import select
+    from app.models.agreement import Agreement
+
+    # Validate file type
+    allowed_types = {
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    }
+    allowed_extensions = {".pdf", ".docx"}
+
+    filename = file.filename or "document"
+    file_ext = "." + filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+
+    if file.content_type not in allowed_types and file_ext not in allowed_extensions:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Only PDF (.pdf) and Word (.docx) files are supported.",
+        )
+
+    # Read file content
+    file_content = await file.read()
+
+    # Validate file size (20MB max for agreement docs)
+    max_size = 20 * 1024 * 1024
+    if len(file_content) > max_size:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="File too large. Maximum size is 20MB.",
+        )
+
+    # Get agreement to find family_file_id
+    agreement_result = await db.execute(
+        select(Agreement).where(Agreement.id == agreement_id)
+    )
+    agreement = agreement_result.scalar_one_or_none()
+    if not agreement:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Agreement not found"
+        )
+
+    family_file_id = agreement.family_file_id or agreement.case_id
+
+    # Upload to Supabase Storage
+    storage_service = SupabaseStorageService()
+    storage_path = build_aria_document_path(family_file_id, agreement_id, filename)
+
+    try:
+        storage_url = await storage_service.upload_file(
+            bucket=StorageBucket.DOCUMENTS,
+            path=storage_path,
+            file_content=file_content,
+            content_type=file.content_type or "application/pdf",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload file: {str(e)}",
+        )
+
+    # Extract text from document
+    try:
+        extracted_text, extraction_metadata = extract_text(
+            file_content, file.content_type or "application/pdf", filename
+        )
+    except ValueError as e:
+        # Image-only PDF or unsupported type
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Failed to read document: {str(e)}",
+        )
+
+    # Build attachment info
+    attachment_info = {
+        "filename": filename,
+        "file_type": file.content_type or "application/pdf",
+        "file_size": len(file_content),
+        "storage_url": storage_url,
+        "text_length": extraction_metadata.get("text_length", len(extracted_text)),
+        **extraction_metadata,
+    }
+
+    # Send to ARIA for analysis
+    aria_service = AriaAgreementService(db)
+    result = await aria_service.send_document_message(
+        agreement_id, current_user, extracted_text, attachment_info
+    )
+
+    return AriaDocumentUploadResponse(**result)
 
 
 @router.get("/{agreement_id}/aria/conversation")

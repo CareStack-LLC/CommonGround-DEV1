@@ -1246,6 +1246,45 @@ export const agreementsAPI = {
   },
 
   /**
+   * Upload a document (PDF/DOCX) for ARIA to analyze and use as starting point
+   */
+  async uploadAriaDocument(agreementId: string, file: File): Promise<{
+    response: string;
+    conversation_id: string;
+    message_count: number;
+    is_finalized: boolean;
+    document: {
+      filename: string;
+      file_type: string;
+      file_size: number;
+      storage_url: string;
+      text_length: number;
+    };
+  }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = localStorage.getItem('access_token');
+    const response = await fetch(
+      `${API_URL}/agreements/${agreementId}/aria/upload`,
+      {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(error.detail || 'Failed to upload document');
+    }
+
+    return response.json();
+  },
+
+  /**
    * Get ARIA conversation history
    */
   async getAriaConversation(agreementId: string): Promise<{

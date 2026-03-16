@@ -359,6 +359,18 @@ def build_document_path(family_file_id: str, doc_type: str, filename: str) -> st
     return f"{family_file_id}/{doc_type}/{sanitize_filename(filename)}"
 
 
+def build_aria_document_path(family_file_id: str, agreement_id: str, filename: str) -> str:
+    """
+    Build storage path for ARIA-uploaded agreement documents.
+
+    Args:
+        family_file_id: Family file ID
+        agreement_id: Agreement ID
+        filename: File name
+    """
+    return f"{family_file_id}/aria/{agreement_id}/{sanitize_filename(filename)}"
+
+
 def build_attachment_path(family_file_id: str, message_id: str, filename: str) -> str:
     """
     Build storage path for message attachment.

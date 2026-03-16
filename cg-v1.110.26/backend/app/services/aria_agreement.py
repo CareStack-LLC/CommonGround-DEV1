@@ -124,6 +124,8 @@ Your role is to have a natural, empathetic conversation to understand their cust
 **Current case**: {case_name}
 **Children**: {children_text}
 
+**Document uploads**: Parents may upload an existing custody/parenting agreement document. When they do, you'll receive the document text. Read through it carefully, summarize the key topics covered, note anything unclear or missing, and use it as a starting point for the conversation — don't re-ask about things already clearly stated in the document.
+
 Start by warmly greeting the parent and letting them know they'll fill in names and contact info separately - you're here to help them figure out the custody details in plain language."""
 
     async def send_message(
@@ -220,6 +222,129 @@ Start by warmly greeting the parent and letting them know they'll fill in names 
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Error communicating with ARIA: {str(e)}"
+            )
+
+    async def send_document_message(
+        self,
+        agreement_id: str,
+        user: User,
+        extracted_text: str,
+        attachment_info: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """
+        Process an uploaded document and return ARIA's analysis.
+
+        Injects the extracted document text into the conversation and triggers
+        ARIA to analyze it, identify covered topics, and ask about gaps.
+
+        Args:
+            agreement_id: Agreement being built
+            user: Current user
+            extracted_text: Text extracted from the uploaded document
+            attachment_info: Dict with filename, file_type, file_size, storage_url, text_length
+
+        Returns:
+            dict with assistant's response, conversation state, and document info
+        """
+        # Get or create conversation
+        conversation = await self.get_or_create_conversation(agreement_id, user)
+
+        # Verify user has access to this agreement
+        agreement_result = await self.db.execute(
+            select(Agreement).where(Agreement.id == agreement_id)
+        )
+        agreement = agreement_result.scalar_one_or_none()
+        if not agreement:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Agreement not found",
+            )
+
+        # Get case info for context
+        case_result = await self.db.execute(
+            select(Case).where(Case.id == agreement.case_id)
+        )
+        case = case_result.scalar_one_or_none()
+        children_names = []  # TODO: Query children
+
+        filename = attachment_info.get("filename", "document")
+
+        # Add document upload message to conversation
+        conversation.messages.append(
+            {
+                "role": "user",
+                "content": f"[DOCUMENT UPLOADED: {filename}]\n\n{extracted_text}",
+                "timestamp": datetime.utcnow().isoformat(),
+                "type": "document_upload",
+                "attachment": attachment_info,
+            }
+        )
+        flag_modified(conversation, "messages")
+
+        # Generate system prompt
+        system_prompt = self._get_system_prompt(
+            case.case_name if case else "your case", children_names
+        )
+
+        # Additional instruction for document handling
+        document_instruction = (
+            "The parent has just uploaded an existing custody/parenting agreement document. "
+            "Read through it carefully and:\n"
+            "1. Acknowledge receipt and briefly describe what you found in the document\n"
+            "2. Identify the key topics already covered (custody type, schedule, holidays, "
+            "child support, medical decisions, exchange locations, etc.)\n"
+            "3. Note anything that seems unclear, incomplete, or potentially outdated\n"
+            "4. Ask about important topics NOT covered in the document\n"
+            "5. Use the document as a starting point — don't re-ask about things already "
+            "clearly stated in the document\n\n"
+            "Be specific about what you found — reference actual details from the document "
+            "so the parent knows you read it."
+        )
+
+        # Build OpenAI messages — system prompt + document instruction + conversation history
+        try:
+            openai_messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "system", "content": document_instruction},
+            ] + [
+                {"role": msg["role"], "content": msg["content"]}
+                for msg in conversation.messages
+            ]
+
+            response = self.client.chat.completions.create(
+                model="gpt-4-turbo",
+                max_tokens=3000,  # Allow longer response for document analysis
+                messages=openai_messages,
+            )
+
+            assistant_message = response.choices[0].message.content
+
+            # Add assistant response to conversation
+            conversation.messages.append(
+                {
+                    "role": "assistant",
+                    "content": assistant_message,
+                    "timestamp": datetime.utcnow().isoformat(),
+                }
+            )
+            flag_modified(conversation, "messages")
+
+            # Save conversation
+            await self.db.commit()
+            await self.db.refresh(conversation)
+
+            return {
+                "response": assistant_message,
+                "conversation_id": conversation.id,
+                "message_count": len(conversation.messages),
+                "is_finalized": conversation.is_finalized,
+                "document": attachment_info,
+            }
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error communicating with ARIA: {str(e)}",
             )
 
     async def generate_summary(
