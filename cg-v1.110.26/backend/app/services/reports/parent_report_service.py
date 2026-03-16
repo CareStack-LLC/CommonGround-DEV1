@@ -140,16 +140,27 @@ class ParentReportService:
         else:
             raise ValueError(f"Unknown report type: {report_type}")
 
-        # Persist and return result
-        return await self._persist_report(
-            pdf_bytes=pdf_bytes,
-            report_type=report_type,
-            report_category="parent",
-            family_file_id=family_file_id,
-            user_id=user_id,
-            date_start=date_start,
-            date_end=date_end,
-        )
+        # Persist and return result (non-fatal if DB table doesn't exist yet)
+        try:
+            return await self._persist_report(
+                pdf_bytes=pdf_bytes,
+                report_type=report_type,
+                report_category="parent",
+                family_file_id=family_file_id,
+                user_id=user_id,
+                date_start=date_start,
+                date_end=date_end,
+            )
+        except Exception as e:
+            logger.warning(f"Failed to persist report (table may not exist yet): {e}")
+            await self.db.rollback()
+            report_id = self.generate_report_id()
+            sha256_hash = hashlib.sha256(pdf_bytes).hexdigest()
+            return ReportResult(
+                pdf_bytes=pdf_bytes,
+                report_id=report_id,
+                sha256_hash=sha256_hash,
+            )
 
     async def _generate_custody_time_report(
         self,
