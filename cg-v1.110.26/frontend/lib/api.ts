@@ -1225,7 +1225,7 @@ export const agreementsAPI = {
    */
   async generatePDF(agreementId: string): Promise<Blob> {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/agreements/${agreementId}/pdf`,
+      `${API_URL}/agreements/${agreementId}/pdf`,
       {
         headers: {
           Authorization: `Bearer ${getAuthToken()}`,
