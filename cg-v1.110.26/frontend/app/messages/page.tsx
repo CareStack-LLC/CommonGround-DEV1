@@ -14,8 +14,6 @@ import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
 import { MessageCompose } from '@/components/messages/message-compose';
 import { ARIAReplySuggestion } from '@/components/messages/aria-reply-suggestion';
-import { PreCallSettingsDialog } from '@/components/calls/pre-call-settings-dialog';
-import { SensitivityLevel } from '@/components/calls/aria-sensitivity-slider';
 import {
   MessageSquare,
   Shield,
@@ -617,8 +615,6 @@ function MessagesContent() {
   const [error, setError] = useState<string | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
-  const [showPreCallDialog, setShowPreCallDialog] = useState(false);
-  const [pendingCallType, setPendingCallType] = useState<'video' | 'audio'>('video');
   const [isStartingCall, setIsStartingCall] = useState(false);
   const [acknowledgingMessageId, setAcknowledgingMessageId] = useState<string | null>(null);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
@@ -870,20 +866,11 @@ function MessagesContent() {
       return;
     }
 
-    // Show pre-call settings dialog
-    setPendingCallType(callType);
-    setShowPreCallDialog(true);
-  };
-
-  const handleStartCallWithSettings = (settings: { callType: 'video' | 'audio'; ariaSensitivity: SensitivityLevel }) => {
-    if (!selectedFamilyFile?.id) return;
-
+    // Navigate directly to call page — ARIA is always enabled
     setIsStartingCall(true);
-
     try {
-      // Navigate to call page with family file ID, call type, and ARIA sensitivity
       router.push(
-        `/messages/call?family_file_id=${selectedFamilyFile.id}&call_type=${settings.callType}&aria_sensitivity=${settings.ariaSensitivity}`
+        `/messages/call?family_file_id=${selectedFamilyFile.id}&call_type=${callType}&aria_sensitivity=balanced`
       );
     } catch (error) {
       console.error('Failed to initiate call:', error);
@@ -1148,16 +1135,6 @@ function MessagesContent() {
           </main>
         </div>
       </div>
-
-      {/* Pre-Call Settings Dialog */}
-      <PreCallSettingsDialog
-        open={showPreCallDialog}
-        onOpenChange={setShowPreCallDialog}
-        onStartCall={handleStartCallWithSettings}
-        recipientName={getOtherParentName()}
-        defaultCallType={pendingCallType}
-        isLoading={isStartingCall}
-      />
 
       {/* Welcome Disclaimer Modal */}
       {showDisclaimer && (

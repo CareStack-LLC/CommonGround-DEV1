@@ -630,18 +630,28 @@ function DashboardContent() {
   const needsSetup = familyFilesWithData.length === 0 && !isLoading;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
       <Navigation />
 
       <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
         {/* Header with Greeting */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-            {greeting},
-          </h1>
-          <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-            {user?.first_name}
-          </h2>
+        <div className="mb-8 relative overflow-hidden bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10 rounded-2xl p-6 border border-[var(--portal-primary)]/10">
+          <div className="relative z-10">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              {greeting},
+            </h1>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              {user?.first_name}
+            </h2>
+          </div>
+          {/* Calming nature illustration */}
+          <svg className="absolute right-2 bottom-0 w-32 h-32 sm:w-40 sm:h-40 opacity-15" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M160 180c-20-40-60-60-100-50 30-20 70-15 90 10-10-30-40-55-75-55 25-10 55 5 70 35-5-25-20-45-45-55 20 0 40 15 50 40 0-20-10-40-30-50 15 5 30 20 35 40 5-15 0-35-15-45 10 10 20 25 20 45" stroke="var(--portal-primary)" strokeWidth="2" strokeLinecap="round" fill="none"/>
+            <path d="M140 190c-10-50-40-80-80-85 20-5 45 10 55 35-5-25-25-45-50-50 15 0 35 15 45 35 0-20-15-35-30-40 15 5 25 20 30 35" stroke="var(--portal-primary)" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
+            <circle cx="155" cy="65" r="3" fill="var(--portal-primary)" opacity="0.3"/>
+            <circle cx="170" cy="85" r="2" fill="var(--portal-primary)" opacity="0.2"/>
+            <circle cx="130" cy="100" r="2.5" fill="var(--portal-primary)" opacity="0.25"/>
+          </svg>
         </div>
 
         {/* Upgrade Banner for Free Users */}
@@ -708,6 +718,7 @@ function DashboardContent() {
                         childId={child.id}
                         childData={child}
                         refreshTrigger={refreshKey}
+                        onClick={() => router.push(`/children/${child.id}`)}
                         onWithMe={async (id) => {
                           if (!user) return;
                           try {

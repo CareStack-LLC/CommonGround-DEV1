@@ -12,17 +12,6 @@ import {
 import { formatInUserTimezone, isToday as isTodayTz } from '@/lib/timezone';
 import { Users } from 'lucide-react';
 
-// Format hours remaining into a human-readable string
-function formatHoursRemaining(hours: number | undefined): string {
-    if (!hours) return 'Unknown';
-
-    // Strict "Days" formatting as requested
-    const totalDays = hours / 24;
-    // Format to 1 decimal place if needed, removing .0
-    const formatted = parseFloat(totalDays.toFixed(1));
-    return `${formatted} Day${formatted !== 1 ? 's' : ''}`;
-}
-
 
 function CheckInButton({
     onClick,
@@ -70,11 +59,13 @@ export function DashboardCustodyCard({
     childId,
     childData,
     onWithMe,
+    onClick,
     refreshTrigger = 0,
 }: {
     childId: string;
     childData?: FamilyFileChild;
     onWithMe?: (childId: string) => void | Promise<void>;
+    onClick?: () => void;
     refreshTrigger?: number;
 }) {
     const { user, timezone } = useAuth();
@@ -124,14 +115,21 @@ export function DashboardCustodyCard({
         };
     }, [childId, supabase]);
 
+    // Countdown timer - ticks every 60s to keep countdown live
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => setTick(t => t + 1), 60000);
+        return () => clearInterval(interval);
+    }, []);
+
     if (loading || !timelineData) {
         return (
-            <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-sm animate-pulse h-48">
+            <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-sm animate-pulse h-48">
                 <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-slate-200" />
+                    <div className="w-12 h-12 rounded-full bg-muted" />
                     <div className="flex-1 space-y-2">
-                        <div className="h-4 bg-slate-200 w-1/3 rounded" />
-                        <div className="h-3 bg-slate-200 w-1/2 rounded" />
+                        <div className="h-4 bg-muted w-1/3 rounded" />
+                        <div className="h-3 bg-muted w-1/2 rounded" />
                     </div>
                 </div>
             </div>
@@ -177,25 +175,29 @@ export function DashboardCustodyCard({
         statusText = 'Pending Check-in';
     }
 
-    // We need "days with current parent" - this is effectively the current session duration roughly
-    // The user screenshot showed "Day 5". 
-    // We can calculate this from `currentSession.start_time`.
-    // Calculate streak in DAYS (1 decimal)
-    const getCurrentStreakDays = () => {
-        if (!currentSession) return 0;
-        const start = new Date(currentSession.start_time);
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - start.getTime());
-        const diffDays = diffTime / (1000 * 60 * 60 * 24);
-        return Math.round(diffDays * 10) / 10; // 1 decimal place
-    };
-    const currentStreakDays = getCurrentStreakDays();
-
     // Next exchange logic
     // The timeline endpoint returns sessions. The *next* session after current tells us when exchange happens.
     // Or we find the current session and look at its `end_time`.
     const nextExchangeTime = currentSession?.end_time;
     const hasNextExchange = !!nextExchangeTime && new Date(nextExchangeTime).getFullYear() < 3000; // Check for realistic date
+
+    // Countdown to next exchange
+    const getCountdown = (): string | null => {
+        if (!nextExchangeTime) return null;
+        const diff = new Date(nextExchangeTime).getTime() - Date.now();
+        if (diff <= 0) return '< 1m';
+        const totalMinutes = Math.floor(diff / 60000);
+        const totalHours = Math.floor(totalMinutes / 60);
+        const totalDays = Math.floor(totalHours / 24);
+        const remainingHours = totalHours % 24;
+        const remainingMinutes = totalMinutes % 60;
+        if (totalDays >= 2) return `${totalDays} Days`;
+        if (totalDays >= 1) return `${totalDays} Day ${remainingHours}h`;
+        if (totalHours >= 1) return `${totalHours}h ${remainingMinutes}m`;
+        if (totalMinutes >= 1) return `${totalMinutes}m`;
+        return '< 1m';
+    };
+    const countdown = getCountdown();
 
     // Format next exchange time (timezone-aware)
     const formatNextExchange = () => {
@@ -241,7 +243,10 @@ export function DashboardCustodyCard({
 
 
     return (
-        <div className={`bg-white rounded-2xl border-2 ${!hasCurrentSession ? 'border-cg-amber/50' : 'border-slate-200'} shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-4`}>
+        <div
+            onClick={onClick}
+            className={`bg-card rounded-2xl border-2 ${!hasCurrentSession ? 'border-cg-amber/50' : 'border-border'} shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-4 ${onClick ? 'cursor-pointer' : ''}`}
+        >
             {/* Top accent bar */}
             <div className={`h-2 ${statusColor}`} />
 
@@ -270,10 +275,10 @@ export function DashboardCustodyCard({
                             <p className={`text-sm font-medium ${statusTextColor}`}>
                                 {statusText}
                             </p>
-                            {/* Show days with current parent - ONLY if session active */}
-                            {hasCurrentSession && currentStreakDays > 0 && (
+                            {/* Countdown to next exchange */}
+                            {hasCurrentSession && hasNextExchange && countdown && (
                                 <span className="text-sm font-semibold text-cg-amber">
-                                    • {currentStreakDays} Days
+                                    • {countdown} till {isWithYou ? 'drop off' : 'pick up'}
                                 </span>
                             )}
                         </div>
@@ -318,7 +323,7 @@ export function DashboardCustodyCard({
                 {/* Progress Bar - only show if exchange scheduled */}
                 {hasCurrentSession && hasNextExchange && (
                     <div className="relative mb-2">
-                        <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden">
                             <div
                                 className={`h-full rounded-full transition-all duration-500 ${isWithYou ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]' : 'bg-cg-slate/60'}`}
                                 style={{ width: `${progress}%` }}
@@ -328,27 +333,27 @@ export function DashboardCustodyCard({
                 )}
 
                 {/* Cumulative custody totals */}
-                <div className="mt-4 pt-4 border-t-2 border-slate-100">
+                <div className="mt-4 pt-4 border-t-2 border-border">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
-                            <span className="text-sm text-slate-700 font-semibold">
+                            <span className="text-sm text-foreground font-semibold">
                                 Your total days
                             </span>
                         </div>
                         <span className="text-2xl font-bold text-[var(--portal-primary)]">
-                            {formatDays(myStats.minutes)} <span className="text-xs font-medium text-slate-400">Days</span>
+                            {formatDays(myStats.minutes)} <span className="text-xs font-medium text-muted-foreground">Days</span>
                         </span>
                     </div>
                     <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-2">
                             <div className="w-2.5 h-2.5 rounded-full bg-slate-400 shadow-sm" />
-                            <span className="text-sm text-slate-500 font-medium">
+                            <span className="text-sm text-muted-foreground font-medium">
                                 {coparentName}&apos;s total
                             </span>
                         </div>
-                        <span className="text-xl font-semibold text-slate-500">
-                            {formatDays(theirStats.minutes)} <span className="text-xs font-medium text-slate-400">Days</span>
+                        <span className="text-xl font-semibold text-muted-foreground">
+                            {formatDays(theirStats.minutes)} <span className="text-xs font-medium text-muted-foreground">Days</span>
                         </span>
                     </div>
                 </div>

@@ -206,7 +206,7 @@ function WalletContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-24 lg:pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background pb-24 lg:pb-8">
       <Navigation />
 
       {/* Onboarding Success Banner */}
@@ -232,7 +232,7 @@ function WalletContent() {
       )}
 
       {/* Header */}
-      <header className="border-b-2 border-slate-200 bg-white/80 backdrop-blur-sm">
+      <header className="border-b-2 border-border bg-card/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
@@ -249,7 +249,7 @@ function WalletContent() {
             {wallet?.onboarding_completed && (
               <button
                 onClick={() => router.push('/wallet/settings')}
-                className="p-3 bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg rounded-xl transition-all duration-300"
+                className="p-3 bg-card border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg rounded-xl transition-all duration-300"
               >
                 <Settings className="h-5 w-5 text-muted-foreground" />
               </button>
@@ -287,7 +287,7 @@ function WalletContent() {
               className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                 activeTab === 'overview'
                   ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
-                  : 'bg-white border-2 border-slate-200 text-muted-foreground hover:text-foreground hover:border-[var(--portal-primary)]/30 hover:shadow-lg'
+                  : 'bg-card border-2 border-border text-muted-foreground hover:text-foreground hover:border-[var(--portal-primary)]/30 hover:shadow-lg'
               }`}
             >
               <Wallet className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'overview' ? 'group-hover:scale-110' : ''}`} />
@@ -298,7 +298,7 @@ function WalletContent() {
               className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                 activeTab === 'transactions'
                   ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
-                  : 'bg-white border-2 border-slate-200 text-muted-foreground hover:text-foreground hover:border-[var(--portal-primary)]/30 hover:shadow-lg'
+                  : 'bg-card border-2 border-border text-muted-foreground hover:text-foreground hover:border-[var(--portal-primary)]/30 hover:shadow-lg'
               }`}
             >
               <History className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'transactions' ? 'group-hover:scale-110' : ''}`} />
@@ -309,7 +309,7 @@ function WalletContent() {
               className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                 activeTab === 'children'
                   ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md'
-                  : 'bg-white border-2 border-slate-200 text-muted-foreground hover:text-foreground hover:border-purple-300 hover:shadow-lg'
+                  : 'bg-card border-2 border-border text-muted-foreground hover:text-foreground hover:border-purple-300 hover:shadow-lg'
               }`}
             >
               <PiggyBank className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'children' ? 'group-hover:scale-110' : ''}`} />
@@ -327,7 +327,7 @@ function WalletContent() {
               className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                 activeTab === 'payouts'
                   ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md'
-                  : 'bg-white border-2 border-slate-200 text-muted-foreground hover:text-foreground hover:border-emerald-300 hover:shadow-lg'
+                  : 'bg-card border-2 border-border text-muted-foreground hover:text-foreground hover:border-emerald-300 hover:shadow-lg'
               }`}
             >
               <ArrowDownLeft className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'payouts' ? 'group-hover:scale-110' : ''}`} />
@@ -337,7 +337,7 @@ function WalletContent() {
         )}
 
         {/* Tab Content */}
-        <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-6">
+        <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-6">
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {/* Quick Actions */}
@@ -345,7 +345,7 @@ function WalletContent() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <button
                     onClick={() => setShowDepositModal(true)}
-                    className="p-5 bg-white rounded-2xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] text-left group"
+                    className="p-5 bg-card rounded-2xl border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] text-left group"
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
@@ -355,22 +355,22 @@ function WalletContent() {
                         <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Add Funds</p>
                         <p className="text-sm text-muted-foreground font-medium">Deposit money</p>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
                     </div>
                   </button>
                   <button
                     onClick={() => router.push('/payments')}
-                    className="p-5 bg-white rounded-2xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] text-left group"
+                    className="p-5 bg-card rounded-2xl border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] text-left group"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                        <ArrowUpRight className="h-6 w-6 text-slate-600" />
+                      <div className="w-14 h-14 bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                        <ArrowUpRight className="h-6 w-6 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>ClearFund</p>
                         <p className="text-sm text-muted-foreground font-medium">Pay expenses</p>
                       </div>
-                      <ChevronRight className="h-5 w-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
                     </div>
                   </button>
                 </div>
@@ -452,7 +452,7 @@ function WalletContent() {
                   {payouts.map((payout) => (
                     <div
                       key={payout.id}
-                      className="p-4 bg-white rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+                      className="p-4 bg-card rounded-xl border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
                     >
                       <div className="flex items-center justify-between">
                         <div>
@@ -472,7 +472,7 @@ function WalletContent() {
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                               : payout.status === 'pending'
                               ? 'bg-amber-50 text-amber-700 border-amber-200'
-                              : 'bg-slate-50 text-slate-600 border-slate-200'
+                              : 'bg-muted text-muted-foreground border-border'
                           }`}>
                             {payout.status}
                           </span>
@@ -490,13 +490,13 @@ function WalletContent() {
       {/* Deposit Modal */}
       {showDepositModal && wallet && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border-2 border-slate-200">
-            <div className="p-6 border-b-2 border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+          <div className="bg-card rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border-2 border-border">
+            <div className="p-6 border-b-2 border-border bg-gradient-to-r from-muted/50 to-card">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Add Funds</h2>
                 <button
                   onClick={() => setShowDepositModal(false)}
-                  className="p-2 hover:bg-slate-100 rounded-xl transition-all duration-300"
+                  className="p-2 hover:bg-muted rounded-xl transition-all duration-300"
                 >
                   <X className="h-5 w-5 text-muted-foreground" />
                 </button>

@@ -69,7 +69,7 @@ function TabButton({
         rounded-xl transition-all duration-300 flex-shrink-0
         ${active
           ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
-          : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
+          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
         }
       `}
     >
@@ -78,7 +78,7 @@ function TabButton({
       {badge && (
         <span className={`
           hidden sm:inline text-xs px-2 py-0.5 rounded-full font-semibold
-          ${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}
+          ${active ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'}
         `}>
           {badge}
         </span>
@@ -121,7 +121,7 @@ function QuickActionCard({
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
+      className="w-full bg-card rounded-2xl border-2 border-border p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
     >
       <div className={`w-14 h-14 ${classes.iconBg} rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300`}>
         <Icon className={`w-6 h-6 ${classes.iconColor}`} />
@@ -130,27 +130,35 @@ function QuickActionCard({
         <p className="font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{title}</p>
         <p className="text-sm text-muted-foreground truncate font-medium">{description}</p>
       </div>
-      <ChevronLeft className="h-5 w-5 rotate-180 text-slate-400 flex-shrink-0 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+      <ChevronLeft className="h-5 w-5 rotate-180 text-muted-foreground flex-shrink-0 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
     </button>
   );
 }
 
-// Custody Legend with dashboard-matching styling
+// Calendar Legend with event categories
 function CustodyLegend() {
   return (
-    <div className="flex items-center gap-4 text-xs bg-white px-4 py-3 rounded-2xl border-2 border-slate-200 shadow-lg">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs bg-card px-4 py-3 rounded-2xl border-2 border-border shadow-lg">
       <span className="text-muted-foreground font-semibold mr-1">Legend:</span>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Your Time</span>
+        <span className="text-foreground font-semibold whitespace-nowrap">Your Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-cg-slate shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Their Time</span>
+        <span className="text-foreground font-semibold whitespace-nowrap">Their Events</span>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" />
+        <span className="text-foreground font-semibold whitespace-nowrap">(Kids) Events</span>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm" />
+        <span className="text-foreground font-semibold whitespace-nowrap">Professional Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Exchange</span>
+        <span className="text-foreground font-semibold whitespace-nowrap">Exchanges/Swaps</span>
       </div>
     </div>
   );
@@ -174,10 +182,10 @@ function FamilyFileSelector({
         value={selected?.id || ''}
         onChange={(e) => onSelect(e.target.value)}
         className="
-          appearance-none bg-white border border-slate-200 rounded-xl
-          px-4 py-2.5 pr-10 text-sm font-medium text-slate-900
+          appearance-none bg-card border border-border rounded-xl
+          px-4 py-2.5 pr-10 text-sm font-medium text-foreground
           focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]
-          transition-all cursor-pointer hover:border-slate-300
+          transition-all cursor-pointer hover:border-muted-foreground/30
           shadow-sm
         "
       >
@@ -187,7 +195,7 @@ function FamilyFileSelector({
           </option>
         ))}
       </select>
-      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
     </div>
   );
 }
@@ -358,13 +366,13 @@ function ScheduleContent() {
   // Loading State
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <Navigation />
         <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
             <div className="text-center">
               <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
-              <p className="mt-4 text-slate-600 font-medium">Loading TimeBridge...</p>
+              <p className="mt-4 text-muted-foreground font-medium">Loading TimeBridge...</p>
             </div>
           </div>
         </main>
@@ -375,7 +383,7 @@ function ScheduleContent() {
   // Empty State
   if (!selectedFamilyFile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <Navigation />
         <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
@@ -406,7 +414,7 @@ function ScheduleContent() {
   const currentFamilyFileData = familyFilesWithAgreements.find(f => f.familyFile.id === selectedFamilyFile.id);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 pb-32 lg:pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background pb-32 lg:pb-8">
       <Navigation />
 
       <main className="max-w-3xl mx-auto px-4 py-6">
@@ -415,10 +423,10 @@ function ScheduleContent() {
           <div className="flex items-center gap-3 mb-2">
             <button
               onClick={() => router.push('/dashboard')}
-              className="p-2 -ml-2 rounded-xl hover:bg-slate-100 transition-colors"
+              className="p-2 -ml-2 rounded-xl hover:bg-muted transition-colors"
               aria-label="Go back"
             >
-              <ChevronLeft className="h-5 w-5 text-slate-600" />
+              <ChevronLeft className="h-5 w-5 text-muted-foreground" />
             </button>
             <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
               <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
@@ -434,7 +442,7 @@ function ScheduleContent() {
             <span className="font-medium">{selectedFamilyFile.title}</span>
             {selectedAgreement && (
               <>
-                <span className="text-slate-300">•</span>
+                <span className="text-muted-foreground/40">•</span>
                 <FileText className="h-4 w-4" />
                 <span className="font-medium">{selectedAgreement.title}</span>
               </>
@@ -483,7 +491,7 @@ function ScheduleContent() {
 
         {/* Tabs */}
         <div className="flex flex-col gap-4 mb-6">
-          <div className="flex items-center gap-2 p-1.5 bg-white rounded-2xl border-2 border-slate-200 shadow-lg">
+          <div className="flex items-center gap-2 p-1.5 bg-card rounded-2xl border-2 border-border shadow-lg">
             <TabButton
               active={activeTab === 'calendar'}
               icon={Calendar}
@@ -509,7 +517,7 @@ function ScheduleContent() {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-4 sm:p-6">
+        <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-4 sm:p-6">
           {activeTab === 'calendar' && (
             <CalendarView
               key={calendarKey}
