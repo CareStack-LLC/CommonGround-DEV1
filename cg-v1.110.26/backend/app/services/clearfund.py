@@ -159,8 +159,12 @@ class ClearFundService:
                 family_file = result.scalar_one_or_none()
 
                 if family_file and family_file.agreement_split_locked:
-                    # Use agreement-locked split ratio
-                    if family_file.agreement_split_parent_a_percentage is not None:
+                    # Check category-specific split first, then fall back to global
+                    category_splits = family_file.agreement_category_splits or {}
+                    if data.purpose_category in category_splits:
+                        petitioner_percentage = category_splits[data.purpose_category]
+                        split_from_agreement = True
+                    elif family_file.agreement_split_parent_a_percentage is not None:
                         petitioner_percentage = family_file.agreement_split_parent_a_percentage
                         split_from_agreement = True
 
@@ -216,6 +220,20 @@ class ClearFundService:
                     amount_funded=Decimal("0"),
                 )
                 self.db.add(respondent_funding)
+
+            # Create inline attestation if requested
+            if getattr(data, 'include_attestation', False) and getattr(data, 'attestation_text', None):
+                attestation = Attestation(
+                    obligation_id=obligation.id,
+                    attesting_parent_id=user.id,
+                    attestation_text=data.attestation_text,
+                    purpose_declaration=f"Funds will be used for: {data.title} ({data.purpose_category})",
+                    receipt_commitment=data.receipt_required,
+                    purpose_commitment=True,
+                    legal_acknowledgment=True,
+                    attested_at=datetime.utcnow(),
+                )
+                self.db.add(attestation)
 
             await self.db.commit()
             await self.db.refresh(obligation)
@@ -297,6 +315,22 @@ class ClearFundService:
         )
 
         return await self.create_obligation(data, user)
+
+    async def _get_obligation(
+        self,
+        obligation_id: str,
+    ) -> Optional[Obligation]:
+        """Internal: fetch obligation by ID without access check. Returns None if not found."""
+        result = await self.db.execute(
+            select(Obligation)
+            .options(
+                selectinload(Obligation.funding_records),
+                selectinload(Obligation.attestation),
+                selectinload(Obligation.verification_artifacts),
+            )
+            .where(Obligation.id == obligation_id)
+        )
+        return result.scalar_one_or_none()
 
     async def get_obligation(
         self,
@@ -1476,6 +1510,290 @@ class ClearFundService:
                 dates.append(dt)
 
         return dates
+
+
+    # ========================================================================
+    # Receipt Review
+    # ========================================================================
+
+    async def review_receipt(
+        self,
+        artifact_id: str,
+        review_status: str,
+        review_notes: Optional[str],
+        user: User
+    ) -> VerificationArtifact:
+        """
+        Review a receipt as the co-parent (acknowledge or dispute).
+
+        Args:
+            artifact_id: Verification artifact ID
+            review_status: "acknowledged" or "disputed"
+            review_notes: Notes about the review
+            user: Reviewing user (must be the OTHER parent, not uploader)
+
+        Returns:
+            Updated VerificationArtifact
+
+        Raises:
+            HTTPException: If review fails
+        """
+        # Get the artifact
+        result = await self.db.execute(
+            select(VerificationArtifact)
+            .options(selectinload(VerificationArtifact.obligation))
+            .where(VerificationArtifact.id == artifact_id)
+        )
+        artifact = result.scalar_one_or_none()
+        if not artifact:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Verification artifact not found"
+            )
+
+        # Verify the reviewer is NOT the uploader
+        if artifact.verified_by and str(artifact.verified_by) == str(user.id):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Cannot review your own receipt"
+            )
+
+        # Verify case access
+        obligation = artifact.obligation
+        if obligation:
+            case_id = obligation.family_file_id or obligation.case_id
+            if case_id:
+                await self._verify_case_access(case_id, user)
+
+        try:
+            artifact.reviewed_by = str(user.id)
+            artifact.review_status = review_status
+            artifact.reviewed_at = datetime.utcnow()
+            artifact.review_notes = review_notes
+
+            # If disputed, also update the obligation's dispute status
+            if review_status == "disputed" and obligation:
+                obligation.dispute_status = "disputed"
+                obligation.dispute_reason = f"Receipt disputed: {review_notes}"
+                obligation.disputed_at = datetime.utcnow()
+                obligation.disputed_by = str(user.id)
+
+            await self.db.commit()
+            await self.db.refresh(artifact)
+
+            # Broadcast via WebSocket
+            if obligation:
+                broadcast_id = obligation.family_file_id or obligation.case_id
+                if broadcast_id:
+                    await realtime_service.broadcast_obligation_updated(
+                        family_file_id=broadcast_id,
+                        obligation_id=str(obligation.id),
+                        obligation_data={
+                            "id": str(obligation.id),
+                            "title": obligation.title,
+                            "receipt_review": {
+                                "artifact_id": str(artifact.id),
+                                "review_status": review_status,
+                                "reviewed_by": str(user.id),
+                            }
+                        }
+                    )
+
+            return artifact
+
+        except Exception as e:
+            await self.db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to review receipt: {str(e)}"
+            ) from e
+
+    # ========================================================================
+    # Category Spending Analytics
+    # ========================================================================
+
+    async def get_category_spending_summary(
+        self,
+        case_id: str,
+        user: User,
+        period_start: Optional[datetime] = None,
+        period_end: Optional[datetime] = None,
+    ):
+        """
+        Get per-category spending summary.
+
+        Returns totals per category with petitioner/respondent breakdown.
+        """
+        access = await self._verify_case_access(case_id, user)
+
+        if access.is_family_file:
+            obligation_filter = or_(
+                Obligation.family_file_id == case_id,
+                Obligation.case_id == case_id
+            )
+        else:
+            obligation_filter = Obligation.case_id == access.effective_case_id
+
+        # Build date filter
+        filters = [
+            obligation_filter,
+            Obligation.status.notin_(["cancelled", "expired", "template"])
+        ]
+        if period_start:
+            filters.append(Obligation.created_at >= period_start)
+        if period_end:
+            filters.append(Obligation.created_at <= period_end)
+
+        result = await self.db.execute(
+            select(
+                Obligation.purpose_category,
+                func.sum(Obligation.total_amount).label("total_amount"),
+                func.sum(Obligation.petitioner_share).label("petitioner_amount"),
+                func.sum(Obligation.respondent_share).label("respondent_amount"),
+                func.count(Obligation.id).label("count"),
+            )
+            .where(and_(*filters))
+            .group_by(Obligation.purpose_category)
+            .order_by(func.sum(Obligation.total_amount).desc())
+        )
+        rows = result.all()
+
+        from app.schemas.clearfund import CategorySpending, CategorySpendingSummary
+
+        categories = []
+        grand_total = Decimal("0")
+        for row in rows:
+            total = Decimal(str(row.total_amount or 0))
+            grand_total += total
+            categories.append(CategorySpending(
+                category=row.purpose_category,
+                total_amount=total,
+                petitioner_amount=Decimal(str(row.petitioner_amount or 0)),
+                respondent_amount=Decimal(str(row.respondent_amount or 0)),
+                obligation_count=row.count,
+            ))
+
+        return CategorySpendingSummary(
+            case_id=case_id,
+            period_start=period_start,
+            period_end=period_end,
+            categories=categories,
+            total_amount=grand_total,
+        )
+
+    async def get_monthly_totals(
+        self,
+        case_id: str,
+        user: User,
+        months: int = 6
+    ) -> list:
+        """
+        Get monthly spending totals with category breakdown.
+
+        Args:
+            case_id: Case or Family File ID
+            user: Current user
+            months: Number of months to look back
+
+        Returns:
+            List of MonthlyTotals
+        """
+        access = await self._verify_case_access(case_id, user)
+
+        if access.is_family_file:
+            obligation_filter = or_(
+                Obligation.family_file_id == case_id,
+                Obligation.case_id == case_id
+            )
+        else:
+            obligation_filter = Obligation.case_id == access.effective_case_id
+
+        # Calculate start date
+        now = datetime.utcnow()
+        start_date = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        start_date = start_date - relativedelta(months=months - 1)
+
+        result = await self.db.execute(
+            select(
+                func.date_trunc('month', Obligation.created_at).label("month"),
+                Obligation.purpose_category,
+                func.sum(Obligation.total_amount).label("total_amount"),
+            )
+            .where(
+                and_(
+                    obligation_filter,
+                    Obligation.created_at >= start_date,
+                    Obligation.status.notin_(["cancelled", "expired", "template"])
+                )
+            )
+            .group_by(
+                func.date_trunc('month', Obligation.created_at),
+                Obligation.purpose_category
+            )
+            .order_by(func.date_trunc('month', Obligation.created_at))
+        )
+        rows = result.all()
+
+        from app.schemas.clearfund import MonthlyTotals
+
+        # Aggregate by month
+        month_data: dict = {}
+        for row in rows:
+            month_key = row.month.strftime("%Y-%m") if row.month else "unknown"
+            if month_key not in month_data:
+                month_data[month_key] = {"total": Decimal("0"), "by_category": {}}
+            amount = Decimal(str(row.total_amount or 0))
+            month_data[month_key]["total"] += amount
+            month_data[month_key]["by_category"][row.purpose_category] = amount
+
+        return [
+            MonthlyTotals(
+                month=month,
+                total_amount=data["total"],
+                by_category=data["by_category"],
+            )
+            for month, data in sorted(month_data.items())
+        ]
+
+    async def get_category_splits(
+        self,
+        family_file_id: str,
+        user: User
+    ):
+        """
+        Get per-category split ratios for a family file.
+
+        Returns the split configuration for the expense creation form.
+        """
+        await self._verify_case_access(family_file_id, user)
+
+        result = await self.db.execute(
+            select(FamilyFile).where(FamilyFile.id == family_file_id)
+        )
+        family_file = result.scalar_one_or_none()
+        if not family_file:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Family file not found"
+            )
+
+        from app.schemas.clearfund import CategorySplitsResponse
+
+        # Determine global split ratio string
+        global_ratio = None
+        if family_file.agreement_split_parent_a_percentage is not None:
+            pct_a = family_file.agreement_split_parent_a_percentage
+            pct_b = 100 - pct_a
+            global_ratio = f"{pct_a}/{pct_b}"
+
+        return CategorySplitsResponse(
+            family_file_id=family_file_id,
+            split_locked=bool(family_file.agreement_split_locked),
+            global_split_ratio=global_ratio,
+            global_parent_a_percentage=family_file.agreement_split_parent_a_percentage,
+            category_splits=family_file.agreement_category_splits or {},
+            source_agreement_id=None,  # Agreement ID not tracked on family_file; splits are stored directly
+        )
 
 
 class LedgerService:

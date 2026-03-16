@@ -35,6 +35,9 @@ from app.schemas.clearfund import (
     VerificationCreate,
     ReceiptUpload,
     VerificationArtifactResponse,
+    ReceiptReview,
+    CategorySplitsResponse,
+    CategorySpendingSummary,
     LedgerListResponse,
     PrepaymentCreate,
     BalanceSummary,
@@ -465,6 +468,49 @@ async def list_artifacts(
     ]
 
 
+@router.post("/artifacts/{artifact_id}/review")
+async def review_receipt(
+    artifact_id: str,
+    data: ReceiptReview,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> VerificationArtifactResponse:
+    """
+    Review a receipt as the co-parent.
+
+    Acknowledge or dispute a receipt uploaded by the other parent.
+    Disputes freeze the obligation and create an audit trail.
+    """
+    service = ClearFundService(db)
+    artifact = await service.review_receipt(
+        artifact_id,
+        data.review_status,
+        data.review_notes,
+        current_user
+    )
+    return VerificationArtifactResponse.model_validate(artifact)
+
+
+# ============================================================================
+# Category Splits Endpoint
+# ============================================================================
+
+@router.get("/splits/{family_file_id}")
+async def get_category_splits(
+    family_file_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> CategorySplitsResponse:
+    """
+    Get per-category split ratios for a family file.
+
+    Returns the agreement-defined split configuration so the expense
+    creation form can auto-apply correct percentages per category.
+    """
+    service = ClearFundService(db)
+    return await service.get_category_splits(family_file_id, current_user)
+
+
 # ============================================================================
 # Completion Endpoints
 # ============================================================================
@@ -570,19 +616,23 @@ async def record_prepayment(
 @router.get("/analytics/")
 async def get_analytics(
     case_id: str = Query(..., description="Case ID"),
+    months: int = Query(6, ge=1, le=24, description="Months of history"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ) -> ClearFundAnalytics:
     """
     Get ClearFund dashboard analytics.
 
-    Returns summary metrics, balances, and recent activity.
+    Returns summary metrics, balances, monthly totals, and recent activity.
     """
     service = ClearFundService(db)
 
     # Get metrics and balance
     metrics = await service.get_obligation_metrics(case_id, current_user)
     balance = await service.get_balance_summary(case_id, current_user)
+
+    # Get monthly totals
+    monthly_totals = await service.get_monthly_totals(case_id, current_user, months=months)
 
     # Get recent activity
     obligations, _ = await service.list_obligations(
@@ -593,7 +643,7 @@ async def get_analytics(
         case_id=case_id,
         balance_summary=balance,
         obligation_metrics=metrics,
-        monthly_totals=[],  # TODO: Implement
+        monthly_totals=monthly_totals,
         recent_activity=[
             ObligationResponse.model_validate(o) for o in obligations
         ],
@@ -609,6 +659,31 @@ async def get_metrics(
     """Get obligation metrics for dashboard cards."""
     service = ClearFundService(db)
     return await service.get_obligation_metrics(case_id, current_user)
+
+
+@router.get("/analytics/category-spending")
+async def get_category_spending(
+    case_id: str = Query(..., description="Case ID"),
+    period_start: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
+    period_end: Optional[str] = Query(None, description="End date (YYYY-MM-DD)"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> CategorySpendingSummary:
+    """
+    Get per-category spending summary.
+
+    Returns spending totals broken down by category with
+    petitioner/respondent contributions.
+    """
+    from datetime import datetime as dt
+
+    start = dt.fromisoformat(period_start) if period_start else None
+    end = dt.fromisoformat(period_end) if period_end else None
+
+    service = ClearFundService(db)
+    return await service.get_category_spending_summary(
+        case_id, current_user, period_start=start, period_end=end
+    )
 
 
 # ============================================================================

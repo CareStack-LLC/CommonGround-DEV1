@@ -1375,13 +1375,53 @@ function DecisionMakingForm({ data, onChange }: { data: any; onChange: (field: s
   );
 }
 
+const EXPENSE_CATEGORIES_BUILDER = [
+  { key: 'medical', label: 'Medical' },
+  { key: 'education', label: 'Education' },
+  { key: 'sports', label: 'Sports' },
+  { key: 'extracurricular', label: 'Extracurricular' },
+  { key: 'childcare', label: 'Childcare' },
+  { key: 'clothing', label: 'Clothing' },
+  { key: 'transportation', label: 'Transportation' },
+];
+
 function ExpensesForm({ data, onChange }: { data: any; onChange: (field: string, value: any) => void }) {
+  const [perCategoryEnabled, setPerCategoryEnabled] = useState(
+    !!data.category_splits && Object.keys(data.category_splits).length > 0
+  );
+
+  // Parse global split ratio to a percentage for pre-filling
+  const globalPct = (() => {
+    const ratio = data.split_ratio || '50/50';
+    if (ratio === '50/50') return 50;
+    if (ratio === '60/40') return 60;
+    return 50;
+  })();
+
+  const handleCategorySplitChange = (categoryKey: string, value: number) => {
+    const current = data.category_splits || {};
+    const updated = { ...current, [categoryKey]: value };
+    onChange('category_splits', updated);
+  };
+
+  const togglePerCategory = (enabled: boolean) => {
+    setPerCategoryEnabled(enabled);
+    if (enabled && (!data.category_splits || Object.keys(data.category_splits).length === 0)) {
+      // Pre-fill all categories from global split
+      const prefilled: Record<string, number> = {};
+      EXPENSE_CATEGORIES_BUILDER.forEach(cat => { prefilled[cat.key] = globalPct; });
+      onChange('category_splits', prefilled);
+    } else if (!enabled) {
+      onChange('category_splits', null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="p-4 rounded-xl bg-muted border-2 border-border">
         <p className="text-sm text-muted-foreground flex items-center gap-2 font-medium">
           <Info className="h-4 w-4 text-[var(--portal-primary)]" />
-          This section covers shared expenses beyond any court-ordered child support. Use CommonGround's ClearFund to track and split expenses.
+          This section covers shared expenses beyond any court-ordered child support. Use CommonGround&apos;s ClearFund to track and split expenses.
         </p>
       </div>
 
@@ -1405,6 +1445,50 @@ function ExpensesForm({ data, onChange }: { data: any; onChange: (field: string,
             <Label htmlFor="income_based" className="font-medium cursor-pointer">Based on income proportions</Label>
           </div>
         </RadioGroup>
+      </div>
+
+      {/* Per-Category Splits */}
+      <div className="space-y-3">
+        <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border-2 border-border hover:border-[var(--portal-primary)]/30 transition-colors">
+          <input
+            type="checkbox"
+            checked={perCategoryEnabled}
+            onChange={(e) => togglePerCategory(e.target.checked)}
+            className="h-5 w-5 rounded border-border accent-[var(--portal-primary)]"
+          />
+          <div>
+            <span className="text-sm font-bold text-foreground">Different splits per category</span>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              e.g. Medical 50/50, Education 80/20, Sports 60/40
+            </p>
+          </div>
+        </label>
+
+        {perCategoryEnabled && (
+          <div className="ml-1 space-y-3 p-4 rounded-xl border-2 border-[var(--portal-primary)]/20 bg-[var(--portal-primary)]/5">
+            <p className="text-xs text-muted-foreground font-medium mb-1">
+              Set Parent A&apos;s percentage for each category. Parent B gets the remainder.
+            </p>
+            {EXPENSE_CATEGORIES_BUILDER.map((cat) => {
+              const val = (data.category_splits || {})[cat.key] ?? globalPct;
+              return (
+                <div key={cat.key} className="flex items-center gap-3">
+                  <span className="text-sm font-semibold text-foreground w-28 flex-shrink-0">{cat.label}</span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={val}
+                    onChange={(e) => handleCategorySplitChange(cat.key, parseInt(e.target.value))}
+                    className="flex-1 accent-[var(--portal-primary)]"
+                  />
+                  <span className="text-sm font-mono font-bold text-foreground w-20 text-right">{val}/{100 - val}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div>

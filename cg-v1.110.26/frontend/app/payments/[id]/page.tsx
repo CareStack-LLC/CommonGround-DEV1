@@ -80,6 +80,7 @@ function ObligationDetailContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [reviewingArtifact, setReviewingArtifact] = useState<string | null>(null);
 
   const obligationId = params.id as string;
 
@@ -505,45 +506,121 @@ function ObligationDetailContent() {
           </div>
         )}
 
-        {/* Verification Artifacts */}
+        {/* Verification Artifacts / Receipts */}
         {artifacts.length > 0 && (
           <div className="cg-card p-6">
             <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-cg-success" />
-              Verification Artifacts
+              Receipts & Verification
             </h2>
 
             <div className="space-y-3">
-              {artifacts.map(artifact => (
-                <div key={artifact.id} className="flex items-start gap-3 p-3 bg-muted/30 rounded-xl">
-                  <div className="p-2 bg-card rounded-lg border border-border">
-                    {artifact.artifact_type === 'receipt' ? (
-                      <Upload className="h-4 w-4 text-muted-foreground" />
-                    ) : (
-                      <FileText className="h-4 w-4 text-muted-foreground" />
+              {artifacts.map(artifact => {
+                const isUploader = artifact.verified_by === user?.id;
+                const canReview = !isUploader && (!artifact.review_status || artifact.review_status === 'pending');
+                const reviewStatusBadge = artifact.review_status === 'acknowledged'
+                  ? { label: 'Acknowledged', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
+                  : artifact.review_status === 'disputed'
+                  ? { label: 'Disputed', bg: 'bg-red-50 text-red-700 border-red-200' }
+                  : { label: 'Pending Review', bg: 'bg-amber-50 text-amber-700 border-amber-200' };
+
+                return (
+                  <div key={artifact.id} className="p-4 bg-muted/30 rounded-xl border border-border">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-card rounded-lg border border-border">
+                        {artifact.artifact_type === 'receipt' ? (
+                          <Upload className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-foreground">{capitalizeFirst(artifact.artifact_type)}</p>
+                          <span className={`inline-flex items-center px-2 py-0.5 text-xs font-bold rounded-lg border ${reviewStatusBadge.bg}`}>
+                            {reviewStatusBadge.label}
+                          </span>
+                        </div>
+                        {artifact.vendor_name && (
+                          <p className="text-sm text-muted-foreground">{artifact.vendor_name}</p>
+                        )}
+                        <p className="text-sm text-muted-foreground">
+                          {formatCurrency(artifact.amount_verified)} verified on {formatDate(artifact.verified_at)}
+                        </p>
+                        {artifact.review_notes && (
+                          <p className="text-sm text-muted-foreground mt-1 italic">
+                            Review note: {artifact.review_notes}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {artifact.receipt_url && (
+                          <a
+                            href={getImageUrl(artifact.receipt_url) || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cg-btn-secondary text-sm py-1.5 px-3"
+                          >
+                            View
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Co-parent review buttons */}
+                    {canReview && (
+                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+                        <button
+                          disabled={reviewingArtifact === artifact.id}
+                          onClick={async () => {
+                            setReviewingArtifact(artifact.id);
+                            try {
+                              await clearfundAPI.reviewReceipt(artifact.id, {
+                                review_status: 'acknowledged',
+                              });
+                              await loadObligationData();
+                            } catch (err: any) {
+                              setError(err.message || 'Failed to review receipt');
+                            } finally {
+                              setReviewingArtifact(null);
+                            }
+                          }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-all duration-200"
+                        >
+                          <CheckCircle className="h-3.5 w-3.5" />
+                          Looks Good
+                        </button>
+                        <button
+                          disabled={reviewingArtifact === artifact.id}
+                          onClick={async () => {
+                            const notes = prompt('Why are you disputing this receipt?');
+                            if (!notes || notes.length < 10) {
+                              setError('Please provide a reason (at least 10 characters)');
+                              return;
+                            }
+                            setReviewingArtifact(artifact.id);
+                            try {
+                              await clearfundAPI.reviewReceipt(artifact.id, {
+                                review_status: 'disputed',
+                                review_notes: notes,
+                              });
+                              await loadObligationData();
+                            } catch (err: any) {
+                              setError(err.message || 'Failed to dispute receipt');
+                            } finally {
+                              setReviewingArtifact(null);
+                            }
+                          }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-all duration-200"
+                        >
+                          <AlertTriangle className="h-3.5 w-3.5" />
+                          Dispute
+                        </button>
+                      </div>
                     )}
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-foreground">{capitalizeFirst(artifact.artifact_type)}</p>
-                    {artifact.vendor_name && (
-                      <p className="text-sm text-muted-foreground">{artifact.vendor_name}</p>
-                    )}
-                    <p className="text-sm text-muted-foreground">
-                      {formatCurrency(artifact.amount_verified)} verified on {formatDate(artifact.verified_at)}
-                    </p>
-                  </div>
-                  {artifact.receipt_url && (
-                    <a
-                      href={getImageUrl(artifact.receipt_url) || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="cg-btn-secondary text-sm py-1.5 px-3"
-                    >
-                      View
-                    </a>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

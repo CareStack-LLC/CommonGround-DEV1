@@ -166,6 +166,11 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
         DateTime, nullable=True
     )
 
+    # Per-category split overrides from active agreement
+    agreement_category_splits: Mapped[Optional[dict]] = mapped_column(
+        JSON, nullable=True
+    )  # {"medical": 50, "education": 80, "sports": 60} — parent_a % per category
+
     # Default exchange location from active agreement
     default_exchange_location: Mapped[Optional[str]] = mapped_column(
         String(500), nullable=True

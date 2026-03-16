@@ -147,6 +147,10 @@ class ExpenseData(BaseModel):
         None,
         description="Details if split is 'custom'"
     )
+    category_splits: Optional[Dict[str, int]] = Field(
+        None,
+        description="Per-category parent_a percentage overrides, e.g. {'medical': 50, 'education': 80}"
+    )
     reimbursement_window: str = Field(
         default="30_days",
         description="Days for reimbursement (14_days, 30_days, 60_days)"

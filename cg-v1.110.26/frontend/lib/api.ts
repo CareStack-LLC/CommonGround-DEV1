@@ -2751,6 +2751,38 @@ export interface CreateObligationRequest {
   verification_required?: boolean;
   receipt_required?: boolean;
   notes?: string;
+  include_attestation?: boolean;
+  attestation_text?: string;
+}
+
+export interface CategorySplitsResponse {
+  family_file_id: string;
+  split_locked: boolean;
+  global_split_ratio: string | null;
+  global_parent_a_percentage: number | null;
+  category_splits: Record<string, number>;
+  source_agreement_id: string | null;
+}
+
+export interface ReceiptReviewRequest {
+  review_status: 'acknowledged' | 'disputed';
+  review_notes?: string;
+}
+
+export interface CategorySpending {
+  category: string;
+  total_amount: string;
+  petitioner_amount: string;
+  respondent_amount: string;
+  obligation_count: number;
+}
+
+export interface CategorySpendingSummary {
+  case_id: string;
+  period_start?: string;
+  period_end?: string;
+  categories: CategorySpending[];
+  total_amount: string;
 }
 
 export interface FundingRecord {
@@ -2815,6 +2847,11 @@ export interface VerificationArtifact {
   verification_notes?: string;
   verified_at: string;
   created_at: string;
+  // Co-parent review fields
+  reviewed_by?: string;
+  review_status?: 'pending' | 'acknowledged' | 'disputed';
+  reviewed_at?: string;
+  review_notes?: string;
 }
 
 export interface RecordVerificationRequest {
@@ -3349,6 +3386,37 @@ export const clearfundAPI = {
    */
   async getMetrics(caseId: string): Promise<ObligationMetrics> {
     return fetchAPI<ObligationMetrics>(`/clearfund/analytics/metrics?case_id=${caseId}`);
+  },
+
+  /**
+   * Get per-category spending summary
+   */
+  async getCategorySpending(caseId: string, periodStart?: string, periodEnd?: string): Promise<CategorySpendingSummary> {
+    let url = `/clearfund/analytics/category-spending?case_id=${caseId}`;
+    if (periodStart) url += `&period_start=${periodStart}`;
+    if (periodEnd) url += `&period_end=${periodEnd}`;
+    return fetchAPI<CategorySpendingSummary>(url);
+  },
+
+  // Category Splits
+
+  /**
+   * Get per-category split ratios for a family file
+   */
+  async getCategorySplits(familyFileId: string): Promise<CategorySplitsResponse> {
+    return fetchAPI<CategorySplitsResponse>(`/clearfund/splits/${familyFileId}`);
+  },
+
+  // Receipt Review
+
+  /**
+   * Review a receipt as the co-parent (acknowledge or dispute)
+   */
+  async reviewReceipt(artifactId: string, data: ReceiptReviewRequest): Promise<VerificationArtifact> {
+    return fetchAPI<VerificationArtifact>(`/clearfund/artifacts/${artifactId}/review`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   },
 };
 

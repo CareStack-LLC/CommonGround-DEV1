@@ -99,6 +99,17 @@ EXTRACTION_SCHEMA_V2_STANDARD = """{
     "expense_categories": ["string - Categories of shared expenses (medical, education, activities, clothing, etc.)"],
     "split_ratio": "string - 50/50|60/40|70/30|income_based|custom",
     "custom_split_details": "string - If custom, describe the split (optional)",
+    "category_splits": {
+      "medical": "integer - parent_a percentage for medical expenses (0-100, optional)",
+      "education": "integer - parent_a percentage for education expenses (0-100, optional)",
+      "sports": "integer - parent_a percentage for sports expenses (0-100, optional)",
+      "extracurricular": "integer - parent_a percentage for extracurricular expenses (0-100, optional)",
+      "childcare": "integer - parent_a percentage for childcare expenses (0-100, optional)",
+      "clothing": "integer - parent_a percentage for clothing expenses (0-100, optional)",
+      "transportation": "integer - parent_a percentage for transportation expenses (0-100, optional)",
+      "device": "integer - parent_a percentage for device/technology expenses (0-100, optional)",
+      "camp": "integer - parent_a percentage for camp expenses (0-100, optional)"
+    },
     "reimbursement_window": "string - 14_days|30_days|60_days",
     "documentation_required": "boolean - Whether receipts/documentation required",
     "payment_method": "string - commonground_clearfund|venmo|zelle|check|cash"
@@ -210,6 +221,13 @@ PARSING RULES:
 7. **KEEP IT PRACTICAL**:
    - Travel consent goes in Quick Accords
    - Focus on recurring patterns, not one-off events
+
+8. **PER-CATEGORY SPLITS**:
+   - If parents specify different splits per expense type, populate category_splits
+   - "medical is 50/50 but school is 80/20" → split_ratio: "50/50", category_splits: {"medical": 50, "education": 80}
+   - "everything split equally" → split_ratio: "50/50", category_splits: null
+   - Parent_a's percentage is always the first number in a ratio
+   - Only include categories where the split differs from the global split_ratio
 
 JSON SCHEMA TO POPULATE:
 {schema}
@@ -331,9 +349,13 @@ Example: "For routine questions, what's a fair response time to expect from each
 Help establish expense sharing (this is for non-court-ordered expenses).
 
 Ask about:
-- What expenses will you share? (medical, school, activities)
-- **Split Ratio**: "Is it 50/50 or income-based?"
+- What expenses will you share? (medical, school, activities, clothing, devices)
+- **Default Split Ratio**: "Is it 50/50 or income-based?"
+- **Per-Category Splits**: "Are all categories split the same, or do you want different ratios? For example, some parents split medical 50/50 but school expenses 80/20."
 - **Reimbursement**: "If one of you pays upfront, how many days to pay back? 14 days?"
+- **Receipts**: "Do you want to require receipts for shared expenses?"
+
+If they want different splits per category, get the specific ratio for each category they mention.
 
 Note: If there's a court order for child support, this section is just for extras.
 """,

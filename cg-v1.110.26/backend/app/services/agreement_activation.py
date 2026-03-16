@@ -802,7 +802,7 @@ class AgreementActivationService:
         agreement: Agreement,
         expense_data: ExpenseData
     ) -> None:
-        """Store expense split ratio on family file."""
+        """Store expense split ratio on family file (global + per-category)."""
         parent_a_pct, _ = parse_split_ratio(expense_data.split_ratio)
 
         family_file.agreement_expense_split_ratio = expense_data.split_ratio
@@ -810,6 +810,10 @@ class AgreementActivationService:
         family_file.agreement_split_locked = True
         family_file.agreement_split_source_id = agreement.id
         family_file.agreement_split_set_at = datetime.utcnow()
+
+        # Store per-category split overrides if specified
+        if expense_data.category_splits:
+            family_file.agreement_category_splits = expense_data.category_splits
 
     async def _set_exchange_location(
         self,

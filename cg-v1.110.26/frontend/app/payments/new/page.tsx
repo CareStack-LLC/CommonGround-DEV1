@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, DollarSign, Calendar, FileText, AlertCircle } from 'lucide-react';
+import { ArrowLeft, DollarSign, Calendar, FileText, AlertCircle, Shield, Sparkles, Lock, Zap, Stethoscope, GraduationCap, Volleyball, Baby } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { casesAPI, clearfundAPI, familyFilesAPI, Case, FamilyFile, ObligationCategory, CreateObligationRequest } from '@/lib/api';
+import { casesAPI, clearfundAPI, familyFilesAPI, Case, FamilyFile, ObligationCategory, CreateObligationRequest, CategorySplitsResponse } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ProtectedRoute } from '@/components/protected-route';
@@ -22,6 +22,56 @@ const categories: { value: ObligationCategory; label: string; description: strin
   { value: 'childcare', label: 'Childcare', description: 'Daycare, babysitting' },
   { value: 'child_support', label: 'Child Support', description: 'Regular support payments' },
   { value: 'other', label: 'Other', description: 'Other child-related expenses' },
+];
+
+// Quick-create templates for common expense types
+interface QuickTemplate {
+  label: string;
+  icon: React.ElementType;
+  category: ObligationCategory;
+  titlePrefix: string;
+  receiptRequired: boolean;
+  verificationRequired: boolean;
+  description: string;
+}
+
+const QUICK_TEMPLATES: QuickTemplate[] = [
+  {
+    label: 'Doctor Visit',
+    icon: Stethoscope,
+    category: 'medical',
+    titlePrefix: 'Doctor Visit — ',
+    receiptRequired: true,
+    verificationRequired: true,
+    description: 'Medical appointment copay or bill',
+  },
+  {
+    label: 'School Supplies',
+    icon: GraduationCap,
+    category: 'education',
+    titlePrefix: 'School Supplies — ',
+    receiptRequired: true,
+    verificationRequired: true,
+    description: 'Books, materials, or tuition',
+  },
+  {
+    label: 'Sports / Activities',
+    icon: Volleyball,
+    category: 'sports',
+    titlePrefix: 'Sports — ',
+    receiptRequired: true,
+    verificationRequired: true,
+    description: 'Equipment, fees, or uniforms',
+  },
+  {
+    label: 'Childcare',
+    icon: Baby,
+    category: 'childcare',
+    titlePrefix: 'Childcare — ',
+    receiptRequired: false,
+    verificationRequired: true,
+    description: 'Daycare, babysitting, or after-school',
+  },
 ];
 
 // Combined type for Cases and Family Files
@@ -52,9 +102,57 @@ function NewExpenseContent() {
   const [receiptRequired, setReceiptRequired] = useState(false);
   const [notes, setNotes] = useState('');
 
+  // Category splits from agreement
+  const [categorySplits, setCategorySplits] = useState<CategorySplitsResponse | null>(null);
+  const [splitFromAgreement, setSplitFromAgreement] = useState(false);
+
+  // Attestation
+  const [includeAttestation, setIncludeAttestation] = useState(false);
+  const [attestationText, setAttestationText] = useState('');
+
   useEffect(() => {
     loadCasesAndFamilyFiles();
   }, []);
+
+  // Load category splits when a family file is selected
+  useEffect(() => {
+    if (!selectedCaseId) return;
+    const selectedItem = items.find(i => i.id === selectedCaseId);
+    if (selectedItem?.type === 'family_file') {
+      clearfundAPI.getCategorySplits(selectedCaseId)
+        .then(splits => {
+          setCategorySplits(splits);
+          // Apply initial category split
+          applyCategorySplit(category, splits);
+        })
+        .catch(() => setCategorySplits(null));
+    } else {
+      setCategorySplits(null);
+      setSplitFromAgreement(false);
+    }
+  }, [selectedCaseId, items]);
+
+  const applyCategorySplit = useCallback((cat: ObligationCategory, splits: CategorySplitsResponse | null) => {
+    if (!splits || !splits.split_locked) {
+      setSplitFromAgreement(false);
+      return;
+    }
+    // Check category-specific split first, then global
+    if (cat in splits.category_splits) {
+      setPetitionerPercentage(splits.category_splits[cat]);
+      setSplitFromAgreement(true);
+    } else if (splits.global_parent_a_percentage !== null) {
+      setPetitionerPercentage(splits.global_parent_a_percentage);
+      setSplitFromAgreement(true);
+    } else {
+      setSplitFromAgreement(false);
+    }
+  }, []);
+
+  const handleCategoryChange = (cat: ObligationCategory) => {
+    setCategory(cat);
+    applyCategorySplit(cat, categorySplits);
+  };
 
   const loadCasesAndFamilyFiles = async () => {
     try {
@@ -136,6 +234,8 @@ function NewExpenseContent() {
         verification_required: verificationRequired,
         receipt_required: receiptRequired,
         notes: notes.trim() || undefined,
+        include_attestation: includeAttestation,
+        attestation_text: includeAttestation ? attestationText.trim() : undefined,
       };
 
       const obligation = await clearfundAPI.createObligation(data);
@@ -227,6 +327,35 @@ function NewExpenseContent() {
           </div>
         )}
 
+        {/* Quick Create Templates */}
+        <div className="mb-6">
+          <p className="text-sm font-bold text-muted-foreground mb-2 flex items-center gap-1.5">
+            <Zap className="h-4 w-4 text-amber-500" />
+            Quick Create
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {QUICK_TEMPLATES.map((tpl) => (
+              <button
+                key={tpl.label}
+                type="button"
+                onClick={() => {
+                  setCategory(tpl.category);
+                  setTitle(tpl.titlePrefix);
+                  setReceiptRequired(tpl.receiptRequired);
+                  setVerificationRequired(tpl.verificationRequired);
+                  applyCategorySplit(tpl.category, categorySplits);
+                }}
+                className="flex flex-col items-center gap-1.5 p-3 bg-card rounded-xl border-2 border-border hover:border-[var(--portal-primary)]/40 hover:shadow-md transition-all duration-300 group"
+              >
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <tpl.icon className="h-4 w-4 text-[var(--portal-primary)]" />
+                </div>
+                <span className="text-xs font-bold text-foreground">{tpl.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit}>
           <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-6">
             <div className="space-y-6">
@@ -273,21 +402,27 @@ function NewExpenseContent() {
                   Category *
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.value}
-                      type="button"
-                      onClick={() => setCategory(cat.value)}
-                      className={`p-3 rounded-xl border-2 text-left transition-all duration-300 ${
-                        category === cat.value
-                          ? 'border-[var(--portal-primary)] bg-[var(--portal-primary)]/5 shadow-md'
-                          : 'border-border hover:border-[var(--portal-primary)]/30 hover:shadow-md bg-card'
-                      }`}
-                    >
-                      <p className={`font-bold text-sm ${category === cat.value ? 'text-[var(--portal-primary)]' : 'text-foreground'}`}>{cat.label}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5 font-medium">{cat.description}</p>
-                    </button>
-                  ))}
+                  {categories.map((cat) => {
+                    const hasCategorySplit = categorySplits?.split_locked && cat.value in (categorySplits?.category_splits || {});
+                    return (
+                      <button
+                        key={cat.value}
+                        type="button"
+                        onClick={() => handleCategoryChange(cat.value)}
+                        className={`p-3 rounded-xl border-2 text-left transition-all duration-300 relative ${
+                          category === cat.value
+                            ? 'border-[var(--portal-primary)] bg-[var(--portal-primary)]/5 shadow-md'
+                            : 'border-border hover:border-[var(--portal-primary)]/30 hover:shadow-md bg-card'
+                        }`}
+                      >
+                        <p className={`font-bold text-sm ${category === cat.value ? 'text-[var(--portal-primary)]' : 'text-foreground'}`}>{cat.label}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 font-medium">{cat.description}</p>
+                        {hasCategorySplit && (
+                          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" title="Custom split from agreement" />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -313,9 +448,22 @@ function NewExpenseContent() {
 
               {/* Split Percentage */}
               <div>
-                <label className="block text-sm font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  Cost Split
-                </label>
+                <div className="flex items-center gap-2 mb-2">
+                  <label className="block text-sm font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    Cost Split
+                  </label>
+                  {splitFromAgreement && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">
+                      <Lock className="h-3 w-3" />
+                      From Agreement
+                    </span>
+                  )}
+                </div>
+                {splitFromAgreement && categorySplits && (
+                  <p className="text-xs text-emerald-600 mb-2 font-medium">
+                    Your agreement specifies {petitionerPercentage}/{100 - petitionerPercentage} for {categories.find(c => c.value === category)?.label} expenses
+                  </p>
+                )}
                 <div className="flex items-center gap-4">
                   <div className="flex-1">
                     <input
@@ -324,7 +472,10 @@ function NewExpenseContent() {
                       max="100"
                       step="5"
                       value={petitionerPercentage}
-                      onChange={(e) => setPetitionerPercentage(parseInt(e.target.value))}
+                      onChange={(e) => {
+                        setPetitionerPercentage(parseInt(e.target.value));
+                        if (splitFromAgreement) setSplitFromAgreement(false);
+                      }}
                       className="w-full accent-[var(--portal-primary)]"
                     />
                     <div className="flex justify-between text-sm text-muted-foreground mt-1 font-medium">
@@ -392,6 +543,42 @@ function NewExpenseContent() {
                   />
                   <span className="text-sm text-foreground font-medium">Require receipt upload</span>
                 </label>
+              </div>
+
+              {/* Attestation */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 cursor-pointer p-3 bg-muted rounded-xl border-2 border-border hover:border-[var(--portal-primary)]/30 transition-all duration-300">
+                  <input
+                    type="checkbox"
+                    checked={includeAttestation}
+                    onChange={(e) => {
+                      setIncludeAttestation(e.target.checked);
+                      if (e.target.checked && !attestationText) {
+                        setAttestationText(
+                          `I attest that these funds will be used exclusively for: ${title || '[expense title]'} (${categories.find(c => c.value === category)?.label || category}). I understand this is a legal record and commit to providing documentation upon request.`
+                        );
+                      }
+                    }}
+                    className="w-5 h-5 rounded border-border accent-[var(--portal-primary)]"
+                  />
+                  <div className="flex-1">
+                    <span className="text-sm text-foreground font-bold flex items-center gap-1.5">
+                      <Shield className="h-4 w-4 text-[var(--portal-primary)]" />
+                      Include Attestation (sworn statement)
+                    </span>
+                    <p className="text-xs text-muted-foreground mt-0.5">Creates a legal record of your commitment to use funds as stated</p>
+                  </div>
+                </label>
+                {includeAttestation && (
+                  <textarea
+                    value={attestationText}
+                    onChange={(e) => setAttestationText(e.target.value)}
+                    placeholder="I attest that these funds will be used for..."
+                    rows={3}
+                    className="w-full px-4 py-3 border-2 border-[var(--portal-primary)]/30 rounded-xl bg-[var(--portal-primary)]/5 text-foreground placeholder:text-muted-foreground resize-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all duration-300 text-sm"
+                    maxLength={5000}
+                  />
+                )}
               </div>
 
               {/* Notes */}

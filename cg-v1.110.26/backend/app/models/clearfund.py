@@ -375,6 +375,14 @@ class VerificationArtifact(Base, UUIDMixin, TimestampMixin):
         String(64), nullable=True
     )  # SHA-256 of receipt file
 
+    # Co-parent receipt review
+    reviewed_by: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+    review_status: Mapped[str] = mapped_column(
+        String(20), default="pending"
+    )  # pending | acknowledged | disputed
+    reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    review_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # Relationships
     obligation: Mapped["Obligation"] = relationship(
         "Obligation", back_populates="verification_artifacts"

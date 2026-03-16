@@ -63,6 +63,15 @@ class ObligationCreate(ObligationBase):
         False,
         description="Set True to ignore agreement-locked split ratio and use custom percentage"
     )
+    include_attestation: bool = Field(
+        False,
+        description="Create attestation inline with obligation"
+    )
+    attestation_text: Optional[str] = Field(
+        None,
+        max_length=5000,
+        description="Attestation text if include_attestation is True"
+    )
 
     @field_validator('source_type')
     @classmethod
@@ -306,8 +315,55 @@ class VerificationArtifactResponse(BaseModel):
     verified_at: datetime
     created_at: datetime
 
+    # Co-parent review fields
+    reviewed_by: Optional[str] = None
+    review_status: str = "pending"
+    reviewed_at: Optional[datetime] = None
+    review_notes: Optional[str] = None
+
     class Config:
         from_attributes = True
+
+
+class ReceiptReview(BaseModel):
+    """Co-parent receipt review request."""
+
+    review_status: str = Field(
+        ...,
+        description="Review status: acknowledged or disputed"
+    )
+    review_notes: Optional[str] = Field(
+        None,
+        max_length=1000,
+        description="Notes about the review (required for disputes)"
+    )
+
+    @field_validator('review_status')
+    @classmethod
+    def validate_review_status(cls, v: str) -> str:
+        """Validate review status."""
+        allowed = {"acknowledged", "disputed"}
+        if v not in allowed:
+            raise ValueError(f"Invalid review status. Must be one of: {', '.join(allowed)}")
+        return v
+
+    @model_validator(mode='after')
+    def require_notes_for_dispute(self) -> 'ReceiptReview':
+        """Require notes when disputing a receipt."""
+        if self.review_status == "disputed" and not self.review_notes:
+            raise ValueError("Notes are required when disputing a receipt")
+        return self
+
+
+class CategorySplitsResponse(BaseModel):
+    """Per-category split ratios for a family file."""
+
+    family_file_id: str
+    split_locked: bool
+    global_split_ratio: Optional[str] = None
+    global_parent_a_percentage: Optional[int] = None
+    category_splits: dict[str, int] = {}
+    source_agreement_id: Optional[str] = None
 
 
 # ============================================================================
@@ -408,6 +464,26 @@ class MonthlyTotals(BaseModel):
     month: str  # YYYY-MM
     total_amount: Decimal
     by_category: dict[str, Decimal]
+
+
+class CategorySpending(BaseModel):
+    """Spending totals for a single category."""
+
+    category: str
+    total_amount: Decimal
+    petitioner_amount: Decimal
+    respondent_amount: Decimal
+    obligation_count: int
+
+
+class CategorySpendingSummary(BaseModel):
+    """Per-category spending summary for analytics."""
+
+    case_id: str
+    period_start: Optional[datetime] = None
+    period_end: Optional[datetime] = None
+    categories: list[CategorySpending]
+    total_amount: Decimal
 
 
 class ClearFundAnalytics(BaseModel):

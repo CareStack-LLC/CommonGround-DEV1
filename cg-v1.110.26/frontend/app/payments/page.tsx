@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { familyFilesAPI, agreementsAPI, clearfundAPI, walletAPI, FamilyFile, Agreement, Obligation, BalanceSummary, ObligationMetrics, WalletWithBalance } from '@/lib/api';
+import { familyFilesAPI, agreementsAPI, clearfundAPI, walletAPI, FamilyFile, Agreement, Obligation, BalanceSummary, ObligationMetrics, WalletWithBalance, CategorySpendingSummary } from '@/lib/api';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import ObligationCard from '@/components/clearfund/obligation-card';
@@ -236,24 +236,41 @@ function MetricsRow({
       icon: AlertTriangle,
       bg: 'bg-red-100',
       text: 'text-red-600',
+      isOverdue: true,
     },
   ];
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      {stats.map((stat) => (
-        <div key={stat.label} className="bg-card rounded-2xl border-2 border-border shadow-lg p-4 hover:shadow-xl hover:scale-[1.01] transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1.5 font-semibold">{stat.label}</p>
-              <p className={`text-2xl font-bold ${stat.text}`}>{stat.value}</p>
-            </div>
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${stat.bg} shadow-md`}>
-              <stat.icon className={`h-5 w-5 ${stat.text}`} />
+      {stats.map((stat) => {
+        const hasOverdue = stat.isOverdue && stat.value > 0;
+        return (
+          <div
+            key={stat.label}
+            className={`bg-card rounded-2xl border-2 shadow-lg p-4 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 ${
+              hasOverdue ? 'border-red-300' : 'border-border'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground mb-1.5 font-semibold">{stat.label}</p>
+                <p className={`text-2xl font-bold ${stat.text}`}>{stat.value}</p>
+              </div>
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${stat.bg} shadow-md relative`}>
+                <stat.icon className={`h-5 w-5 ${stat.text}`} />
+                {hasOverdue && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 items-center justify-center text-[9px] text-white font-bold">
+                      {stat.value}
+                    </span>
+                  </span>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -267,6 +284,7 @@ function PaymentsContent() {
   const [obligations, setObligations] = useState<Obligation[]>([]);
   const [balanceSummary, setBalanceSummary] = useState<BalanceSummary | null>(null);
   const [metrics, setMetrics] = useState<ObligationMetrics | null>(null);
+  const [categorySpending, setCategorySpending] = useState<CategorySpendingSummary | null>(null);
   const [activeTab, setActiveTab] = useState<TabType>('pending');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -384,6 +402,14 @@ function PaymentsContent() {
       } catch (err: any) {
         console.error('Failed to load metrics:', err);
         setMetrics(null);
+      }
+
+      try {
+        const spendingRes = await clearfundAPI.getCategorySpending(selectedFamilyFile.id);
+        setCategorySpending(spendingRes);
+      } catch (err: any) {
+        console.error('Failed to load category spending:', err);
+        setCategorySpending(null);
       }
     } catch (err: any) {
       console.error('ClearFund data load error:', err);
@@ -634,20 +660,76 @@ function PaymentsContent() {
         {/* Metrics */}
         <MetricsRow metrics={metrics} isLoading={isLoading} />
 
+        {/* Category Spending Breakdown */}
+        {categorySpending && categorySpending.categories.length > 0 && (
+          <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+            <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              <BarChart3 className="h-4 w-4 text-[var(--portal-primary)]" />
+              Spending by Category
+            </h3>
+            <div className="space-y-2.5">
+              {categorySpending.categories.slice(0, 6).map((cat) => {
+                const total = parseFloat(cat.total_amount) || 1;
+                const grandTotal = parseFloat(categorySpending.total_amount) || 1;
+                const percentage = Math.round((total / grandTotal) * 100);
+                const petPct = total > 0 ? Math.round((parseFloat(cat.petitioner_amount) / total) * 100) : 50;
+
+                return (
+                  <div key={cat.category}>
+                    <div className="flex items-center justify-between text-sm mb-1">
+                      <span className="font-semibold text-foreground capitalize">{cat.category.replace('_', ' ')}</span>
+                      <span className="font-mono text-sm font-bold text-foreground">
+                        ${parseFloat(cat.total_amount).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      </span>
+                    </div>
+                    <div className="h-2.5 bg-muted rounded-full overflow-hidden flex">
+                      <div
+                        className="bg-[var(--portal-primary)] rounded-l-full transition-all duration-500"
+                        style={{ width: `${petPct}%` }}
+                      />
+                      <div
+                        className="bg-amber-400 rounded-r-full transition-all duration-500"
+                        style={{ width: `${100 - petPct}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground mt-0.5">
+                      <span>{petPct}% You</span>
+                      <span>{cat.obligation_count} expense{cat.obligation_count !== 1 ? 's' : ''}</span>
+                      <span>{100 - petPct}% Co-parent</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Overdue Warning */}
         {metrics && metrics.total_overdue > 0 && (
-          <div className="flex items-center gap-4 p-5 bg-card rounded-2xl border-2 border-destructive/20 shadow-lg">
-            <div className="w-14 h-14 bg-destructive/10 rounded-2xl flex items-center justify-center shadow-md">
+          <div className="flex items-center gap-4 p-5 bg-card rounded-2xl border-2 border-destructive/20 shadow-lg animate-pulse-subtle">
+            <div className="w-14 h-14 bg-destructive/10 rounded-2xl flex items-center justify-center shadow-md relative">
               <AlertTriangle className="h-6 w-6 text-destructive" />
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-white text-xs font-bold rounded-full flex items-center justify-center">
+                {metrics.total_overdue}
+              </span>
             </div>
-            <div>
+            <div className="flex-1">
               <p className="font-bold text-destructive" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                {metrics.total_overdue} Overdue Obligation{metrics.total_overdue > 1 ? 's' : ''}
+                Action Required: {metrics.total_overdue} Overdue
               </p>
-              <p className="text-sm text-destructive font-medium">
-                Please address overdue items to maintain compliance.
+              <p className="text-sm text-destructive/80 font-medium">
+                {parseFloat(balanceSummary?.total_overdue || '0') > 0
+                  ? `$${parseFloat(balanceSummary?.total_overdue || '0').toFixed(2)} overdue — `
+                  : ''}
+                address overdue items to maintain compliance.
               </p>
             </div>
+            <button
+              onClick={() => setActiveTab('pending')}
+              className="px-4 py-2 text-sm font-bold text-destructive border-2 border-destructive/30 rounded-xl hover:bg-destructive/10 transition-all duration-200 flex-shrink-0"
+            >
+              View
+            </button>
           </div>
         )}
 
