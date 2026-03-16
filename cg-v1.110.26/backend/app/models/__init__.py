@@ -256,6 +256,7 @@ from app.models.report_request import (
     REPORT_REQUEST_STATUSES,
     URGENCY_LEVELS,
 )
+from app.models.generated_report import GeneratedReport
 
 __all__ = [
     "Base",
@@ -505,4 +506,6 @@ __all__ = [
     "ReportRequest",
     "REPORT_REQUEST_STATUSES",
     "URGENCY_LEVELS",
+    # Generated Reports (Verification System)
+    "GeneratedReport",
 ]

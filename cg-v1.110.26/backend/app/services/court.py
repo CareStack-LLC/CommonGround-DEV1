@@ -14,6 +14,7 @@ from sqlalchemy import select, and_, or_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.models.generated_report import GeneratedReport
 from app.models.court import (
     CourtProfessional,
     CourtAccessGrant,
@@ -832,6 +833,26 @@ class ReportService:
         )
 
         self.db.add(report)
+
+        # Create GeneratedReport record for unified verification
+        try:
+            generated = GeneratedReport(
+                report_id=report_number,
+                sha256_hash=content_hash,
+                report_type=data.report_type.value,
+                report_category="investigation",
+                family_file_id=None,  # Court reports link via case_id
+                generated_by_id=generated_by,
+                date_range_start=data.date_range_start,
+                date_range_end=data.date_range_end,
+                generated_at=datetime.utcnow(),
+                source_record_id=report.id,
+                source_record_type="investigation_report",
+            )
+            self.db.add(generated)
+        except Exception:
+            pass  # Non-fatal
+
         await self.db.commit()
         await self.db.refresh(report)
         return report

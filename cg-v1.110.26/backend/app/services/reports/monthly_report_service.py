@@ -217,7 +217,7 @@ class MonthlyReportService:
         )
 
         # Convert to PDF
-        pdf_bytes = self.parent_service._html_to_pdf(html_content)
+        pdf_bytes, _ = self.parent_service._html_to_pdf(html_content)
 
         # Build summary dict for email notifications
         summary = {

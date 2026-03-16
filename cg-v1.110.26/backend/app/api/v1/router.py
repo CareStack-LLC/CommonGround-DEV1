@@ -55,6 +55,7 @@ from app.api.v1.endpoints import (
     invitations,
     sendgrid_webhooks,
     marketing,
+    verify,
 )
 
 api_router = APIRouter()
@@ -179,6 +180,9 @@ api_router.include_router(sendgrid_webhooks.router, prefix="/webhooks", tags=["S
 
 # Marketing - Newsletter and contact form
 api_router.include_router(marketing.router, prefix="/marketing", tags=["Marketing"])
+
+# Report Verification - Public endpoint (no auth required)
+api_router.include_router(verify.router, prefix="/verify", tags=["Verification"])
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
