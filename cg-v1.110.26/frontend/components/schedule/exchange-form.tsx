@@ -479,7 +479,7 @@ export default function ExchangeForm({
                 />
               </div>
               <div>
-                <Label htmlFor="duration" className="text-foreground">Duration (minutes)</Label>
+                <Label htmlFor="duration" className="text-foreground">Grace Period (minutes)</Label>
                 <Input
                   id="duration"
                   type="number"
@@ -489,6 +489,9 @@ export default function ExchangeForm({
                   onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) || 15 })}
                   className="mt-1"
                 />
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  Time to wait before flagging as late. After grace period + 10 min, parent is flagged as no-show.
+                </p>
               </div>
             </div>
 

@@ -2,19 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { familyFilesAPI, agreementsAPI, exchangesAPI, FamilyFile, Agreement, EventV2, ExchangeInstanceForCalendar, CustodyExchangeInstance } from '@/lib/api';
+import { familyFilesAPI, agreementsAPI, exchangesAPI, FamilyFile, FamilyFileDetail, Agreement, MyTimeCollection, EventV2, ExchangeInstanceForCalendar, CustodyExchangeInstance } from '@/lib/api';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
+import { PageContainer } from '@/components/layout';
+import CollectionsManager from '@/components/schedule/collections-manager';
+import TimeBlocksManager from '@/components/schedule/time-blocks-manager';
 import CalendarView from '@/components/schedule/calendar-view';
 import EventForm from '@/components/schedule/event-form';
 import EventDetails from '@/components/schedule/event-details';
 import ExchangeForm from '@/components/schedule/exchange-form';
 import SilentHandoffCheckIn from '@/components/schedule/silent-handoff-checkin';
 import SwapRequestModal from '@/components/schedule/swap-request-modal';
-import { ExchangeSummaryCard } from '@/components/schedule/exchange-summary-card';
 import {
   Calendar,
+  Clock,
+  FolderOpen,
   RefreshCw,
   Users,
   FileText,
@@ -22,7 +27,10 @@ import {
   ChevronDown,
   ChevronLeft,
   ArrowLeftRight,
+  MapPin,
+  CheckCircle2,
   AlertCircle,
+  Sparkles,
 } from 'lucide-react';
 
 interface FamilyFileWithAgreements {
@@ -38,6 +46,46 @@ interface FamilyFileWithAgreements {
  * - Custody visualization showing parenting time
  * - Professional, polished interface for busy parents
  */
+
+// Tab Button Component with dashboard-matching styling
+function TabButton({
+  active,
+  icon: Icon,
+  label,
+  badge,
+  onClick,
+}: {
+  active: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  badge?: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        group relative flex items-center gap-2.5 px-4 py-3 text-sm font-bold
+        rounded-xl transition-all duration-300 flex-shrink-0
+        ${active
+          ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
+          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+        }
+      `}
+    >
+      <Icon className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${active ? '' : 'group-hover:scale-110'}`} />
+      <span className="hidden sm:inline whitespace-nowrap" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{label}</span>
+      {badge && (
+        <span className={`
+          hidden sm:inline text-xs px-2 py-0.5 rounded-full font-semibold
+          ${active ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'}
+        `}>
+          {badge}
+        </span>
+      )}
+    </button>
+  );
+}
 
 // Quick Action Card - matches dashboard ActionStreamItem style
 function QuickActionCard({
@@ -87,26 +135,30 @@ function QuickActionCard({
   );
 }
 
-// Custody Legend with dashboard-matching styling
+// Calendar Legend with event categories
 function CustodyLegend() {
   return (
-    <div className="flex items-center gap-4 text-xs bg-card px-4 py-3 rounded-2xl border-2 border-border shadow-lg flex-wrap">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs bg-card px-4 py-3 rounded-2xl border-2 border-border shadow-lg">
       <span className="text-muted-foreground font-semibold mr-1">Legend:</span>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Your Time</span>
+        <span className="text-foreground font-semibold whitespace-nowrap">Your Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-cg-slate shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Their Time</span>
+        <span className="text-foreground font-semibold whitespace-nowrap">Their Events</span>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" />
+        <span className="text-foreground font-semibold whitespace-nowrap">(Kids) Events</span>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm" />
+        <span className="text-foreground font-semibold whitespace-nowrap">Professional Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Exchange</span>
-      </div>
-      <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#2D6A8F] shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Professional</span>
+        <span className="text-foreground font-semibold whitespace-nowrap">Exchanges/Swaps</span>
       </div>
     </div>
   );
@@ -133,7 +185,7 @@ function FamilyFileSelector({
           appearance-none bg-card border border-border rounded-xl
           px-4 py-2.5 pr-10 text-sm font-medium text-foreground
           focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)]
-          transition-all cursor-pointer hover:border-border
+          transition-all cursor-pointer hover:border-muted-foreground/30
           shadow-sm
         "
       >
@@ -154,11 +206,13 @@ function ScheduleContent() {
   const [familyFilesWithAgreements, setFamilyFilesWithAgreements] = useState<FamilyFileWithAgreements[]>([]);
   const [selectedFamilyFile, setSelectedFamilyFile] = useState<FamilyFile | null>(null);
   const [selectedAgreement, setSelectedAgreement] = useState<Agreement | null>(null);
+  const [selectedCollection, setSelectedCollection] = useState<MyTimeCollection | null>(null);
   const [showEventForm, setShowEventForm] = useState(false);
   const [showExchangeForm, setShowExchangeForm] = useState(false);
   const [showSwapModal, setShowSwapModal] = useState(false);
   const [eventFormDate, setEventFormDate] = useState<Date | undefined>();
   const [selectedEvent, setSelectedEvent] = useState<EventV2 | null>(null);
+  const [activeTab, setActiveTab] = useState<'calendar' | 'collections' | 'blocks'>('calendar');
   const [calendarKey, setCalendarKey] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -203,9 +257,7 @@ function ScheduleContent() {
         if (firstWithAgreements) {
           setSelectedFamilyFile(firstWithAgreements.familyFile);
           if (firstWithAgreements.agreements.length > 0) {
-            // Prefer the active agreement, fall back to first
-            const activeAgreement = firstWithAgreements.agreements.find(a => a.status === 'active');
-            setSelectedAgreement(activeAgreement || firstWithAgreements.agreements[0]);
+            setSelectedAgreement(firstWithAgreements.agreements[0]);
           }
         } else {
           setSelectedFamilyFile(filesWithAgreements[0].familyFile);
@@ -247,6 +299,11 @@ function ScheduleContent() {
     setCalendarKey(prev => prev + 1);
   };
 
+  const handleCollectionSelect = (collection: MyTimeCollection) => {
+    setSelectedCollection(collection);
+    setActiveTab('blocks');
+  };
+
   const handleExchangeClick = async (exchange: ExchangeInstanceForCalendar) => {
     if (!selectedFamilyFile) return;
 
@@ -284,9 +341,7 @@ function ScheduleContent() {
     if (item) {
       setSelectedFamilyFile(item.familyFile);
       if (item.agreements.length > 0) {
-        // Prefer the active agreement, fall back to first
-        const activeAgreement = item.agreements.find(a => a.status === 'active');
-        setSelectedAgreement(activeAgreement || item.agreements[0]);
+        setSelectedAgreement(item.agreements[0]);
       } else {
         setSelectedAgreement(null);
       }
@@ -311,7 +366,7 @@ function ScheduleContent() {
   // Loading State
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <Navigation />
         <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
@@ -328,7 +383,7 @@ function ScheduleContent() {
   // Empty State
   if (!selectedFamilyFile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <Navigation />
         <main className="max-w-3xl mx-auto px-4 py-8 pb-32 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
@@ -359,7 +414,7 @@ function ScheduleContent() {
   const currentFamilyFileData = familyFilesWithAgreements.find(f => f.familyFile.id === selectedFamilyFile.id);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted pb-32 lg:pb-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background pb-32 lg:pb-8">
       <Navigation />
 
       <main className="max-w-3xl mx-auto px-4 py-6">
@@ -382,45 +437,18 @@ function ScheduleContent() {
               </h1>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground ml-14 flex-wrap">
-            <Users className="h-4 w-4 flex-shrink-0" />
-            {familyFilesWithAgreements.length > 1 ? (
-              <div className="relative">
-                <select
-                  value={selectedFamilyFile.id}
-                  onChange={(e) => handleFamilyFileChange(e.target.value)}
-                  className="appearance-none bg-muted/50 border border-border rounded-lg px-2.5 py-1 pr-7 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-[var(--portal-primary)]/20 focus:border-[var(--portal-primary)] transition-all cursor-pointer hover:bg-muted"
-                >
-                  {familyFilesWithAgreements.map((item) => (
-                    <option key={item.familyFile.id} value={item.familyFile.id}>
-                      {item.familyFile.title}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-              </div>
-            ) : (
-              <span className="font-medium">{selectedFamilyFile.title}</span>
-            )}
+          <div className="flex items-center gap-2 text-sm text-muted-foreground ml-14">
+            <Users className="h-4 w-4" />
+            <span className="font-medium">{selectedFamilyFile.title}</span>
             {selectedAgreement && (
               <>
-                <span className="text-muted-foreground">•</span>
-                <FileText className="h-4 w-4 flex-shrink-0" />
+                <span className="text-muted-foreground/40">•</span>
+                <FileText className="h-4 w-4" />
                 <span className="font-medium">{selectedAgreement.title}</span>
               </>
             )}
           </div>
         </div>
-
-        {/* Exchange Schedule from Agreement */}
-        {selectedFamilyFile && (
-          <div className="mb-6">
-            <ExchangeSummaryCard
-              familyFileId={selectedFamilyFile.id}
-              agreementId={selectedAgreement?.id}
-            />
-          </div>
-        )}
 
         {/* Quick Actions */}
         <div className="space-y-3 mb-6">
@@ -445,30 +473,67 @@ function ScheduleContent() {
             color="sage"
             onClick={() => setShowSwapModal(true)}
           />
+          <QuickActionCard
+            icon={FolderOpen}
+            title="My Collections"
+            description="Organize time blocks"
+            color="amber"
+            onClick={() => setActiveTab('collections')}
+          />
         </div>
 
         {error && (
-          <div className="mb-6 flex items-center gap-3 p-4 bg-destructive/10 border-2 border-destructive/20 rounded-2xl">
-            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
-            <p className="text-sm text-destructive font-medium">{error}</p>
+          <div className="mb-6 flex items-center gap-3 p-4 bg-red-50 border-2 border-red-200 rounded-2xl">
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm text-red-700 font-medium">{error}</p>
           </div>
         )}
 
-        {/* Custody Legend */}
-        <div className="mb-6">
-          <CustodyLegend />
+        {/* Tabs */}
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex items-center gap-2 p-1.5 bg-card rounded-2xl border-2 border-border shadow-lg">
+            <TabButton
+              active={activeTab === 'calendar'}
+              icon={Calendar}
+              label="Calendar"
+              onClick={() => setActiveTab('calendar')}
+            />
+            <TabButton
+              active={activeTab === 'collections'}
+              icon={FolderOpen}
+              label="Collections"
+              onClick={() => setActiveTab('collections')}
+            />
+            <TabButton
+              active={activeTab === 'blocks'}
+              icon={Clock}
+              label="Time Blocks"
+              badge="Private"
+              onClick={() => setActiveTab('blocks')}
+            />
+          </div>
+
+          {activeTab === 'calendar' && <CustodyLegend />}
         </div>
 
-        {/* Calendar */}
+        {/* Tab Content */}
         <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-4 sm:p-6">
-          <CalendarView
-            key={calendarKey}
-            caseId={selectedFamilyFile.id}
-            agreementId={selectedAgreement?.id}
-            onCreateEvent={handleCreateEvent}
-            onEventClick={handleEventClick}
-            onExchangeClick={handleExchangeClick}
-          />
+          {activeTab === 'calendar' && (
+            <CalendarView
+              key={calendarKey}
+              caseId={selectedFamilyFile.id}
+              agreementId={selectedAgreement?.id}
+              onCreateEvent={handleCreateEvent}
+              onEventClick={handleEventClick}
+              onExchangeClick={handleExchangeClick}
+            />
+          )}
+          {activeTab === 'collections' && (
+            <CollectionsManager caseId={selectedFamilyFile.id} onCollectionSelect={handleCollectionSelect} />
+          )}
+          {activeTab === 'blocks' && (
+            <TimeBlocksManager caseId={selectedFamilyFile.id} selectedCollection={selectedCollection || undefined} />
+          )}
         </div>
       </main>
 

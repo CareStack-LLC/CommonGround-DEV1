@@ -37,10 +37,7 @@ import {
   CheckCircle,
   Zap,
   Gavel,
-  Baby,
-  Clock,
-  Shield,
-  Handshake,
+
 } from 'lucide-react';
 
 import { UpgradeBanner } from '@/components/upgrade-banner';
@@ -128,7 +125,7 @@ function ActionStreamItem({
   return (
     <button
       onClick={onClick}
-      className="w-full bg-card rounded-2xl border-2 border-border p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
+      className="w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
     >
       <div className={`w-14 h-14 ${iconBg} rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-110 transition-transform duration-300`}>
         <Icon className={`w-6 h-6 ${iconColor}`} />
@@ -140,7 +137,7 @@ function ActionStreamItem({
       {hasNotification && (
         <div className="w-3 h-3 bg-cg-error rounded-full flex-shrink-0 shadow-md animate-pulse" />
       )}
-      <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+      <ChevronRight className="w-5 h-5 text-slate-400 flex-shrink-0 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
     </button>
   );
 }
@@ -158,7 +155,7 @@ function QuickActionButton({
   return (
     <button
       onClick={onClick}
-      className="group flex flex-col items-center gap-3 p-5 bg-card rounded-2xl border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-105"
+      className="group flex flex-col items-center gap-3 p-5 bg-white rounded-2xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-105"
     >
       <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transition-all duration-300">
         <Icon className="w-6 h-6 text-[var(--portal-primary)]" />
@@ -243,7 +240,7 @@ function UpcomingEventItem({ event }: { event: UpcomingEvent }) {
   return (
     <button
       onClick={() => router.push('/schedule')}
-      className="w-full p-4 flex items-center gap-4 text-left hover:bg-muted transition-all duration-200 rounded-xl group"
+      className="w-full p-4 flex items-center gap-4 text-left hover:bg-slate-50 transition-all duration-200 rounded-xl group"
     >
       <div className={`w-12 h-12 ${bg} rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-200`}>
         <Icon className={`w-6 h-6 ${color}`} />
@@ -273,7 +270,7 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
 
   if (!events || events.length === 0) {
     return (
-      <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-lg">
+      <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
             <CheckCircle className="w-6 h-6 text-[var(--portal-primary)]" />
@@ -288,14 +285,14 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
   }
 
   return (
-    <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg">
-      <div className="max-h-[280px] overflow-y-auto divide-y-2 divide-border">
+    <div className="bg-white rounded-2xl border-2 border-slate-200 overflow-hidden shadow-lg">
+      <div className="max-h-[280px] overflow-y-auto divide-y-2 divide-slate-100">
         {events.map((event) => (
           <UpcomingEventItem key={event.id} event={event} />
         ))}
       </div>
-      {events.length > 5 && (
-        <div className="p-3 border-t-2 border-border bg-muted">
+      {events.length > 3 && (
+        <div className="p-3 border-t-2 border-slate-100 bg-slate-50">
           <button
             onClick={() => router.push('/schedule')}
             className="w-full text-center text-sm text-[var(--portal-primary)] hover:text-[#2D6A8F] font-bold py-2 transition-all duration-200 hover:scale-105"
@@ -633,18 +630,28 @@ function DashboardContent() {
   const needsSetup = familyFilesWithData.length === 0 && !isLoading;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
       <Navigation />
 
       <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
         {/* Header with Greeting */}
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-            {greeting},
-          </h1>
-          <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-            {user?.first_name}
-          </h2>
+        <div className="mb-8 relative overflow-hidden bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10 rounded-2xl p-6 border border-[var(--portal-primary)]/10">
+          <div className="relative z-10">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              {greeting},
+            </h1>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              {user?.first_name}
+            </h2>
+          </div>
+          {/* Calming nature illustration */}
+          <svg className="absolute right-2 bottom-0 w-32 h-32 sm:w-40 sm:h-40 opacity-15" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M160 180c-20-40-60-60-100-50 30-20 70-15 90 10-10-30-40-55-75-55 25-10 55 5 70 35-5-25-20-45-45-55 20 0 40 15 50 40 0-20-10-40-30-50 15 5 30 20 35 40 5-15 0-35-15-45 10 10 20 25 20 45" stroke="var(--portal-primary)" strokeWidth="2" strokeLinecap="round" fill="none"/>
+            <path d="M140 190c-10-50-40-80-80-85 20-5 45 10 55 35-5-25-25-45-50-50 15 0 35 15 45 35 0-20-15-35-30-40 15 5 25 20 30 35" stroke="var(--portal-primary)" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
+            <circle cx="155" cy="65" r="3" fill="var(--portal-primary)" opacity="0.3"/>
+            <circle cx="170" cy="85" r="2" fill="var(--portal-primary)" opacity="0.2"/>
+            <circle cx="130" cy="100" r="2.5" fill="var(--portal-primary)" opacity="0.25"/>
+          </svg>
         </div>
 
         {/* Upgrade Banner for Free Users */}
@@ -658,7 +665,7 @@ function DashboardContent() {
           needsSetup ? (
             // Getting Started
             <div className="space-y-6">
-              <div className="bg-card rounded-3xl border-2 border-border p-10 text-center shadow-2xl">
+              <div className="bg-white rounded-3xl border-2 border-slate-200 p-10 text-center shadow-2xl">
                 <div className="w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                   <FolderOpen className="w-10 h-10 text-[var(--portal-primary)]" />
                 </div>
@@ -679,7 +686,7 @@ function DashboardContent() {
 
               {/* Quick Info Cards */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                   <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
                     <MessageSquare className="w-6 h-6 text-[var(--portal-primary)]" />
                   </div>
@@ -688,7 +695,7 @@ function DashboardContent() {
                     AI-powered communication that reduces conflict
                   </p>
                 </div>
-                <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 shadow-lg hover:shadow-xl transition-all duration-300">
                   <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center mb-4 shadow-md">
                     <Calendar className="w-6 h-6 text-[var(--portal-primary)]" />
                   </div>
@@ -701,63 +708,17 @@ function DashboardContent() {
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Quick Actions */}
-              <section>
-                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  Quick Actions
-                </h3>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  <QuickActionButton
-                    icon={MessageSquare}
-                    label="Message"
-                    onClick={() => router.push('/messages')}
-                  />
-                  <QuickActionButton
-                    icon={Calendar}
-                    label="Schedule"
-                    onClick={() => router.push('/schedule')}
-                  />
-                  <QuickActionButton
-                    icon={Wallet}
-                    label="Expense"
-                    onClick={() => router.push('/payments/new')}
-                  />
-                  <QuickActionButton
-                    icon={FolderOpen}
-                    label="Files"
-                    onClick={() => router.push('/family-files')}
-                  />
-                  <QuickActionButton
-                    icon={Shield}
-                    label="KidSpace"
-                    onClick={() => {
-                      const activeFiles = familyFilesWithData.filter(f => f.familyFile.status === 'active');
-                      if (activeFiles.length === 1) {
-                        router.push(`/family-files/${activeFiles[0].familyFile.id}/kidcoms`);
-                      } else {
-                        router.push('/kidcoms');
-                      }
-                    }}
-                  />
-                  <QuickActionButton
-                    icon={Handshake}
-                    label="Agreements"
-                    onClick={() => router.push('/agreements')}
-                  />
-                </div>
-              </section>
-
-              {/* Custody Status Cards - Grid layout for at-a-glance view */}
+              {/* Custody Status Cards - One per child across all family files */}
               {familyFilesWithData.some(f => f.familyFile.children && f.familyFile.children.length > 0) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <div className="space-y-4 mb-6">
                   {familyFilesWithData.map(data =>
                     data.familyFile.children?.map(child => (
                       <DashboardCustodyCard
                         key={child.id}
                         childId={child.id}
-                        familyFileId={data.familyFile.id}
                         childData={child}
                         refreshTrigger={refreshKey}
+                        onClick={() => router.push(`/children/${child.id}`)}
                         onWithMe={async (id) => {
                           if (!user) return;
                           try {
@@ -804,7 +765,7 @@ function DashboardContent() {
                     dashboardSummary.unread_messages_count === 0 &&
                     dashboardSummary.pending_agreements_count === 0 &&
                     dashboardSummary.unread_court_count === 0 && (
-                      <div className="bg-card rounded-2xl border-2 border-border p-6 flex items-center gap-4 shadow-lg">
+                      <div className="bg-white rounded-2xl border-2 border-slate-200 p-6 flex items-center gap-4 shadow-lg">
                         <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md">
                           <CheckCircle className="w-7 h-7 text-[var(--portal-primary)]" />
                         </div>
@@ -956,6 +917,35 @@ function DashboardContent() {
                 <UpcomingEventsList events={dashboardSummary?.upcoming_events} />
               </section>
 
+              {/* Quick Actions */}
+              <section>
+                <h3 className="text-lg font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  Quick Actions
+                </h3>
+                <div className="grid grid-cols-4 gap-3">
+                  <QuickActionButton
+                    icon={MessageSquare}
+                    label="Message"
+                    onClick={() => router.push('/messages')}
+                  />
+                  <QuickActionButton
+                    icon={Calendar}
+                    label="Schedule"
+                    onClick={() => router.push('/schedule')}
+                  />
+                  <QuickActionButton
+                    icon={Wallet}
+                    label="Expense"
+                    onClick={() => router.push('/payments/new')}
+                  />
+                  <QuickActionButton
+                    icon={FolderOpen}
+                    label="Files"
+                    onClick={() => router.push('/family-files')}
+                  />
+                </div>
+              </section>
+
               {/* Family Files Summary */}
               {familyFilesWithData.length > 0 && (
                 <section>
@@ -972,86 +962,35 @@ function DashboardContent() {
                     </button>
                   </div>
                   <div className="space-y-3">
-                    {familyFilesWithData.slice(0, 2).map(({ familyFile, agreements }) => {
-                      // Determine the co-parent (the other parent)
-                      const coParent = user?.id === familyFile.parent_a_id
-                        ? familyFile.parent_b_info
-                        : familyFile.parent_a_info;
-                      const coParentName = coParent
-                        ? [coParent.first_name, coParent.last_name].filter(Boolean).join(' ')
-                        : null;
-
-                      // Children names
-                      const childrenNames = familyFile.children?.map(c => c.first_name).join(', ');
-
-                      // Active agreement
-                      const activeAgreement = agreements.find(a => a.status === 'active');
-                      const pendingCount = agreements.filter(a => a.status === 'pending_approval' || a.status === 'draft').length;
-
-                      return (
-                        <button
-                          key={familyFile.id}
-                          onClick={() => router.push(`/family-files/${familyFile.id}`)}
-                          className="group w-full bg-card rounded-2xl border-2 border-border p-5 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                              <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                                {familyFile.title}
-                              </p>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
-                          </div>
-                          <div className="mt-3 ml-16 space-y-1.5">
-                            {coParentName && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Users className="w-3.5 h-3.5 flex-shrink-0" />
-                                <span className="font-medium">Co-parent: <span className="text-foreground">{coParentName}</span></span>
-                              </div>
-                            )}
-                            {childrenNames && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Baby className="w-3.5 h-3.5 flex-shrink-0" />
-                                <span className="font-medium truncate">Children: <span className="text-foreground">{childrenNames}</span></span>
-                              </div>
-                            )}
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <FileText className="w-3.5 h-3.5 flex-shrink-0" />
-                              <span className="font-medium truncate">
-                                {activeAgreement ? (
-                                  <>Active: <span className="text-foreground">{activeAgreement.title}</span></>
-                                ) : pendingCount > 0 ? (
-                                  <span className="text-amber-600 dark:text-amber-400">{pendingCount} pending agreement{pendingCount > 1 ? 's' : ''}</span>
-                                ) : (
-                                  <span className="text-muted-foreground">No agreements</span>
-                                )}
-                              </span>
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
+                    {familyFilesWithData.slice(0, 2).map(({ familyFile }) => (
+                      <button
+                        key={familyFile.id}
+                        onClick={() => router.push(`/family-files/${familyFile.id}`)}
+                        className="group w-full bg-white rounded-2xl border-2 border-slate-200 p-5 flex items-center gap-4 text-left hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                      >
+                        <div className="w-12 h-12 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                          <FolderOpen className="w-6 h-6 text-[var(--portal-primary)]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                            {familyFile.title}
+                          </p>
+                          <p className="text-sm text-muted-foreground font-medium">
+                            {familyFile.children?.length || 0} children
+                          </p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
+                      </button>
+                    ))}
                   </div>
                 </section>
               )}
 
               {/* Recent Activity */}
               <section>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                    Recent Activity
-                  </h3>
-                  <button
-                    onClick={() => router.push('/activities')}
-                    className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#2D6A8F] transition-colors flex items-center gap-1"
-                  >
-                    View all
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
+                <h3 className="text-lg font-bold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  Recent Activity
+                </h3>
                 <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
                   <ActivityFeed
                     activities={dashboardSummary?.recent_activities || []}

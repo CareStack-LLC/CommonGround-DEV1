@@ -50,7 +50,7 @@ interface FamilyFile {
 }
 
 /**
- * KidSpace - Safe Child Communication
+ * KidComs - Safe Child Communication
  *
  * Design Philosophy: Playful yet secure
  * - Friendly, approachable interface for child communication
@@ -105,7 +105,7 @@ function KidComsContent() {
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <LockedFeatureCard
             feature="kidcoms_access"
-            title="KidSpace Video Calls"
+            title="KidComs Video Calls"
             description="Connect with your children through secure video calls with ARIA monitoring, circle management, and theater mode. Available with Complete subscription."
             icon={Video}
             requiredTier="complete"
@@ -130,7 +130,7 @@ function KidComsContent() {
   }
 
   function selectFamilyFile(id: string) {
-    router.push(`/family-files/${id}/kidcoms`);
+    router.push(`/kidcoms?case=${id}`);
   }
 
   async function loadData() {
@@ -159,7 +159,7 @@ function KidComsContent() {
       setSessions(sessionsData.items);
     } catch (err) {
       console.error('Error loading KidComs data:', err);
-      setError('Failed to load KidSpace data');
+      setError('Failed to load KidComs data');
     } finally {
       setIsLoading(false);
     }
@@ -238,24 +238,24 @@ function KidComsContent() {
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <Video className="h-10 w-10 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">KidSpace</h1>
+              <h1 className="text-3xl font-bold text-foreground mb-2">KidComs</h1>
               <p className="text-muted-foreground">Safe video calls with your circle</p>
             </header>
 
             {error && (
-              <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl max-w-2xl mx-auto">
-                <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                <p className="text-sm text-red-700 font-medium">{error}</p>
+              <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl max-w-2xl mx-auto">
+                <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                <p className="text-sm text-red-700 dark:text-red-300 font-medium">{error}</p>
               </div>
             )}
 
             {/* Select Family File */}
-            <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-8 text-center max-w-4xl mx-auto">
+            <div className="bg-card rounded-2xl border border-border shadow-sm p-8 text-center max-w-4xl mx-auto">
               <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 flex items-center justify-center mx-auto mb-6">
                 <FolderHeart className="h-12 w-12 text-[var(--portal-primary)]" />
               </div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Select a Family File</h2>
-              <p className="text-muted-foreground mb-8">Choose a family file to access KidSpace features</p>
+              <p className="text-muted-foreground mb-8">Choose a family file to access KidComs features</p>
 
               {isLoading ? (
                 <div className="flex justify-center py-8">
@@ -284,7 +284,7 @@ function KidComsContent() {
                       key={ff.id}
                       onClick={() => selectFamilyFile(ff.id)}
                       className="
-                        bg-card border-2 border-border rounded-2xl p-5 text-left
+                        bg-card border border-border rounded-2xl p-5 text-left
                         hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all
                         group
                       "
@@ -296,14 +296,14 @@ function KidComsContent() {
                         </div>
                         <span className={`px-2.5 py-1 text-xs rounded-full font-semibold ${
                           ff.status === 'active'
-                            ? 'bg-emerald-100 text-emerald-700'
+                            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
                             : 'bg-muted text-muted-foreground'
                         }`}>
                           {ff.status}
                         </span>
                       </div>
                       {ff.children && ff.children.length > 0 && (
-                        <div className="mt-4 flex items-center gap-2">
+                        <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
                           <Users className="h-4 w-4" />
                           <span className="font-medium">
                             {ff.children.length} {ff.children.length === 1 ? 'child' : 'children'}
@@ -331,7 +331,7 @@ function KidComsContent() {
               <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
           </div>
-          <p className="mt-6 text-muted-foreground font-medium">Loading KidSpace...</p>
+          <p className="mt-6 text-muted-foreground font-medium">Loading KidComs...</p>
         </div>
       </div>
     );
@@ -351,14 +351,14 @@ function KidComsContent() {
                 className="p-2 -ml-2 rounded-xl hover:bg-[var(--portal-primary)]/10 transition-colors"
                 aria-label="Go back"
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="h-5 w-5 text-muted-foreground" />
               </button>
               <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center shadow-md">
                 <Video className="h-5 w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">KidSpace</h1>
-                <p className="text-muted-foreground">Safe video calls with your circle</p>
+                <h1 className="text-3xl font-bold text-foreground">KidComs</h1>
+                <p className="text-sm text-muted-foreground">Safe video calls with your circle</p>
               </div>
             </div>
             <button
@@ -374,9 +374,9 @@ function KidComsContent() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl mb-6">
-            <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-            <p className="text-sm text-red-700 font-medium">{error}</p>
+          <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl mb-6">
+            <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <p className="text-sm text-red-700 dark:text-red-300 font-medium">{error}</p>
           </div>
         )}
 
@@ -385,7 +385,7 @@ function KidComsContent() {
           <div className="lg:col-span-1 space-y-6">
             {/* Child Selector */}
             {children.length > 0 && (
-              <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+              <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
                 <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
                   <Shield className="h-4 w-4 text-[var(--portal-primary)]" />
                   Select Child
@@ -399,7 +399,7 @@ function KidComsContent() {
                         w-full flex items-center gap-3 p-3 rounded-xl transition-all
                         ${selectedChild?.id === child.id
                           ? 'bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-secondary)]/10 border-2 border-[var(--portal-primary)]/40 shadow-sm'
-                          : 'bg-muted hover:bg-muted/80 border-2 border-transparent'
+                          : 'bg-muted/50 hover:bg-muted border-2 border-transparent'
                         }
                       `}
                     >
@@ -416,7 +416,7 @@ function KidComsContent() {
             )}
 
             {/* Quick Actions */}
-            <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+            <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
               <h3 className="text-sm font-semibold text-foreground mb-4">Quick Actions</h3>
               <div className="grid grid-cols-2 gap-3">
                 <button
@@ -466,7 +466,7 @@ function KidComsContent() {
 
           {/* Center Column - Circle Contacts */}
           <div className="lg:col-span-1">
-            <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+            <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-bold text-foreground">My Circle</h3>
                 <button
@@ -488,7 +488,7 @@ function KidComsContent() {
                     <Users className="h-10 w-10 text-[var(--portal-primary)]" />
                   </div>
                   <p className="font-semibold text-foreground mb-1">No circle contacts yet</p>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     Add trusted contacts to start video calls
                   </p>
                 </div>
@@ -497,7 +497,7 @@ function KidComsContent() {
                   {contacts.map((contact) => (
                     <div
                       key={contact.id}
-                      className="flex items-center justify-between p-3 bg-muted rounded-xl border border-border hover:border-[var(--portal-primary)]/20 transition-colors"
+                      className="flex items-center justify-between p-3 bg-muted/50 rounded-xl border border-border hover:border-[var(--portal-primary)]/20 transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center text-white font-bold shadow-sm">
@@ -537,7 +537,7 @@ function KidComsContent() {
 
           {/* Right Column - Recent Sessions */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+            <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
               <h3 className="text-lg font-bold text-foreground mb-4">Recent Sessions</h3>
 
               {sessions.length === 0 ? (
@@ -546,7 +546,7 @@ function KidComsContent() {
                     <Clock className="h-10 w-10 text-[var(--portal-primary)]" />
                   </div>
                   <p className="font-semibold text-foreground mb-1">No sessions yet</p>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     Start a video call to see it here
                   </p>
                 </div>
@@ -564,12 +564,12 @@ function KidComsContent() {
                         w-full flex items-center justify-between p-3 rounded-xl transition-all
                         ${session.status === 'active' || session.status === 'waiting'
                           ? 'bg-[var(--portal-primary)]/5 hover:bg-[var(--portal-primary)]/10 cursor-pointer border border-[var(--portal-primary)]/20'
-                          : 'bg-muted cursor-default border border-border'
+                          : 'bg-muted/50 cursor-default border border-border'
                         }
                       `}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                        <div className="p-2 bg-card rounded-lg shadow-sm">
                           {getSessionTypeIcon(session.session_type)}
                         </div>
                         <div className="text-left">
@@ -592,7 +592,7 @@ function KidComsContent() {
 
             {/* Feature Status */}
             {settings && (
-              <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
+              <div className="bg-card rounded-2xl border border-border shadow-sm p-5">
                 <h3 className="text-sm font-semibold text-foreground mb-4">Enabled Features</h3>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="flex items-center gap-2">
@@ -631,7 +631,7 @@ export default function KidComsPage() {
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[var(--portal-secondary)] flex items-center justify-center shadow-lg">
               <Sparkles className="h-10 w-10 text-white animate-pulse" />
             </div>
-            <p className="mt-6 text-muted-foreground font-medium">Loading KidSpace...</p>
+            <p className="mt-6 text-muted-foreground font-medium">Loading KidComs...</p>
           </div>
         </div>
       }>
