@@ -6,6 +6,8 @@ Handles automatic extraction and creation when a SharedCare Agreement is activat
 2. Create recurring CustodyExchange records from parenting time
 3. Store expense split ratio on FamilyFile
 4. Set default exchange location
+5. Create ScheduleEvents for calendar visibility (exchanges, holidays, activities)
+6. Store communication preferences on FamilyFile
 
 This service is called when both parents approve and the agreement status
 changes to "active".
@@ -20,12 +22,13 @@ from typing import Optional, List, Dict, Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from dateutil.rrule import rrule, WEEKLY, MONTHLY
+from dateutil.rrule import rrule, WEEKLY, MONTHLY, YEARLY
 from dateutil.relativedelta import relativedelta
 
 from app.models.agreement import Agreement, AgreementSection
 from app.models.family_file import FamilyFile
 from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
+from app.models.schedule import ScheduleEvent
 from app.models.child import Child
 from app.models.clearfund import Obligation, ObligationFunding
 from app.schemas.parenting_schedule import (
@@ -33,6 +36,9 @@ from app.schemas.parenting_schedule import (
     LogisticsData,
     ExpenseData,
     ChildSupportData,
+    HolidayScheduleData,
+    RecurringActivityData,
+    CommunicationPreferencesData,
     ActivationResult,
     SCHEDULE_PATTERN_MAPPING,
     parse_split_ratio,
@@ -190,6 +196,67 @@ class AgreementActivationService:
                 logger.error(f"Failed to create recurring expense templates for agreement {agreement.id}: {e}")
                 result.errors.append(f"Failed to create recurring expense templates: {str(e)}")
 
+        # Step 5: Create ScheduleEvents for calendar visibility of exchanges
+        if parenting_data and child_ids:
+            try:
+                events_count = await self._create_exchange_schedule_events(
+                    family_file=family_file,
+                    agreement=agreement,
+                    parenting_data=parenting_data,
+                    logistics_data=logistics_data,
+                    child_ids=child_ids,
+                    created_by=activated_by
+                )
+                result.schedule_events_created = events_count
+                logger.info(f"Created {events_count} exchange schedule events for agreement {agreement.id}")
+            except Exception as e:
+                logger.error(f"Failed to create exchange schedule events for agreement {agreement.id}: {e}")
+                result.errors.append(f"Failed to create exchange schedule events: {str(e)}")
+
+        # Step 6: Create holiday ScheduleEvents
+        try:
+            holiday_count = await self._create_holiday_events(
+                agreement=agreement,
+                family_file=family_file,
+                child_ids=child_ids,
+                created_by=activated_by
+            )
+            result.holiday_events_created = holiday_count
+            if holiday_count > 0:
+                logger.info(f"Created {holiday_count} holiday events for agreement {agreement.id}")
+        except Exception as e:
+            logger.error(f"Failed to create holiday events for agreement {agreement.id}: {e}")
+            result.errors.append(f"Failed to create holiday events: {str(e)}")
+
+        # Step 7: Create recurring activity ScheduleEvents + optional Obligations
+        try:
+            activity_count = await self._create_activity_events(
+                agreement=agreement,
+                family_file=family_file,
+                expense_data=expense_data,
+                child_ids=child_ids,
+                created_by=activated_by
+            )
+            result.activity_events_created = activity_count
+            if activity_count > 0:
+                logger.info(f"Created {activity_count} activity events for agreement {agreement.id}")
+        except Exception as e:
+            logger.error(f"Failed to create activity events for agreement {agreement.id}: {e}")
+            result.errors.append(f"Failed to create activity events: {str(e)}")
+
+        # Step 8: Store communication preferences on FamilyFile
+        try:
+            prefs_set = await self._store_communication_preferences(
+                agreement=agreement,
+                family_file=family_file
+            )
+            result.communication_prefs_set = prefs_set
+            if prefs_set:
+                logger.info(f"Stored communication preferences for agreement {agreement.id}")
+        except Exception as e:
+            logger.error(f"Failed to store communication preferences for agreement {agreement.id}: {e}")
+            result.errors.append(f"Failed to store communication preferences: {str(e)}")
+
         await self.db.commit()
         return result
 
@@ -214,6 +281,11 @@ class AgreementActivationService:
         family_file = await self._get_family_file(agreement)
         children = await self._get_children(family_file.id) if family_file else []
 
+        # Extract holiday and activity data
+        holidays = await self._extract_holiday_schedule(agreement)
+        activities = await self._extract_recurring_activities(agreement)
+        comm_prefs = await self._extract_communication_preferences(agreement)
+
         preview = {
             "parenting_schedule": parenting_data.model_dump() if parenting_data else None,
             "logistics": logistics_data.model_dump() if logistics_data else None,
@@ -226,6 +298,13 @@ class AgreementActivationService:
             ),
             "children_count": len(children),
             "exchange_pattern_info": None,
+            # New preview fields
+            "holiday_schedule": [h.model_dump() for h in holidays],
+            "holiday_events_count": len(holidays),
+            "recurring_activities": [a.model_dump() for a in activities],
+            "activity_events_count": len(activities),
+            "will_store_communication_prefs": comm_prefs is not None,
+            "communication_preferences": comm_prefs.model_dump() if comm_prefs else None,
         }
 
         # Add exchange pattern details
@@ -740,6 +819,511 @@ class AgreementActivationService:
         """Store default exchange location on family file."""
         family_file.default_exchange_location = logistics_data.exchange_location_address
         family_file.default_exchange_location_type = logistics_data.exchange_location
+
+    # =========================================================================
+    # Private Methods - ScheduleEvent Creation (Calendar Visibility)
+    # =========================================================================
+
+    async def _create_exchange_schedule_events(
+        self,
+        family_file: FamilyFile,
+        agreement: Agreement,
+        parenting_data: ParentingTimeData,
+        logistics_data: Optional[LogisticsData],
+        child_ids: List[str],
+        created_by: str
+    ) -> int:
+        """
+        Create ScheduleEvents for custody exchanges so they appear on the calendar.
+
+        Each exchange gets a corresponding calendar event for visibility.
+        The CustodyExchange handles tracking; the ScheduleEvent handles display.
+        """
+        events_created = 0
+        pattern = parenting_data.schedule_pattern
+        pattern_info = SCHEDULE_PATTERN_MAPPING.get(pattern, {})
+
+        # Parse times
+        hour, minute = parse_transition_time(parenting_data.transition_time)
+        now = datetime.utcnow()
+
+        # Get exchange location
+        location = None
+        if logistics_data:
+            location = logistics_data.exchange_location_address or logistics_data.exchange_location
+
+        # Determine exchange days based on pattern
+        if pattern == "2-2-3":
+            exchange_days = ["Monday", "Wednesday", "Friday"]
+        elif pattern == "every_other_weekend":
+            exchange_days = ["Friday", "Sunday"]
+        else:
+            exchange_days = [parenting_data.transition_day]
+
+        for day_name in exchange_days:
+            day_num = get_day_number(day_name)
+            days_until = (day_num - now.weekday()) % 7
+            if days_until == 0:
+                days_until = 7
+            first_date = now + timedelta(days=days_until)
+            start_time = first_date.replace(hour=hour, minute=minute, second=0, microsecond=0)
+            end_time = start_time + timedelta(minutes=30)
+
+            # Determine recurrence
+            recurrence_pattern_str = pattern_info.get("recurrence_pattern", "weekly")
+            if recurrence_pattern_str == "custom":
+                recurrence_pattern_str = "weekly"
+
+            event = ScheduleEvent(
+                id=str(uuid.uuid4()),
+                family_file_id=family_file.id,
+                created_by=created_by,
+                event_type="regular",
+                event_category="exchange",
+                start_time=start_time,
+                end_time=end_time,
+                all_day=False,
+                custodial_parent_id=family_file.parent_a_id,
+                child_ids=child_ids,
+                title=f"{day_name} Custody Exchange",
+                description=f"Custody exchange per SharedCare Agreement. Schedule: {pattern_info.get('description', pattern)}",
+                location=location,
+                visibility="co_parent",
+                location_shared=True,
+                is_exchange=True,
+                exchange_location=location,
+                agreement_id=agreement.id,
+                is_agreement_derived=True,
+                status="scheduled",
+            )
+            self.db.add(event)
+            events_created += 1
+
+        await self.db.flush()
+        return events_created
+
+    async def _extract_holiday_schedule(self, agreement: Agreement) -> List[HolidayScheduleData]:
+        """Extract holiday schedule from parenting_time section structured_data."""
+        result = await self.db.execute(
+            select(AgreementSection).where(
+                AgreementSection.agreement_id == agreement.id
+            )
+        )
+        sections = result.scalars().all()
+        holidays = []
+
+        for section in sections:
+            section_title_lower = (section.section_title or "").lower()
+            section_type = section.section_type or ""
+
+            if "parenting" in section_title_lower or section_type == "parenting_time":
+                if section.structured_data:
+                    holiday_list = section.structured_data.get("holiday_schedule", [])
+                    if isinstance(holiday_list, list):
+                        for h in holiday_list:
+                            try:
+                                holidays.append(HolidayScheduleData(
+                                    holiday_name=h.get("holiday_name", "Holiday"),
+                                    arrangement=h.get("arrangement", "alternate_yearly"),
+                                    start_time=h.get("start_time"),
+                                    end_time=h.get("end_time"),
+                                    notes=h.get("notes"),
+                                ))
+                            except Exception as e:
+                                logger.warning(f"Failed to parse holiday data: {e}")
+
+        return holidays
+
+    async def _create_holiday_events(
+        self,
+        agreement: Agreement,
+        family_file: FamilyFile,
+        child_ids: List[str],
+        created_by: str
+    ) -> int:
+        """
+        Create yearly recurring ScheduleEvents for each holiday in the agreement.
+
+        Maps well-known holidays to approximate dates and creates events
+        with arrangement details in the description.
+        """
+        holidays = await self._extract_holiday_schedule(agreement)
+        if not holidays:
+            return 0
+
+        events_created = 0
+        now = datetime.utcnow()
+        current_year = now.year
+
+        for holiday in holidays:
+            # Get approximate date for this holiday
+            holiday_date = self._get_holiday_date(holiday.holiday_name, current_year)
+            if not holiday_date:
+                # Unknown holiday, skip but log
+                logger.info(f"Unknown holiday '{holiday.holiday_name}', creating event on Jan 1 as placeholder")
+                holiday_date = datetime(current_year, 1, 1, 9, 0)
+
+            # If the holiday already passed this year, use next year
+            if holiday_date < now:
+                holiday_date = self._get_holiday_date(holiday.holiday_name, current_year + 1)
+                if not holiday_date:
+                    holiday_date = datetime(current_year + 1, 1, 1, 9, 0)
+
+            # Build description based on arrangement
+            arrangement_desc = self._describe_arrangement(holiday.arrangement)
+            description = f"Holiday custody arrangement: {arrangement_desc}"
+            if holiday.notes:
+                description += f"\nNotes: {holiday.notes}"
+            description += f"\n\nFrom SharedCare Agreement"
+
+            # Create the schedule event
+            end_time = holiday_date + timedelta(hours=12)  # Default 12-hour event
+
+            event = ScheduleEvent(
+                id=str(uuid.uuid4()),
+                family_file_id=family_file.id,
+                created_by=created_by,
+                event_type="holiday",
+                event_category="exchange",
+                start_time=holiday_date,
+                end_time=end_time,
+                all_day=True,
+                custodial_parent_id=family_file.parent_a_id,
+                child_ids=child_ids,
+                title=f"{holiday.holiday_name}",
+                description=description,
+                visibility="co_parent",
+                location_shared=False,
+                is_exchange=False,
+                agreement_id=agreement.id,
+                is_agreement_derived=True,
+                status="scheduled",
+            )
+            self.db.add(event)
+            events_created += 1
+
+        await self.db.flush()
+        return events_created
+
+    def _get_holiday_date(self, holiday_name: str, year: int) -> Optional[datetime]:
+        """
+        Get approximate date for a well-known holiday.
+
+        Returns datetime for the given year, or None if unrecognized.
+        """
+        name = holiday_name.lower().strip()
+
+        # Fixed-date holidays
+        if "new year" in name:
+            return datetime(year, 1, 1, 9, 0)
+        elif "valentine" in name:
+            return datetime(year, 2, 14, 9, 0)
+        elif "easter" in name:
+            # Approximate Easter (usually late March / April)
+            return datetime(year, 4, 1, 9, 0)
+        elif "mother" in name:
+            # Second Sunday of May (approximate)
+            return datetime(year, 5, 10, 9, 0)
+        elif "memorial" in name:
+            # Last Monday of May (approximate)
+            return datetime(year, 5, 27, 9, 0)
+        elif "father" in name:
+            # Third Sunday of June (approximate)
+            return datetime(year, 6, 17, 9, 0)
+        elif "fourth" in name or "july" in name or "independence" in name:
+            return datetime(year, 7, 4, 9, 0)
+        elif "labor" in name:
+            # First Monday of September (approximate)
+            return datetime(year, 9, 2, 9, 0)
+        elif "halloween" in name:
+            return datetime(year, 10, 31, 17, 0)
+        elif "thanksgiving" in name:
+            # Fourth Thursday of November (approximate)
+            return datetime(year, 11, 25, 9, 0)
+        elif "christmas eve" in name:
+            return datetime(year, 12, 24, 17, 0)
+        elif "christmas" in name:
+            return datetime(year, 12, 25, 9, 0)
+        elif "spring break" in name:
+            # Approximate: mid-March
+            return datetime(year, 3, 15, 9, 0)
+        elif "summer" in name:
+            # Summer break: June 1
+            return datetime(year, 6, 1, 9, 0)
+        elif "winter break" in name:
+            return datetime(year, 12, 20, 9, 0)
+        elif "birthday" in name:
+            # Can't determine birthday date without more info
+            return None
+
+        return None
+
+    def _describe_arrangement(self, arrangement: str) -> str:
+        """Convert arrangement code to human-readable description."""
+        mapping = {
+            "alternate_yearly": "Alternates each year between parents",
+            "parent_a_even_years": "Parent A has even years, Parent B has odd years",
+            "parent_b_even_years": "Parent B has even years, Parent A has odd years",
+            "split_day": "Day is split between both parents",
+            "always_parent_a": "Always with Parent A",
+            "always_parent_b": "Always with Parent B",
+        }
+        return mapping.get(arrangement, arrangement)
+
+    async def _extract_recurring_activities(self, agreement: Agreement) -> List[RecurringActivityData]:
+        """Extract recurring activities from agreement sections."""
+        result = await self.db.execute(
+            select(AgreementSection).where(
+                AgreementSection.agreement_id == agreement.id
+            )
+        )
+        sections = result.scalars().all()
+        activities = []
+
+        for section in sections:
+            if not section.structured_data:
+                continue
+
+            # Check for recurring_activities in any section
+            activity_list = section.structured_data.get("recurring_activities", [])
+            if isinstance(activity_list, list):
+                for a in activity_list:
+                    try:
+                        activities.append(RecurringActivityData(
+                            activity_name=a.get("activity_name", "Activity"),
+                            child_name=a.get("child_name"),
+                            day_of_week=a.get("day_of_week", "Monday"),
+                            time=a.get("time", "4:00 PM"),
+                            end_time=a.get("end_time"),
+                            location=a.get("location"),
+                            responsible_parent=a.get("responsible_parent", "during_own_time"),
+                            cost_per_session=a.get("cost_per_session"),
+                            cost_frequency=a.get("cost_frequency"),
+                        ))
+                    except Exception as e:
+                        logger.warning(f"Failed to parse activity data: {e}")
+
+        return activities
+
+    async def _create_activity_events(
+        self,
+        agreement: Agreement,
+        family_file: FamilyFile,
+        expense_data: Optional[ExpenseData],
+        child_ids: List[str],
+        created_by: str
+    ) -> int:
+        """
+        Create weekly recurring ScheduleEvents for each activity.
+
+        Also creates Obligations if the activity has associated costs.
+        """
+        activities = await self._extract_recurring_activities(agreement)
+        if not activities:
+            return 0
+
+        events_created = 0
+        now = datetime.utcnow()
+
+        # Get split ratio for cost obligations
+        petitioner_percentage = 50
+        if expense_data and expense_data.split_ratio:
+            petitioner_percentage, _ = parse_split_ratio(expense_data.split_ratio)
+
+        for activity in activities:
+            # Calculate first occurrence
+            day_num = get_day_number(activity.day_of_week)
+            days_until = (day_num - now.weekday()) % 7
+            if days_until == 0:
+                days_until = 7
+            first_date = now + timedelta(days=days_until)
+
+            # Parse times
+            hour, minute = parse_transition_time(activity.time)
+            start_time = first_date.replace(hour=hour, minute=minute, second=0, microsecond=0)
+
+            if activity.end_time:
+                end_hour, end_minute = parse_transition_time(activity.end_time)
+                end_time = first_date.replace(hour=end_hour, minute=end_minute, second=0, microsecond=0)
+            else:
+                end_time = start_time + timedelta(hours=1)
+
+            # Map activity to category
+            category = self._map_activity_category(activity.activity_name)
+
+            # Build description
+            description = f"Recurring activity from SharedCare Agreement"
+            if activity.child_name:
+                description += f"\nChild: {activity.child_name}"
+            if activity.responsible_parent and activity.responsible_parent != "during_own_time":
+                description += f"\nResponsible: {activity.responsible_parent}"
+            if activity.cost_per_session:
+                description += f"\nCost: ${activity.cost_per_session}/{activity.cost_frequency or 'session'}"
+
+            event = ScheduleEvent(
+                id=str(uuid.uuid4()),
+                family_file_id=family_file.id,
+                created_by=created_by,
+                event_type="regular",
+                event_category=category,
+                start_time=start_time,
+                end_time=end_time,
+                all_day=False,
+                custodial_parent_id=family_file.parent_a_id,
+                child_ids=child_ids,
+                title=activity.activity_name,
+                description=description,
+                location=activity.location,
+                visibility="co_parent",
+                location_shared=True if activity.location else False,
+                is_exchange=False,
+                agreement_id=agreement.id,
+                is_agreement_derived=True,
+                status="scheduled",
+            )
+            self.db.add(event)
+            events_created += 1
+
+            # Create obligation if activity has costs
+            if activity.cost_per_session and activity.cost_per_session > 0:
+                try:
+                    await self._create_activity_obligation(
+                        family_file=family_file,
+                        agreement=agreement,
+                        activity=activity,
+                        child_ids=child_ids,
+                        petitioner_percentage=petitioner_percentage,
+                        created_by=created_by
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to create obligation for activity {activity.activity_name}: {e}")
+
+        await self.db.flush()
+        return events_created
+
+    def _map_activity_category(self, activity_name: str) -> str:
+        """Map activity name to ScheduleEvent category."""
+        name = activity_name.lower()
+        if any(kw in name for kw in ["soccer", "basketball", "football", "baseball", "swim", "sport", "gym", "tennis", "dance", "cheer"]):
+            return "sports"
+        elif any(kw in name for kw in ["therapy", "counseling", "doctor", "dentist", "medical", "psych"]):
+            return "medical"
+        elif any(kw in name for kw in ["tutor", "school", "homework", "class", "lesson", "music", "band", "piano", "violin", "art"]):
+            return "school"
+        return "general"
+
+    async def _create_activity_obligation(
+        self,
+        family_file: FamilyFile,
+        agreement: Agreement,
+        activity: RecurringActivityData,
+        child_ids: List[str],
+        petitioner_percentage: int,
+        created_by: str
+    ) -> None:
+        """Create a recurring expense obligation for an activity with costs."""
+        amount = Decimal(str(activity.cost_per_session))
+        petitioner_share = amount * Decimal(petitioner_percentage) / 100
+        respondent_share = amount - petitioner_share
+
+        # Map cost frequency to recurrence
+        freq_map = {
+            "per_session": "weekly",
+            "monthly": "monthly",
+            "semester": "monthly",  # Approximate
+            "annual": "monthly",    # Will be divided
+        }
+        frequency = freq_map.get(activity.cost_frequency or "per_session", "monthly")
+        recurrence_rule = self._build_recurrence_rule(frequency=frequency, due_day=1)
+
+        # Map to obligation category
+        category = self._map_activity_category(activity.activity_name)
+        purpose = "extracurricular" if category in ("sports", "general") else category
+
+        template = Obligation(
+            id=str(uuid.uuid4()),
+            family_file_id=family_file.id,
+            agreement_id=agreement.id,
+            source_type="agreement",
+            source_id=agreement.id,
+            purpose_category=purpose,
+            title=f"{activity.activity_name} - {frequency.capitalize()}",
+            description=f"Recurring expense for {activity.activity_name}. From SharedCare Agreement.",
+            child_ids=child_ids,
+            total_amount=amount,
+            petitioner_share=petitioner_share,
+            respondent_share=respondent_share,
+            petitioner_percentage=petitioner_percentage,
+            split_from_agreement=True,
+            status="template",
+            is_recurring=True,
+            recurrence_rule=recurrence_rule,
+            verification_required=True,
+            receipt_required=True,
+            created_by=created_by,
+        )
+        self.db.add(template)
+        await self.db.flush()
+
+    async def _extract_communication_preferences(self, agreement: Agreement) -> Optional[CommunicationPreferencesData]:
+        """Extract communication preferences from decision_communication section."""
+        result = await self.db.execute(
+            select(AgreementSection).where(
+                AgreementSection.agreement_id == agreement.id
+            )
+        )
+        sections = result.scalars().all()
+
+        for section in sections:
+            section_title_lower = (section.section_title or "").lower()
+            section_type = section.section_type or ""
+
+            if "decision" in section_title_lower or "communication" in section_title_lower or section_type == "decision_communication":
+                if section.structured_data:
+                    data = section.structured_data
+                    try:
+                        return CommunicationPreferencesData(
+                            communication_platform=data.get("communication_platform", "commonground"),
+                            response_timeframe=data.get("response_timeframe", "24_hours"),
+                            emergency_contact_order=data.get("emergency_contact_order"),
+                            major_decision_authority=data.get("major_decision_authority", "joint"),
+                            decision_categories=data.get("decision_categories"),
+                        )
+                    except Exception as e:
+                        logger.warning(f"Failed to parse communication preferences: {e}")
+
+        return None
+
+    async def _store_communication_preferences(
+        self,
+        agreement: Agreement,
+        family_file: FamilyFile
+    ) -> bool:
+        """
+        Extract communication preferences from agreement and store on FamilyFile.
+
+        Returns True if preferences were stored, False otherwise.
+        """
+        prefs = await self._extract_communication_preferences(agreement)
+        if not prefs:
+            return False
+
+        family_file.agreement_communication_platform = prefs.communication_platform
+        family_file.agreement_response_timeframe = prefs.response_timeframe
+
+        # Build decision authority JSON
+        decision_authority = {}
+        if prefs.major_decision_authority:
+            decision_authority["major"] = prefs.major_decision_authority
+        if prefs.decision_categories:
+            decision_authority.update(prefs.decision_categories)
+        if prefs.emergency_contact_order:
+            decision_authority["emergency_contact_order"] = prefs.emergency_contact_order
+
+        if decision_authority:
+            family_file.agreement_decision_authority = decision_authority
+
+        return True
 
     async def _extract_child_support(self, agreement: Agreement) -> Optional[ChildSupportData]:
         """

@@ -1198,6 +1198,20 @@ export const agreementsAPI = {
   },
 
   /**
+   * Get activation summary (what was auto-created when agreement was activated)
+   */
+  async getActivationSummary(agreementId: string): Promise<any> {
+    return fetchAPI<any>(`/agreements/${agreementId}/activation-summary`);
+  },
+
+  /**
+   * Get compliance/adherence metrics for an active agreement
+   */
+  async getCompliance(agreementId: string): Promise<any> {
+    return fetchAPI<any>(`/agreements/${agreementId}/compliance`);
+  },
+
+  /**
    * Delete agreement (only if draft)
    */
   async delete(agreementId: string): Promise<void> {

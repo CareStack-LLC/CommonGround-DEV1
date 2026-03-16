@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
-import { CheckCircle2, Circle, ChevronRight, ChevronLeft, Info, Lightbulb, ArrowLeft, FileText, MessageCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Circle, ChevronRight, ChevronLeft, Info, Lightbulb, ArrowLeft, FileText, MessageCircle, AlertCircle, Plus, Trash2 } from 'lucide-react';
 
 // V2 Section Types - 7 sections for standard, 5 for lite
 type SectionKeyV2 =
@@ -951,6 +951,282 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
             className="mt-2 border-2 border-border rounded-xl focus:border-[var(--portal-primary)] focus:ring-[var(--portal-primary)]"
           />
         </div>
+      </div>
+
+      {/* Holiday Schedule */}
+      <div className="border-t-2 border-border pt-6 mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <Label className="font-bold text-base">Holiday Schedule</Label>
+            <p className="text-sm text-muted-foreground mt-1">How will major holidays be handled?</p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const holidays = [...(data.holiday_schedule || []), { holiday_name: '', arrangement: 'alternate_yearly', start_time: '', end_time: '', notes: '' }];
+              onChange('holiday_schedule', holidays);
+            }}
+            className="border-2 border-amber-200 hover:border-amber-400 text-amber-700 bg-amber-50"
+          >
+            <Plus className="w-4 h-4 mr-1" /> Add Holiday
+          </Button>
+        </div>
+        {(data.holiday_schedule || []).map((holiday: any, idx: number) => (
+          <div key={idx} className="p-4 rounded-xl border-2 border-border bg-card mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-muted-foreground">Holiday {idx + 1}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  const holidays = [...(data.holiday_schedule || [])];
+                  holidays.splice(idx, 1);
+                  onChange('holiday_schedule', holidays);
+                }}
+                className="text-red-400 hover:text-red-600 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-medium">Holiday name</Label>
+                <select
+                  value={holiday.holiday_name || ''}
+                  onChange={(e) => {
+                    const holidays = [...(data.holiday_schedule || [])];
+                    holidays[idx] = { ...holidays[idx], holiday_name: e.target.value };
+                    onChange('holiday_schedule', holidays);
+                  }}
+                  className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:border-[var(--portal-primary)] focus:outline-none"
+                >
+                  <option value="">Select holiday...</option>
+                  <option value="Thanksgiving">Thanksgiving</option>
+                  <option value="Christmas">Christmas</option>
+                  <option value="Christmas Eve">Christmas Eve</option>
+                  <option value="New Year">New Year</option>
+                  <option value="Easter">Easter</option>
+                  <option value="Spring Break">Spring Break</option>
+                  <option value="Summer Break">Summer Break</option>
+                  <option value="Fourth of July">Fourth of July</option>
+                  <option value="Labor Day">Labor Day</option>
+                  <option value="Memorial Day">Memorial Day</option>
+                  <option value="Halloween">Halloween</option>
+                  <option value="Mother's Day">Mother&apos;s Day</option>
+                  <option value="Father's Day">Father&apos;s Day</option>
+                  <option value="Winter Break">Winter Break</option>
+                </select>
+              </div>
+              <div>
+                <Label className="text-xs font-medium">Arrangement</Label>
+                <select
+                  value={holiday.arrangement || 'alternate_yearly'}
+                  onChange={(e) => {
+                    const holidays = [...(data.holiday_schedule || [])];
+                    holidays[idx] = { ...holidays[idx], arrangement: e.target.value };
+                    onChange('holiday_schedule', holidays);
+                  }}
+                  className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:border-[var(--portal-primary)] focus:outline-none"
+                >
+                  <option value="alternate_yearly">Alternate yearly</option>
+                  <option value="parent_a_even_years">I get even years</option>
+                  <option value="parent_b_even_years">Other parent gets even years</option>
+                  <option value="split_day">Split the day</option>
+                  <option value="always_parent_a">Always with me</option>
+                  <option value="always_parent_b">Always with other parent</option>
+                </select>
+              </div>
+            </div>
+            <div className="mt-2">
+              <Label className="text-xs font-medium">Notes (optional)</Label>
+              <Input
+                value={holiday.notes || ''}
+                placeholder="e.g., Pickup at 6 PM day before"
+                onChange={(e) => {
+                  const holidays = [...(data.holiday_schedule || [])];
+                  holidays[idx] = { ...holidays[idx], notes: e.target.value };
+                  onChange('holiday_schedule', holidays);
+                }}
+                className="mt-1 border border-border rounded-lg text-sm"
+              />
+            </div>
+          </div>
+        ))}
+        {(!data.holiday_schedule || data.holiday_schedule.length === 0) && (
+          <p className="text-sm text-muted-foreground italic">No holidays added yet. Click &quot;Add Holiday&quot; to specify holiday arrangements.</p>
+        )}
+      </div>
+
+      {/* Recurring Activities */}
+      <div className="border-t-2 border-border pt-6 mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <Label className="font-bold text-base">Recurring Activities</Label>
+            <p className="text-sm text-muted-foreground mt-1">Regular activities like sports, lessons, or therapy</p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const activities = [...(data.recurring_activities || []), { activity_name: '', day_of_week: '', time: '', end_time: '', location: '', responsible_parent: 'during_own_time', cost_per_session: '', cost_frequency: '' }];
+              onChange('recurring_activities', activities);
+            }}
+            className="border-2 border-amber-200 hover:border-amber-400 text-amber-700 bg-amber-50"
+          >
+            <Plus className="w-4 h-4 mr-1" /> Add Activity
+          </Button>
+        </div>
+        {(data.recurring_activities || []).map((activity: any, idx: number) => (
+          <div key={idx} className="p-4 rounded-xl border-2 border-border bg-card mb-3">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-muted-foreground">Activity {idx + 1}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  const activities = [...(data.recurring_activities || [])];
+                  activities.splice(idx, 1);
+                  onChange('recurring_activities', activities);
+                }}
+                className="text-red-400 hover:text-red-600 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-medium">Activity name</Label>
+                <Input
+                  value={activity.activity_name || ''}
+                  placeholder="e.g., Soccer practice"
+                  onChange={(e) => {
+                    const activities = [...(data.recurring_activities || [])];
+                    activities[idx] = { ...activities[idx], activity_name: e.target.value };
+                    onChange('recurring_activities', activities);
+                  }}
+                  className="mt-1 border border-border rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-medium">Day of week</Label>
+                <select
+                  value={activity.day_of_week || ''}
+                  onChange={(e) => {
+                    const activities = [...(data.recurring_activities || [])];
+                    activities[idx] = { ...activities[idx], day_of_week: e.target.value };
+                    onChange('recurring_activities', activities);
+                  }}
+                  className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:border-[var(--portal-primary)] focus:outline-none"
+                >
+                  <option value="">Select day...</option>
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                  <option value="Sunday">Sunday</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3 mt-2">
+              <div>
+                <Label className="text-xs font-medium">Start time</Label>
+                <Input
+                  type="time"
+                  value={activity.time || ''}
+                  onChange={(e) => {
+                    const activities = [...(data.recurring_activities || [])];
+                    activities[idx] = { ...activities[idx], time: e.target.value };
+                    onChange('recurring_activities', activities);
+                  }}
+                  className="mt-1 border border-border rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-medium">End time</Label>
+                <Input
+                  type="time"
+                  value={activity.end_time || ''}
+                  onChange={(e) => {
+                    const activities = [...(data.recurring_activities || [])];
+                    activities[idx] = { ...activities[idx], end_time: e.target.value };
+                    onChange('recurring_activities', activities);
+                  }}
+                  className="mt-1 border border-border rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-medium">Who takes them?</Label>
+                <select
+                  value={activity.responsible_parent || 'during_own_time'}
+                  onChange={(e) => {
+                    const activities = [...(data.recurring_activities || [])];
+                    activities[idx] = { ...activities[idx], responsible_parent: e.target.value };
+                    onChange('recurring_activities', activities);
+                  }}
+                  className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:border-[var(--portal-primary)] focus:outline-none"
+                >
+                  <option value="during_own_time">Whoever has them</option>
+                  <option value="parent_a">I always take them</option>
+                  <option value="parent_b">Other parent always takes them</option>
+                  <option value="alternating">We alternate</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3 mt-2">
+              <div>
+                <Label className="text-xs font-medium">Location (optional)</Label>
+                <Input
+                  value={activity.location || ''}
+                  placeholder="e.g., Lincoln Elementary"
+                  onChange={(e) => {
+                    const activities = [...(data.recurring_activities || [])];
+                    activities[idx] = { ...activities[idx], location: e.target.value };
+                    onChange('recurring_activities', activities);
+                  }}
+                  className="mt-1 border border-border rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-medium">Cost per session ($)</Label>
+                <Input
+                  type="number"
+                  value={activity.cost_per_session || ''}
+                  placeholder="0"
+                  onChange={(e) => {
+                    const activities = [...(data.recurring_activities || [])];
+                    activities[idx] = { ...activities[idx], cost_per_session: e.target.value ? parseFloat(e.target.value) : '' };
+                    onChange('recurring_activities', activities);
+                  }}
+                  className="mt-1 border border-border rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-medium">Cost frequency</Label>
+                <select
+                  value={activity.cost_frequency || ''}
+                  onChange={(e) => {
+                    const activities = [...(data.recurring_activities || [])];
+                    activities[idx] = { ...activities[idx], cost_frequency: e.target.value };
+                    onChange('recurring_activities', activities);
+                  }}
+                  className="mt-1 w-full rounded-lg border border-border bg-card px-3 py-2 text-sm focus:border-[var(--portal-primary)] focus:outline-none"
+                >
+                  <option value="">Select...</option>
+                  <option value="per_session">Per session</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="semester">Per semester</option>
+                  <option value="annual">Annual</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        ))}
+        {(!data.recurring_activities || data.recurring_activities.length === 0) && (
+          <p className="text-sm text-muted-foreground italic">No activities added yet. Click &quot;Add Activity&quot; for sports, lessons, therapy, etc.</p>
+        )}
       </div>
     </div>
   );

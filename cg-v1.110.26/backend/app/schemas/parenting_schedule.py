@@ -199,6 +199,104 @@ class ChildSupportData(BaseModel):
     )
 
 
+class HolidayScheduleData(BaseModel):
+    """
+    Structured data for a holiday custody arrangement.
+
+    Extracted from the holiday_schedule array in parenting_time section.
+    Used to create yearly recurring ScheduleEvents.
+    """
+    holiday_name: str = Field(
+        description="Holiday name (e.g., Thanksgiving, Christmas, Spring Break)"
+    )
+    arrangement: str = Field(
+        description="How the holiday is handled (alternate_yearly, parent_a_even_years, parent_b_even_years, split_day, always_parent_a, always_parent_b)"
+    )
+    start_time: Optional[str] = Field(
+        None,
+        description="When holiday custody starts (e.g., '6:00 PM day before', 'morning of')"
+    )
+    end_time: Optional[str] = Field(
+        None,
+        description="When holiday custody ends (e.g., '6:00 PM', 'morning after')"
+    )
+    notes: Optional[str] = Field(
+        None,
+        description="Special details about this holiday arrangement"
+    )
+
+
+class RecurringActivityData(BaseModel):
+    """
+    Structured data for a recurring child activity.
+
+    Extracted from the recurring_activities section.
+    Used to create weekly ScheduleEvents and optional Obligations for costs.
+    """
+    activity_name: str = Field(
+        description="Activity name (e.g., Band practice, Soccer, Tutoring)"
+    )
+    child_name: Optional[str] = Field(
+        None,
+        description="Which child this applies to (all children if omitted)"
+    )
+    day_of_week: str = Field(
+        description="Day of week (Monday, Tuesday, etc.)"
+    )
+    time: str = Field(
+        description="Start time (e.g., '4:00 PM')"
+    )
+    end_time: Optional[str] = Field(
+        None,
+        description="End time (e.g., '5:30 PM')"
+    )
+    location: Optional[str] = Field(
+        None,
+        description="Where the activity takes place"
+    )
+    responsible_parent: Optional[str] = Field(
+        "during_own_time",
+        description="Who handles this activity (parent_a, parent_b, alternating, during_own_time)"
+    )
+    cost_per_session: Optional[float] = Field(
+        None,
+        description="Cost per session in dollars"
+    )
+    cost_frequency: Optional[str] = Field(
+        None,
+        description="How often cost applies (per_session, monthly, semester, annual)"
+    )
+
+
+class CommunicationPreferencesData(BaseModel):
+    """
+    Structured data for communication and decision-making preferences.
+
+    Extracted from decision_communication section.
+    Stored on FamilyFile for platform-wide use.
+    """
+    communication_platform: Optional[str] = Field(
+        "commonground",
+        description="Primary communication platform"
+    )
+    response_timeframe: Optional[str] = Field(
+        "24_hours",
+        description="Expected response time (24_hours, 48_hours, 72_hours, same_day_urgent)"
+    )
+    emergency_contact_order: Optional[str] = Field(
+        None,
+        description="Who to contact first in emergencies"
+    )
+    major_decision_authority: Optional[str] = Field(
+        "joint",
+        description="Who makes major decisions (joint, parent_a, parent_b)"
+    )
+    decision_categories: Optional[Dict[str, str]] = Field(
+        None,
+        description="Per-category authority mapping (education, healthcare, religion, extracurriculars)"
+    )
+
+
 class ActivationResult(BaseModel):
     """Result of agreement activation processing."""
     exchanges_created: int = 0
@@ -206,6 +304,10 @@ class ActivationResult(BaseModel):
     exchange_location_set: bool = False
     recurring_obligations_created: int = 0
     obligation_instances_created: int = 0
+    schedule_events_created: int = 0
+    holiday_events_created: int = 0
+    activity_events_created: int = 0
+    communication_prefs_set: bool = False
     errors: List[str] = Field(default_factory=list)
 
 

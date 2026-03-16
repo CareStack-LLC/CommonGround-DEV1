@@ -48,8 +48,31 @@ EXTRACTION_SCHEMA_V2_STANDARD = """{
     "custom_pattern_description": "string - If custom, describe the pattern (optional)",
     "transition_day": "string - Day of week (Monday, Tuesday, etc.)",
     "transition_time": "string - Time (e.g., 6:00 PM, after school)",
-    "schedule_notes": "string - Any special notes about the schedule (optional)"
+    "schedule_notes": "string - Any special notes about the schedule (optional)",
+    "holiday_schedule": [
+      {
+        "holiday_name": "string - e.g. Thanksgiving, Christmas, Spring Break, Summer Break, New Year, Easter, Fourth of July, Labor Day, Memorial Day",
+        "arrangement": "string - alternate_yearly|parent_a_even_years|parent_b_even_years|split_day|always_parent_a|always_parent_b",
+        "start_time": "string - When holiday custody starts (e.g., 6:00 PM day before, morning of, noon, optional)",
+        "end_time": "string - When holiday custody ends (e.g., 6:00 PM, morning after, noon, optional)",
+        "notes": "string - Any special details about this holiday arrangement (optional)"
+      }
+    ]
   },
+
+  "recurring_activities": [
+    {
+      "activity_name": "string - e.g. Band practice, Soccer, Tutoring, Therapy, Dance class",
+      "child_name": "string - Which child this applies to (optional, all children if omitted)",
+      "day_of_week": "string - Day of week (Monday, Tuesday, etc.)",
+      "time": "string - Start time (e.g., 4:00 PM)",
+      "end_time": "string - End time (e.g., 5:30 PM, optional)",
+      "location": "string - Where the activity takes place (address or venue name, optional)",
+      "responsible_parent": "string - parent_a|parent_b|alternating|during_own_time",
+      "cost_per_session": "number - Cost per session in dollars (optional)",
+      "cost_frequency": "string - per_session|monthly|semester|annual (optional)"
+    }
+  ],
 
   "logistics_transitions": {
     "exchange_location": "string - school|parent_a_home|parent_b_home|neutral_location",
@@ -172,10 +195,21 @@ PARSING RULES:
    - "every other weekend" = weekends alternating, weekdays with primary
    - "equal time" → primary_residence: "equal"
 
-5. **KEEP IT SIMPLE**:
-   - Holiday schedules go in Quick Accords, not here
+5. **HOLIDAY SCHEDULES**:
+   - Map holiday arrangements to: alternate_yearly, parent_a_even_years, parent_b_even_years, split_day, always_parent_a, always_parent_b
+   - "we alternate Thanksgiving" → arrangement: "alternate_yearly"
+   - "I get Christmas even years" → arrangement: "parent_a_even_years"
+   - "we split Christmas day" → arrangement: "split_day"
+
+6. **RECURRING ACTIVITIES**:
+   - Extract regular child activities (sports, lessons, therapy, tutoring)
+   - Map responsible parent: "I take him" → responsible_parent: "parent_a"
+   - "whoever has them" → responsible_parent: "during_own_time"
+   - Include costs if mentioned: "it's $50/session" → cost_per_session: 50
+
+7. **KEEP IT PRACTICAL**:
    - Travel consent goes in Quick Accords
-   - Focus on baseline, everyday schedule
+   - Focus on recurring patterns, not one-off events
 
 JSON SCHEMA TO POPULATE:
 {schema}
@@ -248,8 +282,26 @@ Focus on:
 - **Transitions**: "What specific day and time do you switch?"
 - **First Step**: "Who has the kids on the very first day of the schedule?"
 
-DON'T get into holidays - those go in Quick Accords.
+Then cover holidays:
+- **Major Holidays**: "How do you want to handle Thanksgiving, Christmas, and other major holidays? Alternate years, or does one parent always have a specific holiday?"
+- **School Breaks**: "What about spring break and summer break — do you split them, alternate years, or keep the regular schedule?"
+- **Other Days**: "Any other special days — birthdays, Mother's Day, Father's Day?"
+
 Example: "For the 'Week-on/Week-off' - does the switch happen every Friday? And at what time?"
+Then: "Now let's talk holidays. Do you want to alternate major holidays each year, or have a set arrangement?"
+""",
+
+    "recurring_activities": """
+Help identify recurring child activities that need to be scheduled and tracked.
+
+Ask about:
+- **Regular Activities**: "Do any of the kids have regular activities like sports, music lessons, tutoring, or therapy?"
+- **Details**: For each activity, get: day of week, time, location, and which parent takes them
+- **Costs**: "Does that activity have a cost? If so, how much and how is it split?"
+- **Transportation**: "Who's responsible for getting them there — whoever has them that day, or does one parent always handle it?"
+
+Keep it conversational:
+"Let's talk about the kids' regular activities. Things like sports practice, music lessons, tutoring — anything that happens on a weekly basis. What do they have going on?"
 """,
 
     "logistics_transitions": """

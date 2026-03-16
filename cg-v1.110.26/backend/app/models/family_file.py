@@ -174,6 +174,17 @@ class FamilyFile(Base, UUIDMixin, TimestampMixin):
         String(50), nullable=True
     )  # "school", "parent_a_home", "parent_b_home", "neutral_location"
 
+    # Communication preferences from active agreement
+    agreement_communication_platform: Mapped[Optional[str]] = mapped_column(
+        String(50), nullable=True
+    )  # "commonground", "text", "email", "phone", "talking_parents"
+    agreement_response_timeframe: Mapped[Optional[str]] = mapped_column(
+        String(50), nullable=True
+    )  # "24_hours", "48_hours", "72_hours", "same_day_urgent"
+    agreement_decision_authority: Mapped[Optional[dict]] = mapped_column(
+        JSON, nullable=True
+    )  # {"major": "joint", "education": "joint", "healthcare": "parent_a", ...}
+
     # Relationships
     creator: Mapped["User"] = relationship(
         "User", foreign_keys=[created_by], backref="created_family_files"

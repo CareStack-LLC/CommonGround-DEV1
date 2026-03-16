@@ -481,6 +481,9 @@ function AgreementDetailsContent() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activationSummary, setActivationSummary] = useState<any>(null);
+  const [complianceData, setComplianceData] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'details' | 'implementation' | 'adherence'>('details');
 
   useEffect(() => {
     loadAgreement();
@@ -500,6 +503,20 @@ function AgreementDetailsContent() {
         setSummary(summaryData);
       } catch {
         // Summary may fail if AI is unavailable
+      }
+
+      // Load activation summary and compliance for active agreements
+      if (data.agreement.status === 'active') {
+        try {
+          const [activationData, complianceResult] = await Promise.all([
+            agreementsAPI.getActivationSummary(agreementId),
+            agreementsAPI.getCompliance(agreementId),
+          ]);
+          setActivationSummary(activationData);
+          setComplianceData(complianceResult);
+        } catch {
+          // Non-critical - page still works without these
+        }
       }
     } catch (err: any) {
       console.error('Failed to load agreement:', err);
@@ -1029,7 +1046,205 @@ function AgreementDetailsContent() {
               </div>
             </div>
 
+            {/* Tab Navigation for Active Agreements */}
+            {agreement.status === 'active' && (
+              <div className="bg-card rounded-2xl border-2 border-border overflow-hidden">
+                <div className="flex">
+                  {[
+                    { key: 'details' as const, label: 'Agreement', icon: '📋' },
+                    { key: 'implementation' as const, label: 'Implementation', icon: '⚡' },
+                    { key: 'adherence' as const, label: 'Adherence', icon: '📊' },
+                  ].map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setActiveTab(tab.key)}
+                      className={`flex-1 px-4 py-3 text-sm font-semibold transition-all ${
+                        activeTab === tab.key
+                          ? 'bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] border-b-2 border-[var(--portal-primary)]'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      }`}
+                    >
+                      {tab.icon} {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Implementation Tab - What's Been Set Up */}
+            {agreement.status === 'active' && activeTab === 'implementation' && activationSummary && (
+              <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg">
+                <div className="p-6 border-b border-border">
+                  <h3 className="font-serif text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    What&apos;s Been Set Up
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    These items were automatically created from your agreement
+                  </p>
+                </div>
+                <div className="p-6 space-y-3">
+                  {/* Summary stats */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    {activationSummary.summary.custody_exchanges > 0 && (
+                      <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 text-center">
+                        <div className="text-2xl font-bold text-blue-600">{activationSummary.summary.custody_exchanges}</div>
+                        <div className="text-xs text-blue-600/70">Exchanges</div>
+                      </div>
+                    )}
+                    {activationSummary.summary.holiday_events > 0 && (
+                      <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-center">
+                        <div className="text-2xl font-bold text-amber-600">{activationSummary.summary.holiday_events}</div>
+                        <div className="text-xs text-amber-600/70">Holidays</div>
+                      </div>
+                    )}
+                    {activationSummary.summary.activity_events > 0 && (
+                      <div className="p-3 rounded-xl bg-green-50 dark:bg-green-950/30 text-center">
+                        <div className="text-2xl font-bold text-green-600">{activationSummary.summary.activity_events}</div>
+                        <div className="text-xs text-green-600/70">Activities</div>
+                      </div>
+                    )}
+                    {activationSummary.summary.obligation_templates > 0 && (
+                      <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 text-center">
+                        <div className="text-2xl font-bold text-purple-600">{activationSummary.summary.obligation_templates}</div>
+                        <div className="text-xs text-purple-600/70">Obligations</div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Item list */}
+                  {activationSummary.items.map((item: any, idx: number) => (
+                    <div key={idx} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors">
+                      <CheckCircle className="h-5 w-5 text-cg-success flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-foreground truncate">{item.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {item.type === 'exchange' && '📍 Calendar Exchange'}
+                          {item.type === 'holiday' && '🎄 Holiday Event'}
+                          {item.type === 'activity' && '⚽ Recurring Activity'}
+                          {item.type === 'custody_exchange' && '🔄 Custody Exchange'}
+                          {item.type === 'obligation_template' && `💰 ${item.amount ? `$${item.amount}` : 'Expense'}`}
+                        </p>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        item.status === 'active' || item.status === 'scheduled'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-400'
+                          : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {item.status}
+                      </span>
+                    </div>
+                  ))}
+
+                  {activationSummary.items.length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">No items have been auto-created yet.</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Adherence Tab */}
+            {agreement.status === 'active' && activeTab === 'adherence' && (
+              <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg">
+                <div className="p-6 border-b border-border">
+                  <h3 className="font-serif text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    Agreement Adherence
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    How well both parents are following the agreement
+                  </p>
+                </div>
+                <div className="p-6">
+                  {complianceData ? (
+                    <div className="space-y-6">
+                      {/* Overall Score */}
+                      <div className="text-center p-6 rounded-2xl bg-muted/30">
+                        <div className={`text-5xl font-bold ${
+                          complianceData.overall_score >= 90 ? 'text-green-600' :
+                          complianceData.overall_score >= 75 ? 'text-blue-600' :
+                          complianceData.overall_score >= 50 ? 'text-amber-600' :
+                          'text-red-600'
+                        }`}>
+                          {complianceData.overall_score}%
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1 capitalize">
+                          {complianceData.status?.replace('_', ' ')}
+                        </div>
+                      </div>
+
+                      {/* Exchange Compliance */}
+                      <div className="p-4 rounded-xl border border-border">
+                        <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                          <Calendar className="h-4 w-4" /> Exchange Compliance
+                        </h4>
+                        <div className="grid grid-cols-3 gap-3 text-center">
+                          <div>
+                            <div className="text-lg font-bold text-foreground">{complianceData.exchange_compliance.completed}</div>
+                            <div className="text-xs text-muted-foreground">Completed</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-foreground">{complianceData.exchange_compliance.missed}</div>
+                            <div className="text-xs text-muted-foreground">Missed</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-foreground">{complianceData.exchange_compliance.on_time_rate}%</div>
+                            <div className="text-xs text-muted-foreground">On-Time</div>
+                          </div>
+                        </div>
+                        {/* Progress bar */}
+                        <div className="mt-3">
+                          <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                            <span>Completion Rate</span>
+                            <span>{complianceData.exchange_compliance.completion_rate}%</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-blue-500 rounded-full transition-all"
+                              style={{ width: `${complianceData.exchange_compliance.completion_rate}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Financial Compliance */}
+                      <div className="p-4 rounded-xl border border-border">
+                        <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                          💰 Financial Compliance
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3 text-center">
+                          <div>
+                            <div className="text-lg font-bold text-foreground">{complianceData.financial_compliance.funded}</div>
+                            <div className="text-xs text-muted-foreground">Funded</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-foreground">{complianceData.financial_compliance.total_obligations}</div>
+                            <div className="text-xs text-muted-foreground">Total</div>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                            <span>Funding Rate</span>
+                            <span>{complianceData.financial_compliance.completion_rate}%</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-green-500 rounded-full transition-all"
+                              style={{ width: `${complianceData.financial_compliance.completion_rate}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">Adherence data will appear as exchanges and payments are tracked.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Sections - The Living Document */}
+            {(agreement.status !== 'active' || activeTab === 'details') && (
             <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
               <div className="p-6 border-b border-border">
                 <div className="flex items-center justify-between">
@@ -1083,6 +1298,7 @@ function AgreementDetailsContent() {
                 </div>
               )}
             </div>
+            )}
 
             {/* Floating Propose Change Button - Future Feature */}
             {agreement.status === 'active' && (

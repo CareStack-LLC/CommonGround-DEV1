@@ -413,8 +413,131 @@ async def activate_agreement(
             "exchanges_created": activation_result.exchanges_created,
             "split_ratio_set": activation_result.split_ratio_set,
             "exchange_location_set": activation_result.exchange_location_set,
+            "schedule_events_created": activation_result.schedule_events_created,
+            "holiday_events_created": activation_result.holiday_events_created,
+            "activity_events_created": activation_result.activity_events_created,
+            "communication_prefs_set": activation_result.communication_prefs_set,
+            "recurring_obligations_created": activation_result.recurring_obligations_created,
+            "obligation_instances_created": activation_result.obligation_instances_created,
             "errors": activation_result.errors if activation_result.errors else None
         }
+    }
+
+
+@router.get("/{agreement_id}/activation-summary")
+async def get_activation_summary(
+    agreement_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get a summary of what was auto-created when the agreement was activated.
+
+    Returns all agreement-derived items (exchanges, schedule events, obligations)
+    with their current status.
+    """
+    from app.models.schedule import ScheduleEvent
+    from app.models.custody_exchange import CustodyExchange
+    from app.models.clearfund import Obligation
+    from sqlalchemy import select, and_
+
+    agreement_service = AgreementService(db)
+    agreement = await agreement_service.get_agreement(agreement_id, current_user)
+
+    items = []
+
+    # Get agreement-derived schedule events
+    events_result = await db.execute(
+        select(ScheduleEvent).where(
+            and_(
+                ScheduleEvent.agreement_id == agreement_id,
+                ScheduleEvent.is_agreement_derived == True
+            )
+        )
+    )
+    events = events_result.scalars().all()
+
+    exchange_events = 0
+    holiday_events = 0
+    activity_events = 0
+
+    for event in events:
+        event_type_label = "event"
+        if event.is_exchange:
+            event_type_label = "exchange"
+            exchange_events += 1
+        elif event.event_type == "holiday":
+            event_type_label = "holiday"
+            holiday_events += 1
+        else:
+            event_type_label = "activity"
+            activity_events += 1
+
+        items.append({
+            "type": event_type_label,
+            "title": event.title,
+            "description": event.description,
+            "status": event.status,
+            "start_time": event.start_time.isoformat() if event.start_time else None,
+            "category": event.event_category,
+        })
+
+    # Get agreement-derived custody exchanges
+    exchanges_result = await db.execute(
+        select(CustodyExchange).where(
+            CustodyExchange.agreement_id == agreement_id
+        )
+    )
+    exchanges = exchanges_result.scalars().all()
+
+    for exchange in exchanges:
+        items.append({
+            "type": "custody_exchange",
+            "title": exchange.title,
+            "description": f"{exchange.recurrence_pattern} exchange",
+            "status": exchange.status,
+            "start_time": exchange.scheduled_time.isoformat() if exchange.scheduled_time else None,
+            "category": "exchange",
+        })
+
+    # Get agreement-derived obligations
+    obligations_result = await db.execute(
+        select(Obligation).where(
+            Obligation.agreement_id == agreement_id
+        )
+    )
+    obligations = obligations_result.scalars().all()
+
+    templates = 0
+    instances = 0
+    for obligation in obligations:
+        if obligation.status == "template":
+            templates += 1
+            items.append({
+                "type": "obligation_template",
+                "title": obligation.title,
+                "description": obligation.description,
+                "status": obligation.status,
+                "amount": float(obligation.total_amount) if obligation.total_amount else None,
+                "category": obligation.purpose_category,
+            })
+        else:
+            instances += 1
+
+    return {
+        "agreement_id": agreement_id,
+        "agreement_status": agreement.status,
+        "activated_at": agreement.effective_date,
+        "summary": {
+            "custody_exchanges": len(exchanges),
+            "schedule_events": exchange_events,
+            "holiday_events": holiday_events,
+            "activity_events": activity_events,
+            "obligation_templates": templates,
+            "obligation_instances": instances,
+            "communication_prefs_set": agreement.family_file_id is not None,
+        },
+        "items": items,
     }
 
 
@@ -440,6 +563,116 @@ async def deactivate_agreement(
         "id": agreement.id,
         "status": agreement.status,
         "message": "Agreement deactivated successfully!"
+    }
+
+
+@router.get("/{agreement_id}/compliance")
+async def get_agreement_compliance(
+    agreement_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get compliance/adherence metrics for an active agreement.
+
+    Filters exchange and financial compliance to only items derived
+    from this specific agreement.
+    """
+    from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
+    from app.models.clearfund import Obligation
+    from sqlalchemy import select, and_, func
+
+    agreement_service = AgreementService(db)
+    agreement = await agreement_service.get_agreement(agreement_id, current_user)
+
+    # --- Exchange Compliance ---
+    exchanges_result = await db.execute(
+        select(CustodyExchange).where(
+            CustodyExchange.agreement_id == agreement_id
+        )
+    )
+    exchanges = exchanges_result.scalars().all()
+    exchange_ids = [str(e.id) for e in exchanges]
+
+    total_instances = 0
+    completed_instances = 0
+    missed_instances = 0
+    on_time_count = 0
+
+    if exchange_ids:
+        instances_result = await db.execute(
+            select(CustodyExchangeInstance).where(
+                CustodyExchangeInstance.exchange_id.in_(exchange_ids)
+            )
+        )
+        instances = instances_result.scalars().all()
+        total_instances = len(instances)
+
+        for inst in instances:
+            if inst.status == "completed":
+                completed_instances += 1
+                # Check if on-time (both parents checked in within geofence)
+                if inst.from_parent_checked_in and inst.to_parent_checked_in:
+                    on_time_count += 1
+            elif inst.status == "missed":
+                missed_instances += 1
+
+    exchange_completion_rate = (completed_instances / total_instances * 100) if total_instances > 0 else 0
+    on_time_rate = (on_time_count / completed_instances * 100) if completed_instances > 0 else 0
+
+    # --- Financial Compliance ---
+    obligations_result = await db.execute(
+        select(Obligation).where(
+            and_(
+                Obligation.agreement_id == agreement_id,
+                Obligation.status != "template"
+            )
+        )
+    )
+    obligations = obligations_result.scalars().all()
+
+    total_obligations = len(obligations)
+    funded_obligations = sum(1 for o in obligations if o.status in ("funded", "verified", "completed"))
+    financial_completion_rate = (funded_obligations / total_obligations * 100) if total_obligations > 0 else 0
+
+    # --- Overall Score (weighted: exchange 50%, financial 50%) ---
+    overall_score = 0
+    if total_instances > 0 or total_obligations > 0:
+        exchange_weight = 0.5 if total_instances > 0 else 0
+        financial_weight = 0.5 if total_obligations > 0 else 0
+        total_weight = exchange_weight + financial_weight
+        if total_weight > 0:
+            overall_score = (
+                (exchange_completion_rate * exchange_weight + financial_completion_rate * financial_weight)
+                / total_weight
+            )
+
+    # Determine status label
+    if overall_score >= 90:
+        status_label = "excellent"
+    elif overall_score >= 75:
+        status_label = "good"
+    elif overall_score >= 50:
+        status_label = "needs_improvement"
+    else:
+        status_label = "concerning"
+
+    return {
+        "agreement_id": agreement_id,
+        "overall_score": round(overall_score, 1),
+        "status": status_label,
+        "exchange_compliance": {
+            "total_exchanges": total_instances,
+            "completed": completed_instances,
+            "missed": missed_instances,
+            "completion_rate": round(exchange_completion_rate, 1),
+            "on_time_rate": round(on_time_rate, 1),
+        },
+        "financial_compliance": {
+            "total_obligations": total_obligations,
+            "funded": funded_obligations,
+            "completion_rate": round(financial_completion_rate, 1),
+        },
     }
 
 
