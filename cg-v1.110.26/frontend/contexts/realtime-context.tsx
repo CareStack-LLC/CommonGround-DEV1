@@ -13,8 +13,18 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 import { useAuth } from '@/lib/auth-context';
 import {
   createFamilyFileChannel,
+  createScheduleChannel,
+  createFinanceChannel,
+  createLegalChannel,
   subscribeToMessages,
   subscribeToActivities,
+  subscribeToExchanges,
+  subscribeToExchangeInstances,
+  subscribeToScheduleEvents,
+  subscribeToObligations,
+  subscribeToWalletTransactions,
+  subscribeToAgreements,
+  subscribeToAgreementSections,
   setupPresence,
   setupTypingBroadcast,
   sendTypingIndicator,
@@ -22,6 +32,13 @@ import {
   untrackPresence,
   MessageRow,
   ActivityRow,
+  CustodyExchangeRow,
+  ExchangeInstanceRow,
+  ScheduleEventRow,
+  ObligationRow,
+  WalletTransactionRow,
+  AgreementRow,
+  AgreementSectionRow,
   PresenceState,
   TypingPayload,
   ConnectionState,
@@ -43,12 +60,39 @@ interface RealtimeContextType {
   subscribeToFamilyFile: (familyFileId: string) => void;
   unsubscribeFromFamilyFile: (familyFileId: string) => void;
 
+  // Domain channel management
+  subscribeToScheduleChannel: (familyFileId: string) => void;
+  unsubscribeFromScheduleChannel: (familyFileId: string) => void;
+  subscribeToFinanceChannel: (familyFileId: string, walletId?: string) => void;
+  unsubscribeFromFinanceChannel: (familyFileId: string) => void;
+  subscribeToLegalChannel: (familyFileId: string, agreementId?: string) => void;
+  unsubscribeFromLegalChannel: (familyFileId: string) => void;
+
   // Message events
   onMessageInsert: (handler: (message: MessageRow) => void) => () => void;
   onMessageUpdate: (handler: (message: MessageRow) => void) => () => void;
 
   // Activity events
   onActivityInsert: (handler: (activity: ActivityRow) => void) => () => void;
+
+  // Schedule domain events
+  onExchangeInsert: (handler: (exchange: CustodyExchangeRow) => void) => () => void;
+  onExchangeUpdate: (handler: (exchange: CustodyExchangeRow) => void) => () => void;
+  onExchangeInstanceUpdate: (handler: (instance: ExchangeInstanceRow) => void) => () => void;
+  onScheduleEventInsert: (handler: (event: ScheduleEventRow) => void) => () => void;
+  onScheduleEventUpdate: (handler: (event: ScheduleEventRow) => void) => () => void;
+  onScheduleEventDelete: (handler: (old: { id: string }) => void) => () => void;
+
+  // Finance domain events
+  onObligationInsert: (handler: (obligation: ObligationRow) => void) => () => void;
+  onObligationUpdate: (handler: (obligation: ObligationRow) => void) => () => void;
+  onWalletTransactionInsert: (handler: (tx: WalletTransactionRow) => void) => () => void;
+  onWalletTransactionUpdate: (handler: (tx: WalletTransactionRow) => void) => () => void;
+
+  // Legal domain events
+  onAgreementInsert: (handler: (agreement: AgreementRow) => void) => () => void;
+  onAgreementUpdate: (handler: (agreement: AgreementRow) => void) => () => void;
+  onAgreementSectionUpdate: (handler: (section: AgreementSectionRow) => void) => () => void;
 
   // Presence
   onlineUsers: Map<string, OnlineUser>;
@@ -72,19 +116,47 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
 
   // Refs for channels and handlers
   const channelsRef = useRef<Map<string, RealtimeChannel>>(new Map());
+  const scheduleChannelsRef = useRef<Map<string, RealtimeChannel>>(new Map());
+  const financeChannelsRef = useRef<Map<string, RealtimeChannel>>(new Map());
+  const legalChannelsRef = useRef<Map<string, RealtimeChannel>>(new Map());
+
+  // Message & Activity handlers (existing)
   const messageInsertHandlers = useRef<Set<(message: MessageRow) => void>>(new Set());
   const messageUpdateHandlers = useRef<Set<(message: MessageRow) => void>>(new Set());
   const activityInsertHandlers = useRef<Set<(activity: ActivityRow) => void>>(new Set());
   const typingHandlers = useRef<Set<(payload: TypingPayload) => void>>(new Set());
 
+  // Schedule domain handlers
+  const exchangeInsertHandlers = useRef<Set<(exchange: CustodyExchangeRow) => void>>(new Set());
+  const exchangeUpdateHandlers = useRef<Set<(exchange: CustodyExchangeRow) => void>>(new Set());
+  const exchangeInstanceUpdateHandlers = useRef<Set<(instance: ExchangeInstanceRow) => void>>(new Set());
+  const scheduleEventInsertHandlers = useRef<Set<(event: ScheduleEventRow) => void>>(new Set());
+  const scheduleEventUpdateHandlers = useRef<Set<(event: ScheduleEventRow) => void>>(new Set());
+  const scheduleEventDeleteHandlers = useRef<Set<(old: { id: string }) => void>>(new Set());
+
+  // Finance domain handlers
+  const obligationInsertHandlers = useRef<Set<(obligation: ObligationRow) => void>>(new Set());
+  const obligationUpdateHandlers = useRef<Set<(obligation: ObligationRow) => void>>(new Set());
+  const walletTransactionInsertHandlers = useRef<Set<(tx: WalletTransactionRow) => void>>(new Set());
+  const walletTransactionUpdateHandlers = useRef<Set<(tx: WalletTransactionRow) => void>>(new Set());
+
+  // Legal domain handlers
+  const agreementInsertHandlers = useRef<Set<(agreement: AgreementRow) => void>>(new Set());
+  const agreementUpdateHandlers = useRef<Set<(agreement: AgreementRow) => void>>(new Set());
+  const agreementSectionUpdateHandlers = useRef<Set<(section: AgreementSectionRow) => void>>(new Set());
+
   // Handle auth state changes - cleanup on logout
   useEffect(() => {
     if (!isAuthenticated || !user) {
       // Cleanup all channels
-      channelsRef.current.forEach((channel) => {
-        channel.unsubscribe();
-      });
+      channelsRef.current.forEach((channel) => channel.unsubscribe());
       channelsRef.current.clear();
+      scheduleChannelsRef.current.forEach((channel) => channel.unsubscribe());
+      scheduleChannelsRef.current.clear();
+      financeChannelsRef.current.forEach((channel) => channel.unsubscribe());
+      financeChannelsRef.current.clear();
+      legalChannelsRef.current.forEach((channel) => channel.unsubscribe());
+      legalChannelsRef.current.clear();
       setConnectionState('disconnected');
       setOnlineUsers(new Map());
       setTypingUsers(new Map());
@@ -253,6 +325,203 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // ============================================================
+  // Schedule Domain Channel
+  // ============================================================
+
+  const subscribeToScheduleChannel = useCallback(
+    (familyFileId: string) => {
+      if (scheduleChannelsRef.current.has(familyFileId)) return;
+
+      const channel = createScheduleChannel(familyFileId);
+
+      subscribeToExchanges(
+        channel,
+        familyFileId,
+        (exchange) => exchangeInsertHandlers.current.forEach((h) => h(exchange)),
+        (exchange) => exchangeUpdateHandlers.current.forEach((h) => h(exchange))
+      );
+
+      subscribeToExchangeInstances(channel, (instance) =>
+        exchangeInstanceUpdateHandlers.current.forEach((h) => h(instance))
+      );
+
+      subscribeToScheduleEvents(
+        channel,
+        familyFileId,
+        (event) => scheduleEventInsertHandlers.current.forEach((h) => h(event)),
+        (event) => scheduleEventUpdateHandlers.current.forEach((h) => h(event)),
+        (old) => scheduleEventDeleteHandlers.current.forEach((h) => h(old))
+      );
+
+      channel.subscribe();
+      scheduleChannelsRef.current.set(familyFileId, channel);
+    },
+    []
+  );
+
+  const unsubscribeFromScheduleChannel = useCallback((familyFileId: string) => {
+    const channel = scheduleChannelsRef.current.get(familyFileId);
+    if (channel) {
+      channel.unsubscribe();
+      scheduleChannelsRef.current.delete(familyFileId);
+    }
+  }, []);
+
+  // ============================================================
+  // Finance Domain Channel
+  // ============================================================
+
+  const subscribeToFinanceChannel = useCallback(
+    (familyFileId: string, walletId?: string) => {
+      if (financeChannelsRef.current.has(familyFileId)) return;
+
+      const channel = createFinanceChannel(familyFileId);
+
+      subscribeToObligations(
+        channel,
+        familyFileId,
+        (obligation) => obligationInsertHandlers.current.forEach((h) => h(obligation)),
+        (obligation) => obligationUpdateHandlers.current.forEach((h) => h(obligation))
+      );
+
+      if (walletId) {
+        subscribeToWalletTransactions(
+          channel,
+          walletId,
+          (tx) => walletTransactionInsertHandlers.current.forEach((h) => h(tx)),
+          (tx) => walletTransactionUpdateHandlers.current.forEach((h) => h(tx))
+        );
+      }
+
+      channel.subscribe();
+      financeChannelsRef.current.set(familyFileId, channel);
+    },
+    []
+  );
+
+  const unsubscribeFromFinanceChannel = useCallback((familyFileId: string) => {
+    const channel = financeChannelsRef.current.get(familyFileId);
+    if (channel) {
+      channel.unsubscribe();
+      financeChannelsRef.current.delete(familyFileId);
+    }
+  }, []);
+
+  // ============================================================
+  // Legal Domain Channel
+  // ============================================================
+
+  const subscribeToLegalChannel = useCallback(
+    (familyFileId: string, agreementId?: string) => {
+      if (legalChannelsRef.current.has(familyFileId)) return;
+
+      const channel = createLegalChannel(familyFileId);
+
+      subscribeToAgreements(
+        channel,
+        familyFileId,
+        (agreement) => agreementInsertHandlers.current.forEach((h) => h(agreement)),
+        (agreement) => agreementUpdateHandlers.current.forEach((h) => h(agreement))
+      );
+
+      if (agreementId) {
+        subscribeToAgreementSections(channel, agreementId, (section) =>
+          agreementSectionUpdateHandlers.current.forEach((h) => h(section))
+        );
+      }
+
+      channel.subscribe();
+      legalChannelsRef.current.set(familyFileId, channel);
+    },
+    []
+  );
+
+  const unsubscribeFromLegalChannel = useCallback((familyFileId: string) => {
+    const channel = legalChannelsRef.current.get(familyFileId);
+    if (channel) {
+      channel.unsubscribe();
+      legalChannelsRef.current.delete(familyFileId);
+    }
+  }, []);
+
+  // ============================================================
+  // Schedule Domain Event Handler Registrations
+  // ============================================================
+
+  const onExchangeInsert = useCallback((handler: (exchange: CustodyExchangeRow) => void) => {
+    exchangeInsertHandlers.current.add(handler);
+    return () => { exchangeInsertHandlers.current.delete(handler); };
+  }, []);
+
+  const onExchangeUpdate = useCallback((handler: (exchange: CustodyExchangeRow) => void) => {
+    exchangeUpdateHandlers.current.add(handler);
+    return () => { exchangeUpdateHandlers.current.delete(handler); };
+  }, []);
+
+  const onExchangeInstanceUpdate = useCallback((handler: (instance: ExchangeInstanceRow) => void) => {
+    exchangeInstanceUpdateHandlers.current.add(handler);
+    return () => { exchangeInstanceUpdateHandlers.current.delete(handler); };
+  }, []);
+
+  const onScheduleEventInsert = useCallback((handler: (event: ScheduleEventRow) => void) => {
+    scheduleEventInsertHandlers.current.add(handler);
+    return () => { scheduleEventInsertHandlers.current.delete(handler); };
+  }, []);
+
+  const onScheduleEventUpdate = useCallback((handler: (event: ScheduleEventRow) => void) => {
+    scheduleEventUpdateHandlers.current.add(handler);
+    return () => { scheduleEventUpdateHandlers.current.delete(handler); };
+  }, []);
+
+  const onScheduleEventDelete = useCallback((handler: (old: { id: string }) => void) => {
+    scheduleEventDeleteHandlers.current.add(handler);
+    return () => { scheduleEventDeleteHandlers.current.delete(handler); };
+  }, []);
+
+  // ============================================================
+  // Finance Domain Event Handler Registrations
+  // ============================================================
+
+  const onObligationInsert = useCallback((handler: (obligation: ObligationRow) => void) => {
+    obligationInsertHandlers.current.add(handler);
+    return () => { obligationInsertHandlers.current.delete(handler); };
+  }, []);
+
+  const onObligationUpdate = useCallback((handler: (obligation: ObligationRow) => void) => {
+    obligationUpdateHandlers.current.add(handler);
+    return () => { obligationUpdateHandlers.current.delete(handler); };
+  }, []);
+
+  const onWalletTransactionInsert = useCallback((handler: (tx: WalletTransactionRow) => void) => {
+    walletTransactionInsertHandlers.current.add(handler);
+    return () => { walletTransactionInsertHandlers.current.delete(handler); };
+  }, []);
+
+  const onWalletTransactionUpdate = useCallback((handler: (tx: WalletTransactionRow) => void) => {
+    walletTransactionUpdateHandlers.current.add(handler);
+    return () => { walletTransactionUpdateHandlers.current.delete(handler); };
+  }, []);
+
+  // ============================================================
+  // Legal Domain Event Handler Registrations
+  // ============================================================
+
+  const onAgreementInsert = useCallback((handler: (agreement: AgreementRow) => void) => {
+    agreementInsertHandlers.current.add(handler);
+    return () => { agreementInsertHandlers.current.delete(handler); };
+  }, []);
+
+  const onAgreementUpdate = useCallback((handler: (agreement: AgreementRow) => void) => {
+    agreementUpdateHandlers.current.add(handler);
+    return () => { agreementUpdateHandlers.current.delete(handler); };
+  }, []);
+
+  const onAgreementSectionUpdate = useCallback((handler: (section: AgreementSectionRow) => void) => {
+    agreementSectionUpdateHandlers.current.add(handler);
+    return () => { agreementSectionUpdateHandlers.current.delete(handler); };
+  }, []);
+
   // Send typing indicator
   const sendTyping = useCallback(
     (familyFileId: string, isTyping: boolean, agreementId?: string) => {
@@ -283,10 +552,14 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      channelsRef.current.forEach((channel) => {
-        channel.unsubscribe();
-      });
+      channelsRef.current.forEach((channel) => channel.unsubscribe());
       channelsRef.current.clear();
+      scheduleChannelsRef.current.forEach((channel) => channel.unsubscribe());
+      scheduleChannelsRef.current.clear();
+      financeChannelsRef.current.forEach((channel) => channel.unsubscribe());
+      financeChannelsRef.current.clear();
+      legalChannelsRef.current.forEach((channel) => channel.unsubscribe());
+      legalChannelsRef.current.clear();
 
       // Clear all typing timeouts
       typingUsers.forEach((data) => {
@@ -300,11 +573,38 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     isConnected: connectionState === 'connected',
     subscribeToFamilyFile,
     unsubscribeFromFamilyFile,
+    // Domain channels
+    subscribeToScheduleChannel,
+    unsubscribeFromScheduleChannel,
+    subscribeToFinanceChannel,
+    unsubscribeFromFinanceChannel,
+    subscribeToLegalChannel,
+    unsubscribeFromLegalChannel,
+    // Message events
     onMessageInsert,
     onMessageUpdate,
+    // Activity events
     onActivityInsert,
+    // Schedule domain events
+    onExchangeInsert,
+    onExchangeUpdate,
+    onExchangeInstanceUpdate,
+    onScheduleEventInsert,
+    onScheduleEventUpdate,
+    onScheduleEventDelete,
+    // Finance domain events
+    onObligationInsert,
+    onObligationUpdate,
+    onWalletTransactionInsert,
+    onWalletTransactionUpdate,
+    // Legal domain events
+    onAgreementInsert,
+    onAgreementUpdate,
+    onAgreementSectionUpdate,
+    // Presence
     onlineUsers,
     isUserOnline,
+    // Typing
     sendTyping,
     onTypingChange,
     typingUsers,

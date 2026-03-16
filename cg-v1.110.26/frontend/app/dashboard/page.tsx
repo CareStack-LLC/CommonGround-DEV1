@@ -2,7 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { useWebSocket } from '@/contexts/websocket-context';
+import { useRealtimeExchanges } from '@/hooks/use-realtime-exchanges';
+import { useRealtimeSchedule } from '@/hooks/use-realtime-schedule';
+import { useRealtimeWallet } from '@/hooks/use-realtime-wallet';
+import { useRealtimeAgreements } from '@/hooks/use-realtime-agreements';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { ActivityFeed } from '@/components/dashboard/activity-feed';
@@ -314,23 +317,8 @@ function DashboardContent() {
   const { user } = useAuth();
   const router = useRouter();
   const { isFree } = useSubscription();
-  const {
-    subscribe,
-    unsubscribe,
-    onExchangeCreated,
-    onExchangeUpdated,
-    onExchangeCheckin,
-    onObligationCreated,
-    onObligationUpdated,
-    onPaymentReceived,
-    onDashboardUpdate,
-    onEventCreated,
-    onEventUpdated,
-    onEventDeleted,
-    onAgreementCreated,
-    onAgreementUpdated,
-    onAgreementApproved,
-  } = useWebSocket();
+  // Primary family file ID for realtime subscriptions
+  const [activeFamilyFileId, setActiveFamilyFileId] = useState<string | null>(null);
   const [familyFilesWithData, setFamilyFilesWithData] = useState<FamilyFileWithData[]>([]);
   const [dashboardSummary, setDashboardSummary] = useState<DashboardSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -429,6 +417,10 @@ function DashboardContent() {
       if (activeFiles.length > 0) {
         // Store active file IDs for auto-refresh
         activeFileIdsRef.current = activeFiles.map(f => f.id);
+        // Set the primary family file for Supabase Realtime subscriptions
+        if (activeFiles.length > 0) {
+          setActiveFamilyFileId(activeFiles[0].id);
+        }
 
         // Fetch dashboard summaries for ALL active family files
         const summaryPromises = activeFiles.map(file =>
@@ -494,99 +486,36 @@ function DashboardContent() {
     loadDashboardData();
   }, [loadDashboardData]);
 
-  // WS5: WebSocket subscriptions and real-time event handling
-  useEffect(() => {
-    // Subscribe to all active family files
-    activeFileIdsRef.current.forEach(familyFileId => {
-      subscribe(familyFileId);
-    });
+  // Supabase Realtime: Subscribe to all domain events for live dashboard updates
+  useRealtimeExchanges({
+    familyFileId: activeFamilyFileId,
+    onExchangeCreated: () => refreshSummary(),
+    onExchangeUpdated: () => refreshSummary(),
+    onExchangeCheckin: () => refreshSummary(),
+  });
 
-    // Set up event listeners for real-time updates
-    const unsubscribeFns = [
-      onExchangeCreated(() => {
-        console.log('[Dashboard] Exchange created - refreshing...');
-        refreshSummary();
-      }),
-      onExchangeUpdated(() => {
-        console.log('[Dashboard] Exchange updated - refreshing...');
-        refreshSummary();
-      }),
-      onExchangeCheckin(() => {
-        console.log('[Dashboard] Exchange check-in - refreshing...');
-        refreshSummary();
-      }),
-      onObligationCreated(() => {
-        console.log('[Dashboard] Obligation created - refreshing...');
-        refreshSummary();
-      }),
-      onObligationUpdated(() => {
-        console.log('[Dashboard] Obligation updated - refreshing...');
-        refreshSummary();
-      }),
-      onPaymentReceived(() => {
-        console.log('[Dashboard] Payment received - refreshing...');
-        refreshSummary();
-      }),
-      onDashboardUpdate(() => {
-        console.log('[Dashboard] Dashboard update - refreshing...');
-        refreshSummary();
-      }),
-      // WS5: Event notifications
-      onEventCreated(() => {
-        console.log('[Dashboard] Event created - refreshing...');
-        refreshSummary();
-      }),
-      onEventUpdated(() => {
-        console.log('[Dashboard] Event updated - refreshing...');
-        refreshSummary();
-      }),
-      onEventDeleted(() => {
-        console.log('[Dashboard] Event deleted - refreshing...');
-        refreshSummary();
-      }),
-      // WS5: Agreement notifications
-      onAgreementCreated(() => {
-        console.log('[Dashboard] Agreement created - refreshing...');
-        refreshSummary();
-      }),
-      onAgreementUpdated(() => {
-        console.log('[Dashboard] Agreement updated - refreshing...');
-        refreshSummary();
-      }),
-      onAgreementApproved(() => {
-        console.log('[Dashboard] Agreement approved - refreshing...');
-        refreshSummary();
-      }),
-    ];
+  useRealtimeSchedule({
+    familyFileId: activeFamilyFileId,
+    onEventCreated: () => refreshSummary(),
+    onEventUpdated: () => refreshSummary(),
+    onEventDeleted: () => refreshSummary(),
+  });
 
-    // Cleanup: unsubscribe from WebSocket and remove listeners
-    return () => {
-      activeFileIdsRef.current.forEach(familyFileId => {
-        unsubscribe(familyFileId);
-      });
-      unsubscribeFns.forEach(fn => fn());
-    };
-  }, [
-    subscribe,
-    unsubscribe,
-    onExchangeCreated,
-    onExchangeUpdated,
-    onExchangeCheckin,
-    onObligationCreated,
-    onObligationUpdated,
-    onPaymentReceived,
-    onDashboardUpdate,
-    onEventCreated,
-    onEventUpdated,
-    onEventDeleted,
-    onAgreementCreated,
-    onAgreementUpdated,
-    onAgreementApproved,
-    refreshSummary,
-  ]);
+  useRealtimeWallet({
+    familyFileId: activeFamilyFileId,
+    onObligationCreated: () => refreshSummary(),
+    onObligationUpdated: () => refreshSummary(),
+    onBalanceChanged: () => refreshSummary(),
+  });
 
-  // WS5: Polling removed - dashboard now relies entirely on WebSocket updates
-  // The window focus refresh below provides fallback when user returns to tab
+  useRealtimeAgreements({
+    familyFileId: activeFamilyFileId,
+    onAgreementCreated: () => refreshSummary(),
+    onAgreementUpdated: () => refreshSummary(),
+    onAgreementApproved: () => refreshSummary(),
+  });
+
+  // Supabase Realtime replaces WebSocket polling - window focus refresh as fallback
 
   // Refresh when window regains focus (user comes back to tab)
   useEffect(() => {

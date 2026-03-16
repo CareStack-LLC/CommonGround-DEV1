@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useWebSocket } from '@/contexts/websocket-context';
+import { useRealtime } from '@/contexts/realtime-context';
 
 interface OnlineIndicatorProps {
   userId: string;
@@ -12,10 +11,10 @@ interface OnlineIndicatorProps {
 }
 
 /**
- * WS5: Online Presence Indicator
+ * Online Presence Indicator
  *
  * Displays real-time online/offline status for a user.
- * Uses WebSocket events to update in real-time.
+ * Uses Supabase Realtime Presence tracking (replaces WebSocket onUserStatus).
  */
 export function OnlineIndicator({
   userId,
@@ -24,19 +23,8 @@ export function OnlineIndicator({
   size = 'md',
   className = '',
 }: OnlineIndicatorProps) {
-  const [isOnline, setIsOnline] = useState(false);
-  const { onUserStatus } = useWebSocket();
-
-  // Listen for user status changes
-  useEffect(() => {
-    const unsubscribe = onUserStatus((data) => {
-      if (data.user_id === userId) {
-        setIsOnline(data.status === 'online');
-      }
-    });
-
-    return unsubscribe;
-  }, [userId, onUserStatus]);
+  const { isUserOnline } = useRealtime();
+  const isOnline = isUserOnline(userId);
 
   // Size mappings
   const sizeClasses = {
@@ -90,18 +78,8 @@ export function OnlineIndicator({
  * Compact badge version for avatars or small spaces
  */
 export function OnlineBadge({ userId, size = 'md' }: { userId: string; size?: 'sm' | 'md' | 'lg' }) {
-  const [isOnline, setIsOnline] = useState(false);
-  const { onUserStatus } = useWebSocket();
-
-  useEffect(() => {
-    const unsubscribe = onUserStatus((data) => {
-      if (data.user_id === userId) {
-        setIsOnline(data.status === 'online');
-      }
-    });
-
-    return unsubscribe;
-  }, [userId, onUserStatus]);
+  const { isUserOnline } = useRealtime();
+  const isOnline = isUserOnline(userId);
 
   if (!isOnline) return null;
 
