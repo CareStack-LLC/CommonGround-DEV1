@@ -270,6 +270,16 @@ class AgreementPDFGenerator:
             except Exception:
                 return Paragraph("(Content could not be rendered)", style)
 
+    @staticmethod
+    def _get_parent_name(parent) -> str:
+        """Get a parent's display name, handling both User and UserProfile objects."""
+        if hasattr(parent, 'full_name'):
+            return parent.full_name or "Unknown"
+        first = getattr(parent, 'first_name', '') or ''
+        last = getattr(parent, 'last_name', '') or ''
+        name = f"{first} {last}".strip()
+        return name or "Unknown"
+
     # ─── Header / Footer Callbacks ─────────────────────────────────────
 
     def _draw_header(self, canvas, doc):
@@ -548,7 +558,7 @@ class AgreementPDFGenerator:
         ))
 
         if parent:
-            name = self._sanitize_for_reportlab(parent.full_name or "Unknown")
+            name = self._sanitize_for_reportlab(self._get_parent_name(parent))
             email = self._sanitize_for_reportlab(parent.email or "Unknown")
             parts.append(self._safe_paragraph(name, self.styles['PartyName']))
             parts.append(self._safe_paragraph(f"Email: {email}", self.styles['PartyDetail']))
@@ -700,7 +710,7 @@ class AgreementPDFGenerator:
         ])
 
         # Name
-        name = parent.full_name if parent else "Not available"
+        name = self._get_parent_name(parent) if parent else "Not available"
         rows.append([
             Paragraph("Full Name", self.styles['SignatureLabel']),
             Paragraph(name, self.styles['SignatureValue']),
