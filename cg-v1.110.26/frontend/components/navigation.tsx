@@ -42,10 +42,10 @@ interface NavItem {
 // App navigation items (bottom nav for mobile)
 const appNavItems: NavItem[] = [
   { name: 'Dashboard', path: '/dashboard', icon: Home },
-  { name: 'Chat', path: '/messages', icon: MessageSquare },
-  { name: 'Files', path: '/family-files', icon: FolderHeart },
+  { name: 'Messages', path: '/messages', icon: MessageSquare },
+  { name: 'Family Files', path: '/family-files', icon: FolderHeart },
   { name: 'Clearfund', path: '/payments', icon: Wallet },
-  { name: 'Calendar', path: '/schedule', icon: Calendar },
+  { name: 'TimeBridge', path: '/schedule', icon: Calendar },
 ];
 
 // Marketing/public page links for top nav

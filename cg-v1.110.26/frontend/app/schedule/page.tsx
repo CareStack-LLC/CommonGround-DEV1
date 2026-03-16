@@ -90,23 +90,27 @@ function QuickActionCard({
 // Custody Legend with dashboard-matching styling
 function CustodyLegend() {
   return (
-    <div className="flex items-center gap-4 text-xs bg-card px-4 py-3 rounded-2xl border-2 border-border shadow-lg flex-wrap">
+    <div className="flex items-center gap-4 gap-y-2 text-xs bg-card px-4 py-3 rounded-2xl border-2 border-border shadow-lg flex-wrap">
       <span className="text-muted-foreground font-semibold mr-1">Legend:</span>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-[var(--portal-primary)] shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Your Time</span>
+        <span className="text-foreground font-semibold whitespace-nowrap">Your Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-cg-slate shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Their Time</span>
+        <span className="text-foreground font-semibold whitespace-nowrap">Their Events</span>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" />
+        <span className="text-foreground font-semibold whitespace-nowrap">(Kids) Events</span>
+      </div>
+      <div className="flex items-center gap-1.5 flex-shrink-0">
+        <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm" />
+        <span className="text-foreground font-semibold whitespace-nowrap">Professional Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
         <div className="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Exchange</span>
-      </div>
-      <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#2D6A8F] shadow-sm" />
-        <span className="text-foreground font-semibold whitespace-nowrap">Professional</span>
+        <span className="text-foreground font-semibold whitespace-nowrap">Exchanges/Swaps</span>
       </div>
     </div>
   );

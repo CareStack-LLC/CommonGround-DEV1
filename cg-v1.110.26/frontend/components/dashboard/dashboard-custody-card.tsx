@@ -146,6 +146,13 @@ export function DashboardCustodyCard({
         return () => { supabase.removeChannel(channel); };
     }, [childId, familyFileId]);
 
+    // Tick every 60s to keep countdown live
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => setTick(t => t + 1), 60000);
+        return () => clearInterval(interval);
+    }, []);
+
     // Loading skeleton
     if (loading || !timelineData) {
         return (
@@ -182,18 +189,22 @@ export function DashboardCustodyCard({
         statusText = 'Pending Check-in';
     }
 
-    // Current streak — count full calendar days (inclusive)
-    // Pickup Sunday = Day 1, Monday = Day 2, Tuesday = Day 3, etc.
-    const currentStreakDays = (() => {
-        if (!currentSession) return 0;
-        const start = new Date(currentSession.start_time);
-        const now = new Date();
-        // Zero out times to compare calendar dates
-        const startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-        const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const diffDays = Math.round((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-        return diffDays + 1; // +1 because pickup day counts as Day 1
-    })();
+    // Countdown to next exchange
+    const getCountdown = (exchangeTime: string | undefined): string | null => {
+        if (!exchangeTime) return null;
+        const diff = new Date(exchangeTime).getTime() - Date.now();
+        if (diff <= 0) return '< 1m';
+        const totalMinutes = Math.floor(diff / 60000);
+        const totalHours = Math.floor(totalMinutes / 60);
+        const totalDays = Math.floor(totalHours / 24);
+        const remainingHours = totalHours % 24;
+        const remainingMinutes = totalMinutes % 60;
+        if (totalDays >= 2) return `${totalDays} Days`;
+        if (totalDays >= 1) return `${totalDays} Day ${remainingHours}h`;
+        if (totalHours >= 1) return `${totalHours}h ${remainingMinutes}m`;
+        if (totalMinutes >= 1) return `${totalMinutes}m`;
+        return '< 1m';
+    };
 
     // Next exchange — use real data from custody status API
     const nextExchangeTime = childStatus?.next_exchange_time;
@@ -314,9 +325,9 @@ export function DashboardCustodyCard({
 
                 {/* Bottom stats */}
                 <div className="pt-3 border-t border-border flex items-center justify-between">
-                    {hasCurrentSession && currentStreakDays > 0 ? (
-                        <span className="text-xs text-muted-foreground">
-                            Day <span className="font-bold text-foreground">{currentStreakDays}</span> with you
+                    {hasCurrentSession && hasNextExchange ? (
+                        <span className="text-xs font-semibold text-cg-amber">
+                            {getCountdown(nextExchangeTime)} till {nextAction === 'pickup' || !isWithYou ? 'pick up' : 'drop off'}
                         </span>
                     ) : (
                         <span className="text-xs text-muted-foreground">{statusText}</span>
