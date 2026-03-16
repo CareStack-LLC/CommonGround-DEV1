@@ -10,7 +10,7 @@
 ## Backend (Render)
 
 ### Service: commonground-api
-- **URL**: https://commonground-api-gdxg.onrender.com
+- **URL**: https://commonground-api-a0fr.onrender.com
 - **Status**: ✅ LIVE
 - **Deployment ID**: dep-d5pnov2li9vc73c08ie0
 - **Commit**: 27a7e12d (Parent Calling Feature)
@@ -32,7 +32,7 @@ All 7 new parent-calls endpoints are available:
 
 **Verification**:
 ```bash
-curl -s "https://commonground-api-gdxg.onrender.com/openapi.json" | jq '.paths | keys | map(select(contains("parent-calls")))'
+curl -s "https://commonground-api-a0fr.onrender.com/openapi.json" | jq '.paths | keys | map(select(contains("parent-calls")))'
 ```
 
 ### Database Migration
@@ -148,14 +148,14 @@ userName: profile?.preferred_name || `${profile?.first_name || ''} ${profile?.la
 ### 1. Check Backend Health
 
 ```bash
-curl https://commonground-api-gdxg.onrender.com/docs
+curl https://commonground-api-a0fr.onrender.com/docs
 # Should return Swagger UI HTML
 ```
 
 ### 2. Verify Parent Calls Endpoints
 
 ```bash
-curl -s https://commonground-api-gdxg.onrender.com/openapi.json | jq '.paths | keys | map(select(contains("parent-calls")))'
+curl -s https://commonground-api-a0fr.onrender.com/openapi.json | jq '.paths | keys | map(select(contains("parent-calls")))'
 # Should list all 7 endpoints
 ```
 
@@ -284,7 +284,7 @@ Features:
 ✅ Approval-gated (both parents must join)
 ✅ Court-ready evidence packages
 
-Backend: https://commonground-api-gdxg.onrender.com/docs
+Backend: https://commonground-api-a0fr.onrender.com/docs
 Frontend: https://common-ground-blue.vercel.app
 
 Please test and report any issues!

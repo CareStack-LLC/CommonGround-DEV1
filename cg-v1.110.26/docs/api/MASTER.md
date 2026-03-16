@@ -10,7 +10,7 @@ This document is a consolidation of all documentation files in this directory.
 
 **Last Updated:** January 18, 2026
 **API Version:** 1.6.0
-**Base URL:** `https://commonground-api-gdxg.onrender.com/api/v1`
+**Base URL:** `https://commonground-api-a0fr.onrender.com/api/v1`
 **Local Development:** `http://localhost:8000/api/v1`
 
 ---

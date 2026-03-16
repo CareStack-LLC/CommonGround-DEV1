@@ -8,7 +8,7 @@ Creates:
 - Professional access request from Celia to Family First Law Group
 
 Usage:
-    python scripts/seed_firm_invitation.py --api-url https://commonground-api-gdxg.onrender.com
+    python scripts/seed_firm_invitation.py --api-url https://commonground-api-a0fr.onrender.com
     python scripts/seed_firm_invitation.py --api-url http://localhost:8000
 """
 

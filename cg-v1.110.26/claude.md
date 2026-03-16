@@ -41,7 +41,7 @@ mypy app/
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
-- Production API: https://commonground-api-gdxg.onrender.com
+- Production API: https://commonground-api-a0fr.onrender.com
 
 ## Project Structure
 
@@ -435,7 +435,7 @@ When generating ARIA responses or UI copy:
 | Service | Provider | URL |
 |---------|----------|-----|
 | Frontend | Vercel | https://common-ground-blue.vercel.app |
-| Backend | Render | https://commonground-api-gdxg.onrender.com |
+| Backend | Render | https://commonground-api-a0fr.onrender.com |
 | Database | Supabase (PostgreSQL) | Supabase Dashboard |
 | Auth | Supabase Auth + TOTP MFA | Supabase Dashboard |
 | Cache | Redis Cloud / Upstash | - |

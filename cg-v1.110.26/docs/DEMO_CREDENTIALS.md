@@ -330,8 +330,8 @@
 ## 🔗 Quick Links
 
 **Frontend:** https://common-ground-blue.vercel.app
-**Backend API:** https://commonground-api-gdxg.onrender.com
-**API Docs:** https://commonground-api-gdxg.onrender.com/docs
+**Backend API:** https://commonground-api-a0fr.onrender.com
+**API Docs:** https://commonground-api-a0fr.onrender.com/docs
 
 ---
 
