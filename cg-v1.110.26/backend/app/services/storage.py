@@ -34,6 +34,7 @@ class StorageBucket:
     MESSAGE_ATTACHMENTS = "message_attachments"  # Private bucket for parent message attachments
     CALL_RECORDINGS = "call_recordings"  # Private bucket for parent call recordings
     PROFESSIONAL_MEDIA = "professional-media"  # Public bucket for firm logos, videos, and professional headshots
+    REPORTS = "reports"  # Private bucket for generated PDF reports
 
 
 class SupabaseStorageService:
@@ -428,6 +429,11 @@ def validate_attachment(
         return True, "video", None
     else:
         return False, None, f"File type {content_type} is not allowed"
+
+
+def build_report_path(family_file_id: str, report_id: str) -> str:
+    """Build storage path for a generated PDF report."""
+    return f"{family_file_id}/{report_id}.pdf"
 
 
 def build_professional_headshot_path(professional_id: str, filename: str) -> str:

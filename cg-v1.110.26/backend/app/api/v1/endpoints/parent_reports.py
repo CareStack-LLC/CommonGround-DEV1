@@ -96,7 +96,7 @@ async def generate_parent_report(
     # Generate report
     try:
         service = ParentReportService(db)
-        pdf_bytes = await service.generate_report(
+        result = await service.generate_report(
             report_type=report_type,
             family_file_id=family_file_id,
             date_start=date_start,
@@ -127,11 +127,13 @@ async def generate_parent_report(
     filename = f"CommonGround-{report_name}-{date.today().isoformat()}.pdf"
 
     return StreamingResponse(
-        io.BytesIO(pdf_bytes),
+        io.BytesIO(result.pdf_bytes),
         media_type="application/pdf",
         headers={
             "Content-Disposition": f'attachment; filename="{filename}"',
-            "Content-Length": str(len(pdf_bytes)),
+            "Content-Length": str(len(result.pdf_bytes)),
+            "X-Report-ID": result.report_id,
+            "X-SHA256-Hash": result.sha256_hash,
         }
     )
 

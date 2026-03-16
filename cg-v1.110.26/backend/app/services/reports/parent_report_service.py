@@ -32,9 +32,20 @@ from app.models.custody_day_record import CustodyDayRecord
 from app.models.schedule import ScheduleEvent
 from app.models.kidcoms import KidComsSession, KidComsMessage, KidComsCommunicationLog
 from app.models.circle import CircleContact
+from app.models.generated_report import GeneratedReport
 from app.services.custody_time import CustodyTimeService
 from app.services.geolocation import GeolocationService
+from app.services.storage import StorageBucket, build_report_path, storage_service
 from .chart_builder import ChartBuilder, COLORS, ChartData
+
+
+class ReportResult:
+    """Result of generating a PDF report."""
+
+    def __init__(self, pdf_bytes: bytes, report_id: str, sha256_hash: str):
+        self.pdf_bytes = pdf_bytes
+        self.report_id = report_id
+        self.sha256_hash = sha256_hash
 
 # Toxicity category descriptions for reports
 TOXICITY_CATEGORY_DESCRIPTIONS = {
@@ -92,9 +103,9 @@ class ParentReportService:
         date_start: date,
         date_end: date,
         user_id: str,
-    ) -> bytes:
+    ) -> ReportResult:
         """
-        Generate a PDF report.
+        Generate a PDF report, persist it to storage, and record it in the database.
 
         Args:
             report_type: Type of report to generate
@@ -104,30 +115,41 @@ class ParentReportService:
             user_id: ID of user requesting the report
 
         Returns:
-            PDF file as bytes
+            ReportResult with pdf_bytes, report_id, and sha256_hash
         """
         if report_type == "custody_time":
-            return await self._generate_custody_time_report(
+            pdf_bytes = await self._generate_custody_time_report(
                 family_file_id, date_start, date_end, user_id
             )
         elif report_type == "communication":
-            return await self._generate_communication_report(
+            pdf_bytes = await self._generate_communication_report(
                 family_file_id, date_start, date_end, user_id
             )
         elif report_type == "expense":
-            return await self._generate_expense_report(
+            pdf_bytes = await self._generate_expense_report(
                 family_file_id, date_start, date_end, user_id
             )
         elif report_type == "schedule":
-            return await self._generate_schedule_report(
+            pdf_bytes = await self._generate_schedule_report(
                 family_file_id, date_start, date_end, user_id
             )
         elif report_type == "kidspace_communication":
-            return await self._generate_kidspace_communication_report(
+            pdf_bytes = await self._generate_kidspace_communication_report(
                 family_file_id, date_start, date_end, user_id
             )
         else:
             raise ValueError(f"Unknown report type: {report_type}")
+
+        # Persist and return result
+        return await self._persist_report(
+            pdf_bytes=pdf_bytes,
+            report_type=report_type,
+            report_category="parent",
+            family_file_id=family_file_id,
+            user_id=user_id,
+            date_start=date_start,
+            date_end=date_end,
+        )
 
     async def _generate_custody_time_report(
         self,
@@ -279,7 +301,8 @@ class ParentReportService:
         )
 
         # Convert to PDF
-        return self._html_to_pdf(html_content)
+        pdf_bytes, _ = self._html_to_pdf(html_content)
+        return pdf_bytes
 
     async def _generate_communication_report(
         self,
@@ -398,7 +421,8 @@ class ParentReportService:
         )
 
         # Convert to PDF
-        return self._html_to_pdf(html_content)
+        pdf_bytes, _ = self._html_to_pdf(html_content)
+        return pdf_bytes
 
     async def _generate_expense_report(
         self,
@@ -550,7 +574,8 @@ class ParentReportService:
         )
 
         # Convert to PDF
-        return self._html_to_pdf(html_content)
+        pdf_bytes, _ = self._html_to_pdf(html_content)
+        return pdf_bytes
 
     async def _generate_schedule_report(
         self,
@@ -626,7 +651,8 @@ class ParentReportService:
     )
 
         # Convert to PDF
-        return self._html_to_pdf(html_content)
+        pdf_bytes, _ = self._html_to_pdf(html_content)
+        return pdf_bytes
 
     async def _generate_kidspace_communication_report(
         self,
@@ -811,7 +837,8 @@ class ParentReportService:
         )
 
         # Convert to PDF
-        return self._html_to_pdf(html_content)
+        pdf_bytes, _ = self._html_to_pdf(html_content)
+        return pdf_bytes
 
     @staticmethod
     def generate_report_id() -> str:
@@ -820,8 +847,13 @@ class ParentReportService:
         random_suffix = secrets.token_hex(2).upper()
         return f"RPT-{now.strftime('%Y%m%d')}-{random_suffix}"
 
-    def _html_to_pdf(self, html_content: str) -> bytes:
-        """Convert HTML to PDF using WeasyPrint with SHA-256 verification."""
+    def _html_to_pdf(self, html_content: str) -> tuple[bytes, str]:
+        """
+        Convert HTML to PDF using WeasyPrint with SHA-256 verification.
+
+        Returns:
+            Tuple of (pdf_bytes, sha256_hash)
+        """
         html = HTML(string=html_content, base_url=str(TEMPLATE_DIR))
         pdf_buffer = io.BytesIO()
         html.write_pdf(pdf_buffer)
@@ -832,7 +864,84 @@ class ParentReportService:
         sha256_hash = hashlib.sha256(pdf_bytes).hexdigest()
         logger.info(f"Report generated - SHA-256: {sha256_hash[:16]}...")
 
-        return pdf_bytes
+        return pdf_bytes, sha256_hash
+
+    async def _persist_report(
+        self,
+        pdf_bytes: bytes,
+        report_type: str,
+        report_category: str,
+        family_file_id: str,
+        user_id: str,
+        date_start: date,
+        date_end: date,
+        source_record_id: Optional[str] = None,
+        source_record_type: Optional[str] = None,
+    ) -> ReportResult:
+        """
+        Upload PDF to storage and create a GeneratedReport database record.
+
+        Returns:
+            ReportResult with pdf_bytes, report_id, and sha256_hash
+        """
+        report_id = self.generate_report_id()
+        sha256_hash = hashlib.sha256(pdf_bytes).hexdigest()
+
+        # Upload to Supabase storage
+        file_url = None
+        try:
+            path = build_report_path(family_file_id, report_id)
+            file_url = await storage_service.upload_file(
+                bucket=StorageBucket.REPORTS,
+                path=path,
+                file_content=pdf_bytes,
+                content_type="application/pdf",
+            )
+        except Exception as e:
+            # Non-fatal: report is still usable even if storage fails
+            logger.warning(f"Failed to upload report {report_id} to storage: {e}")
+
+        # Build redacted family file number
+        family_file_number_redacted = None
+        family_file = await self._get_family_file(family_file_id)
+        if family_file and family_file.family_file_number:
+            ffn = family_file.family_file_number
+            # Show last 3 chars: FF-••••3A7
+            if len(ffn) > 3:
+                family_file_number_redacted = f"{ffn[:3]}{'•' * (len(ffn) - 6)}{ffn[-3:]}"
+            else:
+                family_file_number_redacted = ffn
+
+        # Create database record
+        record = GeneratedReport(
+            report_id=report_id,
+            sha256_hash=sha256_hash,
+            report_type=report_type,
+            report_category=report_category,
+            family_file_id=family_file_id,
+            generated_by_id=user_id,
+            date_range_start=date_start,
+            date_range_end=date_end,
+            file_url=file_url,
+            file_size_bytes=len(pdf_bytes),
+            generated_at=datetime.utcnow(),
+            family_file_number_redacted=family_file_number_redacted,
+            source_record_id=source_record_id,
+            source_record_type=source_record_type,
+        )
+        self.db.add(record)
+        await self.db.commit()
+
+        logger.info(
+            f"Report persisted: {report_id} | type={report_type} | "
+            f"sha256={sha256_hash[:16]}... | size={len(pdf_bytes)}"
+        )
+
+        return ReportResult(
+            pdf_bytes=pdf_bytes,
+            report_id=report_id,
+            sha256_hash=sha256_hash,
+        )
 
     async def _get_calendar_events(
         self,

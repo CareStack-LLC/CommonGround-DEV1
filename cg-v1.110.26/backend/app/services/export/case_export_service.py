@@ -23,6 +23,7 @@ from sqlalchemy.orm import selectinload
 from app.models.case import Case
 from app.models.user import User
 from app.models.export import CaseExport, ExportSection, SECTION_TYPES
+from app.models.generated_report import GeneratedReport
 from app.models.audit import EventLog
 from app.services.export.redaction import RedactionService
 from app.services.export.pdf_builder import ExportPDFBuilder, calculate_content_hash
@@ -211,6 +212,28 @@ class CaseExportService:
             # Set expiration (30 days for non-permanent)
             from datetime import timedelta
             export.expires_at = datetime.utcnow() + timedelta(days=30)
+
+            # Create GeneratedReport record for unified verification
+            try:
+                generated_report = GeneratedReport(
+                    report_id=f"RPT-{datetime.utcnow().strftime('%Y%m%d')}-{uuid.uuid4().hex[:4].upper()}",
+                    sha256_hash=content_hash,
+                    report_type="court_export",
+                    report_category="court_export",
+                    family_file_id=getattr(case, "family_file_id", None),
+                    generated_by_id=user_id,
+                    date_range_start=date_start,
+                    date_range_end=date_end,
+                    file_url=file_url,
+                    file_size_bytes=len(pdf_bytes),
+                    page_count=export.page_count,
+                    generated_at=datetime.utcnow(),
+                    source_record_id=export.id,
+                    source_record_type="case_export",
+                )
+                self.db.add(generated_report)
+            except Exception:
+                pass  # Non-fatal: export still works without verification row
 
             await self.db.commit()
             await self.db.refresh(export)
