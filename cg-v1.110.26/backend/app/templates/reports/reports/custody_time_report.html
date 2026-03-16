@@ -8,6 +8,10 @@
 {% block content %}
 <!-- Executive Summary -->
 <section class="section">
+  <div class="how-to-read">
+    This report tracks how parenting time was split between both parents during the reporting period. It compares the actual custody time against the agreed schedule and shows whether custody exchanges happened as planned.
+  </div>
+
   <h2>Executive Summary</h2>
   <div class="card keep-together" style="padding: var(--spacing-xl); background: var(--cg-sage-subtle); border: 1px solid var(--cg-sage-light);">
     <div class="grid grid-3" style="gap: var(--spacing-xl); text-align: center;">
@@ -104,6 +108,15 @@
         {{ split_donut_chart | safe }}
       </div>
 
+      <!-- Color Legend -->
+      <div class="legend-box">
+        <div class="legend-box-title">Color Key</div>
+        <div class="legend-box-items">
+          <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-teal);"></span><span>{{ parent_a_name }}</span></div>
+          <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-blue);"></span><span>{{ parent_b_name }}</span></div>
+        </div>
+      </div>
+
       <!-- Right: Stats -->
       <div>
         <div style="margin-bottom: 2rem;">
@@ -116,19 +129,19 @@
         <div style="display: flex; gap: 3rem; margin-bottom: 2rem;">
           <div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-              <span style="width: 10px; height: 10px; border-radius: 50%; background: #3B82F6;"></span>
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: var(--cg-teal);"></span>
               <span class="font-bold text-primary">{{ parent_a_name }}</span>
             </div>
-            <div style="font-size: 2rem; font-weight: 700; color: #3B82F6;">{{
+            <div style="font-size: 2rem; font-weight: 700; color: var(--cg-teal);">{{
               "%.1f"|format(stats.parent_a_percentage) }}%</div>
             <div class="text-muted text-sm">{{ stats.parent_a_days }} days</div>
           </div>
           <div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-              <span style="width: 10px; height: 10px; border-radius: 50%; background: #F97316;"></span>
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: var(--cg-blue);"></span>
               <span class="font-bold text-primary">{{ parent_b_name }}</span>
             </div>
-            <div style="font-size: 2rem; font-weight: 700; color: #F97316;">{{
+            <div style="font-size: 2rem; font-weight: 700; color: var(--cg-blue);">{{
               "%.1f"|format(stats.parent_b_percentage) }}%</div>
             <div class="text-muted text-sm">{{ stats.parent_b_days }} days</div>
           </div>
@@ -228,6 +241,10 @@
         </tr>
       </tbody>
     </table>
+
+    <div class="tip-box">
+      What does variance mean? Variance shows the difference between the agreed custody split and the actual time spent. Small variances (under 5%) are normal and expected. Larger variances may indicate scheduling issues that need attention.
+    </div>
   </div>
 </section>
 {% endif %}
@@ -261,6 +278,9 @@
   {% if exchanges %}
   <div class="card" style="margin-top: var(--spacing-lg);">
     <div class="card-header">Exchange History Log</div>
+    <div class="note-box">
+      GPS verification confirms both parents were at the designated exchange location. A checkmark means the parent's device was verified within the agreed meeting radius.
+    </div>
     <table style="font-size: 13px;">
       <thead>
         <tr style="background: var(--cg-slate-subtle);">
@@ -287,13 +307,13 @@
           </td>
           <td style="padding: 10px 16px;">
             {% if exchange.from_parent_checked_in and exchange.to_parent_checked_in %}
-            <span class="text-sage font-bold">✓ Both Parents</span>
+            <span class="text-sage font-bold">&#10003; Both Parents</span>
             {% elif exchange.from_parent_checked_in %}
             <span class="text-secondary">Drop-off only</span>
             {% elif exchange.to_parent_checked_in %}
             <span class="text-secondary">Pick-up only</span>
             {% else %}
-            <span class="text-muted">—</span>
+            <span class="text-muted">&mdash;</span>
             {% endif %}
           </td>
         </tr>
@@ -393,5 +413,17 @@
   Custody time is determined from: exchange check-ins (highest confidence),
   completed custody exchanges, the agreed parenting schedule, and manual "With Me" confirmations.
   Days without any recorded data are marked as unrecorded.
+</div>
+
+<div class="glossary-section">
+  <h2>Glossary</h2>
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="glossary-term">Custody Split</div><div class="glossary-definition">The percentage of time each parent has physical custody of the child(ren).</div></div>
+    <div class="glossary-item"><div class="glossary-term">Variance</div><div class="glossary-definition">The difference between the agreed custody schedule and the actual time spent. Positive means more time than agreed; negative means less.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Exchange Compliance</div><div class="glossary-definition">The percentage of scheduled custody exchanges that were completed as planned.</div></div>
+    <div class="glossary-item"><div class="glossary-term">GPS Verification</div><div class="glossary-definition">Location confirmation using the parent's mobile device to verify they were at the agreed exchange location.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Overnights</div><div class="glossary-definition">Nights where the child slept at a parent's residence, used to calculate custody time percentages.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Check-in</div><div class="glossary-definition">When a parent confirms their presence at a custody exchange via the CommonGround app.</div></div>
+  </div>
 </div>
 {% endblock %}

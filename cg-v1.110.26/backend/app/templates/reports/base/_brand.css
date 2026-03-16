@@ -1,36 +1,41 @@
 /*
  * CommonGround Brand Design System
  * Matches frontend/app/globals.css for consistent branding
+ * Updated March 2026 — teal/blue/gold identity
  */
 
 :root {
-  /* Primary - Sage Green (trust, nature, calm) */
-  --cg-sage: #4A6C58;
-  --cg-sage-dark: #2C4034;
-  --cg-sage-light: #6B9B7A;
-  --cg-sage-subtle: #E8F0EC;
+  /* Primary - Teal (trust, growth, co-parenting) */
+  --cg-teal: #3DAA8A;
+  --cg-teal-dark: #2C8A6E;
+  --cg-teal-light: #5BC4A0;
+  --cg-teal-subtle: #E6F5F0;
 
-  /* Secondary - Slate Blue (stability, neutrality) */
-  --cg-slate: #475569;
-  --cg-slate-dark: #1E293B;
-  --cg-slate-light: #64748B;
-  --cg-slate-subtle: #F1F5F9;
+  /* Secondary - Blue (stability, professionalism) */
+  --cg-blue: #2D6A8F;
+  --cg-blue-dark: #1E4E6B;
+  --cg-blue-light: #4BA8C8;
+  --cg-blue-subtle: #E8F4F8;
+
+  /* Accent - Gold (warmth, children, connection) */
+  --cg-gold: #F5A623;
+  --cg-gold-light: #FDE8C8;
+  --cg-gold-subtle: #FFF8ED;
+
+  /* Gradients */
+  --cg-gradient-teal: linear-gradient(135deg, #5BC4A0, #3DAA8A);
+  --cg-gradient-blue: linear-gradient(135deg, #4BA8C8, #2D6A8F);
 
   /* Backgrounds */
   --cg-sand: #F5F0E8;
   --cg-cream: #FFFBF5;
   --cg-white: #FFFFFF;
 
-  /* Accents */
-  --cg-amber: #D97706;  /* Darkened for text readability */
-  --cg-amber-light: #FEF3C7;
-  --cg-amber-subtle: #FFFBEB;
-
   /* Text - High Contrast */
   --cg-text-primary: #1E293B;
   --cg-text-secondary: #475569;
-  --cg-text-muted: #64748B;
-  --cg-text-light: #94A3B8;
+  --cg-text-muted: #94A3B8;
+  --cg-text-light: #CBD5E1;
 
   /* Borders */
   --cg-border: #E2E8F0;
@@ -38,14 +43,27 @@
   --cg-border-input: #E2E8F0;
 
   /* Status Colors */
-  --cg-success: #4A6C58;
-  --cg-warning: #D97706;
+  --cg-success: #3DAA8A;
+  --cg-warning: #F5A623;
   --cg-error: #DC2626;
-  --cg-info: #3B82F6;
+  --cg-info: #2D6A8F;
+
+  /* Legacy aliases for templates still using old names */
+  --cg-sage: #3DAA8A;
+  --cg-sage-dark: #2C8A6E;
+  --cg-sage-light: #5BC4A0;
+  --cg-sage-subtle: #E6F5F0;
+  --cg-slate: #2D6A8F;
+  --cg-slate-dark: #1E4E6B;
+  --cg-slate-light: #4BA8C8;
+  --cg-slate-subtle: #E8F4F8;
+  --cg-amber: #F5A623;
+  --cg-amber-light: #FDE8C8;
+  --cg-amber-subtle: #FFF8ED;
 
   /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-serif: 'Crimson Text', serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'DM Serif Display', Georgia, serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
 
   /* Spacing */
@@ -87,27 +105,50 @@ h1, h2, h3, h4, h5, h6 {
 .font-sans { font-family: var(--font-sans); }
 .font-mono { font-family: var(--font-mono); }
 
-.text-sage { color: var(--cg-sage); }
-.text-sage-dark { color: var(--cg-sage-dark); }
-.text-slate { color: var(--cg-slate); }
-.text-amber { color: var(--cg-amber); }
+.text-teal { color: var(--cg-teal); }
+.text-teal-dark { color: var(--cg-teal-dark); }
+.text-blue { color: var(--cg-blue); }
+.text-gold { color: var(--cg-gold); }
+.text-sage { color: var(--cg-teal); }
+.text-sage-dark { color: var(--cg-teal-dark); }
+.text-slate { color: var(--cg-blue); }
+.text-amber { color: var(--cg-gold); }
 .text-error { color: var(--cg-error); }
 .text-muted { color: var(--cg-text-muted); }
 
-.bg-sage-subtle { background-color: var(--cg-sage-subtle); }
+.bg-teal-subtle { background-color: var(--cg-teal-subtle); }
+.bg-blue-subtle { background-color: var(--cg-blue-subtle); }
+.bg-sage-subtle { background-color: var(--cg-teal-subtle); }
 .bg-cream { background-color: var(--cg-cream); }
 
 /* Font-face fallbacks for WeasyPrint */
 @font-face {
-  font-family: 'Crimson Text';
+  font-family: 'DM Serif Display';
   font-style: normal;
   font-weight: 400;
-  src: local('Crimson Text'), local('Georgia'), local('Times New Roman');
+  src: local('DM Serif Display'), local('Georgia'), local('Times New Roman');
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'DM Sans';
   font-style: normal;
   font-weight: 400;
-  src: local('Inter'), local('Helvetica Neue'), local('Arial');
+  src: local('DM Sans'), local('Helvetica Neue'), local('Arial');
 }
-
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 500;
+  src: local('DM Sans Medium'), local('DM Sans'), local('Helvetica Neue'), local('Arial');
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('DM Sans SemiBold'), local('DM Sans'), local('Helvetica Neue Bold'), local('Arial Bold');
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('DM Sans Bold'), local('DM Sans'), local('Helvetica Neue Bold'), local('Arial Bold');
+}

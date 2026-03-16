@@ -2,6 +2,7 @@
 ChartBuilder - Generate beautiful SVG charts for CommonGround reports.
 
 Uses pure SVG generation for perfect print quality at any size.
+Updated March 2026 — teal/blue/gold brand identity.
 """
 
 import math
@@ -9,23 +10,37 @@ from typing import Optional
 from dataclasses import dataclass
 
 
-# Brand colors from _brand.css
+# Brand colors matching _brand.css (teal/blue/gold identity)
 COLORS = {
-    "sage": "#4A6C58",
-    "sage_dark": "#3A5646",
-    "sage_light": "#6B9B7A",
-    "sage_subtle": "#E8F0EC",
-    "slate": "#475569",
-    "slate_light": "#64748B",
-    "slate_subtle": "#E2E8F0",
-    "amber": "#D4A574",
-    "amber_light": "#E5C9A8",
-    "border": "#D9D4CC",
-    "border_light": "#E8E3DB",
-    "text_primary": "#2D3A35",
-    "text_secondary": "#6B7B74",
-    "text_muted": "#94A3A0",
+    "teal": "#3DAA8A",
+    "teal_dark": "#2C8A6E",
+    "teal_light": "#5BC4A0",
+    "teal_subtle": "#E6F5F0",
+    "blue": "#2D6A8F",
+    "blue_dark": "#1E4E6B",
+    "blue_light": "#4BA8C8",
+    "blue_subtle": "#E8F4F8",
+    "gold": "#F5A623",
+    "gold_light": "#FDE8C8",
+    "gold_subtle": "#FFF8ED",
+    "error": "#DC2626",
+    "error_light": "#FEE2E2",
+    "border": "#E2E8F0",
+    "border_light": "#F1F5F9",
+    "text_primary": "#1E293B",
+    "text_secondary": "#475569",
+    "text_muted": "#94A3B8",
     "white": "#FFFFFF",
+    # Legacy aliases
+    "sage": "#3DAA8A",
+    "sage_dark": "#2C8A6E",
+    "sage_light": "#5BC4A0",
+    "sage_subtle": "#E6F5F0",
+    "slate": "#2D6A8F",
+    "slate_light": "#4BA8C8",
+    "slate_subtle": "#E8F4F8",
+    "amber": "#F5A623",
+    "amber_light": "#FDE8C8",
 }
 
 
@@ -34,7 +49,7 @@ class ChartData:
     """Data point for charts."""
     label: str
     value: float
-    color: str = COLORS["sage"]
+    color: str = COLORS["teal"]
 
 
 class ChartBuilder:
@@ -46,7 +61,7 @@ class ChartBuilder:
         total: float,
         label: str = "",
         center_text: Optional[str] = None,
-        color: str = COLORS["sage"],
+        color: str = COLORS["teal"],
         background_color: str = COLORS["border_light"],
         size: int = 140,
         stroke_width: int = 20,
@@ -123,8 +138,8 @@ class ChartBuilder:
         value_b: float,
         label_a: str = "Parent A",
         label_b: str = "Parent B",
-        color_a: str = COLORS["sage"],
-        color_b: str = COLORS["slate"],
+        color_a: str = COLORS["teal"],
+        color_b: str = COLORS["blue"],
         size: int = 160,
         stroke_width: int = 24,
         center_text: Optional[str] = None,
@@ -298,8 +313,8 @@ class ChartBuilder:
         value_b: float,
         label_a: str = "Parent A",
         label_b: str = "Parent B",
-        color_a: str = COLORS["sage"],
-        color_b: str = COLORS["slate"],
+        color_a: str = COLORS["teal"],
+        color_b: str = COLORS["blue"],
         width: int = 400,
         bar_height: int = 32,
         is_percentage: bool = True,
@@ -396,7 +411,7 @@ class ChartBuilder:
         value: str,
         label: str,
         sublabel: str = "",
-        color: str = COLORS["sage"],
+        color: str = COLORS["teal"],
     ) -> str:
         """
         Generate a stat badge for key metrics.
@@ -444,5 +459,40 @@ class ChartBuilder:
         return f'''
         <div class="chart-legend">
             {''.join(items_html)}
+        </div>
+        '''
+
+    @staticmethod
+    def legend_box(
+        title: str,
+        items: list[tuple[str, str]],  # [(label, color), ...]
+    ) -> str:
+        """
+        Generate a bordered legend box with color swatches and labels.
+
+        Reusable across all reports for chart/status color explanations.
+
+        Args:
+            title: Legend box title (e.g., "Color Key", "Chart Legend")
+            items: List of (label, color) tuples
+
+        Returns:
+            HTML markup string
+        """
+        items_html = []
+        for label, color in items:
+            items_html.append(f'''
+                <div class="legend-box-item">
+                    <span class="legend-box-swatch" style="background: {color}"></span>
+                    <span>{label}</span>
+                </div>
+            ''')
+
+        return f'''
+        <div class="legend-box">
+            <div class="legend-box-title">{title}</div>
+            <div class="legend-box-items">
+                {''.join(items_html)}
+            </div>
         </div>
         '''

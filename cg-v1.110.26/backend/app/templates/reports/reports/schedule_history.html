@@ -7,6 +7,12 @@
 
 {% block content %}
 
+<div class="how-to-read">
+  <h3>How to Read This Report</h3>
+  <p>This report tracks calendar events, custody exchanges, and schedule modifications. <strong>GPS verification</strong> confirms that parents were present at designated exchange locations by recording their device coordinates when they check in through the app.</p>
+  <p>The "Exchange Location Radius" is the allowed distance from the agreed meeting point — check-ins within this radius are marked as verified.</p>
+</div>
+
 <!-- Executive Summary Stats -->
 <section class="section">
   <h2>Schedule Overview</h2>
@@ -36,6 +42,16 @@
       <div class="stat-value slate">{{ stats.cancelled }}</div>
       <div class="stat-label">Cancelled</div>
       <div class="stat-sublabel">cancelled by parent</div>
+    </div>
+  </div>
+
+  <div class="legend-box">
+    <div class="legend-box-title">Exchange Status Key</div>
+    <div class="legend-box-items">
+      <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-teal);"></span><span>Completed</span></div>
+      <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-error);"></span><span>Missed</span></div>
+      <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-gold);"></span><span>Late</span></div>
+      <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-text-muted);"></span><span>Cancelled</span></div>
     </div>
   </div>
 </section>
@@ -104,6 +120,10 @@
         <div class="stat-sublabel">{{ parent_b_stats.in_geofence }} of {{ parent_b_stats.check_ins }} verified</div>
       </div>
     </div>
+  </div>
+
+  <div class="tip-box">
+    <p>What is GPS verification? When parents check in at a custody exchange location using the CommonGround app, GPS coordinates are recorded to confirm both parties were present. The "exchange location radius" is the allowed distance from the agreed meeting point (typically 500 feet). Location accuracy depends on device settings and conditions.</p>
   </div>
 </section>
 {% endif %}
@@ -223,7 +243,7 @@
 <section class="section">
   <h2>Exchange Detail Log</h2>
   <div class="card" style="padding: 0; overflow: hidden;">
-    <table class="full-width" style="font-size: 9pt;">
+    <table class="full-width" style="font-size: 10pt;">
       <thead>
         <tr>
           <th>Date</th>
@@ -270,12 +290,16 @@
 </section>
 {% endif %}
 
-<!-- Data Sources Note -->
-<div class="note info" style="margin-top: 2rem;">
-  <strong>About This Report</strong><br>
-  Exchange data is collected from the CommonGround scheduling system. GPS coordinates are
-  recorded when parents check in at exchanges using the mobile app. Location accuracy
-  depends on device settings and conditions. All GPS data is secured and used only for
-  compliance verification.
+<!-- Glossary -->
+<div class="glossary-section">
+  <h2>Glossary</h2>
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="glossary-term">Custody Exchange</div><div class="glossary-definition">A scheduled transfer of the child(ren) from one parent to the other, at a designated time and location.</div></div>
+    <div class="glossary-item"><div class="glossary-term">GPS Verification</div><div class="glossary-definition">Location confirmation using the parent's mobile device to verify they were at the agreed exchange location when they checked in.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Exchange Location Radius</div><div class="glossary-definition">The allowed distance from the agreed meeting point. Check-ins within this radius are marked as "verified."</div></div>
+    <div class="glossary-item"><div class="glossary-term">Schedule Modification</div><div class="glossary-definition">A request by one parent to change a scheduled event, which may require approval from the other parent.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Completion Rate</div><div class="glossary-definition">The percentage of scheduled custody exchanges that were completed as planned, excluding cancelled exchanges.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Check-in</div><div class="glossary-definition">When a parent confirms their presence at a custody exchange via the CommonGround app, recording their GPS location and timestamp.</div></div>
+  </div>
 </div>
 {% endblock %}

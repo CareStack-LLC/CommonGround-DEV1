@@ -10,6 +10,12 @@
   /* Local styles removed in favor of design system in _brand.css */
 </style>
 
+<div class="how-to-read">
+  <h3>How to Read This Report</h3>
+  <p>This report tracks shared financial obligations between parents through CommonGround's <strong>ClearFund</strong> system. It shows expenses, child support payments, and how well each parent is meeting their financial responsibilities as defined in the custody agreement.</p>
+  <p>Compliance is measured by whether payments were made on time and in the correct amount.</p>
+</div>
+
 <!-- Understanding Compliance -->
 <section class="section compliance-section keep-together">
   <div class="card" style="background: var(--cg-sage-subtle); border: 1px solid var(--cg-sage-light);">
@@ -142,6 +148,20 @@
     </div>
   </div>
 </section>
+
+<div class="tip-box">
+  <p>What does "funded" mean? A funded obligation means the responsible parent has submitted payment through ClearFund. "Compliance" means the payment was confirmed and matched the agreed amount. Discrepancies may arise from disputed charges or processing delays.</p>
+</div>
+
+<div class="legend-box">
+  <div class="legend-box-title">Status Key</div>
+  <div class="legend-box-items">
+    <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-teal);"></span><span>Compliant / Funded</span></div>
+    <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-gold);"></span><span>Partial / Pending</span></div>
+    <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-error);"></span><span>Non-compliant / Overdue</span></div>
+    <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-text-muted);"></span><span>Cancelled / Disputed</span></div>
+  </div>
+</div>
 
 <!-- Parent Contributions Section -->
 <section class="section">
@@ -358,5 +378,17 @@
   </div>
 </section>
 {% endif %}
+
+<div class="glossary-section">
+  <h2>Glossary</h2>
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="glossary-term">Obligation</div><div class="glossary-definition">A financial responsibility entered into ClearFund, such as child support, medical expenses, or shared costs.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Funded</div><div class="glossary-definition">The parent responsible for the obligation has submitted payment through ClearFund.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Compliance Rate</div><div class="glossary-definition">The percentage of financial obligations that were paid on time and in the correct amount.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Expense Split</div><div class="glossary-definition">The percentage each parent is responsible for, as defined in the custody agreement (e.g., 50/50 or 60/40).</div></div>
+    <div class="glossary-item"><div class="glossary-term">ClearFund</div><div class="glossary-definition">CommonGround's financial tracking system for managing shared parenting expenses and child support payments.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Payment Verification</div><div class="glossary-definition">Confirmation that a payment was received, matched the required amount, and was recorded in the system.</div></div>
+  </div>
+</div>
 
 {% endblock %}

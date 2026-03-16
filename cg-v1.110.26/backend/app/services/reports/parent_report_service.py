@@ -225,8 +225,8 @@ class ParentReportService:
             label_a=parent_a_name,
             label_b=parent_b_name,
              # Use bright colors for Actual
-            color_a="#3B82F6", # Bright Blue
-            color_b="#F97316", # Bright Orange
+            color_a=COLORS["teal"],
+            color_b=COLORS["blue"],
             center_text="Expected",
             center_sublabel=split_display,
         )
@@ -509,7 +509,7 @@ class ParentReportService:
         if categories and stats["total_amount"] > 0:
             # Build chart data from categories
             chart_items = []
-            cat_colors = [COLORS["sage"], COLORS["slate"], COLORS["amber"], "#3B82F6", "#8B5CF6", "#EC4899"]
+            cat_colors = [COLORS["teal"], COLORS["blue"], COLORS["gold"], COLORS["teal_light"], COLORS["blue_light"], COLORS["gold_light"]]
             for i, cat in enumerate(categories[:6]):
                 chart_items.append(ChartData(
                     label=cat["name"].replace("_", " ").title(),
@@ -779,7 +779,7 @@ class ParentReportService:
 
         session_type_chart = ""
         if type_counts:
-            chart_colors = [COLORS["sage"], COLORS["slate"], COLORS["amber"], "#3B82F6", "#8B5CF6"]
+            chart_colors = [COLORS["teal"], COLORS["blue"], COLORS["gold"], COLORS["teal_light"], COLORS["blue_light"]]
             chart_data = []
             for i, (label, count) in enumerate(sorted(type_counts.items(), key=lambda x: x[1], reverse=True)):
                 chart_data.append(ChartData(
