@@ -152,6 +152,30 @@ export interface GeofenceEntryEvent {
   timestamp: string;
 }
 
+// WS7: Custody override ("With Me") notifications
+export interface CustodyOverrideEvent {
+  type: 'custody_override';
+  family_file_id: string;
+  claiming_parent_id: string;
+  claiming_parent_name: string;
+  child_ids: string[];
+  child_names: string[];
+  notes: string | null;
+  message: string;
+  timestamp: string;
+}
+
+export interface CustodyOverrideAcknowledgedEvent {
+  type: 'custody_override_acknowledged';
+  family_file_id: string;
+  acknowledged_by: string;
+  acknowledged_by_name: string;
+  child_ids: string[];
+  status: 'acknowledged' | 'disputed';
+  notes: string | null;
+  timestamp: string;
+}
+
 // WS5: Schedule Event real-time notifications
 export interface EventCreatedEvent {
   type: 'event_created';
@@ -375,6 +399,8 @@ export type WebSocketEventType =
   | 'balance_changed'
   | 'dashboard_update'
   | 'geofence_entry'
+  | 'custody_override'
+  | 'custody_override_acknowledged'
   | 'event_created'
   | 'event_updated'
   | 'event_deleted'

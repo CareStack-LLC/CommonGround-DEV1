@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { QrCode, Camera, CheckCircle, XCircle, Loader2, Copy, Check } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { QrCode, Camera, CheckCircle, XCircle, Loader2, Copy, Check, Keyboard, AlertTriangle } from 'lucide-react';
 import { exchangesAPI, CustodyExchangeInstance, QRTokenResponse } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface QRConfirmationProps {
   instance: CustodyExchangeInstance;
@@ -14,6 +15,114 @@ interface QRConfirmationProps {
 }
 
 type Mode = 'display' | 'scan';
+type ScanMode = 'camera' | 'manual';
+
+/**
+ * QR Camera Scanner component using html5-qrcode
+ * Dynamically imports the library to avoid SSR issues
+ */
+function QRCameraScanner({
+  onScanSuccess,
+  onScanError
+}: {
+  onScanSuccess: (decodedText: string) => void;
+  onScanError?: (error: string) => void;
+}) {
+  const scannerRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isStarting, setIsStarting] = useState(true);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    let html5QrCode: any = null;
+
+    const startScanner = async () => {
+      try {
+        // Dynamic import to avoid SSR issues
+        const { Html5Qrcode } = await import('html5-qrcode');
+
+        if (!mountedRef.current) return;
+
+        html5QrCode = new Html5Qrcode('qr-scanner-container');
+        scannerRef.current = html5QrCode;
+
+        await html5QrCode.start(
+          { facingMode: 'environment' },
+          {
+            fps: 10,
+            qrbox: { width: 200, height: 200 },
+            aspectRatio: 1.0,
+          },
+          (decodedText: string) => {
+            if (mountedRef.current) {
+              onScanSuccess(decodedText);
+            }
+          },
+          () => {
+            // QR scan failure per frame - ignore (this fires constantly while scanning)
+          }
+        );
+
+        if (mountedRef.current) {
+          setIsStarting(false);
+        }
+      } catch (err: any) {
+        if (!mountedRef.current) return;
+
+        const errorMsg = err?.message || 'Camera access denied';
+        setCameraError(
+          errorMsg.includes('NotAllowedError') || errorMsg.includes('Permission')
+            ? 'Camera permission denied. Please allow camera access or enter the code manually.'
+            : `Camera error: ${errorMsg}`
+        );
+        setIsStarting(false);
+        onScanError?.(errorMsg);
+      }
+    };
+
+    startScanner();
+
+    return () => {
+      mountedRef.current = false;
+      if (html5QrCode) {
+        html5QrCode.stop().catch(() => {});
+        html5QrCode.clear();
+      }
+    };
+  }, [onScanSuccess, onScanError]);
+
+  if (cameraError) {
+    return (
+      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-4 mb-4">
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+          <p className="text-sm text-amber-800 dark:text-amber-300">{cameraError}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-4">
+      <div className="relative rounded-lg overflow-hidden bg-black">
+        {isStarting && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-white mx-auto mb-2" />
+              <p className="text-sm text-white/80">Starting camera...</p>
+            </div>
+          </div>
+        )}
+        <div id="qr-scanner-container" ref={containerRef} className="w-full" />
+      </div>
+      <p className="text-xs text-muted-foreground text-center mt-2">
+        Point your camera at the QR code on the other parent&apos;s device
+      </p>
+    </div>
+  );
+}
 
 export default function QRConfirmation({
   instance,
@@ -28,6 +137,7 @@ export default function QRConfirmation({
   const [isConfirming, setIsConfirming] = useState(false);
   const [confirmSuccess, setConfirmSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [scanMode, setScanMode] = useState<ScanMode>('camera');
 
   useEffect(() => {
     loadQRToken();
@@ -46,8 +156,9 @@ export default function QRConfirmation({
     }
   };
 
-  const handleConfirmQR = async () => {
-    if (!scanToken.trim()) {
+  const handleConfirmQR = useCallback(async (token?: string) => {
+    const tokenToUse = token || scanToken.trim();
+    if (!tokenToUse) {
       setError('Please enter the QR code token');
       return;
     }
@@ -56,7 +167,7 @@ export default function QRConfirmation({
     setError(null);
 
     try {
-      const result = await exchangesAPI.confirmQR(instance.id, scanToken.trim());
+      const result = await exchangesAPI.confirmQR(instance.id, tokenToUse);
       setConfirmSuccess(true);
       onConfirmComplete?.(result);
     } catch (err: any) {
@@ -64,7 +175,13 @@ export default function QRConfirmation({
     } finally {
       setIsConfirming(false);
     }
-  };
+  }, [instance.id, scanToken, onConfirmComplete]);
+
+  const handleScanSuccess = useCallback((decodedText: string) => {
+    setScanToken(decodedText);
+    // Auto-confirm when QR is scanned
+    handleConfirmQR(decodedText);
+  }, [handleConfirmQR]);
 
   const copyToken = async () => {
     if (qrToken) {
@@ -107,7 +224,7 @@ export default function QRConfirmation({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md bg-background">
+      <Card className="w-full max-w-md bg-background max-h-[90vh] overflow-y-auto">
         <CardContent className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -139,7 +256,7 @@ export default function QRConfirmation({
               className="flex-1"
             >
               <Camera className="h-4 w-4 mr-2" />
-              Enter Code
+              Scan Code
             </Button>
           </div>
 
@@ -157,23 +274,21 @@ export default function QRConfirmation({
             </div>
           )}
 
-          {/* Display Mode - Show QR Code */}
+          {/* Display Mode - Show Real QR Code */}
           {mode === 'display' && qrToken && !isLoading && (
             <div className="text-center">
               <p className="text-muted-foreground mb-4">
                 Show this code to the other parent to confirm the exchange.
               </p>
 
-              {/* QR Code Placeholder - would use qrcode.react in production */}
-              <div className="bg-white p-6 rounded-lg inline-block mb-4 border-2 border-dashed border-gray-300">
-                <div className="w-48 h-48 bg-gray-100 rounded flex items-center justify-center">
-                  <div className="text-center">
-                    <QrCode className="h-16 w-16 mx-auto text-gray-400 mb-2" />
-                    <p className="text-xs text-gray-500 font-mono break-all px-2">
-                      {qrToken.token.substring(0, 16)}...
-                    </p>
-                  </div>
-                </div>
+              {/* Real QR Code via qrcode.react */}
+              <div className="bg-white p-6 rounded-lg inline-block mb-4 border border-gray-200 shadow-sm">
+                <QRCodeSVG
+                  value={qrToken.token}
+                  size={192}
+                  level="M"
+                  includeMargin={false}
+                />
               </div>
 
               <p className="text-sm text-muted-foreground mb-2">
@@ -199,29 +314,68 @@ export default function QRConfirmation({
             </div>
           )}
 
-          {/* Scan Mode - Enter Code */}
+          {/* Scan Mode - Camera or Manual Entry */}
           {mode === 'scan' && !isLoading && (
             <div>
-              <p className="text-muted-foreground mb-4">
-                Enter the confirmation code shown on the other parent's device.
-              </p>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-foreground mb-1">
-                  Confirmation Code
-                </label>
-                <input
-                  type="text"
-                  value={scanToken}
-                  onChange={(e) => setScanToken(e.target.value)}
-                  placeholder="Paste or type the code..."
-                  className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground font-mono"
-                />
+              {/* Scan mode toggle */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setScanMode('camera')}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    scanMode === 'camera'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700'
+                      : 'bg-secondary text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Camera className="h-4 w-4" />
+                  Scan with Camera
+                </button>
+                <button
+                  onClick={() => setScanMode('manual')}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    scanMode === 'manual'
+                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700'
+                      : 'bg-secondary text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Keyboard className="h-4 w-4" />
+                  Enter Manually
+                </button>
               </div>
 
+              {/* Camera Scanner */}
+              {scanMode === 'camera' && (
+                <QRCameraScanner
+                  onScanSuccess={handleScanSuccess}
+                  onScanError={() => setScanMode('manual')}
+                />
+              )}
+
+              {/* Manual Entry */}
+              {scanMode === 'manual' && (
+                <div>
+                  <p className="text-muted-foreground mb-4">
+                    Enter the confirmation code shown on the other parent&apos;s device.
+                  </p>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-foreground mb-1">
+                      Confirmation Code
+                    </label>
+                    <input
+                      type="text"
+                      value={scanToken}
+                      onChange={(e) => setScanToken(e.target.value)}
+                      placeholder="Paste or type the code..."
+                      className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground placeholder:text-muted-foreground font-mono"
+                    />
+                  </div>
+                </div>
+              )}
+
               <Button
-                onClick={handleConfirmQR}
-                disabled={isConfirming || !scanToken.trim()}
+                onClick={() => handleConfirmQR()}
+                disabled={isConfirming || (!scanToken.trim() && scanMode === 'manual')}
                 className="w-full bg-purple-600 hover:bg-purple-700"
               >
                 {isConfirming ? (

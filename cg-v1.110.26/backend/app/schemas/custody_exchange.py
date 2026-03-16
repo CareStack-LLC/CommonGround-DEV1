@@ -400,3 +400,11 @@ class ManualCustodyOverrideResponse(BaseModel):
     message: str
     notification_sent_to: Optional[str] = None  # Coparent name
     requires_acknowledgment: bool = True
+
+
+class CustodyOverrideAcknowledgeRequest(BaseModel):
+    """Request to acknowledge a custody override claim."""
+    family_file_id: str
+    child_ids: List[str] = Field(..., min_length=1, description="Children being acknowledged")
+    status: str = Field("acknowledged", description="acknowledged or disputed")
+    notes: Optional[str] = None

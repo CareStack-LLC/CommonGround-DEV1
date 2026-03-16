@@ -24,6 +24,10 @@ import {
   ArrowLeftRight,
   AlertCircle,
 } from 'lucide-react';
+import { useWebSocket } from '@/contexts/websocket-context';
+import GeofenceAlert from '@/components/schedule/geofence-alert';
+import CustodyOverrideBanner from '@/components/schedule/custody-override-banner';
+import type { GeofenceEntryEvent } from '@/lib/websocket';
 
 interface FamilyFileWithAgreements {
   familyFile: FamilyFile;
@@ -167,6 +171,17 @@ function ScheduleContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedExchangeInstance, setSelectedExchangeInstance] = useState<CustodyExchangeInstance | null>(null);
+  const [geofenceAlert, setGeofenceAlert] = useState<GeofenceEntryEvent | null>(null);
+
+  // WebSocket: Listen for geofence entry events
+  const { onGeofenceEntry } = useWebSocket();
+
+  useEffect(() => {
+    const unsub = onGeofenceEntry((event: GeofenceEntryEvent) => {
+      setGeofenceAlert(event);
+    });
+    return unsub;
+  }, [onGeofenceEntry]);
 
   useEffect(() => {
     if (user) {
@@ -360,7 +375,23 @@ function ScheduleContent() {
     <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted pb-32 lg:pb-8">
       <Navigation />
 
+      {/* Geofence Entry Alert */}
+      {geofenceAlert && (
+        <GeofenceAlert
+          event={geofenceAlert}
+          onOpenCheckIn={(exchangeId) => {
+            // Find and open the exchange check-in
+            setGeofenceAlert(null);
+            // The user can click on the exchange in calendar to open check-in
+          }}
+          onDismiss={() => setGeofenceAlert(null)}
+        />
+      )}
+
       <main className="max-w-3xl mx-auto px-4 py-6">
+        {/* Custody Override Banner */}
+        <CustodyOverrideBanner onRefresh={() => setCalendarKey(prev => prev + 1)} />
+
         {/* Page Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">

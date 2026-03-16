@@ -6,11 +6,14 @@ Handles creation, recurrence generation, and check-in logic.
 
 import uuid
 import secrets
+import logging
 from datetime import datetime, timedelta
 from typing import Optional, List, Tuple, Dict, Any
 from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+logger = logging.getLogger(__name__)
 
 from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
 from app.models.case import Case, CaseParticipant
@@ -2077,4 +2080,56 @@ class CustodyExchangeService:
             )
 
         await db.commit()
+
+        # Broadcast custody override event to the OTHER parent
+        try:
+            from app.services.realtime import realtime_service, RealtimeEventType
+
+            other_parent_id = (
+                family_file.parent_b_id if user_id == family_file.parent_a_id
+                else family_file.parent_a_id
+            )
+
+            if other_parent_id:
+                # Get the claiming parent's display name
+                from app.models.user import User
+                user_result = await db.execute(
+                    select(User).where(User.id == user_id)
+                )
+                claiming_user = user_result.scalar_one_or_none()
+                claiming_name = (
+                    f"{claiming_user.first_name} {claiming_user.last_name}"
+                    if claiming_user and claiming_user.first_name
+                    else "Co-parent"
+                )
+
+                # Get child names for the notification message
+                child_names = []
+                for child_id in child_ids:
+                    child_result = await db.execute(
+                        select(Child).where(Child.id == child_id)
+                    )
+                    child = child_result.scalar_one_or_none()
+                    if child:
+                        child_names.append(child.first_name or "Child")
+
+                child_names_str = ", ".join(child_names) if child_names else "the children"
+
+                await realtime_service.send_to_user(
+                    user_id=other_parent_id,
+                    event_type=RealtimeEventType.CUSTODY_OVERRIDE,
+                    data={
+                        "family_file_id": family_file_id,
+                        "claiming_parent_id": user_id,
+                        "claiming_parent_name": claiming_name,
+                        "child_ids": child_ids,
+                        "child_names": child_names,
+                        "notes": notes,
+                        "message": f"{claiming_name} says {child_names_str} is with them currently",
+                    }
+                )
+        except Exception as e:
+            # Don't fail the override if notification fails
+            logger.warning(f"Failed to broadcast custody override notification: {e}")
+
         return True

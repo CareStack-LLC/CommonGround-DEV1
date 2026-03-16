@@ -20,6 +20,8 @@ import {
   wsClient,
   WebSocketMessage,
   GeofenceEntryEvent,
+  CustodyOverrideEvent,
+  CustodyOverrideAcknowledgedEvent,
   KidComsCallIncomingEvent,
   IncomingCallEvent,
   CallDeclinedEvent,
@@ -34,6 +36,9 @@ interface WebSocketContextType {
   unsubscribe: (caseId: string) => void;
   // Geofence notifications
   onGeofenceEntry: (handler: (data: GeofenceEntryEvent) => void) => () => void;
+  // Custody override ("With Me") notifications
+  onCustodyOverride: (handler: (data: CustodyOverrideEvent) => void) => () => void;
+  onCustodyOverrideAcknowledged: (handler: (data: CustodyOverrideAcknowledgedEvent) => void) => () => void;
   // KidComs Call Notifications
   onKidComsCallIncoming: (handler: (data: KidComsCallIncomingEvent) => void) => () => void;
   // Parent-to-Parent Call Notifications
@@ -119,6 +124,24 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     return () => wsClient.off('geofence_entry', typedHandler);
   }, []);
 
+  // Custody override ("With Me") handler
+  const onCustodyOverride = useCallback((handler: (data: CustodyOverrideEvent) => void) => {
+    const typedHandler = (data: WebSocketMessage) => {
+      handler(data as unknown as CustodyOverrideEvent);
+    };
+    wsClient.on('custody_override', typedHandler);
+    return () => wsClient.off('custody_override', typedHandler);
+  }, []);
+
+  // Custody override acknowledged handler
+  const onCustodyOverrideAcknowledged = useCallback((handler: (data: CustodyOverrideAcknowledgedEvent) => void) => {
+    const typedHandler = (data: WebSocketMessage) => {
+      handler(data as unknown as CustodyOverrideAcknowledgedEvent);
+    };
+    wsClient.on('custody_override_acknowledged', typedHandler);
+    return () => wsClient.off('custody_override_acknowledged', typedHandler);
+  }, []);
+
   // KidComs Call Notification handler
   const onKidComsCallIncoming = useCallback((handler: (data: KidComsCallIncomingEvent) => void) => {
     const typedHandler = (data: WebSocketMessage) => {
@@ -169,6 +192,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
     subscribe,
     unsubscribe,
     onGeofenceEntry,
+    onCustodyOverride,
+    onCustodyOverrideAcknowledged,
     onKidComsCallIncoming,
     onIncomingCall,
     onCallDeclined,

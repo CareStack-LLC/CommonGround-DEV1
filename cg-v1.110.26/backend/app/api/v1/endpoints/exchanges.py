@@ -27,6 +27,7 @@ from app.schemas.custody_exchange import (
     QRTokenResponse,
     ManualCustodyOverrideRequest,
     ManualCustodyOverrideResponse,
+    CustodyOverrideAcknowledgeRequest,
 )
 from app.services.custody_exchange import CustodyExchangeService
 from app.services.geolocation import GeolocationService
@@ -1051,3 +1052,84 @@ async def override_custody(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=str(e)
         )
+
+
+@router.post(
+    "/acknowledge-custody-override",
+    response_model=ManualCustodyOverrideResponse,
+    summary="Acknowledge custody override",
+    description="Co-parent acknowledges or disputes a 'With Me' custody claim."
+)
+async def acknowledge_custody_override(
+    data: CustodyOverrideAcknowledgeRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Acknowledge or dispute a custody override claim from the other parent.
+
+    - **family_file_id**: The family file
+    - **child_ids**: Children being acknowledged
+    - **status**: 'acknowledged' or 'disputed'
+    - **notes**: Optional notes
+    """
+    from app.models.family_file import FamilyFile
+    from app.services.realtime import realtime_service, RealtimeEventType
+    from sqlalchemy import select
+
+    # Verify access to family file
+    result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == data.family_file_id)
+    )
+    family_file = result.scalar_one_or_none()
+
+    if not family_file:
+        raise HTTPException(status_code=404, detail="Family file not found")
+
+    if current_user.id not in [family_file.parent_a_id, family_file.parent_b_id]:
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    # Determine the other parent to notify
+    other_parent_id = (
+        family_file.parent_b_id if current_user.id == family_file.parent_a_id
+        else family_file.parent_a_id
+    )
+
+    # Log activity
+    try:
+        actor_name = f"{current_user.first_name} {current_user.last_name or ''}".strip()
+        await log_exchange_activity(
+            db=db,
+            family_file_id=data.family_file_id,
+            actor_id=str(current_user.id),
+            actor_name=actor_name or "Co-parent",
+            exchange_id=None,
+            action=f"custody_override_{data.status}",
+            extra_data={"child_ids": data.child_ids, "notes": data.notes}
+        )
+    except Exception:
+        pass
+
+    # Notify the claiming parent of acknowledgment
+    try:
+        if other_parent_id:
+            await realtime_service.send_to_user(
+                user_id=other_parent_id,
+                event_type=RealtimeEventType.CUSTODY_OVERRIDE_ACKNOWLEDGED,
+                data={
+                    "family_file_id": data.family_file_id,
+                    "acknowledged_by": str(current_user.id),
+                    "acknowledged_by_name": actor_name,
+                    "child_ids": data.child_ids,
+                    "status": data.status,
+                    "notes": data.notes,
+                }
+            )
+    except Exception:
+        pass
+
+    status_text = "acknowledged" if data.status == "acknowledged" else "disputed"
+    return ManualCustodyOverrideResponse(
+        success=True,
+        message=f"Custody override {status_text} for {len(data.child_ids)} child(ren)",
+    )

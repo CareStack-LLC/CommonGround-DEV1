@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Clock, CheckCircle, XCircle, Loader2, QrCode, Navigation, Users, Package, ArrowDown, ArrowUp } from 'lucide-react';
+import { MapPin, Clock, CheckCircle, XCircle, Loader2, QrCode, Navigation, Users, Package, ArrowDown, ArrowUp, Hand, AlertTriangle } from 'lucide-react';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import {
   exchangesAPI,
@@ -13,6 +13,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import dynamic from 'next/dynamic';
+
+// Dynamically import GeofenceMap to avoid SSR issues with Mapbox
+const GeofenceMap = dynamic(() => import('./geofence-map'), { ssr: false });
 
 interface SilentHandoffCheckInProps {
   instance: CustodyExchangeInstance;
@@ -34,6 +38,8 @@ export default function SilentHandoffCheckIn({
   const [checkInSuccess, setCheckInSuccess] = useState<CustodyExchangeInstance | null>(null);
   const [notes, setNotes] = useState('');
   const [children, setChildren] = useState<FamilyFileChild[]>([]);
+  const [isWithMe, setIsWithMe] = useState(false);
+  const [withMeSuccess, setWithMeSuccess] = useState(false);
 
   const exchange = instance.exchange;
   const hasSilentHandoff = exchange?.silent_handoff_enabled;
@@ -112,6 +118,37 @@ export default function SilentHandoffCheckIn({
     }
   };
 
+  const handleWithMe = async () => {
+    if (!familyFileId) {
+      setCheckInError('Family file not found. Cannot record override.');
+      return;
+    }
+
+    setIsWithMe(true);
+    setCheckInError(null);
+
+    try {
+      // Get all children IDs from this exchange
+      const allChildIds = [
+        ...(exchange?.viewer_pickup_child_ids || []),
+        ...(exchange?.viewer_dropoff_child_ids || []),
+      ];
+
+      if (allChildIds.length === 0) {
+        setCheckInError('No children found for this exchange.');
+        setIsWithMe(false);
+        return;
+      }
+
+      await familyFilesAPI.overrideCustody(familyFileId, allChildIds, notes || 'Manual check-in via Silent Handoff');
+      setWithMeSuccess(true);
+    } catch (err: any) {
+      setCheckInError(err.message || 'Failed to record custody override.');
+    } finally {
+      setIsWithMe(false);
+    }
+  };
+
   const formatTime = (dateStr: string) => {
     return new Date(dateStr).toLocaleTimeString('en-US', {
       hour: 'numeric',
@@ -164,7 +201,7 @@ export default function SilentHandoffCheckIn({
               <h2 className="text-xl font-bold text-foreground mb-2">Check-in Successful</h2>
 
               {hasGeofence && (
-                <div className="mb-4">
+                <div className="mb-4 space-y-3">
                   {isInGeofence ? (
                     <Badge variant="default" className="bg-green-600">
                       Within geofence ({formatDistance(distance)})
@@ -173,6 +210,30 @@ export default function SilentHandoffCheckIn({
                     <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
                       Outside geofence ({formatDistance(distance)})
                     </Badge>
+                  )}
+
+                  {/* Map showing check-in position */}
+                  {exchange?.location_lat && exchange?.location_lng && (
+                    <GeofenceMap
+                      center={{ lat: exchange.location_lat, lng: exchange.location_lng }}
+                      radiusMeters={exchange.geofence_radius_meters || 100}
+                      parentPositions={[
+                        ...(checkInSuccess.from_parent_check_in_lat && checkInSuccess.from_parent_check_in_lng ? [{
+                          lat: checkInSuccess.from_parent_check_in_lat,
+                          lng: checkInSuccess.from_parent_check_in_lng,
+                          name: exchange.other_parent_name || 'Parent A',
+                          inGeofence: checkInSuccess.from_parent_in_geofence || false,
+                        }] : []),
+                        ...(checkInSuccess.to_parent_check_in_lat && checkInSuccess.to_parent_check_in_lng ? [{
+                          lat: checkInSuccess.to_parent_check_in_lat,
+                          lng: checkInSuccess.to_parent_check_in_lng,
+                          name: 'You',
+                          inGeofence: checkInSuccess.to_parent_in_geofence || false,
+                        }] : []),
+                      ]}
+                      height="180px"
+                      interactive
+                    />
                   )}
                 </div>
               )}
@@ -287,6 +348,21 @@ export default function SilentHandoffCheckIn({
             )}
           </div>
 
+          {/* Geofence Map */}
+          {hasGeofence && exchange?.location_lat && exchange?.location_lng && (
+            <div className="mb-6">
+              <GeofenceMap
+                center={{ lat: exchange.location_lat, lng: exchange.location_lng }}
+                radiusMeters={exchange.geofence_radius_meters || 100}
+                height="180px"
+                interactive
+              />
+              <p className="text-xs text-muted-foreground text-center mt-1.5">
+                Geofence radius: {exchange.geofence_radius_meters || 100}m
+              </p>
+            </div>
+          )}
+
           {/* Window Status */}
           {windowStatus && (
             <div className="mb-6 space-y-3">
@@ -317,8 +393,29 @@ export default function SilentHandoffCheckIn({
                     Check-in window has closed
                   </p>
                   <p className="text-xs text-red-700/80 dark:text-red-400/80 mt-1">
-                    The time frame for GPS check-in has passed. If you need to record this exchange, please contact your co-parent or legal professional.
+                    The GPS check-in window has passed. You can still record this exchange using the &quot;Child is With Me&quot; button below.
                   </p>
+                  {familyFileId && !withMeSuccess && (
+                    <Button
+                      onClick={handleWithMe}
+                      disabled={isWithMe}
+                      variant="outline"
+                      size="sm"
+                      className="mt-2 w-full border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                    >
+                      {isWithMe ? (
+                        <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Recording...</>
+                      ) : (
+                        <><Hand className="h-3 w-3 mr-1" /> Child is With Me</>
+                      )}
+                    </Button>
+                  )}
+                  {withMeSuccess && (
+                    <div className="mt-2 flex items-center gap-1.5 text-green-700 dark:text-green-400">
+                      <CheckCircle className="h-4 w-4" />
+                      <span className="text-sm font-medium">Recorded! The other parent has been notified.</span>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -407,6 +504,28 @@ export default function SilentHandoffCheckIn({
                 )}
               </Button>
             </div>
+
+            {/* "With Me" secondary action — always available as fallback */}
+            {familyFileId && !withMeSuccess && (
+              <Button
+                onClick={handleWithMe}
+                disabled={isWithMe}
+                variant="outline"
+                className="w-full border-cg-amber/50 text-cg-amber-dark hover:bg-cg-amber/10"
+              >
+                {isWithMe ? (
+                  <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Recording...</>
+                ) : (
+                  <><Hand className="h-4 w-4 mr-2" /> Child is With Me (Manual Override)</>
+                )}
+              </Button>
+            )}
+            {withMeSuccess && (
+              <div className="flex items-center justify-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="text-sm font-medium text-green-700 dark:text-green-400">Custody override recorded. Other parent notified.</span>
+              </div>
+            )}
 
             {/* Dev/Test Mode: Use exchange location for testing */}
             {process.env.NODE_ENV === 'development' && hasGeofence && (

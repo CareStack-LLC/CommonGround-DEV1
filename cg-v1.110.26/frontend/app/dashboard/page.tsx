@@ -49,6 +49,10 @@ import {
 import { UpgradeBanner } from '@/components/upgrade-banner';
 import { useSubscription } from '@/contexts/subscription-context';
 import { DashboardCustodyCard } from '@/components/dashboard/dashboard-custody-card';
+import { useWebSocket } from '@/contexts/websocket-context';
+import GeofenceAlert from '@/components/schedule/geofence-alert';
+import CustodyOverrideBanner from '@/components/schedule/custody-override-banner';
+import type { GeofenceEntryEvent } from '@/lib/websocket';
 
 
 /**
@@ -324,6 +328,17 @@ function DashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const activeFileIdsRef = useRef<string[]>([]);
+  const [geofenceAlert, setGeofenceAlert] = useState<GeofenceEntryEvent | null>(null);
+
+  // WebSocket: Listen for geofence entry events
+  const { onGeofenceEntry } = useWebSocket();
+
+  useEffect(() => {
+    const unsub = onGeofenceEntry((event: GeofenceEntryEvent) => {
+      setGeofenceAlert(event);
+    });
+    return unsub;
+  }, [onGeofenceEntry]);
 
   // Lightweight refresh - only updates summary data (for auto-refresh)
   const refreshSummary = useCallback(async () => {
@@ -565,7 +580,22 @@ function DashboardContent() {
     <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted">
       <Navigation />
 
+      {/* Geofence Entry Alert */}
+      {geofenceAlert && (
+        <GeofenceAlert
+          event={geofenceAlert}
+          onOpenCheckIn={() => {
+            setGeofenceAlert(null);
+            router.push('/schedule');
+          }}
+          onDismiss={() => setGeofenceAlert(null)}
+        />
+      )}
+
       <main className="max-w-3xl mx-auto px-4 py-6 pb-32 lg:pb-8">
+        {/* Custody Override Banner */}
+        <CustodyOverrideBanner onRefresh={() => setRefreshKey(prev => prev + 1)} />
+
         {/* Header with Greeting */}
         <div className="mb-8 relative overflow-hidden bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10 rounded-2xl p-6 border border-[var(--portal-primary)]/10">
           <div className="relative z-10">

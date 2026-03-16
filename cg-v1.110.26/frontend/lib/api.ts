@@ -5251,6 +5251,26 @@ export const familyFilesAPI = {
   },
 
   /**
+   * Acknowledge or dispute a custody override ("With Me") claim
+   */
+  async acknowledgeCustodyOverride(
+    familyFileId: string,
+    childIds: string[],
+    status: 'acknowledged' | 'disputed',
+    notes?: string
+  ): Promise<{ success: boolean; message: string }> {
+    return fetchAPI<{ success: boolean; message: string }>('/exchanges/acknowledge-custody-override', {
+      method: 'POST',
+      body: JSON.stringify({
+        family_file_id: familyFileId,
+        child_ids: childIds,
+        status,
+        notes,
+      }),
+    });
+  },
+
+  /**
    * Delete a Family File
    * Only the creator (Parent A) can delete
    */

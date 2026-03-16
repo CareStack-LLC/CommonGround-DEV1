@@ -20,6 +20,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
+import dynamic from 'next/dynamic';
+
+const GeofenceMap = dynamic(() => import('./geofence-map'), { ssr: false });
 
 interface ExchangeFormProps {
   caseId: string;
@@ -528,7 +531,146 @@ export default function ExchangeForm({
               />
             </div>
 
-            {/* Silent Handoff Settings Removed */}
+            {/* Silent Handoff Settings */}
+            <div className="p-4 bg-secondary/50 rounded-lg border border-border">
+              <div className="flex items-center gap-2 mb-3">
+                <input
+                  type="checkbox"
+                  id="silent_handoff_enabled"
+                  checked={formData.silent_handoff_enabled}
+                  onChange={(e) => setFormData({ ...formData, silent_handoff_enabled: e.target.checked })}
+                  className="rounded border-input"
+                />
+                <Label htmlFor="silent_handoff_enabled" className="cursor-pointer flex items-center gap-1 text-foreground font-medium">
+                  <Navigation className="h-4 w-4" />
+                  Enable Silent Handoff GPS Check-in
+                </Label>
+              </div>
+
+              {formData.silent_handoff_enabled && (
+                <div className="space-y-4 mt-3 pl-6 border-l-2 border-cg-sage/30">
+                  {/* GPS Coordinates */}
+                  <div>
+                    <p className="text-sm font-medium text-foreground mb-1.5">Exchange Location GPS</p>
+                    {formData.location_lat && formData.location_lng ? (
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <span className="text-sm text-green-700 dark:text-green-400">
+                          Coordinates set: {formData.location_lat.toFixed(4)}&deg;, {formData.location_lng.toFixed(4)}&deg;
+                        </span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleGeocodeAddress}
+                          disabled={isGeocodingAddress || !formData.location.trim()}
+                        >
+                          {isGeocodingAddress ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Update'}
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGeocodeAddress}
+                        disabled={isGeocodingAddress || !formData.location.trim()}
+                        className="w-full"
+                      >
+                        {isGeocodingAddress ? (
+                          <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Geocoding...</>
+                        ) : (
+                          <><MapPin className="h-3 w-3 mr-1" /> Set GPS Coordinates from Address</>
+                        )}
+                      </Button>
+                    )}
+                    {!formData.location.trim() && (
+                      <p className="text-xs text-muted-foreground mt-1">Enter a location above first</p>
+                    )}
+                  </div>
+
+                  {/* Geofence Radius */}
+                  <div>
+                    <Label className="text-sm text-foreground">
+                      Geofence Radius: <span className="font-bold">{formData.geofence_radius_meters}m</span>
+                    </Label>
+                    <input
+                      type="range"
+                      min={50}
+                      max={500}
+                      step={25}
+                      value={formData.geofence_radius_meters}
+                      onChange={(e) => setFormData({ ...formData, geofence_radius_meters: parseInt(e.target.value) })}
+                      className="w-full mt-1 accent-cg-sage"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>50m</span>
+                      <span>500m</span>
+                    </div>
+                  </div>
+
+                  {/* Check-in Window */}
+                  <div>
+                    <Label className="text-sm text-foreground mb-1.5 block">Check-in Window</Label>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <Input
+                          type="number"
+                          min={5}
+                          max={120}
+                          value={formData.check_in_window_before_minutes}
+                          onChange={(e) => setFormData({ ...formData, check_in_window_before_minutes: parseInt(e.target.value) || 30 })}
+                          className="text-center"
+                        />
+                        <p className="text-xs text-muted-foreground text-center mt-0.5">min before</p>
+                      </div>
+                      <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <div className="flex-1">
+                        <Input
+                          type="number"
+                          min={5}
+                          max={120}
+                          value={formData.check_in_window_after_minutes}
+                          onChange={(e) => setFormData({ ...formData, check_in_window_after_minutes: parseInt(e.target.value) || 30 })}
+                          className="text-center"
+                        />
+                        <p className="text-xs text-muted-foreground text-center mt-0.5">min after</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* QR Confirmation */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="qr_confirmation_required"
+                      checked={formData.qr_confirmation_required}
+                      onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
+                      className="rounded border-input"
+                    />
+                    <Label htmlFor="qr_confirmation_required" className="cursor-pointer flex items-center gap-1 text-sm text-foreground">
+                      <QrCode className="h-4 w-4" />
+                      Require QR Code Confirmation
+                    </Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground -mt-2">
+                    When enabled, parents must scan each other&apos;s QR code after GPS check-in for a verified exchange.
+                  </p>
+
+                  {/* Map Preview */}
+                  {formData.location_lat && formData.location_lng && (
+                    <div className="mt-3">
+                      <p className="text-xs font-medium text-foreground mb-1.5">Geofence Preview</p>
+                      <GeofenceMap
+                        center={{ lat: formData.location_lat, lng: formData.location_lng }}
+                        radiusMeters={formData.geofence_radius_meters}
+                        height="150px"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Recurring */}
             <div className="p-4 bg-secondary/50 rounded-lg border border-border">

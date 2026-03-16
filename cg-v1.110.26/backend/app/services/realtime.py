@@ -54,6 +54,10 @@ class RealtimeEventType:
     GEOFENCE_ENTRY = "geofence_entry"
     GEOFENCE_EXIT = "geofence_exit"
 
+    # Custody override events (Silent Handoff "With Me")
+    CUSTODY_OVERRIDE = "custody_override"
+    CUSTODY_OVERRIDE_ACKNOWLEDGED = "custody_override_acknowledged"
+
     # Presence events
     USER_ONLINE = "user_online"
     USER_OFFLINE = "user_offline"
