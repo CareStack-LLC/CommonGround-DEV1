@@ -103,53 +103,55 @@ function WalletContent() {
       setIsLoading(true);
       setError(null);
 
-      // Load wallet
-      try {
-        const walletData = await walletAPI.getMyWallet();
+      // Load wallet, payouts, and family files in parallel
+      const [walletResult, payoutsResult, ffResult] = await Promise.allSettled([
+        walletAPI.getMyWallet(),
+        walletAPI.getPayouts({ page_size: 10 }),
+        familyFilesAPI.list(),
+      ]);
+
+      // Process wallet + transactions
+      if (walletResult.status === 'fulfilled') {
+        const walletData = walletResult.value;
         setWallet(walletData);
-
-        // Load transactions if wallet exists
         if (walletData.id) {
-          const txData = await walletAPI.getTransactions(walletData.id, { page_size: 20 });
-          setTransactions(txData.items);
-        }
-      } catch (err: any) {
-        // No wallet yet - that's ok
-        if (!err.message?.includes('404')) {
-          console.error('Wallet load error:', err);
-        }
-      }
-
-      // Load payouts
-      try {
-        const payoutData = await walletAPI.getPayouts({ page_size: 10 });
-        setPayouts(payoutData.items);
-      } catch (err) {
-        console.error('Payouts load error:', err);
-      }
-
-      // Load family files for child wallets
-      try {
-        const ffData = await familyFilesAPI.list();
-        setFamilyFiles(ffData.items || []);
-
-        // Load child wallets - if familyFileId provided, only load for that family
-        const allChildWallets: ChildWallet[] = [];
-        const filesToLoad = familyFileId
-          ? (ffData.items || []).filter(ff => ff.id === familyFileId)
-          : (ffData.items || []);
-
-        for (const ff of filesToLoad) {
           try {
-            const children = await walletAPI.getChildWallets(ff.id);
-            allChildWallets.push(...children);
+            const txData = await walletAPI.getTransactions(walletData.id, { page_size: 20 });
+            setTransactions(txData.items);
           } catch (err) {
-            console.error('Child wallets load error:', err);
+            console.error('Transactions load error:', err);
+          }
+        }
+      } else if (!walletResult.reason?.message?.includes('404')) {
+        console.error('Wallet load error:', walletResult.reason);
+      }
+
+      // Process payouts
+      if (payoutsResult.status === 'fulfilled') {
+        setPayouts(payoutsResult.value.items);
+      }
+
+      // Process family files + child wallets in parallel
+      if (ffResult.status === 'fulfilled') {
+        const files = ffResult.value.items || [];
+        setFamilyFiles(files);
+
+        const filesToLoad = familyFileId
+          ? files.filter(ff => ff.id === familyFileId)
+          : files;
+
+        // Fetch all child wallets in parallel instead of sequential loop
+        const childWalletResults = await Promise.allSettled(
+          filesToLoad.map(ff => walletAPI.getChildWallets(ff.id))
+        );
+
+        const allChildWallets: ChildWallet[] = [];
+        for (const result of childWalletResults) {
+          if (result.status === 'fulfilled') {
+            allChildWallets.push(...result.value);
           }
         }
         setChildWallets(allChildWallets);
-      } catch (err) {
-        console.error('Family files load error:', err);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to load wallet data');

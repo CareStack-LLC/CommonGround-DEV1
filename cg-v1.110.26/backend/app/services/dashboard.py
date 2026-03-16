@@ -179,19 +179,19 @@ class DashboardService:
         result = await db.execute(query)
         obligations = result.scalars().all()
 
+        # Batch-load all creator names in one query (avoids N+1)
+        creator_ids = list({str(obl.created_by) for obl in obligations if obl.created_by})
+        creator_map: dict = {}
+        if creator_ids:
+            creators_result = await db.execute(
+                select(User.id, User.first_name).where(User.id.in_(creator_ids))
+            )
+            creator_map = {str(row.id): row.first_name for row in creators_result.all()}
+
         items = []
         for obl in obligations:
             days_pending = (datetime.utcnow() - obl.created_at).days if obl.created_at else 0
-
-            # Get creator name (who submitted this expense request)
-            creator_name = None
-            if obl.created_by:
-                creator_result = await db.execute(
-                    select(User).where(User.id == obl.created_by)
-                )
-                creator = creator_result.scalar_one_or_none()
-                if creator:
-                    creator_name = creator.first_name
+            creator_name = creator_map.get(str(obl.created_by)) if obl.created_by else None
 
             # Get the user's share amount
             user_share = float(obl.petitioner_share) if is_petitioner else float(obl.respondent_share)
@@ -243,26 +243,29 @@ class DashboardService:
         )
         messages = result.scalars().all()
 
-        # Get sender name from first message
+        # Batch-load all sender names in one query (avoids N+1)
+        sender_ids = list({str(msg.sender_id) for msg in messages if msg.sender_id})
+        sender_map: dict = {}
+        if sender_ids:
+            senders_result = await db.execute(
+                select(User.id, User.first_name).where(User.id.in_(sender_ids))
+            )
+            sender_map = {str(row.id): row.first_name for row in senders_result.all()}
+
         sender_name = None
         items = []
 
         for msg in messages:
-            # Get sender name
-            if not sender_name and msg.sender_id:
-                sender_result = await db.execute(
-                    select(User).where(User.id == msg.sender_id)
-                )
-                sender = sender_result.scalar_one_or_none()
-                if sender:
-                    sender_name = sender.first_name
+            msg_sender_name = sender_map.get(str(msg.sender_id)) if msg.sender_id else None
+            if not sender_name and msg_sender_name:
+                sender_name = msg_sender_name
 
             content_preview = msg.content[:50] + "..." if len(msg.content) > 50 else msg.content
 
             items.append(UnreadMessage(
                 id=str(msg.id),
                 sender_id=str(msg.sender_id),
-                sender_name=sender_name or "Co-parent",
+                sender_name=msg_sender_name or "Co-parent",
                 content_preview=content_preview,
                 sent_at=msg.sent_at,
             ))
@@ -327,16 +330,17 @@ class DashboardService:
         )
         quick_accords = quick_accord_result.scalars().all()
 
+        # Batch-load all initiator names in one query (avoids N+1)
+        initiator_ids = list({str(qa.initiated_by) for qa in quick_accords if qa.initiated_by})
+        initiator_map: dict = {}
+        if initiator_ids:
+            initiators_result = await db.execute(
+                select(User.id, User.first_name).where(User.id.in_(initiator_ids))
+            )
+            initiator_map = {str(row.id): row.first_name for row in initiators_result.all()}
+
         for qa in quick_accords:
-            # Get initiator name
-            initiator_name = None
-            if qa.initiated_by:
-                initiator_result = await db.execute(
-                    select(User).where(User.id == qa.initiated_by)
-                )
-                initiator = initiator_result.scalar_one_or_none()
-                if initiator:
-                    initiator_name = initiator.first_name
+            initiator_name = initiator_map.get(str(qa.initiated_by)) if qa.initiated_by else None
 
             items.append(PendingAgreement(
                 id=str(qa.id),

@@ -13,7 +13,7 @@ from typing import List, Optional, Dict, Any
 import json
 
 from fastapi import HTTPException, status
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.child import Child, ChildProfileStatus
@@ -705,24 +705,19 @@ class ChildService:
         """
         await self._verify_case_access(case_id, user.id)
 
+        # Use database-level GROUP BY count instead of loading all rows
         result = await self.db.execute(
-            select(Child).where(Child.case_id == case_id)
+            select(Child.status, func.count(Child.id).label("cnt"))
+            .where(Child.case_id == case_id)
+            .group_by(Child.status)
         )
-        children = result.scalars().all()
+        status_counts = {row.status: row.cnt for row in result.all()}
 
         counts = {
-            "pending_approval": 0,
-            "active": 0,
-            "archived": 0,
-            "total": len(children),
+            "pending_approval": status_counts.get(ChildProfileStatus.PENDING_APPROVAL.value, 0),
+            "active": status_counts.get(ChildProfileStatus.ACTIVE.value, 0),
+            "archived": status_counts.get(ChildProfileStatus.ARCHIVED.value, 0),
+            "total": sum(status_counts.values()),
         }
-
-        for child in children:
-            if child.status == ChildProfileStatus.PENDING_APPROVAL.value:
-                counts["pending_approval"] += 1
-            elif child.status == ChildProfileStatus.ACTIVE.value:
-                counts["active"] += 1
-            elif child.status == ChildProfileStatus.ARCHIVED.value:
-                counts["archived"] += 1
 
         return counts

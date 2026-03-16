@@ -182,23 +182,17 @@ function ScheduleContent() {
       const familyFilesResponse = await familyFilesAPI.list();
       const familyFiles = familyFilesResponse.items || [];
 
-      const filesWithAgreements: FamilyFileWithAgreements[] = [];
+      // Fetch all agreements in parallel instead of sequential loop
+      const agreementResults = await Promise.allSettled(
+        familyFiles.map(ff => agreementsAPI.listForFamilyFile(ff.id))
+      );
 
-      for (const ff of familyFiles) {
-        try {
-          const agreementsResponse = await agreementsAPI.listForFamilyFile(ff.id);
-          filesWithAgreements.push({
-            familyFile: ff,
-            agreements: agreementsResponse.items || [],
-          });
-        } catch (err) {
-          console.error(`Failed to load agreements for family file ${ff.id}:`, err);
-          filesWithAgreements.push({
-            familyFile: ff,
-            agreements: [],
-          });
-        }
-      }
+      const filesWithAgreements: FamilyFileWithAgreements[] = familyFiles.map((ff, i) => ({
+        familyFile: ff,
+        agreements: agreementResults[i].status === 'fulfilled'
+          ? (agreementResults[i] as PromiseFulfilledResult<any>).value.items || []
+          : [],
+      }));
 
       setFamilyFilesWithAgreements(filesWithAgreements);
 

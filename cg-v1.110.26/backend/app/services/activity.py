@@ -134,22 +134,17 @@ class ActivityService:
         if category:
             base_filter = and_(base_filter, Activity.category == category)
 
-        # Get total count
-        total_result = await db.execute(
-            select(func.count(Activity.id)).where(base_filter)
+        # Get total + unread counts in a single query using conditional aggregation
+        read_col = Activity.read_by_parent_a_at if is_parent_a else Activity.read_by_parent_b_at
+        counts_result = await db.execute(
+            select(
+                func.count(Activity.id).label("total"),
+                func.count().filter(read_col.is_(None)).label("unread"),
+            ).where(base_filter)
         )
-        total = total_result.scalar() or 0
-
-        # Get unread count
-        if is_parent_a:
-            unread_filter = and_(base_filter, Activity.read_by_parent_a_at.is_(None))
-        else:
-            unread_filter = and_(base_filter, Activity.read_by_parent_b_at.is_(None))
-
-        unread_result = await db.execute(
-            select(func.count(Activity.id)).where(unread_filter)
-        )
-        unread_count = unread_result.scalar() or 0
+        counts_row = counts_result.one()
+        total = counts_row.total or 0
+        unread_count = counts_row.unread or 0
 
         # Get paginated activities
         result = await db.execute(
@@ -220,22 +215,17 @@ class ActivityService:
         # Get recent activities (including all activities for this family file)
         base_filter = Activity.family_file_id == family_file_id
 
-        # Get total count
-        total_result = await db.execute(
-            select(func.count(Activity.id)).where(base_filter)
+        # Get total + unread counts in a single query using conditional aggregation
+        read_col = Activity.read_by_parent_a_at if is_parent_a else Activity.read_by_parent_b_at
+        counts_result = await db.execute(
+            select(
+                func.count(Activity.id).label("total"),
+                func.count().filter(read_col.is_(None)).label("unread"),
+            ).where(base_filter)
         )
-        total_count = total_result.scalar() or 0
-
-        # Get unread count
-        if is_parent_a:
-            unread_filter = and_(base_filter, Activity.read_by_parent_a_at.is_(None))
-        else:
-            unread_filter = and_(base_filter, Activity.read_by_parent_b_at.is_(None))
-
-        unread_result = await db.execute(
-            select(func.count(Activity.id)).where(unread_filter)
-        )
-        unread_count = unread_result.scalar() or 0
+        counts_row = counts_result.one()
+        total_count = counts_row.total or 0
+        unread_count = counts_row.unread or 0
 
         # Get recent activities
         result = await db.execute(
