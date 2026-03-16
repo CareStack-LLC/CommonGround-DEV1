@@ -8,6 +8,8 @@ Uses ReportLab for reliable server-side PDF generation.
 """
 
 import io
+import re
+import html as html_module
 from datetime import datetime
 from typing import Optional, List, Any, Dict
 
@@ -214,6 +216,59 @@ class AgreementPDFGenerator:
             leading=13,
             spaceAfter=16,
         ))
+
+    # ─── Content Sanitization ────────────────────────────────────────
+
+    @staticmethod
+    def _sanitize_for_reportlab(text: str) -> str:
+        """
+        Sanitize arbitrary text/HTML content for ReportLab Paragraph.
+
+        ReportLab's Paragraph uses an XML-like parser that crashes on
+        unbalanced/unknown HTML tags. This strips all HTML tags except
+        the ones ReportLab supports, and escapes special chars.
+        """
+        if not text:
+            return ""
+
+        # Allowed ReportLab inline tags
+        ALLOWED_TAGS = {'b', 'i', 'u', 'br', 'br/', 'font', 'super', 'sub', 'a', 'strong', 'em'}
+
+        # First, unescape any HTML entities so we work with raw text
+        text = html_module.unescape(text)
+
+        # Strip all HTML tags except allowed ones
+        def _replace_tag(match):
+            full = match.group(0)
+            tag_name = match.group(1).lower().strip().split()[0].rstrip('/')
+            if tag_name in ALLOWED_TAGS:
+                return full
+            return ''  # strip unknown tags
+
+        text = re.sub(r'<(/?\s*\w[^>]*)>', _replace_tag, text)
+
+        # Escape remaining bare & < > that aren't part of allowed tags
+        # Replace & that aren't already entities
+        text = re.sub(r'&(?!amp;|lt;|gt;|quot;|apos;|nbsp;|#\d+;)', '&amp;', text)
+
+        # Replace < > that aren't part of tags (already handled above, but safety net)
+        # Don't re-escape valid tags — only bare < > chars
+        # This is tricky, so we just try to build the paragraph and fall back
+        return text.strip()
+
+    @staticmethod
+    def _safe_paragraph(text: str, style) -> 'Paragraph':
+        """Create a Paragraph, falling back to plain text if XML parsing fails."""
+        try:
+            return Paragraph(text, style)
+        except Exception:
+            # Strip ALL tags as a last resort
+            clean = re.sub(r'<[^>]+>', '', text)
+            clean = html_module.escape(clean)
+            try:
+                return Paragraph(clean, style)
+            except Exception:
+                return Paragraph("(Content could not be rendered)", style)
 
     # ─── Header / Footer Callbacks ─────────────────────────────────────
 
@@ -493,8 +548,10 @@ class AgreementPDFGenerator:
         ))
 
         if parent:
-            parts.append(Paragraph(parent.full_name, self.styles['PartyName']))
-            parts.append(Paragraph(f"Email: {parent.email}", self.styles['PartyDetail']))
+            name = self._sanitize_for_reportlab(parent.full_name or "Unknown")
+            email = self._sanitize_for_reportlab(parent.email or "Unknown")
+            parts.append(self._safe_paragraph(name, self.styles['PartyName']))
+            parts.append(self._safe_paragraph(f"Email: {email}", self.styles['PartyDetail']))
             if parent.phone:
                 parts.append(Paragraph(f"Phone: {parent.phone}", self.styles['PartyDetail']))
         else:
@@ -524,7 +581,8 @@ class AgreementPDFGenerator:
         for section in sections:
             # Section header with number
             header_text = f"{section.section_number}. {section.section_title}"
-            elements.append(Paragraph(header_text, self.styles['SectionHead']))
+            header_text = self._sanitize_for_reportlab(header_text)
+            elements.append(self._safe_paragraph(header_text, self.styles['SectionHead']))
             elements.append(HRFlowable(
                 width="100%", thickness=0.5, color=CG_SAGE,
                 spaceBefore=0, spaceAfter=8
@@ -541,7 +599,8 @@ class AgreementPDFGenerator:
                     content = "<i>No content provided for this section.</i>"
 
             # Clean content for reportlab (handle HTML-like tags)
-            elements.append(Paragraph(content, self.styles['SectionBody']))
+            content = self._sanitize_for_reportlab(content)
+            elements.append(self._safe_paragraph(content, self.styles['SectionBody']))
             elements.append(Spacer(1, 8))
 
         return elements

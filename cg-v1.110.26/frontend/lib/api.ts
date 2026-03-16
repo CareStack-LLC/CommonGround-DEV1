@@ -1234,7 +1234,12 @@ export const agreementsAPI = {
     );
 
     if (!response.ok) {
-      throw new APIError('Failed to generate PDF', response.status);
+      let detail = 'Failed to generate PDF';
+      try {
+        const err = await response.json();
+        detail = err.detail || detail;
+      } catch {}
+      throw new APIError(detail, response.status);
     }
 
     return response.blob();
