@@ -138,6 +138,32 @@ function QuickAccordDetailContent() {
     }
   };
 
+  // Resolve pickup/dropoff responsibility to parent's first name
+  const resolveResponsibility = (responsibility: string | null): string => {
+    if (!responsibility) return 'Not specified';
+    const val = responsibility.toLowerCase().trim();
+
+    // Map generic values to actual parent names from familyFile
+    if (val === 'user' || val === 'initiator' || val === 'parent_a') {
+      if (familyFile?.parent_a_info?.first_name) {
+        return familyFile.parent_a_info.first_name;
+      }
+      return 'Parent A';
+    }
+    if (val === 'other_parent' || val === 'co-parent' || val === 'parent_b') {
+      if (familyFile?.parent_b_info?.first_name) {
+        return familyFile.parent_b_info.first_name;
+      }
+      return 'Parent B';
+    }
+    if (val === 'both' || val === 'shared') {
+      return 'Both parents';
+    }
+
+    // If it's already a name or descriptive text, capitalize and return
+    return responsibility.charAt(0).toUpperCase() + responsibility.slice(1);
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
@@ -476,7 +502,7 @@ function QuickAccordDetailContent() {
                 <Car className="h-4 w-4 text-cg-sage flex-shrink-0" />
                 <div className="min-w-0">
                   <div className="text-sm text-muted-foreground">Pickup</div>
-                  <div className="text-sm capitalize">{quickAccord.pickup_responsibility}</div>
+                  <div className="text-sm font-medium">{resolveResponsibility(quickAccord.pickup_responsibility)}</div>
                 </div>
               </div>
             )}
@@ -486,7 +512,7 @@ function QuickAccordDetailContent() {
                 <Car className="h-4 w-4 text-cg-sage flex-shrink-0 rotate-180" />
                 <div className="min-w-0">
                   <div className="text-sm text-muted-foreground">Drop-off</div>
-                  <div className="text-sm capitalize">{quickAccord.dropoff_responsibility}</div>
+                  <div className="text-sm font-medium">{resolveResponsibility(quickAccord.dropoff_responsibility)}</div>
                 </div>
               </div>
             )}
@@ -600,7 +626,7 @@ function QuickAccordDetailContent() {
 export default function QuickAccordDetailPage() {
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <PageContainer background="transparent" className="pb-32">
           <QuickAccordDetailContent />

@@ -73,7 +73,7 @@ QUICK_ACCORD_SCHEMA = {
         "pickup_details": {
             "type": "object",
             "properties": {
-                "responsible_parent": {"type": "string", "description": "Who is picking up (mother/father/parent_a/parent_b)"},
+                "responsible_parent": {"type": "string", "description": "Who is picking up. MUST be one of: 'parent_a' (the user/initiator), 'parent_b' (the other parent), or 'both'. Never use 'user' or generic terms."},
                 "time": {"type": "string", "description": "Pickup time"},
                 "location": {"type": "string", "description": "Pickup location if different from main location"}
             }
@@ -81,7 +81,7 @@ QUICK_ACCORD_SCHEMA = {
         "dropoff_details": {
             "type": "object",
             "properties": {
-                "responsible_parent": {"type": "string", "description": "Who is dropping off"},
+                "responsible_parent": {"type": "string", "description": "Who is dropping off. MUST be one of: 'parent_a' (the user/initiator), 'parent_b' (the other parent), or 'both'. Never use 'user' or generic terms."},
                 "time": {"type": "string", "description": "Drop-off time"},
                 "location": {"type": "string", "description": "Drop-off location"}
             }
@@ -231,8 +231,8 @@ Return a JSON object with these fields (include only fields that have been discu
 - start_date, end_date: for date ranges (ISO format)
 - child_names: array of child names involved
 - location: where it's happening
-- pickup_details: {responsible_parent, time, location}
-- dropoff_details: {responsible_parent, time, location}
+- pickup_details: {responsible_parent, time, location} — responsible_parent MUST be 'parent_a' (the user creating this) or 'parent_b' (the other parent), never 'user'
+- dropoff_details: {responsible_parent, time, location} — same rule for responsible_parent
 - transportation_notes: any transport notes
 - has_shared_expense: boolean
 - estimated_amount: number in dollars
@@ -454,14 +454,27 @@ Return ONLY the JSON object, no other text."""
             except ValueError:
                 pass
 
-        # Parse pickup/dropoff
+        # Parse pickup/dropoff — normalize "user"/"initiator" to "parent_a"/"parent_b"
+        def _normalize_parent(value: str, is_initiator_parent_a: bool) -> str:
+            """Map generic values to parent_a/parent_b."""
+            val = (value or "").lower().strip()
+            if val in ("user", "initiator", "me", "requesting_parent"):
+                return "parent_a" if is_initiator_parent_a else "parent_b"
+            if val in ("other", "other_parent", "co-parent", "coparent"):
+                return "parent_b" if is_initiator_parent_a else "parent_a"
+            return value
+
         pickup = extracted_data.get("pickup_details", {})
         if pickup:
-            quick_accord.pickup_responsibility = pickup.get("responsible_parent")
+            raw = pickup.get("responsible_parent")
+            if raw:
+                quick_accord.pickup_responsibility = _normalize_parent(raw, is_parent_a)
 
         dropoff = extracted_data.get("dropoff_details", {})
         if dropoff:
-            quick_accord.dropoff_responsibility = dropoff.get("responsible_parent")
+            raw = dropoff.get("responsible_parent")
+            if raw:
+                quick_accord.dropoff_responsibility = _normalize_parent(raw, is_parent_a)
 
         quick_accord.transportation_notes = extracted_data.get("transportation_notes")
 

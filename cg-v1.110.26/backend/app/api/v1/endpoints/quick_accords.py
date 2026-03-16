@@ -28,7 +28,13 @@ router = APIRouter()
 
 
 def _build_quick_accord_response(qa) -> dict:
-    """Build a QuickAccordResponse dict from a QuickAccord model."""
+    """Build a QuickAccordResponse dict from a QuickAccord model.
+
+    IMPORTANT: This function must NOT trigger lazy loading of relationships.
+    Use inspect() to check if relationships are already loaded before accessing them.
+    """
+    from sqlalchemy import inspect as sa_inspect
+
     response = {
         "id": qa.id,
         "family_file_id": qa.family_file_id,
@@ -63,15 +69,20 @@ def _build_quick_accord_response(qa) -> dict:
         "is_expired": qa.is_expired,
     }
 
-    # Include minimal family_file data if loaded (only essential fields)
-    if hasattr(qa, 'family_file') and qa.family_file:
-        ff = qa.family_file
-        response["family_file"] = {
-            "id": ff.id,
-            "title": getattr(ff, 'title', 'Family'),
-            "parent_a_id": str(ff.parent_a_id) if ff.parent_a_id else None,
-            "parent_b_id": str(ff.parent_b_id) if ff.parent_b_id else None,
-        }
+    # Include minimal family_file data ONLY if already loaded (avoid lazy loading in async context)
+    try:
+        state = sa_inspect(qa)
+        if 'family_file' not in state.unloaded and qa.family_file:
+            ff = qa.family_file
+            response["family_file"] = {
+                "id": ff.id,
+                "title": getattr(ff, 'title', 'Family'),
+                "parent_a_id": str(ff.parent_a_id) if ff.parent_a_id else None,
+                "parent_b_id": str(ff.parent_b_id) if ff.parent_b_id else None,
+            }
+    except Exception:
+        # If inspect fails (detached instance), skip family_file
+        pass
 
     return response
 
