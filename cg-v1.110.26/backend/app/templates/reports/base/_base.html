@@ -80,12 +80,10 @@
           <span class="meta-label">Generated On</span>
           <span class="meta-value">{{ generated_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
         </div>
-        {% if report_id %}
         <div class="meta-item">
           <span class="meta-label">Report ID</span>
-          <span class="meta-value font-mono" style="font-size: 0.85rem;">{{ report_id }}</span>
+          <span class="meta-value font-mono" style="font-size: 0.85rem;">{{ report_id or 'RPT-' ~ generated_at.strftime('%Y%m%d-%H%M%S') }}</span>
         </div>
-        {% endif %}
       </div>
     </div>
 
@@ -243,7 +241,18 @@
         <span class="verification-label">Integrity Check</span>
         <span class="verification-value"><span class="badge badge-success">Passed</span></span>
       </div>
+      {% if sha256_hash %}
+      <div class="verification-item">
+        <span class="verification-label">SHA-256 Hash</span>
+        <span class="verification-value font-mono" style="font-size: 0.7rem;">{{ sha256_hash[:32] }}...</span>
+      </div>
+      {% endif %}
     </div>
+    {% if sha256_hash %}
+    <p style="font-size: 8pt; color: var(--cg-text-muted); margin-top: var(--spacing-sm); margin-bottom: var(--spacing-md);">
+      The SHA-256 hash above can be used to verify this document has not been altered since generation. Compare this hash against the value stored in CommonGround's audit log to confirm document integrity.
+    </p>
+    {% endif %}
     <p class="verification-note">
       This document contains confidential family information.
       Unauthorized distribution is prohibited.
