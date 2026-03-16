@@ -6,6 +6,12 @@
 {% block report_subtitle %}ARIA Intervention Analysis and Message Compliance{% endblock %}
 
 {% block content %}
+<div class="how-to-read">
+  <h3>How to Read This Report</h3>
+  <p>This report analyzes messaging patterns between parents through CommonGround. <strong>ARIA</strong> (AI Relationship Intelligence Assistant) reviews messages to promote respectful co-parenting communication. When ARIA detects language that could escalate conflict, it suggests a more constructive way to phrase the message. The sender can accept, modify, or skip the suggestion.</p>
+  <p>A lower intervention rate and higher communication score indicate healthier co-parenting dialogue.</p>
+</div>
+
 <!-- Executive Summary Section -->
 <section class="section">
   <h2>Executive Summary</h2>
@@ -88,7 +94,7 @@
           style="margin-top: var(--spacing-lg);">
           <strong style="display: block; margin-bottom: 0.5rem;">Assessment</strong>
           {% if stats.good_faith_rate >= 70 %}
-          Both parents are demonstrating <span class="text-sage font-bold">good faith</span> by accepting ARIA's
+          Both parents are demonstrating <span class="text-sage font-bold">constructive communication</span> by accepting ARIA's
           suggestions for more constructive communication.
           {% elif stats.good_faith_rate >= 50 %}
           Parents are showing <span class="text-amber font-bold">moderate willingness</span> to improve communication.
@@ -100,6 +106,10 @@
         {% endif %}
       </div>
     </div>
+  </div>
+
+  <div class="tip-box">
+    <p>A high Constructive Communication Rate means parents are accepting ARIA's suggestions for better phrasing. This demonstrates willingness to communicate respectfully, which courts view favorably.</p>
   </div>
 </section>
 
@@ -268,6 +278,10 @@
     </div>
   </div>
 
+  <div class="note-box">
+    <p>Toxicity scores are AI-generated estimates, not legal determinations. Scores range from 0.0 (neutral) to 1.0 (highly problematic). Context matters — consult your attorney for legal interpretation of these scores.</p>
+  </div>
+
   <div class="card" style="margin-top: var(--spacing-lg);">
     <div class="card-header"
       style="font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em; color: var(--cg-text-muted);">Toxicity
@@ -357,7 +371,19 @@
   <strong class="text-info">About This Report</strong><br>
   This report analyzes messaging patterns between parents through CommonGround's ARIA system.
   ARIA interventions indicate moments where communication could be improved, not necessarily
-  wrongdoing. A high good faith rate shows willingness to communicate constructively.
+  wrongdoing. A high Constructive Communication Rate shows willingness to communicate constructively.
   Message content is not included in this report for privacy, except where explicitly noted in flagged analysis.
+</div>
+
+<div class="glossary-section">
+  <h2>Glossary</h2>
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="glossary-term">ARIA</div><div class="glossary-definition">AI Relationship Intelligence Assistant — CommonGround's AI that monitors messages and suggests constructive rewrites when it detects potential conflict.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Intervention</div><div class="glossary-definition">When ARIA detects concerning language and offers an alternative phrasing to the sender before the message is delivered.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Toxicity Score</div><div class="glossary-definition">An AI-generated rating from 0.0 (neutral) to 1.0 (highly problematic) measuring the intensity of concerning language in a message.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Constructive Communication Rate</div><div class="glossary-definition">The percentage of ARIA interventions where the parent accepted or modified the suggested rewrite, showing willingness to communicate constructively.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Communication Score</div><div class="glossary-definition">A 0-100 rating reflecting overall communication quality, considering message volume, intervention rate, and response patterns.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Health Score</div><div class="glossary-definition">An overall 0-100 metric representing the quality of co-parenting communication, combining multiple factors including toxicity levels and response times.</div></div>
+  </div>
 </div>
 {% endblock %}

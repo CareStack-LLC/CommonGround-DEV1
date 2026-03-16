@@ -6,6 +6,14 @@
 {% block report_subtitle %}Comprehensive Co-Parenting Summary for {{ month_name }} {{ year }}{% endblock %}
 
 {% block content %}
+<!-- How to Read This Report -->
+<div class="how-to-read">
+  <h3>How to Read This Report</h3>
+  <p>This monthly report provides a comprehensive overview of co-parenting activity across four key areas: custody time, communication, finances, and schedule compliance. The <strong>Overall Compliance Score</strong> combines all four areas into a single metric using weighted percentages.</p>
+  <p>Each section can be read independently. Look for the colored badges — green indicates good standing, gold means attention may be needed, and red signals an area requiring action.</p>
+</div>
+
+
 <!-- ================================================================== -->
 <!-- SECTION 1: Executive Summary                                       -->
 <!-- ================================================================== -->
@@ -29,6 +37,10 @@
       <div style="height: 8px; background: var(--cg-border-light); border-radius: 4px; overflow: hidden;">
         <div style="height: 100%; width: {{ overall_compliance }}%; background: {% if overall_compliance >= 90 %}var(--cg-sage){% elif overall_compliance >= 70 %}var(--cg-amber){% else %}var(--cg-error){% endif %}; border-radius: 4px; transition: width 0.3s;"></div>
       </div>
+    </div>
+
+    <div class="note-box" style="margin-top: var(--spacing-lg); text-align: left;">
+      <p>The Overall Compliance Score is calculated using weighted averages: Exchange Completion (35%), Communication Health (25%), Financial Compliance (25%), and GPS Verification (15%). See the detailed breakdown at the end of this report.</p>
     </div>
   </div>
 
@@ -77,6 +89,7 @@
 <!-- ================================================================== -->
 <section class="section" style="page-break-before: always;">
   <h2>Custody Time</h2>
+  <div class="tip-box"><p>Look for the custody split percentage and exchange completion rate. A variance of under 5% from the agreed schedule is considered normal.</p></div>
 
   <div class="card keep-together" style="padding: var(--spacing-xl);">
     <div class="grid grid-2" style="gap: var(--spacing-xl); align-items: center;">
@@ -89,26 +102,26 @@
         <div style="display: flex; gap: 3rem; margin-bottom: var(--spacing-xl);">
           <div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-              <span style="width: 10px; height: 10px; border-radius: 50%; background: #3B82F6;"></span>
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: var(--cg-teal);"></span>
               <span class="font-bold text-primary">{{ parent_a_name }}</span>
             </div>
-            <div style="font-size: 2rem; font-weight: 700; color: #3B82F6;">{{ "%.1f"|format(custody_stats.parent_a_percentage) }}%</div>
+            <div style="font-size: 2rem; font-weight: 700; color: var(--cg-teal);">{{ "%.1f"|format(custody_stats.parent_a_percentage) }}%</div>
             <div class="text-muted text-sm">{{ custody_stats.parent_a_days }} days</div>
           </div>
           <div>
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-              <span style="width: 10px; height: 10px; border-radius: 50%; background: #F97316;"></span>
+              <span style="width: 10px; height: 10px; border-radius: 50%; background: var(--cg-blue);"></span>
               <span class="font-bold text-primary">{{ parent_b_name }}</span>
             </div>
-            <div style="font-size: 2rem; font-weight: 700; color: #F97316;">{{ "%.1f"|format(custody_stats.parent_b_percentage) }}%</div>
+            <div style="font-size: 2rem; font-weight: 700; color: var(--cg-blue);">{{ "%.1f"|format(custody_stats.parent_b_percentage) }}%</div>
             <div class="text-muted text-sm">{{ custody_stats.parent_b_days }} days</div>
           </div>
         </div>
 
         <!-- Split bar visualization -->
         <div style="height: 12px; border-radius: 6px; overflow: hidden; display: flex;">
-          <div style="width: {{ custody_stats.parent_a_percentage }}%; background: #3B82F6;"></div>
-          <div style="width: {{ custody_stats.parent_b_percentage }}%; background: #F97316;"></div>
+          <div style="width: {{ custody_stats.parent_a_percentage }}%; background: var(--cg-teal);"></div>
+          <div style="width: {{ custody_stats.parent_b_percentage }}%; background: var(--cg-blue);"></div>
         </div>
       </div>
 
@@ -151,6 +164,7 @@
 <!-- ================================================================== -->
 <section class="section" style="page-break-before: always;">
   <h2>Communication</h2>
+  <div class="tip-box"><p>The Health Score (0-100) reflects overall communication quality. A score above 80 is excellent. ARIA interventions show where communication could improve, not necessarily wrongdoing.</p></div>
 
   <div class="grid grid-3" style="gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
     <div class="stat-card">
@@ -185,7 +199,7 @@
           <th>Parent</th>
           <th>Messages Sent</th>
           <th>Interventions</th>
-          <th>Good Faith Rate</th>
+          <th>Constructive Communication Rate</th>
           <th>Comm. Score</th>
         </tr>
       </thead>
@@ -222,6 +236,7 @@
 <!-- ================================================================== -->
 <section class="section" style="page-break-before: always;">
   <h2>Financial Summary</h2>
+  <div class="tip-box"><p>The Compliance Rate shows what percentage of financial obligations were paid on time. "Funded" means the payment was submitted; "Completed" means it was confirmed and verified.</p></div>
 
   <div class="grid grid-3" style="gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
     <div class="stat-card">
@@ -278,6 +293,7 @@
 <!-- ================================================================== -->
 <section class="section" style="page-break-before: always;">
   <h2>Schedule & Verification</h2>
+  <div class="tip-box"><p>GPS Verification confirms parents checked in at the agreed exchange location. The verification rate shows how consistently both parents are using the check-in feature.</p></div>
 
   <div class="grid grid-3" style="gap: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
     <div class="stat-card">
@@ -449,5 +465,18 @@
   This monthly report aggregates data from custody exchanges, ARIA-mediated messaging,
   ClearFund financial obligations, and GPS-verified check-ins. All data is collected
   automatically by the CommonGround platform and verified for accuracy.
+</div>
+
+<!-- Glossary -->
+<div class="glossary-section">
+  <h2>Glossary</h2>
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="glossary-term">Overall Compliance Score</div><div class="glossary-definition">A weighted metric combining exchange completion (35%), communication health (25%), financial compliance (25%), and GPS verification (15%).</div></div>
+    <div class="glossary-item"><div class="glossary-term">Exchange Rate</div><div class="glossary-definition">The percentage of scheduled custody exchanges that were completed as planned.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Communication Health</div><div class="glossary-definition">A 0-100 score reflecting the quality of parent-to-parent messaging, including toxicity levels and ARIA intervention frequency.</div></div>
+    <div class="glossary-item"><div class="glossary-term">ARIA Intervention</div><div class="glossary-definition">When the AI assistant detects potentially harmful language and suggests a constructive alternative before the message is sent.</div></div>
+    <div class="glossary-item"><div class="glossary-term">GPS Verification</div><div class="glossary-definition">Location confirmation using the parent's mobile device at custody exchanges, recorded when they check in through the app.</div></div>
+    <div class="glossary-item"><div class="glossary-term">ClearFund</div><div class="glossary-definition">CommonGround's financial tracking system for managing shared parenting expenses and child support payments.</div></div>
+  </div>
 </div>
 {% endblock %}

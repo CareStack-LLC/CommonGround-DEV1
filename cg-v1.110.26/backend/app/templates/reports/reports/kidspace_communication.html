@@ -6,6 +6,13 @@
 {% block report_subtitle %}Child Communication Activity and Circle Contact Summary{% endblock %}
 
 {% block content %}
+<div class="how-to-read">
+  <h3>How to Read This Report</h3>
+  <p><strong>KidSpace</strong> is CommonGround's child-friendly communication hub where children can video call, chat, and connect with approved contacts in their <strong>Circle</strong>. All sessions are monitored by ARIA for child safety.</p>
+  <p>Circle contacts are adults approved by both parents for child communication. Each contact has specific permissions and communication windows set by the parents.</p>
+</div>
+
+
 <!-- Executive Summary Section -->
 <section class="section">
   <h2>Executive Summary</h2>
@@ -50,6 +57,15 @@
     </div>
   </div>
 </section>
+
+<div class="legend-box">
+  <div class="legend-box-title">Session Type Key</div>
+  <div class="legend-box-items">
+    <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-teal);"></span><span>Video Call</span></div>
+    <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-blue);"></span><span>Chat</span></div>
+    <div class="legend-box-item"><span class="legend-box-swatch" style="background: var(--cg-gold);"></span><span>Theater / Shared Activity</span></div>
+  </div>
+</div>
 {% endif %}
 
 <!-- Session Breakdown Section -->
@@ -126,6 +142,10 @@
 <section class="section">
   <h2>Circle Contact Activity</h2>
 
+  <div class="note-box">
+    <p>Circle contacts are adults approved by both parents for child communication. Each contact has specific permissions set by the parents, including allowed communication types and time windows.</p>
+  </div>
+
   <div class="card keep-together">
     <div class="card-header">Contact Communication Summary</div>
     <table style="font-size: 13px;">
@@ -192,6 +212,10 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="tip-box">
+    <p>Communication schedule compliance shows whether KidSpace sessions occurred within the allowed hours set in family settings. Sessions outside allowed hours are flagged for parental review but are not blocked.</p>
   </div>
 </section>
 
@@ -265,5 +289,17 @@
   child safety. Circle contact activity is tracked from approved contacts within the family's
   communication circle. Session durations are calculated from start/end timestamps recorded
   by the Daily.co video infrastructure.
+</div>
+
+<div class="glossary-section">
+  <h2>Glossary</h2>
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="glossary-term">KidSpace</div><div class="glossary-definition">CommonGround's child-friendly communication hub for video calls, chats, and shared activities with approved contacts.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Circle Contact</div><div class="glossary-definition">An adult approved by both parents to communicate with the child through KidSpace. Contacts must be added and approved before communication is allowed.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Session</div><div class="glossary-definition">A single communication event in KidSpace — this can be a video call, chat conversation, or shared theater activity.</div></div>
+    <div class="glossary-item"><div class="glossary-term">ARIA Monitoring</div><div class="glossary-definition">AI-powered safety monitoring that reviews KidSpace messages for concerning content and flags them for parental review.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Communication Window</div><div class="glossary-definition">The allowed hours during which KidSpace sessions can take place, as configured in the family settings.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Theater</div><div class="glossary-definition">A KidSpace feature where children and contacts can watch content or do activities together during a video session.</div></div>
+  </div>
 </div>
 {% endblock %}
