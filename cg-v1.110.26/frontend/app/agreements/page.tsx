@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { Navigation } from '@/components/navigation';
-import { familyFilesAPI, agreementsAPI, FamilyFileDetail } from '@/lib/api';
+import { familyFilesAPI, agreementsAPI, quickAccordsAPI, FamilyFileDetail, QuickAccord } from '@/lib/api';
 import { ProtectedRoute } from '@/components/protected-route';
 import {
   FolderOpen,
@@ -21,6 +21,7 @@ import {
   FileSignature,
   Loader2,
   ChevronLeft,
+  Handshake,
 } from 'lucide-react';
 
 interface FamilyFileAgreement {
@@ -278,6 +279,86 @@ function EmptyAgreementsState({
   );
 }
 
+function QuickAccordCard({
+  quickAccord,
+  onClick,
+}: {
+  quickAccord: QuickAccord;
+  onClick: () => void;
+}) {
+  const categoryLabels: Record<string, string> = {
+    travel: 'Travel',
+    schedule_swap: 'Schedule Swap',
+    special_event: 'Special Event',
+    overnight: 'Overnight',
+    expense: 'Expense',
+    other: 'Other',
+  };
+
+  const categoryColors: Record<string, string> = {
+    travel: 'bg-blue-100 text-blue-700 border-blue-200',
+    schedule_swap: 'bg-purple-100 text-purple-700 border-purple-200',
+    special_event: 'bg-pink-100 text-pink-700 border-pink-200',
+    overnight: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+    expense: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    other: 'bg-muted text-foreground border-border',
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className="
+        w-full text-left bg-card border-2 border-border rounded-2xl p-5 shadow-lg
+        hover:shadow-xl hover:border-amber-300 transition-all duration-300
+        group
+      "
+    >
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <div className="flex items-start gap-3 flex-1 min-w-0">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center flex-shrink-0 shadow-md">
+            <Handshake className="h-5 w-5 text-amber-600" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-bold text-foreground truncate group-hover:text-amber-700 transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              {quickAccord.title}
+            </h3>
+            <p className="text-xs text-muted-foreground mt-0.5 font-medium">
+              {quickAccord.accord_number}
+            </p>
+          </div>
+        </div>
+        <StatusBadge status={quickAccord.status} />
+      </div>
+
+      <div className="pl-[56px]">
+        <div className="flex flex-wrap gap-2 mb-2">
+          <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border ${categoryColors[quickAccord.purpose_category] || categoryColors.other}`}>
+            {categoryLabels[quickAccord.purpose_category] || 'Other'}
+          </span>
+          {quickAccord.event_date && (
+            <span className="text-xs text-muted-foreground font-medium">
+              {new Date(quickAccord.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </span>
+          )}
+          {quickAccord.has_shared_expense && (
+            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-200">
+              $ Expense
+            </span>
+          )}
+        </div>
+        {quickAccord.purpose_description && (
+          <p className="text-sm text-muted-foreground font-medium line-clamp-2">{quickAccord.purpose_description}</p>
+        )}
+      </div>
+
+      <div className="mt-4 pt-3 border-t-2 border-border flex items-center justify-between">
+        <span className="text-xs text-muted-foreground font-medium">Click to view details</span>
+        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-amber-600 group-hover:translate-x-1 transition-all duration-300" />
+      </div>
+    </button>
+  );
+}
+
 function BuilderChoiceModal({
   isOpen,
   isCreating,
@@ -308,7 +389,46 @@ function BuilderChoiceModal({
 
         {/* Options */}
         <div className="p-6 space-y-4">
-          {/* ARIA Option */}
+          {/* Upload Document Option */}
+          <button
+            onClick={onSelectAria}
+            disabled={isCreating}
+            className="
+              w-full text-left p-5 border-2 border-blue-200 rounded-2xl
+              hover:border-blue-400 hover:bg-blue-50
+              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
+              group shadow-lg hover:shadow-xl
+            "
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
+                <FileSignature className="h-7 w-7" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-bold text-foreground group-hover:text-blue-700 transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    I Have an Existing Document
+                  </h3>
+                  <span className="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full shadow-sm">
+                    Fastest
+                  </span>
+                </div>
+                <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+                  Upload a custody agreement, parenting plan, or court order (PDF or Word). ARIA will read it and create your digital agreement.
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                    Upload PDF/Word
+                  </span>
+                  <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                    AI-Powered
+                  </span>
+                </div>
+              </div>
+            </div>
+          </button>
+
+          {/* ARIA Conversational Option */}
           <button
             onClick={onSelectAria}
             disabled={isCreating}
@@ -326,21 +446,21 @@ function BuilderChoiceModal({
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="font-bold text-foreground group-hover:text-amber-700 transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                    Talk to ARIA
+                    Talk It Through with ARIA
                   </h3>
                   <span className="px-2.5 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full shadow-sm">
                     Recommended
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                  Have a natural conversation about your custody arrangement. ARIA will ask questions and create your agreement.
+                  Describe your custody arrangement in your own words. ARIA will ask the right questions and build your agreement from the conversation.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
                   <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
                     Conversational
                   </span>
                   <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
-                    Faster
+                    Guided
                   </span>
                   <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
                     AI-Powered
@@ -367,20 +487,17 @@ function BuilderChoiceModal({
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-foreground group-hover:text-[var(--portal-primary)] transition-colors mb-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  Step-by-Step Wizard
+                  Fill Out a Form
                 </h3>
                 <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                  Fill out structured forms with clear sections for custody schedules, holidays, and more.
+                  Prefer structure? Fill out a simple 7-section form covering custody, schedules, logistics, and more.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-3">
                   <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
                     Structured
                   </span>
                   <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
-                    Traditional
-                  </span>
-                  <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
-                    Detailed
+                    7 Sections
                   </span>
                 </div>
               </div>
@@ -423,6 +540,9 @@ function AgreementsListContent() {
   const [error, setError] = useState<string | null>(null);
   const [showBuilderChoice, setShowBuilderChoice] = useState(false);
   const [isCreatingAgreement, setIsCreatingAgreement] = useState(false);
+  const [activeTab, setActiveTab] = useState<'agreements' | 'quickaccords'>('agreements');
+  const [quickAccords, setQuickAccords] = useState<QuickAccord[]>([]);
+  const [isLoadingQuickAccords, setIsLoadingQuickAccords] = useState(false);
 
   // Get familyFileId from URL if present
   const urlFamilyFileId = searchParams.get('familyFileId');
@@ -462,7 +582,10 @@ function AgreementsListContent() {
 
   const handleSelectFamilyFile = async (familyFile: FamilyFileWithAgreements) => {
     setSelectedFamilyFile(familyFile);
-    await loadAgreements(familyFile.id);
+    await Promise.all([
+      loadAgreements(familyFile.id),
+      loadQuickAccords(familyFile.id),
+    ]);
   };
 
   const loadAgreements = async (familyFileId: string) => {
@@ -481,6 +604,19 @@ function AgreementsListContent() {
       }
     } finally {
       setIsLoadingAgreements(false);
+    }
+  };
+
+  const loadQuickAccords = async (familyFileId: string) => {
+    try {
+      setIsLoadingQuickAccords(true);
+      const data = await quickAccordsAPI.list(familyFileId);
+      setQuickAccords(data.items || []);
+    } catch (err: any) {
+      console.error('Failed to load quick accords:', err);
+      setQuickAccords([]);
+    } finally {
+      setIsLoadingQuickAccords(false);
     }
   };
 
@@ -620,105 +756,213 @@ function AgreementsListContent() {
 
                 {/* Family File Header */}
                 <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-5">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                    <div>
-                      <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                        {selectedFamilyFile.title}
-                      </h2>
-                      <p className="text-sm text-muted-foreground font-medium">
-                        SharedCare Agreements
-                      </p>
-                    </div>
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+                    <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                      {selectedFamilyFile.title}
+                    </h2>
+                    {activeTab === 'agreements' ? (
+                      <button
+                        onClick={() => setShowBuilderChoice(true)}
+                        disabled={isCreatingAgreement || !canCreateAgreement}
+                        className={`
+                          inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold
+                          transition-all duration-300
+                          ${!canCreateAgreement || isCreatingAgreement
+                            ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                            : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md hover:shadow-lg'
+                          }
+                        `}
+                      >
+                        {isCreatingAgreement ? (
+                          <>
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Creating...
+                          </>
+                        ) : !canCreateAgreement ? (
+                          <>
+                            <Lock className="h-4 w-4" />
+                            Locked
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="h-4 w-4" />
+                            Create Agreement
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => router.push(`/family-files/${selectedFamilyFile.id}/quick-accord/new`)}
+                        className="
+                          inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold
+                          bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md hover:shadow-lg
+                          transition-all duration-300
+                        "
+                      >
+                        <Plus className="h-4 w-4" />
+                        New QuickAccord
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Tab Toggle */}
+                  <div className="flex gap-1 p-1 bg-muted rounded-xl">
                     <button
-                      onClick={() => setShowBuilderChoice(true)}
-                      disabled={isCreatingAgreement || !canCreateAgreement}
+                      onClick={() => setActiveTab('agreements')}
                       className={`
-                        inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold
-                        transition-all duration-300
-                        ${!canCreateAgreement || isCreatingAgreement
-                          ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                          : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md hover:shadow-lg'
+                        flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all duration-200
+                        ${activeTab === 'agreements'
+                          ? 'bg-card text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
                         }
                       `}
                     >
-                      {isCreatingAgreement ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Creating...
-                        </>
-                      ) : !canCreateAgreement ? (
-                        <>
-                          <Lock className="h-4 w-4" />
-                          Locked
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="h-4 w-4" />
-                          Create Agreement
-                        </>
+                      <FileSignature className="h-4 w-4" />
+                      SharedCare Agreements
+                      {selectedFamilyFile.agreements && selectedFamilyFile.agreements.length > 0 && (
+                        <span className="px-2 py-0.5 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
+                          {selectedFamilyFile.agreements.length}
+                        </span>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setActiveTab('quickaccords')}
+                      className={`
+                        flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all duration-200
+                        ${activeTab === 'quickaccords'
+                          ? 'bg-card text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                        }
+                      `}
+                    >
+                      <Handshake className="h-4 w-4" />
+                      QuickAccords
+                      {quickAccords.length > 0 && (
+                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                          {quickAccords.length}
+                        </span>
                       )}
                     </button>
                   </div>
                 </div>
 
-                {/* Loading State */}
-                {isLoadingAgreements && (
-                  <div className="flex items-center justify-center py-16">
-                    <div className="text-center">
-                      <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
-                      <p className="mt-4 text-muted-foreground font-medium">Loading agreements...</p>
-                    </div>
-                  </div>
+                {/* SharedCare Agreements Tab */}
+                {activeTab === 'agreements' && (
+                  <>
+                    {/* Loading State */}
+                    {isLoadingAgreements && (
+                      <div className="flex items-center justify-center py-16">
+                        <div className="text-center">
+                          <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin mx-auto" />
+                          <p className="mt-4 text-muted-foreground font-medium">Loading agreements...</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Error State */}
+                    {error && (
+                      <div className="bg-card rounded-2xl border-2 border-red-200 shadow-lg p-5 bg-gradient-to-r from-red-50 to-transparent">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-xl shadow-md">
+                            <AlertCircle className="h-5 w-5 text-red-600" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-bold text-red-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Failed to load agreements</p>
+                            <p className="text-sm text-red-700 font-medium mt-1">{error}</p>
+                            <button
+                              onClick={() => loadAgreements(selectedFamilyFile.id)}
+                              className="mt-3 px-4 py-2 bg-card border-2 border-red-300 text-red-700 rounded-xl text-sm font-bold hover:bg-red-50 transition-all duration-300"
+                            >
+                              Try Again
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Empty State */}
+                    {!isLoadingAgreements &&
+                      !error &&
+                      (!selectedFamilyFile.agreements || selectedFamilyFile.agreements.length === 0) && (
+                        <div className="bg-card rounded-2xl border-2 border-border shadow-lg">
+                          <EmptyAgreementsState
+                            canCreate={canCreateAgreement || false}
+                            onCreate={() => setShowBuilderChoice(true)}
+                          />
+                        </div>
+                      )}
+
+                    {/* Agreements Grid */}
+                    {!isLoadingAgreements &&
+                      !error &&
+                      selectedFamilyFile.agreements &&
+                      selectedFamilyFile.agreements.length > 0 && (
+                        <div className="grid gap-5 grid-cols-1 lg:grid-cols-2">
+                          {selectedFamilyFile.agreements.map((agreement) => (
+                            <AgreementCard
+                              key={agreement.id}
+                              agreement={agreement}
+                              onClick={() => router.push(`/agreements/${agreement.id}`)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                  </>
                 )}
 
-                {/* Error State */}
-                {error && (
-                  <div className="bg-card rounded-2xl border-2 border-red-200 shadow-lg p-5 bg-gradient-to-r from-red-50 to-transparent">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-xl shadow-md">
-                        <AlertCircle className="h-5 w-5 text-red-600" />
+                {/* QuickAccords Tab */}
+                {activeTab === 'quickaccords' && (
+                  <>
+                    {isLoadingQuickAccords && (
+                      <div className="flex items-center justify-center py-16">
+                        <div className="text-center">
+                          <div className="w-14 h-14 border-3 border-amber-200 border-t-amber-500 rounded-full animate-spin mx-auto" />
+                          <p className="mt-4 text-muted-foreground font-medium">Loading QuickAccords...</p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-bold text-red-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Failed to load agreements</p>
-                        <p className="text-sm text-red-700 font-medium mt-1">{error}</p>
-                        <button
-                          onClick={() => loadAgreements(selectedFamilyFile.id)}
-                          className="mt-3 px-4 py-2 bg-card border-2 border-red-300 text-red-700 rounded-xl text-sm font-bold hover:bg-red-50 transition-all duration-300"
-                        >
-                          Try Again
-                        </button>
+                    )}
+
+                    {!isLoadingQuickAccords && quickAccords.length === 0 && (
+                      <div className="bg-card rounded-2xl border-2 border-border shadow-lg">
+                        <div className="text-center py-16 px-6">
+                          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center shadow-md">
+                            <Handshake className="h-10 w-10 text-amber-500" />
+                          </div>
+                          <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                            No QuickAccords Yet
+                          </h3>
+                          <p className="text-muted-foreground font-medium mb-8 max-w-sm mx-auto leading-relaxed">
+                            QuickAccords are lightweight agreements for one-off arrangements like schedule swaps, special events, or travel plans.
+                          </p>
+                          <button
+                            onClick={() => router.push(`/family-files/${selectedFamilyFile.id}/quick-accord/new`)}
+                            className="
+                              inline-flex items-center gap-2 px-6 py-3
+                              bg-gradient-to-r from-amber-500 to-amber-600 text-white
+                              rounded-xl font-bold shadow-md hover:shadow-lg
+                              transition-all duration-300
+                            "
+                          >
+                            <Plus className="h-4 w-4" />
+                            Create First QuickAccord
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    )}
+
+                    {!isLoadingQuickAccords && quickAccords.length > 0 && (
+                      <div className="grid gap-5 grid-cols-1 lg:grid-cols-2">
+                        {quickAccords.map((qa) => (
+                          <QuickAccordCard
+                            key={qa.id}
+                            quickAccord={qa}
+                            onClick={() => router.push(`/family-files/${selectedFamilyFile.id}/quick-accord/${qa.id}`)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
-
-                {/* Empty State */}
-                {!isLoadingAgreements &&
-                  !error &&
-                  (!selectedFamilyFile.agreements || selectedFamilyFile.agreements.length === 0) && (
-                    <div className="bg-card rounded-2xl border-2 border-border shadow-lg">
-                      <EmptyAgreementsState
-                        canCreate={canCreateAgreement || false}
-                        onCreate={() => setShowBuilderChoice(true)}
-                      />
-                    </div>
-                  )}
-
-                {/* Agreements Grid */}
-                {!isLoadingAgreements &&
-                  !error &&
-                  selectedFamilyFile.agreements &&
-                  selectedFamilyFile.agreements.length > 0 && (
-                    <div className="grid gap-5 grid-cols-1 lg:grid-cols-2">
-                      {selectedFamilyFile.agreements.map((agreement) => (
-                        <AgreementCard
-                          key={agreement.id}
-                          agreement={agreement}
-                          onClick={() => router.push(`/agreements/${agreement.id}`)}
-                        />
-                      ))}
-                    </div>
-                  )}
               </div>
             )}
           </div>

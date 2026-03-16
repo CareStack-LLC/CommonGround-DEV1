@@ -26,6 +26,64 @@ interface Message {
   attachment?: MessageAttachment;
 }
 
+// Human-readable labels for extraction preview
+const SECTION_LABELS: Record<string, string> = {
+  parties: 'Parties & Children',
+  parties_children: 'Parties & Children',
+  scope: 'Scope & Duration',
+  scope_duration: 'Scope & Duration',
+  schedule: 'Parenting Time',
+  parenting_time: 'Parenting Time',
+  logistics: 'Logistics & Transitions',
+  logistics_transitions: 'Logistics & Transitions',
+  decision_making: 'Decision-Making & Communication',
+  decision_communication: 'Decision-Making & Communication',
+  financial: 'Expenses & Financial',
+  expenses_financial: 'Expenses & Financial',
+  legal: 'Review & Sign',
+  modification_disputes: 'Review & Sign',
+};
+
+const FIELD_LABELS: Record<string, string> = {
+  custody_type: 'Custody Type',
+  parent_a_name: 'Parent A',
+  parent_b_name: 'Parent B',
+  parent_a_role: 'Parent A Role',
+  parent_b_role: 'Parent B Role',
+  children: 'Children',
+  state: 'State',
+  county: 'County',
+  effective_date: 'Effective Date',
+  end_date: 'End Date',
+  schedule_type: 'Schedule Type',
+  weekday_schedule: 'Weekday Schedule',
+  weekend_schedule: 'Weekend Schedule',
+  holiday_schedule: 'Holiday Schedule',
+  summer_schedule: 'Summer Schedule',
+  pickup_time: 'Pickup Time',
+  dropoff_time: 'Drop-off Time',
+  pickup_location: 'Pickup Location',
+  dropoff_location: 'Drop-off Location',
+  transportation: 'Transportation',
+  education_decisions: 'Education Decisions',
+  healthcare_decisions: 'Healthcare Decisions',
+  religious_decisions: 'Religious Decisions',
+  communication_method: 'Communication Method',
+  child_support: 'Child Support',
+  expense_sharing: 'Expense Sharing',
+  medical_expenses: 'Medical Expenses',
+  dispute_resolution: 'Dispute Resolution',
+  modification_process: 'Modification Process',
+};
+
+function humanizeFieldName(field: string): string {
+  return FIELD_LABELS[field] || field.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function humanizeSectionName(section: string): string {
+  return SECTION_LABELS[section] || section.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function AriaBuilderContent() {
   const { user } = useAuth();
   const router = useRouter();
@@ -75,11 +133,13 @@ function AriaBuilderContent() {
         setMessages([
           {
             role: 'assistant',
-            content: `Hi! I'm ARIA, and I'm here to help you create your custody agreement in a way that feels natural.
+            content: `Hi! I'm ARIA, and I'm here to help you build your SharedCare agreement. There are a couple ways we can get started:
 
-Instead of filling out forms, just tell me about your custody arrangement in your own words. What matters most to you and your family?
+📄 **Upload an existing document** — If you already have a custody agreement, parenting plan, or court order, tap the paperclip button below and I'll read through it, pull out the key details, and use it as our starting point.
 
-I'll ask questions to make sure we cover everything important, and at the end, I'll create a clear summary for you to review.`,
+💬 **Just tell me about your arrangement** — Describe your custody situation in your own words and I'll ask the right questions to make sure we cover everything.
+
+Either way, I'll organize everything into a clear agreement for you to review. What works best for you?`,
             timestamp: new Date().toISOString(),
           },
         ]);
@@ -148,7 +208,7 @@ I'll ask questions to make sure we cover everything important, and at the end, I
   };
 
   const handleFinalize = async () => {
-    if (!confirm('Are you sure you want to finalize this agreement? This will populate sections 4-18 with the data shown above.')) {
+    if (!confirm('Create your agreement from the extracted data? You can still review and edit everything in the agreement builder.')) {
       return;
     }
 
@@ -280,11 +340,11 @@ I'll ask questions to make sure we cover everything important, and at the end, I
             <div className="flex gap-3">
               {messages.length > 2 && !showSummary && (
                 <Button
-                  variant="outline"
                   onClick={handleGenerateSummary}
                   disabled={isGeneratingSummary}
+                  className="bg-green-600 hover:bg-green-700 text-white"
                 >
-                  {isGeneratingSummary ? 'Generating...' : 'Generate Summary'}
+                  {isGeneratingSummary ? 'Reviewing...' : 'Review & Create Agreement'}
                 </Button>
               )}
               <Button
@@ -309,7 +369,7 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                   </Button>
                 </div>
                 <CardDescription>
-                  Review this summary and make sure everything is correct
+                  Review what ARIA captured from your conversation. You can still edit everything after creating.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -335,12 +395,14 @@ I'll ask questions to make sure we cover everything important, and at the end, I
                   <div className="space-y-4">
                     {Object.entries(extractionPreview).map(([sectionName, fields]: [string, any]) => (
                       <div key={sectionName} className="border-l-4 border-green-500 pl-4">
-                        <h4 className="font-semibold text-foreground mb-2">{sectionName}</h4>
+                        <h4 className="font-semibold text-foreground mb-2">{humanizeSectionName(sectionName)}</h4>
                         <div className="space-y-1">
                           {Array.isArray(fields) ? fields.map((item: any, idx: number) => (
                             <div key={idx} className="text-sm">
-                              <span className="text-muted-foreground">{item.field}:</span>{' '}
-                              <span className="font-medium text-foreground">{item.value}</span>
+                              <span className="text-muted-foreground">{humanizeFieldName(item.field)}:</span>{' '}
+                              <span className="font-medium text-foreground">
+                                {Array.isArray(item.value) ? item.value.join(', ') : String(item.value)}
+                              </span>
                             </div>
                           )) : (
                             <div className="text-sm text-muted-foreground">

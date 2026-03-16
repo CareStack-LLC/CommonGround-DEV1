@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
-import { CheckCircle2, Circle, ChevronRight, ChevronLeft, Info, Lightbulb, ArrowLeft, FileText } from 'lucide-react';
+import { CheckCircle2, Circle, ChevronRight, ChevronLeft, Info, Lightbulb, ArrowLeft, FileText, MessageCircle, AlertCircle } from 'lucide-react';
 
 // V2 Section Types - 7 sections for standard, 5 for lite
 type SectionKeyV2 =
@@ -141,10 +141,11 @@ function BuilderV2Content() {
       setExistingSections(data.sections || []);
 
       // Load family file data if this is a family file-based agreement
+      let ff: FamilyFileDetail | null = null;
       if (data.agreement.family_file_id) {
         try {
-          const familyFileData = await familyFilesAPI.get(data.agreement.family_file_id);
-          setFamilyFile(familyFileData);
+          ff = await familyFilesAPI.get(data.agreement.family_file_id);
+          setFamilyFile(ff);
         } catch (err) {
           console.error('Failed to load family file:', err);
         }
@@ -161,6 +162,33 @@ function BuilderV2Content() {
           completed.add(v2Key);
         }
       });
+
+      // Auto-populate parties_children from FamilyFile if section is empty
+      if (!dataMap['parties_children'] && ff) {
+        const parentAName = ff.parent_a_info
+          ? `${ff.parent_a_info.first_name || ''} ${ff.parent_a_info.last_name || ''}`.trim()
+          : '';
+        const parentBName = ff.parent_b_info
+          ? `${ff.parent_b_info.first_name || ''} ${ff.parent_b_info.last_name || ''}`.trim()
+          : ff.parent_b_email || '';
+        const children = (ff.children || []).map((child: FamilyFileChild) => ({
+          name: `${child.first_name} ${child.last_name}`.trim(),
+          date_of_birth: child.date_of_birth,
+          gender: child.gender || '',
+        }));
+
+        dataMap['parties_children'] = {
+          parent_a_name: parentAName,
+          parent_a_role: ff.parent_a_role || 'parent_a',
+          parent_b_name: parentBName,
+          parent_b_role: ff.parent_b_role || 'parent_b',
+          children,
+          state: ff.state || '',
+          county: ff.county || '',
+        };
+        completed.add('parties_children');
+      }
+
       setSectionData(dataMap);
       setCompletedSections(completed);
     } catch (err: any) {
@@ -188,7 +216,22 @@ function BuilderV2Content() {
 
       // Update local state
       setSectionData(prev => ({ ...prev, [key]: data }));
-      setCompletedSections(prev => new Set([...prev, key]));
+
+      // Only mark as completed if required fields are filled
+      const requiredForSection = REQUIRED_FIELDS[key as SectionKeyV2] || [];
+      const allFilled = requiredForSection.every(field => {
+        const val = data?.[field];
+        return val !== undefined && val !== null && val !== '' && val !== false;
+      });
+      if (allFilled) {
+        setCompletedSections(prev => new Set([...prev, key]));
+      } else {
+        setCompletedSections(prev => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
+      }
 
       // Save to backend via API
       const sectionInfo = SECTION_TYPE_MAP[key];
@@ -322,13 +365,23 @@ function BuilderV2Content() {
                 <p className="text-sm text-muted-foreground font-medium">Simple 7-Section Builder</p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => router.push(`/agreements/${agreementId}`)}
-              className="border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300 font-bold"
-            >
-              Save & Exit
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => router.push(`/agreements/${agreementId}/aria`)}
+                className="border-2 border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 font-bold text-amber-700 bg-amber-50"
+              >
+                <MessageCircle className="w-4 h-4 mr-1.5" />
+                Switch to ARIA
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push(`/agreements/${agreementId}`)}
+                className="border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300 font-bold"
+              >
+                Save & Exit
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -405,10 +458,19 @@ function BuilderV2Content() {
                 {suggestions.map((suggestion) => (
                   <button
                     key={suggestion.id}
+                    onClick={() => {
+                      if (agreement?.family_file_id) {
+                        window.open(
+                          `/family-files/${agreement.family_file_id}/quick-accord/new?category=${suggestion.id}&context=${sections[currentSectionIndex].key}`,
+                          '_blank'
+                        );
+                      }
+                    }}
                     className="w-full text-left p-4 rounded-xl border-2 border-border bg-card hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
                   >
                     <h4 className="font-bold text-foreground">{suggestion.title}</h4>
                     <p className="text-sm text-muted-foreground font-medium">{suggestion.description}</p>
+                    <span className="text-xs text-[var(--portal-primary)] font-semibold mt-1 inline-block">Create QuickAccord →</span>
                   </button>
                 ))}
               </div>
@@ -496,6 +558,27 @@ function BuilderV2Content() {
 }
 
 // Section Form Component
+// Required fields per section for inline validation
+const REQUIRED_FIELDS: Record<SectionKeyV2, string[]> = {
+  parties_children: [], // Pre-filled from FamilyFile, no manual required fields
+  scope_duration: ['effective_date'],
+  parenting_time: ['primary_residence', 'schedule_pattern'],
+  logistics_transitions: ['exchange_location', 'transportation_responsibility'],
+  decision_communication: ['major_decision_authority'],
+  expenses_financial: [], // Optional section
+  modification_disputes: ['parent_a_acknowledgment'],
+};
+
+const REQUIRED_FIELD_LABELS: Record<string, string> = {
+  effective_date: 'Start date',
+  primary_residence: 'Primary residence',
+  schedule_pattern: 'Schedule pattern',
+  exchange_location: 'Exchange location',
+  transportation_responsibility: 'Transportation',
+  major_decision_authority: 'Decision authority',
+  parent_a_acknowledgment: 'Acknowledgment',
+};
+
 function SectionForm({
   sectionKey,
   data,
@@ -510,6 +593,7 @@ function SectionForm({
   familyFile: FamilyFileDetail | null;
 }) {
   const [formData, setFormData] = useState(data);
+  const [showValidation, setShowValidation] = useState(false);
 
   useEffect(() => {
     setFormData(data);
@@ -521,24 +605,56 @@ function SectionForm({
     onSave(newData);
   };
 
-  switch (sectionKey) {
-    case 'parties_children':
-      return <PartiesChildrenForm data={formData} onChange={handleChange} familyFile={familyFile} />;
-    case 'scope_duration':
-      return <ScopeDurationForm data={formData} onChange={handleChange} />;
-    case 'parenting_time':
-      return <ParentingTimeForm data={formData} onChange={handleChange} />;
-    case 'logistics_transitions':
-      return <LogisticsForm data={formData} onChange={handleChange} />;
-    case 'decision_communication':
-      return <DecisionMakingForm data={formData} onChange={handleChange} />;
-    case 'expenses_financial':
-      return <ExpensesForm data={formData} onChange={handleChange} />;
-    case 'modification_disputes':
-      return <AcknowledgmentForm data={formData} onChange={handleChange} />;
-    default:
-      return <div>Section not implemented</div>;
-  }
+  // Calculate missing required fields
+  const requiredFields = REQUIRED_FIELDS[sectionKey] || [];
+  const missingFields = requiredFields.filter(field => {
+    const val = formData?.[field];
+    return val === undefined || val === null || val === '' || val === false;
+  });
+
+  const formContent = (() => {
+    switch (sectionKey) {
+      case 'parties_children':
+        return <PartiesChildrenForm data={formData} onChange={handleChange} familyFile={familyFile} />;
+      case 'scope_duration':
+        return <ScopeDurationForm data={formData} onChange={handleChange} />;
+      case 'parenting_time':
+        return <ParentingTimeForm data={formData} onChange={handleChange} />;
+      case 'logistics_transitions':
+        return <LogisticsForm data={formData} onChange={handleChange} />;
+      case 'decision_communication':
+        return <DecisionMakingForm data={formData} onChange={handleChange} />;
+      case 'expenses_financial':
+        return <ExpensesForm data={formData} onChange={handleChange} />;
+      case 'modification_disputes':
+        return <AcknowledgmentForm data={formData} onChange={handleChange} />;
+      default:
+        return <div>Section not implemented</div>;
+    }
+  })();
+
+  return (
+    <div>
+      {formContent}
+
+      {/* Validation indicator */}
+      {missingFields.length > 0 && (
+        <div className="mt-6 p-3 rounded-xl bg-amber-50 border-2 border-amber-200">
+          <p className="text-sm font-semibold text-amber-800 flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" />
+            Required fields remaining:
+          </p>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {missingFields.map(field => (
+              <span key={field} className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                {REQUIRED_FIELD_LABELS[field] || field.replace(/_/g, ' ')}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // Helper function to format parent name
