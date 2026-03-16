@@ -40,12 +40,8 @@ export default function SwapRequestModal({
         location_lng: null as number | null,
         child_directions: {} as Record<string, 'pickup' | 'dropoff' | 'none'>,
         reason: '',
-        // Silent Handoff settings
-        silent_handoff_enabled: false,
-        geofence_radius_meters: 100,
-        check_in_window_before_minutes: 30,
-        check_in_window_after_minutes: 30,
-        qr_confirmation_required: false,
+        // Grace period for check-in (minutes before flagged as late)
+        grace_period_minutes: 15,
     });
 
     const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
@@ -177,14 +173,14 @@ export default function SwapRequestModal({
                 location_notes: formData.location_notes || undefined,
                 scheduled_time: new Date(formData.scheduled_time).toISOString(),
                 is_recurring: false, // Swaps are always one-time
-                // Silent Handoff settings
-                silent_handoff_enabled: formData.silent_handoff_enabled,
-                location_lat: formData.silent_handoff_enabled ? formData.location_lat || undefined : undefined,
-                location_lng: formData.silent_handoff_enabled ? formData.location_lng || undefined : undefined,
-                geofence_radius_meters: formData.silent_handoff_enabled ? formData.geofence_radius_meters : undefined,
-                check_in_window_before_minutes: formData.silent_handoff_enabled ? formData.check_in_window_before_minutes : undefined,
-                check_in_window_after_minutes: formData.silent_handoff_enabled ? formData.check_in_window_after_minutes : undefined,
-                qr_confirmation_required: formData.silent_handoff_enabled ? formData.qr_confirmation_required : undefined,
+                // Silent Handoff — always enabled for swaps
+                silent_handoff_enabled: true,
+                location_lat: formData.location_lat || undefined,
+                location_lng: formData.location_lng || undefined,
+                geofence_radius_meters: 100,
+                check_in_window_before_minutes: formData.grace_period_minutes,
+                check_in_window_after_minutes: formData.grace_period_minutes + 10,
+                qr_confirmation_required: false,
             };
 
             await exchangesAPI.create(exchangeData);
@@ -350,88 +346,38 @@ export default function SwapRequestModal({
                             />
                         </div>
 
-                        {/* Silent Handoff Toggle */}
-                        <div className="p-4 bg-secondary/50 rounded-lg border border-border">
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="silent_handoff"
-                                    checked={formData.silent_handoff_enabled}
-                                    onChange={(e) => setFormData({ ...formData, silent_handoff_enabled: e.target.checked })}
-                                    className="rounded border-input"
-                                />
-                                <Label htmlFor="silent_handoff" className="cursor-pointer flex items-center gap-1 text-foreground">
-                                    <Navigation className="h-4 w-4" />
-                                    Enable GPS Check-in (Silent Handoff)
-                                </Label>
-                            </div>
-                            <p className="text-xs text-muted-foreground mt-1 ml-6">
-                                Both parents check in via GPS to confirm the swap
+                        {/* Grace Period */}
+                        <div>
+                            <Label htmlFor="grace_period" className="text-foreground">
+                                <Clock className="inline h-4 w-4 mr-1" />
+                                Grace Period (minutes)
+                            </Label>
+                            <Input
+                                id="grace_period"
+                                type="number"
+                                min={5}
+                                max={120}
+                                value={formData.grace_period_minutes}
+                                onChange={(e) => setFormData({ ...formData, grace_period_minutes: parseInt(e.target.value) || 15 })}
+                                className="mt-1"
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                                Time to wait before flagging as late. After grace period + 10 min, parent is flagged as no-show.
                             </p>
+                        </div>
 
-                            {formData.silent_handoff_enabled && (
-                                <div className="mt-4 space-y-4 pl-6 border-l-2 border-[var(--portal-primary)]/30">
-                                    {/* Geofence Radius */}
-                                    <div>
-                                        <Label className="text-sm text-foreground">
-                                            Geofence Radius: {formData.geofence_radius_meters}m
-                                        </Label>
-                                        <input
-                                            type="range"
-                                            min="25"
-                                            max="500"
-                                            step="25"
-                                            value={formData.geofence_radius_meters}
-                                            onChange={(e) => setFormData({ ...formData, geofence_radius_meters: parseInt(e.target.value) })}
-                                            className="w-full mt-1"
-                                        />
-                                        <div className="flex justify-between text-xs text-muted-foreground">
-                                            <span>25m</span>
-                                            <span>500m</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Check-in Windows */}
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <Label className="text-xs text-foreground">Early check-in (min)</Label>
-                                            <Input
-                                                type="number"
-                                                min="5"
-                                                max="120"
-                                                value={formData.check_in_window_before_minutes}
-                                                onChange={(e) => setFormData({ ...formData, check_in_window_before_minutes: parseInt(e.target.value) || 30 })}
-                                                className="mt-1"
-                                            />
-                                        </div>
-                                        <div>
-                                            <Label className="text-xs text-foreground">Late check-in (min)</Label>
-                                            <Input
-                                                type="number"
-                                                min="5"
-                                                max="120"
-                                                value={formData.check_in_window_after_minutes}
-                                                onChange={(e) => setFormData({ ...formData, check_in_window_after_minutes: parseInt(e.target.value) || 30 })}
-                                                className="mt-1"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* QR Confirmation */}
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="checkbox"
-                                            id="qr_required"
-                                            checked={formData.qr_confirmation_required}
-                                            onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
-                                            className="rounded border-input"
-                                        />
-                                        <Label htmlFor="qr_required" className="cursor-pointer text-sm text-foreground">
-                                            Require QR scan confirmation
-                                        </Label>
-                                    </div>
+                        {/* GPS Check-in Info */}
+                        <div className="p-4 bg-cg-sage/10 rounded-lg border border-cg-sage/20">
+                            <div className="flex items-start gap-2.5">
+                                <Navigation className="h-4 w-4 text-cg-sage mt-0.5 shrink-0" />
+                                <div>
+                                    <p className="text-sm font-medium text-foreground">GPS Check-in Enabled</p>
+                                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                                        Both parents are verified via GPS when they arrive at the swap location within a 100m radius.
+                                        The check-in window uses the grace period above. If a parent doesn&apos;t arrive in time they&apos;re flagged as late, then as a no-show after an additional 10 minutes.
+                                    </p>
                                 </div>
-                            )}
+                            </div>
                         </div>
 
                         {/* Reason */}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, RefreshCw, MapPin, Clock, Package, FileText, Repeat, Box, CheckCircle, Navigation, QrCode, Loader2, Lock } from 'lucide-react';
+import { X, RefreshCw, MapPin, Clock, Package, FileText, Repeat, Box, CheckCircle, Navigation, Loader2, Lock } from 'lucide-react';
 import { useFeatureGate } from '@/hooks/use-feature-gate';
 import { TierBadge } from '@/components/tier-badge';
 import {
@@ -20,9 +20,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import dynamic from 'next/dynamic';
-
-const GeofenceMap = dynamic(() => import('./geofence-map'), { ssr: false });
 
 interface ExchangeFormProps {
   caseId: string;
@@ -85,14 +82,9 @@ export default function ExchangeForm({
     special_instructions: '',
     notes_visible_to_coparent: true,
     selected_cubbie_items: [] as string[], // IDs of selected cubbie items
-    // Silent Handoff settings
-    silent_handoff_enabled: false,
+    // Silent Handoff — always enabled for exchanges (GPS check-in is automatic)
     location_lat: null as number | null,
     location_lng: null as number | null,
-    geofence_radius_meters: 100,
-    check_in_window_before_minutes: 30,
-    check_in_window_after_minutes: 30,
-    qr_confirmation_required: false,
   });
 
   const [isGeocodingAddress, setIsGeocodingAddress] = useState(false);
@@ -265,14 +257,14 @@ export default function ExchangeForm({
         items_to_bring: itemsToBring || undefined,
         special_instructions: formData.special_instructions || undefined,
         notes_visible_to_coparent: formData.notes_visible_to_coparent,
-        // Silent Handoff settings
-        silent_handoff_enabled: formData.silent_handoff_enabled,
-        location_lat: formData.silent_handoff_enabled ? formData.location_lat || undefined : undefined,
-        location_lng: formData.silent_handoff_enabled ? formData.location_lng || undefined : undefined,
-        geofence_radius_meters: formData.silent_handoff_enabled ? formData.geofence_radius_meters : undefined,
-        check_in_window_before_minutes: formData.silent_handoff_enabled ? formData.check_in_window_before_minutes : undefined,
-        check_in_window_after_minutes: formData.silent_handoff_enabled ? formData.check_in_window_after_minutes : undefined,
-        qr_confirmation_required: formData.silent_handoff_enabled ? formData.qr_confirmation_required : undefined,
+        // Silent Handoff — always enabled for exchanges
+        silent_handoff_enabled: true,
+        location_lat: formData.location_lat || undefined,
+        location_lng: formData.location_lng || undefined,
+        geofence_radius_meters: 100,
+        check_in_window_before_minutes: formData.duration_minutes,
+        check_in_window_after_minutes: formData.duration_minutes + 10,
+        qr_confirmation_required: false,
       };
 
       const exchange = await exchangesAPI.create(exchangeData);
@@ -531,145 +523,20 @@ export default function ExchangeForm({
               />
             </div>
 
-            {/* Silent Handoff Settings */}
-            <div className="p-4 bg-secondary/50 rounded-lg border border-border">
-              <div className="flex items-center gap-2 mb-3">
-                <input
-                  type="checkbox"
-                  id="silent_handoff_enabled"
-                  checked={formData.silent_handoff_enabled}
-                  onChange={(e) => setFormData({ ...formData, silent_handoff_enabled: e.target.checked })}
-                  className="rounded border-input"
-                />
-                <Label htmlFor="silent_handoff_enabled" className="cursor-pointer flex items-center gap-1 text-foreground font-medium">
-                  <Navigation className="h-4 w-4" />
-                  Enable Silent Handoff GPS Check-in
-                </Label>
-              </div>
-
-              {formData.silent_handoff_enabled && (
-                <div className="space-y-4 mt-3 pl-6 border-l-2 border-cg-sage/30">
-                  {/* GPS Coordinates */}
-                  <div>
-                    <p className="text-sm font-medium text-foreground mb-1.5">Exchange Location GPS</p>
-                    {formData.location_lat && formData.location_lng ? (
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <span className="text-sm text-green-700 dark:text-green-400">
-                          Coordinates set: {formData.location_lat.toFixed(4)}&deg;, {formData.location_lng.toFixed(4)}&deg;
-                        </span>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleGeocodeAddress}
-                          disabled={isGeocodingAddress || !formData.location.trim()}
-                        >
-                          {isGeocodingAddress ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Update'}
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleGeocodeAddress}
-                        disabled={isGeocodingAddress || !formData.location.trim()}
-                        className="w-full"
-                      >
-                        {isGeocodingAddress ? (
-                          <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Geocoding...</>
-                        ) : (
-                          <><MapPin className="h-3 w-3 mr-1" /> Set GPS Coordinates from Address</>
-                        )}
-                      </Button>
-                    )}
-                    {!formData.location.trim() && (
-                      <p className="text-xs text-muted-foreground mt-1">Enter a location above first</p>
-                    )}
-                  </div>
-
-                  {/* Geofence Radius */}
-                  <div>
-                    <Label className="text-sm text-foreground">
-                      Geofence Radius: <span className="font-bold">{formData.geofence_radius_meters}m</span>
-                    </Label>
-                    <input
-                      type="range"
-                      min={50}
-                      max={500}
-                      step={25}
-                      value={formData.geofence_radius_meters}
-                      onChange={(e) => setFormData({ ...formData, geofence_radius_meters: parseInt(e.target.value) })}
-                      className="w-full mt-1 accent-cg-sage"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>50m</span>
-                      <span>500m</span>
-                    </div>
-                  </div>
-
-                  {/* Check-in Window */}
-                  <div>
-                    <Label className="text-sm text-foreground mb-1.5 block">Check-in Window</Label>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1">
-                        <Input
-                          type="number"
-                          min={5}
-                          max={120}
-                          value={formData.check_in_window_before_minutes}
-                          onChange={(e) => setFormData({ ...formData, check_in_window_before_minutes: parseInt(e.target.value) || 30 })}
-                          className="text-center"
-                        />
-                        <p className="text-xs text-muted-foreground text-center mt-0.5">min before</p>
-                      </div>
-                      <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <div className="flex-1">
-                        <Input
-                          type="number"
-                          min={5}
-                          max={120}
-                          value={formData.check_in_window_after_minutes}
-                          onChange={(e) => setFormData({ ...formData, check_in_window_after_minutes: parseInt(e.target.value) || 30 })}
-                          className="text-center"
-                        />
-                        <p className="text-xs text-muted-foreground text-center mt-0.5">min after</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* QR Confirmation */}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="qr_confirmation_required"
-                      checked={formData.qr_confirmation_required}
-                      onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
-                      className="rounded border-input"
-                    />
-                    <Label htmlFor="qr_confirmation_required" className="cursor-pointer flex items-center gap-1 text-sm text-foreground">
-                      <QrCode className="h-4 w-4" />
-                      Require QR Code Confirmation
-                    </Label>
-                  </div>
-                  <p className="text-xs text-muted-foreground -mt-2">
-                    When enabled, parents must scan each other&apos;s QR code after GPS check-in for a verified exchange.
+            {/* GPS Check-in Info */}
+            <div className="p-4 bg-cg-sage/10 rounded-lg border border-cg-sage/20">
+              <div className="flex items-start gap-2.5">
+                <Navigation className="h-4 w-4 text-cg-sage mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">GPS Check-in Enabled</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    Both parents are verified via GPS when they arrive at the exchange location within a 100m radius.
+                    The check-in window opens at the scheduled time and uses the grace period above.
+                    If a parent doesn&apos;t check in within the grace period they&apos;re flagged as late, and after an additional 10 minutes as a no-show.
+                    Parents can also use the &quot;With Me&quot; button to manually confirm a handoff.
                   </p>
-
-                  {/* Map Preview */}
-                  {formData.location_lat && formData.location_lng && (
-                    <div className="mt-3">
-                      <p className="text-xs font-medium text-foreground mb-1.5">Geofence Preview</p>
-                      <GeofenceMap
-                        center={{ lat: formData.location_lat, lng: formData.location_lng }}
-                        radiusMeters={formData.geofence_radius_meters}
-                        height="150px"
-                      />
-                    </div>
-                  )}
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Recurring */}
