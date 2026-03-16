@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const securityHeaders = [
   {
@@ -9,7 +10,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",  // Tailwind + Google Fonts
       "img-src 'self' data: https: blob:",
       "font-src 'self' https://fonts.gstatic.com",  // Google Fonts
-      "connect-src 'self' http://localhost:8000 ws://localhost:8000 wss://*.daily.co https://*.daily.co https://commonground-api-a0fr.onrender.com https://*.onrender.com wss://*.onrender.com https://unpkg.com https://cdnjs.cloudflare.com https://*.stripe.com https://*.supabase.co wss://*.supabase.co",  // Backend API + Daily.co + CDNs + Stripe + Supabase + WebSocket
+      "connect-src 'self' http://localhost:8000 ws://localhost:8000 wss://*.daily.co https://*.daily.co https://commonground-api-a0fr.onrender.com https://*.onrender.com wss://*.onrender.com https://unpkg.com https://cdnjs.cloudflare.com https://*.stripe.com https://*.supabase.co wss://*.supabase.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com",  // Backend API + Daily.co + CDNs + Stripe + Supabase + WebSocket + Mapbox
       "frame-src 'self' https://*.daily.co https://www.youtube.com https://www.youtube-nocookie.com https://js.stripe.com https://*.stripe.com",  // Allow Daily.co video iframe + YouTube + Stripe 3D Secure
       "media-src 'self' https://*.daily.co blob:",  // Allow media from Daily.co
       "worker-src 'self' blob:",  // PDF.js worker
@@ -41,6 +42,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Monorepo root for proper module resolution and output tracing
+  outputFileTracingRoot: path.join(__dirname, '../../'),
   async headers() {
     return [
       {
@@ -75,7 +78,12 @@ const nextConfig: NextConfig = {
       react: './node_modules/react',
       'react-dom': './node_modules/react-dom',
     },
+    resolveExtensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.mjs'],
   },
+  // Transpile workspace packages that may not be in local node_modules (hoisted to root)
+  transpilePackages: ['react-map-gl', 'mapbox-gl', '@vis.gl/react-mapbox'],
+  // Enable server external packages for mapbox (native bindings)
+  serverExternalPackages: ['mapbox-gl'],
   // Keep webpack config for fallback
   webpack: (config) => {
     config.resolve.alias.canvas = false;
