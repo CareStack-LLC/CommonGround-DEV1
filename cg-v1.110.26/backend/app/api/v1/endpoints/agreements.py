@@ -3,7 +3,7 @@ Agreement endpoints for custody agreement management.
 """
 
 from typing import List, Dict, Any, Optional
-from fastapi import APIRouter, Depends, Body, File, UploadFile, HTTPException, status, Response
+from fastapi import APIRouter, Depends, Body, File, UploadFile, HTTPException, status, Response, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 
@@ -310,6 +310,7 @@ async def submit_for_approval(
 @router.post("/{agreement_id}/approve")
 async def approve_agreement(
     agreement_id: str,
+    request: Request,
     approval_data: ApprovalRequest = Body(...),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -318,19 +319,34 @@ async def approve_agreement(
     Approve an agreement.
 
     Requires both parents to approve before becoming active.
+    Captures IP address and user-agent for digital signature verification.
 
     Args:
         agreement_id: ID of the agreement
-        approval_data: Optional approval notes
+        request: FastAPI request object for metadata capture
+        approval_data: Approval notes and disclaimer acceptance
 
     Returns:
         Updated agreement status
     """
+    # Validate disclaimer acceptance
+    if not approval_data.disclaimer_accepted:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must accept the legal disclaimer to approve this agreement"
+        )
+
+    # Capture request metadata for digital signature verification
+    ip_address = request.headers.get("x-forwarded-for", request.client.host if request.client else "Unknown")
+    user_agent = request.headers.get("user-agent", "Unknown")
+
     agreement_service = AgreementService(db)
     agreement = await agreement_service.approve_agreement(
         agreement_id,
         current_user,
-        approval_data.notes
+        approval_data.notes,
+        ip_address=ip_address,
+        user_agent=user_agent
     )
 
     return {
@@ -711,19 +727,44 @@ async def download_agreement_pdf(
     Returns:
         PDF file
     """
-    agreement_service = AgreementService(db)
-    agreement = await agreement_service.get_agreement(agreement_id, current_user)
+    import logging
+    logger = logging.getLogger(__name__)
 
-    # Generate PDF
-    pdf_bytes = await agreement_service.generate_pdf(agreement)
+    try:
+        agreement_service = AgreementService(db)
+        agreement = await agreement_service.get_agreement(agreement_id, current_user)
 
-    return Response(
-        content=pdf_bytes,
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f'attachment; filename="agreement_{agreement_id}.pdf"'
-        }
-    )
+        if not agreement:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Agreement {agreement_id} not found"
+            )
+
+        # Generate PDF
+        logger.info(f"Generating PDF for agreement {agreement_id}")
+        pdf_bytes = await agreement_service.generate_pdf(agreement)
+
+        if not pdf_bytes:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="PDF generation returned empty result"
+            )
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="agreement_{agreement_id}.pdf"'
+            }
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"PDF generation failed for agreement {agreement_id}: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate PDF: {str(e)}"
+        )
 
 
 # ============================================================================

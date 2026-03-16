@@ -1166,10 +1166,10 @@ export const agreementsAPI = {
   /**
    * Approve agreement
    */
-  async approve(agreementId: string, notes?: string): Promise<{ agreement: Agreement; sections: AgreementSection[]; completion_percentage: number }> {
+  async approve(agreementId: string, notes?: string, disclaimerAccepted: boolean = false): Promise<{ agreement: Agreement; sections: AgreementSection[]; completion_percentage: number }> {
     const result = await fetchAPI<Agreement>(`/agreements/${agreementId}/approve`, {
       method: 'POST',
-      body: JSON.stringify({ notes: notes || null }),
+      body: JSON.stringify({ notes: notes || null, disclaimer_accepted: disclaimerAccepted }),
     });
     // Approve returns just the agreement, so fetch full data
     return this.get(agreementId);

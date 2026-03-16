@@ -557,7 +557,10 @@ class AgreementService:
 
     async def generate_pdf(self, agreement: Agreement) -> bytes:
         """
-        Generate PDF document from agreement.
+        Generate court-ready PDF document from agreement.
+
+        Uses the AgreementPDFGenerator for branded, professional output
+        with digital signature verification sections.
 
         Args:
             agreement: Agreement to generate PDF for
@@ -568,46 +571,13 @@ class AgreementService:
         Raises:
             HTTPException: If generation fails
         """
+        import logging
+        logger = logging.getLogger(__name__)
+
         try:
-            # Create PDF in memory
-            buffer = io.BytesIO()
-            doc = SimpleDocTemplate(buffer, pagesize=letter,
-                                   topMargin=0.75*inch, bottomMargin=0.75*inch)
+            from app.services.agreement_pdf_generator import AgreementPDFGenerator
 
-            # Build story (content)
-            story = []
-            styles = getSampleStyleSheet()
-
-            # Title style
-            title_style = ParagraphStyle(
-                'CustomTitle',
-                parent=styles['Heading1'],
-                fontSize=18,
-                textColor='black',
-                spaceAfter=30,
-                alignment=TA_CENTER
-            )
-
-            # Add title
-            story.append(Paragraph(agreement.title, title_style))
-            story.append(Spacer(1, 0.3*inch))
-
-            # Add metadata
-            meta_style = styles['Normal']
-            story.append(Paragraph(f"<b>Agreement ID:</b> {agreement.id}", meta_style))
-            story.append(Paragraph(f"<b>Version:</b> {agreement.version}", meta_style))
-            story.append(Paragraph(f"<b>Status:</b> {agreement.status.upper()}", meta_style))
-            story.append(Paragraph(f"<b>Created:</b> {agreement.created_at.strftime('%B %d, %Y')}", meta_style))
-
-            if agreement.effective_date:
-                story.append(Paragraph(
-                    f"<b>Effective Date:</b> {agreement.effective_date.strftime('%B %d, %Y')}",
-                    meta_style
-                ))
-
-            story.append(Spacer(1, 0.5*inch))
-
-            # Add sections
+            # Load sections (ordered)
             result = await self.db.execute(
                 select(AgreementSection)
                 .where(AgreementSection.agreement_id == agreement.id)
@@ -615,81 +585,53 @@ class AgreementService:
             )
             sections = result.scalars().all()
 
-            section_style = ParagraphStyle(
-                'SectionTitle',
-                parent=styles['Heading2'],
-                fontSize=14,
-                textColor='black',
-                spaceAfter=12,
-                spaceBefore=20
+            # Load parent User objects for the parties section
+            parent_a = None
+            parent_b = None
+
+            if agreement.family_file_id:
+                ff_result = await self.db.execute(
+                    select(FamilyFile)
+                    .options(
+                        selectinload(FamilyFile.parent_a),
+                        selectinload(FamilyFile.parent_b),
+                    )
+                    .where(FamilyFile.id == agreement.family_file_id)
+                )
+                family_file = ff_result.scalar_one_or_none()
+                if family_file:
+                    parent_a = family_file.parent_a
+                    parent_b = family_file.parent_b
+
+            elif agreement.case_id:
+                # Legacy case-based: load participants
+                participants_result = await self.db.execute(
+                    select(CaseParticipant)
+                    .options(selectinload(CaseParticipant.user))
+                    .where(CaseParticipant.case_id == agreement.case_id)
+                )
+                participants = participants_result.scalars().all()
+                for p in participants:
+                    if p.role == "petitioner" and p.user:
+                        parent_a = p.user
+                    elif p.role == "respondent" and p.user:
+                        parent_b = p.user
+
+            # Generate the PDF
+            generator = AgreementPDFGenerator()
+            pdf_bytes = generator.generate(
+                agreement=agreement,
+                parent_a=parent_a,
+                parent_b=parent_b,
+                sections=sections,
+                format_structured_data=self._format_structured_data_for_pdf,
             )
 
-            content_style = ParagraphStyle(
-                'SectionContent',
-                parent=styles['Normal'],
-                fontSize=11,
-                alignment=TA_JUSTIFY,
-                spaceAfter=12
-            )
-
-            for section in sections:
-                # Section title
-                story.append(Paragraph(
-                    f"{section.section_number}. {section.section_title}",
-                    section_style
-                ))
-
-                # Section content - handle both v1 (content) and v2 (structured_data)
-                content = section.content
-                if not content or content.strip() == '':
-                    # For v2 agreements, format structured_data
-                    if section.structured_data:
-                        content = self._format_structured_data_for_pdf(section.structured_data)
-                    else:
-                        content = "<i>No content provided</i>"
-
-                story.append(Paragraph(content, content_style))
-                story.append(Spacer(1, 0.2*inch))
-
-            # Add signature block
-            story.append(PageBreak())
-            story.append(Spacer(1, 0.5*inch))
-            story.append(Paragraph("<b>SIGNATURES</b>", title_style))
-            story.append(Spacer(1, 0.3*inch))
-
-            sig_style = styles['Normal']
-            story.append(Paragraph(
-                "By signing below, both parties acknowledge that they have read, understood, and agree to the terms of this Parenting Agreement.",
-                sig_style
-            ))
-            story.append(Spacer(1, 0.5*inch))
-
-            # Parent signatures
-            story.append(Paragraph("_" * 50, sig_style))
-            story.append(Paragraph("Parent A Signature", sig_style))
-            story.append(Paragraph(
-                f"Date: {agreement.petitioner_approved_at.strftime('%B %d, %Y') if agreement.petitioner_approved_at else '___________'}",
-                sig_style
-            ))
-            story.append(Spacer(1, 0.5*inch))
-
-            story.append(Paragraph("_" * 50, sig_style))
-            story.append(Paragraph("Parent B Signature", sig_style))
-            story.append(Paragraph(
-                f"Date: {agreement.respondent_approved_at.strftime('%B %d, %Y') if agreement.respondent_approved_at else '___________'}",
-                sig_style
-            ))
-
-            # Build PDF
-            doc.build(story)
-
-            # Get PDF bytes
-            pdf_bytes = buffer.getvalue()
-            buffer.close()
-
+            logger.info(f"Generated PDF for agreement {agreement.id}: {len(pdf_bytes)} bytes")
             return pdf_bytes
 
         except Exception as e:
+            logger.error(f"Failed to generate PDF for agreement {agreement.id}: {str(e)}", exc_info=True)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to generate PDF: {str(e)}"
@@ -803,7 +745,9 @@ class AgreementService:
         self,
         agreement_id: str,
         user: User,
-        notes: Optional[str] = None
+        notes: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None
     ) -> Agreement:
         """
         Approve an agreement.
@@ -873,6 +817,8 @@ class AgreementService:
                     )
                 agreement.petitioner_approved = True
                 agreement.petitioner_approved_at = datetime.utcnow()
+                agreement.petitioner_approval_ip = ip_address
+                agreement.petitioner_approval_user_agent = user_agent
 
             elif user_role == "respondent":
                 if agreement.respondent_approved:
@@ -882,6 +828,8 @@ class AgreementService:
                     )
                 agreement.respondent_approved = True
                 agreement.respondent_approved_at = datetime.utcnow()
+                agreement.respondent_approval_ip = ip_address
+                agreement.respondent_approval_user_agent = user_agent
 
             # Check if both parents have approved
             if agreement.petitioner_approved and agreement.respondent_approved:

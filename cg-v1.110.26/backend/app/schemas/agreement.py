@@ -97,6 +97,7 @@ class ApprovalRequest(BaseModel):
     """Request to approve an agreement."""
 
     notes: Optional[str] = None
+    disclaimer_accepted: bool = False
 
 
 class AgreementVersionResponse(BaseModel):

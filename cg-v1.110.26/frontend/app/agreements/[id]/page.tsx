@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { useFeatureGate } from '@/hooks/use-feature-gate';
 import { TierBadge } from '@/components/tier-badge';
+import { ApprovalDisclaimerModal } from '@/components/approval-disclaimer-modal';
 
 /* =============================================================================
    HELPER FUNCTIONS
@@ -477,6 +478,7 @@ function AgreementDetailsContent() {
   const [summary, setSummary] = useState<AgreementQuickSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isApproving, setIsApproving] = useState(false);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
@@ -547,9 +549,10 @@ function AgreementDetailsContent() {
       setIsApproving(true);
       setError(null);
 
-      const data = await agreementsAPI.approve(agreementId);
+      const data = await agreementsAPI.approve(agreementId, undefined, true);
       setAgreement(data.agreement);
       setSections(data.sections);
+      setShowApprovalModal(false);
     } catch (err: any) {
       console.error('Failed to approve agreement:', err);
       setError(err.message || 'Failed to approve agreement');
@@ -941,7 +944,7 @@ function AgreementDetailsContent() {
                   <>
                     {canApprove() ? (
                       <ActionButton
-                        onClick={handleApprove}
+                        onClick={() => setShowApprovalModal(true)}
                         isLoading={isApproving}
                         variant="success"
                         icon={<CheckCircle className="h-4 w-4" />}
@@ -1315,6 +1318,15 @@ function AgreementDetailsContent() {
           </div>
         )}
       </main>
+
+      {/* Approval Disclaimer Modal */}
+      <ApprovalDisclaimerModal
+        isOpen={showApprovalModal}
+        onClose={() => setShowApprovalModal(false)}
+        onConfirm={handleApprove}
+        agreementTitle={agreement?.title || 'SharedCare Agreement'}
+        isLoading={isApproving}
+      />
     </div>
   );
 }

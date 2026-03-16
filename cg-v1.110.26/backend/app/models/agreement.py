@@ -100,6 +100,12 @@ class Agreement(Base, UUIDMixin, TimestampMixin):
     respondent_approved: Mapped[bool] = mapped_column(Boolean, default=False)
     respondent_approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
+    # Approval metadata (for digital signature verification)
+    petitioner_approval_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
+    petitioner_approval_user_agent: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    respondent_approval_ip: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
+    respondent_approval_user_agent: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # Effective dates
     effective_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     expiration_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
