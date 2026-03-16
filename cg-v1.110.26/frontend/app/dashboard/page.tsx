@@ -977,10 +977,10 @@ function DashboardContent() {
 
               {/* Recent Activity */}
               <section>
-                <h3 className="text-lg font-bold text-slate-900 mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                <h3 className="text-lg font-bold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Recent Activity
                 </h3>
-                <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
                   <ActivityFeed
                     activities={dashboardSummary?.recent_activities || []}
                     unreadCount={dashboardSummary?.unread_activity_count || 0}

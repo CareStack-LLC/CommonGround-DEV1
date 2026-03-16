@@ -44,11 +44,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 // Map categories to colors
 const categoryColors: Record<string, { bg: string; text: string; gradient: string }> = {
-  communication: { bg: 'bg-blue-100', text: 'text-blue-600', gradient: 'from-blue-100 to-blue-50' },
-  custody: { bg: 'bg-emerald-100', text: 'text-emerald-600', gradient: 'from-emerald-100 to-emerald-50' },
-  schedule: { bg: 'bg-amber-100', text: 'text-amber-600', gradient: 'from-amber-100 to-amber-50' },
-  financial: { bg: 'bg-purple-100', text: 'text-purple-600', gradient: 'from-purple-100 to-purple-50' },
-  system: { bg: 'bg-slate-100', text: 'text-slate-500', gradient: 'from-slate-100 to-slate-50' },
+  communication: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400', gradient: 'from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-900/10' },
+  custody: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-600 dark:text-emerald-400', gradient: 'from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-900/10' },
+  schedule: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400', gradient: 'from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-900/10' },
+  financial: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-600 dark:text-purple-400', gradient: 'from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-900/10' },
+  system: { bg: 'bg-slate-100 dark:bg-slate-800/50', text: 'text-slate-500 dark:text-slate-400', gradient: 'from-slate-100 to-slate-50 dark:from-slate-800/50 dark:to-slate-800/30' },
 };
 
 interface GroupedActivities {
@@ -95,7 +95,7 @@ function ActivityItem({
   return (
     <button
       onClick={() => onNavigate(activity)}
-      className={`w-full p-4 flex items-start gap-4 text-left transition-all duration-300 hover:bg-slate-50 ${
+      className={`w-full p-4 flex items-start gap-4 text-left transition-all duration-300 hover:bg-muted/50 ${
         !activity.is_read ? 'bg-[var(--portal-primary)]/5 border-l-4 border-l-[var(--portal-primary)]' : ''
       }`}
     >
@@ -142,7 +142,7 @@ function ActivitySection({
       <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-3 px-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
         {title}
       </h3>
-      <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg divide-y divide-slate-100 overflow-hidden">
+      <div className="bg-card rounded-2xl border-2 border-border shadow-lg divide-y divide-border overflow-hidden">
         {activities.map((activity) => (
           <ActivityItem
             key={activity.id}
@@ -293,7 +293,7 @@ function ActivitiesContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
         <Navigation />
         <main className="max-w-3xl mx-auto px-4 py-8 pb-24 lg:pb-8">
           <div className="flex items-center justify-center h-[60vh]">
@@ -308,7 +308,7 @@ function ActivitiesContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background">
       <Navigation />
 
       <main className="max-w-3xl mx-auto px-4 py-6 pb-24 lg:pb-8">
@@ -317,7 +317,7 @@ function ActivitiesContent() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.back()}
-              className="p-2.5 rounded-xl bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+              className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
             >
               <ArrowLeft className="w-5 h-5 text-muted-foreground" />
             </button>
@@ -340,7 +340,7 @@ function ActivitiesContent() {
             <button
               onClick={handleMarkAllRead}
               disabled={isMarkingRead}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-[var(--portal-primary)] bg-white border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg rounded-xl transition-all duration-300 disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-[var(--portal-primary)] bg-card border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg rounded-xl transition-all duration-300 disabled:opacity-50"
             >
               <CheckCheck className="w-4 h-4" />
               {isMarkingRead ? 'Marking...' : 'Mark all read'}
@@ -350,9 +350,9 @@ function ActivitiesContent() {
 
         {/* Activities */}
         {activities.length === 0 ? (
-          <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-8 text-center">
-            <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
-              <Bell className="w-7 h-7 text-slate-500" />
+          <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-8 text-center">
+            <div className="w-14 h-14 bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+              <Bell className="w-7 h-7 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               No activity yet
