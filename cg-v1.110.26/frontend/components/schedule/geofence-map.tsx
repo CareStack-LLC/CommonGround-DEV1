@@ -1,8 +1,8 @@
 'use client';
 
 import { useMemo, useCallback } from 'react';
-import Map, { Source, Layer, Marker, NavigationControl } from 'react-map-gl';
-import type { CircleLayer, FillLayer, LineLayer } from 'react-map-gl';
+import Map, { Source, Layer, Marker, NavigationControl } from 'react-map-gl/mapbox';
+import type { FillLayer, LineLayer } from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 // Mapbox public token from environment

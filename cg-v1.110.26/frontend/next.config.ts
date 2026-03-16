@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import path from "path";
 
 const securityHeaders = [
   {
@@ -42,8 +41,6 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // Monorepo root for proper module resolution and output tracing
-  outputFileTracingRoot: path.join(__dirname, '../../'),
   async headers() {
     return [
       {
@@ -78,12 +75,7 @@ const nextConfig: NextConfig = {
       react: './node_modules/react',
       'react-dom': './node_modules/react-dom',
     },
-    resolveExtensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.mjs'],
   },
-  // Transpile workspace packages that may not be in local node_modules (hoisted to root)
-  transpilePackages: ['react-map-gl', 'mapbox-gl', '@vis.gl/react-mapbox'],
-  // Enable server external packages for mapbox (native bindings)
-  serverExternalPackages: ['mapbox-gl'],
   // Keep webpack config for fallback
   webpack: (config) => {
     config.resolve.alias.canvas = false;
