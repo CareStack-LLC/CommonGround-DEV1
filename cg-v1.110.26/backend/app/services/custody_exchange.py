@@ -77,6 +77,9 @@ class CustodyExchangeService:
         check_in_window_after_minutes: int = 30,
         silent_handoff_enabled: bool = False,
         qr_confirmation_required: bool = False,
+        # Swap flag
+        is_swap: bool = False,
+        swap_reason: Optional[str] = None,
     ) -> CustodyExchange:
         """Create a new custody exchange (pickup/dropoff)."""
 
@@ -153,6 +156,9 @@ class CustodyExchangeService:
             check_in_window_after_minutes=check_in_window_after_minutes,
             silent_handoff_enabled=silent_handoff_enabled,
             qr_confirmation_required=qr_confirmation_required,
+            # Swap flag
+            is_swap=is_swap,
+            swap_reason=swap_reason,
         )
 
         db.add(exchange)
@@ -928,6 +934,10 @@ class CustodyExchangeService:
         data["check_in_window_after_minutes"] = exchange.check_in_window_after_minutes
         data["silent_handoff_enabled"] = exchange.silent_handoff_enabled
         data["qr_confirmation_required"] = exchange.qr_confirmation_required
+
+        # Swap fields
+        data["is_swap"] = exchange.is_swap
+        data["swap_reason"] = exchange.swap_reason
 
         return data
 

@@ -86,6 +86,9 @@ async def create_exchange(
             check_in_window_after_minutes=exchange_data.check_in_window_after_minutes,
             silent_handoff_enabled=exchange_data.silent_handoff_enabled,
             qr_confirmation_required=exchange_data.qr_confirmation_required,
+            # Swap flag
+            is_swap=exchange_data.is_swap,
+            swap_reason=exchange_data.swap_reason,
         )
 
         # Get other parent info for perspective-aware display
@@ -883,6 +886,61 @@ async def geocode_address(
         formatted_address=result["formatted_address"],
         accuracy=result["accuracy"]
     )
+
+
+# ============================================================
+# Swap Count Endpoint
+# ============================================================
+
+@router.get(
+    "/case/{case_id}/swap-count",
+    summary="Get swap count",
+    description="Get the total number of schedule swaps per parent for a case."
+)
+async def get_swap_count(
+    case_id: str,
+    parent_id: Optional[str] = Query(None, description="Filter by specific parent"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get swap count for a case.
+
+    Returns total swaps and per-parent breakdown.
+    Only counts exchanges where is_swap=True.
+    """
+    from sqlalchemy import func
+    from app.models.custody_exchange import CustodyExchange
+
+    # Build base query
+    query = select(
+        CustodyExchange.created_by,
+        func.count(CustodyExchange.id).label("count")
+    ).where(
+        and_(
+            or_(
+                CustodyExchange.case_id == case_id,
+                CustodyExchange.family_file_id == case_id,
+            ),
+            CustodyExchange.is_swap == True,
+            CustodyExchange.status != "cancelled",
+        )
+    ).group_by(CustodyExchange.created_by)
+
+    if parent_id:
+        query = query.where(CustodyExchange.created_by == parent_id)
+
+    result = await db.execute(query)
+    rows = result.all()
+
+    by_parent = {row.created_by: row.count for row in rows}
+    total = sum(by_parent.values())
+
+    return {
+        "case_id": case_id,
+        "total_swaps": total,
+        "by_parent": by_parent,
+    }
 
 
 # ============================================================

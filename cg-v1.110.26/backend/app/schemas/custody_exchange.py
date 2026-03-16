@@ -59,6 +59,10 @@ class CustodyExchangeCreate(BaseModel):
     silent_handoff_enabled: bool = False
     qr_confirmation_required: bool = False
 
+    # Swap flag
+    is_swap: bool = False
+    swap_reason: Optional[str] = None
+
 
 class CustodyExchangeUpdate(BaseModel):
     """Schema for updating a custody exchange."""
@@ -100,6 +104,10 @@ class CustodyExchangeUpdate(BaseModel):
     silent_handoff_enabled: Optional[bool] = None
     qr_confirmation_required: Optional[bool] = None
 
+    # Swap flag
+    is_swap: Optional[bool] = None
+    swap_reason: Optional[str] = None
+
 
 class CustodyExchangeResponse(BaseModel):
     """Schema for custody exchange response."""
@@ -140,6 +148,10 @@ class CustodyExchangeResponse(BaseModel):
     check_in_window_after_minutes: int = 30
     silent_handoff_enabled: bool = False
     qr_confirmation_required: bool = False
+
+    # Swap flag
+    is_swap: bool = False
+    swap_reason: Optional[str] = None
 
     # Computed fields
     is_owner: bool = False

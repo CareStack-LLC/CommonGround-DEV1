@@ -57,6 +57,10 @@ class CustodyExchange(Base):
         nullable=False
     )  # "pickup", "dropoff", "both"
 
+    # Swap flag — when True, this exchange represents a schedule swap request
+    is_swap: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    swap_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # Title for display (auto-generated if not provided)
     title: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
 

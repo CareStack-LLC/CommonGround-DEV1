@@ -2352,6 +2352,9 @@ export interface CustodyExchange {
   check_in_window_after_minutes: number;
   silent_handoff_enabled: boolean;
   qr_confirmation_required: boolean;
+  // Swap fields
+  is_swap: boolean;
+  swap_reason?: string;
   created_at: string;
   updated_at: string;
 }
@@ -2421,6 +2424,9 @@ export interface CreateCustodyExchangeRequest {
   check_in_window_after_minutes?: number;
   silent_handoff_enabled?: boolean;
   qr_confirmation_required?: boolean;
+  // Swap fields
+  is_swap?: boolean;
+  swap_reason?: string;
 }
 
 export interface UpdateCustodyExchangeRequest {
@@ -2578,7 +2584,22 @@ export const exchangesAPI = {
       body: JSON.stringify({ address }),
     });
   },
+
+  /**
+   * Get swap count for a case (per parent)
+   */
+  async getSwapCount(caseId: string, parentId?: string): Promise<SwapCountResponse> {
+    let url = `/exchanges/case/${caseId}/swap-count`;
+    if (parentId) url += `?parent_id=${parentId}`;
+    return fetchAPI<SwapCountResponse>(url);
+  },
 };
+
+export interface SwapCountResponse {
+  case_id: string;
+  total_swaps: number;
+  by_parent: Record<string, number>;
+}
 
 // ==================== SILENT HANDOFF TYPES ====================
 
