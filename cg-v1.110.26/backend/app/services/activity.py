@@ -217,16 +217,10 @@ class ActivityService:
         family_file = await ActivityService._verify_access(db, family_file_id, user)
         is_parent_a = str(user.id) == str(family_file.parent_a_id)
 
-        # Get recent activities (excluding activities by this user)
-        base_filter = and_(
-            Activity.family_file_id == family_file_id,
-            or_(
-                Activity.actor_id != str(user.id),
-                Activity.actor_id.is_(None)
-            )
-        )
+        # Get recent activities (including all activities for this family file)
+        base_filter = Activity.family_file_id == family_file_id
 
-        # Get total count (activities not by this user)
+        # Get total count
         total_result = await db.execute(
             select(func.count(Activity.id)).where(base_filter)
         )
