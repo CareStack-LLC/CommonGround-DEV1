@@ -11,7 +11,7 @@ For each firm:
 - Links them to their firm via FirmMembership
 
 Usage:
-    python scripts/seed_professional_demo.py --api-url https://commonground-api-gdxg.onrender.com
+    python scripts/seed_professional_demo.py --api-url https://commonground-api-a0fr.onrender.com
     python scripts/seed_professional_demo.py --api-url http://localhost:8000
 """
 
