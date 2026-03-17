@@ -200,7 +200,9 @@ export default function VideoCall({
           const tile = videoEl.closest('[data-participant-id]');
           const participantId = tile?.getAttribute('data-participant-id') || 'unknown';
 
-          const callStartTime = callObject?.meetingSessionSummary?.()?.startedAt;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const sessionSummary = callObject?.meetingSessionSummary?.() as any;
+          const callStartTime = sessionSummary?.startedAt as string | undefined;
           const callTimeSeconds = callStartTime
             ? (Date.now() - new Date(callStartTime).getTime()) / 1000
             : 0;

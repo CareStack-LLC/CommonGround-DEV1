@@ -406,7 +406,7 @@ export default function ChildChatPage() {
             disabled={isSending}
           />
           <button
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={(!newMessage.trim() && !pendingAttachment) || isSending}
             className={cn(
               'p-3 rounded-xl transition-all duration-200',

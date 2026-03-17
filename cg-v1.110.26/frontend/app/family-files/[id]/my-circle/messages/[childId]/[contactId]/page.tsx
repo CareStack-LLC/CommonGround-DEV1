@@ -538,7 +538,7 @@ export default function ParentChatViewPage({ params }: PageParams) {
                   />
                 </div>
                 <button
-                  onClick={handleSend}
+                  onClick={() => handleSend()}
                   disabled={(!newMessage.trim() && !pendingAttachment) || isSending}
                   className="w-11 h-11 rounded-xl bg-teal-600 text-white flex items-center justify-center hover:bg-teal-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                 >
