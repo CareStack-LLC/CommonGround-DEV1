@@ -45,28 +45,32 @@ function CommonGroundLogo({ size = 48 }: { size?: number }) {
       height={size}
       className="flex-shrink-0"
     >
-      <rect width="512" height="512" rx="64" fill="url(#cg-dash-bg)" />
       <defs>
-        <linearGradient id="cg-dash-bg" x1="0" y1="0" x2="512" y2="512">
-          <stop stopColor="#E8F4F8" />
-          <stop offset="1" stopColor="#D6ECE8" />
+        <linearGradient id="cg-dash-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#E8F4F8" />
+          <stop offset="100%" stopColor="#D6ECE8" />
         </linearGradient>
-        <linearGradient id="cg-dash-pa" x1="140" y1="110" x2="196" y2="186">
-          <stop stopColor="#5BC4A0" />
-          <stop offset="1" stopColor="#3DAA8A" />
+        <linearGradient id="cg-dash-pa" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#5BC4A0" />
+          <stop offset="100%" stopColor="#3DAA8A" />
         </linearGradient>
-        <linearGradient id="cg-dash-pb" x1="316" y1="110" x2="372" y2="186">
-          <stop stopColor="#4BA8C8" />
-          <stop offset="1" stopColor="#2D6A8F" />
+        <linearGradient id="cg-dash-pb" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#4BA8C8" />
+          <stop offset="100%" stopColor="#2D6A8F" />
         </linearGradient>
       </defs>
+      <rect width="512" height="512" rx="120" fill="url(#cg-dash-bg)" />
+      {/* Left parent */}
       <circle cx="168" cy="148" r="48" fill="url(#cg-dash-pa)" />
-      <path d="M120 260c0-26.5 21.5-48 48-48s48 21.5 48 48" stroke="url(#cg-dash-pa)" strokeWidth="16" fill="none" strokeLinecap="round" />
+      <path d="M118 218 Q168 258 218 218" stroke="url(#cg-dash-pa)" strokeWidth="16" strokeLinecap="round" fill="none" />
+      {/* Right parent */}
       <circle cx="344" cy="148" r="48" fill="url(#cg-dash-pb)" />
-      <path d="M296 260c0-26.5 21.5-48 48-48s48 21.5 48 48" stroke="url(#cg-dash-pb)" strokeWidth="16" fill="none" strokeLinecap="round" />
-      <path d="M168 200 Q256 140 344 200" stroke="#F5A623" strokeWidth="10" fill="none" strokeLinecap="round" />
+      <path d="M294 218 Q344 258 394 218" stroke="url(#cg-dash-pb)" strokeWidth="16" strokeLinecap="round" fill="none" />
+      {/* Golden arch */}
+      <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+      {/* Child */}
       <circle cx="256" cy="330" r="38" fill="#F5A623" />
-      <path d="M218 410c0-21 17-38 38-38s38 17 38 38" stroke="#F5A623" strokeWidth="14" fill="none" strokeLinecap="round" />
+      <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
     </svg>
   );
 }
@@ -497,15 +501,15 @@ export default function CircleContactDashboardPage() {
       <header className="bg-card/80 backdrop-blur-xl border-b border-border sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* Logo & User Info */}
+            {/* Logo & Brand */}
             <div className="flex items-center gap-3">
               <CommonGroundLogo size={40} />
               <div>
                 <h1 className="text-lg font-bold text-foreground leading-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   Common<span className="text-[#3DAA8A]">Ground</span>
                 </h1>
-                <p className="text-xs text-muted-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
-                  Welcome, {userData?.contactName}
+                <p className="text-xs text-[#2D6A8F] dark:text-[#4BA8C8] font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  My Circle
                 </p>
               </div>
             </div>
@@ -528,25 +532,24 @@ export default function CircleContactDashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
-        {/* Hero Welcome Section */}
-        <div className="mb-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 rounded-full mb-4 border border-[#3DAA8A]/20">
-            <Star className="h-4 w-4 text-[#F5A623]" />
-            <span className="text-sm font-semibold text-[#2D6A8F] dark:text-[#4BA8C8]" style={{ fontFamily: "'Inter', sans-serif" }}>
-              You&apos;re Part of Something Special
-            </span>
+        {/* Greeting Card — matches parent dashboard style */}
+        <div className="mb-8 relative overflow-hidden bg-gradient-to-br from-[#3DAA8A]/5 to-[#3DAA8A]/10 dark:from-[#3DAA8A]/10 dark:to-[#2D6A8F]/10 rounded-2xl p-6 border border-[#3DAA8A]/10">
+          <div className="relative z-10">
+            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+              {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening'},
+            </h1>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[#3DAA8A]" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+              {userData?.contactName}
+            </h2>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3 tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            Thank You for Being Here
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto mb-3 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
-            You&apos;re part of a trusted circle helping to keep a child grounded in love and connection.
-            In times of change, <span className="text-[#3DAA8A] dark:text-[#5BC4A0] font-medium">you are their constant</span>.
-          </p>
-          <p className="text-sm text-[#3DAA8A] dark:text-[#5BC4A0] italic flex items-center justify-center gap-2" style={{ fontFamily: "'Inter', sans-serif" }}>
-            <Sparkles className="h-4 w-4" />
-            {encouragingMessage}
-          </p>
+          {/* Calming nature illustration — same as parent dashboard */}
+          <svg className="absolute right-2 bottom-0 w-32 h-32 sm:w-40 sm:h-40 opacity-15" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M160 180c-20-40-60-60-100-50 30-20 70-15 90 10-10-30-40-55-75-55 25-10 55 5 70 35-5-25-20-45-45-55 20 0 40 15 50 40 0-20-10-40-30-50 15 5 30 20 35 40 5-15 0-35-15-45 10 10 20 25 20 45" stroke="#3DAA8A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+            <path d="M140 190c-10-50-40-80-80-85 20-5 45 10 55 35-5-25-25-45-50-50 15 0 35 15 45 35 0-20-15-35-30-40 15 5 25 20 30 35" stroke="#3DAA8A" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
+            <circle cx="155" cy="65" r="3" fill="#3DAA8A" opacity="0.3"/>
+            <circle cx="170" cy="85" r="2" fill="#3DAA8A" opacity="0.2"/>
+            <circle cx="130" cy="100" r="2.5" fill="#3DAA8A" opacity="0.25"/>
+          </svg>
         </div>
 
         {/* Error Message */}
@@ -727,8 +730,29 @@ export default function CircleContactDashboardPage() {
           </div>
         )}
 
+        {/* Encouraging Message — moved below connections */}
+        <div className="mt-8 mb-8 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 rounded-full mb-4 border border-[#3DAA8A]/20">
+            <Star className="h-4 w-4 text-[#F5A623]" />
+            <span className="text-sm font-semibold text-[#2D6A8F] dark:text-[#4BA8C8]" style={{ fontFamily: "'Inter', sans-serif" }}>
+              You&apos;re Part of Something Special
+            </span>
+          </div>
+          <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-3 tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Thank You for Being Here
+          </h3>
+          <p className="text-muted-foreground max-w-xl mx-auto mb-3 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
+            You&apos;re part of a trusted circle helping to keep a child grounded in love and connection.
+            In times of change, <span className="text-[#3DAA8A] dark:text-[#5BC4A0] font-medium">you are their constant</span>.
+          </p>
+          <p className="text-sm text-[#3DAA8A] dark:text-[#5BC4A0] italic flex items-center justify-center gap-2" style={{ fontFamily: "'Inter', sans-serif" }}>
+            <Sparkles className="h-4 w-4" />
+            {encouragingMessage}
+          </p>
+        </div>
+
         {/* Trust & Safety Section */}
-        <div className="mt-12 mb-8">
+        <div className="mt-4 mb-8">
           <div className="bg-card rounded-2xl p-6 border border-border shadow-sm">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-xl bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 flex items-center justify-center shadow-sm flex-shrink-0">
