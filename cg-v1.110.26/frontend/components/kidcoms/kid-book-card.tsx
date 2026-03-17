@@ -29,7 +29,7 @@ export function KidBookCard({ book, onClick, className, progress }: KidBookCardP
     <button
       onClick={onClick}
       className={cn(
-        'relative bg-white rounded-xl overflow-hidden shadow-md border border-slate-200',
+        'relative bg-card rounded-xl overflow-hidden shadow-md border border-border',
         'transition-all duration-150',
         'hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5',
         'active:scale-100 active:translate-y-0',
@@ -40,7 +40,7 @@ export function KidBookCard({ book, onClick, className, progress }: KidBookCardP
       aria-label={`Read ${book.title}`}
     >
       {/* Book Cover Section */}
-      <div className="relative aspect-[3/4] bg-slate-100">
+      <div className="relative aspect-[3/4] bg-muted">
         {book.cover ? (
           <Image
             src={book.cover}
@@ -50,7 +50,7 @@ export function KidBookCard({ book, onClick, className, progress }: KidBookCardP
             sizes="(max-width: 768px) 50vw, 33vw"
           />
         ) : (
-          <div className="relative h-full flex items-center justify-center bg-gradient-to-br from-amber-100 to-orange-100">
+          <div className="relative h-full flex items-center justify-center bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-950/50 dark:to-orange-950/50">
             <BookOpen className="w-12 h-12 text-amber-500" />
           </div>
         )}
@@ -60,10 +60,10 @@ export function KidBookCard({ book, onClick, className, progress }: KidBookCardP
 
         {/* Page count badge */}
         {book.pages && (
-          <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm">
+          <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/50 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm">
             <div className="flex items-center gap-1">
               <BookOpen className="w-3 h-3 text-amber-500" />
-              <span className="text-xs font-medium text-slate-700" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                 {book.pages}
               </span>
             </div>
@@ -73,16 +73,16 @@ export function KidBookCard({ book, onClick, className, progress }: KidBookCardP
         {/* Progress indicator */}
         {progress && progress.currentPage > 0 && (
           <div className="absolute bottom-2 left-2 right-2">
-            <div className="bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-sm">
+            <div className="bg-white/90 dark:bg-black/60 backdrop-blur-sm rounded-lg p-2 shadow-sm">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-slate-600" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <span className="text-xs text-slate-600 dark:text-slate-300" style={{ fontFamily: 'Inter, sans-serif' }}>
                   Page {progress.currentPage}
                 </span>
-                <span className="text-xs font-medium text-amber-600" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                <span className="text-xs font-medium text-amber-600 dark:text-amber-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                   {Math.round(progressPercentage)}%
                 </span>
               </div>
-              <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-300"
                   style={{ width: `${Math.min(progressPercentage, 100)}%` }}
@@ -96,13 +96,13 @@ export function KidBookCard({ book, onClick, className, progress }: KidBookCardP
       {/* Book Info Section */}
       <div className="p-3">
         {/* Title */}
-        <h3 className="font-semibold text-slate-800 text-sm line-clamp-2 mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h3 className="font-semibold text-foreground text-sm line-clamp-2 mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
           {book.title}
         </h3>
 
         {/* Author */}
         {book.author && (
-          <p className="text-xs text-slate-500 line-clamp-1" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <p className="text-xs text-muted-foreground line-clamp-1" style={{ fontFamily: 'Inter, sans-serif' }}>
             by {book.author}
           </p>
         )}

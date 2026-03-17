@@ -245,7 +245,7 @@ function KidComsContent() {
             {error && (
               <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl max-w-2xl mx-auto">
                 <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                <p className="text-sm text-red-700 font-medium">{error}</p>
+                <p className="text-sm text-red-700 dark:text-red-400 font-medium">{error}</p>
               </div>
             )}
 
@@ -296,7 +296,7 @@ function KidComsContent() {
                         </div>
                         <span className={`px-2.5 py-1 text-xs rounded-full font-semibold ${
                           ff.status === 'active'
-                            ? 'bg-emerald-100 text-emerald-700'
+                            ? 'bg-cg-success-subtle text-cg-success'
                             : 'bg-muted text-muted-foreground'
                         }`}>
                           {ff.status}
@@ -376,7 +376,7 @@ function KidComsContent() {
         {error && (
           <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40 rounded-xl mb-6">
             <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-            <p className="text-sm text-red-700 font-medium">{error}</p>
+            <p className="text-sm text-red-700 dark:text-red-400 font-medium">{error}</p>
           </div>
         )}
 
@@ -516,14 +516,14 @@ function KidComsContent() {
                             onClick={() => startVideoCall(contact.id)}
                             disabled={isStartingSession}
                             className="
-                              p-2 bg-emerald-100 hover:bg-emerald-200 rounded-full
+                              p-2 bg-cg-success-subtle hover:bg-cg-success/20 rounded-full
                               transition-colors shadow-sm
                             "
                           >
-                            <Phone className="h-4 w-4 text-emerald-700" />
+                            <Phone className="h-4 w-4 text-cg-success" />
                           </button>
                         ) : (
-                          <span className="text-xs text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full font-semibold">
+                          <span className="text-xs text-cg-warning bg-cg-warning-subtle px-2.5 py-1 rounded-full font-semibold">
                             Pending
                           </span>
                         )}
@@ -569,7 +569,7 @@ function KidComsContent() {
                       `}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-white rounded-lg shadow-sm">
+                        <div className="p-2 bg-card rounded-lg shadow-sm">
                           {getSessionTypeIcon(session.session_type)}
                         </div>
                         <div className="text-left">

@@ -121,10 +121,10 @@ function SettingsContent() {
 
   if (!familyFileId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center p-8">
-          <Settings className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No family file selected</p>
+          <Settings className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
+          <p className="text-muted-foreground">No family file selected</p>
         </div>
       </div>
     );
@@ -132,34 +132,34 @@ function SettingsContent() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-600 dark:text-purple-400" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => router.push(`/kidcoms?case=${familyFileId}`)}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">KidSpace Settings</h1>
-                <p className="text-sm text-gray-500">Parental controls and preferences</p>
+                <h1 className="text-xl font-bold text-foreground">KidSpace Settings</h1>
+                <p className="text-sm text-muted-foreground">Parental controls and preferences</p>
               </div>
             </div>
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+              className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 disabled:opacity-50"
             >
               {isSaving ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -174,27 +174,27 @@ function SettingsContent() {
 
       <main className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         {error && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 flex items-center space-x-2">
+          <div className="p-4 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 flex items-center space-x-2">
             <AlertCircle className="h-5 w-5" />
             <span>{error}</span>
           </div>
         )}
 
         {successMessage && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+          <div className="p-4 bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-400">
             {successMessage}
           </div>
         )}
 
         {/* Circle Approval */}
-        <section className="bg-white rounded-xl shadow-sm border p-6">
+        <section className="bg-card rounded-xl shadow-sm border border-border p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Shield className="h-5 w-5 text-purple-600" />
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-lg">
+              <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
             </div>
-            <h2 className="text-lg font-semibold">Circle Approval</h2>
+            <h2 className="text-lg font-semibold text-foreground">Circle Approval</h2>
           </div>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             How should circle contacts be approved?
           </p>
           <div className="space-y-3">
@@ -209,8 +209,8 @@ function SettingsContent() {
                 className="w-4 h-4 text-purple-600"
               />
               <div>
-                <span className="font-medium">Both parents must approve</span>
-                <p className="text-sm text-gray-500">Recommended for maximum safety</p>
+                <span className="font-medium text-foreground">Both parents must approve</span>
+                <p className="text-sm text-muted-foreground">Recommended for maximum safety</p>
               </div>
             </label>
             <label className="flex items-center space-x-3 cursor-pointer">
@@ -224,31 +224,31 @@ function SettingsContent() {
                 className="w-4 h-4 text-purple-600"
               />
               <div>
-                <span className="font-medium">Either parent can approve</span>
-                <p className="text-sm text-gray-500">More flexible, faster approval</p>
+                <span className="font-medium text-foreground">Either parent can approve</span>
+                <p className="text-sm text-muted-foreground">More flexible, faster approval</p>
               </div>
             </label>
           </div>
         </section>
 
         {/* Allowed Features */}
-        <section className="bg-white rounded-xl shadow-sm border p-6">
+        <section className="bg-card rounded-xl shadow-sm border border-border p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Video className="h-5 w-5 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/50 rounded-lg">
+              <Video className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h2 className="text-lg font-semibold">Allowed Features</h2>
+            <h2 className="text-lg font-semibold text-foreground">Allowed Features</h2>
           </div>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-muted-foreground mb-4">
             Which features can your child use during sessions?
           </p>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { key: 'video', label: 'Video Calls', icon: Video, color: 'text-purple-600' },
-              { key: 'chat', label: 'Chat', icon: MessageCircle, color: 'text-blue-600' },
-              { key: 'theater', label: 'Theater', icon: Film, color: 'text-pink-600' },
-              { key: 'arcade', label: 'Arcade', icon: Gamepad2, color: 'text-green-600' },
-              { key: 'whiteboard', label: 'Whiteboard', icon: PenTool, color: 'text-orange-600' },
+              { key: 'video', label: 'Video Calls', icon: Video, color: 'text-purple-600 dark:text-purple-400' },
+              { key: 'chat', label: 'Chat', icon: MessageCircle, color: 'text-blue-600 dark:text-blue-400' },
+              { key: 'theater', label: 'Theater', icon: Film, color: 'text-pink-600 dark:text-pink-400' },
+              { key: 'arcade', label: 'Arcade', icon: Gamepad2, color: 'text-green-600 dark:text-green-400' },
+              { key: 'whiteboard', label: 'Whiteboard', icon: PenTool, color: 'text-orange-600 dark:text-orange-400' },
             ].map((feature) => {
               const Icon = feature.icon;
               const isEnabled = formData.allowed_features?.[feature.key as keyof typeof formData.allowed_features] ?? true;
@@ -257,8 +257,8 @@ function SettingsContent() {
                   key={feature.key}
                   className={`flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                     isEnabled
-                      ? 'bg-purple-50 border-purple-200'
-                      : 'bg-gray-50 border-gray-200'
+                      ? 'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700'
+                      : 'bg-muted border-border'
                   }`}
                 >
                   <input
@@ -268,7 +268,7 @@ function SettingsContent() {
                     className="w-4 h-4 text-purple-600 rounded"
                   />
                   <Icon className={`h-5 w-5 ${feature.color}`} />
-                  <span className="font-medium">{feature.label}</span>
+                  <span className="font-medium text-foreground">{feature.label}</span>
                 </label>
               );
             })}
@@ -276,16 +276,16 @@ function SettingsContent() {
         </section>
 
         {/* Session Limits */}
-        <section className="bg-white rounded-xl shadow-sm border p-6">
+        <section className="bg-card rounded-xl shadow-sm border border-border p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Clock className="h-5 w-5 text-yellow-600" />
+            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg">
+              <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
             </div>
-            <h2 className="text-lg font-semibold">Session Limits</h2>
+            <h2 className="text-lg font-semibold text-foreground">Session Limits</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Max Duration (minutes)
               </label>
               <input
@@ -299,11 +299,11 @@ function SettingsContent() {
                     max_session_duration_minutes: parseInt(e.target.value) || 60,
                   }))
                 }
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Max Daily Sessions
               </label>
               <input
@@ -317,11 +317,11 @@ function SettingsContent() {
                     max_daily_sessions: parseInt(e.target.value) || 5,
                   }))
                 }
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Max Participants
               </label>
               <input
@@ -335,25 +335,25 @@ function SettingsContent() {
                     max_participants_per_session: parseInt(e.target.value) || 4,
                   }))
                 }
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
               />
             </div>
           </div>
         </section>
 
         {/* Parental Controls */}
-        <section className="bg-white rounded-xl shadow-sm border p-6">
+        <section className="bg-card rounded-xl shadow-sm border border-border p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Users className="h-5 w-5 text-green-600" />
+            <div className="p-2 bg-green-100 dark:bg-green-900/50 rounded-lg">
+              <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
-            <h2 className="text-lg font-semibold">Parental Controls</h2>
+            <h2 className="text-lg font-semibold text-foreground">Parental Controls</h2>
           </div>
           <div className="space-y-4">
             <label className="flex items-center justify-between">
               <div>
-                <span className="font-medium">Allow child to start sessions</span>
-                <p className="text-sm text-gray-500">
+                <span className="font-medium text-foreground">Allow child to start sessions</span>
+                <p className="text-sm text-muted-foreground">
                   If disabled, only parents can initiate calls
                 </p>
               </div>
@@ -371,8 +371,8 @@ function SettingsContent() {
             </label>
             <label className="flex items-center justify-between">
               <div>
-                <span className="font-medium">Require parent in call</span>
-                <p className="text-sm text-gray-500">
+                <span className="font-medium text-foreground">Require parent in call</span>
+                <p className="text-sm text-muted-foreground">
                   A parent must be present during all sessions
                 </p>
               </div>
@@ -390,8 +390,8 @@ function SettingsContent() {
             </label>
             <label className="flex items-center justify-between">
               <div>
-                <span className="font-medium">Enforce availability schedule</span>
-                <p className="text-sm text-gray-500">
+                <span className="font-medium text-foreground">Enforce availability schedule</span>
+                <p className="text-sm text-muted-foreground">
                   Only allow sessions during set hours
                 </p>
               </div>
@@ -409,8 +409,8 @@ function SettingsContent() {
             </label>
             <label className="flex items-center justify-between">
               <div>
-                <span className="font-medium">Record sessions</span>
-                <p className="text-sm text-gray-500">
+                <span className="font-medium text-foreground">Record sessions</span>
+                <p className="text-sm text-muted-foreground">
                   Save recordings for parental review
                 </p>
               </div>
@@ -430,18 +430,18 @@ function SettingsContent() {
         </section>
 
         {/* Notifications */}
-        <section className="bg-white rounded-xl shadow-sm border p-6">
+        <section className="bg-card rounded-xl shadow-sm border border-border p-6">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <Bell className="h-5 w-5 text-red-600" />
+            <div className="p-2 bg-red-100 dark:bg-red-900/50 rounded-lg">
+              <Bell className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
-            <h2 className="text-lg font-semibold">Notifications</h2>
+            <h2 className="text-lg font-semibold text-foreground">Notifications</h2>
           </div>
           <div className="space-y-4">
             <label className="flex items-center justify-between">
               <div>
-                <span className="font-medium">Notify when session starts</span>
-                <p className="text-sm text-gray-500">
+                <span className="font-medium text-foreground">Notify when session starts</span>
+                <p className="text-sm text-muted-foreground">
                   Get notified when your child joins a call
                 </p>
               </div>
@@ -459,8 +459,8 @@ function SettingsContent() {
             </label>
             <label className="flex items-center justify-between">
               <div>
-                <span className="font-medium">Notify when session ends</span>
-                <p className="text-sm text-gray-500">
+                <span className="font-medium text-foreground">Notify when session ends</span>
+                <p className="text-sm text-muted-foreground">
                   Get notified when a call is completed
                 </p>
               </div>
@@ -478,8 +478,8 @@ function SettingsContent() {
             </label>
             <label className="flex items-center justify-between">
               <div>
-                <span className="font-medium">Notify on ARIA flags</span>
-                <p className="text-sm text-gray-500">
+                <span className="font-medium text-foreground">Notify on ARIA flags</span>
+                <p className="text-sm text-muted-foreground">
                   Get alerted if chat content is flagged
                 </p>
               </div>
@@ -506,8 +506,8 @@ export default function KidComsSettingsPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+        <div className="flex items-center justify-center min-h-screen bg-background">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-600 dark:text-purple-400" />
         </div>
       }
     >

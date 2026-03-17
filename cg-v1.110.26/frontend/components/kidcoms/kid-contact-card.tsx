@@ -47,7 +47,7 @@ export function KidContactCard({
   return (
     <div
       className={cn(
-        'bg-white rounded-3xl p-4 shadow-lg',
+        'bg-card rounded-3xl p-4 shadow-lg border border-border',
         'flex items-center gap-4',
         'transition-all duration-200',
         'hover:shadow-xl hover:-translate-y-0.5',
@@ -65,11 +65,11 @@ export function KidContactCard({
 
       {/* Name and Relationship */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-xl font-black text-gray-800 truncate">
+        <h3 className="text-xl font-black text-foreground truncate">
           {contact.display_name}
         </h3>
         {contact.relationship && (
-          <p className="text-sm text-gray-500 font-semibold capitalize truncate">
+          <p className="text-sm text-muted-foreground font-semibold capitalize truncate">
             {contact.relationship.replace('_', ' ')}
           </p>
         )}
@@ -91,7 +91,7 @@ export function KidContactCard({
                   'shadow-lg hover:shadow-xl',
                   'hover:scale-110 active:scale-95',
                 ]
-              : 'bg-gray-300 opacity-50 cursor-not-allowed'
+              : 'bg-gray-300 dark:bg-gray-700 opacity-50 cursor-not-allowed'
           )}
           aria-label={`Call ${contact.display_name}`}
           title={contact.can_voice_call ? `Call ${contact.display_name}` : 'Voice calls not available'}
@@ -113,7 +113,7 @@ export function KidContactCard({
                   'shadow-lg hover:shadow-xl',
                   'hover:scale-110 active:scale-95',
                 ]
-              : 'bg-gray-300 opacity-50 cursor-not-allowed'
+              : 'bg-gray-300 dark:bg-gray-700 opacity-50 cursor-not-allowed'
           )}
           aria-label={`Video call ${contact.display_name}`}
           title={contact.can_video_call ? `Video call ${contact.display_name}` : 'Video calls not available'}

@@ -195,15 +195,15 @@ function CircleManagementContent() {
     if (contact.is_partially_approved) {
       return { icon: Clock, color: 'text-yellow-500', text: 'Pending Approval' };
     }
-    return { icon: AlertCircle, color: 'text-gray-400', text: 'Not Approved' };
+    return { icon: AlertCircle, color: 'text-muted-foreground', text: 'Not Approved' };
   }
 
   if (!familyFileId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center p-8">
-          <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">No family file selected</p>
+          <Users className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
+          <p className="text-muted-foreground">No family file selected</p>
         </div>
       </div>
     );
@@ -211,35 +211,35 @@ function CircleManagementContent() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-600 dark:text-purple-400" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => router.push(`/kidcoms?case=${familyFileId}`)}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">My Circle</h1>
-                <p className="text-sm text-gray-500">
+                <h1 className="text-xl font-bold text-foreground">My Circle</h1>
+                <p className="text-sm text-muted-foreground">
                   Manage approved contacts for video calls
                 </p>
               </div>
             </div>
             <button
               onClick={() => setShowAddForm(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+              className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600"
             >
               <Plus className="h-4 w-4" />
               <span>Add Contact</span>
@@ -250,21 +250,21 @@ function CircleManagementContent() {
 
       <main className="max-w-4xl mx-auto px-4 py-6">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400">
             {error}
           </div>
         )}
 
         {/* Add/Edit Form */}
         {showAddForm && (
-          <div className="mb-6 bg-white rounded-xl shadow-sm border p-6">
-            <h3 className="text-lg font-semibold mb-4">
+          <div className="mb-6 bg-card rounded-xl shadow-sm border border-border p-6">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
               {editingContact ? 'Edit Contact' : 'Add New Contact'}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Name *
                   </label>
                   <input
@@ -273,12 +273,12 @@ function CircleManagementContent() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, contact_name: e.target.value }))
                     }
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Relationship
                   </label>
                   <select
@@ -286,7 +286,7 @@ function CircleManagementContent() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, relationship_type: e.target.value }))
                     }
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                   >
                     {relationshipChoices.map((choice) => (
                       <option key={choice.value} value={choice.value}>
@@ -296,7 +296,7 @@ function CircleManagementContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Email
                   </label>
                   <input
@@ -305,11 +305,11 @@ function CircleManagementContent() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, contact_email: e.target.value }))
                     }
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Phone
                   </label>
                   <input
@@ -318,12 +318,12 @@ function CircleManagementContent() {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, contact_phone: e.target.value }))
                     }
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Notes
                 </label>
                 <textarea
@@ -332,21 +332,21 @@ function CircleManagementContent() {
                     setFormData((prev) => ({ ...prev, notes: e.target.value }))
                   }
                   rows={2}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                 />
               </div>
               <div className="flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                  className="px-4 py-2 text-muted-foreground hover:text-foreground"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -363,15 +363,15 @@ function CircleManagementContent() {
 
         {/* Contacts List */}
         {contacts.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
-            <Users className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No contacts yet</h3>
-            <p className="text-gray-500 mb-4">
+          <div className="bg-card rounded-xl shadow-sm border border-border p-8 text-center">
+            <Users className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-2">No contacts yet</h3>
+            <p className="text-muted-foreground mb-4">
               Add trusted contacts like grandparents, aunts, uncles, or family friends
             </p>
             <button
               onClick={() => setShowAddForm(true)}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600"
             >
               Add Your First Contact
             </button>
@@ -385,18 +385,18 @@ function CircleManagementContent() {
               return (
                 <div
                   key={contact.id}
-                  className={`bg-white rounded-xl shadow-sm border p-4 ${
+                  className={`bg-card rounded-xl shadow-sm border border-border p-4 ${
                     !contact.is_active ? 'opacity-50' : ''
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-start space-x-4 min-w-0 flex-1">
-                      <div className="w-12 h-12 rounded-full bg-green-200 flex items-center justify-center text-green-700 font-semibold text-lg flex-shrink-0">
+                      <div className="w-12 h-12 rounded-full bg-green-200 dark:bg-green-900 flex items-center justify-center text-green-700 dark:text-green-300 font-semibold text-lg flex-shrink-0">
                         {contact.contact_name[0]}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold text-gray-900">
+                          <h3 className="font-semibold text-foreground">
                             {contact.contact_name}
                           </h3>
                           <span className={`flex items-center space-x-1 text-sm ${status.color}`}>
@@ -404,10 +404,10 @@ function CircleManagementContent() {
                             <span>{status.text}</span>
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 capitalize">
+                        <p className="text-sm text-muted-foreground capitalize">
                           {contact.relationship_type.replace('_', ' ')}
                         </p>
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-sm text-gray-500">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-sm text-muted-foreground">
                           {contact.contact_email && (
                             <span className="flex items-center space-x-1 min-w-0">
                               <Mail className="h-4 w-4 flex-shrink-0" />
@@ -422,7 +422,7 @@ function CircleManagementContent() {
                           )}
                         </div>
                         {contact.notes && (
-                          <p className="mt-2 text-sm text-gray-600">{contact.notes}</p>
+                          <p className="mt-2 text-sm text-muted-foreground">{contact.notes}</p>
                         )}
                       </div>
                     </div>
@@ -433,7 +433,7 @@ function CircleManagementContent() {
                         <button
                           onClick={() => handleApprove(contact.id, true)}
                           disabled={approvingContactId === contact.id}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/50 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Approve"
                         >
                           {approvingContactId === contact.id ? (
@@ -448,7 +448,7 @@ function CircleManagementContent() {
                       {!contact.is_verified && contact.contact_email && (
                         <button
                           onClick={() => handleSendInvite(contact.id)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                          className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg"
                           title="Send verification invite"
                         >
                           <Send className="h-5 w-5" />
@@ -458,7 +458,7 @@ function CircleManagementContent() {
                       {/* Edit */}
                       <button
                         onClick={() => startEdit(contact)}
-                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                        className="p-2 text-muted-foreground hover:bg-muted rounded-lg"
                         title="Edit"
                       >
                         <Edit className="h-5 w-5" />
@@ -467,7 +467,7 @@ function CircleManagementContent() {
                       {/* Delete */}
                       <button
                         onClick={() => handleDelete(contact.id)}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                        className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg"
                         title="Remove"
                       >
                         <Trash2 className="h-5 w-5" />
@@ -487,8 +487,8 @@ function CircleManagementContent() {
 export default function CircleManagementPage() {
   return (
     <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-600 dark:text-purple-400" />
       </div>
     }>
       <CircleManagementContent />

@@ -35,7 +35,7 @@ export function KidMovieCard({ video, onClick, className, progress, isFavorite: 
     <button
       onClick={onClick}
       className={cn(
-        'bg-white rounded-xl overflow-hidden shadow-md border border-slate-200',
+        'bg-card rounded-xl overflow-hidden shadow-md border border-border',
         'transition-all duration-150',
         'hover:shadow-lg hover:scale-[1.02] hover:-translate-y-0.5',
         'active:scale-100 active:translate-y-0',
@@ -48,19 +48,19 @@ export function KidMovieCard({ video, onClick, className, progress, isFavorite: 
       {/* Favorite Button */}
       <button
         onClick={handleFavoriteClick}
-        className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm border border-slate-200 flex items-center justify-center hover:scale-110 transition-transform duration-150"
+        className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-sm border border-border flex items-center justify-center hover:scale-110 transition-transform duration-150"
         aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
       >
         <Heart
           className={cn(
             'w-4 h-4 transition-colors duration-150',
-            isFavorite ? 'fill-red-500 text-red-500' : 'text-slate-400'
+            isFavorite ? 'fill-red-500 text-red-500' : 'text-slate-400 dark:text-slate-500'
           )}
         />
       </button>
 
       {/* Poster Section */}
-      <div className="relative aspect-video bg-slate-100">
+      <div className="relative aspect-video bg-muted">
         {/* Thumbnail or Placeholder */}
         {video.thumbnail ? (
           <Image
@@ -72,7 +72,7 @@ export function KidMovieCard({ video, onClick, className, progress, isFavorite: 
           />
         ) : (
           <div className="flex items-center justify-center h-full">
-            <Film className="w-12 h-12 text-slate-300" />
+            <Film className="w-12 h-12 text-muted-foreground/50" />
           </div>
         )}
 
@@ -107,21 +107,21 @@ export function KidMovieCard({ video, onClick, className, progress, isFavorite: 
       {/* Info Section */}
       <div className="p-3">
         {/* Title */}
-        <h3 className="font-semibold text-slate-800 text-sm line-clamp-2 mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        <h3 className="font-semibold text-foreground text-sm line-clamp-2 mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
           {video.title}
         </h3>
 
         {/* Meta Info */}
         <div className="flex items-center justify-between">
           {video.duration && (
-            <div className="flex items-center gap-1 text-xs text-slate-500">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="w-3 h-3" />
               <span style={{ fontFamily: 'Inter, sans-serif' }}>{video.duration}</span>
             </div>
           )}
 
           {progress !== undefined && progress > 0 && (
-            <div className="text-xs font-medium text-teal-600" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+            <div className="text-xs font-medium text-teal-600 dark:text-teal-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
               {Math.round(progress)}%
             </div>
           )}
