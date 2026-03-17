@@ -245,6 +245,11 @@ from app.models.circle_call import (
     CircleCallStatus,
     CircleCallSeverity,
 )
+from app.models.call_video_flag import (
+    VideoFrameAnalysis,
+    CallViolationTracker,
+    VideoViolationType,
+)
 from app.models.invitation import (
     CaseInvitation,
     CaseEvent,
@@ -509,4 +514,8 @@ __all__ = [
     "URGENCY_LEVELS",
     # Generated Reports (Verification System)
     "GeneratedReport",
+    # ARIA Video & Violation Tracking
+    "VideoFrameAnalysis",
+    "CallViolationTracker",
+    "VideoViolationType",
 ]

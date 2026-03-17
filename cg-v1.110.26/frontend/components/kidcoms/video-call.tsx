@@ -15,10 +15,27 @@ interface VideoCallProps {
   roomUrl: string;
   token: string;
   userName: string;
+  sessionId?: string;
+  callType?: 'parent' | 'circle';
+  ariaEnabled?: boolean;
+  frameCaptureIntervalMs?: number;
   onLeave?: () => void;
   onParticipantJoined?: (participant: DailyParticipant) => void;
   onParticipantLeft?: (participant: DailyParticipant) => void;
   onError?: (error: string) => void;
+  onAriaIntervention?: (data: AriaInterventionData) => void;
+}
+
+export interface AriaInterventionData {
+  type: string;
+  flag_id: string;
+  participant_id: string;
+  severity: string;
+  message: string;
+  should_terminate: boolean;
+  requires_acknowledgment: boolean;
+  strike_number: number;
+  violation_source?: string;
 }
 
 interface ParticipantTile {
@@ -35,10 +52,15 @@ export default function VideoCall({
   roomUrl,
   token,
   userName,
+  sessionId,
+  callType = 'parent',
+  ariaEnabled = true,
+  frameCaptureIntervalMs = 10000,
   onLeave,
   onParticipantJoined,
   onParticipantLeft,
   onError,
+  onAriaIntervention,
 }: VideoCallProps) {
   const [callObject, setCallObject] = useState<DailyCall | null>(null);
   const [participants, setParticipants] = useState<Map<string, ParticipantTile>>(new Map());
@@ -50,6 +72,10 @@ export default function VideoCall({
   // Track if we've already created a call object (prevents duplicate in React Strict Mode)
   const callCreatedRef = useRef(false);
   const callRef = useRef<DailyCall | null>(null);
+
+  // ARIA frame capture refs
+  const frameCountRef = useRef(0);
+  const frameCaptureIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize Daily.co call
   useEffect(() => {
@@ -136,6 +162,85 @@ export default function VideoCall({
       }
     };
   }, []); // Remove dependencies to prevent recreation
+
+  // ARIA frame capture - periodically captures video frames and sends to backend for analysis
+  useEffect(() => {
+    if (!ariaEnabled || !sessionId || !callObject || isJoining) return;
+
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || '';
+    const endpoint = callType === 'circle'
+      ? `${apiBase}/api/v1/circle-calls/${sessionId}/video-frame`
+      : `${apiBase}/api/v1/parent-calls/${sessionId}/video-frame`;
+
+    const captureAndSendFrames = async () => {
+      // Get all video elements in the call
+      const videoElements = document.querySelectorAll<HTMLVideoElement>('video');
+
+      for (const videoEl of Array.from(videoElements)) {
+        // Skip if video isn't playing or has no source
+        if (videoEl.readyState < 2 || videoEl.videoWidth === 0) continue;
+
+        try {
+          // Create canvas to capture frame
+          const canvas = document.createElement('canvas');
+          canvas.width = 640;
+          canvas.height = 480;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) continue;
+
+          // Draw video frame to canvas
+          ctx.drawImage(videoEl, 0, 0, 640, 480);
+
+          // Convert to base64 JPEG
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+          const base64Data = dataUrl.replace(/^data:image\/jpeg;base64,/, '');
+
+          // Determine participant ID from the video element
+          // The participant ID is derived from which video tile this belongs to
+          const tile = videoEl.closest('[data-participant-id]');
+          const participantId = tile?.getAttribute('data-participant-id') || 'unknown';
+
+          const callStartTime = callObject?.meetingSessionSummary?.()?.startedAt;
+          const callTimeSeconds = callStartTime
+            ? (Date.now() - new Date(callStartTime).getTime()) / 1000
+            : 0;
+
+          frameCountRef.current += 1;
+
+          // Send to backend
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              frame_b64: base64Data,
+              participant_id: participantId,
+              frame_number: frameCountRef.current,
+              call_time_seconds: callTimeSeconds,
+            }),
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.flagged && result.intervention && onAriaIntervention) {
+              onAriaIntervention(result.intervention);
+            }
+          }
+        } catch (err) {
+          console.error('ARIA frame capture error:', err);
+        }
+      }
+    };
+
+    // Start periodic frame capture
+    frameCaptureIntervalRef.current = setInterval(captureAndSendFrames, frameCaptureIntervalMs);
+
+    return () => {
+      if (frameCaptureIntervalRef.current) {
+        clearInterval(frameCaptureIntervalRef.current);
+        frameCaptureIntervalRef.current = null;
+      }
+    };
+  }, [ariaEnabled, sessionId, callObject, isJoining, callType, frameCaptureIntervalMs, onAriaIntervention]);
 
   function updateParticipants(dailyParticipants: Record<string, DailyParticipant>) {
     const newParticipants = new Map<string, ParticipantTile>();
@@ -309,6 +414,7 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
 
   return (
     <div
+      data-participant-id={participant.sessionId}
       className={`relative bg-slate-800 rounded-xl overflow-hidden ring-1 ring-slate-700/50 ${
         isLarge ? 'aspect-video' : ''
       }`}

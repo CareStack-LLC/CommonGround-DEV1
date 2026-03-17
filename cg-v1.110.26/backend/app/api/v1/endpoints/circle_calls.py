@@ -16,6 +16,7 @@ Key differences from parent calls:
 """
 
 import logging
+from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, File, UploadFile, Form
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -35,6 +36,7 @@ from app.models.circle_call import (
     CircleCallFlag,
     CircleCallStatus,
 )
+from app.models.call_video_flag import CallViolationTracker
 from app.schemas.circle_calls import (
     CircleCallCreate,
     CircleCallJoin,
@@ -48,6 +50,8 @@ from app.schemas.circle_calls import (
 )
 from app.services.circle_call import circle_call_service
 from app.services.aria_circle_monitor import aria_circle_monitor
+from app.services.aria_vision_monitor import aria_vision_monitor
+from app.services.aria_violation_tracker import ARIAViolationTrackerService
 from app.services.daily_video import daily_service
 from app.services.storage import storage_service, StorageBucket
 from app.core.config import settings
@@ -1218,6 +1222,260 @@ async def get_circle_call_report(
     )
 
     return report
+
+
+@router.post("/{session_id}/video-frame")
+async def analyze_circle_call_video_frame(
+    session_id: str,
+    frame_b64: str,
+    participant_id: str,
+    frame_number: int = 0,
+    call_time_seconds: float = 0.0,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Receive and analyze a video frame from a circle call.
+
+    Runs Claude Vision analysis (child-safe mode) on the frame.
+    If a violation is detected, creates records and broadcasts intervention.
+
+    Args:
+        session_id: Call session ID
+        frame_b64: Base64-encoded JPEG frame data
+        participant_id: ID of the participant in the frame
+        frame_number: Sequential frame number
+        call_time_seconds: Seconds since call start
+
+    Returns:
+        Analysis result and any intervention details
+    """
+    # Get session
+    result = await db.execute(
+        select(CircleCallSession).where(CircleCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Circle call session not found"
+        )
+
+    if not session.aria_active:
+        return {"message": "ARIA monitoring disabled", "flagged": False}
+
+    # Run vision analysis with child-safe mode
+    try:
+        frame_result = await aria_vision_monitor.analyze_frame(
+            frame_b64=frame_b64,
+            participant_id=participant_id,
+            call_type="child",  # Stricter thresholds for child calls
+        )
+    except Exception as e:
+        logger.error(f"Vision analysis failed: {e}")
+        return {"message": "Vision analysis failed", "flagged": False}
+
+    # Create frame analysis record
+    try:
+        frame_analysis = await aria_vision_monitor.create_frame_analysis_record(
+            db=db,
+            frame_b64=frame_b64,
+            result=frame_result,
+            participant_id=participant_id,
+            frame_number=frame_number,
+            call_time_seconds=call_time_seconds,
+            circle_session_id=session_id,
+        )
+    except Exception as e:
+        logger.error(f"Failed to create frame analysis record: {e}")
+        return {"message": "Failed to store analysis", "flagged": False}
+
+    # If flagged, handle violation
+    if frame_result.is_flagged:
+        # Store flagged frame as evidence
+        try:
+            await aria_vision_monitor.store_flagged_frame(
+                db=db,
+                frame_b64=frame_b64,
+                frame_analysis=frame_analysis,
+                family_file_id=str(session.family_file_id),
+            )
+        except Exception as e:
+            logger.error(f"Failed to store flagged frame: {e}")
+
+        # Handle through circle monitor's video violation handler
+        try:
+            intervention_data = await aria_circle_monitor.handle_video_violation(
+                db=db,
+                session=session,
+                participant_id=participant_id,
+                violation_type=frame_result.violation_type,
+                violation_score=frame_result.violation_score,
+                violation_description=frame_result.violation_description or "",
+                frame_analysis_id=str(frame_analysis.id),
+            )
+
+            # Broadcast to parents
+            ff_result = await db.execute(
+                select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+            )
+            family_file = ff_result.scalar_one_or_none()
+
+            if family_file:
+                for parent_id in [family_file.parent_a_id, family_file.parent_b_id]:
+                    if parent_id:
+                        await manager.send_personal_message(
+                            message=intervention_data,
+                            user_id=str(parent_id)
+                        )
+
+            await db.commit()
+
+            return {
+                "message": "Frame analyzed - violation detected",
+                "flagged": True,
+                "intervention": intervention_data,
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to handle video violation: {e}")
+            await db.commit()
+            return {"message": "Frame flagged but intervention failed", "flagged": True}
+
+    await db.commit()
+    return {"message": "Frame analyzed - no violation", "flagged": False}
+
+
+@router.post("/{session_id}/acknowledge-violation/{flag_id}")
+async def acknowledge_circle_call_violation(
+    session_id: str,
+    flag_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Acknowledge a violation to clear the mute state in a circle call.
+
+    Parents can acknowledge violations on behalf of circle contacts/children.
+
+    Args:
+        session_id: Call session ID
+        flag_id: ID of the CircleCallFlag to acknowledge
+
+    Returns:
+        Success message with unmute confirmation
+    """
+    # Get session
+    result = await db.execute(
+        select(CircleCallSession).where(CircleCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Circle call session not found"
+        )
+
+    # Verify user is a parent in this family (parents manage circle call violations)
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+
+    if not family_file or current_user.id not in [family_file.parent_a_id, family_file.parent_b_id]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only parents can acknowledge circle call violations"
+        )
+
+    # Get the flag
+    flag_result = await db.execute(
+        select(CircleCallFlag).where(CircleCallFlag.id == flag_id)
+    )
+    flag = flag_result.scalar_one_or_none()
+
+    if not flag:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Flag not found"
+        )
+
+    # Get the offending participant's tracker
+    if not flag.offending_speaker_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No offending speaker identified for this flag"
+        )
+
+    violation_tracker = ARIAViolationTrackerService()
+    tracker = await violation_tracker.get_or_create_tracker(
+        db=db,
+        participant_id=flag.offending_speaker_id,
+        circle_session_id=session_id,
+    )
+
+    # Acknowledge the violation
+    success = await violation_tracker.acknowledge_violation(
+        db=db,
+        tracker=tracker,
+        flag_id=flag_id,
+    )
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Could not acknowledge violation - flag mismatch or call terminated"
+        )
+
+    # Update the flag
+    flag.acknowledged = True
+    flag.acknowledged_at = datetime.utcnow()
+    await db.commit()
+
+    # Broadcast unmute event
+    unmute_event = {
+        "type": "aria_unmute",
+        "session_id": session_id,
+        "flag_id": flag_id,
+        "participant_id": flag.offending_speaker_id,
+        "message": "Violation acknowledged by parent. Participant unmuted.",
+    }
+
+    # Notify parents
+    for parent_id in [family_file.parent_a_id, family_file.parent_b_id]:
+        if parent_id:
+            await manager.send_personal_message(
+                message=unmute_event,
+                user_id=str(parent_id)
+            )
+
+    # Notify child and contact
+    cu_result = await db.execute(
+        select(ChildUser).where(ChildUser.child_id == session.child_id)
+    )
+    child_user = cu_result.scalar_one_or_none()
+    if child_user:
+        await manager.send_personal_message(
+            message=unmute_event,
+            user_id=str(child_user.id)
+        )
+
+    ccu_result = await db.execute(
+        select(CircleUser).where(CircleUser.circle_contact_id == session.circle_contact_id)
+    )
+    circle_user = ccu_result.scalar_one_or_none()
+    if circle_user:
+        await manager.send_personal_message(
+            message=unmute_event,
+            user_id=str(circle_user.id)
+        )
+
+    return {
+        "message": "Violation acknowledged - participant unmuted",
+        "flag_id": flag_id,
+        "strike_number": tracker.total_violation_count,
+    }
 
 
 # Background task helpers

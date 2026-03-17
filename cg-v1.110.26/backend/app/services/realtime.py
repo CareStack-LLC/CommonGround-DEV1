@@ -63,6 +63,14 @@ class RealtimeEventType:
     USER_OFFLINE = "user_offline"
     TYPING = "typing"
 
+    # ARIA Call Monitoring events
+    ARIA_AUDIO_MUTE = "aria_audio_mute"
+    ARIA_VIDEO_BLOCK = "aria_video_block"
+    ARIA_UNMUTE = "aria_unmute"
+    ARIA_CALL_TERMINATE = "aria_call_terminate"
+    ARIA_VIOLATION_STATUS = "aria_violation_status"
+    ARIA_WARNING = "aria_warning"
+
 
 class RealtimeService:
     """

@@ -355,6 +355,17 @@ class CallFlag(Base, UUIDMixin, TimestampMixin):
         Float, nullable=True
     )  # Time in call when flagged
 
+    # Violation source tracking
+    violation_source: Mapped[str] = mapped_column(
+        String(20), default="audio"
+    )  # audio, video
+
+    # Acknowledgment tracking (mute stays until acknowledged)
+    acknowledged: Mapped[bool] = mapped_column(Boolean, default=False)
+    acknowledged_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True
+    )
+
     # Speaker tracking for mute interventions
     offending_speaker_id: Mapped[Optional[str]] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True

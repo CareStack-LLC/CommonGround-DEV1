@@ -10,6 +10,7 @@ Provides:
 """
 
 import logging
+from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, File, UploadFile, Form
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,8 +38,11 @@ from app.schemas.parent_call import (
     CallFlagResponse,
     ARIASettingsUpdate,
 )
+from app.models.call_video_flag import CallViolationTracker
 from app.services.parent_call import parent_call_service
 from app.services.aria_call_monitor import aria_call_monitor
+from app.services.aria_vision_monitor import aria_vision_monitor
+from app.services.aria_violation_tracker import ARIAViolationTrackerService
 from app.services.daily_video import daily_service
 from app.services.whisper_transcription import whisper_service
 from app.services.storage import storage_service, StorageBucket, build_recording_path
@@ -1190,6 +1194,224 @@ async def get_aria_analysis(
         "flags": flags,
         "overall_score": overall_score,
         "recommendations": recommendations
+    }
+
+
+@router.post("/{session_id}/video-frame")
+async def analyze_video_frame(
+    session_id: str,
+    frame_b64: str,
+    participant_id: str,
+    frame_number: int = 0,
+    call_time_seconds: float = 0.0,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Receive and analyze a video frame from a parent call.
+
+    Runs Claude Vision analysis on the frame. If a violation is detected,
+    creates a VideoFrameAnalysis record and updates the violation tracker.
+    Broadcasts WebSocket intervention to both parents.
+
+    Args:
+        session_id: Call session ID
+        frame_b64: Base64-encoded JPEG frame data
+        participant_id: ID of the participant in the frame
+        frame_number: Sequential frame number
+        call_time_seconds: Seconds since call start
+
+    Returns:
+        Analysis result and any intervention details
+    """
+    # Get session
+    result = await db.execute(
+        select(ParentCallSession).where(ParentCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Call session not found"
+        )
+
+    if not session.aria_active:
+        return {"message": "ARIA monitoring disabled", "flagged": False}
+
+    # Run vision analysis
+    try:
+        frame_result = await aria_vision_monitor.analyze_frame(
+            frame_b64=frame_b64,
+            participant_id=participant_id,
+            call_type="parent",
+        )
+    except Exception as e:
+        logger.error(f"Vision analysis failed: {e}")
+        return {"message": "Vision analysis failed", "flagged": False}
+
+    # Create frame analysis record
+    try:
+        frame_analysis = await aria_vision_monitor.create_frame_analysis_record(
+            db=db,
+            frame_b64=frame_b64,
+            result=frame_result,
+            participant_id=participant_id,
+            frame_number=frame_number,
+            call_time_seconds=call_time_seconds,
+            session_id=session_id,
+        )
+    except Exception as e:
+        logger.error(f"Failed to create frame analysis record: {e}")
+        return {"message": "Failed to store analysis", "flagged": False}
+
+    # If flagged, handle violation through tracker
+    if frame_result.is_flagged:
+        # Store flagged frame as evidence
+        try:
+            ff_result = await db.execute(
+                select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+            )
+            family_file = ff_result.scalar_one_or_none()
+            if family_file:
+                await aria_vision_monitor.store_flagged_frame(
+                    db=db,
+                    frame_b64=frame_b64,
+                    frame_analysis=frame_analysis,
+                    family_file_id=str(family_file.id),
+                )
+        except Exception as e:
+            logger.error(f"Failed to store flagged frame: {e}")
+
+        # Handle through call monitor's video violation handler
+        try:
+            intervention_data = await aria_call_monitor.handle_video_violation(
+                db=db,
+                session=session,
+                frame_analysis=frame_analysis,
+            )
+
+            # Broadcast to both parents
+            for parent_id in [session.parent_a_id, session.parent_b_id]:
+                if parent_id:
+                    await manager.send_personal_message(
+                        message=intervention_data,
+                        user_id=str(parent_id)
+                    )
+
+            await db.commit()
+
+            return {
+                "message": "Frame analyzed - violation detected",
+                "flagged": True,
+                "intervention": intervention_data,
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to handle video violation: {e}")
+            await db.commit()
+            return {"message": "Frame flagged but intervention failed", "flagged": True}
+
+    await db.commit()
+    return {"message": "Frame analyzed - no violation", "flagged": False}
+
+
+@router.post("/{session_id}/acknowledge-violation/{flag_id}")
+async def acknowledge_violation(
+    session_id: str,
+    flag_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Acknowledge a violation to clear the mute state.
+
+    The muted participant must acknowledge the warning before being unmuted.
+    Validates that the requesting user is the muted participant.
+
+    Args:
+        session_id: Call session ID
+        flag_id: ID of the CallFlag to acknowledge
+
+    Returns:
+        Success message with unmute confirmation
+    """
+    # Get session
+    result = await db.execute(
+        select(ParentCallSession).where(ParentCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Call session not found"
+        )
+
+    # Verify user is a participant
+    if current_user.id not in [session.parent_a_id, session.parent_b_id]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not a participant in this call"
+        )
+
+    # Get the flag
+    flag_result = await db.execute(
+        select(CallFlag).where(CallFlag.id == flag_id)
+    )
+    flag = flag_result.scalar_one_or_none()
+
+    if not flag:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Flag not found"
+        )
+
+    # Get violation tracker for this participant
+    violation_tracker = ARIAViolationTrackerService()
+    tracker = await violation_tracker.get_or_create_tracker(
+        db=db,
+        participant_id=str(current_user.id),
+        session_id=session_id,
+    )
+
+    # Acknowledge the violation
+    success = await violation_tracker.acknowledge_violation(
+        db=db,
+        tracker=tracker,
+        flag_id=flag_id,
+    )
+
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Could not acknowledge violation - flag mismatch or call terminated"
+        )
+
+    # Update the flag
+    flag.acknowledged = True
+    flag.acknowledged_at = datetime.utcnow()
+    await db.commit()
+
+    # Broadcast unmute event to both parents
+    unmute_event = {
+        "type": "aria_unmute",
+        "session_id": session_id,
+        "flag_id": flag_id,
+        "participant_id": str(current_user.id),
+        "message": "Violation acknowledged. Microphone unmuted.",
+    }
+
+    for parent_id in [session.parent_a_id, session.parent_b_id]:
+        if parent_id:
+            await manager.send_personal_message(
+                message=unmute_event,
+                user_id=str(parent_id)
+            )
+
+    return {
+        "message": "Violation acknowledged - you have been unmuted",
+        "flag_id": flag_id,
+        "strike_number": tracker.total_violation_count,
     }
 
 
