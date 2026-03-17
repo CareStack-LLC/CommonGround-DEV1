@@ -87,7 +87,7 @@ export function FeaturedHeroBanner({
         <div className="max-w-2xl">
           {/* Badge */}
           <div className="flex items-center gap-2 mb-2">
-            <div className="px-3 py-1 bg-cyan-500 rounded-full flex items-center gap-1.5">
+            <div className="px-3 py-1 bg-[#4BA8C8] rounded-full flex items-center gap-1.5">
               <span className="text-white font-bold text-xs" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 {badge}
               </span>
@@ -178,11 +178,11 @@ export function FeaturedHeroBanner({
                 onClick={onWatchTogether}
                 className={cn(
                   'flex items-center gap-2 px-6 py-3 rounded-full',
-                  'bg-cyan-500 text-white font-bold',
-                  'hover:bg-cyan-400 active:scale-95',
+                  'bg-[#4BA8C8] text-white font-bold',
+                  'hover:bg-[#3DAA8A] active:scale-95',
                   'transition-all duration-200',
-                  'shadow-xl hover:shadow-cyan-500/20',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+                  'shadow-xl hover:shadow-[#4BA8C8]/20',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4BA8C8] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
                 )}
                 style={{ fontFamily: 'Space Grotesk, sans-serif' }}
               >

@@ -14,7 +14,7 @@ export function OriginalsBadge({ className, size = 'sm' }: OriginalsBadgeProps) 
     <div
       className={cn(
         'inline-flex items-center gap-1 rounded-full',
-        'bg-gradient-to-r from-teal-500/90 to-cyan-500/90 backdrop-blur-sm',
+        'bg-gradient-to-r from-[#3DAA8A]/90 to-[#4BA8C8]/90 backdrop-blur-sm',
         isSmall ? 'px-2 py-0.5' : 'px-3 py-1',
         className
       )}

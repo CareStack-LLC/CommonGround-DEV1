@@ -22,12 +22,12 @@ interface GameScores {
 
 const GAME_GRADIENTS: Record<string, { border: string; glow: string; accent: string }> = {
   tictactoe: {
-    border: 'linear-gradient(135deg, #06b6d4, #0891b2, #22d3ee)',
-    glow: 'rgba(6, 182, 212, 0.25)',
-    accent: '#22d3ee',
+    border: 'linear-gradient(135deg, #4BA8C8, #349878, #4BA8C8)',
+    glow: 'rgba(75, 168, 200, 0.25)',
+    accent: '#4BA8C8',
   },
   memory: {
-    border: 'linear-gradient(135deg, #a855f7, #7c3aed, #c084fc)',
+    border: 'linear-gradient(135deg, #a855f7, #2D6A8F, #c084fc)',
     glow: 'rgba(168, 85, 247, 0.25)',
     accent: '#c084fc',
   },
@@ -75,10 +75,10 @@ const games = [
 ];
 
 const AVATAR_COLORS = [
-  'from-cyan-500 to-teal-500',
+  'from-[#4BA8C8] to-[#3DAA8A]',
   'from-red-500 to-orange-500',
   'from-amber-500 to-orange-400',
-  'from-emerald-500 to-teal-500',
+  'from-emerald-500 to-[#3DAA8A]',
 ];
 
 export default function ArcadePage() {
@@ -141,7 +141,7 @@ export default function ArcadePage() {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--portal-background)' }}>
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center mx-auto animate-pulse">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4BA8C8] to-[#3DAA8A] flex items-center justify-center mx-auto animate-pulse">
             <Gamepad2 className="w-8 h-8 text-white" strokeWidth={1.5} />
           </div>
           <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Loading arcade...</p>
@@ -313,7 +313,7 @@ export default function ArcadePage() {
                 <div className="absolute top-3 left-3">
                   <span
                     className="px-3 py-1 rounded-full text-white text-xs font-bold shadow-lg backdrop-blur-sm"
-                    style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}
+                    style={{ background: 'linear-gradient(135deg, #4BA8C8, #349878)' }}
                   >
                     ⭐ Featured
                   </span>
@@ -364,7 +364,7 @@ export default function ArcadePage() {
             className="text-xl font-bold mb-4 flex items-center gap-2"
             style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}
           >
-            <Zap className="w-5 h-5" style={{ color: '#2dd4bf' }} />
+            <Zap className="w-5 h-5" style={{ color: '#5BC4A0' }} />
             All Games
           </h2>
 
@@ -413,7 +413,7 @@ export default function ArcadePage() {
                         <div className="absolute top-2 left-2">
                           <span
                             className="px-2 py-0.5 rounded-full text-white text-[10px] font-bold"
-                            style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}
+                            style={{ background: 'linear-gradient(135deg, #4BA8C8, #349878)' }}
                           >
                             {game.badge}
                           </span>

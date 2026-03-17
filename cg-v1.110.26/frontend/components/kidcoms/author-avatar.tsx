@@ -42,8 +42,8 @@ export function AuthorAvatar({
   const getBackgroundColor = (str: string): string => {
     const colors = [
       'bg-gradient-to-br from-amber-400 to-orange-500',
-      'bg-gradient-to-br from-emerald-400 to-teal-500',
-      'bg-gradient-to-br from-blue-400 to-cyan-500',
+      'bg-gradient-to-br from-emerald-400 to-[#3DAA8A]',
+      'bg-gradient-to-br from-blue-400 to-[#4BA8C8]',
       'bg-gradient-to-br from-purple-400 to-pink-500',
       'bg-gradient-to-br from-rose-400 to-red-500',
       'bg-gradient-to-br from-indigo-400 to-purple-500',

@@ -24,10 +24,10 @@ interface ChildUserData {
 }
 
 const AVATAR_COLORS = [
-  'from-cyan-500 to-teal-500',
+  'from-[#4BA8C8] to-[#3DAA8A]',
   'from-red-500 to-orange-500',
   'from-amber-500 to-orange-400',
-  'from-emerald-500 to-teal-500',
+  'from-emerald-500 to-[#3DAA8A]',
 ];
 
 // Derive unique authors from books

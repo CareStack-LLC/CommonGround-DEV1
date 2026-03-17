@@ -12,8 +12,8 @@ interface QuickActionCardProps {
 
 const colorStyles = {
   teal: {
-    bg: 'bg-gradient-to-br from-teal-500 to-cyan-500',
-    shadow: 'shadow-teal-500/20',
+    bg: 'bg-gradient-to-br from-[#3DAA8A] to-[#4BA8C8]',
+    shadow: 'shadow-[#3DAA8A]/20',
   },
   red: {
     bg: 'bg-gradient-to-br from-red-500 to-orange-500',
@@ -24,8 +24,8 @@ const colorStyles = {
     shadow: 'shadow-amber-500/20',
   },
   cyan: {
-    bg: 'bg-gradient-to-br from-cyan-500 to-teal-500',
-    shadow: 'shadow-cyan-500/20',
+    bg: 'bg-gradient-to-br from-[#4BA8C8] to-[#3DAA8A]',
+    shadow: 'shadow-[#4BA8C8]/20',
   },
 };
 
@@ -41,7 +41,7 @@ export function QuickActionCard({ title, icon, color, onClick, className }: Quic
         'shadow-md transition-all duration-150',
         'hover:shadow-lg hover:scale-105 hover:-translate-y-0.5',
         'active:scale-100 active:translate-y-0',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3DAA8A] focus-visible:ring-offset-2',
         styles.bg,
         styles.shadow,
         className

@@ -68,8 +68,8 @@ export function StreamingBookCard({
         className={cn(
           'relative w-full rounded-xl overflow-hidden',
           'transition-all duration-300 ease-out',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
-          'group-hover:scale-[1.03] group-hover:shadow-xl group-hover:shadow-cyan-500/10'
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4BA8C8] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
+          'group-hover:scale-[1.03] group-hover:shadow-xl group-hover:shadow-[#4BA8C8]/10'
         )}
         style={{ background: 'var(--portal-surface, #1E293B)', border: '1px solid var(--portal-border, #334155)', boxShadow: 'var(--portal-shadow-md)' }}
       >
@@ -155,7 +155,7 @@ export function StreamingBookCard({
 
           {/* Progress Indicator */}
           {progress && progress.currentPage > 0 ? (
-            <div className="text-[10px] text-cyan-400 font-semibold">
+            <div className="text-[10px] text-[#4BA8C8] font-semibold">
               {progress.completed ? '✓ Finished' : `${Math.round(progressPercentage)}% read`}
             </div>
           ) : book.pages ? (

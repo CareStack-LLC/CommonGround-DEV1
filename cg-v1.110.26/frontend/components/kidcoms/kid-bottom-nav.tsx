@@ -29,7 +29,7 @@ function NavLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
         'relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl',
         'min-w-[56px] justify-center',
         'transition-all duration-300 ease-in-out',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-1',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3DAA8A] focus-visible:ring-offset-1',
         isActive ? 'scale-105' : 'active:scale-95 hover:scale-102'
       )}
       style={{
@@ -66,7 +66,7 @@ function NavLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
           isActive ? 'w-8 opacity-100' : 'w-0 opacity-0'
         )}
         style={{
-          background: 'linear-gradient(90deg, #06b6d4, #14b8a6, #2dd4bf)',
+          background: 'linear-gradient(90deg, #3DAA8A, #2D6A8F, #4BA8C8)',
         }}
       />
     </Link>

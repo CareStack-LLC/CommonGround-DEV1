@@ -150,10 +150,10 @@ export function TicTacToe() {
             </p>
             <button
               onClick={resetGame}
-              className="w-10 h-10 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 flex items-center justify-center transition-colors"
+              className="w-10 h-10 rounded-xl bg-[#4BA8C8]/20 hover:bg-[#4BA8C8]/30 flex items-center justify-center transition-colors"
               aria-label="New game"
             >
-              <RotateCcw className="w-5 h-5 text-cyan-400" />
+              <RotateCcw className="w-5 h-5 text-[#4BA8C8]" />
             </button>
           </div>
 
@@ -181,7 +181,7 @@ export function TicTacToe() {
                 disabled={!isPlayerTurn || cell !== null || !!winner}
                 className={cn(
                   'aspect-square rounded-xl transition-all duration-200',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4BA8C8]',
                   cell === null && !winner
                     ? 'hover:scale-105 active:scale-95 cursor-pointer'
                     : '',
@@ -190,7 +190,7 @@ export function TicTacToe() {
                 aria-label={`Cell ${index + 1}${cell ? `, ${cell}` : ', empty'}`}
               >
                 <div className="w-full h-full flex items-center justify-center">
-                  {cell === 'X' && <X className="w-12 h-12 sm:w-16 sm:h-16 text-cyan-400 stroke-[3]" />}
+                  {cell === 'X' && <X className="w-12 h-12 sm:w-16 sm:h-16 text-[#4BA8C8] stroke-[3]" />}
                   {cell === 'O' && <Circle className="w-12 h-12 sm:w-16 sm:h-16 text-red-400 stroke-[3]" />}
                 </div>
               </button>
@@ -208,7 +208,7 @@ export function TicTacToe() {
               {winner === 'O' && <Circle className="w-16 h-16 mx-auto text-red-400" />}
               {winner === 'draw' && (
                 <div className="flex justify-center gap-3">
-                  <X className="w-14 h-14 text-cyan-400" />
+                  <X className="w-14 h-14 text-[#4BA8C8]" />
                   <Circle className="w-14 h-14 text-red-400" />
                 </div>
               )}
@@ -225,7 +225,7 @@ export function TicTacToe() {
             </p>
             <button
               onClick={resetGame}
-              className="px-8 py-3 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
+              className="px-8 py-3 rounded-full bg-gradient-to-r from-[#3DAA8A] to-[#4BA8C8] text-white font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
               style={{ fontFamily: 'Space Grotesk, sans-serif' }}
             >
               Play Again

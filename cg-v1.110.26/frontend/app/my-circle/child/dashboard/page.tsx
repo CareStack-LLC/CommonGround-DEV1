@@ -53,18 +53,18 @@ interface ChildUserData {
 }
 
 const AVATAR_COLORS = [
-  'from-cyan-500 to-teal-500',
+  'from-[#4BA8C8] to-[#3DAA8A]',
   'from-red-500 to-orange-500',
   'from-amber-500 to-orange-400',
-  'from-emerald-500 to-teal-500',
+  'from-emerald-500 to-[#3DAA8A]',
 ];
 
 const CONTACT_COLORS = [
-  'from-emerald-400 to-teal-500',
+  'from-emerald-400 to-[#3DAA8A]',
   'from-pink-400 to-rose-500',
   'from-blue-400 to-indigo-500',
   'from-amber-400 to-orange-500',
-  'from-purple-400 to-violet-500',
+  'from-purple-400 to-[#2D6A8F]',
 ];
 
 const COMING_SOON = [
@@ -76,8 +76,8 @@ const COMING_SOON = [
 const EVENT_TYPES = [
   { key: 'movie_night' as const, emoji: '🎬', label: 'Movie Night', color: 'from-red-600 to-red-500' },
   { key: 'reading_time' as const, emoji: '📚', label: 'Reading Time', color: 'from-amber-500 to-orange-400' },
-  { key: 'game_session' as const, emoji: '🎮', label: 'Game Session', color: 'from-cyan-500 to-teal-500' },
-  { key: 'family_call' as const, emoji: '📞', label: 'Family Call', color: 'from-emerald-500 to-teal-500' },
+  { key: 'game_session' as const, emoji: '🎮', label: 'Game Session', color: 'from-[#4BA8C8] to-[#3DAA8A]' },
+  { key: 'family_call' as const, emoji: '📞', label: 'Family Call', color: 'from-emerald-500 to-[#3DAA8A]' },
 ];
 
 function formatRelativeTime(dateStr: string): string {
@@ -113,7 +113,7 @@ function getEventEmoji(type: string): string {
 function getEventColor(type: string): string {
   const map: Record<string, string> = {
     movie_night: 'from-red-500 to-orange-500', reading_time: 'from-amber-500 to-yellow-400',
-    game_session: 'from-cyan-500 to-teal-500', family_call: 'from-emerald-500 to-teal-500',
+    game_session: 'from-[#4BA8C8] to-[#3DAA8A]', family_call: 'from-emerald-500 to-[#3DAA8A]',
     custom: 'from-purple-500 to-indigo-500',
   };
   return map[type] || 'from-slate-500 to-slate-600';
@@ -394,7 +394,7 @@ export default function ChildDashboardPage() {
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/20">
                           <div
-                            className={`h-full ${isVideo ? 'bg-cyan-500' : 'bg-amber-500'} rounded-r-full`}
+                            className={`h-full ${isVideo ? 'bg-[#4BA8C8]' : 'bg-amber-500'} rounded-r-full`}
                             style={{ width: `${progressPct}%` }}
                           />
                         </div>
@@ -408,7 +408,7 @@ export default function ChildDashboardPage() {
                             {isVideo ? 'Movie' : 'Book'}
                           </span>
                         </div>
-                        <span className={`${isVideo ? 'text-cyan-400' : 'text-amber-400'} text-xs font-bold flex-shrink-0`} style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                        <span className={`${isVideo ? 'text-[#4BA8C8]' : 'text-amber-400'} text-xs font-bold flex-shrink-0`} style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                           {progressPct}%
                         </span>
                       </div>
@@ -429,8 +429,8 @@ export default function ChildDashboardPage() {
             {[
               { label: 'MOVIES', icon: Film, color: 'from-red-600 to-red-500', shadow: 'shadow-red-500/20', href: '/my-circle/child/movies' },
               { label: 'BOOKS', icon: BookOpen, color: 'from-amber-500 to-orange-400', shadow: 'shadow-amber-500/20', href: '/my-circle/child/library' },
-              { label: 'GAMES', icon: Gamepad2, color: 'from-cyan-500 to-teal-500', shadow: 'shadow-cyan-500/20', href: '/my-circle/child/arcade' },
-              { label: 'MY CIRCLE', icon: Users, color: 'from-emerald-500 to-teal-500', shadow: 'shadow-emerald-500/20', href: '/my-circle/child/my-circle-page' },
+              { label: 'GAMES', icon: Gamepad2, color: 'from-[#4BA8C8] to-[#3DAA8A]', shadow: 'shadow-[#4BA8C8]/20', href: '/my-circle/child/arcade' },
+              { label: 'MY CIRCLE', icon: Users, color: 'from-emerald-500 to-[#3DAA8A]', shadow: 'shadow-emerald-500/20', href: '/my-circle/child/my-circle-page' },
             ].map(({ label, icon: Icon, color, shadow, href }) => (
               <button
                 key={label}
@@ -487,7 +487,7 @@ export default function ChildDashboardPage() {
                     </div>
                     <button
                       onClick={() => router.push(`/my-circle/child/my-circle-page`)}
-                      className="w-10 h-10 rounded-full flex items-center justify-center hover:text-cyan-400 transition-all"
+                      className="w-10 h-10 rounded-full flex items-center justify-center hover:text-[#5BC4A0] transition-all"
                       style={{ background: 'var(--portal-surface-hover, var(--portal-surface))', color: 'var(--portal-muted)' }}
                     >
                       {isVideo ? <Video className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
@@ -507,7 +507,7 @@ export default function ChildDashboardPage() {
             </h2>
             <button
               onClick={() => router.push('/my-circle/child/my-circle-page')}
-              className="text-xs text-teal-400 hover:text-teal-300 font-semibold flex items-center gap-1"
+              className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] font-semibold flex items-center gap-1"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               View All <ChevronRight className="w-3 h-3" />
@@ -538,7 +538,7 @@ export default function ChildDashboardPage() {
                     <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${CONTACT_COLORS[colorIdx]} flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform relative`}>
                       <span className="text-white font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{initial}</span>
                       {hasUnread && (
-                        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-teal-400 rounded-full" style={{ border: '2px solid var(--portal-background)' }} />
+                        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#3DAA8A] rounded-full" style={{ border: '2px solid var(--portal-background)' }} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -600,7 +600,7 @@ export default function ChildDashboardPage() {
                           {date} · {time}
                         </span>
                         {event.created_by_child && (
-                          <span className="text-cyan-400 text-[10px] font-medium ml-1">You created this</span>
+                          <span className="text-[#4BA8C8] text-[10px] font-medium ml-1">You created this</span>
                         )}
                       </div>
                     </div>
@@ -611,7 +611,7 @@ export default function ChildDashboardPage() {
             )}
             <button
               onClick={() => { setShowAddEvent(true); setEventStep('type'); setEventCreated(false); }}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed hover:border-cyan-500/50 hover:text-cyan-400 transition-all duration-200"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed hover:border-[#4BA8C8]/50 hover:text-[#5BC4A0] transition-all duration-200"
               style={{ borderColor: 'var(--portal-border)', color: 'var(--portal-muted)', fontFamily: 'Inter, sans-serif', fontSize: '14px' }}
             >
               <Plus className="w-4 h-4" /> Add new event
@@ -627,7 +627,7 @@ export default function ChildDashboardPage() {
             </h2>
             <button
               onClick={() => router.push('/my-circle/child/movies')}
-              className="flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors"
+              className="flex items-center gap-1 text-sm font-semibold text-[#4BA8C8] hover:text-[#5BC4A0] transition-colors"
             >
               View All <ChevronRight className="w-4 h-4" />
             </button>
@@ -640,12 +640,12 @@ export default function ChildDashboardPage() {
                     <img src={item.poster} alt="Coming soon" className="absolute inset-0 w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute top-3 left-3">
-                      <span className="px-3 py-1 rounded-full bg-cyan-500 text-white text-[10px] font-bold uppercase tracking-wide shadow-lg">
+                      <span className="px-3 py-1 rounded-full bg-[#4BA8C8] text-white text-[10px] font-bold uppercase tracking-wide shadow-lg">
                         Coming Soon
                       </span>
                     </div>
                     <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+                      <Sparkles className="w-3.5 h-3.5 text-[#5BC4A0]" />
                       <span className="text-white/80 text-xs font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>Watch for it!</span>
                     </div>
                   </div>
@@ -658,10 +658,10 @@ export default function ChildDashboardPage() {
         {/* Featured Author */}
         <section className="px-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-cyan-400 text-xs font-semibold uppercase tracking-widest" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-[#4BA8C8] text-xs font-semibold uppercase tracking-widest" style={{ fontFamily: 'Inter, sans-serif' }}>
               Featured Author
             </p>
-            <button onClick={() => router.push('/my-circle/child/library')} className="flex items-center gap-1 text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+            <button onClick={() => router.push('/my-circle/child/library')} className="flex items-center gap-1 text-sm font-semibold text-[#4BA8C8] hover:text-[#5BC4A0] transition-colors">
               Library <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -699,12 +699,12 @@ export default function ChildDashboardPage() {
                 <p className="text-base leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-text)' }}>
                   When the sky begins to whisper secrets, Luna and her brave cat Midnight step into a magical adventure filled with constellations, courage, and a little bit of mystery.
                 </p>
-                <p className="text-cyan-400 font-bold text-base italic" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <p className="text-[#4BA8C8] font-bold text-base italic" style={{ fontFamily: 'Inter, sans-serif' }}>
                   If you love magic, friendship, and nighttime adventures, this is your next favorite story.
                 </p>
                 <button
                   onClick={() => router.push('/my-circle/child/library/luna-midnight')}
-                  className="w-full sm:w-auto mt-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-2xl text-white font-black text-lg shadow-xl shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  className="w-full sm:w-auto mt-2 px-8 py-4 bg-gradient-to-r from-[#4BA8C8] to-[#3DAA8A] rounded-2xl text-white font-black text-lg shadow-xl shadow-[#4BA8C8]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                   style={{ fontFamily: 'Space Grotesk, sans-serif' }}
                 >
                   READ NOW
@@ -805,7 +805,7 @@ export default function ChildDashboardPage() {
                       value={newEventTitle}
                       onChange={e => setNewEventTitle(e.target.value)}
                       placeholder="What's happening?"
-                      className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-[#4BA8C8] transition-colors"
                       style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                     />
                   </div>
@@ -816,7 +816,7 @@ export default function ChildDashboardPage() {
                         type="date"
                         value={newEventDate}
                         onChange={e => setNewEventDate(e.target.value)}
-                        className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-colors"
+                        className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-[#4BA8C8] transition-colors"
                         style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                       />
                     </div>
@@ -826,7 +826,7 @@ export default function ChildDashboardPage() {
                         type="time"
                         value={newEventTime}
                         onChange={e => setNewEventTime(e.target.value)}
-                        className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 transition-colors"
+                        className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-[#4BA8C8] transition-colors"
                         style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                       />
                     </div>
@@ -845,7 +845,7 @@ export default function ChildDashboardPage() {
                           onClick={() => setNewEventParents(opt.value)}
                           className={`py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${
                             newEventParents === opt.value
-                              ? 'bg-cyan-500 text-white'
+                              ? 'bg-[#4BA8C8] text-white'
                               : ''
                           }`}
                           style={newEventParents !== opt.value ? { background: 'var(--portal-input-bg)', color: 'var(--portal-muted)', border: '1px solid var(--portal-input-border)', fontFamily: 'Inter, sans-serif' } : { fontFamily: 'Inter, sans-serif' }}
@@ -858,7 +858,7 @@ export default function ChildDashboardPage() {
                   <button
                     onClick={handleCreateEvent}
                     disabled={!newEventTitle || !newEventDate || !newEventTime || isCreatingEvent}
-                    className="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-xl text-white font-bold shadow-lg shadow-cyan-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="w-full py-3.5 bg-gradient-to-r from-[#4BA8C8] to-[#3DAA8A] rounded-xl text-white font-bold shadow-lg shadow-[#4BA8C8]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     style={{ fontFamily: 'Space Grotesk, sans-serif' }}
                   >
                     {isCreatingEvent ? (

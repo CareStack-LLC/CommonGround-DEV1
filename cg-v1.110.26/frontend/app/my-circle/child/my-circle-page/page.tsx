@@ -34,12 +34,12 @@ interface ContactOverride {
 }
 
 const AVATAR_COLORS = [
-  'from-teal-500 to-emerald-500',
-  'from-cyan-500 to-teal-500',
+  'from-[#3DAA8A] to-emerald-500',
+  'from-[#4BA8C8] to-[#3DAA8A]',
   'from-amber-500 to-orange-400',
   'from-red-500 to-orange-500',
   'from-pink-500 to-rose-500',
-  'from-violet-500 to-purple-500',
+  'from-[#2D6A8F] to-purple-500',
 ];
 
 const CONTACT_EMOJIS: Record<string, string> = {
@@ -328,7 +328,7 @@ export default function MyCirclePage() {
                     </p>
                   )}
                   {overrides[contact.contact_id]?.nickname && (
-                    <p className="text-[10px] text-teal-400 mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    <p className="text-[10px] text-[#3DAA8A] mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
                       ✏️ Custom name
                     </p>
                   )}
@@ -362,7 +362,7 @@ export default function MyCirclePage() {
                     onClick={() => handleCall(contact, 'video')}
                     disabled={!contact.can_video_call}
                     className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${contact.can_video_call
-                      ? 'bg-cyan-500 hover:bg-cyan-400 shadow-lg shadow-cyan-500/30 hover:scale-110 active:scale-95'
+                      ? 'bg-[#4BA8C8] hover:bg-[#5BC4A0] shadow-lg shadow-[#4BA8C8]/30 hover:scale-110 active:scale-95'
                       : 'opacity-40 cursor-not-allowed'
                       }`}
                     aria-label={`Video call ${displayName}`}
@@ -456,7 +456,7 @@ export default function MyCirclePage() {
                 className="relative group"
                 aria-label="Change photo"
               >
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center shadow-xl">
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-[#3DAA8A] to-[#4BA8C8] flex items-center justify-center shadow-xl">
                   {editPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={editPhoto} alt="Preview" className="w-full h-full object-cover" />
@@ -468,7 +468,7 @@ export default function MyCirclePage() {
                 <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                   <Camera className="w-8 h-8 text-white" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center shadow-lg" style={{ border: '2px solid var(--portal-surface-elevated)' }}>
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[#4BA8C8] flex items-center justify-center shadow-lg" style={{ border: '2px solid var(--portal-surface-elevated)' }}>
                   <Camera className="w-4 h-4 text-white" />
                 </div>
               </button>
@@ -491,7 +491,7 @@ export default function MyCirclePage() {
                 value={editName}
                 onChange={e => setEditName(e.target.value)}
                 placeholder={editContact.display_name}
-                className="w-full px-4 py-3 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#4BA8C8] focus:border-transparent transition-all"
                 style={{ fontFamily: 'Space Grotesk, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                 maxLength={30}
               />
@@ -508,7 +508,7 @@ export default function MyCirclePage() {
               </button>
               <button
                 onClick={saveEdit}
-                className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-cyan-500/20"
+                className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-[#3DAA8A] to-[#4BA8C8] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-[#4BA8C8]/20"
                 style={{ fontFamily: 'Inter, sans-serif' }}
               >
                 <Check className="w-4 h-4" /> Save

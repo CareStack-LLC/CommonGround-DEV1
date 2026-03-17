@@ -19,28 +19,32 @@ function CommonGroundLogo({ size = 64 }: { size?: number }) {
       height={size}
       className="flex-shrink-0"
     >
-      <rect width="512" height="512" rx="64" fill="url(#cg-bg)" />
       <defs>
-        <linearGradient id="cg-bg" x1="0" y1="0" x2="512" y2="512">
-          <stop stopColor="#E8F4F8" />
-          <stop offset="1" stopColor="#D6ECE8" />
+        <linearGradient id="cg-bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#E8F4F8" />
+          <stop offset="100%" stopColor="#D6ECE8" />
         </linearGradient>
-        <linearGradient id="cg-parent-a" x1="140" y1="110" x2="196" y2="186">
-          <stop stopColor="#5BC4A0" />
-          <stop offset="1" stopColor="#3DAA8A" />
+        <linearGradient id="cg-parent-a" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#5BC4A0" />
+          <stop offset="100%" stopColor="#3DAA8A" />
         </linearGradient>
-        <linearGradient id="cg-parent-b" x1="316" y1="110" x2="372" y2="186">
-          <stop stopColor="#4BA8C8" />
-          <stop offset="1" stopColor="#2D6A8F" />
+        <linearGradient id="cg-parent-b" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#4BA8C8" />
+          <stop offset="100%" stopColor="#2D6A8F" />
         </linearGradient>
       </defs>
+      <rect width="512" height="512" rx="120" fill="url(#cg-bg)" />
+      {/* Left parent */}
       <circle cx="168" cy="148" r="48" fill="url(#cg-parent-a)" />
-      <path d="M120 260c0-26.5 21.5-48 48-48s48 21.5 48 48" stroke="url(#cg-parent-a)" strokeWidth="16" fill="none" strokeLinecap="round" />
+      <path d="M118 218 Q168 258 218 218" stroke="url(#cg-parent-a)" strokeWidth="16" strokeLinecap="round" fill="none" />
+      {/* Right parent */}
       <circle cx="344" cy="148" r="48" fill="url(#cg-parent-b)" />
-      <path d="M296 260c0-26.5 21.5-48 48-48s48 21.5 48 48" stroke="url(#cg-parent-b)" strokeWidth="16" fill="none" strokeLinecap="round" />
-      <path d="M168 200 Q256 140 344 200" stroke="#F5A623" strokeWidth="10" fill="none" strokeLinecap="round" />
+      <path d="M294 218 Q344 258 394 218" stroke="url(#cg-parent-b)" strokeWidth="16" strokeLinecap="round" fill="none" />
+      {/* Golden arch */}
+      <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+      {/* Child */}
       <circle cx="256" cy="330" r="38" fill="#F5A623" />
-      <path d="M218 410c0-21 17-38 38-38s38 17 38 38" stroke="#F5A623" strokeWidth="14" fill="none" strokeLinecap="round" />
+      <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
     </svg>
   );
 }

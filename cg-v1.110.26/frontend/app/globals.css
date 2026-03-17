@@ -385,38 +385,38 @@
 
 /* Child Portal - "Modern Pre-Teen App" */
 .child-portal {
-  /* Colors - Modern, cooler palette (Netflix, Spotify, Discord inspired) */
-  --portal-primary: #14B8A6; /* Teal - main accent */
-  --portal-primary-hover: #0D9488;
-  --portal-primary-light: #2DD4BF;
-  --portal-secondary: #7C3AED; /* Violet - secondary accent */
-  --portal-secondary-light: #A78BFA;
-  --portal-accent: #64748B; /* Slate - neutral */
-  --portal-accent-hover: #475569;
-  --portal-background: #F8FAFC; /* Slate-50 to white gradient */
+  /* Colors - CommonGround brand palette (unified across all portals) */
+  --portal-primary: #3DAA8A; /* Calm Teal - brand primary */
+  --portal-primary-hover: #349878;
+  --portal-primary-light: #5BC4A0; /* Soft Teal - light accent */
+  --portal-secondary: #2D6A8F; /* Ocean Blue - brand secondary */
+  --portal-secondary-light: #4BA8C8; /* Sky Blue - lighter blue */
+  --portal-accent: #F5A623; /* Child Gold - warmth accent */
+  --portal-accent-hover: #E8941E;
+  --portal-background: #F4F8F7; /* Brand soft white */
   --portal-surface: #FFFFFF;
   --portal-surface-elevated: #FFFFFF;
-  --portal-border: #E2E8F0; /* Slate-200 */
-  --portal-border-hover: #CBD5E1;
-  --portal-text: #1E293B; /* Slate-800 dark */
-  --portal-text-light: #64748B; /* Slate-500 */
-  --portal-text-heading: #0F172A; /* Slate-900 */
+  --portal-border: #D6ECE8; /* Brand teal-tinted border */
+  --portal-border-hover: #C2DDD7;
+  --portal-text: #1E3A4A; /* Brand deep navy */
+  --portal-text-light: #5A7A8A; /* Muted navy */
+  --portal-text-heading: #1E3A4A; /* Brand deep navy */
 
-  /* Feature-specific colors */
-  --kid-cyan: #06B6D4; /* Cyan-500 - replaces purple everywhere */
-  --kid-teal: #14B8A6; /* Teal-500 - secondary accent */
-  --kid-movies: #EF4444; /* Red-500 - Netflix vibe */
-  --kid-books: #F59E0B; /* Amber-500 - warm, inviting */
-  --kid-games: #06B6D4; /* Cyan-500 - playful tech (was Violet-500) */
-  --kid-calls: #10B981; /* Emerald-500 - communication */
-  --kid-people: #14B8A6; /* Teal-500 - social */
-  --kid-calendar: #3B82F6; /* Blue-500 - organization */
+  /* Feature-specific colors — brand-aligned */
+  --kid-cyan: #4BA8C8; /* Sky Blue - brand accent */
+  --kid-teal: #3DAA8A; /* Calm Teal - brand primary */
+  --kid-movies: #2D6A8F; /* Ocean Blue - cinema feel */
+  --kid-books: #F5A623; /* Child Gold - warm, inviting */
+  --kid-games: #3DAA8A; /* Calm Teal - playful brand */
+  --kid-calls: #5BC4A0; /* Soft Teal - communication */
+  --kid-people: #2D6A8F; /* Ocean Blue - social */
+  --kid-calendar: #4BA8C8; /* Sky Blue - organization */
 
   /* Shadows - Subtle, modern */
-  --portal-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --portal-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
-  --portal-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
-  --portal-shadow-xl: 0 16px 24px rgba(0, 0, 0, 0.12);
+  --portal-shadow-sm: 0 1px 3px rgba(13, 27, 36, 0.06);
+  --portal-shadow-md: 0 4px 8px rgba(13, 27, 36, 0.08);
+  --portal-shadow-lg: 0 8px 16px rgba(13, 27, 36, 0.1);
+  --portal-shadow-xl: 0 16px 24px rgba(13, 27, 36, 0.12);
 
   /* Border Radii - Modern, not overly round */
   --portal-radius-sm: 0.5rem;
@@ -438,35 +438,35 @@
   --portal-line-height: 1.6;
 
   /* Extended — for KidSpace theme migration */
-  --portal-surface-dim: rgba(241, 245, 249, 0.6);
-  --portal-surface-hover: #F1F5F9;
-  --portal-muted: #64748B;
-  --portal-card-hover: rgba(20, 184, 166, 0.06);
-  --portal-gradient-start: #14B8A6;
-  --portal-gradient-end: #06B6D4;
-  --portal-input-bg: #F1F5F9;
-  --portal-input-border: #CBD5E1;
+  --portal-surface-dim: rgba(244, 248, 247, 0.6);
+  --portal-surface-hover: #E8F4F0;
+  --portal-muted: #5A7A8A;
+  --portal-card-hover: rgba(61, 170, 138, 0.06);
+  --portal-gradient-start: #3DAA8A;
+  --portal-gradient-end: #2D6A8F;
+  --portal-input-bg: #F4F8F7;
+  --portal-input-border: #D6ECE8;
   --portal-overlay: rgba(0, 0, 0, 0.5);
-  --portal-divider: #E2E8F0;
+  --portal-divider: #D6ECE8;
 }
 
-/* Child Portal - Dark Mode */
+/* Child Portal - Dark Mode — CommonGround brand dark palette */
 .dark .child-portal {
-  --portal-primary: #2DD4BF; /* Teal-300 */
-  --portal-primary-hover: #14B8A6;
-  --portal-primary-light: #5EEAD4;
-  --portal-secondary: #A78BFA; /* Violet-400 */
-  --portal-secondary-light: #7C3AED;
-  --portal-accent: #94A3B8; /* Slate-400 */
-  --portal-accent-hover: #CBD5E1;
-  --portal-background: #0F172A; /* Slate-900 */
-  --portal-surface: #1E293B; /* Slate-800 */
-  --portal-surface-elevated: #334155; /* Slate-700 */
-  --portal-border: #334155; /* Slate-700 */
-  --portal-border-hover: #475569; /* Slate-600 */
-  --portal-text: #E2E8F0; /* Slate-200 */
-  --portal-text-light: #94A3B8; /* Slate-400 */
-  --portal-text-heading: #F8FAFC; /* Slate-50 */
+  --portal-primary: #5BC4A0; /* Soft Teal - brand light teal */
+  --portal-primary-hover: #3DAA8A;
+  --portal-primary-light: #7DD8B8;
+  --portal-secondary: #4BA8C8; /* Sky Blue - brand lighter blue */
+  --portal-secondary-light: #2D6A8F;
+  --portal-accent: #F5A623; /* Child Gold */
+  --portal-accent-hover: #FFB940;
+  --portal-background: #0D1B24; /* Brand dark bg */
+  --portal-surface: #1E3A4A; /* Brand dark navy */
+  --portal-surface-elevated: #2A4D5E; /* Elevated dark navy */
+  --portal-border: #2A4D5E; /* Dark border */
+  --portal-border-hover: #3A6070; /* Hover border */
+  --portal-text: #CBD8E0; /* Brand light text */
+  --portal-text-light: #8BA8B8; /* Muted light text */
+  --portal-text-heading: #F4F8F7; /* Brand soft white */
 
   --portal-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --portal-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
@@ -474,16 +474,16 @@
   --portal-shadow-xl: 0 16px 24px rgba(0, 0, 0, 0.6);
 
   /* Extended — dark mode overrides */
-  --portal-surface-dim: rgba(30, 41, 59, 0.4);
-  --portal-surface-hover: #334155;
-  --portal-muted: #94A3B8;
-  --portal-card-hover: rgba(45, 212, 191, 0.06);
-  --portal-gradient-start: #2DD4BF;
-  --portal-gradient-end: #22D3EE;
-  --portal-input-bg: #1E293B;
-  --portal-input-border: #475569;
+  --portal-surface-dim: rgba(30, 58, 74, 0.4);
+  --portal-surface-hover: #2A4D5E;
+  --portal-muted: #8BA8B8;
+  --portal-card-hover: rgba(61, 170, 138, 0.08);
+  --portal-gradient-start: #5BC4A0;
+  --portal-gradient-end: #4BA8C8;
+  --portal-input-bg: #1E3A4A;
+  --portal-input-border: #3A6070;
   --portal-overlay: rgba(0, 0, 0, 0.7);
-  --portal-divider: #334155;
+  --portal-divider: #2A4D5E;
 }
 
 /* SuperAdmin Portal - "Dark Command Center" */
