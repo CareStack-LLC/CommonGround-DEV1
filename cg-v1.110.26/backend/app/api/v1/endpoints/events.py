@@ -11,8 +11,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user, get_current_child_user
 from app.models.user import User
+from app.models.kidcoms import ChildUser
+from app.models.child import Child
+from app.models.family_file import FamilyFile
 from app.schemas.schedule import (
     ScheduleEventCreate,
     ScheduleEventUpdate,
@@ -519,3 +522,177 @@ async def check_in_with_gps(
         "longitude": check_in.longitude,
         "device_accuracy": check_in.device_accuracy
     }
+
+
+# ========== CHILD EVENT ENDPOINTS ==========
+
+from pydantic import BaseModel, Field
+from sqlalchemy import select, or_, cast, String
+from app.models.schedule import ScheduleEvent
+
+
+class ChildEventCreate(BaseModel):
+    """Schema for child-created events."""
+    title: str = Field(..., min_length=1, max_length=200)
+    description: Optional[str] = None
+    start_time: datetime
+    end_time: datetime
+    event_type: str = Field(
+        default="custom",
+        pattern=r"^(movie_night|reading_time|game_session|family_call|custom)$"
+    )
+    invite_parents: str = Field(
+        default="both",
+        pattern=r"^(both|parent_a|parent_b|none)$"
+    )
+    invite_contact_ids: List[str] = []
+
+
+@router.post(
+    "/child/create",
+    status_code=status.HTTP_201_CREATED,
+    summary="Child creates event",
+    description="Allow a child to create events and invite parents or circle contacts."
+)
+async def create_child_event(
+    event_data: ChildEventCreate,
+    current_child: ChildUser = Depends(get_current_child_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Create an event as a child.
+
+    - Child can set title, time, type, and invite parents/contacts
+    - Events are always visible to both parents (co_parent visibility)
+    - created_by is left null (child-created), child_ids includes this child
+    """
+    # Get child record for name
+    child_result = await db.execute(
+        select(Child).where(Child.id == str(current_child.child_id))
+    )
+    child = child_result.scalar_one_or_none()
+    if not child:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Child profile not found"
+        )
+
+    # Get family file for parent IDs
+    family_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == str(current_child.family_file_id))
+    )
+    family_file = family_result.scalar_one_or_none()
+    if not family_file:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Family file not found"
+        )
+
+    # Build attendee list based on invite_parents
+    attendee_ids = []
+    if event_data.invite_parents in ("both", "parent_a") and family_file.parent_a_id:
+        attendee_ids.append(str(family_file.parent_a_id))
+    if event_data.invite_parents in ("both", "parent_b") and family_file.parent_b_id:
+        attendee_ids.append(str(family_file.parent_b_id))
+
+    # Category data with child creator info
+    category_data = {
+        "created_by_child_id": str(current_child.child_id),
+        "created_by_child_name": child.display_name,
+        "event_type": event_data.event_type,
+        "invited_contact_ids": event_data.invite_contact_ids,
+    }
+
+    event = ScheduleEvent(
+        family_file_id=str(current_child.family_file_id),
+        title=event_data.title,
+        description=event_data.description,
+        start_time=event_data.start_time,
+        end_time=event_data.end_time,
+        event_type="regular",
+        event_category="general",
+        category_data=category_data,
+        child_ids=[str(current_child.child_id)],
+        visibility="co_parent",
+        location_shared=False,
+        custodial_parent_id=str(family_file.parent_a_id or family_file.parent_b_id or ""),
+        status="scheduled",
+        attendee_ids=attendee_ids,
+    )
+
+    db.add(event)
+    await db.commit()
+    await db.refresh(event)
+
+    return {
+        "id": str(event.id),
+        "title": event.title,
+        "description": event.description,
+        "start_time": event.start_time.isoformat(),
+        "end_time": event.end_time.isoformat(),
+        "event_type": event_data.event_type,
+        "invite_parents": event_data.invite_parents,
+        "created_by_child_name": child.display_name,
+        "status": event.status,
+    }
+
+
+@router.get(
+    "/child/upcoming",
+    summary="Get child's upcoming events",
+    description="Get upcoming events for the authenticated child."
+)
+async def get_child_upcoming_events(
+    limit: int = 20,
+    current_child: ChildUser = Depends(get_current_child_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get upcoming events for a child.
+
+    Returns events where:
+    - child_ids includes this child (parent-created events that tag this child)
+    - category_data->created_by_child_id matches (child-created events)
+    """
+    child_id_str = str(current_child.child_id)
+    family_file_id = str(current_child.family_file_id)
+    now = datetime.utcnow()
+
+    # Query events for this family file that are upcoming
+    result = await db.execute(
+        select(ScheduleEvent)
+        .where(
+            ScheduleEvent.family_file_id == family_file_id,
+            ScheduleEvent.end_time >= now,
+            ScheduleEvent.status == "scheduled",
+        )
+        .order_by(ScheduleEvent.start_time.asc())
+        .limit(limit)
+    )
+    all_events = result.scalars().all()
+
+    # Filter to events relevant to this child
+    child_events = []
+    for event in all_events:
+        is_child_tagged = child_id_str in (event.child_ids or [])
+        is_child_created = (
+            isinstance(event.category_data, dict)
+            and event.category_data.get("created_by_child_id") == child_id_str
+        )
+        if is_child_tagged or is_child_created:
+            child_events.append({
+                "id": str(event.id),
+                "title": event.title,
+                "description": event.description,
+                "start_time": event.start_time.isoformat(),
+                "end_time": event.end_time.isoformat(),
+                "event_type": (
+                    event.category_data.get("event_type", "custom")
+                    if isinstance(event.category_data, dict)
+                    else "custom"
+                ),
+                "created_by_child": is_child_created,
+                "status": event.status,
+            })
+
+    return child_events

@@ -8895,6 +8895,65 @@ export const circleCallsAPI = {
   async getSession(sessionId: string): Promise<CircleCallSession> {
     return fetchAPI<CircleCallSession>(`/circle-calls/${sessionId}`);
   },
+
+  /**
+   * Get child's call history (child auth)
+   */
+  async getChildCallHistory(limit = 20, offset = 0): Promise<ChildCallHistoryEntry[]> {
+    return fetchAPIWithChildAuth<ChildCallHistoryEntry[]>(
+      `/circle-calls/child/my-history?limit=${limit}&offset=${offset}`
+    );
+  },
+};
+
+export interface ChildCallHistoryEntry {
+  id: string;
+  contact_name: string;
+  contact_id: string;
+  call_type: string;
+  status: string;
+  initiated_by_type: string;
+  initiated_at: string | null;
+  ended_at: string | null;
+  duration_seconds: number | null;
+}
+
+// ============================================================================
+// Child Events API
+// ============================================================================
+
+export interface ChildEventCreateRequest {
+  title: string;
+  description?: string;
+  start_time: string;
+  end_time: string;
+  event_type: 'movie_night' | 'reading_time' | 'game_session' | 'family_call' | 'custom';
+  invite_parents: 'both' | 'parent_a' | 'parent_b' | 'none';
+  invite_contact_ids?: string[];
+}
+
+export interface ChildEvent {
+  id: string;
+  title: string;
+  description: string | null;
+  start_time: string;
+  end_time: string;
+  event_type: string;
+  created_by_child: boolean;
+  status: string;
+}
+
+export const childEventsAPI = {
+  async create(data: ChildEventCreateRequest): Promise<ChildEvent> {
+    return fetchAPIWithChildAuth<ChildEvent>('/events/child/create', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getUpcoming(limit = 20): Promise<ChildEvent[]> {
+    return fetchAPIWithChildAuth<ChildEvent[]>(`/events/child/upcoming?limit=${limit}`);
+  },
 };
 
 // ============================================================================

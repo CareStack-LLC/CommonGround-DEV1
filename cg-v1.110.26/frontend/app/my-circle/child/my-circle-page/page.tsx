@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { kidcomsAPI } from '@/lib/api';
-import { Users, Phone, Video, MessageCircle, Camera, X, Check, Pencil } from 'lucide-react';
+import { kidcomsAPI, circleCallsAPI, ChildCallHistoryEntry } from '@/lib/api';
+import { Users, Phone, Video, MessageCircle, Camera, X, Check, Pencil, Loader2 } from 'lucide-react';
 
 interface ChildUserData {
   userId: string;
@@ -71,6 +71,21 @@ function saveOverrides(map: Record<string, ContactOverride>) {
   localStorage.setItem(OVERRIDES_KEY, JSON.stringify(map));
 }
 
+function formatTimeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return 'Just now';
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDays = Math.floor(diffHr / 24);
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString();
+}
+
 export default function MyCirclePage() {
   const router = useRouter();
   const [userData, setUserData] = useState<ChildUserData | null>(null);
@@ -78,6 +93,9 @@ export default function MyCirclePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isStartingCall, setIsStartingCall] = useState(false);
   const [overrides, setOverrides] = useState<Record<string, ContactOverride>>({});
+
+  const [recentCalls, setRecentCalls] = useState<ChildCallHistoryEntry[]>([]);
+  const [callsLoading, setCallsLoading] = useState(true);
 
   // Edit modal state
   const [editContact, setEditContact] = useState<ChildContact | null>(null);
@@ -92,7 +110,19 @@ export default function MyCirclePage() {
   useEffect(() => {
     validateAndLoadUser();
     setOverrides(getOverrides());
+    loadRecentCalls();
   }, []);
+
+  async function loadRecentCalls() {
+    try {
+      const history = await circleCallsAPI.getChildCallHistory(10);
+      setRecentCalls(history);
+    } catch (err) {
+      console.error('Failed to load call history:', err);
+    } finally {
+      setCallsLoading(false);
+    }
+  }
 
   function validateAndLoadUser() {
     try {
@@ -355,35 +385,52 @@ export default function MyCirclePage() {
           })}
         </div>
 
-        {/* Recent Calls Section — Match Dashboard Styling */}
+        {/* Recent Calls Section */}
         <section className="mt-12 pb-8">
           <h2 className="text-xl font-bold text-white mb-4 px-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
             Recent Calls
           </h2>
           <div className="bg-slate-800/40 rounded-3xl overflow-hidden border border-slate-800/60 shadow-xl">
-            {[
-              { name: 'Mom', type: 'video', time: '10 min ago', color: 'from-pink-400 to-rose-500', initial: 'M' },
-              { name: 'Dad', type: 'voice', time: '2 hours ago', color: 'from-blue-400 to-indigo-500', initial: 'D' },
-              { name: 'Grandma', type: 'video', time: 'Yesterday', color: 'from-emerald-400 to-teal-500', initial: 'G' },
-              { name: 'Mom', type: 'video', time: '2 days ago', color: 'from-pink-400 to-rose-500', initial: 'M' },
-              { name: 'Alice', type: 'voice', time: '3 days ago', color: 'from-amber-400 to-orange-500', initial: 'A' },
-            ].map((call, idx) => (
-              <div key={idx} className="flex items-center gap-4 p-4 border-b border-slate-800/60 last:border-0 hover:bg-slate-800/40 transition-colors group">
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${call.color} flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform`}>
-                  <span className="text-white font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{call.initial}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{call.name}</h3>
-                  <p className="text-slate-500 text-xs flex items-center gap-1.5" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    {call.type === 'video' ? <Video className="w-3 h-3" /> : <Phone className="w-3 h-3" />}
-                    {call.type === 'video' ? 'Video Call' : 'Voice Call'} · {call.time}
-                  </p>
-                </div>
-                <button className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:bg-slate-700 transition-all">
-                  {call.type === 'video' ? <Video className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
-                </button>
+            {callsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
               </div>
-            ))}
+            ) : recentCalls.length === 0 ? (
+              <div className="text-center py-8 px-4">
+                <Phone className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                <p className="text-slate-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  No calls yet. Tap a contact above to start!
+                </p>
+              </div>
+            ) : (
+              recentCalls.map((call) => {
+                const initial = call.contact_name?.charAt(0).toUpperCase() || '?';
+                const colorIdx = call.contact_name.length % AVATAR_COLORS.length;
+                const color = AVATAR_COLORS[colorIdx];
+                const isVideo = call.call_type === 'video_call';
+                const timeAgo = call.initiated_at ? formatTimeAgo(call.initiated_at) : '';
+
+                return (
+                  <div key={call.id} className="flex items-center gap-4 p-4 border-b border-slate-800/60 last:border-0 hover:bg-slate-800/40 transition-colors group">
+                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform`}>
+                      <span className="text-white font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{initial}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{call.contact_name}</h3>
+                      <p className="text-slate-500 text-xs flex items-center gap-1.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        {isVideo ? <Video className="w-3 h-3" /> : <Phone className="w-3 h-3" />}
+                        {isVideo ? 'Video Call' : 'Voice Call'}
+                        {timeAgo && ` · ${timeAgo}`}
+                        {call.duration_seconds && ` · ${Math.round(call.duration_seconds / 60)}m`}
+                      </p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">
+                      {isVideo ? <Video className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </section>
       </main>

@@ -85,13 +85,22 @@ export function StreamingBookCard({
             </div>
           )}
 
-          {/* Star Rating — top right */}
+          {/* Star Rating — top left */}
           <div className="absolute top-2 left-2 z-20 bg-black/50 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1">
             <span className="text-yellow-400 text-xs">★</span>
             <span className="text-white text-xs font-bold" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
               {rating.toFixed(1)}
             </span>
           </div>
+
+          {/* Continue Reading badge */}
+          {progress && progress.currentPage > 0 && !progress.completed && (
+            <div className="absolute top-2 right-2 z-20 bg-amber-500/90 backdrop-blur-sm rounded-full px-2 py-0.5">
+              <span className="text-white text-[10px] font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>
+                Continue
+              </span>
+            </div>
+          )}
 
           {/* Progress Bar - Bottom */}
           {progress && progress.currentPage > 0 && (
@@ -134,11 +143,15 @@ export function StreamingBookCard({
           )}
 
           {/* Progress Indicator */}
-          {progress && progress.currentPage > 0 && (
+          {progress && progress.currentPage > 0 ? (
             <div className="text-[10px] text-cyan-400 font-semibold">
               {progress.completed ? '✓ Finished' : `${Math.round(progressPercentage)}% read`}
             </div>
-          )}
+          ) : book.pages ? (
+            <div className="text-[10px] text-slate-500 font-medium">
+              ~{Math.max(1, Math.round(book.pages * 0.5))} min read
+            </div>
+          ) : null}
         </div>
       </button>
     </div>

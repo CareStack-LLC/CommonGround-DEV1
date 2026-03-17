@@ -13,6 +13,23 @@ interface MemoryCard {
 
 const CARD_EMOJIS = ['🎮', '🎨', '🎭', '🎪', '🎸', '🎺', '🎹', '🎬'];
 
+function getScores() {
+  try {
+    const raw = localStorage.getItem('kid_game_scores');
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return {};
+}
+
+function saveScore(moves: number) {
+  const scores = getScores();
+  const mem = scores.memory || { bestMoves: 0, gamesCompleted: 0 };
+  mem.gamesCompleted++;
+  if (mem.bestMoves === 0 || moves < mem.bestMoves) mem.bestMoves = moves;
+  scores.memory = mem;
+  localStorage.setItem('kid_game_scores', JSON.stringify(scores));
+}
+
 export function MemoryGame() {
   const [cards, setCards] = useState<MemoryCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
@@ -20,19 +37,15 @@ export function MemoryGame() {
   const [matchedPairs, setMatchedPairs] = useState(0);
   const [isGameWon, setIsGameWon] = useState(false);
 
-  // Initialize game
   useEffect(() => {
     initializeGame();
   }, []);
 
   function initializeGame() {
-    // Create pairs of cards
     const cardPairs = CARD_EMOJIS.flatMap((emoji, index) => [
       { id: index * 2, emoji, isFlipped: false, isMatched: false },
       { id: index * 2 + 1, emoji, isFlipped: false, isMatched: false },
     ]);
-
-    // Shuffle cards
     const shuffled = cardPairs.sort(() => Math.random() - 0.5);
     setCards(shuffled);
     setFlippedCards([]);
@@ -42,21 +55,13 @@ export function MemoryGame() {
   }
 
   function handleCardClick(cardId: number) {
-    // Prevent clicking if:
-    // - Two cards already flipped
-    // - Card already flipped
-    // - Card already matched
-    // - Game is won
     if (
       flippedCards.length === 2 ||
       flippedCards.includes(cardId) ||
       cards[cardId].isMatched ||
       isGameWon
-    ) {
-      return;
-    }
+    ) return;
 
-    // Flip the card
     const newCards = [...cards];
     newCards[cardId].isFlipped = true;
     setCards(newCards);
@@ -64,16 +69,12 @@ export function MemoryGame() {
     const newFlippedCards = [...flippedCards, cardId];
     setFlippedCards(newFlippedCards);
 
-    // Check for match when two cards are flipped
     if (newFlippedCards.length === 2) {
-      setMoves(moves + 1);
+      const newMoves = moves + 1;
+      setMoves(newMoves);
 
       const [firstId, secondId] = newFlippedCards;
-      const firstCard = newCards[firstId];
-      const secondCard = newCards[secondId];
-
-      if (firstCard.emoji === secondCard.emoji) {
-        // Match found!
+      if (newCards[firstId].emoji === newCards[secondId].emoji) {
         newCards[firstId].isMatched = true;
         newCards[secondId].isMatched = true;
         setCards(newCards);
@@ -82,12 +83,11 @@ export function MemoryGame() {
         const newMatchedPairs = matchedPairs + 1;
         setMatchedPairs(newMatchedPairs);
 
-        // Check if game is won
         if (newMatchedPairs === CARD_EMOJIS.length) {
+          saveScore(newMoves);
           setTimeout(() => setIsGameWon(true), 500);
         }
       } else {
-        // No match - flip back after delay
         setTimeout(() => {
           const resetCards = [...newCards];
           resetCards[firstId].isFlipped = false;
@@ -100,40 +100,28 @@ export function MemoryGame() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-blue-100 p-6 pb-24">
-      {/* Header */}
-      <div className="max-w-2xl mx-auto mb-6">
-        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-6">
+    <div className="p-4 pb-8">
+      {/* Stats Header */}
+      <div className="max-w-2xl mx-auto mb-5">
+        <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-5">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-black text-gray-800">MEMORY MATCH</h1>
-              <p className="text-sm text-gray-600 mt-1">Find all the pairs!</p>
+            <div className="flex gap-5">
+              <div className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-amber-400" />
+                <span className="font-bold text-white text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{moves} Moves</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-emerald-400" />
+                <span className="font-bold text-white text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{matchedPairs}/{CARD_EMOJIS.length} Pairs</span>
+              </div>
             </div>
             <button
               onClick={initializeGame}
-              className={cn(
-                'bg-purple-500 hover:bg-purple-600 text-white',
-                'rounded-full p-3 shadow-lg',
-                'transition-all duration-200',
-                'hover:scale-110 active:scale-95',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-300'
-              )}
+              className="w-10 h-10 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 flex items-center justify-center transition-colors"
               aria-label="Reset game"
             >
-              <RotateCcw className="w-6 h-6" />
+              <RotateCcw className="w-5 h-5 text-purple-400" />
             </button>
-          </div>
-
-          {/* Stats */}
-          <div className="flex gap-4 mt-4">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Star className="w-5 h-5 text-yellow-500" />
-              <span className="font-bold">{moves} Moves</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <Trophy className="w-5 h-5 text-green-500" />
-              <span className="font-bold">{matchedPairs}/{CARD_EMOJIS.length} Pairs</span>
-            </div>
           </div>
         </div>
       </div>
@@ -147,22 +135,20 @@ export function MemoryGame() {
               onClick={() => handleCardClick(index)}
               disabled={card.isMatched || card.isFlipped}
               className={cn(
-                'aspect-square rounded-2xl shadow-lg',
-                'transition-all duration-300 ease-out',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-300',
+                'aspect-square rounded-xl shadow-lg transition-all duration-300 ease-out',
+                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400',
                 card.isFlipped || card.isMatched
-                  ? 'bg-white rotate-0'
-                  : 'bg-gradient-to-br from-purple-400 to-pink-400 hover:scale-105',
-                card.isMatched && 'opacity-60 cursor-not-allowed',
-                !card.isFlipped && !card.isMatched && 'hover:shadow-xl active:scale-95'
+                  ? 'bg-slate-700/60 border border-slate-600/50'
+                  : 'bg-gradient-to-br from-purple-600/40 to-pink-600/40 border border-purple-500/30 hover:scale-105 hover:shadow-xl active:scale-95',
+                card.isMatched && 'opacity-50'
               )}
               aria-label={card.isFlipped ? `Card ${card.emoji}` : 'Hidden card'}
             >
               <div className="w-full h-full flex items-center justify-center">
                 {card.isFlipped || card.isMatched ? (
-                  <span className="text-5xl">{card.emoji}</span>
+                  <span className="text-4xl sm:text-5xl">{card.emoji}</span>
                 ) : (
-                  <div className="text-white text-4xl">?</div>
+                  <div className="text-purple-300 text-3xl font-bold">?</div>
                 )}
               </div>
             </button>
@@ -172,26 +158,19 @@ export function MemoryGame() {
 
       {/* Win Modal */}
       {isGameWon && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center animate-bounce-in">
-            <div className="mb-4">
-              <Trophy className="w-20 h-20 mx-auto text-yellow-500" />
-            </div>
-            <h2 className="text-3xl font-black text-gray-800 mb-2">YOU WON!</h2>
-            <p className="text-xl text-gray-600 mb-6">
-              Great job! You matched all pairs in <span className="font-bold text-purple-600">{moves} moves</span>!
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+            <Trophy className="w-16 h-16 mx-auto text-amber-400 mb-4" />
+            <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              YOU WON!
+            </h2>
+            <p className="text-slate-400 mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+              All pairs matched in <span className="font-bold text-purple-400">{moves} moves</span>!
             </p>
             <button
               onClick={initializeGame}
-              className={cn(
-                'bg-gradient-to-r from-purple-500 to-pink-500',
-                'hover:from-purple-600 hover:to-pink-600',
-                'text-white font-bold text-lg',
-                'px-8 py-4 rounded-full shadow-lg',
-                'transition-all duration-200',
-                'hover:scale-105 active:scale-95',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-300'
-              )}
+              className="px-8 py-3 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
+              style={{ fontFamily: 'Space Grotesk, sans-serif' }}
             >
               Play Again
             </button>

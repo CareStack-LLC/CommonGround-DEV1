@@ -23,7 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.core.database import get_db
-from app.core.security import get_current_user, get_current_participant_user
+from app.core.security import get_current_user, get_current_participant_user, get_current_child_user
 from app.models.user import User
 from app.models.family_file import FamilyFile
 from app.models.circle import CircleContact
@@ -1114,6 +1114,53 @@ async def get_circle_call_history(
                 aria_terminated_call=session.aria_terminated_call,
                 has_recording=bool(session.recording_url),
             ))
+
+    return history
+
+
+@router.get("/child/my-history")
+async def get_child_call_history(
+    limit: int = 20,
+    offset: int = 0,
+    db: AsyncSession = Depends(get_db),
+    current_child: ChildUser = Depends(get_current_child_user)
+):
+    """
+    Get call history for the authenticated child.
+
+    Returns recent circle call sessions involving this child,
+    with contact names and call metadata.
+    """
+    # Get sessions for this child
+    result = await db.execute(
+        select(CircleCallSession)
+        .where(CircleCallSession.child_id == str(current_child.child_id))
+        .order_by(CircleCallSession.initiated_at.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    sessions = result.scalars().all()
+
+    history = []
+    for session in sessions:
+        # Get contact name
+        contact_result = await db.execute(
+            select(CircleContact).where(CircleContact.id == session.circle_contact_id)
+        )
+        contact = contact_result.scalar_one_or_none()
+        contact_name = contact.contact_name if contact else "Unknown"
+
+        history.append({
+            "id": str(session.id),
+            "contact_name": contact_name,
+            "contact_id": str(session.circle_contact_id),
+            "call_type": session.call_type,
+            "status": session.status,
+            "initiated_by_type": session.initiated_by_type,
+            "initiated_at": session.initiated_at.isoformat() if session.initiated_at else None,
+            "ended_at": session.ended_at.isoformat() if session.ended_at else None,
+            "duration_seconds": session.duration_seconds,
+        })
 
     return history
 
