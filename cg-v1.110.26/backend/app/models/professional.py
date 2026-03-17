@@ -521,7 +521,7 @@ class CaseAssignment(Base, UUIDMixin, TimestampMixin):
     # Access scopes (what they can see/do)
     access_scopes: Mapped[list] = mapped_column(JSON, default=list)
     # Uses existing AccessScope enum values from court.py:
-    # ["agreement", "schedule", "checkins", "messages", "financials", "compliance", "interventions"]
+    # ["agreement", "schedule", "checkins", "messages", "financials", "compliance", "interventions", "circle"]
 
     # ARIA controls
     can_control_aria: Mapped[bool] = mapped_column(Boolean, default=False)

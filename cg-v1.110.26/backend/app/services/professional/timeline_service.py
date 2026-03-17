@@ -27,6 +27,9 @@ from app.models.agreement import Agreement, AgreementVersion
 from app.models.court import CourtEvent
 from app.models.intake import IntakeSession
 from app.models.payment import Payment, ExpenseRequest
+from app.models.circle_message import CircleMessage
+from app.models.circle_call import CircleCallSession
+from app.models.circle import CircleContact
 
 
 class TimelineEventType(str, Enum):
@@ -44,6 +47,9 @@ class TimelineEventType(str, Enum):
     EXPENSE_REQUEST = "expense_request"
     PROFESSIONAL_ASSIGNED = "professional_assigned"
     PROFESSIONAL_MESSAGE = "professional_message"
+    CIRCLE_MESSAGE = "circle_message"
+    CIRCLE_CALL = "circle_call"
+    CIRCLE_CONTACT_CHANGE = "circle_contact_change"
 
 
 # =============================================================================
@@ -141,6 +147,36 @@ class CaseTimelineService:
             )
             events.extend(prof_messages)
 
+        # Circle events (messages, calls, contact changes)
+        circle_event_types = {
+            TimelineEventType.CIRCLE_MESSAGE,
+            TimelineEventType.CIRCLE_CALL,
+            TimelineEventType.CIRCLE_CONTACT_CHANGE,
+        }
+        if not event_types or circle_event_types.intersection(event_types):
+            if "circle" in scopes:
+                try:
+                    if not event_types or TimelineEventType.CIRCLE_MESSAGE in event_types:
+                        circle_msgs = await self._get_circle_message_events(
+                            family_file_id, start_date, end_date
+                        )
+                        events.extend(circle_msgs)
+
+                    if not event_types or TimelineEventType.CIRCLE_CALL in event_types:
+                        circle_calls = await self._get_circle_call_events(
+                            family_file_id, start_date, end_date
+                        )
+                        events.extend(circle_calls)
+
+                    if not event_types or TimelineEventType.CIRCLE_CONTACT_CHANGE in event_types:
+                        contact_changes = await self._get_circle_contact_change_events(
+                            family_file_id, start_date, end_date
+                        )
+                        events.extend(contact_changes)
+                except Exception:
+                    # Circle tables may not exist yet; don't break timeline
+                    pass
+
         # Sort by timestamp descending (most recent first)
         events.sort(key=lambda x: x["timestamp"], reverse=True)
 
@@ -223,6 +259,22 @@ class CaseTimelineService:
             summary["payment_count"] = await self._count_payments(
                 family_file_id, start_date
             )
+
+        if "circle" in scopes:
+            try:
+                summary["circle_message_count"] = await self._count_circle_messages(
+                    family_file_id, start_date
+                )
+                summary["circle_flagged_message_count"] = await self._count_flagged_circle_messages(
+                    family_file_id, start_date
+                )
+                summary["circle_call_count"] = await self._count_circle_calls(
+                    family_file_id, start_date
+                )
+            except Exception:
+                summary["circle_message_count"] = 0
+                summary["circle_flagged_message_count"] = 0
+                summary["circle_call_count"] = 0
 
         return summary
 
@@ -520,6 +572,173 @@ class CaseTimelineService:
         return events
 
     # -------------------------------------------------------------------------
+    # Circle Event Fetchers
+    # -------------------------------------------------------------------------
+
+    async def _get_circle_message_events(
+        self,
+        family_file_id: str,
+        start_date: Optional[datetime],
+        end_date: Optional[datetime],
+    ) -> list[dict]:
+        """Get circle message events (child ↔ contact/parent communication)."""
+        query = select(CircleMessage).where(
+            CircleMessage.family_file_id == family_file_id
+        )
+
+        if start_date:
+            query = query.where(CircleMessage.sent_at >= start_date)
+        if end_date:
+            query = query.where(CircleMessage.sent_at <= end_date)
+
+        query = query.order_by(desc(CircleMessage.sent_at)).limit(200)
+        result = await self.db.execute(query)
+
+        events = []
+        for msg in result.scalars().all():
+            is_flagged = msg.aria_flagged or msg.is_hidden
+            title = "Circle message flagged by ARIA" if is_flagged else "Circle message sent"
+            description = (
+                f"From {msg.sender_name} ({msg.sender_type}) — "
+                + (msg.content[:150] + "..." if len(msg.content) > 150 else msg.content)
+            )
+
+            events.append({
+                "id": f"cmsg-{msg.id}",
+                "event_type": TimelineEventType.CIRCLE_MESSAGE.value,
+                "timestamp": msg.sent_at,
+                "title": title,
+                "description": description,
+                "is_flagged": is_flagged,
+                "details": {
+                    "message_id": msg.id,
+                    "child_id": msg.child_id,
+                    "sender_id": msg.sender_id,
+                    "sender_type": msg.sender_type,
+                    "recipient_type": msg.recipient_type,
+                    "aria_flagged": msg.aria_flagged,
+                    "aria_category": msg.aria_category,
+                    "is_hidden": msg.is_hidden,
+                },
+            })
+
+        return events
+
+    async def _get_circle_call_events(
+        self,
+        family_file_id: str,
+        start_date: Optional[datetime],
+        end_date: Optional[datetime],
+    ) -> list[dict]:
+        """Get circle call session events."""
+        query = select(CircleCallSession).where(
+            CircleCallSession.family_file_id == family_file_id
+        )
+
+        if start_date:
+            query = query.where(CircleCallSession.initiated_at >= start_date)
+        if end_date:
+            query = query.where(CircleCallSession.initiated_at <= end_date)
+
+        query = query.order_by(desc(CircleCallSession.initiated_at)).limit(100)
+        result = await self.db.execute(query)
+
+        events = []
+        for session in result.scalars().all():
+            is_flagged = session.aria_terminated_call or session.aria_intervention_count > 0
+            status = session.status
+
+            if session.aria_terminated_call:
+                title = "Circle call terminated by ARIA"
+            elif status == "completed":
+                duration_str = ""
+                if session.duration_seconds:
+                    mins = session.duration_seconds // 60
+                    duration_str = f" ({mins} min)"
+                title = f"Circle {session.call_type} call completed{duration_str}"
+            elif status == "missed":
+                title = "Circle call missed"
+            else:
+                title = f"Circle {session.call_type} call — {status}"
+
+            events.append({
+                "id": f"ccall-{session.id}",
+                "event_type": TimelineEventType.CIRCLE_CALL.value,
+                "timestamp": session.started_at or session.initiated_at,
+                "title": title,
+                "description": f"Call type: {session.call_type}, status: {status}",
+                "is_flagged": is_flagged,
+                "details": {
+                    "session_id": session.id,
+                    "child_id": session.child_id,
+                    "circle_contact_id": session.circle_contact_id,
+                    "call_type": session.call_type,
+                    "status": status,
+                    "duration_seconds": session.duration_seconds,
+                    "aria_intervention_count": session.aria_intervention_count,
+                    "aria_terminated": session.aria_terminated_call,
+                    "overall_safety_score": session.overall_safety_score,
+                },
+            })
+
+        return events
+
+    async def _get_circle_contact_change_events(
+        self,
+        family_file_id: str,
+        start_date: Optional[datetime],
+        end_date: Optional[datetime],
+    ) -> list[dict]:
+        """Get circle contact addition/change events."""
+        query = select(CircleContact).where(
+            CircleContact.family_file_id == family_file_id
+        )
+
+        if start_date:
+            query = query.where(CircleContact.created_at >= start_date)
+        if end_date:
+            query = query.where(CircleContact.created_at <= end_date)
+
+        query = query.order_by(desc(CircleContact.created_at)).limit(50)
+        result = await self.db.execute(query)
+
+        events = []
+        for contact in result.scalars().all():
+            if not contact.is_active:
+                title = f"Circle contact blocked: {contact.contact_name}"
+                is_flagged = True
+            elif contact.is_fully_approved:
+                title = f"Circle contact approved: {contact.contact_name}"
+                is_flagged = False
+            elif contact.is_partially_approved:
+                title = f"Circle contact pending approval: {contact.contact_name}"
+                is_flagged = False
+            else:
+                title = f"Circle contact added: {contact.contact_name}"
+                is_flagged = False
+
+            events.append({
+                "id": f"ccontact-{contact.id}",
+                "event_type": TimelineEventType.CIRCLE_CONTACT_CHANGE.value,
+                "timestamp": contact.created_at,
+                "title": title,
+                "description": f"{contact.contact_name} ({contact.relationship_type})",
+                "is_flagged": is_flagged,
+                "details": {
+                    "contact_id": contact.id,
+                    "contact_name": contact.contact_name,
+                    "relationship_type": contact.relationship_type,
+                    "child_id": contact.child_id,
+                    "is_active": contact.is_active,
+                    "is_fully_approved": contact.is_fully_approved,
+                    "is_verified": contact.is_verified,
+                    "added_by": contact.added_by,
+                },
+            })
+
+        return events
+
+    # -------------------------------------------------------------------------
     # Count Helpers
     # -------------------------------------------------------------------------
 
@@ -634,6 +853,52 @@ class CaseTimelineService:
                 and_(
                     Payment.case_id == case_id,
                     Payment.created_at >= since,
+                )
+            )
+        )
+        return result.scalar() or 0
+
+    async def _count_circle_messages(
+        self,
+        family_file_id: str,
+        since: datetime,
+    ) -> int:
+        result = await self.db.execute(
+            select(func.count(CircleMessage.id)).where(
+                and_(
+                    CircleMessage.family_file_id == family_file_id,
+                    CircleMessage.sent_at >= since,
+                )
+            )
+        )
+        return result.scalar() or 0
+
+    async def _count_flagged_circle_messages(
+        self,
+        family_file_id: str,
+        since: datetime,
+    ) -> int:
+        result = await self.db.execute(
+            select(func.count(CircleMessage.id)).where(
+                and_(
+                    CircleMessage.family_file_id == family_file_id,
+                    CircleMessage.sent_at >= since,
+                    CircleMessage.aria_flagged == True,
+                )
+            )
+        )
+        return result.scalar() or 0
+
+    async def _count_circle_calls(
+        self,
+        family_file_id: str,
+        since: datetime,
+    ) -> int:
+        result = await self.db.execute(
+            select(func.count(CircleCallSession.id)).where(
+                and_(
+                    CircleCallSession.family_file_id == family_file_id,
+                    CircleCallSession.initiated_at >= since,
                 )
             )
         )

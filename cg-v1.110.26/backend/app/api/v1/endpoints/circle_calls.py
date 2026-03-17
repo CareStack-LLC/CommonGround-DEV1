@@ -643,6 +643,178 @@ async def end_circle_call(
     }
 
 
+@router.post("/{session_id}/terminate")
+async def terminate_circle_call(
+    session_id: str,
+    background_tasks: BackgroundTasks,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Terminate an active circle call as a parent.
+
+    Parent-only endpoint that forcefully ends an active call between a child
+    and a circle contact. Sets status to 'terminated_by_parent', broadcasts
+    a disconnect event via WebSocket, and sends push notifications to both
+    participants.
+
+    Args:
+        session_id: Call session ID
+
+    Returns:
+        Success message with duration
+
+    Raises:
+        404: Session not found
+        403: User not a parent in this family
+        400: Call is not active
+    """
+    from datetime import datetime, timezone
+    from app.services.push import push_service
+
+    # Get session
+    result = await db.execute(
+        select(CircleCallSession).where(CircleCallSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Circle call session not found"
+        )
+
+    # Verify the user is a parent in this family
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+
+    if not family_file or current_user.id not in [family_file.parent_a_id, family_file.parent_b_id]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only parents in this family can terminate calls"
+        )
+
+    # Must be an active or ringing call
+    if session.status not in [CircleCallStatus.ACTIVE.value, CircleCallStatus.RINGING.value]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Call is not active (current status: {session.status})"
+        )
+
+    # Stop recording and transcription if active
+    if session.status == CircleCallStatus.ACTIVE.value:
+        try:
+            await daily_service.stop_recording(session.daily_room_name)
+            await daily_service.stop_transcription(session.daily_room_name)
+            logger.info(f"Stopped recording/transcription for terminated session {session_id}")
+        except Exception as e:
+            logger.error(f"Failed to stop recording/transcription during terminate: {e}")
+
+    # Update session status
+    session.status = CircleCallStatus.TERMINATED_BY_PARENT.value
+    session.ended_at = datetime.now(timezone.utc)
+    if session.started_at:
+        session.duration_seconds = int((session.ended_at - session.started_at).total_seconds())
+    session.aria_termination_reason = f"Terminated by parent {current_user.id}"
+    await db.commit()
+
+    # Get contact and child for notifications
+    contact_result = await db.execute(
+        select(CircleContact).where(CircleContact.id == session.circle_contact_id)
+    )
+    contact = contact_result.scalar_one_or_none()
+
+    child_result = await db.execute(
+        select(Child).where(Child.id == session.child_id)
+    )
+    child = child_result.scalar_one_or_none()
+
+    # Broadcast WebSocket event to both participants so frontend disconnects
+    terminate_notification = {
+        "type": "circle_call_terminated_by_parent",
+        "session_id": str(session.id),
+        "terminated_by": str(current_user.id),
+        "message": "This call was ended by a parent.",
+    }
+
+    # Notify child user
+    cu_result = await db.execute(
+        select(ChildUser).where(ChildUser.child_id == session.child_id)
+    )
+    child_user = cu_result.scalar_one_or_none()
+    if child_user:
+        await manager.send_personal_message(
+            message=terminate_notification,
+            user_id=str(child_user.id)
+        )
+
+    # Notify circle contact user
+    ccu_result = await db.execute(
+        select(CircleUser).where(CircleUser.circle_contact_id == session.circle_contact_id)
+    )
+    circle_user = ccu_result.scalar_one_or_none()
+    if circle_user:
+        await manager.send_personal_message(
+            message=terminate_notification,
+            user_id=str(circle_user.id)
+        )
+
+    # Notify the other parent too
+    for parent_id in [family_file.parent_a_id, family_file.parent_b_id]:
+        if parent_id and parent_id != current_user.id:
+            await manager.send_personal_message(
+                message=terminate_notification,
+                user_id=str(parent_id)
+            )
+
+    # Send push notifications to both participants
+    child_name = child.display_name if child else "Your child"
+    contact_name = contact.contact_name if contact else "The contact"
+
+    # Push to child
+    if child_user:
+        try:
+            await push_service.send_notification(
+                db=db,
+                user_id=str(child_user.id),
+                title="Call Ended",
+                body=f"Your call with {contact_name} was ended by your parent.",
+            )
+        except Exception as e:
+            logger.error(f"Failed to send push to child: {e}")
+
+    # Push to contact
+    if circle_user:
+        try:
+            await push_service.send_notification(
+                db=db,
+                user_id=str(circle_user.id),
+                title="Call Ended",
+                body=f"Your call with {child_name} was ended by a parent.",
+            )
+        except Exception as e:
+            logger.error(f"Failed to send push to contact: {e}")
+
+    # Schedule post-call processing
+    if session.status == CircleCallStatus.TERMINATED_BY_PARENT.value:
+        background_tasks.add_task(
+            _process_circle_call_complete,
+            session_id=session_id,
+            room_name=session.daily_room_name,
+            family_file_id=str(session.family_file_id)
+        )
+
+    logger.info(f"Circle call session {session_id} terminated by parent {current_user.id}")
+
+    return {
+        "message": "Call terminated successfully",
+        "session_id": session_id,
+        "duration_seconds": session.duration_seconds,
+    }
+
+
 @router.post("/{session_id}/transcript-chunk")
 async def process_circle_call_transcript_chunk(
     session_id: str,

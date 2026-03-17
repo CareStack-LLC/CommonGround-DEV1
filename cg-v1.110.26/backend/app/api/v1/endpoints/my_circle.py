@@ -74,7 +74,15 @@ from app.schemas.kidcoms import (
 )
 from app.services import my_circle as my_circle_service
 from app.services.email import email_service
+from app.services.push import push_service
+from app.services.activity import ActivityService
+from app.models.activity import ActivityType
+from app.models.audit import EventLog
+from app.models.case import Case
 from app.core.config import settings
+
+import hashlib
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +115,78 @@ async def get_family_file_with_access(
         )
 
     return family_file
+
+
+async def _create_event_log(
+    db: AsyncSession,
+    family_file_id: str,
+    event_type: str,
+    category: str,
+    actor_id: Optional[str],
+    event_data: dict,
+    severity: str = "info",
+    related_user_id: Optional[str] = None,
+    related_resource_type: Optional[str] = None,
+    related_resource_id: Optional[str] = None,
+    source: str = "api",
+):
+    """
+    Create an immutable EventLog entry for court-evidence chain of custody.
+
+    Non-fatal: failures are logged but do not affect the calling operation.
+    """
+    try:
+        from sqlalchemy import func, desc as sql_desc
+
+        # Find the case associated with this family file
+        case_result = await db.execute(
+            select(Case).where(Case.family_file_id == family_file_id).limit(1)
+        )
+        case = case_result.scalar_one_or_none()
+        if not case:
+            return
+
+        # Get the next sequence number for this case
+        seq_result = await db.execute(
+            select(func.coalesce(func.max(EventLog.sequence_number), 0)).where(
+                EventLog.case_id == str(case.id)
+            )
+        )
+        next_seq = (seq_result.scalar() or 0) + 1
+
+        # Get previous hash for chain linking
+        prev_result = await db.execute(
+            select(EventLog.content_hash)
+            .where(EventLog.case_id == str(case.id))
+            .order_by(sql_desc(EventLog.sequence_number))
+            .limit(1)
+        )
+        previous_hash = prev_result.scalar_one_or_none()
+
+        # Compute content hash
+        from datetime import datetime as dt
+        content_str = json.dumps(event_data, sort_keys=True, default=str)
+        content_hash = hashlib.sha256(content_str.encode()).hexdigest()
+
+        event_log = EventLog(
+            event_type=event_type,
+            case_id=str(case.id),
+            actor_id=actor_id,
+            event_timestamp=dt.utcnow(),
+            event_data=event_data,
+            content_hash=content_hash,
+            previous_hash=previous_hash,
+            sequence_number=next_seq,
+            source=source,
+            category=category,
+            severity=severity,
+            related_user_id=related_user_id,
+            related_resource_type=related_resource_type,
+            related_resource_id=related_resource_id,
+        )
+        db.add(event_log)
+    except Exception as e:
+        logger.error(f"Failed to create EventLog ({event_type}): {e}")
 
 
 def _room_to_response(room: KidComsRoom, contact: Optional[CircleContact] = None) -> KidComsRoomResponse:
@@ -475,6 +555,43 @@ async def invite_circle_user(
         )
         logger.info(f"Circle invitation email sent to {circle_user.email}")
 
+        # Court-evidence EventLog entry
+        await _create_event_log(
+            db=db,
+            family_file_id=contact.family_file_id,
+            event_type="circle_contact_invited",
+            category="custody",
+            actor_id=str(current_user.id),
+            related_resource_type="circle_contact",
+            related_resource_id=str(contact.id),
+            event_data={
+                "contact_name": contact.contact_name,
+                "contact_email": circle_user.email,
+                "relationship_type": contact.relationship_type,
+                "invited_by": inviter_name,
+                "room_number": contact.room_number,
+            },
+        )
+
+        # Activity feed entry
+        try:
+            await ActivityService.create_activity(
+                db=db,
+                family_file_id=contact.family_file_id,
+                activity_type=ActivityType.CIRCLE_CONTACT_ADDED.value,
+                actor_id=str(current_user.id),
+                actor_name=inviter_name,
+                subject_type="circle_contact",
+                subject_id=str(contact.id),
+                subject_name=contact.contact_name,
+                title=f"{inviter_name} invited {contact.contact_name} to the circle",
+                description=f"Invitation sent to {circle_user.email}",
+            )
+        except Exception as e:
+            logger.error(f"Failed to log circle invite activity: {e}")
+
+        await db.commit()
+
         return CircleUserInviteResponse(
             id=circle_user.id,
             circle_contact_id=circle_user.circle_contact_id,
@@ -607,6 +724,43 @@ async def create_and_invite_circle_user(
             relationship=invite_data.relationship_type or "family member",
         )
         logger.info(f"Circle invitation email sent to {invite_data.email}")
+
+        # Court-evidence EventLog entry
+        await _create_event_log(
+            db=db,
+            family_file_id=invite_data.family_file_id,
+            event_type="circle_contact_invited",
+            category="custody",
+            actor_id=str(current_user.id),
+            related_resource_type="circle_contact",
+            related_resource_id=str(contact.id),
+            event_data={
+                "contact_name": invite_data.contact_name,
+                "contact_email": invite_data.email,
+                "relationship_type": invite_data.relationship_type,
+                "invited_by": inviter_name,
+                "room_number": contact.room_number,
+            },
+        )
+
+        # Activity feed entry
+        try:
+            await ActivityService.create_activity(
+                db=db,
+                family_file_id=invite_data.family_file_id,
+                activity_type=ActivityType.CIRCLE_CONTACT_ADDED.value,
+                actor_id=str(current_user.id),
+                actor_name=inviter_name,
+                subject_type="circle_contact",
+                subject_id=str(contact.id),
+                subject_name=invite_data.contact_name,
+                title=f"{inviter_name} invited {invite_data.contact_name} to the circle",
+                description=f"Invitation sent to {invite_data.email}",
+            )
+        except Exception as e:
+            logger.error(f"Failed to log circle invite activity: {e}")
+
+        await db.commit()
 
         return CircleUserInviteResponse(
             id=circle_user.id,
@@ -769,6 +923,74 @@ async def accept_circle_invite(
             "family_file_id": contact.family_file_id if contact else None,
         }
         token = create_access_token(token_data)
+
+        # Notify the inviting parent(s) that the invite was accepted
+        contact_name = contact.contact_name if contact else "A contact"
+        family_file_id = contact.family_file_id if contact else None
+
+        if family_file_id:
+            try:
+                ff_result = await db.execute(
+                    select(FamilyFile).where(FamilyFile.id == family_file_id)
+                )
+                family_file = ff_result.scalar_one_or_none()
+                if family_file:
+                    # Notify both parents
+                    for parent_id in [family_file.parent_a_id, family_file.parent_b_id]:
+                        if parent_id:
+                            try:
+                                await push_service.send_notification(
+                                    db=db,
+                                    user_id=parent_id,
+                                    title="Circle Invite Accepted",
+                                    body=f"Your circle invitation was accepted by {contact_name}",
+                                    url="/my-circle/contact",
+                                    tag=f"circle-invite-accepted-{circle_user.circle_contact_id}",
+                                    data={
+                                        "type": "circle_invite_accepted",
+                                        "contact_id": str(circle_user.circle_contact_id),
+                                        "contact_name": contact_name,
+                                    },
+                                )
+                            except Exception as e:
+                                logger.error(f"Failed to send invite-accepted notification to parent {parent_id}: {e}")
+            except Exception as e:
+                logger.error(f"Failed to send invite-accepted notifications: {e}")
+
+            # Court-evidence EventLog entry
+            await _create_event_log(
+                db=db,
+                family_file_id=family_file_id,
+                event_type="circle_invite_accepted",
+                category="custody",
+                actor_id=str(circle_user.circle_contact_id),
+                related_resource_type="circle_contact",
+                related_resource_id=str(circle_user.circle_contact_id),
+                event_data={
+                    "contact_name": contact_name,
+                    "contact_email": circle_user.email,
+                    "accepted_at": datetime.utcnow().isoformat(),
+                },
+            )
+
+            # Activity feed entry
+            try:
+                await ActivityService.create_activity(
+                    db=db,
+                    family_file_id=family_file_id,
+                    activity_type=ActivityType.CIRCLE_INVITE_ACCEPTED.value,
+                    actor_id=str(circle_user.circle_contact_id),
+                    actor_name=contact_name,
+                    subject_type="circle_contact",
+                    subject_id=str(circle_user.circle_contact_id),
+                    subject_name=contact_name,
+                    title=f"{contact_name} accepted the circle invitation",
+                    description=f"{contact_name} can now communicate with children in the circle",
+                )
+            except Exception as e:
+                logger.error(f"Failed to log circle invite-accepted activity: {e}")
+
+            await db.commit()
 
         return CircleUserLoginResponse(
             access_token=token,
@@ -1701,6 +1923,17 @@ async def update_permission(
 
     await get_family_file_with_access(db, permission.family_file_id, current_user.id)
 
+    # Capture old values before update for audit trail
+    old_values = {
+        "can_video_call": permission.can_video_call,
+        "can_voice_call": permission.can_voice_call,
+        "can_chat": permission.can_chat,
+        "can_theater": permission.can_theater,
+        "allowed_days": permission.allowed_days,
+        "allowed_start_time": permission.allowed_start_time,
+        "allowed_end_time": permission.allowed_end_time,
+    }
+
     # Update fields
     update_fields = update_data.model_dump(exclude_unset=True)
     for field, value in update_fields.items():
@@ -1708,6 +1941,59 @@ async def update_permission(
             setattr(permission, field, value)
 
     permission.set_by_parent_id = current_user.id
+
+    # Capture new values after update
+    new_values = {
+        "can_video_call": permission.can_video_call,
+        "can_voice_call": permission.can_voice_call,
+        "can_chat": permission.can_chat,
+        "can_theater": permission.can_theater,
+        "allowed_days": permission.allowed_days,
+        "allowed_start_time": permission.allowed_start_time,
+        "allowed_end_time": permission.allowed_end_time,
+    }
+
+    actor_name = f"{current_user.first_name or ''} {current_user.last_name or ''}".strip() or "Parent"
+    contact_name = permission.circle_contact.contact_name if permission.circle_contact else "Contact"
+    child_name = permission.child.first_name if permission.child else "Child"
+
+    # Court-evidence EventLog entry with old/new values
+    await _create_event_log(
+        db=db,
+        family_file_id=permission.family_file_id,
+        event_type="circle_permission_updated",
+        category="custody",
+        actor_id=str(current_user.id),
+        related_resource_type="circle_permission",
+        related_resource_id=str(permission_id),
+        related_user_id=str(permission.circle_contact_id) if permission.circle_contact_id else None,
+        event_data={
+            "contact_name": contact_name,
+            "child_name": child_name,
+            "old_values": old_values,
+            "new_values": new_values,
+            "changed_fields": [k for k in update_fields.keys() if old_values.get(k) != new_values.get(k)],
+        },
+    )
+
+    # Activity feed entry
+    try:
+        changed_summary = ", ".join(k.replace("_", " ") for k in update_fields.keys())
+        await ActivityService.create_activity(
+            db=db,
+            family_file_id=permission.family_file_id,
+            activity_type=ActivityType.CIRCLE_PERMISSION_CHANGED.value,
+            actor_id=str(current_user.id),
+            actor_name=actor_name,
+            subject_type="circle_permission",
+            subject_id=str(permission_id),
+            subject_name=contact_name,
+            title=f"{actor_name} updated permissions for {contact_name}",
+            description=f"Changed: {changed_summary} (for {child_name})",
+            extra_data={"old_values": old_values, "new_values": new_values},
+        )
+    except Exception as e:
+        logger.error(f"Failed to log circle permission activity: {e}")
 
     await db.commit()
     await db.refresh(permission)

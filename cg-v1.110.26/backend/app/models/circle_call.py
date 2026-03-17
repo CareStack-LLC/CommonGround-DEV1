@@ -47,6 +47,7 @@ class CircleCallStatus(str, Enum):
     MISSED = "missed"  # Call not answered
     CANCELLED = "cancelled"  # Call cancelled before starting
     TERMINATED = "terminated"  # Call ended by ARIA for safety
+    TERMINATED_BY_PARENT = "terminated_by_parent"  # Call ended by parent
 
 
 class CircleCallSeverity(str, Enum):

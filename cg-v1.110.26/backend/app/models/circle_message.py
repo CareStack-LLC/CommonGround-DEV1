@@ -54,6 +54,12 @@ class CircleMessage(Base, UUIDMixin, TimestampMixin):
     content: Mapped[str] = mapped_column(Text)
     original_content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Stored if ARIA modifies
 
+    # Attachment (optional media/file)
+    attachment_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    attachment_type: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)  # image, video, file
+    attachment_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    attachment_size: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # bytes
+
     # ARIA child-safety analysis
     aria_analyzed: Mapped[bool] = mapped_column(Boolean, default=False)
     aria_flagged: Mapped[bool] = mapped_column(Boolean, default=False)

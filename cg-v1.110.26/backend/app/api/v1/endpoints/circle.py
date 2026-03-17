@@ -5,10 +5,13 @@ The Circle is a list of trusted contacts (grandparents, family friends, etc.)
 that a child can communicate with through KidComs.
 """
 
+import hashlib
+import json
+import logging
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select, and_, or_, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -18,6 +21,11 @@ from app.models.family_file import FamilyFile
 from app.models.child import Child
 from app.models.circle import CircleContact, ApprovalMode
 from app.models.kidcoms import KidComsSettings
+from app.models.audit import EventLog
+from app.models.case import Case
+from app.models.activity import ActivityType
+from app.services.activity import ActivityService
+from app.services.push import push_service
 from app.schemas.circle import (
     CircleContactCreate,
     CircleContactUpdate,
@@ -28,6 +36,8 @@ from app.schemas.circle import (
     CircleContactInviteResponse,
     RELATIONSHIP_CHOICES,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -55,6 +65,75 @@ async def get_family_file_with_access(
         )
 
     return family_file
+
+
+async def _create_event_log(
+    db: AsyncSession,
+    family_file_id: str,
+    event_type: str,
+    category: str,
+    actor_id: Optional[str],
+    event_data: dict,
+    severity: str = "info",
+    related_user_id: Optional[str] = None,
+    related_resource_type: Optional[str] = None,
+    related_resource_id: Optional[str] = None,
+    source: str = "api",
+):
+    """
+    Create an immutable EventLog entry for court-evidence chain of custody.
+
+    Non-fatal: failures are logged but do not affect the calling operation.
+    """
+    try:
+        # Find the case associated with this family file
+        case_result = await db.execute(
+            select(Case).where(Case.family_file_id == family_file_id).limit(1)
+        )
+        case = case_result.scalar_one_or_none()
+        if not case:
+            return
+
+        # Get the next sequence number for this case
+        seq_result = await db.execute(
+            select(func.coalesce(func.max(EventLog.sequence_number), 0)).where(
+                EventLog.case_id == str(case.id)
+            )
+        )
+        next_seq = (seq_result.scalar() or 0) + 1
+
+        # Get previous hash for chain linking
+        prev_result = await db.execute(
+            select(EventLog.content_hash)
+            .where(EventLog.case_id == str(case.id))
+            .order_by(desc(EventLog.sequence_number))
+            .limit(1)
+        )
+        previous_hash = prev_result.scalar_one_or_none()
+
+        # Compute content hash
+        content_str = json.dumps(event_data, sort_keys=True, default=str)
+        content_hash = hashlib.sha256(content_str.encode()).hexdigest()
+
+        event_log = EventLog(
+            event_type=event_type,
+            case_id=str(case.id),
+            actor_id=actor_id,
+            event_timestamp=datetime.utcnow(),
+            event_data=event_data,
+            content_hash=content_hash,
+            previous_hash=previous_hash,
+            sequence_number=next_seq,
+            source=source,
+            category=category,
+            severity=severity,
+            related_user_id=related_user_id,
+            related_resource_type=related_resource_type,
+            related_resource_id=related_resource_id,
+        )
+        db.add(event_log)
+    except Exception as e:
+        logger.error(f"Failed to create EventLog ({event_type}): {e}")
 
 
 async def get_approval_mode(db: AsyncSession, family_file_id: str) -> ApprovalMode:
@@ -295,10 +374,75 @@ async def delete_circle_contact(
         )
 
     # Verify access
-    await get_family_file_with_access(db, contact.family_file_id, current_user.id)
+    family_file = await get_family_file_with_access(db, contact.family_file_id, current_user.id)
+
+    actor_name = f"{current_user.first_name or ''} {current_user.last_name or ''}".strip() or "Parent"
+    contact_name = contact.contact_name or "Contact"
 
     # Soft delete
     contact.is_active = False
+
+    # Court-evidence EventLog entry
+    await _create_event_log(
+        db=db,
+        family_file_id=contact.family_file_id,
+        event_type="circle_contact_blocked",
+        category="custody",
+        actor_id=str(current_user.id),
+        severity="warning",
+        related_resource_type="circle_contact",
+        related_resource_id=str(contact.id),
+        event_data={
+            "contact_name": contact_name,
+            "contact_email": contact.contact_email,
+            "relationship_type": contact.relationship_type,
+            "blocked_by": actor_name,
+            "room_number": contact.room_number,
+        },
+    )
+
+    # Notify the other parent that a contact was blocked
+    other_parent_id = (
+        family_file.parent_b_id
+        if str(family_file.parent_a_id) == str(current_user.id)
+        else family_file.parent_a_id
+    )
+    if other_parent_id:
+        try:
+            await push_service.send_notification(
+                db=db,
+                user_id=other_parent_id,
+                title="Circle Contact Removed",
+                body=f"{actor_name} removed {contact_name} from the circle",
+                url="/my-circle/contact",
+                tag=f"circle-contact-blocked-{contact.id}",
+                data={
+                    "type": "circle_contact_blocked",
+                    "contact_id": str(contact.id),
+                    "contact_name": contact_name,
+                },
+            )
+        except Exception as e:
+            logger.error(f"Failed to send contact-blocked notification: {e}")
+
+    # Activity feed entry
+    try:
+        await ActivityService.create_activity(
+            db=db,
+            family_file_id=contact.family_file_id,
+            activity_type=ActivityType.CIRCLE_CONTACT_BLOCKED.value,
+            actor_id=str(current_user.id),
+            actor_name=actor_name,
+            subject_type="circle_contact",
+            subject_id=str(contact.id),
+            subject_name=contact_name,
+            title=f"{actor_name} removed {contact_name} from the circle",
+            description=f"{contact_name} can no longer communicate with children",
+            severity="warning",
+        )
+    except Exception as e:
+        logger.error(f"Failed to log circle contact-blocked activity: {e}")
+
     await db.commit()
 
 

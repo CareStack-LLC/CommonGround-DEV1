@@ -25,6 +25,12 @@ class CircleMessageCreate(BaseModel):
     )
     content: str = Field(..., min_length=1, max_length=2000, description="Message text content")
 
+    # Optional attachment fields (set after uploading via /upload-attachment)
+    attachment_url: Optional[str] = Field(None, description="URL of the uploaded attachment")
+    attachment_type: Optional[str] = Field(None, pattern=r"^(image|video|file)$", description="Attachment type")
+    attachment_name: Optional[str] = Field(None, max_length=255, description="Original filename")
+    attachment_size: Optional[int] = Field(None, ge=0, description="File size in bytes")
+
 
 # ============================================================
 # Response Schemas
@@ -48,6 +54,12 @@ class CircleMessageResponse(BaseModel):
     # Content
     content: str
     original_content: Optional[str] = None
+
+    # Attachment
+    attachment_url: Optional[str] = None
+    attachment_type: Optional[str] = None
+    attachment_name: Optional[str] = None
+    attachment_size: Optional[int] = None
 
     # ARIA analysis
     aria_analyzed: bool = False

@@ -76,7 +76,7 @@
           <td style="padding-left: 12px;">
             <strong style="color: #2D3A35;">Safe Messaging</strong>
             <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
-              Send messages that parents can review for safety
+              Send messages monitored by ARIA for child safety &mdash; parents are notified of all communications
             </p>
           </td>
         </tr>
@@ -119,8 +119,15 @@
 </div>
 
 <!-- Safety Note -->
-<p style="color: #94A3A0; font-size: 13px; text-align: center; margin: 0;">
-  All communication is monitored by parents for {{ child_name }}'s safety.
-  This is a child-safe platform designed with families in mind.
-</p>
+<div style="background-color: #F0F5F4; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+  <p style="color: #2D3A35; font-size: 13px; font-weight: 600; margin: 0 0 8px 0;">
+    Child Safety Commitment
+  </p>
+  <p style="color: #6B7B74; font-size: 13px; margin: 0; line-height: 1.6;">
+    All communication on CommonGround is monitored by <strong>ARIA</strong>, our AI child-safety system.
+    Messages and calls are analyzed in real-time to protect {{ child_name }}.
+    Parents can review all communications at any time. By accepting this invitation,
+    you agree to these safety monitoring terms.
+  </p>
+</div>
 {% endblock %}

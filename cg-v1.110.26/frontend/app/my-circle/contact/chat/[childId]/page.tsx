@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Send, Shield, Loader2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Send, Shield, Loader2, AlertTriangle, Paperclip, X, FileText } from 'lucide-react';
 import { circleMessagesAPI, CircleMessageData } from '@/lib/api';
 import { useRealtimeCircleMessages } from '@/hooks/use-realtime-circle-messages';
 import { cn } from '@/lib/utils';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
 export default function ContactChatPage() {
   const router = useRouter();
@@ -19,6 +22,12 @@ export default function ContactChatPage() {
   const [childName, setChildName] = useState('');
   const [contactId, setContactId] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // Attachment state
+  const [pendingAttachment, setPendingAttachment] = useState<File | null>(null);
+  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -54,6 +63,13 @@ export default function ContactChatPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (attachmentPreview) URL.revokeObjectURL(attachmentPreview);
+    };
+  }, [attachmentPreview]);
 
   async function loadChat() {
     try {
@@ -94,19 +110,68 @@ export default function ContactChatPage() {
     }
   }
 
-  async function handleSend() {
-    if (!newMessage.trim() || isSending) return;
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const content = newMessage.trim();
+    const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      setError(`File type not allowed. Accepted: ${ALLOWED_EXTENSIONS.join(', ')}`);
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setError('File too large. Maximum size is 10 MB.');
+      return;
+    }
+
+    if (attachmentPreview) URL.revokeObjectURL(attachmentPreview);
+    const previewUrl = URL.createObjectURL(file);
+    setAttachmentPreview(previewUrl);
+    setPendingAttachment(file);
+    setError(null);
+
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }
+
+  function clearAttachment() {
+    if (attachmentPreview) URL.revokeObjectURL(attachmentPreview);
+    setAttachmentPreview(null);
+    setPendingAttachment(null);
+  }
+
+  async function handleSend() {
+    if ((!newMessage.trim() && !pendingAttachment) || isSending) return;
+
+    const content = newMessage.trim() || (pendingAttachment ? 'Sent an image' : '');
+    const currentAttachment = pendingAttachment;
     setNewMessage('');
+    clearAttachment();
     setIsSending(true);
 
     try {
+      let attachmentData: { url: string; type: string; name: string; size: number } | undefined;
+
+      if (currentAttachment) {
+        setIsUploading(true);
+        try {
+          attachmentData = await circleMessagesAPI.uploadAttachmentAsContact(currentAttachment);
+        } finally {
+          setIsUploading(false);
+        }
+      }
+
       const sent = await circleMessagesAPI.sendAsContact({
         child_id: childId,
         recipient_id: childId,
         recipient_type: 'child',
         content,
+        ...(attachmentData && {
+          attachment_url: attachmentData.url,
+          attachment_type: attachmentData.type,
+          attachment_name: attachmentData.name,
+          attachment_size: attachmentData.size,
+        }),
       });
 
       setMessages((prev) => {
@@ -208,9 +273,51 @@ export default function ContactChatPage() {
         </div>
       )}
 
+      {/* Attachment Preview */}
+      {attachmentPreview && (
+        <div className="px-4 py-2 bg-card/80 border-t border-border">
+          <div className="relative inline-block">
+            <img
+              src={attachmentPreview}
+              alt="Attachment preview"
+              className="h-20 w-20 object-cover rounded-lg border border-border"
+            />
+            <button
+              onClick={clearAttachment}
+              className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+              aria-label="Remove attachment"
+            >
+              <X className="w-3 h-3 text-white" />
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
+            {pendingAttachment?.name} ({((pendingAttachment?.size || 0) / 1024).toFixed(0)} KB)
+          </p>
+        </div>
+      )}
+
       {/* Compose Area */}
       <div className="px-4 py-3 bg-card/80 backdrop-blur-sm border-t border-border">
         <div className="flex items-center gap-2 max-w-3xl mx-auto">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+
+          {/* Attachment button */}
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isSending}
+            className="p-3 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-teal-500"
+            aria-label="Attach image"
+          >
+            <Paperclip className="w-5 h-5" />
+          </button>
+
           <input
             ref={inputRef}
             type="text"
@@ -225,10 +332,10 @@ export default function ContactChatPage() {
           />
           <button
             onClick={handleSend}
-            disabled={!newMessage.trim() || isSending}
+            disabled={(!newMessage.trim() && !pendingAttachment) || isSending}
             className={cn(
               'p-3 rounded-xl transition-all duration-200',
-              newMessage.trim()
+              (newMessage.trim() || pendingAttachment)
                 ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-md hover:shadow-lg hover:scale-105 active:scale-95'
                 : 'bg-muted text-muted-foreground cursor-not-allowed',
             )}
@@ -298,9 +405,39 @@ function MessageBubble({
           </p>
         )}
 
-        <p className="text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
-          {message.content}
-        </p>
+        {/* Attachment display */}
+        {message.attachment_url && message.attachment_type === 'image' && (
+          <div className="mb-2">
+            <img
+              src={message.attachment_url}
+              alt={message.attachment_name || 'Image'}
+              className="rounded-lg max-w-full max-h-60 object-cover cursor-pointer"
+              onClick={() => window.open(message.attachment_url!, '_blank')}
+              loading="lazy"
+            />
+          </div>
+        )}
+
+        {message.attachment_url && message.attachment_type !== 'image' && (
+          <a
+            href={message.attachment_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              'flex items-center gap-2 mb-2 px-3 py-2 rounded-lg text-sm',
+              isMine ? 'bg-white/20 hover:bg-white/30' : 'bg-background hover:bg-muted',
+            )}
+          >
+            <FileText className="w-4 h-4 flex-shrink-0" />
+            <span className="truncate">{message.attachment_name || 'File'}</span>
+          </a>
+        )}
+
+        {message.content && (
+          <p className="text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+            {message.content}
+          </p>
+        )}
 
         <div className="flex items-center justify-end gap-1 mt-1">
           {/* ARIA flag indicator */}

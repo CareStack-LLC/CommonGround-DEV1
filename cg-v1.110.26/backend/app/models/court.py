@@ -47,6 +47,7 @@ class AccessScope(str, Enum):
     FINANCIALS = "financials"
     COMPLIANCE = "compliance"
     INTERVENTIONS = "interventions"  # ARIA data
+    CIRCLE = "circle"  # My Circle contacts, messages, and calls
 
 
 class GrantStatus(str, Enum):

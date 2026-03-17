@@ -46,6 +46,16 @@ class ActivityType(str, Enum):
     EXPENSE_REQUESTED = "expense_requested"
     EXPENSE_APPROVED = "expense_approved"
 
+    # My Circle
+    CIRCLE_MESSAGE_SENT = "circle_message_sent"
+    CIRCLE_MESSAGE_FLAGGED = "circle_message_flagged"
+    CIRCLE_CONTACT_ADDED = "circle_contact_added"
+    CIRCLE_CONTACT_BLOCKED = "circle_contact_blocked"
+    CIRCLE_PERMISSION_CHANGED = "circle_permission_changed"
+    CIRCLE_CALL_STARTED = "circle_call_started"
+    CIRCLE_CALL_ENDED = "circle_call_ended"
+    CIRCLE_INVITE_ACCEPTED = "circle_invite_accepted"
+
     # System
     INVITATION_SENT = "invitation_sent"
     INVITATION_ACCEPTED = "invitation_accepted"
@@ -87,6 +97,14 @@ ACTIVITY_CATEGORY_MAP = {
     ActivityType.AGREEMENT_APPROVED: ActivityCategory.CUSTODY,
     ActivityType.EXPENSE_REQUESTED: ActivityCategory.FINANCIAL,
     ActivityType.EXPENSE_APPROVED: ActivityCategory.FINANCIAL,
+    ActivityType.CIRCLE_MESSAGE_SENT: ActivityCategory.COMMUNICATION,
+    ActivityType.CIRCLE_MESSAGE_FLAGGED: ActivityCategory.COMMUNICATION,
+    ActivityType.CIRCLE_CONTACT_ADDED: ActivityCategory.CUSTODY,
+    ActivityType.CIRCLE_CONTACT_BLOCKED: ActivityCategory.CUSTODY,
+    ActivityType.CIRCLE_PERMISSION_CHANGED: ActivityCategory.CUSTODY,
+    ActivityType.CIRCLE_CALL_STARTED: ActivityCategory.COMMUNICATION,
+    ActivityType.CIRCLE_CALL_ENDED: ActivityCategory.COMMUNICATION,
+    ActivityType.CIRCLE_INVITE_ACCEPTED: ActivityCategory.SYSTEM,
     ActivityType.INVITATION_SENT: ActivityCategory.SYSTEM,
     ActivityType.INVITATION_ACCEPTED: ActivityCategory.SYSTEM,
 }
@@ -109,6 +127,14 @@ ACTIVITY_ICON_MAP = {
     ActivityType.AGREEMENT_APPROVED: "check",
     ActivityType.EXPENSE_REQUESTED: "wallet",
     ActivityType.EXPENSE_APPROVED: "check",
+    ActivityType.CIRCLE_MESSAGE_SENT: "message",
+    ActivityType.CIRCLE_MESSAGE_FLAGGED: "alert",
+    ActivityType.CIRCLE_CONTACT_ADDED: "users",
+    ActivityType.CIRCLE_CONTACT_BLOCKED: "shield",
+    ActivityType.CIRCLE_PERMISSION_CHANGED: "settings",
+    ActivityType.CIRCLE_CALL_STARTED: "video",
+    ActivityType.CIRCLE_CALL_ENDED: "video",
+    ActivityType.CIRCLE_INVITE_ACCEPTED: "check",
     ActivityType.INVITATION_SENT: "mail",
     ActivityType.INVITATION_ACCEPTED: "users",
 }

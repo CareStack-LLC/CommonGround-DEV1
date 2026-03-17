@@ -13,10 +13,14 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 
+from sqlalchemy import func
+
 from app.services.professional.aria_control_service import ARIAControlService
 from app.models.family_file import FamilyFile
 from app.models.user import User
 from app.models.message import Message, MessageFlag
+from app.models.circle_message import CircleMessage
+from app.models.circle_call import CircleCallSession, CircleCallFlag
 
 
 class ARIAAnalysisReport:
@@ -63,6 +67,11 @@ class ARIAAnalysisReport:
             filtered_interventions[:10]  # Top 10 most severe
         )
 
+        # Circle ARIA data (child safety monitoring)
+        circle_aria_data = await self._build_circle_aria_section(
+            family_file_id, start_date, end_date
+        )
+
         return {
             "report_type": "aria_analysis",
             "metadata": {
@@ -85,7 +94,9 @@ class ARIAAnalysisReport:
                 "intervention_rate": aria_metrics.get("intervention_rate", 0),
                 "escalations": aria_metrics.get("escalations", 0),
                 "threat_count": sum(1 for i in filtered_interventions if "threat" in i.get("flag_type", "").lower()),
-                "trend": "increasing" if len(filtered_interventions) > 10 else "stable"
+                "trend": "increasing" if len(filtered_interventions) > 10 else "stable",
+                "circle_flagged_messages": circle_aria_data.get("flagged_messages", 0),
+                "circle_terminated_calls": circle_aria_data.get("terminated_calls", 0),
             },
             "intervention_breakdown": {
                 "by_type": self._count_by_type(filtered_interventions),
@@ -94,7 +105,10 @@ class ARIAAnalysisReport:
             },
             "intervention_examples": intervention_examples,
             "communication_patterns": self._analyze_patterns(filtered_interventions),
-            "recommendations": self._build_recommendations(filtered_interventions)
+            "circle_aria_activity": circle_aria_data,
+            "recommendations": self._build_recommendations(
+                filtered_interventions, circle_aria_data
+            ),
         }
 
     def _count_by_type(self, interventions: list) -> dict:
@@ -162,7 +176,103 @@ class ARIAAnalysisReport:
             "escalation_trend": "increasing" if len(interventions) > 15 else "stable"
         }
 
-    def _build_recommendations(self, interventions: list) -> list:
+    async def _build_circle_aria_section(
+        self,
+        family_file_id: str,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> dict:
+        """Build circle ARIA child-safety section for the analysis report."""
+        section = {
+            "total_circle_messages": 0,
+            "flagged_messages": 0,
+            "hidden_messages": 0,
+            "flagged_categories": {},
+            "total_calls": 0,
+            "terminated_calls": 0,
+            "call_aria_interventions": 0,
+            "call_flags_by_severity": {"low": 0, "medium": 0, "high": 0, "severe": 0},
+        }
+
+        try:
+            # Circle message ARIA stats
+            msg_result = await self.db.execute(
+                select(
+                    func.count(CircleMessage.id),
+                    func.count(CircleMessage.id).filter(CircleMessage.aria_flagged == True),
+                    func.count(CircleMessage.id).filter(CircleMessage.is_hidden == True),
+                ).where(
+                    and_(
+                        CircleMessage.family_file_id == family_file_id,
+                        CircleMessage.sent_at >= start_date,
+                        CircleMessage.sent_at <= end_date,
+                    )
+                )
+            )
+            row = msg_result.one()
+            section["total_circle_messages"] = row[0] or 0
+            section["flagged_messages"] = row[1] or 0
+            section["hidden_messages"] = row[2] or 0
+
+            # Flagged categories breakdown
+            flagged_msgs_result = await self.db.execute(
+                select(CircleMessage.aria_category, func.count(CircleMessage.id)).where(
+                    and_(
+                        CircleMessage.family_file_id == family_file_id,
+                        CircleMessage.sent_at >= start_date,
+                        CircleMessage.sent_at <= end_date,
+                        CircleMessage.aria_flagged == True,
+                        CircleMessage.aria_category.isnot(None),
+                    )
+                ).group_by(CircleMessage.aria_category)
+            )
+            for cat_row in flagged_msgs_result.all():
+                section["flagged_categories"][cat_row[0]] = cat_row[1]
+
+            # Circle call ARIA stats
+            call_result = await self.db.execute(
+                select(
+                    func.count(CircleCallSession.id),
+                    func.count(CircleCallSession.id).filter(
+                        CircleCallSession.aria_terminated_call == True
+                    ),
+                    func.coalesce(func.sum(CircleCallSession.aria_intervention_count), 0),
+                ).where(
+                    and_(
+                        CircleCallSession.family_file_id == family_file_id,
+                        CircleCallSession.initiated_at >= start_date,
+                        CircleCallSession.initiated_at <= end_date,
+                    )
+                )
+            )
+            crow = call_result.one()
+            section["total_calls"] = crow[0] or 0
+            section["terminated_calls"] = crow[1] or 0
+            section["call_aria_interventions"] = int(crow[2] or 0)
+
+            # Call flags by severity
+            flag_result = await self.db.execute(
+                select(CircleCallFlag.severity, func.count(CircleCallFlag.id)).join(
+                    CircleCallSession
+                ).where(
+                    and_(
+                        CircleCallSession.family_file_id == family_file_id,
+                        CircleCallSession.initiated_at >= start_date,
+                        CircleCallSession.initiated_at <= end_date,
+                    )
+                ).group_by(CircleCallFlag.severity)
+            )
+            for frow in flag_result.all():
+                if frow[0] in section["call_flags_by_severity"]:
+                    section["call_flags_by_severity"][frow[0]] = frow[1]
+
+        except Exception:
+            # Circle tables may not be migrated yet; return empty section
+            pass
+
+        return section
+
+    def _build_recommendations(self, interventions: list, circle_data: Optional[dict] = None) -> list:
         """Build recommendations based on ARIA data."""
         recommendations = []
 
@@ -184,5 +294,32 @@ class ARIAAnalysisReport:
                 "priority": "medium",
                 "recommendation": "Recommend parenting coordinator appointment to mediate communication"
             })
+
+        # Circle child-safety recommendations
+        if circle_data:
+            if circle_data.get("terminated_calls", 0) > 0:
+                recommendations.append({
+                    "priority": "urgent",
+                    "recommendation": (
+                        f"{circle_data['terminated_calls']} circle call(s) terminated by ARIA child safety — "
+                        "review and restrict contact permissions immediately"
+                    )
+                })
+            if circle_data.get("hidden_messages", 0) > 0:
+                recommendations.append({
+                    "priority": "high",
+                    "recommendation": (
+                        f"{circle_data['hidden_messages']} circle message(s) hidden due to severe safety flags — "
+                        "assess whether contact should remain in child's circle"
+                    )
+                })
+            if circle_data.get("flagged_messages", 0) > 3:
+                recommendations.append({
+                    "priority": "medium",
+                    "recommendation": (
+                        "Pattern of flagged circle messages detected — "
+                        "consider supervised-only communication for affected contacts"
+                    )
+                })
 
         return recommendations

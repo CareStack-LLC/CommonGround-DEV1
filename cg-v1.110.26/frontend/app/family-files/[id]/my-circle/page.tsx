@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, use, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Users,
   Plus,
@@ -25,7 +25,7 @@ import {
   Sparkles,
   Home as HomeIcon,
 } from 'lucide-react';
-import { myCircleAPI, familyFilesAPI, circleAPI, KidComsRoom, CirclePermission, FamilyFileChild, CircleContact } from '@/lib/api';
+import { myCircleAPI, familyFilesAPI, circleAPI, circleMessagesAPI, KidComsRoom, CirclePermission, FamilyFileChild, CircleContact, CircleMessageData } from '@/lib/api';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
 import { PageContainer } from '@/components/layout';
@@ -39,16 +39,16 @@ interface PageParams {
 }
 
 const ROOM_COLORS = [
-  'bg-red-100 border-red-300 text-red-700',
-  'bg-orange-100 border-orange-300 text-orange-700',
-  'bg-amber-100 border-amber-300 text-amber-700',
-  'bg-yellow-100 border-yellow-300 text-yellow-700',
-  'bg-lime-100 border-lime-300 text-lime-700',
-  'bg-green-100 border-green-300 text-green-700',
-  'bg-teal-100 border-teal-300 text-teal-700',
-  'bg-cyan-100 border-cyan-300 text-cyan-700',
-  'bg-blue-100 border-blue-300 text-blue-700',
-  'bg-purple-100 border-purple-300 text-purple-700',
+  'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-700 dark:text-red-300',
+  'bg-orange-100 dark:bg-orange-900/30 border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300',
+  'bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300',
+  'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700 text-yellow-700 dark:text-yellow-300',
+  'bg-lime-100 dark:bg-lime-900/30 border-lime-300 dark:border-lime-700 text-lime-700 dark:text-lime-300',
+  'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-700 dark:text-green-300',
+  'bg-teal-100 dark:bg-teal-900/30 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300',
+  'bg-cyan-100 dark:bg-cyan-900/30 border-cyan-300 dark:border-cyan-700 text-cyan-700 dark:text-cyan-300',
+  'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300',
+  'bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300',
 ];
 
 const RELATIONSHIP_OPTIONS = [
@@ -67,13 +67,35 @@ const RELATIONSHIP_OPTIONS = [
 ];
 
 export default function MyCircleManagementPage({ params }: PageParams) {
+  return (
+    <Suspense fallback={
+      <ProtectedRoute>
+        <div className="min-h-screen bg-background pb-20 lg:pb-0">
+          <Navigation />
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="w-14 h-14 border-3 border-teal-500/20 border-t-teal-500 rounded-full animate-spin" />
+            <p className="mt-4 text-muted-foreground font-medium">Loading My Circle...</p>
+          </div>
+        </div>
+      </ProtectedRoute>
+    }>
+      <MyCircleContent params={params} />
+    </Suspense>
+  );
+}
+
+function MyCircleContent({ params }: PageParams) {
   const resolvedParams = use(params);
   const familyFileId = resolvedParams.id;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'messages' ? 'messages' : 'contacts';
+  const [activeTab, setActiveTab] = useState<'contacts' | 'messages'>(initialTab);
 
   const [isLoading, setIsLoading] = useState(true);
   const [rooms, setRooms] = useState<KidComsRoom[]>([]);
   const [contacts, setContacts] = useState<CircleContact[]>([]);
+  const [permissions, setPermissions] = useState<CirclePermission[]>([]);
 
   // Contact limit gate - Free: 0, Plus: 1, Complete: 5
   const contactLimitGate = useLimitGate('circle_contacts_limit', contacts.length);
@@ -119,14 +141,16 @@ export default function MyCircleManagementPage({ params }: PageParams) {
   async function loadData() {
     try {
       setIsLoading(true);
-      const [roomList, childrenList, contactsList] = await Promise.all([
+      const [roomList, childrenList, contactsList, permissionsList] = await Promise.all([
         myCircleAPI.getRooms(familyFileId),
         familyFilesAPI.getChildren(familyFileId),
         circleAPI.list(familyFileId),
+        myCircleAPI.listPermissions(familyFileId).catch(() => ({ items: [], total: 0 })),
       ]);
       setRooms(roomList.items);
       setChildren(childrenList.items);
       setContacts(contactsList.items);
+      setPermissions(permissionsList.items);
       // Pre-select first child if available
       if (childrenList.items.length > 0 && !selectedChildId) {
         setSelectedChildId(childrenList.items[0].id);
@@ -435,7 +459,44 @@ export default function MyCircleManagementPage({ params }: PageParams) {
               </button>
             </div>
 
+            {/* Tab Switcher */}
+            <div className="flex gap-1 bg-muted/50 rounded-xl p-1">
+              <button
+                onClick={() => setActiveTab('contacts')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
+                  activeTab === 'contacts'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <Users className="h-4 w-4" />
+                Contacts
+                <span className="text-xs bg-muted px-1.5 py-0.5 rounded-full">{contacts.length}</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('messages')}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold transition-all ${
+                  activeTab === 'messages'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                <MessageCircle className="h-4 w-4" />
+                Messages
+              </button>
+            </div>
+
+            {/* Messages Tab */}
+            {activeTab === 'messages' && (
+              <MessagesSection
+                familyFileId={familyFileId}
+                children={children}
+                contacts={contacts}
+              />
+            )}
+
             {/* Circle Contacts */}
+            {activeTab === 'contacts' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Circle Contacts</h2>
@@ -580,27 +641,34 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                             {/* Edit Button */}
                             <button
                               onClick={() => {
-                                // Find permission for this contact and open modal
-                                // For now, create a mock permission object
-                                const mockPermission: CirclePermission = {
-                                  id: contact.id,
-                                  circle_contact_id: contact.id,
-                                  child_id: '',
-                                  family_file_id: familyFileId,
-                                  can_video_call: true,
-                                  can_voice_call: true,
-                                  can_chat: false,
-                                  can_theater: true,
-                                  allowed_start_time: undefined,
-                                  allowed_end_time: undefined,
-                                  allowed_days: undefined,
-                                  is_within_allowed_time: true,
-                                  max_call_duration_minutes: 60,
-                                  require_parent_present: false,
-                                  created_at: '',
-                                  updated_at: '',
-                                };
-                                openPermissionModal(mockPermission);
+                                // Find real permission for this contact
+                                const realPermission = permissions.find(
+                                  (p) => p.circle_contact_id === contact.id
+                                );
+                                if (realPermission) {
+                                  openPermissionModal(realPermission);
+                                } else {
+                                  // Fallback: create default permission if none exists yet
+                                  const defaultPermission: CirclePermission = {
+                                    id: contact.id,
+                                    circle_contact_id: contact.id,
+                                    child_id: children.length > 0 ? children[0].id : '',
+                                    family_file_id: familyFileId,
+                                    can_video_call: true,
+                                    can_voice_call: true,
+                                    can_chat: false,
+                                    can_theater: true,
+                                    allowed_start_time: undefined,
+                                    allowed_end_time: undefined,
+                                    allowed_days: undefined,
+                                    is_within_allowed_time: true,
+                                    max_call_duration_minutes: 60,
+                                    require_parent_present: false,
+                                    created_at: '',
+                                    updated_at: '',
+                                  };
+                                  openPermissionModal(defaultPermission);
+                                }
                               }}
                               className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
                               title="Edit permissions"
@@ -641,6 +709,7 @@ export default function MyCircleManagementPage({ params }: PageParams) {
                 </div>
               )}
             </div>
+            )}
           </div>
         </PageContainer>
 
@@ -1039,5 +1108,204 @@ export default function MyCircleManagementPage({ params }: PageParams) {
         )}
       </div>
     </ProtectedRoute>
+  );
+}
+
+// --- Messages Section Component ---
+interface MessagesSectionProps {
+  familyFileId: string;
+  children: FamilyFileChild[];
+  contacts: CircleContact[];
+}
+
+interface ConversationPreview {
+  childId: string;
+  childName: string;
+  contactId: string;
+  contactName: string;
+  contactRelationship: string;
+  lastMessage?: string;
+  lastMessageAt?: string;
+  senderName?: string;
+}
+
+function MessagesSection({ familyFileId, children: childrenList, contacts }: MessagesSectionProps) {
+  const router = useRouter();
+  const [conversations, setConversations] = useState<ConversationPreview[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadConversations();
+  }, [childrenList, contacts]);
+
+  async function loadConversations() {
+    if (childrenList.length === 0 || contacts.length === 0) {
+      setConversations([]);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const previews: ConversationPreview[] = [];
+
+      // For each child-contact pair, try to fetch the most recent message
+      const approvedContacts = contacts.filter((c) => c.can_communicate && c.is_active !== false);
+
+      for (const child of childrenList) {
+        for (const contact of approvedContacts) {
+          try {
+            const result = await circleMessagesAPI.getConversationAsParent(child.id, contact.id, 0, 1);
+            const lastMsg = result.items.length > 0 ? result.items[0] : undefined;
+            previews.push({
+              childId: child.id,
+              childName: child.first_name,
+              contactId: contact.id,
+              contactName: contact.contact_name,
+              contactRelationship: contact.relationship_type,
+              lastMessage: lastMsg?.content,
+              lastMessageAt: lastMsg?.sent_at,
+              senderName: lastMsg?.sender_name,
+            });
+          } catch {
+            // Conversation may not exist yet — still show the pair
+            previews.push({
+              childId: child.id,
+              childName: child.first_name,
+              contactId: contact.id,
+              contactName: contact.contact_name,
+              contactRelationship: contact.relationship_type,
+            });
+          }
+        }
+      }
+
+      // Sort: conversations with messages first, then by most recent
+      previews.sort((a, b) => {
+        if (a.lastMessageAt && !b.lastMessageAt) return -1;
+        if (!a.lastMessageAt && b.lastMessageAt) return 1;
+        if (a.lastMessageAt && b.lastMessageAt) {
+          return new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime();
+        }
+        return 0;
+      });
+
+      setConversations(previews);
+    } catch (err) {
+      console.error('Error loading conversations:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  function formatTimeAgo(dateStr: string): string {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-teal-500" />
+        <p className="mt-3 text-muted-foreground text-sm">Loading conversations...</p>
+      </div>
+    );
+  }
+
+  if (conversations.length === 0) {
+    return (
+      <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-12 text-center">
+        <div className="w-20 h-20 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mx-auto mb-6">
+          <MessageCircle className="h-10 w-10 text-teal-500" />
+        </div>
+        <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          No conversations yet
+        </h3>
+        <p className="text-muted-foreground">
+          {contacts.length === 0
+            ? 'Invite contacts to your circle to start messaging'
+            : 'Messages between your children and approved contacts will appear here'}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+          Conversations
+        </h2>
+        <span className="text-sm text-muted-foreground font-medium">
+          {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
+        </span>
+      </div>
+
+      <div className="space-y-2">
+        {conversations.map((convo) => (
+          <button
+            key={`${convo.childId}-${convo.contactId}`}
+            onClick={() => router.push(`/family-files/${familyFileId}/my-circle/messages/${convo.childId}/${convo.contactId}`)}
+            className="w-full bg-card border-2 border-border rounded-2xl shadow-sm hover:shadow-lg hover:border-teal-300 transition-all p-4 text-left"
+          >
+            <div className="flex items-center gap-3">
+              {/* Avatar */}
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500/10 to-purple-500/10 flex items-center justify-center text-lg flex-shrink-0">
+                {convo.contactRelationship === 'grandparent' ? '👴' :
+                 convo.contactRelationship === 'aunt' ? '👩' :
+                 convo.contactRelationship === 'uncle' ? '👨' : '💜'}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-foreground text-sm truncate">
+                    {convo.contactName}
+                  </h3>
+                  <span className="text-xs text-muted-foreground">
+                    &amp; {convo.childName}
+                  </span>
+                </div>
+                {convo.lastMessage ? (
+                  <p className="text-sm text-muted-foreground truncate mt-0.5">
+                    <span className="font-medium">{convo.senderName}: </span>
+                    {convo.lastMessage}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic mt-0.5">
+                    No messages yet — tap to start a conversation
+                  </p>
+                )}
+              </div>
+
+              {/* Timestamp */}
+              {convo.lastMessageAt && (
+                <span className="text-xs text-muted-foreground flex-shrink-0">
+                  {formatTimeAgo(convo.lastMessageAt)}
+                </span>
+              )}
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {/* ARIA Safety Note */}
+      <div className="bg-muted/30 border border-border rounded-xl p-3 flex items-start gap-2">
+        <Sparkles className="h-4 w-4 text-teal-500 mt-0.5 flex-shrink-0" />
+        <p className="text-xs text-muted-foreground">
+          All messages are monitored by <strong className="text-foreground">ARIA</strong> for child safety. You can view any conversation and send messages as a parent.
+        </p>
+      </div>
+    </div>
   );
 }

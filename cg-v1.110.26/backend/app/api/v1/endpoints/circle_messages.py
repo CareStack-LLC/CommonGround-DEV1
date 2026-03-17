@@ -6,12 +6,14 @@ Supports child ↔ circle contacts, child ↔ parents communication.
 Parents are always notified of all child messages.
 """
 
+import hashlib
+import json
 import logging
 from datetime import datetime
 from typing import Optional
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, File, UploadFile
 from sqlalchemy import select, and_, or_, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -28,6 +30,8 @@ from app.models.kidcoms import (
     KidComsCommunicationLog,
 )
 from app.models.circle_message import CircleMessage, SenderType
+from app.models.audit import EventLog
+from app.models.case import Case
 from app.schemas.circle_message import (
     CircleMessageCreate,
     CircleMessageResponse,
@@ -39,6 +43,14 @@ from app.schemas.circle_message import (
 from app.services.aria_child_chat import ARIAChildChatMonitor
 from app.services.push import push_service
 from app.services.realtime import RealtimeService
+from app.services.activity import ActivityService
+from app.models.activity import ActivityType
+from app.services.storage import (
+    storage_service,
+    StorageBucket,
+    sanitize_filename,
+    ALLOWED_IMAGE_TYPES,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -64,6 +76,22 @@ async def _validate_chat_permission(
 
     Returns the CirclePermission if valid, raises HTTPException otherwise.
     """
+    # Check that the contact is active (not blocked/removed)
+    contact_result = await db.execute(
+        select(CircleContact).where(
+            and_(
+                CircleContact.id == contact_id,
+                CircleContact.is_active == True,
+            )
+        )
+    )
+    contact = contact_result.scalar_one_or_none()
+    if not contact:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Contact is blocked or has been removed",
+        )
+
     result = await db.execute(
         select(CirclePermission).where(
             and_(
@@ -173,6 +201,76 @@ async def _send_message_notifications(
             logger.error(f"Failed to process recipient notification: {e}")
 
 
+async def _create_event_log(
+    db: AsyncSession,
+    family_file_id: str,
+    event_type: str,
+    category: str,
+    actor_id: Optional[str],
+    event_data: dict,
+    severity: str = "info",
+    related_user_id: Optional[str] = None,
+    related_resource_type: Optional[str] = None,
+    related_resource_id: Optional[str] = None,
+    source: str = "api",
+):
+    """
+    Create an immutable EventLog entry for court-evidence chain of custody.
+
+    Non-fatal: failures are logged but do not affect the calling operation.
+    """
+    try:
+        # Find the case associated with this family file
+        case_result = await db.execute(
+            select(Case).where(Case.family_file_id == family_file_id).limit(1)
+        )
+        case = case_result.scalar_one_or_none()
+        if not case:
+            # No case linked to this family file; skip EventLog
+            return
+
+        # Get the next sequence number for this case
+        seq_result = await db.execute(
+            select(func.coalesce(func.max(EventLog.sequence_number), 0)).where(
+                EventLog.case_id == str(case.id)
+            )
+        )
+        next_seq = (seq_result.scalar() or 0) + 1
+
+        # Get previous hash for chain linking
+        prev_result = await db.execute(
+            select(EventLog.content_hash)
+            .where(EventLog.case_id == str(case.id))
+            .order_by(desc(EventLog.sequence_number))
+            .limit(1)
+        )
+        previous_hash = prev_result.scalar_one_or_none()
+
+        # Compute content hash
+        content_str = json.dumps(event_data, sort_keys=True, default=str)
+        content_hash = hashlib.sha256(content_str.encode()).hexdigest()
+
+        event_log = EventLog(
+            event_type=event_type,
+            case_id=str(case.id),
+            actor_id=actor_id,
+            event_timestamp=datetime.utcnow(),
+            event_data=event_data,
+            content_hash=content_hash,
+            previous_hash=previous_hash,
+            sequence_number=next_seq,
+            source=source,
+            category=category,
+            severity=severity,
+            related_user_id=related_user_id,
+            related_resource_type=related_resource_type,
+            related_resource_id=related_resource_id,
+        )
+        db.add(event_log)
+    except Exception as e:
+        logger.error(f"Failed to create EventLog ({event_type}): {e}")
+
+
 async def _create_communication_log(
     db: AsyncSession,
     message: CircleMessage,
@@ -198,6 +296,206 @@ async def _create_communication_log(
         db.add(log)
     except Exception as e:
         logger.error(f"Failed to create communication log: {e}")
+
+
+# ============================================================
+# POST /circle-messages/upload-attachment — Upload media/file
+# ============================================================
+
+MAX_CIRCLE_ATTACHMENT_SIZE = 10 * 1024 * 1024  # 10 MB
+ALLOWED_CIRCLE_ATTACHMENT_TYPES = {
+    "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp",
+}
+ALLOWED_CIRCLE_ATTACHMENT_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+
+@router.post("/upload-attachment", status_code=status.HTTP_200_OK)
+async def upload_circle_attachment(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Upload a media attachment for a circle message.
+
+    Accepts image files (jpg, png, gif, webp) up to 10 MB.
+    Uploads to Supabase storage and returns the URL + metadata.
+    This is a parent-auth endpoint; child and contact uploads
+    go through their own upload endpoints below.
+    """
+    import os
+
+    # Validate file extension
+    _, ext = os.path.splitext(file.filename or "")
+    if ext.lower() not in ALLOWED_CIRCLE_ATTACHMENT_EXTENSIONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File type '{ext}' not allowed. Accepted: {', '.join(ALLOWED_CIRCLE_ATTACHMENT_EXTENSIONS)}",
+        )
+
+    # Read file content
+    file_content = await file.read()
+    file_size = len(file_content)
+
+    # Validate size
+    if file_size > MAX_CIRCLE_ATTACHMENT_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File too large ({file_size / 1024 / 1024:.1f} MB). Maximum is 10 MB.",
+        )
+
+    # Validate content type
+    content_type = file.content_type or "application/octet-stream"
+    if content_type not in ALLOWED_CIRCLE_ATTACHMENT_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Content type '{content_type}' not allowed.",
+        )
+
+    # Determine attachment type category
+    attachment_type = "image"
+
+    # Build storage path
+    unique_id = str(uuid4())[:8]
+    safe_name = sanitize_filename(file.filename or "attachment")
+    storage_path = f"circle-messages/{unique_id}_{safe_name}"
+
+    try:
+        file_url = await storage_service.upload_file(
+            bucket=StorageBucket.MESSAGE_ATTACHMENTS,
+            path=storage_path,
+            file_content=file_content,
+            content_type=content_type,
+        )
+    except Exception as e:
+        logger.error(f"Failed to upload circle attachment: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload file",
+        )
+
+    return {
+        "url": file_url,
+        "type": attachment_type,
+        "name": file.filename or "attachment",
+        "size": file_size,
+    }
+
+
+@router.post("/upload-attachment/child", status_code=status.HTTP_200_OK)
+async def upload_circle_attachment_as_child(
+    file: UploadFile = File(...),
+    current_child: ChildUser = Depends(get_current_child_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload a media attachment as a child user."""
+    import os
+
+    _, ext = os.path.splitext(file.filename or "")
+    if ext.lower() not in ALLOWED_CIRCLE_ATTACHMENT_EXTENSIONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File type '{ext}' not allowed. Accepted: {', '.join(ALLOWED_CIRCLE_ATTACHMENT_EXTENSIONS)}",
+        )
+
+    file_content = await file.read()
+    file_size = len(file_content)
+
+    if file_size > MAX_CIRCLE_ATTACHMENT_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File too large ({file_size / 1024 / 1024:.1f} MB). Maximum is 10 MB.",
+        )
+
+    content_type = file.content_type or "application/octet-stream"
+    if content_type not in ALLOWED_CIRCLE_ATTACHMENT_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Content type '{content_type}' not allowed.",
+        )
+
+    unique_id = str(uuid4())[:8]
+    safe_name = sanitize_filename(file.filename or "attachment")
+    storage_path = f"circle-messages/{unique_id}_{safe_name}"
+
+    try:
+        file_url = await storage_service.upload_file(
+            bucket=StorageBucket.MESSAGE_ATTACHMENTS,
+            path=storage_path,
+            file_content=file_content,
+            content_type=content_type,
+        )
+    except Exception as e:
+        logger.error(f"Failed to upload circle attachment (child): {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload file",
+        )
+
+    return {
+        "url": file_url,
+        "type": "image",
+        "name": file.filename or "attachment",
+        "size": file_size,
+    }
+
+
+@router.post("/upload-attachment/contact", status_code=status.HTTP_200_OK)
+async def upload_circle_attachment_as_contact(
+    file: UploadFile = File(...),
+    current_circle_user: CircleUser = Depends(get_current_circle_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload a media attachment as a circle contact."""
+    import os
+
+    _, ext = os.path.splitext(file.filename or "")
+    if ext.lower() not in ALLOWED_CIRCLE_ATTACHMENT_EXTENSIONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File type '{ext}' not allowed. Accepted: {', '.join(ALLOWED_CIRCLE_ATTACHMENT_EXTENSIONS)}",
+        )
+
+    file_content = await file.read()
+    file_size = len(file_content)
+
+    if file_size > MAX_CIRCLE_ATTACHMENT_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File too large ({file_size / 1024 / 1024:.1f} MB). Maximum is 10 MB.",
+        )
+
+    content_type = file.content_type or "application/octet-stream"
+    if content_type not in ALLOWED_CIRCLE_ATTACHMENT_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Content type '{content_type}' not allowed.",
+        )
+
+    unique_id = str(uuid4())[:8]
+    safe_name = sanitize_filename(file.filename or "attachment")
+    storage_path = f"circle-messages/{unique_id}_{safe_name}"
+
+    try:
+        file_url = await storage_service.upload_file(
+            bucket=StorageBucket.MESSAGE_ATTACHMENTS,
+            path=storage_path,
+            file_content=file_content,
+            content_type=content_type,
+        )
+    except Exception as e:
+        logger.error(f"Failed to upload circle attachment (contact): {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to upload file",
+        )
+
+    return {
+        "url": file_url,
+        "type": "image",
+        "name": file.filename or "attachment",
+        "size": file_size,
+    }
 
 
 # ============================================================
@@ -244,6 +542,11 @@ async def send_circle_message_as_child(
         sender_name=child.first_name or "Child",
     )
 
+    # Build ARIA content including attachment note
+    aria_content = data.content
+    if data.attachment_url:
+        aria_content += " [Attachment sent: image/media file — ARIA cannot analyze image content yet]"
+
     # Create message
     message = CircleMessage(
         id=str(uuid4()),
@@ -256,6 +559,10 @@ async def send_circle_message_as_child(
         recipient_type=data.recipient_type,
         content=data.content if not analysis.suggested_rewrite else analysis.suggested_rewrite,
         original_content=data.content if analysis.suggested_rewrite else None,
+        attachment_url=data.attachment_url,
+        attachment_type=data.attachment_type,
+        attachment_name=data.attachment_name,
+        attachment_size=data.attachment_size,
         aria_analyzed=True,
         aria_flagged=analysis.should_flag,
         aria_category=analysis.category.value if analysis.category else None,
@@ -273,6 +580,49 @@ async def send_circle_message_as_child(
 
     # Push notifications
     await _send_message_notifications(db, message, family_file_id, child.first_name or "Child")
+
+    # Activity feed logging
+    try:
+        activity_type = ActivityType.CIRCLE_MESSAGE_FLAGGED if analysis.should_flag else ActivityType.CIRCLE_MESSAGE_SENT
+        attachment_note = " with attachment" if data.attachment_url else ""
+        await ActivityService.create_activity(
+            db=db,
+            family_file_id=family_file_id,
+            activity_type=activity_type.value,
+            actor_id=str(current_child.child_id),
+            actor_name=child.first_name or "Child",
+            subject_type="circle_message",
+            subject_id=message.id,
+            subject_name=child.first_name,
+            title=f"{child.first_name or 'Child'} sent a message{attachment_note}" + (" (flagged by ARIA)" if analysis.should_flag else ""),
+            description=f"Circle message from {child.first_name} to {data.recipient_type}",
+            severity="warning" if analysis.should_flag else "info",
+        )
+    except Exception as e:
+        logger.error(f"Failed to log circle message activity: {e}")
+
+    # Court-evidence EventLog entry
+    await _create_event_log(
+        db=db,
+        family_file_id=family_file_id,
+        event_type="circle_message_sent",
+        category="communication",
+        actor_id=str(current_child.child_id),
+        severity="warning" if analysis.should_flag else "info",
+        related_resource_type="circle_message",
+        related_resource_id=message.id,
+        event_data={
+            "sender_type": SenderType.CHILD,
+            "sender_name": child.first_name or "Child",
+            "recipient_type": str(data.recipient_type),
+            "recipient_id": data.recipient_id,
+            "child_id": data.child_id,
+            "message_id": message.id,
+            "aria_flagged": analysis.should_flag,
+            "aria_category": analysis.category.value if analysis.category else None,
+            "has_attachment": bool(data.attachment_url),
+        },
+    )
 
     # Broadcast realtime event
     try:
@@ -345,6 +695,10 @@ async def send_circle_message_as_contact(
         recipient_type=SenderType.CHILD,
         content=data.content if not analysis.suggested_rewrite else analysis.suggested_rewrite,
         original_content=data.content if analysis.suggested_rewrite else None,
+        attachment_url=data.attachment_url,
+        attachment_type=data.attachment_type,
+        attachment_name=data.attachment_name,
+        attachment_size=data.attachment_size,
         aria_analyzed=True,
         aria_flagged=analysis.should_flag,
         aria_category=analysis.category.value if analysis.category else None,
@@ -359,6 +713,48 @@ async def send_circle_message_as_contact(
 
     await _create_communication_log(db, message, family_file_id)
     await _send_message_notifications(db, message, family_file_id, child_name)
+
+    # Activity feed logging
+    try:
+        activity_type = ActivityType.CIRCLE_MESSAGE_FLAGGED if analysis.should_flag else ActivityType.CIRCLE_MESSAGE_SENT
+        await ActivityService.create_activity(
+            db=db,
+            family_file_id=family_file_id,
+            activity_type=activity_type.value,
+            actor_id=str(current_circle_user.contact_id),
+            actor_name=contact_name,
+            subject_type="circle_message",
+            subject_id=message.id,
+            subject_name=child_name,
+            title=f"{contact_name} sent a message to {child_name}" + (" (flagged by ARIA)" if analysis.should_flag else ""),
+            description=f"Circle contact message to {child_name}",
+            severity="warning" if analysis.should_flag else "info",
+        )
+    except Exception as e:
+        logger.error(f"Failed to log circle message activity: {e}")
+
+    # Court-evidence EventLog entry
+    await _create_event_log(
+        db=db,
+        family_file_id=family_file_id,
+        event_type="circle_message_sent",
+        category="communication",
+        actor_id=str(current_circle_user.contact_id),
+        severity="warning" if analysis.should_flag else "info",
+        related_resource_type="circle_message",
+        related_resource_id=message.id,
+        event_data={
+            "sender_type": SenderType.CIRCLE_CONTACT,
+            "sender_name": contact_name,
+            "recipient_type": SenderType.CHILD,
+            "recipient_id": data.child_id,
+            "child_id": data.child_id,
+            "message_id": message.id,
+            "aria_flagged": analysis.should_flag,
+            "aria_category": analysis.category.value if analysis.category else None,
+            "has_attachment": bool(data.attachment_url),
+        },
+    )
 
     try:
         await realtime_service.broadcast_to_family_file(
@@ -437,6 +833,10 @@ async def send_circle_message_as_parent(
         recipient_id=data.child_id,
         recipient_type=SenderType.CHILD,
         content=data.content,
+        attachment_url=data.attachment_url,
+        attachment_type=data.attachment_type,
+        attachment_name=data.attachment_name,
+        attachment_size=data.attachment_size,
         aria_analyzed=True,
         aria_flagged=analysis.should_flag,
         aria_category=analysis.category.value if analysis.category else None,
@@ -465,6 +865,44 @@ async def send_circle_message_as_parent(
             )
         except Exception as e:
             logger.error(f"Failed to notify other parent: {e}")
+
+    # Activity feed logging
+    try:
+        await ActivityService.create_activity(
+            db=db,
+            family_file_id=family_file.id,
+            activity_type=ActivityType.CIRCLE_MESSAGE_SENT.value,
+            actor_id=str(current_user.id),
+            actor_name=sender_name,
+            subject_type="circle_message",
+            subject_id=message.id,
+            subject_name=child.first_name,
+            title=f"{sender_name} sent a message to {child.first_name or 'child'}",
+            description="Parent message via My Circle",
+        )
+    except Exception as e:
+        logger.error(f"Failed to log circle message activity: {e}")
+
+    # Court-evidence EventLog entry
+    await _create_event_log(
+        db=db,
+        family_file_id=family_file.id,
+        event_type="circle_message_sent",
+        category="communication",
+        actor_id=str(current_user.id),
+        related_resource_type="circle_message",
+        related_resource_id=message.id,
+        event_data={
+            "sender_type": str(sender_type),
+            "sender_name": sender_name,
+            "recipient_type": SenderType.CHILD,
+            "recipient_id": data.child_id,
+            "child_id": data.child_id,
+            "message_id": message.id,
+            "aria_flagged": analysis.should_flag,
+            "has_attachment": bool(data.attachment_url),
+        },
+    )
 
     try:
         await realtime_service.broadcast_to_family_file(

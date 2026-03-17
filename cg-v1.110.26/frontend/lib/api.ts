@@ -7119,6 +7119,10 @@ export interface CircleMessageData {
   recipient_type: string;
   content: string;
   original_content?: string;
+  attachment_url?: string;
+  attachment_type?: string;  // "image" | "video" | "file"
+  attachment_name?: string;
+  attachment_size?: number;
   aria_analyzed: boolean;
   aria_flagged: boolean;
   aria_category?: string;
@@ -7162,6 +7166,33 @@ export const circleMessagesAPI = {
   // ==========================================================================
 
   /**
+   * Upload an attachment as a child (child auth)
+   */
+  async uploadAttachmentAsChild(file: File): Promise<{ url: string; type: string; name: string; size: number }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = getChildAuthToken();
+    if (!token) throw new Error('Child not authenticated');
+
+    const response = await fetch(
+      `${API_URL}/circle-messages/upload-attachment/child`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(error.detail || 'Failed to upload attachment');
+    }
+
+    return response.json();
+  },
+
+  /**
    * Send a message as a child (child auth)
    */
   async sendAsChild(data: {
@@ -7169,6 +7200,10 @@ export const circleMessagesAPI = {
     recipient_id: string;
     recipient_type: string;
     content: string;
+    attachment_url?: string;
+    attachment_type?: string;
+    attachment_name?: string;
+    attachment_size?: number;
   }): Promise<CircleMessageData> {
     return fetchAPIWithChildAuth<CircleMessageData>('/circle-messages/', {
       method: 'POST',
@@ -7213,6 +7248,33 @@ export const circleMessagesAPI = {
   // ==========================================================================
 
   /**
+   * Upload an attachment as a circle contact (circle auth)
+   */
+  async uploadAttachmentAsContact(file: File): Promise<{ url: string; type: string; name: string; size: number }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = getCircleAuthToken();
+    if (!token) throw new Error('Circle user not authenticated');
+
+    const response = await fetch(
+      `${API_URL}/circle-messages/upload-attachment/contact`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(error.detail || 'Failed to upload attachment');
+    }
+
+    return response.json();
+  },
+
+  /**
    * Send a message as a circle contact (circle auth)
    */
   async sendAsContact(data: {
@@ -7220,6 +7282,10 @@ export const circleMessagesAPI = {
     recipient_id: string;
     recipient_type: string;
     content: string;
+    attachment_url?: string;
+    attachment_type?: string;
+    attachment_name?: string;
+    attachment_size?: number;
   }): Promise<CircleMessageData> {
     return fetchAPIWithCircleAuth<CircleMessageData>('/circle-messages/from-contact', {
       method: 'POST',
@@ -7264,6 +7330,33 @@ export const circleMessagesAPI = {
   // ==========================================================================
 
   /**
+   * Upload an attachment as a parent (parent auth)
+   */
+  async uploadAttachmentAsParent(file: File): Promise<{ url: string; type: string; name: string; size: number }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = localStorage.getItem('access_token');
+    const response = await fetch(
+      `${API_URL}/circle-messages/upload-attachment`,
+      {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(error.detail || 'Failed to upload attachment');
+    }
+
+    return response.json();
+  },
+
+  /**
    * Send a message as a parent to their child (parent auth)
    */
   async sendAsParent(data: {
@@ -7271,6 +7364,10 @@ export const circleMessagesAPI = {
     recipient_id: string;
     recipient_type: string;
     content: string;
+    attachment_url?: string;
+    attachment_type?: string;
+    attachment_name?: string;
+    attachment_size?: number;
   }): Promise<CircleMessageData> {
     return fetchAPI<CircleMessageData>('/circle-messages/from-parent', {
       method: 'POST',

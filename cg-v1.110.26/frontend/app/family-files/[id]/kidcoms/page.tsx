@@ -304,49 +304,59 @@ export default function KidComsPage() {
                   disabled={!selectedChild || isStartingSession}
                   className={cn(
                     'flex flex-col items-center p-4 rounded-xl transition-all border-2',
-                    'bg-purple-50 border-purple-200 hover:border-purple-300 hover:shadow-md active:scale-95',
+                    'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 hover:border-purple-300 dark:hover:border-purple-500 hover:shadow-md active:scale-95',
                     'disabled:opacity-50 disabled:hover:border-purple-200 disabled:active:scale-100'
                   )}
                 >
                   {isStartingSession ? (
-                    <Loader2 className="h-8 w-8 text-purple-600 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-purple-600 dark:text-purple-400 animate-spin" />
                   ) : (
-                    <Video className="h-8 w-8 text-purple-600" />
+                    <Video className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                   )}
-                  <span className="mt-2 text-sm font-bold text-purple-700">Video Call</span>
+                  <span className="mt-2 text-sm font-bold text-purple-700 dark:text-purple-300">Video Call</span>
                 </button>
                 <button
                   onClick={() => startVoiceCall()}
                   disabled={!selectedChild || isStartingSession}
                   className={cn(
                     'flex flex-col items-center p-4 rounded-xl transition-all border-2',
-                    'bg-blue-50 border-blue-200 hover:border-blue-300 hover:shadow-md active:scale-95',
+                    'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md active:scale-95',
                     'disabled:opacity-50 disabled:hover:border-blue-200 disabled:active:scale-100'
                   )}
                 >
                   {isStartingSession ? (
-                    <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-blue-600 dark:text-blue-400 animate-spin" />
                   ) : (
-                    <Phone className="h-8 w-8 text-blue-600" />
+                    <Phone className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                   )}
-                  <span className="mt-2 text-sm font-bold text-blue-700">Voice Call</span>
+                  <span className="mt-2 text-sm font-bold text-blue-700 dark:text-blue-300">Voice Call</span>
                 </button>
                 <button
                   onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
                   className={cn(
                     'flex flex-col items-center p-4 rounded-xl transition-all border-2',
-                    'bg-teal-50 border-teal-200 hover:border-teal-300 hover:shadow-md active:scale-95'
+                    'bg-teal-50 dark:bg-teal-900/30 border-teal-200 dark:border-teal-700 hover:border-teal-300 dark:hover:border-teal-500 hover:shadow-md active:scale-95'
                   )}
                 >
-                  <Heart className="h-8 w-8 text-teal-600" />
-                  <span className="mt-2 text-sm font-bold text-teal-700">My Circle</span>
+                  <Heart className="h-8 w-8 text-teal-600 dark:text-teal-400" />
+                  <span className="mt-2 text-sm font-bold text-teal-700 dark:text-teal-300">My Circle</span>
                 </button>
                 <button
-                  disabled
-                  className="flex flex-col items-center p-4 border-2 border-border bg-muted rounded-xl opacity-50 cursor-not-allowed"
+                  onClick={() => {
+                    if (settings?.allowed_features?.chat) {
+                      router.push(`/family-files/${familyFileId}/my-circle?tab=messages`);
+                    }
+                  }}
+                  disabled={!settings?.allowed_features?.chat}
+                  className={cn(
+                    'flex flex-col items-center p-4 rounded-xl transition-all border-2',
+                    settings?.allowed_features?.chat
+                      ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700 hover:border-emerald-300 dark:hover:border-emerald-500 hover:shadow-md active:scale-95'
+                      : 'border-border bg-muted rounded-xl opacity-50 cursor-not-allowed'
+                  )}
                 >
-                  <MessageCircle className="h-8 w-8 text-muted-foreground" />
-                  <span className="mt-2 text-sm font-bold text-muted-foreground">Chat</span>
+                  <MessageCircle className={cn('h-8 w-8', settings?.allowed_features?.chat ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground')} />
+                  <span className={cn('mt-2 text-sm font-bold', settings?.allowed_features?.chat ? 'text-emerald-700 dark:text-emerald-300' : 'text-muted-foreground')}>Chat</span>
                 </button>
               </div>
             </div>

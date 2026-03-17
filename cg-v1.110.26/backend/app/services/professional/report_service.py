@@ -311,6 +311,57 @@ class ComplianceReportService:
             "sentiment_score": 75 
         }
 
+        # 4. Circle Activity Stats (child ↔ contact communication)
+        circle_stats = {
+            "total_messages": 0,
+            "flagged_messages": 0,
+            "hidden_messages": 0,
+            "total_calls": 0,
+            "terminated_calls": 0,
+        }
+
+        try:
+            from app.models.circle_message import CircleMessage
+            from app.models.circle_call import CircleCallSession
+
+            circle_msg_query = select(CircleMessage).where(
+                CircleMessage.family_file_id == family_file_id
+            )
+            if start_date:
+                circle_msg_query = circle_msg_query.where(CircleMessage.sent_at >= start_date)
+            if end_date:
+                circle_msg_query = circle_msg_query.where(CircleMessage.sent_at <= end_date)
+
+            circle_msg_result = await self.db.execute(circle_msg_query)
+            circle_msgs = circle_msg_result.scalars().all()
+
+            circle_stats["total_messages"] = len(circle_msgs)
+            circle_stats["flagged_messages"] = sum(1 for m in circle_msgs if m.aria_flagged)
+            circle_stats["hidden_messages"] = sum(1 for m in circle_msgs if m.is_hidden)
+
+            circle_call_query = select(CircleCallSession).where(
+                CircleCallSession.family_file_id == family_file_id
+            )
+            if start_date:
+                circle_call_query = circle_call_query.where(
+                    CircleCallSession.initiated_at >= start_date
+                )
+            if end_date:
+                circle_call_query = circle_call_query.where(
+                    CircleCallSession.initiated_at <= end_date
+                )
+
+            circle_call_result = await self.db.execute(circle_call_query)
+            circle_calls = circle_call_result.scalars().all()
+
+            circle_stats["total_calls"] = len(circle_calls)
+            circle_stats["terminated_calls"] = sum(
+                1 for c in circle_calls if c.aria_terminated_call
+            )
+        except Exception:
+            # Circle tables may not exist yet; don't break reports
+            pass
+
         return {
             "family_file_id": family_file_id,
             "period": {
@@ -320,6 +371,7 @@ class ComplianceReportService:
             "aria_stats": aria_stats,
             "exchange_compliance": exchange_stats,
             "communication_metrics": message_stats,
+            "circle_activity": circle_stats,
             "generated_at": datetime.utcnow().isoformat()
         }
 
@@ -403,6 +455,17 @@ class ComplianceReportService:
         writer.writerow(["Total Messages", comm.get("total_messages", 0)])
         writer.writerow(["Avg Response Time (hrs)", f"{comm.get('avg_response_time_hours', 0):.1f}"])
         writer.writerow(["Sentiment Score", f"{comm.get('sentiment_score', 0)}/100"])
+        writer.writerow([])
+
+        # Circle Activity
+        circle = report_data.get("circle_activity", {})
+        writer.writerow(["My Circle Activity"])
+        writer.writerow(["Metric", "Value"])
+        writer.writerow(["Total Circle Messages", circle.get("total_messages", 0)])
+        writer.writerow(["Flagged Messages (ARIA)", circle.get("flagged_messages", 0)])
+        writer.writerow(["Hidden Messages", circle.get("hidden_messages", 0)])
+        writer.writerow(["Total Circle Calls", circle.get("total_calls", 0)])
+        writer.writerow(["Terminated Calls (ARIA)", circle.get("terminated_calls", 0)])
 
         csv_content = output.getvalue()
         csv_bytes = csv_content.encode("utf-8")
