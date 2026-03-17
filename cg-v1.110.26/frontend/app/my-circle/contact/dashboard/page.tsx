@@ -178,6 +178,25 @@ function saveOverrides(map: Record<string, ChildOverride>) {
   localStorage.setItem(OVERRIDES_KEY, JSON.stringify(map));
 }
 
+// Contact's own profile — stored locally
+interface ContactProfile {
+  displayName?: string;
+  photoDataUrl?: string;
+}
+
+const PROFILE_KEY = 'circle_contact_profile';
+
+function getContactProfile(): ContactProfile {
+  try {
+    if (typeof localStorage === 'undefined') return {};
+    return JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+  } catch { return {}; }
+}
+
+function saveContactProfile(profile: ContactProfile) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+}
+
 const CHILD_AVATARS: Record<string, string> = {
   lion: '\u{1F981}',
   panda: '\u{1F43C}',
@@ -214,12 +233,19 @@ export default function CircleContactDashboardPage() {
     ENCOURAGING_MESSAGES[Math.floor(Math.random() * ENCOURAGING_MESSAGES.length)]
   );
 
-  // Contact editing state
+  // Contact editing state (for children)
   const [overrides, setOverridesState] = useState<Record<string, ChildOverride>>({});
   const [editChild, setEditChild] = useState<ChildWithPermissions | null>(null);
   const [editName, setEditName] = useState('');
   const [editPhoto, setEditPhoto] = useState<string | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Own profile editing state
+  const [contactProfile, setContactProfile] = useState<ContactProfile>({});
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [profileEditName, setProfileEditName] = useState('');
+  const [profileEditPhoto, setProfileEditPhoto] = useState<string | undefined>(undefined);
+  const profileFileInputRef = useRef<HTMLInputElement>(null);
 
   // Poll for incoming calls
   const checkIncomingCalls = useCallback(async () => {
@@ -238,6 +264,7 @@ export default function CircleContactDashboardPage() {
   useEffect(() => {
     loadUserData();
     setOverridesState(getOverrides());
+    setContactProfile(getContactProfile());
   }, []);
 
   useEffect(() => {
@@ -448,6 +475,35 @@ export default function CircleContactDashboardPage() {
     reader.readAsDataURL(file);
   }
 
+  // --- Profile edit handlers ---
+  function openProfileEdit() {
+    setProfileEditName(contactProfile.displayName || userData?.contactName || '');
+    setProfileEditPhoto(contactProfile.photoDataUrl);
+    setShowProfileEdit(true);
+  }
+
+  function saveProfileEdit() {
+    const updated: ContactProfile = {
+      displayName: profileEditName.trim() || undefined,
+      photoDataUrl: profileEditPhoto,
+    };
+    setContactProfile(updated);
+    saveContactProfile(updated);
+    setShowProfileEdit(false);
+  }
+
+  function handleProfileImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setProfileEditPhoto(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  function getContactDisplayName(): string {
+    return contactProfile.displayName || userData?.contactName || '';
+  }
+
   // --- Permission count ---
   function getPermissionCount(perms: CirclePermission): number {
     let count = 0;
@@ -515,8 +571,27 @@ export default function CircleContactDashboardPage() {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <CircleThemeToggle />
+              {/* Profile avatar — tap to edit */}
+              <button
+                onClick={openProfileEdit}
+                className="relative group/profile flex-shrink-0"
+                aria-label="Edit your profile"
+                title="Edit your profile"
+              >
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center text-white text-sm font-bold overflow-hidden shadow-sm ring-2 ring-transparent group-hover/profile:ring-[#3DAA8A]/40 transition-all">
+                  {contactProfile.photoDataUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={contactProfile.photoDataUrl} alt={getContactDisplayName()} className="w-full h-full object-cover" />
+                  ) : (
+                    getContactDisplayName().charAt(0).toUpperCase()
+                  )}
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#3DAA8A] flex items-center justify-center border-2 border-card">
+                  <Pencil className="w-2 h-2 text-white" />
+                </div>
+              </button>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
@@ -534,13 +609,24 @@ export default function CircleContactDashboardPage() {
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Greeting Card — matches parent dashboard style */}
         <div className="mb-8 relative overflow-hidden bg-gradient-to-br from-[#3DAA8A]/5 to-[#3DAA8A]/10 dark:from-[#3DAA8A]/10 dark:to-[#2D6A8F]/10 rounded-2xl p-6 border border-[#3DAA8A]/10">
-          <div className="relative z-10">
-            <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
-              {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening'},
-            </h1>
-            <h2 className="text-2xl sm:text-3xl font-semibold text-[#3DAA8A]" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
-              {userData?.contactName}
-            </h2>
+          <div className="relative z-10 flex items-center gap-4">
+            {/* Profile photo in greeting */}
+            {contactProfile.photoDataUrl && (
+              <button onClick={openProfileEdit} className="flex-shrink-0 group/greet">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-white/50 dark:ring-white/20 group-hover/greet:ring-[#3DAA8A]/60 transition-all">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={contactProfile.photoDataUrl} alt={getContactDisplayName()} className="w-full h-full object-cover" />
+                </div>
+              </button>
+            )}
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+                {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening'},
+              </h1>
+              <h2 className="text-2xl sm:text-3xl font-semibold text-[#3DAA8A]" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+                {getContactDisplayName()}
+              </h2>
+            </div>
           </div>
           {/* Calming nature illustration — same as parent dashboard */}
           <svg className="absolute right-2 bottom-0 w-32 h-32 sm:w-40 sm:h-40 opacity-15" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1048,6 +1134,110 @@ export default function CircleContactDashboardPage() {
                   setOverridesState(updated);
                   saveOverrides(updated);
                   setEditChild(null);
+                }}
+                className="w-full mt-3 py-2.5 text-sm text-muted-foreground hover:text-red-500 transition-colors"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                Reset to original
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Profile Edit Modal */}
+      {showProfileEdit && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center"
+          onClick={() => setShowProfileEdit(false)}
+        >
+          <div
+            className="w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-2xl p-6 pb-safe border border-border shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle — mobile */}
+            <div className="w-10 h-1 rounded-full bg-muted mx-auto mb-5 sm:hidden" />
+
+            <h3 className="text-xl font-bold text-foreground mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              Your Profile
+            </h3>
+            <p className="text-xs text-muted-foreground mb-5" style={{ fontFamily: "'Inter', sans-serif" }}>
+              Update your name and photo
+            </p>
+
+            {/* Photo picker */}
+            <div className="flex justify-center mb-6">
+              <button
+                onClick={() => profileFileInputRef.current?.click()}
+                className="relative group"
+                aria-label="Change profile photo"
+              >
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center shadow-xl text-white text-4xl font-bold">
+                  {profileEditPhoto ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={profileEditPhoto} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    (profileEditName || userData?.contactName || '?').charAt(0).toUpperCase()
+                  )}
+                </div>
+                {/* Camera overlay */}
+                <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                  <Camera className="w-8 h-8 text-white" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[#3DAA8A] flex items-center justify-center shadow-lg border-2 border-card">
+                  <Camera className="w-4 h-4 text-white" />
+                </div>
+              </button>
+              <input
+                ref={profileFileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleProfileImageUpload}
+              />
+            </div>
+
+            {/* Name input */}
+            <div className="mb-6">
+              <label className="text-xs font-semibold uppercase tracking-widest mb-2 block text-muted-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
+                Display Name
+              </label>
+              <input
+                type="text"
+                value={profileEditName}
+                onChange={e => setProfileEditName(e.target.value)}
+                placeholder={userData?.contactName || 'Your name'}
+                className="w-full px-4 py-3 rounded-xl text-base bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-[#3DAA8A] focus:border-transparent transition-all"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                maxLength={40}
+              />
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowProfileEdit(false)}
+                className="flex-1 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-foreground transition-colors"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                <X className="w-4 h-4" /> Cancel
+              </button>
+              <button
+                onClick={saveProfileEdit}
+                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] text-white font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-[#3DAA8A]/20"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                <Check className="w-4 h-4" /> Save
+              </button>
+            </div>
+
+            {/* Remove customization */}
+            {(contactProfile.displayName || contactProfile.photoDataUrl) && (
+              <button
+                onClick={() => {
+                  setContactProfile({});
+                  saveContactProfile({});
+                  setShowProfileEdit(false);
                 }}
                 className="w-full mt-3 py-2.5 text-sm text-muted-foreground hover:text-red-500 transition-colors"
                 style={{ fontFamily: "'Inter', sans-serif" }}
