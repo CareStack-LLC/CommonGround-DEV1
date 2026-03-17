@@ -681,6 +681,8 @@ class CircleUserLoginResponse(BaseModel):
     contact_name: str
     family_file_id: str
     child_ids: List[str]  # Children they can communicate with
+    terms_accepted: bool = False
+    terms_accepted_at: Optional[datetime] = None
 
 
 class CircleUserProfileResponse(BaseModel):

@@ -6662,6 +6662,8 @@ export interface CircleLoginResponse {
   contact_name: string;
   family_file_id: string;
   child_ids: string[];
+  terms_accepted: boolean;
+  terms_accepted_at?: string;
 }
 
 export interface CommunicationLog {
@@ -7088,6 +7090,201 @@ export const myCircleAPI = {
         session_type: sessionType,
       }),
     });
+  },
+
+  /**
+   * Accept Terms of Service (circle auth required)
+   */
+  async acceptTerms(version: string = '1.0'): Promise<{ terms_accepted: boolean; terms_accepted_at: string; terms_version: string }> {
+    return fetchAPIWithCircleAuth<{ terms_accepted: boolean; terms_accepted_at: string; terms_version: string }>('/my-circle/circle-users/accept-terms', {
+      method: 'POST',
+      body: JSON.stringify({ terms_version: version }),
+    });
+  },
+};
+
+
+// ============================================================================
+// Circle Messages API — Text messaging between children, parents, and contacts
+// ============================================================================
+
+export interface CircleMessageData {
+  id: string;
+  family_file_id: string;
+  child_id: string;
+  sender_id: string;
+  sender_type: string;
+  sender_name: string;
+  recipient_id: string;
+  recipient_type: string;
+  content: string;
+  original_content?: string;
+  aria_analyzed: boolean;
+  aria_flagged: boolean;
+  aria_category?: string;
+  aria_reason?: string;
+  aria_score?: number;
+  is_delivered: boolean;
+  is_read: boolean;
+  is_hidden: boolean;
+  sent_at: string;
+  read_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CircleMessageListData {
+  items: CircleMessageData[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
+export interface CircleConversationData {
+  partner_id: string;
+  partner_name: string;
+  partner_type: string;
+  child_id: string;
+  child_name?: string;
+  last_message?: string;
+  last_message_at?: string;
+  unread_count: number;
+}
+
+export interface CircleConversationListData {
+  items: CircleConversationData[];
+  total: number;
+}
+
+export const circleMessagesAPI = {
+  // ==========================================================================
+  // Child Auth Endpoints
+  // ==========================================================================
+
+  /**
+   * Send a message as a child (child auth)
+   */
+  async sendAsChild(data: {
+    child_id: string;
+    recipient_id: string;
+    recipient_type: string;
+    content: string;
+  }): Promise<CircleMessageData> {
+    return fetchAPIWithChildAuth<CircleMessageData>('/circle-messages/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Get conversation messages as a child (child auth)
+   */
+  async getConversationAsChild(childId: string, contactId: string, skip = 0, limit = 50): Promise<CircleMessageListData> {
+    return fetchAPIWithChildAuth<CircleMessageListData>(
+      `/circle-messages/child/${childId}/contact/${contactId}?skip=${skip}&limit=${limit}`
+    );
+  },
+
+  /**
+   * Get all conversations for a child (child auth)
+   */
+  async getConversationsAsChild(): Promise<CircleConversationListData> {
+    return fetchAPIWithChildAuth<CircleConversationListData>('/circle-messages/conversations/child');
+  },
+
+  /**
+   * Mark a message as read (child auth)
+   */
+  async markReadAsChild(messageId: string): Promise<void> {
+    await fetchAPIWithChildAuth<{ status: string }>(`/circle-messages/${messageId}/read`, {
+      method: 'PUT',
+    });
+  },
+
+  /**
+   * Get unread count for a child (child auth)
+   */
+  async getUnreadCountAsChild(): Promise<{ count: number }> {
+    return fetchAPIWithChildAuth<{ count: number }>('/circle-messages/unread-count/child');
+  },
+
+  // ==========================================================================
+  // Circle Contact Auth Endpoints
+  // ==========================================================================
+
+  /**
+   * Send a message as a circle contact (circle auth)
+   */
+  async sendAsContact(data: {
+    child_id: string;
+    recipient_id: string;
+    recipient_type: string;
+    content: string;
+  }): Promise<CircleMessageData> {
+    return fetchAPIWithCircleAuth<CircleMessageData>('/circle-messages/from-contact', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Get conversation messages as a contact (circle auth)
+   */
+  async getConversationAsContact(childId: string, skip = 0, limit = 50): Promise<CircleMessageListData> {
+    return fetchAPIWithCircleAuth<CircleMessageListData>(
+      `/circle-messages/contact/child/${childId}?skip=${skip}&limit=${limit}`
+    );
+  },
+
+  /**
+   * Get all conversations for a contact (circle auth)
+   */
+  async getConversationsAsContact(): Promise<CircleConversationListData> {
+    return fetchAPIWithCircleAuth<CircleConversationListData>('/circle-messages/conversations/contact');
+  },
+
+  /**
+   * Mark a message as read (circle auth)
+   */
+  async markReadAsContact(messageId: string): Promise<void> {
+    await fetchAPIWithCircleAuth<{ status: string }>(`/circle-messages/contact/${messageId}/read`, {
+      method: 'PUT',
+    });
+  },
+
+  /**
+   * Get unread count for a contact (circle auth)
+   */
+  async getUnreadCountAsContact(): Promise<{ count: number }> {
+    return fetchAPIWithCircleAuth<{ count: number }>('/circle-messages/unread-count/contact');
+  },
+
+  // ==========================================================================
+  // Parent Auth Endpoints
+  // ==========================================================================
+
+  /**
+   * Send a message as a parent to their child (parent auth)
+   */
+  async sendAsParent(data: {
+    child_id: string;
+    recipient_id: string;
+    recipient_type: string;
+    content: string;
+  }): Promise<CircleMessageData> {
+    return fetchAPI<CircleMessageData>('/circle-messages/from-parent', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Get conversation messages as a parent (parent auth)
+   */
+  async getConversationAsParent(childId: string, contactId: string, skip = 0, limit = 50): Promise<CircleMessageListData> {
+    return fetchAPI<CircleMessageListData>(
+      `/circle-messages/parent/child/${childId}/contact/${contactId}?skip=${skip}&limit=${limit}`
+    );
   },
 };
 

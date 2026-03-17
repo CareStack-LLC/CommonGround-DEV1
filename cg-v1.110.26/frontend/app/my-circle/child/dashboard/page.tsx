@@ -19,11 +19,13 @@ import {
   Sparkles,
   Video,
   Phone,
+  MessageCircle,
 } from 'lucide-react';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
 import { StreamingBookCard } from '@/components/kidcoms/streaming-book-card';
 import { FeaturedHeroBanner } from '@/components/kidcoms/featured-hero-banner';
 import { theaterContent } from '@/lib/theater-content';
+import { circleMessagesAPI, CircleConversationData } from '@/lib/api';
 import type { WatchProgress } from '@/lib/watch-progress';
 import type { ReadingProgress } from '@/lib/reading-progress';
 
@@ -85,6 +87,21 @@ const MOCK_EVENTS = [
   },
 ];
 
+function formatRelativeTime(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return 'Just now';
+  if (diffMin < 60) return `${diffMin} min ago`;
+  const diffHrs = Math.floor(diffMin / 60);
+  if (diffHrs < 24) return `${diffHrs}h ago`;
+  const diffDays = Math.floor(diffHrs / 24);
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
 export default function ChildDashboardPage() {
   const router = useRouter();
   const [userData, setUserData] = useState<ChildUserData | null>(null);
@@ -93,12 +110,13 @@ export default function ChildDashboardPage() {
   const [progressMap, setProgressMap] = useState<Record<string, WatchProgress | null>>({});
   const [bookProgressMap, setBookProgressMap] = useState<Record<string, ReadingProgress | null>>({});
   const [showAddEvent, setShowAddEvent] = useState(false);
+  const [recentMessages, setRecentMessages] = useState<CircleConversationData[]>([]);
 
   useEffect(() => {
     validateAndLoadUser();
   }, []);
 
-  function validateAndLoadUser() {
+  async function validateAndLoadUser() {
     try {
       const token = localStorage.getItem('child_token');
       const userStr = localStorage.getItem('child_user');
@@ -129,6 +147,14 @@ export default function ChildDashboardPage() {
       const bMap: Record<string, ReadingProgress | null> = {};
       theaterContent.storybooks.forEach(b => { bMap[b.id] = getReadingProgress(b.id); });
       setBookProgressMap(bMap);
+
+      // Load recent messages
+      try {
+        const convos = await circleMessagesAPI.getConversationsAsChild();
+        setRecentMessages(convos.items.slice(0, 3));
+      } catch (err) {
+        console.error('Failed to load messages:', err);
+      }
 
       setIsLoading(false);
     } catch (error) {
@@ -403,6 +429,68 @@ export default function ChildDashboardPage() {
                 </button>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ─────────────────────────────────────────────
+            3b. RECENT MESSAGES
+        ───────────────────────────────────────────── */}
+        <section className="px-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+              Recent Messages
+            </h2>
+            <button
+              onClick={() => router.push('/my-circle/child/my-circle-page')}
+              className="text-xs text-teal-400 hover:text-teal-300 font-semibold flex items-center gap-1"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              View All <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+          <div className="bg-slate-800/40 rounded-3xl overflow-hidden border border-slate-800/60 divide-y divide-slate-800/60">
+            {recentMessages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                <MessageCircle className="w-8 h-8 text-slate-600 mb-2" />
+                <p className="text-slate-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  No messages yet — say hi to someone in your circle!
+                </p>
+              </div>
+            ) : (
+              recentMessages.map((conv) => {
+                const COLORS = ['from-emerald-400 to-teal-500', 'from-pink-400 to-rose-500', 'from-blue-400 to-indigo-500', 'from-amber-400 to-orange-500', 'from-purple-400 to-violet-500'];
+                const colorIdx = conv.partner_name.charCodeAt(0) % COLORS.length;
+                const initial = conv.partner_name.charAt(0).toUpperCase();
+                const hasUnread = conv.unread_count > 0;
+                const timeStr = conv.last_message_at ? formatRelativeTime(conv.last_message_at) : '';
+
+                return (
+                  <button
+                    key={conv.partner_id}
+                    onClick={() => router.push(`/my-circle/child/chat/${conv.partner_id}`)}
+                    className="w-full flex items-center gap-4 p-4 hover:bg-slate-800/40 transition-colors group text-left"
+                  >
+                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${COLORS[colorIdx]} flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform relative`}>
+                      <span className="text-white font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{initial}</span>
+                      {hasUnread && (
+                        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-teal-400 rounded-full border-2 border-slate-900" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`text-sm font-bold ${hasUnread ? 'text-white' : 'text-slate-300'}`} style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                        {conv.partner_name}
+                      </h3>
+                      <p className={`text-xs truncate ${hasUnread ? 'text-slate-300' : 'text-slate-500'}`} style={{ fontFamily: 'Inter, sans-serif' }}>
+                        {conv.last_message || 'Start a conversation'}
+                      </p>
+                    </div>
+                    <span className="text-[10px] text-slate-500 flex-shrink-0" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {timeStr}
+                    </span>
+                  </button>
+                );
+              })
+            )}
           </div>
         </section>
 

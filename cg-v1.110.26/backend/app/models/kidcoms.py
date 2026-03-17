@@ -437,6 +437,10 @@ class CircleUser(Base, UUIDMixin, TimestampMixin):
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # Terms of Service acceptance
+    terms_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    terms_version: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+
     # Relationships
     circle_contact = relationship("CircleContact", back_populates="user_account")
 

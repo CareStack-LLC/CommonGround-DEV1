@@ -163,6 +163,7 @@ from app.models.kidcoms import (
     ParticipantType,
     RoomType,
 )
+from app.models.circle_message import CircleMessage, SenderType
 from app.models.subscription import (
     SubscriptionPlan,
     GrantCode,

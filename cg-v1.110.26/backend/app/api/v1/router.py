@@ -35,6 +35,7 @@ from app.api.v1.endpoints import (
     circle,
     kidcoms,
     my_circle,
+    circle_messages,
     subscriptions,
     grants,
     push,
@@ -117,6 +118,9 @@ api_router.include_router(kidcoms.router, prefix="/kidcoms", tags=["KidComs"])
 
 # My Circle - Child/Contact Communication Portal
 api_router.include_router(my_circle.router, prefix="/my-circle", tags=["My Circle"])
+
+# Circle Messages - Text messaging between children, parents, and circle contacts
+api_router.include_router(circle_messages.router, prefix="/circle-messages", tags=["Circle Messages"])
 
 # Subscriptions - Pricing tiers and billing
 api_router.include_router(subscriptions.router, prefix="/subscriptions", tags=["Subscriptions"])

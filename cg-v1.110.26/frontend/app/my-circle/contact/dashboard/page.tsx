@@ -120,6 +120,17 @@ export default function CircleContactDashboardPage() {
       }
 
       const user = JSON.parse(userStr) as CircleUserData;
+
+      // Terms gate: redirect to terms page if not accepted
+      const loginData = localStorage.getItem('circle_login_data');
+      if (loginData) {
+        const parsed = JSON.parse(loginData);
+        if (!parsed.terms_accepted) {
+          router.push('/my-circle/contact/terms');
+          return;
+        }
+      }
+
       setUserData(user);
       await loadChildrenWithPermissions();
     } catch (err) {
@@ -601,9 +612,9 @@ export default function CircleContactDashboardPage() {
                     disabled={isStartingCall}
                     className={cn(
                       'flex flex-col items-center gap-3 p-5 rounded-2xl transition-all',
-                      'bg-gradient-to-br from-slate-50 to-slate-100/50 hover:from-slate-100 hover:to-slate-100 active:scale-95',
-                      'border border-slate-200/50',
-                      'disabled:opacity-50 disabled:hover:from-slate-50 disabled:active:scale-100'
+                      'bg-gradient-to-br from-slate-50 to-slate-100/50 dark:from-slate-800 dark:to-slate-700/50 hover:from-slate-100 hover:to-slate-100 dark:hover:from-slate-700 dark:hover:to-slate-700 active:scale-95',
+                      'border border-slate-200/50 dark:border-slate-600/50',
+                      'disabled:opacity-50 disabled:hover:from-slate-50 dark:disabled:hover:from-slate-800 disabled:active:scale-100'
                     )}
                   >
                     {isStartingCall ? (
@@ -616,31 +627,37 @@ export default function CircleContactDashboardPage() {
                 )}
               </div>
 
-              {/* Other Options (Coming Soon) */}
+              {/* Chat & Theater Options */}
               {(selectedChild.permissions.can_chat || selectedChild.permissions.can_theater) && (
-                <>
-                  <div className="flex justify-center gap-3 mb-2">
-                    {selectedChild.permissions.can_chat && (
-                      <button
-                        disabled
-                        className="p-4 bg-purple-50 rounded-xl opacity-50 border border-purple-100"
-                        title="Coming soon!"
-                      >
-                        <MessageCircle className="h-6 w-6 text-purple-400" />
-                      </button>
-                    )}
-                    {selectedChild.permissions.can_theater && (
-                      <button
-                        disabled
-                        className="p-4 bg-amber-50 rounded-xl opacity-50 border border-amber-100"
-                        title="Coming soon!"
-                      >
-                        <Film className="h-6 w-6 text-amber-400" />
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mb-6">Chat & Watch Together coming soon!</p>
-                </>
+                <div className="flex justify-center gap-3 mb-6">
+                  {selectedChild.permissions.can_chat && (
+                    <button
+                      onClick={() => {
+                        setSelectedChild(null);
+                        router.push(`/my-circle/contact/chat/${selectedChild.child_id}`);
+                      }}
+                      className={cn(
+                        'flex flex-col items-center gap-2 p-4 rounded-2xl transition-all',
+                        'bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/50 dark:to-purple-900/30',
+                        'hover:from-purple-100 hover:to-purple-100 dark:hover:from-purple-900/50 dark:hover:to-purple-800/30',
+                        'active:scale-95 border border-purple-200/50 dark:border-purple-700/50',
+                      )}
+                    >
+                      <MessageCircle className="h-8 w-8 text-purple-500 dark:text-purple-400" />
+                      <span className="font-semibold text-sm text-purple-600 dark:text-purple-400">Chat</span>
+                    </button>
+                  )}
+                  {selectedChild.permissions.can_theater && (
+                    <button
+                      disabled
+                      className="flex flex-col items-center gap-2 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-2xl opacity-50 border border-amber-200/50 dark:border-amber-700/50"
+                      title="Coming soon!"
+                    >
+                      <Film className="h-8 w-8 text-amber-400" />
+                      <span className="font-semibold text-sm text-amber-500 dark:text-amber-400">Theater</span>
+                    </button>
+                  )}
+                </div>
               )}
 
               {/* Cancel */}

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
 import { kidcomsAPI } from '@/lib/api';
-import { Users, Phone, Video, Camera, X, Check, Pencil } from 'lucide-react';
+import { Users, Phone, Video, MessageCircle, Camera, X, Check, Pencil } from 'lucide-react';
 
 interface ChildUserData {
   userId: string;
@@ -22,6 +22,7 @@ interface ChildContact {
   relationship?: string;
   can_video_call: boolean;
   can_voice_call: boolean;
+  can_chat?: boolean;
 }
 
 // Local override stored in localStorage — child's side only
@@ -252,7 +253,7 @@ export default function MyCirclePage() {
                 My Circle
               </h1>
               <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {contacts.length} {contacts.length === 1 ? 'person' : 'people'} to call
+                {contacts.length} {contacts.length === 1 ? 'person' : 'people'} in your circle
               </p>
             </div>
           </div>
@@ -313,8 +314,18 @@ export default function MyCirclePage() {
                   )}
                 </div>
 
-                {/* Call buttons */}
+                {/* Action buttons */}
                 <div className="flex gap-2 flex-shrink-0">
+                  {contact.can_chat && (
+                    <button
+                      onClick={() => router.push(`/my-circle/child/chat/${contact.contact_id}`)}
+                      className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 bg-purple-500 hover:bg-purple-400 shadow-lg shadow-purple-500/30 hover:scale-110 active:scale-95"
+                      aria-label={`Message ${displayName}`}
+                    >
+                      <MessageCircle color="white" size={28} strokeWidth={3} className="relative z-10" />
+                    </button>
+                  )}
+
                   <button
                     onClick={() => handleCall(contact, 'voice')}
                     disabled={!contact.can_voice_call}

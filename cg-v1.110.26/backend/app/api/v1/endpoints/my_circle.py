@@ -845,6 +845,8 @@ async def circle_user_login(
         contact_name=contact.contact_name if contact else "",
         family_file_id=contact.family_file_id if contact else "",
         child_ids=child_ids,
+        terms_accepted=circle_user.terms_accepted_at is not None,
+        terms_accepted_at=circle_user.terms_accepted_at,
     )
 
 
@@ -1854,3 +1856,33 @@ async def get_communication_logs(
         ))
 
     return items
+
+
+# ============================================================
+# Terms of Service Acceptance
+# ============================================================
+
+@router.post(
+    "/circle-users/accept-terms",
+    summary="Accept Terms of Service",
+    description="Circle user accepts the Terms of Service for My Circle communications.",
+)
+async def accept_terms(
+    current_circle_user: CircleUser = Depends(get_current_circle_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Accept Terms of Service for a circle contact.
+
+    Sets terms_accepted_at and terms_version on the CircleUser record.
+    Must be accepted before the contact can use chat features.
+    """
+    current_circle_user.terms_accepted_at = datetime.utcnow()
+    current_circle_user.terms_version = "1.0"
+    await db.commit()
+
+    return {
+        "terms_accepted": True,
+        "terms_accepted_at": current_circle_user.terms_accepted_at,
+        "terms_version": current_circle_user.terms_version,
+    }

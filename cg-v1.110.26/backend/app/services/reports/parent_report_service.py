@@ -32,6 +32,7 @@ from app.models.custody_day_record import CustodyDayRecord
 from app.models.schedule import ScheduleEvent
 from app.models.kidcoms import KidComsSession, KidComsMessage, KidComsCommunicationLog
 from app.models.circle import CircleContact
+from app.models.circle_message import CircleMessage
 from app.models.generated_report import GeneratedReport
 from app.services.custody_time import CustodyTimeService
 from app.services.geolocation import GeolocationService
@@ -830,6 +831,59 @@ class ParentReportService:
                 bar_height=28,
             )
 
+        # Query Circle Messages (text messaging) in date range
+        circle_messages_result = await self.db.execute(
+            select(CircleMessage).where(
+                CircleMessage.family_file_id == family_file_id,
+                cast(CircleMessage.sent_at, Date) >= date_start,
+                cast(CircleMessage.sent_at, Date) <= date_end,
+            ).order_by(desc(CircleMessage.sent_at))
+        )
+        circle_messages = list(circle_messages_result.scalars().all())
+
+        # Circle message stats
+        total_circle_messages = len(circle_messages)
+        flagged_circle_messages = [m for m in circle_messages if m.aria_flagged]
+        hidden_circle_messages = [m for m in circle_messages if m.is_hidden]
+
+        # Messages per contact
+        message_contact_data: dict[str, dict] = {}
+        for m in circle_messages:
+            # Group by the non-child participant
+            if m.sender_type == "child":
+                pid = m.recipient_id
+                ptype = m.recipient_type
+                pname = ""
+            else:
+                pid = m.sender_id
+                ptype = m.sender_type
+                pname = m.sender_name
+            if pid not in message_contact_data:
+                message_contact_data[pid] = {
+                    "contact_name": pname or contact_map.get(pid, type("", (), {"contact_name": "Unknown"})()).contact_name,
+                    "contact_type": ptype,
+                    "total_messages": 0,
+                    "flagged_messages": 0,
+                }
+            message_contact_data[pid]["total_messages"] += 1
+            if m.aria_flagged:
+                message_contact_data[pid]["flagged_messages"] += 1
+
+        messaging_stats = {
+            "total_messages": total_circle_messages,
+            "flagged_count": len(flagged_circle_messages),
+            "hidden_count": len(hidden_circle_messages),
+            "contact_breakdown": sorted(
+                message_contact_data.values(),
+                key=lambda x: x["total_messages"],
+                reverse=True,
+            ),
+        }
+
+        # Update overall stats with messaging data
+        stats["total_circle_messages"] = total_circle_messages
+        stats["flagged_circle_messages"] = len(flagged_circle_messages)
+
         # Render template
         template = self.jinja_env.get_template("reports/kidspace_communication.html")
         html_content = template.render(
@@ -845,6 +899,8 @@ class ParentReportService:
             children=children,
             flagged_messages=flagged_messages,
             session_type_chart=session_type_chart,
+            messaging_stats=messaging_stats,
+            flagged_circle_messages=flagged_circle_messages,
         )
 
         # Convert to PDF
