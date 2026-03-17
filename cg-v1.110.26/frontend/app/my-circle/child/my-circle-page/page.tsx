@@ -277,7 +277,7 @@ export default function MyCirclePage() {
         <div className="mb-4 flex items-center gap-2 px-1">
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)' }}>
             <Shield className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[11px] font-semibold text-emerald-400" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <span className="text-[11px] font-semibold text-emerald-400" style={{ fontFamily: 'var(--portal-font-body)' }}>
               ARIA is watching over your conversations
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -319,16 +319,16 @@ export default function MyCirclePage() {
 
                 {/* Name and relationship */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-black truncate" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+                  <h3 className="text-lg font-black truncate" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
                     {displayName}
                   </h3>
                   {contact.relationship && (
-                    <p className="text-sm font-semibold capitalize truncate" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                    <p className="text-sm font-semibold capitalize truncate" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
                       {contact.relationship.replace('_', ' ')}
                     </p>
                   )}
                   {overrides[contact.contact_id]?.nickname && (
-                    <p className="text-[10px] text-[#3DAA8A] mt-0.5" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    <p className="text-[10px] text-[#3DAA8A] mt-0.5" style={{ fontFamily: 'var(--portal-font-body)' }}>
                       ✏️ Custom name
                     </p>
                   )}
@@ -377,7 +377,7 @@ export default function MyCirclePage() {
 
         {/* Recent Calls Section */}
         <section className="mt-12 pb-8">
-          <h2 className="text-xl font-bold mb-4 px-1" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+          <h2 className="text-xl font-bold mb-4 px-1" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
             Recent Calls
           </h2>
           <div className="rounded-3xl overflow-hidden" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)', boxShadow: 'var(--portal-shadow-xl)' }}>
@@ -388,7 +388,7 @@ export default function MyCirclePage() {
             ) : recentCalls.length === 0 ? (
               <div className="text-center py-8 px-4">
                 <Phone className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--portal-muted)' }} />
-                <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-text-light)' }}>
+                <p className="text-sm" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-text-light)' }}>
                   No calls yet. Tap a contact above to start!
                 </p>
               </div>
@@ -403,11 +403,11 @@ export default function MyCirclePage() {
                 return (
                   <div key={call.id} className="flex items-center gap-4 p-4 last:border-0 transition-colors group" style={{ borderBottom: '1px solid var(--portal-divider)' }}>
                     <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform`}>
-                      <span className="text-white font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{initial}</span>
+                      <span className="text-white font-black text-lg" style={{ fontFamily: 'var(--portal-font-heading)' }}>{initial}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>{call.contact_name}</h3>
-                      <p className="text-xs flex items-center gap-1.5" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-text-light)' }}>
+                      <h3 className="font-bold text-sm" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>{call.contact_name}</h3>
+                      <p className="text-xs flex items-center gap-1.5" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-text-light)' }}>
                         {isVideo ? <Video className="w-3 h-3" /> : <Phone className="w-3 h-3" />}
                         {isVideo ? 'Video Call' : 'Voice Call'}
                         {timeAgo && ` · ${timeAgo}`}
@@ -442,10 +442,10 @@ export default function MyCirclePage() {
             {/* Handle */}
             <div className="w-10 h-1 rounded-full mx-auto mb-5" style={{ background: 'var(--portal-muted)' }} />
 
-            <h3 className="text-xl font-bold mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+            <h3 className="text-xl font-bold mb-1" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
               Customize Contact
             </h3>
-            <p className="text-xs mb-5" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+            <p className="text-xs mb-5" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
               Only you can see these changes 🔒
             </p>
 
@@ -456,7 +456,7 @@ export default function MyCirclePage() {
                 className="relative group"
                 aria-label="Change photo"
               >
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-[#3DAA8A] to-[#4BA8C8] flex items-center justify-center shadow-xl">
+                <div className={`w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-[#3DAA8A] to-[#4BA8C8] flex items-center justify-center shadow-xl ${!editPhoto ? 'ring-2 ring-[var(--portal-primary)]/20' : ''}`}>
                   {editPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={editPhoto} alt="Preview" className="w-full h-full object-cover" />
@@ -483,7 +483,7 @@ export default function MyCirclePage() {
 
             {/* Name input */}
             <div className="mb-6">
-              <label className="text-xs font-semibold uppercase tracking-widest mb-2 block" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+              <label className="text-xs font-semibold uppercase tracking-widest mb-2 block" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
                 Nickname
               </label>
               <input
@@ -492,7 +492,7 @@ export default function MyCirclePage() {
                 onChange={e => setEditName(e.target.value)}
                 placeholder={editContact.display_name}
                 className="w-full px-4 py-3 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#4BA8C8] focus:border-transparent transition-all"
-                style={{ fontFamily: 'Space Grotesk, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
+                style={{ fontFamily: 'var(--portal-font-heading)', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                 maxLength={30}
               />
             </div>
@@ -502,14 +502,14 @@ export default function MyCirclePage() {
               <button
                 onClick={() => setEditContact(null)}
                 className="flex-1 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-colors"
-                style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-surface)', border: '1px solid var(--portal-border)', color: 'var(--portal-text-light)' }}
+                style={{ fontFamily: 'var(--portal-font-body)', background: 'var(--portal-surface)', border: '1px solid var(--portal-border)', color: 'var(--portal-text-light)' }}
               >
                 <X className="w-4 h-4" /> Cancel
               </button>
               <button
                 onClick={saveEdit}
                 className="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-[#3DAA8A] to-[#4BA8C8] text-white font-bold flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-[#4BA8C8]/20"
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                style={{ fontFamily: 'var(--portal-font-body)' }}
               >
                 <Check className="w-4 h-4" /> Save
               </button>
@@ -526,7 +526,7 @@ export default function MyCirclePage() {
                   setEditContact(null);
                 }}
                 className="w-full mt-3 py-2.5 text-sm hover:text-red-400 transition-colors"
-                style={{ color: 'var(--portal-text-light)', fontFamily: 'Inter, sans-serif' }}
+                style={{ color: 'var(--portal-text-light)', fontFamily: 'var(--portal-font-body)' }}
               >
                 Reset to original
               </button>

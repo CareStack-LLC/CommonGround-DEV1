@@ -1,6 +1,6 @@
 'use client';
 
-import { Phone, Video } from 'lucide-react';
+import { Phone, Video, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface KidContactCardProps {
@@ -14,6 +14,12 @@ interface KidContactCardProps {
   };
   onCall: () => void;
   onVideo: () => void;
+  /** Custom nickname override (child's local customization) */
+  overrideNickname?: string;
+  /** Custom photo data URL override (child's local customization) */
+  overridePhotoUrl?: string;
+  /** Callback when the avatar is clicked to edit the contact */
+  onEdit?: () => void;
   className?: string;
 }
 
@@ -40,9 +46,23 @@ export function KidContactCard({
   contact,
   onCall,
   onVideo,
-  className
+  overrideNickname,
+  overridePhotoUrl,
+  onEdit,
+  className,
 }: KidContactCardProps) {
   const emoji = CONTACT_EMOJIS[contact.contact_type] || CONTACT_EMOJIS.other;
+  const displayName = overrideNickname || contact.display_name;
+  const hasCustomName = overrideNickname && overrideNickname !== contact.display_name;
+
+  const avatarContent = overridePhotoUrl ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={overridePhotoUrl} alt={displayName} className="w-full h-full object-cover" />
+  ) : (
+    <span className="text-3xl" role="img" aria-label={displayName}>
+      {emoji}
+    </span>
+  );
 
   return (
     <div
@@ -54,23 +74,48 @@ export function KidContactCard({
         className
       )}
     >
-      {/* Contact Photo/Emoji */}
+      {/* Contact Photo/Emoji — optionally editable */}
       <div className="flex-shrink-0">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4BA8C8] to-[#3DAA8A] flex items-center justify-center shadow-md">
-          <span className="text-3xl" role="img" aria-label={contact.display_name}>
-            {emoji}
-          </span>
-        </div>
+        {onEdit ? (
+          <button
+            onClick={onEdit}
+            className="relative group"
+            aria-label={`Edit ${displayName}`}
+          >
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4BA8C8] to-[#3DAA8A] flex items-center justify-center shadow-md overflow-hidden">
+              {avatarContent}
+            </div>
+            {/* Edit overlay on hover */}
+            <div className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+              <Pencil className="w-5 h-5 text-white" />
+            </div>
+          </button>
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4BA8C8] to-[#3DAA8A] flex items-center justify-center shadow-md overflow-hidden">
+            {avatarContent}
+          </div>
+        )}
       </div>
 
       {/* Name and Relationship */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-xl font-black text-foreground truncate">
-          {contact.display_name}
+        <h3
+          className="text-xl font-black text-foreground truncate"
+          style={{ fontFamily: 'var(--portal-font-heading)' }}
+        >
+          {displayName}
         </h3>
         {contact.relationship && (
-          <p className="text-sm text-muted-foreground font-semibold capitalize truncate">
+          <p
+            className="text-sm text-muted-foreground font-semibold capitalize truncate"
+            style={{ fontFamily: 'var(--portal-font-body)' }}
+          >
             {contact.relationship.replace('_', ' ')}
+          </p>
+        )}
+        {hasCustomName && (
+          <p className="text-[10px] mt-0.5" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-primary, #3DAA8A)' }}>
+            ✏️ Custom name
           </p>
         )}
       </div>
@@ -93,8 +138,8 @@ export function KidContactCard({
                 ]
               : 'bg-gray-300 dark:bg-gray-700 opacity-50 cursor-not-allowed'
           )}
-          aria-label={`Call ${contact.display_name}`}
-          title={contact.can_voice_call ? `Call ${contact.display_name}` : 'Voice calls not available'}
+          aria-label={`Call ${displayName}`}
+          title={contact.can_voice_call ? `Call ${displayName}` : 'Voice calls not available'}
         >
           <Phone className="w-6 h-6 text-white" />
         </button>
@@ -115,8 +160,8 @@ export function KidContactCard({
                 ]
               : 'bg-gray-300 dark:bg-gray-700 opacity-50 cursor-not-allowed'
           )}
-          aria-label={`Video call ${contact.display_name}`}
-          title={contact.can_video_call ? `Video call ${contact.display_name}` : 'Video calls not available'}
+          aria-label={`Video call ${displayName}`}
+          title={contact.can_video_call ? `Video call ${displayName}` : 'Video calls not available'}
         >
           <Video className="w-6 h-6 text-white" />
         </button>

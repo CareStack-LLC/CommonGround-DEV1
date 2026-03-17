@@ -9,6 +9,8 @@ interface KidComsLogoProps {
   size?: 'sm' | 'md' | 'lg';
   /** 'dark' renders white text (for dark backgrounds), 'light' renders dark text */
   variant?: 'dark' | 'light';
+  /** Which brand text to show: 'commonground' (default) or 'kidspace' */
+  brandLabel?: 'commonground' | 'kidspace';
 }
 
 const SIZES = {
@@ -17,7 +19,7 @@ const SIZES = {
   lg: { container: 'w-12 h-12', text: 'text-xl' },
 };
 
-export function KidComsLogo({ className, showText = true, size = 'md', variant = 'light' }: KidComsLogoProps) {
+export function KidComsLogo({ className, showText = true, size = 'md', variant = 'light', brandLabel = 'commonground' }: KidComsLogoProps) {
   const sizeClasses = SIZES[size];
   const id = useId().replace(/:/g, '');
 
@@ -60,18 +62,28 @@ export function KidComsLogo({ className, showText = true, size = 'md', variant =
         </svg>
       </div>
 
-      {/* CommonGround Text */}
+      {/* Brand Text */}
       {showText && (
-        <span
-          className={cn(
-            sizeClasses.text,
-            variant === 'dark' ? 'text-white' : 'text-[#2C5F5D]'
-          )}
-          style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
-        >
-          <span className="font-bold">Common</span>
-          <span className={cn('font-normal', variant === 'dark' ? 'opacity-90' : 'opacity-80')}>Ground</span>
-        </span>
+        brandLabel === 'kidspace' ? (
+          <span
+            className={sizeClasses.text}
+            style={{ fontFamily: 'var(--portal-font-display, DM Serif Display), Georgia, serif' }}
+          >
+            <span className="font-bold" style={{ color: '#3DAA8A' }}>Kid</span>
+            <span className="font-normal" style={{ color: '#4BA8C8' }}>Space</span>
+          </span>
+        ) : (
+          <span
+            className={cn(
+              sizeClasses.text,
+              variant === 'dark' ? 'text-white' : 'text-[#2C5F5D]'
+            )}
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+          >
+            <span className="font-bold">Common</span>
+            <span className={cn('font-normal', variant === 'dark' ? 'opacity-90' : 'opacity-80')}>Ground</span>
+          </span>
+        )
       )}
     </div>
   );

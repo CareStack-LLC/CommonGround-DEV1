@@ -434,6 +434,7 @@
   --portal-font-heading: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
   --portal-font-body: 'Inter', 'DM Sans', system-ui, sans-serif;
   --portal-font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --portal-font-display: 'DM Serif Display', Georgia, serif;
   --portal-font-size-base: 1rem;
   --portal-line-height: 1.6;
 

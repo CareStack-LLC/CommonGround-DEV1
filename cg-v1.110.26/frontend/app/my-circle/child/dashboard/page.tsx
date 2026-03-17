@@ -310,7 +310,7 @@ export default function ChildDashboardPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--portal-background)' }}>
         <div className="text-center space-y-4">
           <KidComsLogo showText={false} size="lg" variant={logoVariant} className="mx-auto animate-pulse" />
-          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Loading...</p>
+          <p className="text-sm" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>Loading...</p>
         </div>
       </div>
     );
@@ -318,10 +318,10 @@ export default function ChildDashboardPage() {
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--portal-background)' }}>
-      {/* Header */}
+      {/* Header — branded KidSpace logo */}
       <KidSpaceHeader
-        title={`Hey ${userData?.childName || 'friend'} 👋`}
-        subtitle="What are we doing today?"
+        title="KidSpace"
+        showBranding
         userInitial={userInitial}
         avatarGradient={avatarGradient}
         sticky={false}
@@ -338,6 +338,57 @@ export default function ChildDashboardPage() {
       />
 
       <main className="space-y-6 pb-6">
+        {/* Greeting Card */}
+        <div className="px-4">
+          <div
+            className="relative overflow-hidden rounded-2xl p-6 border"
+            style={{
+              background: 'linear-gradient(135deg, var(--portal-primary, #3DAA8A)08, var(--portal-primary, #3DAA8A)18)',
+              borderColor: 'var(--portal-primary, #3DAA8A)1a',
+            }}
+          >
+            <div className="flex items-center gap-4">
+              {/* Avatar */}
+              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${avatarGradient} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                <span className="text-white font-bold text-xl" style={{ fontFamily: 'var(--portal-font-heading)' }}>
+                  {userInitial}
+                </span>
+              </div>
+              {/* Greeting text */}
+              <div>
+                <p
+                  className="text-2xl font-semibold leading-tight"
+                  style={{
+                    fontFamily: 'var(--portal-font-display, DM Serif Display), Georgia, serif',
+                    color: 'var(--portal-text-heading)',
+                  }}
+                >
+                  {new Date().getHours() < 12 ? 'Good Morning,' : new Date().getHours() < 17 ? 'Good Afternoon,' : 'Good Evening,'}
+                </p>
+                <p
+                  className="text-2xl font-semibold"
+                  style={{
+                    fontFamily: 'var(--portal-font-display, DM Serif Display), Georgia, serif',
+                    color: 'var(--portal-primary, #3DAA8A)',
+                  }}
+                >
+                  {userData?.childName || 'friend'}
+                </p>
+              </div>
+            </div>
+            {/* Nature SVG illustration */}
+            <svg className="absolute right-2 bottom-0 w-32 h-32 opacity-[0.12]" viewBox="0 0 120 120" fill="none">
+              <path d="M90 100 Q85 70 60 60 Q35 50 30 20" stroke="var(--portal-primary, #3DAA8A)" strokeWidth="2" fill="none" />
+              <circle cx="30" cy="20" r="8" fill="var(--portal-primary, #3DAA8A)" opacity="0.4" />
+              <circle cx="60" cy="60" r="6" fill="var(--portal-accent, #F5A623)" opacity="0.5" />
+              <path d="M60 60 Q70 40 85 45" stroke="var(--portal-primary, #3DAA8A)" strokeWidth="1.5" fill="none" />
+              <circle cx="85" cy="45" r="5" fill="var(--portal-secondary, #2D6A8F)" opacity="0.3" />
+              <path d="M30 20 Q20 35 25 50" stroke="var(--portal-primary, #3DAA8A)" strokeWidth="1.5" fill="none" />
+              <circle cx="25" cy="50" r="4" fill="var(--portal-primary, #3DAA8A)" opacity="0.3" />
+            </svg>
+          </div>
+        </div>
+
         {/* Featured Hero Banner */}
         <div className="px-4">
           <FeaturedHeroBanner
@@ -363,7 +414,7 @@ export default function ChildDashboardPage() {
         {/* Pick Back Up — real progress only */}
         {pickBackUp.length > 0 && (
           <section className="px-4">
-            <h2 className="text-xl font-bold mb-3" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+            <h2 className="text-xl font-bold mb-3" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
               Pick Back Up
             </h2>
             <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
@@ -401,14 +452,14 @@ export default function ChildDashboardPage() {
                       </div>
                       <div className="px-4 py-3 flex items-center gap-3">
                         <div className="flex-1 min-w-0 text-left">
-                          <h3 className="font-bold text-sm leading-tight line-clamp-1" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+                          <h3 className="font-bold text-sm leading-tight line-clamp-1" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
                             {item.title}
                           </h3>
-                          <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                          <span className="text-xs" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
                             {isVideo ? 'Movie' : 'Book'}
                           </span>
                         </div>
-                        <span className={`${isVideo ? 'text-[#4BA8C8]' : 'text-amber-400'} text-xs font-bold flex-shrink-0`} style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                        <span className={`${isVideo ? 'text-[#4BA8C8]' : 'text-amber-400'} text-xs font-bold flex-shrink-0`} style={{ fontFamily: 'var(--portal-font-mono)' }}>
                           {progressPct}%
                         </span>
                       </div>
@@ -422,7 +473,7 @@ export default function ChildDashboardPage() {
 
         {/* Quick Actions — 2x2 Grid */}
         <section className="px-4">
-          <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+          <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
             Quick Actions
           </h2>
           <div className="grid grid-cols-2 gap-3">
@@ -440,7 +491,7 @@ export default function ChildDashboardPage() {
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
                 <div className="relative h-full flex flex-col items-center justify-center gap-2">
                   <Icon className="w-10 h-10 text-white/90" strokeWidth={1.5} />
-                  <span className="text-white font-bold text-base" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{label}</span>
+                  <span className="text-white font-bold text-base" style={{ fontFamily: 'var(--portal-font-heading)' }}>{label}</span>
                 </div>
               </button>
             ))}
@@ -449,7 +500,7 @@ export default function ChildDashboardPage() {
 
         {/* Recent Calls — Real API data */}
         <section className="px-4">
-          <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+          <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
             Recent Calls
           </h2>
           <div className="rounded-3xl overflow-hidden divide-y" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)', ['--tw-divide-color' as string]: 'var(--portal-divider)' }}>
@@ -460,7 +511,7 @@ export default function ChildDashboardPage() {
             ) : recentCalls.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
                 <Phone className="w-8 h-8 mb-2" style={{ color: 'var(--portal-muted)' }} />
-                <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                <p className="text-sm" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
                   No calls yet — call someone from your circle!
                 </p>
               </div>
@@ -474,11 +525,11 @@ export default function ChildDashboardPage() {
                 return (
                   <div key={call.id} className="flex items-center gap-4 p-4 transition-colors group" style={{ borderBottom: '1px solid var(--portal-divider)' }}>
                     <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${CONTACT_COLORS[colorIdx]} flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform`}>
-                      <span className="text-white font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{initial}</span>
+                      <span className="text-white font-black text-lg" style={{ fontFamily: 'var(--portal-font-heading)' }}>{initial}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>{call.contact_name}</h3>
-                      <p className="text-xs flex items-center gap-1.5" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                      <h3 className="font-bold text-sm" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>{call.contact_name}</h3>
+                      <p className="text-xs flex items-center gap-1.5" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
                         {isVideo ? <Video className="w-3 h-3" /> : <Phone className="w-3 h-3" />}
                         {isVideo ? 'Video Call' : 'Voice Call'}
                         {timeStr && <> · {timeStr}</>}
@@ -502,13 +553,13 @@ export default function ChildDashboardPage() {
         {/* Recent Messages */}
         <section className="px-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+            <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
               Recent Messages
             </h2>
             <button
               onClick={() => router.push('/my-circle/child/my-circle-page')}
               className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] font-semibold flex items-center gap-1"
-              style={{ fontFamily: 'Inter, sans-serif' }}
+              style={{ fontFamily: 'var(--portal-font-body)' }}
             >
               View All <ChevronRight className="w-3 h-3" />
             </button>
@@ -517,7 +568,7 @@ export default function ChildDashboardPage() {
             {recentMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
                 <MessageCircle className="w-8 h-8 mb-2" style={{ color: 'var(--portal-muted)' }} />
-                <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                <p className="text-sm" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
                   No messages yet — say hi to someone in your circle!
                 </p>
               </div>
@@ -536,20 +587,20 @@ export default function ChildDashboardPage() {
                     style={{ borderBottom: '1px solid var(--portal-divider)' }}
                   >
                     <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${CONTACT_COLORS[colorIdx]} flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform relative`}>
-                      <span className="text-white font-black text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{initial}</span>
+                      <span className="text-white font-black text-lg" style={{ fontFamily: 'var(--portal-font-heading)' }}>{initial}</span>
                       {hasUnread && (
                         <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#3DAA8A] rounded-full" style={{ border: '2px solid var(--portal-background)' }} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: hasUnread ? 'var(--portal-text-heading)' : 'var(--portal-text)' }}>
+                      <h3 className="text-sm font-bold" style={{ fontFamily: 'var(--portal-font-heading)', color: hasUnread ? 'var(--portal-text-heading)' : 'var(--portal-text)' }}>
                         {conv.partner_name}
                       </h3>
-                      <p className="text-xs truncate" style={{ fontFamily: 'Inter, sans-serif', color: hasUnread ? 'var(--portal-text)' : 'var(--portal-muted)' }}>
+                      <p className="text-xs truncate" style={{ fontFamily: 'var(--portal-font-body)', color: hasUnread ? 'var(--portal-text)' : 'var(--portal-muted)' }}>
                         {conv.last_message || 'Start a conversation'}
                       </p>
                     </div>
-                    <span className="text-[10px] flex-shrink-0" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                    <span className="text-[10px] flex-shrink-0" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
                       {timeStr}
                     </span>
                   </button>
@@ -562,7 +613,7 @@ export default function ChildDashboardPage() {
         {/* Upcoming Events — Real API data */}
         <section className="px-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+            <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
               Upcoming Events
             </h2>
           </div>
@@ -574,7 +625,7 @@ export default function ChildDashboardPage() {
             ) : upcomingEvents.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-6 px-4 text-center rounded-2xl" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)' }}>
                 <Calendar className="w-8 h-8 mb-2" style={{ color: 'var(--portal-muted)' }} />
-                <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                <p className="text-sm" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
                   No upcoming events — create one below!
                 </p>
               </div>
@@ -591,12 +642,12 @@ export default function ChildDashboardPage() {
                       <span className="text-2xl leading-none">{getEventEmoji(event.event_type)}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+                      <h3 className="font-bold text-sm" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
                         {event.title}
                       </h3>
                       <div className="flex items-center gap-2 mt-0.5">
                         <Calendar className="w-3 h-3" style={{ color: 'var(--portal-muted)' }} />
-                        <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                        <span className="text-xs" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>
                           {date} · {time}
                         </span>
                         {event.created_by_child && (
@@ -612,7 +663,7 @@ export default function ChildDashboardPage() {
             <button
               onClick={() => { setShowAddEvent(true); setEventStep('type'); setEventCreated(false); }}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed hover:border-[#4BA8C8]/50 hover:text-[#5BC4A0] transition-all duration-200"
-              style={{ borderColor: 'var(--portal-border)', color: 'var(--portal-muted)', fontFamily: 'Inter, sans-serif', fontSize: '14px' }}
+              style={{ borderColor: 'var(--portal-border)', color: 'var(--portal-muted)', fontFamily: 'var(--portal-font-body)', fontSize: '14px' }}
             >
               <Plus className="w-4 h-4" /> Add new event
             </button>
@@ -622,7 +673,7 @@ export default function ChildDashboardPage() {
         {/* Coming Soon */}
         <section>
           <div className="px-4 flex items-center justify-between mb-3">
-            <h2 className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+            <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
               Coming Soon
             </h2>
             <button
@@ -646,7 +697,7 @@ export default function ChildDashboardPage() {
                     </div>
                     <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-[#5BC4A0]" />
-                      <span className="text-white/80 text-xs font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>Watch for it!</span>
+                      <span className="text-white/80 text-xs font-medium" style={{ fontFamily: 'var(--portal-font-body)' }}>Watch for it!</span>
                     </div>
                   </div>
                 </div>
@@ -658,7 +709,7 @@ export default function ChildDashboardPage() {
         {/* Featured Author */}
         <section className="px-4">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-[#4BA8C8] text-xs font-semibold uppercase tracking-widest" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-[#4BA8C8] text-xs font-semibold uppercase tracking-widest" style={{ fontFamily: 'var(--portal-font-body)' }}>
               Featured Author
             </p>
             <button onClick={() => router.push('/my-circle/child/library')} className="flex items-center gap-1 text-sm font-semibold text-[#4BA8C8] hover:text-[#5BC4A0] transition-colors">
@@ -671,12 +722,12 @@ export default function ChildDashboardPage() {
                 <img src="/kidsComms/posters/authors/ayaanasclark.jpg" alt="Ayanna S Clark" className="w-full h-full object-cover" />
               </div>
               <div>
-                <p className="font-bold text-base" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Ayanna S Clark</p>
+                <p className="font-bold text-base" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>Ayanna S Clark</p>
                 <div className="flex items-center gap-1 mt-0.5">
                   {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
-                  <span className="text-amber-400 text-xs ml-1" style={{ fontFamily: 'Inter, sans-serif' }}>Top Author</span>
+                  <span className="text-amber-400 text-xs ml-1" style={{ fontFamily: 'var(--portal-font-body)' }}>Top Author</span>
                 </div>
-                <p className="text-xs mt-2 leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-text)' }}>
+                <p className="text-xs mt-2 leading-relaxed" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-text)' }}>
                   Ayanna S. Clark is a Compton-born illustrator and author who creates magical stories that inspire confidence, imagination, and empowerment in young readers.
                 </p>
               </div>
@@ -692,20 +743,20 @@ export default function ChildDashboardPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
             </div>
             <div className="p-6">
-              <h3 className="text-2xl font-black mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+              <h3 className="text-2xl font-black mb-4" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
                 Luna has found a glowing key... and it unlocks the stars.
               </h3>
               <div className="space-y-4">
-                <p className="text-base leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-text)' }}>
+                <p className="text-base leading-relaxed" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-text)' }}>
                   When the sky begins to whisper secrets, Luna and her brave cat Midnight step into a magical adventure filled with constellations, courage, and a little bit of mystery.
                 </p>
-                <p className="text-[#4BA8C8] font-bold text-base italic" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <p className="text-[#4BA8C8] font-bold text-base italic" style={{ fontFamily: 'var(--portal-font-body)' }}>
                   If you love magic, friendship, and nighttime adventures, this is your next favorite story.
                 </p>
                 <button
                   onClick={() => router.push('/my-circle/child/library/luna-midnight')}
                   className="w-full sm:w-auto mt-2 px-8 py-4 bg-gradient-to-r from-[#4BA8C8] to-[#3DAA8A] rounded-2xl text-white font-black text-lg shadow-xl shadow-[#4BA8C8]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                  style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+                  style={{ fontFamily: 'var(--portal-font-heading)' }}
                 >
                   READ NOW
                 </button>
@@ -753,16 +804,16 @@ export default function ChildDashboardPage() {
                 <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
                   <Check className="w-8 h-8 text-emerald-400" />
                 </div>
-                <h3 className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+                <h3 className="text-xl font-bold" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
                   Event Created!
                 </h3>
-                <p className="text-slate-400 text-sm mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <p className="text-slate-400 text-sm mt-1" style={{ fontFamily: 'var(--portal-font-body)' }}>
                   Your event has been added
                 </p>
               </div>
             ) : eventStep === 'type' ? (
               <>
-                <h3 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+                <h3 className="text-xl font-bold mb-4" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
                   What kind of event?
                 </h3>
                 <div className="space-y-3">
@@ -773,7 +824,7 @@ export default function ChildDashboardPage() {
                       className={`w-full flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r ${type.color} hover:opacity-90 active:scale-[0.98] transition-all`}
                     >
                       <span className="text-2xl">{type.emoji}</span>
-                      <span className="text-white font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{type.label}</span>
+                      <span className="text-white font-bold" style={{ fontFamily: 'var(--portal-font-heading)' }}>{type.label}</span>
                     </button>
                   ))}
                   <button
@@ -782,7 +833,7 @@ export default function ChildDashboardPage() {
                     style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)' }}
                   >
                     <span className="text-2xl">📅</span>
-                    <span className="text-white font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Custom Event</span>
+                    <span className="text-white font-bold" style={{ fontFamily: 'var(--portal-font-heading)' }}>Custom Event</span>
                   </button>
                 </div>
               </>
@@ -792,47 +843,47 @@ export default function ChildDashboardPage() {
                   <button onClick={() => setEventStep('type')} className="text-slate-400 hover:text-white transition-colors">
                     <ChevronRight className="w-5 h-5 rotate-180" />
                   </button>
-                  <h3 className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+                  <h3 className="text-xl font-bold" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
                     Event Details
                   </h3>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs font-medium mb-1.5 block" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Event Name</label>
+                    <label className="text-xs font-medium mb-1.5 block" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>Event Name</label>
                     <input
                       type="text"
                       value={newEventTitle}
                       onChange={e => setNewEventTitle(e.target.value)}
                       placeholder="What's happening?"
                       className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-[#4BA8C8] transition-colors"
-                      style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
+                      style={{ fontFamily: 'var(--portal-font-body)', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-medium mb-1.5 block" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Date</label>
+                      <label className="text-xs font-medium mb-1.5 block" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>Date</label>
                       <input
                         type="date"
                         value={newEventDate}
                         onChange={e => setNewEventDate(e.target.value)}
                         className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-[#4BA8C8] transition-colors"
-                        style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
+                        style={{ fontFamily: 'var(--portal-font-body)', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-medium mb-1.5 block" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Time</label>
+                      <label className="text-xs font-medium mb-1.5 block" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>Time</label>
                       <input
                         type="time"
                         value={newEventTime}
                         onChange={e => setNewEventTime(e.target.value)}
                         className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-[#4BA8C8] transition-colors"
-                        style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
+                        style={{ fontFamily: 'var(--portal-font-body)', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs font-medium mb-1.5 block" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Include Parents</label>
+                    <label className="text-xs font-medium mb-1.5 block" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-muted)' }}>Include Parents</label>
                     <div className="grid grid-cols-2 gap-2">
                       {[
                         { value: 'both' as const, label: 'Both Parents' },
@@ -848,7 +899,7 @@ export default function ChildDashboardPage() {
                               ? 'bg-[#4BA8C8] text-white'
                               : ''
                           }`}
-                          style={newEventParents !== opt.value ? { background: 'var(--portal-input-bg)', color: 'var(--portal-muted)', border: '1px solid var(--portal-input-border)', fontFamily: 'Inter, sans-serif' } : { fontFamily: 'Inter, sans-serif' }}
+                          style={newEventParents !== opt.value ? { background: 'var(--portal-input-bg)', color: 'var(--portal-muted)', border: '1px solid var(--portal-input-border)', fontFamily: 'var(--portal-font-body)' } : { fontFamily: 'var(--portal-font-body)' }}
                         >
                           {opt.label}
                         </button>
@@ -859,7 +910,7 @@ export default function ChildDashboardPage() {
                     onClick={handleCreateEvent}
                     disabled={!newEventTitle || !newEventDate || !newEventTime || isCreatingEvent}
                     className="w-full py-3.5 bg-gradient-to-r from-[#4BA8C8] to-[#3DAA8A] rounded-xl text-white font-bold shadow-lg shadow-[#4BA8C8]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                    style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+                    style={{ fontFamily: 'var(--portal-font-heading)' }}
                   >
                     {isCreatingEvent ? (
                       <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -875,7 +926,7 @@ export default function ChildDashboardPage() {
               <button
                 onClick={() => setShowAddEvent(false)}
                 className="w-full mt-4 py-3 text-sm transition-colors"
-                style={{ color: 'var(--portal-muted)', fontFamily: 'Inter, sans-serif' }}
+                style={{ color: 'var(--portal-muted)', fontFamily: 'var(--portal-font-body)' }}
               >
                 Cancel
               </button>

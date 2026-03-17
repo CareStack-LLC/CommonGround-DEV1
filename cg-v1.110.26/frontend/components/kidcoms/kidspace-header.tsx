@@ -20,6 +20,8 @@ interface KidSpaceHeaderProps {
   children?: ReactNode;
   /** Whether the header should be sticky */
   sticky?: boolean;
+  /** Show full KidSpace branding (logo + "KidSpace" text) instead of title */
+  showBranding?: boolean;
 }
 
 export function KidSpaceHeader({
@@ -30,6 +32,7 @@ export function KidSpaceHeader({
   actions,
   children,
   sticky = true,
+  showBranding = false,
 }: KidSpaceHeaderProps) {
   const { resolvedTheme } = useKidSpaceTheme();
   const logoVariant = resolvedTheme === 'dark' ? 'dark' : 'light';
@@ -44,31 +47,37 @@ export function KidSpaceHeader({
     >
       <div className="px-4 py-3">
         <div className="flex items-center justify-between">
-          {/* Left: Logo + Title */}
+          {/* Left: Logo + Title or Branding */}
           <div className="flex items-center gap-3">
-            <KidComsLogo showText={false} size="sm" variant={logoVariant} />
-            <div>
-              <h1
-                className="font-black text-xl leading-tight"
-                style={{
-                  fontFamily: 'Space Grotesk, sans-serif',
-                  color: 'var(--portal-text-heading)',
-                }}
-              >
-                {title}
-              </h1>
-              {subtitle && (
-                <p
-                  className="text-xs"
-                  style={{
-                    fontFamily: 'Inter, sans-serif',
-                    color: 'var(--portal-muted)',
-                  }}
-                >
-                  {subtitle}
-                </p>
-              )}
-            </div>
+            {showBranding ? (
+              <KidComsLogo showText size="md" brandLabel="kidspace" variant={logoVariant} />
+            ) : (
+              <>
+                <KidComsLogo showText={false} size="sm" variant={logoVariant} />
+                <div>
+                  <h1
+                    className="font-black text-xl leading-tight"
+                    style={{
+                      fontFamily: 'var(--portal-font-heading)',
+                      color: 'var(--portal-text-heading)',
+                    }}
+                  >
+                    {title}
+                  </h1>
+                  {subtitle && (
+                    <p
+                      className="text-xs"
+                      style={{
+                        fontFamily: 'var(--portal-font-body)',
+                        color: 'var(--portal-muted)',
+                      }}
+                    >
+                      {subtitle}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           {/* Right: Actions + Theme Toggle + Avatar */}
@@ -82,7 +91,7 @@ export function KidSpaceHeader({
               >
                 <span
                   className="text-white font-bold text-sm"
-                  style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+                  style={{ fontFamily: 'var(--portal-font-heading)' }}
                 >
                   {userInitial}
                 </span>
