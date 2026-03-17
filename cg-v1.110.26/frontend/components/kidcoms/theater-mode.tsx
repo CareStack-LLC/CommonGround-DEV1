@@ -76,10 +76,7 @@ export function TheaterMode({
     currentTime: 0,
   });
 
-  // Track if we're the one who initiated the last action (to avoid echo)
   const lastActionRef = useRef<string>('');
-
-  // Sync interval for periodic state updates
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Handle incoming theater messages from other participant
@@ -90,8 +87,6 @@ export function TheaterMode({
     const handleAppMessage = (event: { data: TheaterSyncMessage; fromId: string }) => {
       const message = event.data;
       if (message.type !== 'theater_control') return;
-
-      // Ignore messages from ourselves
       if (message.data.senderId === userId) return;
 
       const { action, contentType, contentUrl, currentTime, currentPage, isPlaying, contentTitle } = message.data;
@@ -100,7 +95,6 @@ export function TheaterMode({
 
       switch (action) {
         case 'start':
-          // Other person selected content - load it
           setContent({
             type: contentType,
             url: contentUrl,
@@ -114,7 +108,6 @@ export function TheaterMode({
           break;
 
         case 'stop':
-          // Other person exited theater
           setContent(null);
           setTheaterState({ isPlaying: false, currentTime: 0 });
           break;
@@ -136,7 +129,6 @@ export function TheaterMode({
           break;
 
         case 'seek':
-          // Sync to other person's position
           if (currentTime !== undefined) {
             setTheaterState((prev) => ({
               ...prev,
@@ -147,7 +139,6 @@ export function TheaterMode({
           break;
 
         case 'page':
-          // PDF page change
           setTheaterState((prev) => ({
             ...prev,
             currentPage: currentPage,
@@ -155,11 +146,10 @@ export function TheaterMode({
           break;
 
         case 'sync_request':
-          // Other person requesting current state - send full content info
           if (content && callRef.current) {
             console.log('Theater: Responding to sync_request with current content');
             const syncMessage = createTheaterMessage(
-              'start', // Use 'start' so receiver loads the content
+              'start',
               content.type,
               content.url,
               userId,
@@ -187,7 +177,6 @@ export function TheaterMode({
   // Request sync when entering theater mode
   useEffect(() => {
     if (isActive && callRef.current) {
-      // Small delay to let other participant know we're here
       setTimeout(() => {
         const syncRequest = createTheaterMessage(
           'sync_request',
@@ -201,7 +190,7 @@ export function TheaterMode({
     }
   }, [isActive, userId, userName, callRef]);
 
-  // Broadcast current state to other participant
+  // Broadcast current state
   const broadcastState = useCallback((action: TheaterSyncMessage['data']['action']) => {
     const call = callRef.current;
     if (!call || !content) return;
@@ -223,12 +212,12 @@ export function TheaterMode({
     call.sendAppMessage(message, '*');
   }, [callRef, content, userId, userName, theaterState]);
 
-  // Periodic sync while playing (every 3 seconds)
+  // Periodic sync while playing (every 2 seconds for smoother sync)
   useEffect(() => {
     if (content && theaterState.isPlaying) {
       syncIntervalRef.current = setInterval(() => {
         broadcastState('seek');
-      }, 3000);
+      }, 2000);
     }
 
     return () => {
@@ -238,13 +227,11 @@ export function TheaterMode({
     };
   }, [content, theaterState.isPlaying, broadcastState]);
 
-  // Content selection handler - either caller can select
   const handleContentSelect = (selected: { type: ContentType; url: string; title: string }) => {
     setContent(selected);
     setShowLibrary(false);
     setTheaterState({ isPlaying: false, currentTime: 0, currentPage: 1 });
 
-    // Broadcast to other participant
     if (callRef.current) {
       const message = createTheaterMessage(
         'start',
@@ -263,10 +250,8 @@ export function TheaterMode({
     }
   };
 
-  // Playback control handlers - either caller can control
   const handlePlay = () => {
     setTheaterState((prev) => ({ ...prev, isPlaying: true }));
-    // Broadcast immediately with current time
     const call = callRef.current;
     if (call && content) {
       const message = createTheaterMessage(
@@ -287,7 +272,6 @@ export function TheaterMode({
 
   const handlePause = () => {
     setTheaterState((prev) => ({ ...prev, isPlaying: false }));
-    // Broadcast immediately with current time
     const call = callRef.current;
     if (call && content) {
       const message = createTheaterMessage(
@@ -308,7 +292,6 @@ export function TheaterMode({
 
   const handleSeek = (time: number) => {
     setTheaterState((prev) => ({ ...prev, currentTime: time }));
-    // Broadcast the seek immediately
     const call = callRef.current;
     if (call && content) {
       const message = createTheaterMessage(
@@ -327,10 +310,8 @@ export function TheaterMode({
     }
   };
 
-  // Handle PDF page change - broadcast to sync
   const handlePageChange = (page: number) => {
     setTheaterState((prev) => ({ ...prev, currentPage: page }));
-    // Broadcast the page change
     const call = callRef.current;
     if (call && content) {
       const message = createTheaterMessage(
@@ -352,7 +333,6 @@ export function TheaterMode({
     setTheaterState((prev) => ({ ...prev, currentTime: time, duration }));
   };
 
-  // Exit theater - notify other participant
   const handleExit = () => {
     if (callRef.current) {
       const message = createTheaterMessage('stop', 'video', '', userId, { senderName: userName });
@@ -365,49 +345,55 @@ export function TheaterMode({
 
   if (!isActive) return null;
 
-  // Get participants for PiP
   const participantList = Array.from(participants.values());
   const localParticipant = participantList.find((p) => p.isLocal);
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex flex-col">
+    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A]/95 to-[#0D1B24] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-white/90 backdrop-blur-sm border-b border-gray-200">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0D1B24]/90 backdrop-blur-sm border-b border-[#3DAA8A]/10">
         <div className="flex items-center space-x-3">
-          <span className="text-[#2C5F5D] text-sm font-medium px-3 py-1 bg-[#2C5F5D]/10 rounded-lg border border-[#2C5F5D]/20">
+          <span
+            className="text-[#3DAA8A] text-sm font-semibold px-3 py-1 bg-[#3DAA8A]/10 rounded-lg border border-[#3DAA8A]/20"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
             Theater Mode
           </span>
           {content && (
-            <span className="text-[#1E3A4A] font-medium hidden sm:inline">{content.title}</span>
+            <span className="text-white/80 font-medium hidden sm:inline text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
+              {content.title}
+            </span>
           )}
         </div>
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowLibrary(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-[#2C5F5D] hover:bg-[#2C5F5D]/90 text-white rounded-lg transition-colors"
+            className="flex items-center space-x-2 px-3 py-1.5 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 text-white rounded-lg transition-colors text-sm font-medium"
+            style={{ fontFamily: "'Inter', sans-serif" }}
           >
             <Library className="h-4 w-4" />
-            <span className="text-sm hidden sm:inline">Library</span>
+            <span className="hidden sm:inline">Library</span>
           </button>
           <button
             onClick={handleExit}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+            className="flex items-center space-x-2 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors text-sm font-medium"
+            style={{ fontFamily: "'Inter', sans-serif" }}
           >
             <X className="h-4 w-4" />
-            <span className="text-sm hidden sm:inline">Exit</span>
+            <span className="hidden sm:inline">Exit</span>
           </button>
         </div>
       </div>
 
       {/* Main Content Area */}
       <div className="flex-1 relative overflow-hidden">
-        {/* Mobile: Only show remote participant PiP (to see their reactions) */}
+        {/* Mobile: Only show remote participant PiP */}
         <div className="md:hidden absolute top-2 right-2 z-10">
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D] bg-white"
+              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-[#3DAA8A]/50 bg-[#1E3A4A]"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -416,50 +402,50 @@ export function TheaterMode({
 
         {/* Desktop: Show both PiP windows */}
         <div className="hidden md:flex absolute top-4 right-4 z-10 flex-col space-y-2">
-          {/* Remote participant(s) PiP */}
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D] bg-white"
+              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#3DAA8A]/50 bg-[#1E3A4A]"
             >
               <PiPVideoTile participant={participant} />
             </div>
           ))}
 
-          {/* Local participant PiP */}
           {localParticipant && (
-            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2C5F5D] bg-white">
+            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2D6A8F]/50 bg-[#1E3A4A]">
               <PiPVideoTile participant={localParticipant} />
             </div>
           )}
         </div>
 
-        {/* Content Player - full height container */}
+        {/* Content Player */}
         <div className="h-full flex flex-col p-2 md:p-4 md:pr-48">
           {!content ? (
-            // No content selected - show prompt
             <div className="flex-1 flex flex-col items-center justify-center">
               <div className="text-center px-4">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-[#2C5F5D] rounded-full blur-2xl opacity-10" />
-                  <Library className="relative h-16 w-16 md:h-20 md:w-20 text-[#2C5F5D] mx-auto" />
+                  <div className="absolute inset-0 bg-[#3DAA8A] rounded-full blur-2xl opacity-10" />
+                  <Library className="relative h-16 w-16 md:h-20 md:w-20 text-[#3DAA8A] mx-auto" />
                 </div>
-                <h2 className="text-lg md:text-xl text-[#1E3A4A] mb-2 font-semibold">
+                <h2
+                  className="text-lg md:text-xl text-white mb-2 font-bold"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                >
                   Choose something to watch together
                 </h2>
-                <p className="text-gray-600 mb-6 text-sm md:text-base">
+                <p className="text-[#CBD8E0]/60 mb-6 text-sm md:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                   Select a video or storybook from the library
                 </p>
                 <button
                   onClick={() => setShowLibrary(true)}
-                  className="px-6 py-3 bg-[#2C5F5D] hover:bg-[#2C5F5D]/90 text-white rounded-xl font-medium transition-all shadow-lg shadow-[#2C5F5D]/20 hover:shadow-[#2C5F5D]/30"
+                  className="px-6 py-3 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 text-white rounded-xl font-semibold transition-all shadow-lg shadow-[#3DAA8A]/20 hover:shadow-[#3DAA8A]/30"
+                  style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   Open Library
                 </button>
               </div>
             </div>
           ) : content.type === 'video' ? (
-            // Video player - both callers can control (flex-1 ensures full height)
             <div className="flex-1 min-h-0">
               <TheaterVideoPlayer
                 src={content.url}
@@ -474,7 +460,6 @@ export function TheaterMode({
               />
             </div>
           ) : content.type === 'youtube' ? (
-            // YouTube player - synced between callers
             <div className="flex-1 min-h-0">
               <TheaterYoutubePlayer
                 videoId={extractYoutubeId(content.url) || content.url}
@@ -488,7 +473,6 @@ export function TheaterMode({
               />
             </div>
           ) : content.type === 'pdf' ? (
-            // PDF storybook viewer - synced page navigation
             <div className="flex-1 min-h-0">
               <TheaterPdfViewer
                 src={content.url}
@@ -502,13 +486,13 @@ export function TheaterMode({
       </div>
 
       {/* Bottom Controls */}
-      <div className="px-4 py-3 bg-[#2C5F5D] safe-area-bottom border-t border-[#2C5F5D]/50 shadow-lg">
+      <div className="px-4 py-3 bg-[#0D1B24] safe-area-bottom border-t border-[#3DAA8A]/10 shadow-lg">
         <div className="flex items-center justify-center space-x-3">
           <button
             onClick={onToggleAudio}
             className={`p-3 rounded-full transition-all duration-200 ${
               isAudioOn
-                ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-105'
+                ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white hover:scale-105'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
@@ -518,7 +502,7 @@ export function TheaterMode({
             onClick={onToggleVideo}
             className={`p-3 rounded-full transition-all duration-200 ${
               isVideoOn
-                ? 'bg-white/20 hover:bg-white/30 text-white hover:scale-105'
+                ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white hover:scale-105'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
@@ -583,19 +567,21 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#2C5F5D] to-[#F5A623]">
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-semibold shadow-lg shadow-[#2C5F5D]/20">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F]">
+          <div
+            className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold shadow-lg"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
         </div>
       )}
 
-      {/* Hidden audio element for remote participant */}
       {!participant.isLocal && <audio ref={audioRef} />}
 
       {/* Name label */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#1E3A4A]/90 to-transparent px-2 py-1">
-        <span className="text-white text-xs truncate block drop-shadow-lg">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0D1B24]/90 to-transparent px-2 py-1">
+        <span className="text-white text-xs truncate block drop-shadow-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
           {participant.odName}
           {participant.isLocal && <span className="text-[#F5A623]"> (You)</span>}
         </span>

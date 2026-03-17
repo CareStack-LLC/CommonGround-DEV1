@@ -69,7 +69,6 @@ export default function VideoCall({
   const [isAudioOn, setIsAudioOn] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Track if we've already created a call object (prevents duplicate in React Strict Mode)
   const callCreatedRef = useRef(false);
   const callRef = useRef<DailyCall | null>(null);
 
@@ -79,10 +78,7 @@ export default function VideoCall({
 
   // Initialize Daily.co call
   useEffect(() => {
-    // Prevent duplicate call creation in React Strict Mode
-    if (callCreatedRef.current) {
-      return;
-    }
+    if (callCreatedRef.current) return;
     callCreatedRef.current = true;
 
     const call = DailyIframe.createCallObject({
@@ -93,7 +89,6 @@ export default function VideoCall({
     callRef.current = call;
     setCallObject(call);
 
-    // Event handlers
     const onJoinedMeeting = () => {
       setIsJoining(false);
       updateParticipants(call.participants());
@@ -124,7 +119,6 @@ export default function VideoCall({
       onLeave?.();
     };
 
-    // Set up event handlers
     call.on('joined-meeting', onJoinedMeeting);
     call.on('participant-joined', onParticipantJoinedEvent as Parameters<typeof call.on>[1]);
     call.on('participant-left', onParticipantLeftEvent as Parameters<typeof call.on>[1]);
@@ -132,7 +126,6 @@ export default function VideoCall({
     call.on('error', onErrorEvent as Parameters<typeof call.on>[1]);
     call.on('left-meeting', onLeftMeeting);
 
-    // Join the meeting
     call
       .join({
         url: roomUrl,
@@ -146,7 +139,6 @@ export default function VideoCall({
         onError?.('Failed to join meeting');
       });
 
-    // Cleanup on unmount
     return () => {
       if (callRef.current) {
         callRef.current.off('joined-meeting', onJoinedMeeting);
@@ -161,9 +153,9 @@ export default function VideoCall({
         callCreatedRef.current = false;
       }
     };
-  }, []); // Remove dependencies to prevent recreation
+  }, []);
 
-  // ARIA frame capture - periodically captures video frames and sends to backend for analysis
+  // ARIA frame capture
   useEffect(() => {
     if (!ariaEnabled || !sessionId || !callObject || isJoining) return;
 
@@ -173,30 +165,23 @@ export default function VideoCall({
       : `${apiBase}/api/v1/parent-calls/${sessionId}/video-frame`;
 
     const captureAndSendFrames = async () => {
-      // Get all video elements in the call
       const videoElements = document.querySelectorAll<HTMLVideoElement>('video');
 
       for (const videoEl of Array.from(videoElements)) {
-        // Skip if video isn't playing or has no source
         if (videoEl.readyState < 2 || videoEl.videoWidth === 0) continue;
 
         try {
-          // Create canvas to capture frame
           const canvas = document.createElement('canvas');
           canvas.width = 640;
           canvas.height = 480;
           const ctx = canvas.getContext('2d');
           if (!ctx) continue;
 
-          // Draw video frame to canvas
           ctx.drawImage(videoEl, 0, 0, 640, 480);
 
-          // Convert to base64 JPEG
           const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
           const base64Data = dataUrl.replace(/^data:image\/jpeg;base64,/, '');
 
-          // Determine participant ID from the video element
-          // The participant ID is derived from which video tile this belongs to
           const tile = videoEl.closest('[data-participant-id]');
           const participantId = tile?.getAttribute('data-participant-id') || 'unknown';
 
@@ -209,7 +194,6 @@ export default function VideoCall({
 
           frameCountRef.current += 1;
 
-          // Send to backend
           const response = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -233,7 +217,6 @@ export default function VideoCall({
       }
     };
 
-    // Start periodic frame capture
     frameCaptureIntervalRef.current = setInterval(captureAndSendFrames, frameCaptureIntervalMs);
 
     return () => {
@@ -285,16 +268,21 @@ export default function VideoCall({
 
   if (error) {
     return (
-      <div className="h-full flex items-center justify-center bg-slate-900 rounded-2xl border border-slate-800">
+      <div className="h-full flex items-center justify-center bg-[#0D1B24] rounded-2xl border border-[#1E3A4A]/50">
         <div className="text-center p-8">
           <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
             <VideoOff className="h-10 w-10 text-red-400" />
           </div>
-          <p className="text-slate-200 font-medium mb-2">Connection Error</p>
-          <p className="text-slate-400 mb-6 text-sm">{error}</p>
+          <p className="text-white font-semibold mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Connection Error
+          </p>
+          <p className="text-[#CBD8E0]/60 mb-6 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
+            {error}
+          </p>
           <button
             onClick={onLeave}
-            className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-medium transition-colors border border-slate-700"
+            className="px-6 py-2.5 bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white rounded-xl font-medium transition-colors border border-[#3DAA8A]/20"
+            style={{ fontFamily: "'Inter', sans-serif" }}
           >
             Go Back
           </button>
@@ -305,39 +293,43 @@ export default function VideoCall({
 
   if (isJoining) {
     return (
-      <div className="h-full flex items-center justify-center bg-slate-900 rounded-2xl border border-slate-800">
+      <div className="h-full flex items-center justify-center bg-[#0D1B24] rounded-2xl border border-[#1E3A4A]/50">
         <div className="text-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-cg-sage rounded-full blur-xl opacity-30 animate-pulse" />
-            <Loader2 className="relative h-12 w-12 animate-spin text-cg-sage mx-auto mb-4" />
+            <div className="absolute inset-0 bg-[#3DAA8A] rounded-full blur-xl opacity-20 animate-pulse" />
+            <Loader2 className="relative h-12 w-12 animate-spin text-[#3DAA8A] mx-auto mb-4" />
           </div>
-          <p className="text-slate-200 font-medium">Connecting to call...</p>
-          <p className="text-slate-500 text-sm mt-1">Setting up secure connection</p>
+          <p className="text-white font-semibold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            Connecting to call...
+          </p>
+          <p className="text-[#CBD8E0]/50 text-sm mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+            Setting up secure connection
+          </p>
         </div>
       </div>
     );
   }
 
   const participantList = Array.from(participants.values());
-  const localParticipant = participantList.find((p) => p.isLocal);
-  const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="h-full flex flex-col bg-slate-900 rounded-2xl overflow-hidden border border-slate-800">
+    <div className="h-full flex flex-col bg-[#0D1B24] rounded-2xl overflow-hidden border border-[#1E3A4A]/50">
       {/* Video Grid */}
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-3">
         {participantList.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-cg-sage/10 flex items-center justify-center mx-auto mb-4">
-                <Video className="h-8 w-8 text-cg-sage" />
+              <div className="w-16 h-16 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center mx-auto mb-4">
+                <Video className="h-8 w-8 text-[#3DAA8A]" />
               </div>
-              <p className="text-slate-400">Waiting for others to join...</p>
+              <p className="text-[#CBD8E0]/60" style={{ fontFamily: "'Inter', sans-serif" }}>
+                Waiting for others to join...
+              </p>
             </div>
           </div>
         ) : (
           <div
-            className={`grid gap-4 h-full ${
+            className={`grid gap-3 h-full ${
               participantList.length === 1
                 ? 'grid-cols-1'
                 : participantList.length === 2
@@ -359,12 +351,12 @@ export default function VideoCall({
       </div>
 
       {/* Controls */}
-      <div className="bg-slate-800/80 backdrop-blur-sm px-6 py-4 flex items-center justify-center space-x-3 border-t border-slate-700/50">
+      <div className="bg-[#1E3A4A]/60 backdrop-blur-sm px-6 py-4 flex items-center justify-center space-x-3 border-t border-[#3DAA8A]/10">
         <button
           onClick={toggleAudio}
           className={`p-4 rounded-full transition-all duration-200 ${
             isAudioOn
-              ? 'bg-slate-700 hover:bg-slate-600 text-white hover:scale-105'
+              ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white hover:scale-105'
               : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
           }`}
           title={isAudioOn ? 'Mute microphone' : 'Unmute microphone'}
@@ -376,7 +368,7 @@ export default function VideoCall({
           onClick={toggleVideo}
           className={`p-4 rounded-full transition-all duration-200 ${
             isVideoOn
-              ? 'bg-slate-700 hover:bg-slate-600 text-white hover:scale-105'
+              ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white hover:scale-105'
               : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
           }`}
           title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
@@ -417,7 +409,7 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
   return (
     <div
       data-participant-id={participant.sessionId}
-      className={`relative bg-slate-800 rounded-xl overflow-hidden ring-1 ring-slate-700/50 ${
+      className={`relative bg-[#1E3A4A]/50 rounded-xl overflow-hidden ring-1 ring-[#3DAA8A]/10 ${
         isLarge ? 'aspect-video' : ''
       }`}
     >
@@ -430,8 +422,8 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
-          <div className="w-20 h-20 rounded-full bg-cg-sage flex items-center justify-center text-white text-2xl font-semibold shadow-lg shadow-cg-sage/20">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1E3A4A] to-[#0D1B24]">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-[#3DAA8A]/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             {participant.userName[0]?.toUpperCase() || '?'}
           </div>
         </div>
@@ -440,10 +432,10 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
       {/* Participant Name */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3">
         <div className="flex items-center justify-between">
-          <span className="text-white text-sm font-medium drop-shadow-lg">
+          <span className="text-white text-sm font-medium drop-shadow-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
             {participant.userName}
             {participant.isLocal && (
-              <span className="text-cg-sage ml-1">(You)</span>
+              <span className="text-[#3DAA8A] ml-1">(You)</span>
             )}
           </span>
           <div className="flex items-center space-x-2">

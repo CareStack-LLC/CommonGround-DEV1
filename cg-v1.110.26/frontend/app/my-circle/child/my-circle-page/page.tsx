@@ -4,9 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ARIAMascot } from '@/components/kidcoms/aria-mascot';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
-import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
-import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
+import { KidSpaceHeader } from '@/components/kidcoms/kidspace-header';
 import { kidcomsAPI, circleCallsAPI, ChildCallHistoryEntry } from '@/lib/api';
 import { Users, Phone, Video, MessageCircle, Camera, X, Check, Pencil, Loader2, Shield } from 'lucide-react';
 import { ARIAHelper } from '@/components/kidcoms/aria-helper';
@@ -245,23 +243,13 @@ export default function MyCirclePage() {
   if (contacts.length === 0) {
     return (
       <div className="min-h-screen pb-24" style={{ background: 'var(--portal-background)' }}>
-        <header className="backdrop-blur-lg px-4 py-3" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <KidComsLogo size="sm" />
-              <div>
-                <h1 className="font-black text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>My Circle</h1>
-                <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Your people</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <KidSpaceThemeToggle />
-              <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-teal-500/50`} style={{ ['--tw-ring-offset-color' as string]: 'var(--portal-background)' }}>
-                <span className="text-white font-bold text-sm">{userInitial}</span>
-              </div>
-            </div>
-          </div>
-        </header>
+        <KidSpaceHeader
+          title="My Circle"
+          subtitle="Your people"
+          userInitial={userInitial}
+          avatarGradient={avatarGradient}
+          sticky={false}
+        />
 
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center px-6">
@@ -277,28 +265,12 @@ export default function MyCirclePage() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--portal-background)' }}>
       {/* Header */}
-      <header className="sticky top-0 z-40 backdrop-blur-lg" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <KidComsLogo size="sm" />
-            <div>
-              <h1 className="font-black text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
-                My Circle
-              </h1>
-              <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
-                {contacts.length} {contacts.length === 1 ? 'person' : 'people'} in your circle
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <KidSpaceThemeToggle />
-            <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-teal-500/50`} style={{ ['--tw-ring-offset-color' as string]: 'var(--portal-background)' }}>
-              <span className="text-white font-bold text-sm">{userInitial}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+      <KidSpaceHeader
+        title="My Circle"
+        subtitle={`${contacts.length} ${contacts.length === 1 ? 'person' : 'people'} in your circle`}
+        userInitial={userInitial}
+        avatarGradient={avatarGradient}
+      />
 
       <main className="px-4 py-6">
         {/* ARIA monitoring status */}

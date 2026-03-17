@@ -4,13 +4,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Bell, Users, Phone, Video, X, Play, Star, Sparkles } from 'lucide-react';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
-import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
-import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
+import { KidSpaceHeader } from '@/components/kidcoms/kidspace-header';
 import { FeaturedHeroBanner } from '@/components/kidcoms/featured-hero-banner';
 import { HorizontalScrollRow } from '@/components/kidcoms/horizontal-scroll-row';
 import { StreamingMovieCard } from '@/components/kidcoms/streaming-movie-card';
 import { OriginalsBadge } from '@/components/kidcoms/originals-badge';
+import { MovieDetailModal } from '@/components/kidcoms/movie-detail-modal';
 import { kidcomsAPI } from '@/lib/api';
 import { theaterContent, VideoCategory, videoCategories } from '@/lib/theater-content';
 import type { VideoContent } from '@/lib/theater-content';
@@ -45,6 +44,9 @@ export default function MoviesPage() {
   const [progressMap, setProgressMap] = useState<Record<string, WatchProgress | null>>({});
   const [favoritesSet, setFavoritesSet] = useState<Set<string>>(new Set());
   const [featuredIndex, setFeaturedIndex] = useState(0);
+
+  // Movie detail modal state
+  const [selectedMovie, setSelectedMovie] = useState<VideoContent | null>(null);
 
   // Watch Together state
   const [contacts, setContacts] = useState<ChildContact[]>([]);
@@ -183,49 +185,36 @@ export default function MoviesPage() {
   return (
     <div className="min-h-screen pb-20" style={{ background: 'var(--portal-background)' }}>
       {/* Header */}
-      <header className="sticky top-0 z-40 backdrop-blur-lg" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <KidComsLogo size="sm" showText={false} />
-              <div>
-                <h1 className="font-black text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Movies</h1>
-                <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
-                  {stats.totalWatched > 0 ? `${stats.totalWatched} watched · ${stats.totalCompleted} completed` : 'Watch something fun!'}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowSearch(!showSearch)}
-                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
-                style={{ background: 'var(--portal-surface)', color: 'var(--portal-muted)' }}
-              >
-                <Search className="w-4 h-4" />
-              </button>
-              <KidSpaceThemeToggle size="sm" />
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center ring-2 ring-offset-2 ring-red-500/50" style={{ ['--tw-ring-offset-color' as any]: 'var(--portal-background)' }}>
-                <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{userInitial}</span>
-              </div>
-            </div>
+      <KidSpaceHeader
+        title="Movies"
+        subtitle={stats.totalWatched > 0 ? `${stats.totalWatched} watched · ${stats.totalCompleted} completed` : 'Watch something fun!'}
+        userInitial={userInitial}
+        avatarGradient="from-red-500 to-orange-500"
+        actions={
+          <button
+            onClick={() => setShowSearch(!showSearch)}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+            style={{ background: 'var(--portal-surface)', color: 'var(--portal-muted)' }}
+          >
+            <Search className="w-4 h-4" />
+          </button>
+        }
+      >
+        {/* Search Bar */}
+        {showSearch && (
+          <div className="relative px-4 pb-2">
+            <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--portal-muted)' }} />
+            <input
+              type="text"
+              placeholder="Search movies..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              autoFocus
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
+            />
           </div>
-
-          {/* Search Bar */}
-          {showSearch && (
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--portal-muted)' }} />
-              <input
-                type="text"
-                placeholder="Search movies..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                autoFocus
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
-              />
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Category Pills */}
         <div className="px-4 pb-3 overflow-x-auto scrollbar-hide">
@@ -253,9 +242,9 @@ export default function MoviesPage() {
             ))}
           </div>
         </div>
-      </header>
+      </KidSpaceHeader>
 
-      <main className="space-y-8 pt-4 pb-6">
+      <main className="space-y-6 pt-4 pb-6">
 
         {/* ── HERO BANNER ── Large cinematic banner for the featured video */}
         {isHomeView && (
@@ -339,21 +328,19 @@ export default function MoviesPage() {
                     <Users className="w-4 h-4" />
                     Watch Together
                   </button>
+                  <button
+                    onClick={() => setSelectedMovie(featuredVideo)}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-white/90 backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95"
+                    style={{
+                      fontFamily: 'Space Grotesk, sans-serif',
+                      background: 'rgba(255,255,255,0.15)',
+                      border: '1px solid rgba(255,255,255,0.25)',
+                    }}
+                  >
+                    More Info
+                  </button>
                 </div>
               </div>
-            </div>
-
-            {/* Dots indicator */}
-            <div className="flex gap-1.5 justify-center mt-3">
-              {theaterContent.videos.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setFeaturedIndex(i)}
-                  className={`rounded-full transition-all duration-300 ${i === featuredIndex ? 'w-6 h-1.5 bg-cyan-500' : 'w-1.5 h-1.5'
-                    }`}
-                  style={i !== featuredIndex ? { background: 'var(--portal-border)' } : undefined}
-                />
-              ))}
             </div>
           </section>
         )}
@@ -375,7 +362,7 @@ export default function MoviesPage() {
                   />
                   <div className="relative rounded-xl overflow-hidden" style={{ border: '2px solid transparent', background: 'var(--portal-surface)' }}>
                     <button
-                      onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
+                      onClick={() => setSelectedMovie(video)}
                       className="w-full focus:outline-none"
                     >
                       <div className="relative aspect-[2/3]">
@@ -425,7 +412,7 @@ export default function MoviesPage() {
                 return (
                   <StreamingMovieCard
                     video={video}
-                    onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
+                    onClick={() => setSelectedMovie(video)}
                     progress={wp.progress}
                     isFavorite={favoritesSet.has(video.id)}
                     onWatchTogether={() => setWatchTogetherMovie(video)}
@@ -452,7 +439,7 @@ export default function MoviesPage() {
                     renderCard={(video) => (
                       <StreamingMovieCard
                         video={video}
-                        onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
+                        onClick={() => setSelectedMovie(video)}
                         progress={progressMap[video.id]?.progress}
                         isFavorite={favoritesSet.has(video.id)}
                         onWatchTogether={() => setWatchTogetherMovie(video)}
@@ -554,7 +541,7 @@ export default function MoviesPage() {
                   <StreamingMovieCard
                     key={video.id}
                     video={video}
-                    onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
+                    onClick={() => setSelectedMovie(video)}
                     progress={progressMap[video.id]?.progress}
                     isFavorite={favoritesSet.has(video.id)}
                     onWatchTogether={() => setWatchTogetherMovie(video)}
@@ -567,6 +554,16 @@ export default function MoviesPage() {
       </main>
 
       <KidBottomNav />
+
+      {/* ── Movie Detail Modal ── */}
+      <MovieDetailModal
+        video={selectedMovie}
+        onClose={() => setSelectedMovie(null)}
+        onWatchNow={(v) => router.push(`/my-circle/child/movies/${v.id}`)}
+        onWatchTogether={(v) => { setSelectedMovie(null); setWatchTogetherMovie(v); }}
+        progress={selectedMovie ? progressMap[selectedMovie.id] : null}
+        rating={selectedMovie ? 4.5 - theaterContent.videos.indexOf(selectedMovie) * 0.1 : 4.5}
+      />
 
       {/* ── Watch Together Contact Picker Modal ── */}
       {watchTogetherMovie && (

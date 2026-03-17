@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
-import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
-import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
+import { KidSpaceHeader } from '@/components/kidcoms/kidspace-header';
 import { Gamepad2, Trophy, Play, Users, Zap, Star } from 'lucide-react';
 
 interface ChildUserData {
@@ -155,111 +153,14 @@ export default function ArcadePage() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--portal-background)' }}>
       {/* Header */}
-      <header className="sticky top-0 z-40 backdrop-blur-lg" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <KidComsLogo size="sm" showText={false} />
-            <div>
-              <h1 className="font-black text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Arcade</h1>
-              <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
-                {games.length} games ready to play
-              </p>
-            </div>
-          </div>
+      <KidSpaceHeader
+        title="Arcade"
+        subtitle={`${games.length} games ready to play`}
+        userInitial={userInitial}
+        avatarGradient={avatarGradient}
+      />
 
-          <div className="flex items-center gap-2">
-            <KidSpaceThemeToggle size="sm" />
-            <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-cyan-500/50`} style={{ ['--tw-ring-offset-color' as any]: 'var(--portal-background)' }}>
-              <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                {userInitial}
-              </span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="space-y-8 pt-6 pb-4 px-4">
-
-        {/* ── Featured Game Hero ── */}
-        <section>
-          <h2
-            className="text-xl font-bold mb-4 flex items-center gap-2"
-            style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}
-          >
-            <Star className="w-5 h-5" style={{ color: GAME_GRADIENTS[featuredGame.id].accent }} />
-            Featured Game
-          </h2>
-
-          <button
-            onClick={() => handleGameSelect(featuredGame)}
-            className="relative w-full rounded-2xl overflow-hidden group hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
-            style={{
-              padding: '2px',
-              background: GAME_GRADIENTS[featuredGame.id].border,
-              boxShadow: `0 8px 32px ${GAME_GRADIENTS[featuredGame.id].glow}, 0 0 0 1px ${GAME_GRADIENTS[featuredGame.id].glow}`,
-            }}
-          >
-            <div className="rounded-[14px] overflow-hidden" style={{ background: 'var(--portal-surface)' }}>
-              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={featuredGame.poster}
-                  alt={featuredGame.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-                {/* Featured badge */}
-                <div className="absolute top-3 left-3">
-                  <span
-                    className="px-3 py-1 rounded-full text-white text-xs font-bold shadow-lg backdrop-blur-sm"
-                    style={{
-                      background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
-                    }}
-                  >
-                    ⭐ Featured
-                  </span>
-                </div>
-
-                {/* Player count badge */}
-                <div className="absolute top-3 right-3">
-                  <span
-                    className="px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 backdrop-blur-sm"
-                    style={{
-                      background: 'var(--portal-surface)',
-                      color: 'var(--portal-text)',
-                      border: '1px solid var(--portal-border)',
-                    }}
-                  >
-                    <Users className="w-3 h-3" />
-                    {featuredGame.players}
-                  </span>
-                </div>
-
-                {/* Play button overlay */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center shadow-2xl">
-                    <Play className="w-10 h-10 text-white ml-1" fill="currentColor" />
-                  </div>
-                </div>
-
-                {/* Bottom info */}
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="font-black text-white text-2xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                    {featuredGame.title}
-                  </h3>
-                  <div className="flex items-center gap-3 mt-1.5">
-                    {/* Difficulty indicator */}
-                    <DifficultyBadge difficulty={featuredGame.difficulty} />
-                    <span className="text-slate-300 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
-                      {featuredGame.description}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </button>
-        </section>
+      <main className="space-y-6 pt-6 pb-4 px-4">
 
         {/* ── Your Scores Leaderboard ── */}
         <section>
@@ -377,6 +278,84 @@ export default function ArcadePage() {
               </div>
             )}
           </div>
+        </section>
+
+        {/* ── Featured Game Hero ── */}
+        <section>
+          <h2
+            className="text-xl font-bold mb-4 flex items-center gap-2"
+            style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}
+          >
+            <Star className="w-5 h-5" style={{ color: GAME_GRADIENTS[featuredGame.id].accent }} />
+            Featured Game
+          </h2>
+
+          <button
+            onClick={() => handleGameSelect(featuredGame)}
+            className="relative w-full rounded-2xl overflow-hidden group hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
+            style={{
+              padding: '2px',
+              background: GAME_GRADIENTS[featuredGame.id].border,
+              boxShadow: `0 8px 32px ${GAME_GRADIENTS[featuredGame.id].glow}, 0 0 0 1px ${GAME_GRADIENTS[featuredGame.id].glow}`,
+            }}
+          >
+            <div className="rounded-[14px] overflow-hidden" style={{ background: 'var(--portal-surface)' }}>
+              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={featuredGame.poster}
+                  alt={featuredGame.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                {/* Featured badge */}
+                <div className="absolute top-3 left-3">
+                  <span
+                    className="px-3 py-1 rounded-full text-white text-xs font-bold shadow-lg backdrop-blur-sm"
+                    style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}
+                  >
+                    ⭐ Featured
+                  </span>
+                </div>
+
+                {/* Player count badge */}
+                <div className="absolute top-3 right-3">
+                  <span
+                    className="px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 backdrop-blur-sm"
+                    style={{
+                      background: 'var(--portal-surface)',
+                      color: 'var(--portal-text)',
+                      border: '1px solid var(--portal-border)',
+                    }}
+                  >
+                    <Users className="w-3 h-3" />
+                    {featuredGame.players}
+                  </span>
+                </div>
+
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center shadow-2xl">
+                    <Play className="w-10 h-10 text-white ml-1" fill="currentColor" />
+                  </div>
+                </div>
+
+                {/* Bottom info */}
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="font-black text-white text-2xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                    {featuredGame.title}
+                  </h3>
+                  <div className="flex items-center gap-3 mt-1.5">
+                    <DifficultyBadge difficulty={featuredGame.difficulty} />
+                    <span className="text-slate-300 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {featuredGame.description}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </button>
         </section>
 
         {/* ── All Games ── */}

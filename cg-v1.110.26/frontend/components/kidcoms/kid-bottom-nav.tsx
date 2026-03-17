@@ -4,9 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Film, BookOpen, Gamepad2, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
-import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
-import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
 
 interface NavItem {
   href: string;
@@ -78,13 +75,6 @@ function NavLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
 
 export function KidBottomNav() {
   const pathname = usePathname();
-  const { resolvedTheme } = useKidSpaceTheme();
-
-  // Split nav items: first 2 on left, last 2 on right, logo in center
-  const leftItems = navItems.slice(0, 2);
-  const rightItems = navItems.slice(3, 5);
-  const homeItem = navItems[2]; // Home stays in center area conceptually but we place logo center
-
   const isActiveCheck = (href: string) =>
     pathname === href || pathname?.startsWith(href + '/');
 
@@ -98,30 +88,7 @@ export function KidBottomNav() {
       }}
     >
       <div className="flex items-center justify-around h-full px-2">
-        {leftItems.map((item) => (
-          <NavLink
-            key={item.href}
-            item={item}
-            isActive={isActiveCheck(item.href)}
-          />
-        ))}
-
-        {/* Home nav item */}
-        <NavLink
-          item={homeItem}
-          isActive={isActiveCheck(homeItem.href)}
-        />
-
-        {/* Center Logo Mark */}
-        <div className="flex flex-col items-center justify-center min-w-[40px]">
-          <KidComsLogo
-            variant={resolvedTheme === 'dark' ? 'dark' : 'light'}
-            showText={false}
-            size="sm"
-          />
-        </div>
-
-        {rightItems.map((item) => (
+        {navItems.map((item) => (
           <NavLink
             key={item.href}
             item={item}

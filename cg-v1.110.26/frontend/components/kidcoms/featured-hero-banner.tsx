@@ -26,6 +26,7 @@ interface FeaturedHeroBannerProps {
   onFavorite?: () => void;
   isFavorite?: boolean;
   onWatchTogether?: () => void;
+  onMoreInfo?: () => void;
   className?: string;
 }
 
@@ -36,6 +37,7 @@ export function FeaturedHeroBanner({
   onFavorite,
   isFavorite: initialFavorite = false,
   onWatchTogether,
+  onMoreInfo,
   className
 }: FeaturedHeroBannerProps) {
   const [isFavorite, setIsFavorite] = useState(initialFavorite);
@@ -191,6 +193,7 @@ export function FeaturedHeroBanner({
 
             {/* Info Button */}
             <button
+              onClick={onMoreInfo}
               className={cn(
                 'flex items-center gap-2 px-6 py-3 rounded-full',
                 'bg-white/20 backdrop-blur-sm text-white font-semibold',

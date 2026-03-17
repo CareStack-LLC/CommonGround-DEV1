@@ -9,9 +9,9 @@ import { HorizontalScrollRow } from '@/components/kidcoms/horizontal-scroll-row'
 import { theaterContent, BookCategory, bookCategories } from '@/lib/theater-content';
 import { BookOpen, Search, Trophy, Target, Zap } from 'lucide-react';
 import { ARIAHelper } from '@/components/kidcoms/aria-helper';
-import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
-import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
-import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
+import { KidSpaceHeader } from '@/components/kidcoms/kidspace-header';
+import { BookDetailModal } from '@/components/kidcoms/book-detail-modal';
+import type { StorybookContent } from '@/lib/theater-content';
 
 import type { ReadingProgress, ReadingStats } from '@/lib/reading-progress';
 
@@ -54,11 +54,11 @@ function getAuthors(books: typeof theaterContent.storybooks) {
 
 export default function LibraryPage() {
   const router = useRouter();
-  const { resolvedTheme } = useKidSpaceTheme();
   const [userData, setUserData] = useState<ChildUserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<BookCategory | 'all' | 'reading'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBook, setSelectedBook] = useState<StorybookContent | null>(null);
   const [stats, setStats] = useState<ReadingStats>({ booksRead: 0, booksCompleted: 0, pagesRead: 0, streak: 0, lastReadDate: null });
   const [currentlyReading, setCurrentlyReading] = useState<ReadingProgress[]>([]);
   const [progressMap, setProgressMap] = useState<Record<string, ReadingProgress | null>>({});
@@ -136,47 +136,15 @@ export default function LibraryPage() {
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--portal-background)' }}>
-      {/* Dark Header */}
-      <header
-        className="sticky top-0 z-40 backdrop-blur-lg border-b"
-        style={{ background: 'var(--portal-background)', borderColor: 'var(--portal-border)' }}
+      {/* Header */}
+      <KidSpaceHeader
+        title="Library"
+        subtitle={`${books.length} books to explore`}
+        userInitial={userInitial}
+        avatarGradient={avatarGradient}
       >
-        <div className="px-4 py-3">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
-                <BookOpen className="w-5 h-5 text-white" strokeWidth={2.5} />
-              </div>
-              <KidComsLogo
-                variant={resolvedTheme === 'dark' ? 'dark' : 'light'}
-                showText={false}
-                size="sm"
-              />
-              <div>
-                <h1 className="font-black text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
-                  Library
-                </h1>
-                <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
-                  {books.length} books to explore
-                </p>
-              </div>
-            </div>
-
-            {/* Theme Toggle + Profile Avatar */}
-            <div className="flex items-center gap-2">
-              <KidSpaceThemeToggle />
-              <div
-                className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center flex-shrink-0 ring-2 ring-offset-2 ring-cyan-500/50`}
-                style={{ ['--tw-ring-offset-color' as string]: 'var(--portal-background)' }}
-              >
-                <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                  {userInitial}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Search Bar */}
+        {/* Search Bar */}
+        <div className="px-4 pb-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--portal-muted)' }} />
             <input
@@ -222,7 +190,7 @@ export default function LibraryPage() {
             ))}
           </div>
         </div>
-      </header>
+      </KidSpaceHeader>
 
       <main className="space-y-6 pt-4 pb-4">
         {/* Reading Stats card */}
@@ -309,7 +277,7 @@ export default function LibraryPage() {
               renderCard={(book) => (
                 <StreamingBookCard
                   book={book}
-                  onClick={() => router.push(`/my-circle/child/library/${book.id}`)}
+                  onClick={() => setSelectedBook(book)}
                   progress={progressMap[book.id]}
                 />
               )}
@@ -333,7 +301,7 @@ export default function LibraryPage() {
                     renderCard={(book) => (
                       <StreamingBookCard
                         book={book}
-                        onClick={() => router.push(`/my-circle/child/library/${book.id}`)}
+                        onClick={() => setSelectedBook(book)}
                         progress={progressMap[book.id]}
                       />
                     )}
@@ -369,7 +337,7 @@ export default function LibraryPage() {
                   <StreamingBookCard
                     key={book.id}
                     book={book}
-                    onClick={() => router.push(`/my-circle/child/library/${book.id}`)}
+                    onClick={() => setSelectedBook(book)}
                     progress={progressMap[book.id]}
                   />
                 ))}
@@ -388,6 +356,14 @@ export default function LibraryPage() {
       />
 
       <KidBottomNav />
+
+      {/* Book Detail Modal */}
+      <BookDetailModal
+        book={selectedBook}
+        onClose={() => setSelectedBook(null)}
+        onStartReading={(b) => router.push(`/my-circle/child/library/${b.id}`)}
+        progress={selectedBook ? progressMap[selectedBook.id] : null}
+      />
 
       <style>{`
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

@@ -24,11 +24,13 @@ import {
   Loader2,
 } from 'lucide-react';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
+import { KidSpaceHeader } from '@/components/kidcoms/kidspace-header';
 import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
 import { FeaturedHeroBanner } from '@/components/kidcoms/featured-hero-banner';
 import { ARIAHelper } from '@/components/kidcoms/aria-helper';
+import { MovieDetailModal } from '@/components/kidcoms/movie-detail-modal';
 import { theaterContent } from '@/lib/theater-content';
+import type { VideoContent } from '@/lib/theater-content';
 import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
 import {
   circleMessagesAPI,
@@ -287,6 +289,7 @@ export default function ChildDashboardPage() {
   ].filter(e => e.item).sort((a, b) => b.lastAction - a.lastAction);
 
   const [featuredIndex, setFeaturedIndex] = useState(0);
+  const [selectedMovie, setSelectedMovie] = useState<VideoContent | null>(null);
   useEffect(() => {
     const interval = setInterval(() => {
       setFeaturedIndex(i => (i + 1) % theaterContent.videos.length);
@@ -316,35 +319,25 @@ export default function ChildDashboardPage() {
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--portal-background)' }}>
       {/* Header */}
-      <header className="backdrop-blur-lg" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
-        <div className="px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <KidComsLogo showText={false} size="sm" variant={logoVariant} />
-            <div>
-              <h1 className="font-black text-xl leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
-                Hey {userData?.childName || 'friend'} 👋
-              </h1>
-              <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
-                What are we doing today?
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <KidSpaceThemeToggle />
+      <KidSpaceHeader
+        title={`Hey ${userData?.childName || 'friend'} 👋`}
+        subtitle="What are we doing today?"
+        userInitial={userInitial}
+        avatarGradient={avatarGradient}
+        sticky={false}
+        actions={
+          <>
             <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style={{ background: 'var(--portal-surface)', color: 'var(--portal-muted)' }} aria-label="Search">
               <Search className="w-4 h-4" />
             </button>
             <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style={{ background: 'var(--portal-surface)', color: 'var(--portal-muted)' }} aria-label="Notifications">
               <Bell className="w-4 h-4" />
             </button>
-            <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center flex-shrink-0 ring-2 ring-offset-2 ring-cyan-500/50`} style={{ ['--tw-ring-offset-color' as string]: 'var(--portal-background)' }}>
-              <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{userInitial}</span>
-            </div>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
-      <main className="space-y-8 pb-6">
+      <main className="space-y-6 pb-6">
         {/* Featured Hero Banner */}
         <div className="px-4">
           <FeaturedHeroBanner
@@ -361,18 +354,10 @@ export default function ChildDashboardPage() {
             }}
             badge="✨ Featured"
             onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
+            onMoreInfo={() => setSelectedMovie(featuredVideo)}
             onFavorite={() => { }}
             isFavorite={false}
           />
-          <div className="flex gap-1.5 justify-center mt-3">
-            {theaterContent.videos.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setFeaturedIndex(i)}
-                className={`rounded-full transition-all duration-300 ${i === featuredIndex ? 'w-6 h-1.5 bg-cyan-500' : 'w-1.5 h-1.5 bg-slate-600 hover:bg-slate-500'}`}
-              />
-            ))}
-          </div>
         </div>
 
         {/* Pick Back Up — real progress only */}
@@ -731,6 +716,15 @@ export default function ChildDashboardPage() {
       </main>
 
       <KidBottomNav />
+
+      {/* Movie Detail Modal */}
+      <MovieDetailModal
+        video={selectedMovie}
+        onClose={() => setSelectedMovie(null)}
+        onWatchNow={(v) => router.push(`/my-circle/child/movies/${v.id}`)}
+        progress={selectedMovie ? progressMap[selectedMovie.id] : null}
+        rating={4.5}
+      />
 
       {/* ARIA Greeting */}
       <ARIAHelper
