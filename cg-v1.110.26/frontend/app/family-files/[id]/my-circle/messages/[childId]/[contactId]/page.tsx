@@ -14,7 +14,8 @@ import {
   X,
   FileText,
 } from 'lucide-react';
-import { circleMessagesAPI, circleAPI, familyFilesAPI, CircleMessageData } from '@/lib/api';
+import { circleMessagesAPI, circleAPI, familyFilesAPI, CircleMessageData, CircleARIAInterventionPayload } from '@/lib/api';
+import { ARIARewriteModal } from '@/components/messages/aria-rewrite-modal';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
 import { PageContainer } from '@/components/layout';
@@ -40,6 +41,11 @@ export default function ParentChatViewPage({ params }: PageParams) {
   const [error, setError] = useState<string | null>(null);
   const [childName, setChildName] = useState('');
   const [contactName, setContactName] = useState('');
+
+  // ARIA intervention state
+  const [ariaIntervention, setAriaIntervention] = useState<CircleARIAInterventionPayload | null>(null);
+  const [pendingMessageContent, setPendingMessageContent] = useState<string>('');
+  const [pendingAttachmentData, setPendingAttachmentData] = useState<{ url: string; type: string; name: string; size: number } | null>(null);
 
   // Attachment state
   const [pendingAttachment, setPendingAttachment] = useState<File | null>(null);
@@ -138,19 +144,20 @@ export default function ParentChatViewPage({ params }: PageParams) {
     setPendingAttachment(null);
   }
 
-  async function handleSend() {
-    if ((!newMessage.trim() && !pendingAttachment) || isSending) return;
+  async function handleSend(overrideContent?: string, ariaAccepted?: boolean, interventionAction?: string) {
+    const content = overrideContent || newMessage.trim() || (pendingAttachment ? 'Sent an image' : '');
+    if (!content && !pendingAttachment && !pendingAttachmentData) return;
+    if (isSending) return;
 
-    const content = newMessage.trim() || (pendingAttachment ? 'Sent an image' : '');
     const currentAttachment = pendingAttachment;
 
     try {
       setIsSending(true);
       setError(null);
 
-      let attachmentData: { url: string; type: string; name: string; size: number } | undefined;
+      let attachmentData = pendingAttachmentData || undefined;
 
-      if (currentAttachment) {
+      if (currentAttachment && !attachmentData) {
         setIsUploading(true);
         try {
           attachmentData = await circleMessagesAPI.uploadAttachmentAsParent(currentAttachment);
@@ -159,7 +166,7 @@ export default function ParentChatViewPage({ params }: PageParams) {
         }
       }
 
-      await circleMessagesAPI.sendAsParent({
+      const result = await circleMessagesAPI.sendAsParent({
         child_id: childId,
         recipient_id: contactId,
         recipient_type: 'contact',
@@ -170,8 +177,22 @@ export default function ParentChatViewPage({ params }: PageParams) {
           attachment_name: attachmentData.name,
           attachment_size: attachmentData.size,
         }),
+        ...(ariaAccepted !== undefined && { aria_accepted_rewrite: ariaAccepted }),
+        ...(interventionAction && { intervention_action: interventionAction }),
       });
 
+      if (result.type === 'intervention') {
+        setAriaIntervention(result.payload);
+        setPendingMessageContent(content);
+        setPendingAttachmentData(attachmentData || null);
+        setIsSending(false);
+        return;
+      }
+
+      // Message sent successfully
+      setAriaIntervention(null);
+      setPendingMessageContent('');
+      setPendingAttachmentData(null);
       setNewMessage('');
       clearAttachment();
       inputRef.current?.focus();
@@ -184,6 +205,28 @@ export default function ParentChatViewPage({ params }: PageParams) {
     } finally {
       setIsSending(false);
     }
+  }
+
+  function handleAriaUseRewrite(rewrittenContent: string) {
+    setAriaIntervention(null);
+    handleSend(rewrittenContent, true, 'accepted');
+  }
+
+  function handleAriaEditRewrite(startingContent: string) {
+    setAriaIntervention(null);
+    setNewMessage(startingContent);
+    inputRef.current?.focus();
+  }
+
+  function handleAriaSendOriginal() {
+    setAriaIntervention(null);
+    handleSend(pendingMessageContent, false, 'sent_anyway');
+  }
+
+  function handleAriaCancel() {
+    setAriaIntervention(null);
+    setPendingMessageContent('');
+    setPendingAttachmentData(null);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -405,6 +448,30 @@ export default function ParentChatViewPage({ params }: PageParams) {
                 <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700 text-xs font-medium">
                   Dismiss
                 </button>
+              </div>
+            )}
+
+            {/* ARIA Intervention Modal */}
+            {ariaIntervention && (
+              <div className="pb-3">
+                <ARIARewriteModal
+                  payload={{
+                    aria_flagged: true,
+                    aria_mode: ariaIntervention.aria_mode,
+                    original_message: ariaIntervention.original_message,
+                    suggested_rewrite: ariaIntervention.suggested_rewrite || null,
+                    explanation: ariaIntervention.explanation || 'ARIA detected a potential concern.',
+                    categories: ariaIntervention.categories || [],
+                    severity: ariaIntervention.severity,
+                    confidence_score: ariaIntervention.confidence_score,
+                  }}
+                  onUseRewrite={handleAriaUseRewrite}
+                  onEditRewrite={handleAriaEditRewrite}
+                  onSendOriginal={handleAriaSendOriginal}
+                  onCancel={handleAriaCancel}
+                  isSending={isSending}
+                  context="parent"
+                />
               </div>
             )}
 

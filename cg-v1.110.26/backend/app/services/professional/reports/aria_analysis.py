@@ -182,12 +182,28 @@ class ARIAAnalysisReport:
         start_date: datetime,
         end_date: datetime,
     ) -> dict:
-        """Build circle ARIA child-safety section for the analysis report."""
+        """Build circle ARIA child-safety section for the analysis report.
+
+        Includes intervention tracking: acceptance rates, category breakdowns,
+        per-sender metrics, severity distribution, user action tracking,
+        and escalation patterns for court-ready reporting.
+        """
+        import json
+
         section = {
             "total_circle_messages": 0,
             "flagged_messages": 0,
             "hidden_messages": 0,
+            "flag_rate": 0.0,
             "flagged_categories": {},
+            "all_categories_breakdown": {},
+            "by_sender_type": {},
+            "by_severity": {"mild": 0, "moderate": 0, "severe": 0},
+            "by_user_action": {},
+            "intervention_acceptance_rate": 0.0,
+            "sent_anyway_count": 0,
+            "avg_response_time_ms": 0,
+            "escalation_trend": "stable",
             "total_calls": 0,
             "terminated_calls": 0,
             "call_aria_interventions": 0,
@@ -213,8 +229,11 @@ class ARIAAnalysisReport:
             section["total_circle_messages"] = row[0] or 0
             section["flagged_messages"] = row[1] or 0
             section["hidden_messages"] = row[2] or 0
+            section["flag_rate"] = round(
+                section["flagged_messages"] / section["total_circle_messages"], 4
+            ) if section["total_circle_messages"] > 0 else 0.0
 
-            # Flagged categories breakdown
+            # Primary category breakdown
             flagged_msgs_result = await self.db.execute(
                 select(CircleMessage.aria_category, func.count(CircleMessage.id)).where(
                     and_(
@@ -228,6 +247,93 @@ class ARIAAnalysisReport:
             )
             for cat_row in flagged_msgs_result.all():
                 section["flagged_categories"][cat_row[0]] = cat_row[1]
+
+            # Get all flagged messages for detailed intervention analysis
+            flagged_detail_result = await self.db.execute(
+                select(CircleMessage).where(
+                    and_(
+                        CircleMessage.family_file_id == family_file_id,
+                        CircleMessage.sent_at >= start_date,
+                        CircleMessage.sent_at <= end_date,
+                        CircleMessage.aria_flagged == True,
+                    )
+                ).order_by(CircleMessage.sent_at)
+            )
+            flagged_msgs = flagged_detail_result.scalars().all()
+
+            # All categories breakdown (from aria_all_categories JSON)
+            all_cats = {}
+            for msg in flagged_msgs:
+                cats = []
+                if msg.aria_all_categories:
+                    try:
+                        cats = json.loads(msg.aria_all_categories)
+                    except (json.JSONDecodeError, TypeError):
+                        cats = [msg.aria_category] if msg.aria_category else []
+                elif msg.aria_category:
+                    cats = [msg.aria_category]
+                for cat in cats:
+                    all_cats[cat] = all_cats.get(cat, 0) + 1
+            section["all_categories_breakdown"] = all_cats
+
+            # By sender type
+            sender_stats = {}
+            for msg in flagged_msgs:
+                st = msg.sender_type
+                if st not in sender_stats:
+                    sender_stats[st] = {"flagged": 0, "hidden": 0}
+                sender_stats[st]["flagged"] += 1
+                if msg.is_hidden:
+                    sender_stats[st]["hidden"] += 1
+            section["by_sender_type"] = sender_stats
+
+            # By severity (from intervention level)
+            severity_names = {1: "mild", 2: "moderate", 3: "severe"}
+            for msg in flagged_msgs:
+                level = msg.aria_intervention_level
+                name = severity_names.get(level)
+                if name:
+                    section["by_severity"][name] += 1
+
+            # By user action
+            action_counts = {}
+            accepted_count = 0
+            total_with_action = 0
+            for msg in flagged_msgs:
+                action = msg.user_action or "no_response"
+                action_counts[action] = action_counts.get(action, 0) + 1
+                if action in ("accepted", "modified"):
+                    accepted_count += 1
+                if action != "no_response":
+                    total_with_action += 1
+                if action == "sent_anyway":
+                    section["sent_anyway_count"] += 1
+            section["by_user_action"] = action_counts
+            section["intervention_acceptance_rate"] = round(
+                accepted_count / total_with_action, 4
+            ) if total_with_action > 0 else 0.0
+
+            # Average response time
+            response_times = [
+                msg.aria_response_time_ms for msg in flagged_msgs
+                if msg.aria_response_time_ms is not None
+            ]
+            section["avg_response_time_ms"] = (
+                round(sum(response_times) / len(response_times))
+                if response_times else 0
+            )
+
+            # Escalation trend
+            if len(flagged_msgs) >= 4:
+                midpoint = len(flagged_msgs) // 2
+                first_half = [m.aria_intervention_level or 0 for m in flagged_msgs[:midpoint]]
+                second_half = [m.aria_intervention_level or 0 for m in flagged_msgs[midpoint:]]
+                first_avg = sum(first_half) / len(first_half)
+                second_avg = sum(second_half) / len(second_half)
+                if second_avg > first_avg + 0.3:
+                    section["escalation_trend"] = "increasing"
+                elif second_avg < first_avg - 0.3:
+                    section["escalation_trend"] = "decreasing"
 
             # Circle call ARIA stats
             call_result = await self.db.execute(
@@ -319,6 +425,53 @@ class ARIAAnalysisReport:
                     "recommendation": (
                         "Pattern of flagged circle messages detected — "
                         "consider supervised-only communication for affected contacts"
+                    )
+                })
+
+            # Intervention acceptance/override tracking
+            if circle_data.get("sent_anyway_count", 0) > 2:
+                recommendations.append({
+                    "priority": "high",
+                    "recommendation": (
+                        f"User overrode ARIA suggestions {circle_data['sent_anyway_count']} time(s) — "
+                        "consider enabling strict mode to prevent bypass of safety interventions"
+                    )
+                })
+
+            # Grooming/alienation specific recommendations
+            all_cats = circle_data.get("all_categories_breakdown", {})
+            if all_cats.get("grooming", 0) > 0:
+                recommendations.append({
+                    "priority": "urgent",
+                    "recommendation": (
+                        f"Grooming patterns detected in {all_cats['grooming']} message(s) — "
+                        "immediate review and potential contact restriction required"
+                    )
+                })
+            if all_cats.get("parental_alienation", 0) > 0:
+                recommendations.append({
+                    "priority": "high",
+                    "recommendation": (
+                        f"Parental alienation language detected in {all_cats['parental_alienation']} message(s) — "
+                        "recommend therapeutic intervention and communication coaching"
+                    )
+                })
+            if all_cats.get("custody_weaponization", 0) > 0:
+                recommendations.append({
+                    "priority": "high",
+                    "recommendation": (
+                        f"Custody weaponization detected in {all_cats['custody_weaponization']} message(s) — "
+                        "document for court review and consider communication restrictions"
+                    )
+                })
+
+            # Escalation trend
+            if circle_data.get("escalation_trend") == "increasing":
+                recommendations.append({
+                    "priority": "high",
+                    "recommendation": (
+                        "Escalation trend detected — intervention severity increasing over time. "
+                        "Recommend immediate professional mediation"
                     )
                 })
 

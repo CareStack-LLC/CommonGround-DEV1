@@ -7128,6 +7128,12 @@ export interface CircleMessageData {
   aria_category?: string;
   aria_reason?: string;
   aria_score?: number;
+  // ARIA intervention tracking (v2)
+  user_action?: string;
+  aria_intervention_level?: number;
+  aria_all_categories?: string;
+  aria_suggested_rewrite?: string;
+  aria_response_time_ms?: number;
   is_delivered: boolean;
   is_read: boolean;
   is_hidden: boolean;
@@ -7136,6 +7142,37 @@ export interface CircleMessageData {
   created_at: string;
   updated_at: string;
 }
+
+/** ARIA 202 intervention response — returned when a message is flagged pre-send */
+export interface CircleARIAInterventionPayload {
+  aria_flagged: true;
+  aria_mode: 'strict' | 'standard';
+  original_message: string;
+  suggested_rewrite?: string;
+  explanation?: string;
+  categories: string[];
+  severity: string;
+  confidence_score?: number;
+  response_time_ms?: number;
+}
+
+/** ARIA pre-send analysis response */
+export interface CircleARIAAnalyzeResponse {
+  is_flagged: boolean;
+  severity: string;
+  categories: string[];
+  explanation?: string;
+  suggested_rewrite?: string;
+  action: string;
+  should_block: boolean;
+  confidence_score: number;
+  response_time_ms: number;
+}
+
+/** Result from send methods: either the saved message or a 202 intervention */
+export type CircleMessageSendResult =
+  | { type: 'sent'; message: CircleMessageData }
+  | { type: 'intervention'; payload: CircleARIAInterventionPayload };
 
 export interface CircleMessageListData {
   items: CircleMessageData[];
@@ -7193,7 +7230,24 @@ export const circleMessagesAPI = {
   },
 
   /**
-   * Send a message as a child (child auth)
+   * Pre-analyze a message before sending (child auth).
+   * Returns ARIA analysis without saving the message.
+   */
+  async analyzeAsChild(data: {
+    content: string;
+    sender_type: string;
+    child_id: string;
+    family_file_id: string;
+  }): Promise<CircleARIAAnalyzeResponse> {
+    return fetchAPIWithChildAuth<CircleARIAAnalyzeResponse>('/circle-messages/analyze/child', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Send a message as a child (child auth).
+   * Returns either the saved message (201) or an ARIA intervention payload (202).
    */
   async sendAsChild(data: {
     child_id: string;
@@ -7204,11 +7258,32 @@ export const circleMessagesAPI = {
     attachment_type?: string;
     attachment_name?: string;
     attachment_size?: number;
-  }): Promise<CircleMessageData> {
-    return fetchAPIWithChildAuth<CircleMessageData>('/circle-messages/', {
+    aria_accepted_rewrite?: boolean;
+    intervention_action?: string;
+  }): Promise<CircleMessageSendResult> {
+    const token = getChildAuthToken();
+    if (!token) throw new Error('Child not authenticated');
+
+    const response = await fetch(`${API_URL}/circle-messages/`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(data),
     });
+
+    const json = await response.json();
+
+    if (response.status === 202 && json.aria_flagged) {
+      return { type: 'intervention', payload: json as CircleARIAInterventionPayload };
+    }
+
+    if (!response.ok) {
+      throw new Error(json.detail || `API error: ${response.status}`);
+    }
+
+    return { type: 'sent', message: json as CircleMessageData };
   },
 
   /**
@@ -7275,7 +7350,23 @@ export const circleMessagesAPI = {
   },
 
   /**
-   * Send a message as a circle contact (circle auth)
+   * Pre-analyze a message before sending (circle contact auth).
+   */
+  async analyzeAsContact(data: {
+    content: string;
+    sender_type: string;
+    child_id: string;
+    family_file_id: string;
+  }): Promise<CircleARIAAnalyzeResponse> {
+    return fetchAPIWithCircleAuth<CircleARIAAnalyzeResponse>('/circle-messages/analyze/contact', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Send a message as a circle contact (circle auth).
+   * Returns either the saved message (201) or an ARIA intervention payload (202).
    */
   async sendAsContact(data: {
     child_id: string;
@@ -7286,11 +7377,32 @@ export const circleMessagesAPI = {
     attachment_type?: string;
     attachment_name?: string;
     attachment_size?: number;
-  }): Promise<CircleMessageData> {
-    return fetchAPIWithCircleAuth<CircleMessageData>('/circle-messages/from-contact', {
+    aria_accepted_rewrite?: boolean;
+    intervention_action?: string;
+  }): Promise<CircleMessageSendResult> {
+    const token = getCircleAuthToken();
+    if (!token) throw new Error('Circle user not authenticated');
+
+    const response = await fetch(`${API_URL}/circle-messages/from-contact`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(data),
     });
+
+    const json = await response.json();
+
+    if (response.status === 202 && json.aria_flagged) {
+      return { type: 'intervention', payload: json as CircleARIAInterventionPayload };
+    }
+
+    if (!response.ok) {
+      throw new Error(json.detail || `API error: ${response.status}`);
+    }
+
+    return { type: 'sent', message: json as CircleMessageData };
   },
 
   /**
@@ -7357,7 +7469,23 @@ export const circleMessagesAPI = {
   },
 
   /**
-   * Send a message as a parent to their child (parent auth)
+   * Pre-analyze a message before sending (parent auth).
+   */
+  async analyzeAsParent(data: {
+    content: string;
+    sender_type: string;
+    child_id: string;
+    family_file_id: string;
+  }): Promise<CircleARIAAnalyzeResponse> {
+    return fetchAPI<CircleARIAAnalyzeResponse>('/circle-messages/analyze', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  /**
+   * Send a message as a parent to their child (parent auth).
+   * Returns either the saved message (201) or an ARIA intervention payload (202).
    */
   async sendAsParent(data: {
     child_id: string;
@@ -7368,11 +7496,30 @@ export const circleMessagesAPI = {
     attachment_type?: string;
     attachment_name?: string;
     attachment_size?: number;
-  }): Promise<CircleMessageData> {
-    return fetchAPI<CircleMessageData>('/circle-messages/from-parent', {
+    aria_accepted_rewrite?: boolean;
+    intervention_action?: string;
+  }): Promise<CircleMessageSendResult> {
+    const token = localStorage.getItem('access_token');
+    const response = await fetch(`${API_URL}/circle-messages/from-parent`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify(data),
     });
+
+    const json = await response.json();
+
+    if (response.status === 202 && json.aria_flagged) {
+      return { type: 'intervention', payload: json as CircleARIAInterventionPayload };
+    }
+
+    if (!response.ok) {
+      throw new Error(json.detail || `API error: ${response.status}`);
+    }
+
+    return { type: 'sent', message: json as CircleMessageData };
   },
 
   /**
@@ -7382,6 +7529,60 @@ export const circleMessagesAPI = {
     return fetchAPI<CircleMessageListData>(
       `/circle-messages/parent/child/${childId}/contact/${contactId}?skip=${skip}&limit=${limit}`
     );
+  },
+
+  // ==========================================================================
+  // Intervention Reporting Endpoints (parent auth)
+  // ==========================================================================
+
+  /**
+   * Get ARIA intervention history for a family file
+   */
+  async getInterventions(familyFileId: string, params?: {
+    start_date?: string;
+    end_date?: string;
+    severity?: string;
+    category?: string;
+    sender_type?: string;
+    skip?: number;
+    limit?: number;
+  }): Promise<{ items: any[]; total: number }> {
+    const searchParams = new URLSearchParams();
+    if (params?.start_date) searchParams.append('start_date', params.start_date);
+    if (params?.end_date) searchParams.append('end_date', params.end_date);
+    if (params?.severity) searchParams.append('severity', params.severity);
+    if (params?.category) searchParams.append('category', params.category);
+    if (params?.sender_type) searchParams.append('sender_type', params.sender_type);
+    if (params?.skip !== undefined) searchParams.append('skip', String(params.skip));
+    if (params?.limit !== undefined) searchParams.append('limit', String(params.limit));
+
+    const qs = searchParams.toString();
+    return fetchAPI(`/circle-messages/interventions/${familyFileId}${qs ? `?${qs}` : ''}`);
+  },
+
+  /**
+   * Get ARIA intervention statistics/summary for a family file
+   */
+  async getInterventionStats(familyFileId: string, params?: {
+    start_date?: string;
+    end_date?: string;
+  }): Promise<{
+    total_messages: number;
+    total_flagged: number;
+    flag_rate: number;
+    by_category: Record<string, number>;
+    by_sender: Record<string, { sent: number; flagged: number }>;
+    by_severity: Record<string, number>;
+    by_user_action: Record<string, number>;
+    escalation_trend: string;
+    time_distribution: Record<string, number>;
+  }> {
+    const searchParams = new URLSearchParams();
+    if (params?.start_date) searchParams.append('start_date', params.start_date);
+    if (params?.end_date) searchParams.append('end_date', params.end_date);
+
+    const qs = searchParams.toString();
+    return fetchAPI(`/circle-messages/intervention-stats/${familyFileId}${qs ? `?${qs}` : ''}`);
   },
 };
 

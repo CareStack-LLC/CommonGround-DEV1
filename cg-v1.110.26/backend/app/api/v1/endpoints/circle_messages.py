@@ -39,8 +39,13 @@ from app.schemas.circle_message import (
     CircleConversationResponse,
     CircleConversationListResponse,
     UnreadCountResponse,
+    CircleMessageAnalyzeRequest,
+    CircleMessageAnalyzeResponse,
+    InterventionRecord,
+    InterventionListResponse,
+    InterventionStatsResponse,
 )
-from app.services.aria_child_chat import ARIAChildChatMonitor
+from app.services.aria_child_chat import ARIAChildChatMonitor, SeverityLevel as AriaSeverity
 from app.services.push import push_service
 from app.services.realtime import RealtimeService
 from app.services.activity import ActivityService
@@ -499,6 +504,162 @@ async def upload_circle_attachment_as_contact(
 
 
 # ============================================================
+# POST /circle-messages/analyze — Pre-send ARIA analysis
+# ============================================================
+
+@router.post("/analyze", response_model=CircleMessageAnalyzeResponse)
+async def analyze_circle_message(
+    data: CircleMessageAnalyzeRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Pre-send ARIA analysis for circle messages (parent auth).
+
+    Runs hybrid regex+LLM analysis and returns results including suggested rewrite.
+    Frontend uses this to show the intervention modal BEFORE the message is sent.
+    """
+    # Load recent messages for context
+    recent_result = await db.execute(
+        select(CircleMessage)
+        .where(CircleMessage.child_id == data.child_id)
+        .where(CircleMessage.family_file_id == data.family_file_id)
+        .order_by(desc(CircleMessage.sent_at))
+        .limit(10)
+    )
+    recent_messages = recent_result.scalars().all()
+    context = [f"{m.sender_name}: {m.content}" for m in reversed(recent_messages)]
+
+    # Determine channel type
+    channel = "parent" if data.sender_type in ("parent_a", "parent_b") else "circle"
+
+    # Run hybrid analysis
+    analysis = await aria_monitor.analyze_message_hybrid(
+        content=data.content,
+        sender_type=data.sender_type,
+        sender_name=current_user.first_name or "User",
+        context=context,
+        channel=channel,
+    )
+
+    # Map severity to action
+    if analysis.should_block:
+        action = "BLOCK"
+    elif analysis.severity in (AriaSeverity.MODERATE, AriaSeverity.SEVERE) and not analysis.should_block:
+        action = "WARN_REWRITE"
+    elif analysis.should_flag:
+        action = "FLAG"
+    else:
+        action = "ALLOW"
+
+    return CircleMessageAnalyzeResponse(
+        is_flagged=analysis.should_flag,
+        severity=analysis.severity.value,
+        categories=analysis.all_categories,
+        explanation=analysis.reason,
+        suggested_rewrite=analysis.suggested_rewrite,
+        action=action,
+        should_block=analysis.should_block,
+        confidence_score=analysis.confidence_score,
+        response_time_ms=analysis.response_time_ms,
+    )
+
+
+@router.post("/analyze/child", response_model=CircleMessageAnalyzeResponse)
+async def analyze_circle_message_as_child(
+    data: CircleMessageAnalyzeRequest,
+    current_child: ChildUser = Depends(get_current_child_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Pre-send ARIA analysis for circle messages (child auth)."""
+    recent_result = await db.execute(
+        select(CircleMessage)
+        .where(CircleMessage.child_id == data.child_id)
+        .where(CircleMessage.family_file_id == data.family_file_id)
+        .order_by(desc(CircleMessage.sent_at))
+        .limit(10)
+    )
+    recent_messages = recent_result.scalars().all()
+    context = [f"{m.sender_name}: {m.content}" for m in reversed(recent_messages)]
+
+    analysis = await aria_monitor.analyze_message_hybrid(
+        content=data.content,
+        sender_type="child",
+        sender_name="Child",
+        context=context,
+        channel="circle",
+    )
+
+    if analysis.should_block:
+        action = "BLOCK"
+    elif analysis.severity in (AriaSeverity.MODERATE, AriaSeverity.SEVERE):
+        action = "WARN_REWRITE"
+    elif analysis.should_flag:
+        action = "FLAG"
+    else:
+        action = "ALLOW"
+
+    return CircleMessageAnalyzeResponse(
+        is_flagged=analysis.should_flag,
+        severity=analysis.severity.value,
+        categories=analysis.all_categories,
+        explanation=analysis.reason,
+        suggested_rewrite=analysis.suggested_rewrite,
+        action=action,
+        should_block=analysis.should_block,
+        confidence_score=analysis.confidence_score,
+        response_time_ms=analysis.response_time_ms,
+    )
+
+
+@router.post("/analyze/contact", response_model=CircleMessageAnalyzeResponse)
+async def analyze_circle_message_as_contact(
+    data: CircleMessageAnalyzeRequest,
+    current_circle_user: CircleUser = Depends(get_current_circle_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Pre-send ARIA analysis for circle messages (contact auth)."""
+    recent_result = await db.execute(
+        select(CircleMessage)
+        .where(CircleMessage.child_id == data.child_id)
+        .where(CircleMessage.family_file_id == data.family_file_id)
+        .order_by(desc(CircleMessage.sent_at))
+        .limit(10)
+    )
+    recent_messages = recent_result.scalars().all()
+    context = [f"{m.sender_name}: {m.content}" for m in reversed(recent_messages)]
+
+    analysis = await aria_monitor.analyze_message_hybrid(
+        content=data.content,
+        sender_type="circle_contact",
+        sender_name=current_circle_user.email,
+        context=context,
+        channel="circle",
+    )
+
+    if analysis.should_block:
+        action = "BLOCK"
+    elif analysis.severity in (AriaSeverity.MODERATE, AriaSeverity.SEVERE):
+        action = "WARN_REWRITE"
+    elif analysis.should_flag:
+        action = "FLAG"
+    else:
+        action = "ALLOW"
+
+    return CircleMessageAnalyzeResponse(
+        is_flagged=analysis.should_flag,
+        severity=analysis.severity.value,
+        categories=analysis.all_categories,
+        explanation=analysis.reason,
+        suggested_rewrite=analysis.suggested_rewrite,
+        action=action,
+        should_block=analysis.should_block,
+        confidence_score=analysis.confidence_score,
+        response_time_ms=analysis.response_time_ms,
+    )
+
+
+# ============================================================
 # POST /circle-messages/ — Send a message
 # ============================================================
 
@@ -535,17 +696,62 @@ async def send_circle_message_as_child(
     if data.recipient_type == SenderType.CIRCLE_CONTACT:
         await _validate_chat_permission(db, data.child_id, data.recipient_id, family_file_id)
 
-    # Run ARIA analysis
-    analysis = aria_monitor.analyze_message(
+    # Run ARIA hybrid analysis (regex + LLM)
+    analysis = await aria_monitor.analyze_message_hybrid(
         content=data.content,
         sender_type="child",
         sender_name=child.first_name or "Child",
+        channel="circle",
     )
 
-    # Build ARIA content including attachment note
-    aria_content = data.content
-    if data.attachment_url:
-        aria_content += " [Attachment sent: image/media file — ARIA cannot analyze image content yet]"
+    # 202 INTERCEPT: If flagged and NOT pre-approved, return intervention payload
+    if analysis.should_flag and not data.aria_accepted_rewrite:
+        from fastapi.responses import JSONResponse
+
+        # Generate contextual rewrite if not already provided by LLM
+        rewrite = analysis.suggested_rewrite
+        if not rewrite and analysis.severity in (AriaSeverity.MODERATE, AriaSeverity.SEVERE):
+            try:
+                from app.services.aria import ARIAService
+                aria_service = ARIAService()
+                rewrite = await aria_service.generate_contextual_rewrite(
+                    flagged_message=data.content,
+                    thread_history=[],
+                    flag_reason=analysis.reason or "Content flagged",
+                    aria_mode="strict",  # Children always get strict mode
+                )
+            except Exception:
+                rewrite = None
+
+        return JSONResponse(
+            status_code=202,
+            content={
+                "aria_flagged": True,
+                "aria_mode": "strict",  # Children: no "send original" option
+                "original_message": data.content,
+                "suggested_rewrite": rewrite,
+                "explanation": analysis.reason,
+                "categories": analysis.all_categories,
+                "severity": analysis.severity.value,
+                "confidence_score": analysis.confidence_score,
+                "response_time_ms": analysis.response_time_ms,
+            }
+        )
+
+    # Determine final content
+    final_content = data.content
+    original_content = None
+    user_action = data.intervention_action
+
+    if data.aria_accepted_rewrite and analysis.suggested_rewrite:
+        original_content = data.content
+        final_content = data.content  # Frontend sends the accepted/edited version as content
+        if not user_action:
+            user_action = "accepted"
+
+    # Map severity to intervention level
+    severity_level_map = {"safe": 0, "mild": 1, "moderate": 2, "severe": 3}
+    intervention_level = severity_level_map.get(analysis.severity.value, 0) if analysis.should_flag else None
 
     # Create message
     message = CircleMessage(
@@ -557,8 +763,8 @@ async def send_circle_message_as_child(
         sender_name=child.first_name or "Child",
         recipient_id=data.recipient_id,
         recipient_type=data.recipient_type,
-        content=data.content if not analysis.suggested_rewrite else analysis.suggested_rewrite,
-        original_content=data.content if analysis.suggested_rewrite else None,
+        content=final_content,
+        original_content=original_content,
         attachment_url=data.attachment_url,
         attachment_type=data.attachment_type,
         attachment_name=data.attachment_name,
@@ -569,6 +775,11 @@ async def send_circle_message_as_child(
         aria_reason=analysis.reason,
         aria_score=analysis.confidence_score,
         is_hidden=analysis.should_hide,
+        user_action=user_action,
+        aria_intervention_level=intervention_level,
+        aria_all_categories=json.dumps(analysis.all_categories) if analysis.all_categories else None,
+        aria_suggested_rewrite=analysis.suggested_rewrite,
+        aria_response_time_ms=analysis.response_time_ms,
         sent_at=datetime.utcnow(),
     )
 
@@ -676,12 +887,62 @@ async def send_circle_message_as_contact(
     child = child_result.scalar_one_or_none()
     child_name = child.first_name if child else "Child"
 
-    # Run ARIA analysis
-    analysis = aria_monitor.analyze_message(
+    # Run ARIA hybrid analysis (regex + LLM)
+    analysis = await aria_monitor.analyze_message_hybrid(
         content=data.content,
         sender_type="circle_contact",
         sender_name=contact_name,
+        channel="circle",
     )
+
+    # 202 INTERCEPT: If flagged and NOT pre-approved, return intervention payload
+    if analysis.should_flag and not data.aria_accepted_rewrite:
+        from fastapi.responses import JSONResponse
+
+        # Generate contextual rewrite if not already provided by LLM
+        rewrite = analysis.suggested_rewrite
+        if not rewrite and analysis.severity in (AriaSeverity.MODERATE, AriaSeverity.SEVERE):
+            try:
+                from app.services.aria import ARIAService
+                aria_service = ARIAService()
+                rewrite = await aria_service.generate_contextual_rewrite(
+                    flagged_message=data.content,
+                    thread_history=[],
+                    flag_reason=analysis.reason or "Content flagged",
+                    aria_mode="standard",  # Contacts get standard mode
+                )
+            except Exception:
+                rewrite = None
+
+        return JSONResponse(
+            status_code=202,
+            content={
+                "aria_flagged": True,
+                "aria_mode": "standard",  # Contacts can choose to send original (logged)
+                "original_message": data.content,
+                "suggested_rewrite": rewrite,
+                "explanation": analysis.reason,
+                "categories": analysis.all_categories,
+                "severity": analysis.severity.value,
+                "confidence_score": analysis.confidence_score,
+                "response_time_ms": analysis.response_time_ms,
+            }
+        )
+
+    # Determine final content
+    final_content = data.content
+    original_content = None
+    user_action = data.intervention_action
+
+    if data.aria_accepted_rewrite and analysis.suggested_rewrite:
+        original_content = data.content
+        final_content = data.content  # Frontend sends accepted/edited version as content
+        if not user_action:
+            user_action = "accepted"
+
+    # Map severity to intervention level
+    severity_level_map = {"safe": 0, "mild": 1, "moderate": 2, "severe": 3}
+    intervention_level = severity_level_map.get(analysis.severity.value, 0) if analysis.should_flag else None
 
     # Create message
     message = CircleMessage(
@@ -693,8 +954,8 @@ async def send_circle_message_as_contact(
         sender_name=contact_name,
         recipient_id=data.child_id,
         recipient_type=SenderType.CHILD,
-        content=data.content if not analysis.suggested_rewrite else analysis.suggested_rewrite,
-        original_content=data.content if analysis.suggested_rewrite else None,
+        content=final_content,
+        original_content=original_content,
         attachment_url=data.attachment_url,
         attachment_type=data.attachment_type,
         attachment_name=data.attachment_name,
@@ -705,6 +966,11 @@ async def send_circle_message_as_contact(
         aria_reason=analysis.reason,
         aria_score=analysis.confidence_score,
         is_hidden=analysis.should_hide,
+        user_action=user_action,
+        aria_intervention_level=intervention_level,
+        aria_all_categories=json.dumps(analysis.all_categories) if analysis.all_categories else None,
+        aria_suggested_rewrite=analysis.suggested_rewrite,
+        aria_response_time_ms=analysis.response_time_ms,
         sent_at=datetime.utcnow(),
     )
 
@@ -752,6 +1018,8 @@ async def send_circle_message_as_contact(
             "message_id": message.id,
             "aria_flagged": analysis.should_flag,
             "aria_category": analysis.category.value if analysis.category else None,
+            "user_action": user_action,
+            "aria_all_categories": analysis.all_categories,
             "has_attachment": bool(data.attachment_url),
         },
     )
@@ -787,7 +1055,8 @@ async def send_circle_message_as_parent(
     Send a message as a parent to their child.
 
     - Parents bypass permission checks (they are the permission authority)
-    - ARIA analysis still runs for consistency and logging
+    - ARIA hybrid analysis runs with pre-send 202 intercept
+    - Standard mode: parents can accept, edit, or send original (logged)
     - Other parent is notified
     """
     # Verify the parent belongs to the family with this child
@@ -816,12 +1085,62 @@ async def send_circle_message_as_parent(
 
     sender_name = f"{current_user.first_name or ''} {current_user.last_name or ''}".strip() or "Parent"
 
-    # Run ARIA analysis (for logging consistency)
-    analysis = aria_monitor.analyze_message(
+    # Run ARIA hybrid analysis (regex + LLM)
+    analysis = await aria_monitor.analyze_message_hybrid(
         content=data.content,
         sender_type=sender_type,
         sender_name=sender_name,
+        channel="circle",
     )
+
+    # 202 INTERCEPT: If flagged and NOT pre-approved, return intervention payload
+    if analysis.should_flag and not data.aria_accepted_rewrite:
+        from fastapi.responses import JSONResponse
+
+        # Generate contextual rewrite if not already provided by LLM
+        rewrite = analysis.suggested_rewrite
+        if not rewrite and analysis.severity in (AriaSeverity.MODERATE, AriaSeverity.SEVERE):
+            try:
+                from app.services.aria import ARIAService
+                aria_service = ARIAService()
+                rewrite = await aria_service.generate_contextual_rewrite(
+                    flagged_message=data.content,
+                    thread_history=[],
+                    flag_reason=analysis.reason or "Content flagged",
+                    aria_mode="standard",  # Parents get standard mode
+                )
+            except Exception:
+                rewrite = None
+
+        return JSONResponse(
+            status_code=202,
+            content={
+                "aria_flagged": True,
+                "aria_mode": "standard",  # Parents can choose to send original (logged)
+                "original_message": data.content,
+                "suggested_rewrite": rewrite,
+                "explanation": analysis.reason,
+                "categories": analysis.all_categories,
+                "severity": analysis.severity.value,
+                "confidence_score": analysis.confidence_score,
+                "response_time_ms": analysis.response_time_ms,
+            }
+        )
+
+    # Determine final content
+    final_content = data.content
+    original_content = None
+    user_action = data.intervention_action
+
+    if data.aria_accepted_rewrite:
+        original_content = data.content
+        final_content = data.content  # Frontend sends accepted/edited version as content
+        if not user_action:
+            user_action = "accepted"
+
+    # Map severity to intervention level
+    severity_level_map = {"safe": 0, "mild": 1, "moderate": 2, "severe": 3}
+    intervention_level = severity_level_map.get(analysis.severity.value, 0) if analysis.should_flag else None
 
     message = CircleMessage(
         id=str(uuid4()),
@@ -832,7 +1151,8 @@ async def send_circle_message_as_parent(
         sender_name=sender_name,
         recipient_id=data.child_id,
         recipient_type=SenderType.CHILD,
-        content=data.content,
+        content=final_content,
+        original_content=original_content,
         attachment_url=data.attachment_url,
         attachment_type=data.attachment_type,
         attachment_name=data.attachment_name,
@@ -843,6 +1163,11 @@ async def send_circle_message_as_parent(
         aria_reason=analysis.reason,
         aria_score=analysis.confidence_score,
         is_hidden=False,  # Parent messages are never hidden
+        user_action=user_action,
+        aria_intervention_level=intervention_level,
+        aria_all_categories=json.dumps(analysis.all_categories) if analysis.all_categories else None,
+        aria_suggested_rewrite=analysis.suggested_rewrite,
+        aria_response_time_ms=analysis.response_time_ms,
         sent_at=datetime.utcnow(),
     )
 
@@ -868,17 +1193,19 @@ async def send_circle_message_as_parent(
 
     # Activity feed logging
     try:
+        activity_type = ActivityType.CIRCLE_MESSAGE_FLAGGED if analysis.should_flag else ActivityType.CIRCLE_MESSAGE_SENT
         await ActivityService.create_activity(
             db=db,
             family_file_id=family_file.id,
-            activity_type=ActivityType.CIRCLE_MESSAGE_SENT.value,
+            activity_type=activity_type.value,
             actor_id=str(current_user.id),
             actor_name=sender_name,
             subject_type="circle_message",
             subject_id=message.id,
             subject_name=child.first_name,
-            title=f"{sender_name} sent a message to {child.first_name or 'child'}",
+            title=f"{sender_name} sent a message to {child.first_name or 'child'}" + (" (flagged by ARIA)" if analysis.should_flag else ""),
             description="Parent message via My Circle",
+            severity="warning" if analysis.should_flag else "info",
         )
     except Exception as e:
         logger.error(f"Failed to log circle message activity: {e}")
@@ -890,6 +1217,7 @@ async def send_circle_message_as_parent(
         event_type="circle_message_sent",
         category="communication",
         actor_id=str(current_user.id),
+        severity="warning" if analysis.should_flag else "info",
         related_resource_type="circle_message",
         related_resource_id=message.id,
         event_data={
@@ -900,6 +1228,9 @@ async def send_circle_message_as_parent(
             "child_id": data.child_id,
             "message_id": message.id,
             "aria_flagged": analysis.should_flag,
+            "aria_category": analysis.category.value if analysis.category else None,
+            "user_action": user_action,
+            "aria_all_categories": analysis.all_categories,
             "has_attachment": bool(data.attachment_url),
         },
     )
@@ -1391,3 +1722,260 @@ async def get_unread_count_as_contact(
     )
     count = result.scalar() or 0
     return UnreadCountResponse(count=count)
+
+
+# ============================================================
+# ARIA Intervention Reporting Endpoints
+# ============================================================
+
+@router.get(
+    "/interventions/{family_file_id}",
+    response_model=InterventionListResponse,
+)
+async def get_interventions(
+    family_file_id: str,
+    start_date: Optional[str] = Query(None, description="Start date (ISO format)"),
+    end_date: Optional[str] = Query(None, description="End date (ISO format)"),
+    severity: Optional[str] = Query(None, pattern=r"^(mild|moderate|severe)$"),
+    category: Optional[str] = Query(None, description="Filter by ARIA category"),
+    sender_type: Optional[str] = Query(None, pattern=r"^(child|parent_a|parent_b|circle_contact)$"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get ARIA intervention history for a family file.
+
+    Returns all flagged messages with full intervention metadata,
+    filterable by date range, severity, category, and sender type.
+    Court-ready data for professional reports.
+    """
+    # Verify parent access
+    family_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == family_file_id)
+    )
+    family_file = family_result.scalar_one_or_none()
+    if not family_file or str(current_user.id) not in [str(family_file.user_a_id), str(family_file.user_b_id)]:
+        raise HTTPException(status_code=403, detail="Not authorized for this family file")
+
+    # Build query for flagged messages
+    filters = [
+        CircleMessage.family_file_id == family_file_id,
+        CircleMessage.aria_flagged == True,
+    ]
+
+    if start_date:
+        try:
+            filters.append(CircleMessage.sent_at >= datetime.fromisoformat(start_date))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid start_date format")
+
+    if end_date:
+        try:
+            filters.append(CircleMessage.sent_at <= datetime.fromisoformat(end_date))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid end_date format")
+
+    if severity:
+        severity_map = {"mild": 1, "moderate": 2, "severe": 3}
+        filters.append(CircleMessage.aria_intervention_level == severity_map.get(severity))
+
+    if category:
+        filters.append(CircleMessage.aria_all_categories.contains(category))
+
+    if sender_type:
+        filters.append(CircleMessage.sender_type == sender_type)
+
+    # Get interventions
+    query = (
+        select(CircleMessage)
+        .where(and_(*filters))
+        .order_by(desc(CircleMessage.sent_at))
+        .offset(skip)
+        .limit(limit)
+    )
+    result = await db.execute(query)
+    messages = result.scalars().all()
+
+    # Get total count
+    count_query = select(func.count(CircleMessage.id)).where(and_(*filters))
+    total_result = await db.execute(count_query)
+    total = total_result.scalar() or 0
+
+    # Map to intervention records
+    items = []
+    for msg in messages:
+        categories = []
+        if msg.aria_all_categories:
+            try:
+                categories = json.loads(msg.aria_all_categories)
+            except (json.JSONDecodeError, TypeError):
+                categories = [msg.aria_category] if msg.aria_category else []
+
+        severity_names = {0: "safe", 1: "mild", 2: "moderate", 3: "severe"}
+        items.append(InterventionRecord(
+            message_id=msg.id,
+            sent_at=msg.sent_at,
+            sender_type=msg.sender_type,
+            sender_name=msg.sender_name,
+            severity=severity_names.get(msg.aria_intervention_level, "unknown"),
+            categories=categories,
+            original_content=msg.original_content,
+            final_content=msg.content,
+            suggested_rewrite=msg.aria_suggested_rewrite,
+            user_action=msg.user_action,
+            aria_score=msg.aria_score,
+            response_time_ms=msg.aria_response_time_ms,
+        ))
+
+    return InterventionListResponse(items=items, total=total)
+
+
+@router.get(
+    "/intervention-stats/{family_file_id}",
+    response_model=InterventionStatsResponse,
+)
+async def get_intervention_stats(
+    family_file_id: str,
+    start_date: Optional[str] = Query(None, description="Start date (ISO format)"),
+    end_date: Optional[str] = Query(None, description="End date (ISO format)"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get ARIA intervention statistics/summary for a family file.
+
+    Returns aggregated metrics: total messages, flag rate, breakdowns
+    by category, sender, severity, user action, and escalation trends.
+    Designed for dashboard cards and professional court reports.
+    """
+    # Verify parent access
+    family_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == family_file_id)
+    )
+    family_file = family_result.scalar_one_or_none()
+    if not family_file or str(current_user.id) not in [str(family_file.user_a_id), str(family_file.user_b_id)]:
+        raise HTTPException(status_code=403, detail="Not authorized for this family file")
+
+    # Date filters
+    date_filters = [CircleMessage.family_file_id == family_file_id]
+    if start_date:
+        try:
+            date_filters.append(CircleMessage.sent_at >= datetime.fromisoformat(start_date))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid start_date format")
+    if end_date:
+        try:
+            date_filters.append(CircleMessage.sent_at <= datetime.fromisoformat(end_date))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid end_date format")
+
+    # Total messages
+    total_result = await db.execute(
+        select(func.count(CircleMessage.id)).where(and_(*date_filters))
+    )
+    total_messages = total_result.scalar() or 0
+
+    # Total flagged
+    flagged_filters = date_filters + [CircleMessage.aria_flagged == True]
+    flagged_result = await db.execute(
+        select(func.count(CircleMessage.id)).where(and_(*flagged_filters))
+    )
+    total_flagged = flagged_result.scalar() or 0
+
+    flag_rate = round(total_flagged / total_messages, 4) if total_messages > 0 else 0.0
+
+    # Get all flagged messages for detailed breakdowns
+    flagged_query = (
+        select(CircleMessage)
+        .where(and_(*flagged_filters))
+        .order_by(CircleMessage.sent_at)
+    )
+    flagged_msgs_result = await db.execute(flagged_query)
+    flagged_msgs = flagged_msgs_result.scalars().all()
+
+    # By category
+    by_category = {}
+    for msg in flagged_msgs:
+        cats = []
+        if msg.aria_all_categories:
+            try:
+                cats = json.loads(msg.aria_all_categories)
+            except (json.JSONDecodeError, TypeError):
+                cats = [msg.aria_category] if msg.aria_category else []
+        elif msg.aria_category:
+            cats = [msg.aria_category]
+        for cat in cats:
+            by_category[cat] = by_category.get(cat, 0) + 1
+
+    # By sender
+    by_sender = {}
+    for msg in flagged_msgs:
+        st = msg.sender_type
+        if st not in by_sender:
+            by_sender[st] = {"sent": 0, "flagged": 0}
+        by_sender[st]["flagged"] += 1
+
+    # Add total sent counts per sender type
+    for st in by_sender:
+        sent_result = await db.execute(
+            select(func.count(CircleMessage.id)).where(
+                and_(*date_filters, CircleMessage.sender_type == st)
+            )
+        )
+        by_sender[st]["sent"] = sent_result.scalar() or 0
+
+    # By severity
+    severity_names = {1: "mild", 2: "moderate", 3: "severe"}
+    by_severity = {}
+    for msg in flagged_msgs:
+        level = msg.aria_intervention_level
+        name = severity_names.get(level, "unknown")
+        by_severity[name] = by_severity.get(name, 0) + 1
+
+    # By user action
+    by_user_action = {}
+    for msg in flagged_msgs:
+        action = msg.user_action or "no_response"
+        by_user_action[action] = by_user_action.get(action, 0) + 1
+
+    # Escalation trend (compare first half vs second half of flagged messages)
+    escalation_trend = "stable"
+    if len(flagged_msgs) >= 4:
+        midpoint = len(flagged_msgs) // 2
+        first_half_avg = sum(
+            (m.aria_intervention_level or 0) for m in flagged_msgs[:midpoint]
+        ) / midpoint
+        second_half_avg = sum(
+            (m.aria_intervention_level or 0) for m in flagged_msgs[midpoint:]
+        ) / (len(flagged_msgs) - midpoint)
+        if second_half_avg > first_half_avg + 0.3:
+            escalation_trend = "increasing"
+        elif second_half_avg < first_half_avg - 0.3:
+            escalation_trend = "decreasing"
+
+    # Time distribution (by hour bucket)
+    time_distribution = {"morning": 0, "afternoon": 0, "evening": 0, "night": 0}
+    for msg in flagged_msgs:
+        hour = msg.sent_at.hour
+        if 6 <= hour < 12:
+            time_distribution["morning"] += 1
+        elif 12 <= hour < 17:
+            time_distribution["afternoon"] += 1
+        elif 17 <= hour < 22:
+            time_distribution["evening"] += 1
+        else:
+            time_distribution["night"] += 1
+
+    return InterventionStatsResponse(
+        total_messages=total_messages,
+        total_flagged=total_flagged,
+        flag_rate=flag_rate,
+        by_category=by_category,
+        by_sender=by_sender,
+        by_severity=by_severity,
+        by_user_action=by_user_action,
+        escalation_trend=escalation_trend,
+        time_distribution=time_distribution,
+    )

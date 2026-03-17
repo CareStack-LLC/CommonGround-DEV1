@@ -1,6 +1,12 @@
 """
 ARIA Detection Patterns - Production Grade
-Expanded vocabulary for court-ready toxicity detection.
+Unified vocabulary for court-ready toxicity detection across ALL messaging channels:
+- Parent ↔ Parent co-parenting messages
+- Child ↔ Circle Contact messages
+- Parent ↔ Child messages (via circle)
+
+Every pattern is case-insensitive at compile time.
+Word boundaries (\b) are used to minimize false positives.
 """
 
 from enum import Enum
@@ -104,26 +110,37 @@ THREATENING_PATTERNS = [
 # ==============================================================================
 # INTENT: CUSTODY WEAPONIZATION (High Risk)
 # ==============================================================================
-# ==============================================================================
-# INTENT: CUSTODY WEAPONIZATION (High Risk)
-# ==============================================================================
 CUSTODY_WEAPONIZATION_PATTERNS = [
-    # Gatekeeping - Allow for fillers (damn, fscking, my) between key phrases
-    r'\b(won\'?t|never|can\'?t|cannot)\b.*?\bsee\b.*?\b(kids?|child(ren)?|bab[yi]es?)\b', 
-    r'\bblock(ing)?\b.*?\bnumber\b', 
-    r'\btaking\b.*?\b(kids?|child(ren)?|bab[yi]es?)\b.*?\baway\b', 
+    # Gatekeeping - Access denial (allow fillers between key phrases)
+    r'\b(won\'?t|never|can\'?t|cannot|not\s+gonna|not\s+going\s+to)\b.*?\bsee\b.*?\b(kids?|child(ren)?|bab[yi]es?|son|daughter|him|her|daddy|mommy|your\s+father|your\s+mother)\b',
+    r'\btaking\b.*?\b(kids?|child(ren)?|bab[yi]es?|them)\b.*?\baway\b',
     r'\brun\s+away\s+with\b.*?\b(them|kids?|child(ren)?|bab[yi]es?)\b',
+    r'\bkeeping\b.*?\b(you|them|kids?|child(ren)?)\b.*?\b(forever|away|with\s+me)\b',
+    r'\bnot\s+going\s+back\s+to\b.*?\b(mom|dad|your\s+father|your\s+mother|him|her)\b',
+    r'\byou\'?re?\s+(staying|living)\s+with\s+me\b',
+    r'\bsay\s+goodbye\s+to\s+(daddy|mommy|your\s+father|your\s+mother)\b',
+    r'\byou\s+don\'?t\s+(need|have)\s+to\s+go\s+(back|there)\b',
+    r'\bwon\'?t\s+let\s+(him|her|them)\s+(see|visit|have)\s+(you|the\s+kids?)\b',
+    r'\bi\'?m\s+(taking|keeping)\s+(you|the\s+kids?|them)\b',
+    r'\bnever\s+let\s+(you|him|her)\s+see\b',
+    r'\bblock(ing)?\b.*?\bnumber\b',
 
-    # Parental Alienation
-    r'\btell\s+(?:[\w\'\*]+\s+){0,3}them\s+(?:[\w\'\*]+\s+){0,3}truth\b', 
-    r'\bthey\s+hate\s+(yo)?u\b', 
-    r'\bnot\s+(?:[\w\'\*]+\s+){0,3}real\s*(dad|mom)\b', 
+    # Coaching children / alienation through child
+    r'\btell\s+the\s+judge\b.*?\b(want|stay|live)\b',
+    r'\byou\s+choose\s+who\s+you\s+(live|stay)\s+with\b',
+    r'\btell\s+(?:[\w\'\*]+\s+){0,3}them\s+(?:[\w\'\*]+\s+){0,3}truth\b',
+    r'\bthey\s+hate\s+(yo)?u\b',
+    r'\bnot\s+(?:[\w\'\*]+\s+){0,3}real\s*(dad|mom|father|mother|parent)\b',
     r'\bthey\s+don\'?t\s+want\s+to\s+come\b',
 
-    # Legal Threats
-    r'\bfull\s+custody\b', r'\bsole\s+custody\b', 
-    r'\bunfit\s+parent\b', r'\bterminate\s+(?:[\w\'\*]+\s+){0,3}rights\b', 
-    r'\bcall\s+(?:[\w\'\*]+\s+){0,3}(cps|dcf|dcfs)\b',
+    # Legal threats / intimidation
+    r'\bfull\s+custody\b', r'\bsole\s+custody\b',
+    r'\bunfit\s+parent\b', r'\bterminate\s+(?:[\w\'\*]+\s+){0,3}rights\b',
+    r'\bcall\s+(?:[\w\'\*]+\s+){0,3}(cps|dcf|dcfs|child\s+services)\b',
+    r'\bget\s+a\s+restraining\s+order\b',
+    r'\bmy\s+lawyer\s+(will|is\s+going\s+to|says)\b',
+    r'\bsupervisor?ed\s+visitation\b',
+    r'\byou\'?ll?\s+lose\s+(the\s+kids?|them|custody)\b',
 ]
 
 # ==============================================================================
@@ -207,5 +224,246 @@ EVASION_PATTERNS = [
     r'\bh\s*0\s*e\b', # h0e
     r'\bb\s*[\!1i]\s*t\s*c\s*h\b',
     r'\bf\s*[v\*]\s*c\s*k\b',
+    # Additional evasion
+    r'f\s+u\s+c\s+k', r's\s+h\s+i\s+t', r'b\s+i\s+t\s+c\s+h',
+    r'@\$\$', r'sh[!\*1]t', r'b\*tch', r'f[#\*]+k',
+    r'a\s*\$\s*\$', r'f\s*[uv]\s*[ck]\s*k?',
+]
+
+# ==============================================================================
+# PARENTAL ALIENATION (High Risk - Child Safety)
+# ==============================================================================
+PARENTAL_ALIENATION_PATTERNS = [
+    # Denigrating the other parent to/around children
+    r'\b(mom|dad|mommy|daddy|your\s+father|your\s+mother)\s+(doesn\'?t|does\s+not)\s+(love|care\s+about|want)\s+(you|the\s+kids?)\b',
+    r'\b(he|she)\s+left\s+(because\s+of|because)\s+you\b',
+    r'\byour\s+(real|new)\s+(mom|dad|father|mother)\b',
+    r'\bit\'?s\s+(your|their)\s+fault\s+(we|I)\s+(divorced|split|broke\s+up|separated)\b',
+    r'\b(he|she)\s+chose\s+(work|someone\s+else|a\s+new\s+family|her|him)\s+over\s+you\b',
+    r'\b(mommy|daddy|mom|dad|your\s+father|your\s+mother)\s+is\s+(bad|mean|crazy|dangerous|a\s+liar|evil|sick|toxic|stupid)\b',
+    r'\bdon\'?t\s+listen\s+to\s+(what|anything)\s+(he|she|they|your\s+mom|your\s+dad)\s+(say|tell)\b',
+    r'\b(he|she)\s+(doesn\'?t|does\s+not)\s+(deserve|care)\s+to\s+be\s+your\s+(mom|dad|parent|father|mother)\b',
+    r'\byou\'?re?\s+better\s+off\s+without\s+(him|her|them|your\s+mom|your\s+dad)\b',
+    r'\bi\'?m\s+your\s+(only|real)\s+(parent|family)\b',
+    r'\b(he|she)\s+is\s+(replacing|trying\s+to\s+replace)\s+(you|me|us)\b',
+    r'\bif\s+(he|she|your\s+mom|your\s+dad)\s+(really|truly)\s+loved\s+you\b',
+    r'\b(he|she|your\s+mom|your\s+dad)\s+is\s+(lying|not\s+telling\s+the\s+truth)\b',
+    r'\byour\s+(mom|dad|father|mother)\s+(never|doesn\'?t)\s+(wanted|want)\s+you\b',
+    r'\b(he|she)\s+doesn\'?t\s+even\s+(care|miss|think\s+about)\s+you\b',
+    r'\byou\'?re?\s+just\s+like\s+your\s+(mom|dad|mother|father)\b',  # Said derogatorily
+    r'\b(mom|dad)\s+(has|is)\s+(a\s+new|another)\s+(family|kid|child)\b',
+    r'\b(he|she)\s+forgot\s+about\s+you\b',
+    r'\b(mommy|daddy)\s+doesn\'?t\s+want\s+to\s+see\s+you\b',
+]
+
+# ==============================================================================
+# GROOMING PATTERNS (Severe - Child Safety)
+# ==============================================================================
+GROOMING_PATTERNS = [
+    # Secret-keeping / isolation
+    r'\b(this|it\'?s)\s+(is\s+)?(just\s+between|our|our\s+little)\s+(us|secret)\b',
+    r'\bdon\'?t\s+tell\s+(your\s+parents?|anyone|anybody|mom|dad|mommy|daddy)\b',
+    r'\bi\s+won\'?t\s+tell\s+if\s+you\s+won\'?t\b',
+    r'\byou\s+can\s+trust\s+me\s+(more\s+than|not)\s+(them|your\s+parents?)\b',
+    r'\bdelete\s+(this|these|our)\s+(messages?|texts?|chat)\b',
+    r'\bkeep\s+(this|it)\s+(a\s+)?secret\b',
+    r'\bour\s+(little\s+)?secret\b',
+    r'\bnobody\s+(needs|has)\s+to\s+know\b',
+
+    # Flattery / boundary testing
+    r'\byou\'?re?\s+(so\s+)?(mature|special|different\s+from\s+other\s+kids?|grown\s+up)\b',
+    r'\bage\s+is\s+just\s+a\s+number\b',
+    r'\bthis\s+is\s+(normal|what\s+friends\s+do|what\s+people\s+do)\b',
+    r'\byou\'?re?\s+(prettier|more\s+grown\s+up|more\s+mature)\s+than\s+(other|most)\s+(kids?|girls?|boys?)\b',
+    r'\byou\s+understand\s+me\s+better\s+than\s+(adults?|anyone)\b',
+
+    # Solicitation / meeting
+    r'\bcome\s+to\s+my\s+(house|place|room|apartment)\b',
+    r'\bi\s+(have|got)\s+something\s+to\s+show\s+you\b.*?\b(don\'?t|can\'?t)\s+tell\b',
+    r'\bdo\s+you\s+have\s+a\s+(boyfriend|girlfriend)\b',
+    r'\bsend\s+(me\s+)?(a\s+)?(pic|photo|picture|selfie)\b',  # Also in child patterns
+    r'\bwhat\s+(are\s+you|r\s+u)\s+wearing\b',
+
+    # Platform switching / isolation
+    r'\blet\'?s\s+(move\s+to|talk\s+on|switch\s+to|use)\s+(a\s+different\s+app|private\s+chat|DMs?|snapchat|instagram|discord|telegram|signal|whatsapp)\b',
+    r'\bdo\s+you\s+have\s+(snapchat|instagram|tiktok|discord|kik|telegram)\b',
+    r'\bgive\s+me\s+your\s+(number|snap|insta|phone)\b',
+    r'\bI\'?m\s+(also|only|just)\s+(\d{1,2}|a\s+kid\s+too)\b',  # Age deception
+]
+
+# ==============================================================================
+# EMOTIONAL MANIPULATION (Moderate-High - All Channels)
+# ==============================================================================
+EMOTIONAL_MANIPULATION_PATTERNS = [
+    # Guilt-tripping
+    r'\bif\s+you\s+(loved|cared\s+about)\s+me\s+you\s+would\b',
+    r'\byou\s+(make|made)\s+me\s+(sad|cry|angry|hurt|depressed|sick)\b',
+    r'\bit\'?s\s+(all\s+)?your\s+fault\b',
+    r'\bi\'?ll?\s+be\s+(sad|hurt|upset|devastated)\s+if\s+you\s+(don\'?t|go|leave)\b',
+    r'\bnobody\s+(else\s+)?(will\s+)?ever\s+love\s+you\s+(like|as\s+much)\b',
+    r'\bafter\s+everything\s+I\s+(did|do|sacrificed|gave\s+up)\s+for\s+you\b',
+    r'\byou\s+owe\s+me\b',
+    r'\byou\'?re?\s+(ungrateful|selfish)\b',
+    r'\bi\s+(wish|regret)\s+(you|I\s+had\s+you|having\s+you)\b',
+    r'\byou\'?re?\s+(nothing|worthless)\s+without\s+me\b',
+
+    # Emotional blackmail
+    r'\bif\s+you\s+(leave|go|don\'?t)\s+I\'?ll?\s+(hurt|kill)\s+myself\b',
+    r'\byou\'?ll?\s+be\s+sorry\b',
+    r'\byou\'?re?\s+going\s+to\s+regret\s+this\b',
+    r'\bno\s+one\s+will\s+ever\s+want\s+you\b',
+    r'\byou\'?re?\s+just\s+like\s+your\s+(mom|dad|mother|father)\b',
+
+    # Gaslighting
+    r'\bthat\s+never\s+happened\b',
+    r'\byou\'?re?\s+(crazy|imagining\s+things|making\s+things\s+up|delusional|overreacting)\b',
+    r'\bi\s+never\s+said\s+that\b',
+    r'\byou\'?re?\s+too\s+sensitive\b',
+    r'\bstop\s+being\s+(dramatic|so\s+emotional)\b',
+]
+
+# ==============================================================================
+# PARENT-TO-PARENT CONFLICT (Moderate - Co-Parenting Context)
+# ==============================================================================
+COPARENTING_CONFLICT_PATTERNS = [
+    # Blame / deflection
+    r'\bthis\s+is\s+(all\s+)?your\s+fault\b',
+    r'\byou\s+(caused|did)\s+this\b',
+    r'\bbecause\s+of\s+(what\s+)?you\s+(did|said)\b',
+    r'\byou\s+always\b', r'\byou\s+never\b',  # Absolute statements
+    r'\bjust\s+like\s+when\s+you\b',
+    r'\bremember\s+when\s+you\b',
+
+    # Passive-aggressive scheduling
+    r'\b(oh\s+)?sure,?\s+change\s+the\s+schedule\s+again\b',
+    r'\bmust\s+be\s+nice\s+to\b',
+    r'\btypical\b',
+    r'\bof\s+course\s+you\s+(would|did|are)\b',
+    r'\bwhatever\s+you\s+say\b',
+    r'\bfigures\b',
+    r'\bshocker\b',
+
+    # Guilt-tripping about children
+    r'\b(the\s+)?kids?\s+(are|is)\s+suffering\s+because\s+of\s+you\b',
+    r'\bthey\s+cry\s+every\s+time\b',
+    r'\byou\'?re?\s+hurting\s+(the\s+)?kids?\b',
+    r'\bgreat\s+parenting\b',  # Sarcastic
+    r'\bparent\s+of\s+the\s+year\b',  # Sarcastic
+    r'\bmother\s+of\s+the\s+year\b', r'\bfather\s+of\s+the\s+year\b',
+
+    # Information withholding / control
+    r'\byou\s+don\'?t\s+need\s+to\s+know\b',
+    r'\bthat\'?s\s+none\s+of\s+your\s+business\b',
+    r'\bi\'?ll?\s+tell\s+you\s+when\s+I\'?m\s+ready\b',
+    r'\bnot\s+your\s+(concern|problem|business)\b',
+
+    # Dismissive / contempt
+    r'\bget\s+over\s+it\b',
+    r'\bstop\s+(whining|complaining|nagging|crying)\b',
+    r'\bgrow\s+up\b',
+    r'\byou\'?re?\s+(pathetic|a\s+joke|worthless|useless|a\s+terrible\s+parent)\b',
+    r'\bwhat\s+kind\s+of\s+(parent|mother|father)\s+(are\s+you|does\s+that)\b',
+    r'\byou\s+should\s+be\s+ashamed\b',
+
+    # Triangulation / involving others
+    r'\beveryone\s+(knows|thinks|says)\s+you\'?re?\b',
+    r'\bmy\s+(mom|friends?|family|sister|brother)\s+(thinks?|says?|agrees?)\b',
+    r'\bthe\s+kids?\s+(told|said|think)\b.*?\b(bad|hate|don\'?t\s+like)\b',
+]
+
+# ==============================================================================
+# CHILD-SPECIFIC STRANGER DANGER (Severe - Circle Contacts)
+# ==============================================================================
+STRANGER_DANGER_PATTERNS = [
+    # Location / personal info probing
+    r'\bwhere\s+do\s+you\s+live\b',
+    r'\bwhat\s+(school|grade|class)\s+(are\s+you\s+in|do\s+you\s+go\s+to)\b',
+    r'\bare\s+(you|your\s+parents?)\s+(asleep|in\s+bed|awake|home)\b',
+    r'\bwhat\s+does\s+your\s+(house|room)\s+look\s+like\b',
+    r'\bare\s+your\s+parents?\s+(home|there|around)\b',
+    r'\b(alone\s+at\s+home|home\s+alone)\b',
+    r'\bhow\s+old\s+are\s+you\b',
+    r'\bwhat\'?s\s+your\s+(age|address)\b',
+
+    # Meeting requests
+    r'\bmeet\s+(me|up)\b',
+    r'\bcome\s+over\b',
+    r'\bpick\s+you\s+up\b',
+    r'\blet\'?s\s+hang\s+out\b.*?\b(alone|just\s+us)\b',
+
+    # Photo/video requests
+    r'\bsend\s+(me\s+)?(a\s+)?(pic|photo|picture|video|selfie)\b',
+    r'\bturn\s+on\s+(your\s+)?(camera|cam|webcam)\b',
+    r'\bvideo\s+call\s+me\b.*?\balone\b',
+
+    # Secret-keeping (also in grooming)
+    r'\bdon\'?t\s+tell\b.*?\b(parents?|mom|dad|anyone)\b',
+    r'\bkeep\s+(it\s+)?a?\s*secret\b',
+    r'\bour\s+secret\b',
+]
+
+# ==============================================================================
+# CHILD EMOTIONAL DISTRESS SIGNALS (Monitor - Alert Parents)
+# ==============================================================================
+CHILD_DISTRESS_PATTERNS = [
+    # Self-harm / suicidal
+    r'\bi\s+want\s+to\s+die\b',
+    r'\bwant\s+to\s+hurt\s+myself\b',
+    r'\bi\s+don\'?t\s+want\s+to\s+(be\s+here|live|exist)\b',
+    r'\bcut(ting)?\s+myself\b',
+    r'\bwish\s+I\s+was\s+dead\b',
+    r'\bwish\s+I\s+was\s+never\s+born\b',
+
+    # Loneliness / hopelessness
+    r'\bnobody\s+(loves|cares\s+about|likes)\s+me\b',
+    r'\bno\s+one\s+cares\b',
+    r'\bi\'?m\s+(so\s+)?(sad|depressed|lonely|hopeless|worthless)\b',
+    r'\bfeel\s+(hopeless|empty|numb|alone)\b',
+    r'\bwhat\'?s\s+the\s+point\b',
+
+    # Abuse indicators
+    r'\b(scared|afraid)\s+(of|at)\s+(home|dad|mom|parent|step)\b',
+    r'\b(hit|hurt|beat|punch|kick|slap)(s|ed|ing)?\s+me\b',
+    r'\b(yell|scream|shout)(s|ed|ing)?\s+at\s+me\b',
+    r'\b(locks?|locked)\s+me\s+(in|out)\b',
+    r'\bwon\'?t\s+(let\s+me\s+eat|feed\s+me|give\s+me\s+food)\b',
+    r'\bmakes?\s+me\s+(scared|afraid|cry)\b',
+    r'\bdon\'?t\s+feel\s+safe\b',
+    r'\btouch(es|ed|ing)?\s+me\b.*?\b(bad|wrong|weird|private)\b',
+
+    # Divorce/separation distress
+    r'\bis\s+it\s+my\s+fault\b',
+    r'\bwhy\s+did\s+(daddy|mommy|mom|dad)\s+leave\b',
+    r'\bwill\s+you\s+leave\s+(me\s+)?too\b',
+    r'\bi\s+miss\s+(daddy|mommy|mom|dad)\s+so\s+much\b',
+    r'\bwhy\s+can\'?t\s+(we|you|they)\s+(all\s+)?live\s+together\b',
+]
+
+# ==============================================================================
+# AGE-INAPPROPRIATE CONTENT (Moderate - Child Context Only)
+# ==============================================================================
+AGE_INAPPROPRIATE_PATTERNS = [
+    # Drugs / substances
+    r'\b(drugs?|weed|marijuana|cocaine|heroin|meth|ecstasy|molly|edibles?)\b',
+    r'\b(alcohol|drunk|wasted|hammered|trashed|blackout|hungover)\b',
+    r'\b(cigarette|vape|vaping|smoking|juul|e-?cig|dab|blunt|joint|bong)\b',
+    r'\b(high|stoned|baked|lit|faded|buzzed)\b',
+    r'\b(dealer|plug|score\s+some)\b',
+
+    # Sexual content
+    r'\b(sex|porn|naked|nude|xxx|hentai|nsfw)\b',
+    r'\b(boobs?|penis|vagina|breasts?)\b',
+    r'\b(condom|birth\s+control|plan\s+b)\b',
+    r'\b(hook\s*up|make\s*out|one\s*night\s*stand)\b',
+    r'\b(onlyfans|pornhub|xvideos|xhamster)\b',
+
+    # Violence
+    r'\b(gore|blood|murder|torture|massacre)\b',
+    r'\b(school\s+shoot|shoot\s+up|bomb\s+threat)\b',
+    r'\b(self[\s-]?harm|cutting|anorex|bulimi)\b',
+    r'\b(dark\s*web|deep\s*web)\b',
+
+    # Gambling
+    r'\b(gambling|betting|casino|slots|poker)\b.*?\b(money|win|lose|bet)\b',
 ]
 

@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Send, Shield, Loader2, AlertTriangle, Paperclip, X, Image as ImageIcon, FileText } from 'lucide-react';
-import { circleMessagesAPI, CircleMessageData } from '@/lib/api';
+import { circleMessagesAPI, CircleMessageData, CircleARIAInterventionPayload } from '@/lib/api';
+import { ARIARewriteModal, ARIARewritePayload } from '@/components/messages/aria-rewrite-modal';
 import { useRealtimeCircleMessages } from '@/hooks/use-realtime-circle-messages';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,11 @@ export default function ChildChatPage() {
   const [contactName, setContactName] = useState('');
   const [childId, setChildId] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  // ARIA intervention state
+  const [ariaIntervention, setAriaIntervention] = useState<CircleARIAInterventionPayload | null>(null);
+  const [pendingMessageContent, setPendingMessageContent] = useState<string>('');
+  const [pendingAttachmentData, setPendingAttachmentData] = useState<{ url: string; type: string; name: string; size: number } | null>(null);
 
   // Attachment state
   const [pendingAttachment, setPendingAttachment] = useState<File | null>(null);
@@ -146,20 +152,23 @@ export default function ChildChatPage() {
     setPendingAttachment(null);
   }
 
-  async function handleSend() {
-    if ((!newMessage.trim() && !pendingAttachment) || isSending || !childId) return;
+  async function handleSend(overrideContent?: string, ariaAccepted?: boolean, interventionAction?: string) {
+    const content = overrideContent || newMessage.trim() || (pendingAttachment ? `Sent an image` : '');
+    if (!content && !pendingAttachment && !pendingAttachmentData) return;
+    if (isSending || !childId) return;
 
-    const content = newMessage.trim() || (pendingAttachment ? `Sent an image` : '');
     const currentAttachment = pendingAttachment;
-    setNewMessage('');
-    clearAttachment();
+    if (!overrideContent) {
+      setNewMessage('');
+      clearAttachment();
+    }
     setIsSending(true);
 
     try {
-      let attachmentData: { url: string; type: string; name: string; size: number } | undefined;
+      let attachmentData = pendingAttachmentData || undefined;
 
-      // Upload attachment first if present
-      if (currentAttachment) {
+      // Upload attachment first if present (and not already uploaded)
+      if (currentAttachment && !attachmentData) {
         setIsUploading(true);
         try {
           attachmentData = await circleMessagesAPI.uploadAttachmentAsChild(currentAttachment);
@@ -168,7 +177,7 @@ export default function ChildChatPage() {
         }
       }
 
-      const sent = await circleMessagesAPI.sendAsChild({
+      const result = await circleMessagesAPI.sendAsChild({
         child_id: childId,
         recipient_id: contactId,
         recipient_type: 'circle_contact',
@@ -179,21 +188,57 @@ export default function ChildChatPage() {
           attachment_name: attachmentData.name,
           attachment_size: attachmentData.size,
         }),
+        ...(ariaAccepted !== undefined && { aria_accepted_rewrite: ariaAccepted }),
+        ...(interventionAction && { intervention_action: interventionAction }),
       });
 
+      if (result.type === 'intervention') {
+        // ARIA flagged — show intervention modal
+        setAriaIntervention(result.payload);
+        setPendingMessageContent(content);
+        setPendingAttachmentData(attachmentData || null);
+        setIsSending(false);
+        return;
+      }
+
+      // Message sent successfully
+      setAriaIntervention(null);
+      setPendingMessageContent('');
+      setPendingAttachmentData(null);
+
       setMessages((prev) => {
-        if (prev.some((m) => m.id === sent.id)) return prev;
-        return [...prev, sent];
+        if (prev.some((m) => m.id === result.message.id)) return prev;
+        return [...prev, result.message];
       });
       scrollToBottom();
     } catch (err) {
       console.error('Error sending message:', err);
       setError('Failed to send message');
-      setNewMessage(content);
+      if (!overrideContent) setNewMessage(content);
     } finally {
       setIsSending(false);
       inputRef.current?.focus();
     }
+  }
+
+  /** Handle ARIA modal: use rewritten version */
+  function handleAriaUseRewrite(rewrittenContent: string) {
+    setAriaIntervention(null);
+    handleSend(rewrittenContent, true, 'accepted');
+  }
+
+  /** Handle ARIA modal: edit first (puts content back in compose box) */
+  function handleAriaEditRewrite(startingContent: string) {
+    setAriaIntervention(null);
+    setNewMessage(startingContent);
+    inputRef.current?.focus();
+  }
+
+  /** Handle ARIA modal: cancel */
+  function handleAriaCancel() {
+    setAriaIntervention(null);
+    setPendingMessageContent('');
+    setPendingAttachmentData(null);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -277,6 +322,29 @@ export default function ChildChatPage() {
           >
             Dismiss
           </button>
+        </div>
+      )}
+
+      {/* ARIA Intervention Modal */}
+      {ariaIntervention && (
+        <div className="px-4 py-3 bg-slate-900/95 border-t border-slate-800">
+          <ARIARewriteModal
+            payload={{
+              aria_flagged: true,
+              aria_mode: ariaIntervention.aria_mode,
+              original_message: ariaIntervention.original_message,
+              suggested_rewrite: ariaIntervention.suggested_rewrite || null,
+              explanation: ariaIntervention.explanation || 'ARIA detected something in your message.',
+              categories: ariaIntervention.categories || [],
+              severity: ariaIntervention.severity,
+              confidence_score: ariaIntervention.confidence_score,
+            }}
+            onUseRewrite={handleAriaUseRewrite}
+            onEditRewrite={handleAriaEditRewrite}
+            onCancel={handleAriaCancel}
+            isSending={isSending}
+            context="child"
+          />
         </div>
       )}
 

@@ -472,88 +472,94 @@ async def send_message(
             detail="Either case_id or family_file_id is required"
         )
 
-    # Analyze with ARIA
+    # Analyze with ARIA — Hybrid approach: ALWAYS run regex + LLM for complete coverage
     aria_analysis = None
     if aria_enabled:
-        # Run ARIA analysis based on provider setting
-        if ai_provider == "claude":
-            analysis_result = await aria_service.analyze_with_ai(message_data.content, case_context)
-            # Convert to SentimentAnalysis format
-            from app.services.aria import SentimentAnalysis, ToxicityCategory, ToxicityLevel
+        from app.services.aria import SentimentAnalysis, ToxicityCategory, ToxicityLevel
 
-            # Determine toxicity level from score
-            score = analysis_result["toxicity_score"]
-            if score < 0.2:
-                toxicity_level = ToxicityLevel.NONE
-            elif score < 0.4:
-                toxicity_level = ToxicityLevel.LOW
-            elif score < 0.6:
-                toxicity_level = ToxicityLevel.MEDIUM
-            elif score < 0.8:
-                toxicity_level = ToxicityLevel.HIGH
-            else:
-                toxicity_level = ToxicityLevel.SEVERE
+        # STEP 1: Always run regex first (fast, catches obvious patterns)
+        regex_analysis = aria_service.analyze_message(message_data.content)
 
-            categories_list = aria_service.map_categories(analysis_result.get("categories", []))
-            # STRICT BLOCKING: Enforce zero tolerance for AI results too
-            block_send = (
-                ToxicityCategory.THREATENING in categories_list or
-                ToxicityCategory.HATE_SPEECH in categories_list or
-                ToxicityCategory.SEXUAL_HARASSMENT in categories_list
-            )
+        # STEP 2: Run LLM for contextual analysis (catches what regex misses)
+        llm_categories = []
+        llm_score = 0.0
+        llm_explanation = ""
+        llm_triggers = []
+        llm_suggestion = None
 
-            aria_analysis = SentimentAnalysis(
-                original_message=message_data.content,
-                toxicity_level=toxicity_level,
-                toxicity_score=score,
-                categories=categories_list,
-                triggers=analysis_result.get("triggers", []),
-                explanation=analysis_result.get("explanation", ""),
-                suggestion=analysis_result["suggestions"][0] if analysis_result.get("suggestions") else None,
-                is_flagged=score > 0.3,
-                block_send=block_send,
-                timestamp=datetime.utcnow()
-            )
-        elif ai_provider == "openai":
-            analysis_result = await aria_service.analyze_with_openai(message_data.content, case_context)
-            from app.services.aria import SentimentAnalysis, ToxicityCategory, ToxicityLevel
+        if ai_provider in ("claude", "openai"):
+            try:
+                if ai_provider == "claude":
+                    analysis_result = await aria_service.analyze_with_ai(message_data.content, case_context)
+                else:
+                    analysis_result = await aria_service.analyze_with_openai(message_data.content, case_context)
 
-            # Determine toxicity level from score
-            score = analysis_result["toxicity_score"]
-            if score < 0.2:
-                toxicity_level = ToxicityLevel.NONE
-            elif score < 0.4:
-                toxicity_level = ToxicityLevel.LOW
-            elif score < 0.6:
-                toxicity_level = ToxicityLevel.MEDIUM
-            elif score < 0.8:
-                toxicity_level = ToxicityLevel.HIGH
-            else:
-                toxicity_level = ToxicityLevel.SEVERE
+                llm_score = analysis_result.get("toxicity_score", 0.0)
+                llm_categories = aria_service.map_categories(analysis_result.get("categories", []))
+                llm_explanation = analysis_result.get("explanation", "")
+                llm_triggers = analysis_result.get("triggers", [])
+                llm_suggestion = analysis_result["suggestions"][0] if analysis_result.get("suggestions") else None
+            except Exception as e:
+                logger.warning(f"LLM analysis failed, using regex only: {e}")
 
-            categories_list = aria_service.map_categories(analysis_result.get("categories", []))
-            # STRICT BLOCKING: Enforce zero tolerance for AI results too
-            block_send = (
-                ToxicityCategory.THREATENING in categories_list or
-                ToxicityCategory.HATE_SPEECH in categories_list or
-                ToxicityCategory.SEXUAL_HARASSMENT in categories_list
-            )
+        # STEP 3: Merge regex + LLM results — all categories, highest severity
+        merged_categories = list(set(regex_analysis.categories + llm_categories))
 
-            aria_analysis = SentimentAnalysis(
-                original_message=message_data.content,
-                toxicity_level=toxicity_level,
-                toxicity_score=score,
-                categories=categories_list,
-                triggers=analysis_result.get("triggers", []),
-                explanation=analysis_result.get("explanation", ""),
-                suggestion=analysis_result["suggestions"][0] if analysis_result.get("suggestions") else None,
-                is_flagged=score > 0.3,
-                block_send=block_send,
-                timestamp=datetime.utcnow()
-            )
+        # Use highest score from either source
+        merged_score = max(regex_analysis.toxicity_score, llm_score)
+
+        # Combine triggers from both sources
+        merged_triggers = list(set(regex_analysis.triggers + llm_triggers))
+
+        # Build comprehensive explanation mentioning ALL detected issues
+        explanations = []
+        if regex_analysis.explanation and regex_analysis.explanation != "No issues detected":
+            explanations.append(regex_analysis.explanation)
+        if llm_explanation and llm_explanation != regex_analysis.explanation:
+            explanations.append(llm_explanation)
+
+        if len(merged_categories) > 1:
+            cat_names = [cat.value.replace("_", " ").title() for cat in merged_categories]
+            merged_explanation = f"Multiple issues detected: {', '.join(cat_names)}. " + " ".join(explanations)
+        elif explanations:
+            merged_explanation = " ".join(explanations)
         else:
-            # Default to regex
-            aria_analysis = aria_service.analyze_message(message_data.content)
+            merged_explanation = regex_analysis.explanation or ""
+
+        # Use the best suggestion available (LLM generally better)
+        merged_suggestion = llm_suggestion or regex_analysis.suggestion
+
+        # Determine toxicity level from merged score
+        if merged_score < 0.2:
+            toxicity_level = ToxicityLevel.NONE
+        elif merged_score < 0.4:
+            toxicity_level = ToxicityLevel.LOW
+        elif merged_score < 0.6:
+            toxicity_level = ToxicityLevel.MEDIUM
+        elif merged_score < 0.8:
+            toxicity_level = ToxicityLevel.HIGH
+        else:
+            toxicity_level = ToxicityLevel.SEVERE
+
+        # STRICT BLOCKING: Enforce zero tolerance for combined results
+        block_send = (
+            ToxicityCategory.THREATENING in merged_categories or
+            ToxicityCategory.HATE_SPEECH in merged_categories or
+            ToxicityCategory.SEXUAL_HARASSMENT in merged_categories
+        )
+
+        aria_analysis = SentimentAnalysis(
+            original_message=message_data.content,
+            toxicity_level=toxicity_level,
+            toxicity_score=merged_score,
+            categories=merged_categories,
+            triggers=merged_triggers,
+            explanation=merged_explanation,
+            suggestion=merged_suggestion,
+            is_flagged=merged_score > 0.3 or regex_analysis.is_flagged,
+            block_send=block_send or getattr(regex_analysis, 'block_send', False),
+            timestamp=datetime.utcnow()
+        )
     else:
         # ARIA disabled - create clean result
         from app.services.aria import SentimentAnalysis, ToxicityLevel
@@ -607,6 +613,16 @@ async def send_message(
 
         # Return 202 with the rewrite so the frontend shows the modal
         from fastapi.responses import JSONResponse
+
+        # Map severity for frontend display
+        severity_str = "safe"
+        if aria_analysis.toxicity_score >= 0.8:
+            severity_str = "severe"
+        elif aria_analysis.toxicity_score >= 0.6:
+            severity_str = "moderate"
+        elif aria_analysis.toxicity_score >= 0.3:
+            severity_str = "mild"
+
         return JSONResponse(
             status_code=202,
             content={
@@ -617,6 +633,8 @@ async def send_message(
                 "explanation": aria_analysis.explanation,
                 "categories": [cat.value for cat in aria_analysis.categories],
                 "toxicity_score": aria_analysis.toxicity_score,
+                "severity": severity_str,
+                "confidence_score": aria_analysis.toxicity_score,
             }
         )
 

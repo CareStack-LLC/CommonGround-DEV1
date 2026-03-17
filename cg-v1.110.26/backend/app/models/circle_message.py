@@ -67,6 +67,13 @@ class CircleMessage(Base, UUIDMixin, TimestampMixin):
     aria_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     aria_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
+    # ARIA intervention tracking (v2)
+    user_action: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)  # accepted/modified/sent_anyway/cancelled/blocked
+    aria_intervention_level: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 1=mild, 2=moderate, 3=severe, 4=blocked
+    aria_all_categories: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # JSON array of all detected categories
+    aria_suggested_rewrite: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # What ARIA suggested
+    aria_response_time_ms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # Analysis latency
+
     # Delivery status
     is_delivered: Mapped[bool] = mapped_column(Boolean, default=True)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)

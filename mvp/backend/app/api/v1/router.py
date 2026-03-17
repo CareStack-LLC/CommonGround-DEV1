@@ -5,6 +5,7 @@ Main API router - combines all endpoint routers.
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    admin,
     auth,
     users,
     cases,
@@ -106,3 +107,6 @@ api_router.include_router(grants.router, prefix="/grants", tags=["Grant Codes"])
 
 # Professional Portal - Attorneys, mediators, paralegals
 api_router.include_router(professional.router, prefix="/professional", tags=["Professional Portal"])
+
+# SuperAdmin Portal
+api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
