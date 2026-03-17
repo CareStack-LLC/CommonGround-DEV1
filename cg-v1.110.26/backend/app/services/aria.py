@@ -9,6 +9,7 @@ Two-tier analysis:
 
 import re
 import json
+import logging
 from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
 from enum import Enum
@@ -20,6 +21,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models.message import Message, MessageFlag
+
+logger = logging.getLogger(__name__)
 
 
 class ToxicityLevel(Enum):
@@ -255,7 +258,7 @@ class ARIAService:
             })
             await db.commit()
         except Exception as e:
-            print(f"FAILED TO LOG ARIA EVENT: {e}")
+            logger.error(f"Failed to log ARIA event: {e}")
 
     async def analyze_message_hybrid(
         self,
@@ -329,7 +332,7 @@ class ARIAService:
             await db.commit() 
             
         except Exception as e:
-            print(f"FAILED TO QUEUE ARIA JOB: {e}")
+            logger.error(f"Failed to queue ARIA job: {e}")
 
         return regex_result
 
@@ -368,7 +371,7 @@ class ARIAService:
             await db.commit() 
             
         except Exception as e:
-            print(f"FAILED TO QUEUE ARIA IMAGE JOB: {e}")
+            logger.error(f"Failed to queue ARIA image job: {e}")
 
 
     def analyze_message(
@@ -762,7 +765,7 @@ Respond in JSON format:
 
         except Exception as e:
             # Fallback to regex analysis
-            print(f"OpenAI analysis failed: {e}")
+            logger.error(f"OpenAI analysis failed: {e}")
             regex_analysis = self.analyze_message(message)
             return {
                 "ai_powered": False,
@@ -1054,11 +1057,11 @@ If the original message had zero constructive content (pure abuse), suggest:
             return rewrite if rewrite else None
 
         except Exception as e:
-            print(f"[ARIA v2] generate_contextual_rewrite (Claude) failed: {e}")
+            logger.error(f"[ARIA v2] generate_contextual_rewrite (Claude) failed: {e}")
             
             # Fallback to OpenAI if Anthropic fails
             try:
-                print("[ARIA v2] Attempting OpenAI fallback for contextual rewrite...")
+                logger.info("[ARIA v2] Attempting OpenAI fallback for contextual rewrite...")
                 openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
                 
                 # Use a similar prompt for OpenAI
@@ -1074,10 +1077,10 @@ If the original message had zero constructive content (pure abuse), suggest:
                 
                 rewrite = response.choices[0].message.content.strip()
                 if rewrite:
-                    print("[ARIA v2] OpenAI fallback successful.")
+                    logger.info("[ARIA v2] OpenAI fallback successful.")
                     return rewrite
             except Exception as oe:
-                print(f"[ARIA v2] OpenAI fallback failed: {oe}")
+                logger.error(f"[ARIA v2] OpenAI fallback failed: {oe}")
                 
             return None
 
@@ -1153,11 +1156,11 @@ Respond in valid JSON only:
             return parsed.get("suggestions", [])[:2]
 
         except Exception as e:
-            print(f"[ARIA v2] generate_reply_suggestion (Claude) failed: {e}")
+            logger.error(f"[ARIA v2] generate_reply_suggestion (Claude) failed: {e}")
             
             # Fallback to OpenAI if Anthropic fails
             try:
-                print("[ARIA v2] Attempting OpenAI fallback for reply suggestions...")
+                logger.info("[ARIA v2] Attempting OpenAI fallback for reply suggestions...")
                 openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
                 
                 response = openai_client.chat.completions.create(
@@ -1174,10 +1177,10 @@ Respond in valid JSON only:
                 parsed = _json.loads(response.choices[0].message.content)
                 suggestions = parsed.get("suggestions", [])[:2]
                 if suggestions:
-                    print("[ARIA v2] OpenAI fallback successful.")
+                    logger.info("[ARIA v2] OpenAI fallback successful.")
                     return suggestions
             except Exception as oe:
-                print(f"[ARIA v2] OpenAI fallback failed: {oe}")
+                logger.error(f"[ARIA v2] OpenAI fallback failed: {oe}")
                 
             return []
 

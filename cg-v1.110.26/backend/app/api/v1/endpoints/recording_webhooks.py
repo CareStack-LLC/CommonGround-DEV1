@@ -88,7 +88,7 @@ async def handle_daily_recording_webhook(
     except Exception as e:
         logger.error(f"Error processing webhook {event_type}: {e}")
         # Return 200 to prevent retries for handled errors
-        return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "An error occurred while processing the webhook."}
 
 
 async def handle_recording_started(db: AsyncSession, data: Dict[str, Any]):
@@ -294,7 +294,7 @@ async def handle_daily_transcription_webhook(
 
     except Exception as e:
         logger.error(f"Error processing transcription webhook {event_type}: {e}")
-        return {"status": "error", "message": str(e)}
+        return {"status": "error", "message": "An error occurred while processing the webhook."}
 
 
 async def handle_transcription_message(db: AsyncSession, data: Dict[str, Any]):

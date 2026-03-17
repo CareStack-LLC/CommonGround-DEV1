@@ -20,6 +20,26 @@ import {
 } from 'lucide-react';
 import { kidcomsAPI, KidComsSettings, KidComsSettingsUpdate } from '@/lib/api';
 
+const DAYS_OF_WEEK = [
+  { key: 'monday', label: 'Mon' },
+  { key: 'tuesday', label: 'Tue' },
+  { key: 'wednesday', label: 'Wed' },
+  { key: 'thursday', label: 'Thu' },
+  { key: 'friday', label: 'Fri' },
+  { key: 'saturday', label: 'Sat' },
+  { key: 'sunday', label: 'Sun' },
+] as const;
+
+const DEFAULT_SCHEDULE: Record<string, { start: string; end: string }> = {
+  monday: { start: '09:00', end: '20:00' },
+  tuesday: { start: '09:00', end: '20:00' },
+  wednesday: { start: '09:00', end: '20:00' },
+  thursday: { start: '09:00', end: '20:00' },
+  friday: { start: '09:00', end: '21:00' },
+  saturday: { start: '08:00', end: '21:00' },
+  sunday: { start: '08:00', end: '20:00' },
+};
+
 function SettingsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,6 +51,11 @@ function SettingsContent() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [settings, setSettings] = useState<KidComsSettings | null>(null);
   const [formData, setFormData] = useState<KidComsSettingsUpdate>({});
+  const [schedule, setSchedule] = useState<Record<string, { start: string; end: string; enabled: boolean }>>(
+    Object.fromEntries(
+      DAYS_OF_WEEK.map(d => [d.key, { ...DEFAULT_SCHEDULE[d.key], enabled: true }])
+    )
+  );
 
   useEffect(() => {
     if (familyFileId) {
@@ -49,6 +74,7 @@ function SettingsContent() {
       setFormData({
         circle_approval_mode: data.circle_approval_mode,
         enforce_availability: data.enforce_availability,
+        availability_schedule: data.availability_schedule,
         require_parent_notification: data.require_parent_notification,
         notify_on_session_start: data.notify_on_session_start,
         notify_on_session_end: data.notify_on_session_end,
@@ -61,6 +87,17 @@ function SettingsContent() {
         allow_child_to_initiate: data.allow_child_to_initiate,
         record_sessions: data.record_sessions,
       });
+      // Load saved schedule into local state
+      if (data.availability_schedule) {
+        const savedSchedule: Record<string, { start: string; end: string; enabled: boolean }> = {};
+        for (const day of DAYS_OF_WEEK) {
+          const saved = data.availability_schedule[day.key] as { start: string; end: string } | undefined;
+          savedSchedule[day.key] = saved
+            ? { start: saved.start, end: saved.end, enabled: true }
+            : { ...DEFAULT_SCHEDULE[day.key], enabled: false };
+        }
+        setSchedule(savedSchedule);
+      }
     } catch (err) {
       console.error('Error loading settings:', err);
       // Settings may not exist yet, use defaults
@@ -117,6 +154,27 @@ function SettingsContent() {
         [feature]: enabled,
       },
     }));
+  }
+
+  function updateScheduleDay(day: string, field: 'start' | 'end' | 'enabled', value: string | boolean) {
+    setSchedule((prev) => {
+      const updated = {
+        ...prev,
+        [day]: { ...prev[day], [field]: value },
+      };
+      // Sync to formData: only include enabled days
+      const apiSchedule: Record<string, { start: string; end: string }> = {};
+      for (const [k, v] of Object.entries(updated)) {
+        if (v.enabled) {
+          apiSchedule[k] = { start: v.start, end: v.end };
+        }
+      }
+      setFormData((prevForm) => ({
+        ...prevForm,
+        availability_schedule: Object.keys(apiSchedule).length > 0 ? apiSchedule : null,
+      }));
+      return updated;
+    });
   }
 
   if (!familyFileId) {
@@ -407,6 +465,53 @@ function SettingsContent() {
                 className="w-5 h-5 text-purple-600 rounded"
               />
             </label>
+
+            {/* Availability Schedule Picker — shown when enforcement is on */}
+            {formData.enforce_availability && (
+              <div className="ml-1 pl-4 border-l-2 border-purple-200 dark:border-purple-800 space-y-3">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Allowed hours per day
+                </p>
+                {DAYS_OF_WEEK.map((day) => {
+                  const daySchedule = schedule[day.key];
+                  return (
+                    <div key={day.key} className="flex items-center gap-3">
+                      <label className="flex items-center gap-2 w-16 shrink-0 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={daySchedule.enabled}
+                          onChange={(e) => updateScheduleDay(day.key, 'enabled', e.target.checked)}
+                          className="w-4 h-4 text-purple-600 rounded"
+                        />
+                        <span className={`text-sm font-medium ${daySchedule.enabled ? 'text-foreground' : 'text-muted-foreground line-through'}`}>
+                          {day.label}
+                        </span>
+                      </label>
+                      {daySchedule.enabled ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="time"
+                            value={daySchedule.start}
+                            onChange={(e) => updateScheduleDay(day.key, 'start', e.target.value)}
+                            className="px-2 py-1 text-sm border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
+                          />
+                          <span className="text-muted-foreground text-xs">to</span>
+                          <input
+                            type="time"
+                            value={daySchedule.end}
+                            onChange={(e) => updateScheduleDay(day.key, 'end', e.target.value)}
+                            className="px-2 py-1 text-sm border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
+                          />
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground italic">No sessions allowed</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
             <label className="flex items-center justify-between">
               <div>
                 <span className="font-medium text-foreground">Record sessions</span>

@@ -4,6 +4,7 @@ Custody Time API endpoints - Track and report parenting time.
 Endpoints for custody statistics, parenting reports, and manual overrides.
 """
 
+import logging
 from datetime import date, datetime
 from typing import Optional
 
@@ -27,6 +28,8 @@ from app.schemas.custody_time import (
     CustodyTimelineResponse,
 )
 from app.services.custody_time import CustodyTimeService, get_period_dates
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -140,9 +143,10 @@ async def get_child_custody_stats(
             db, child.family_file_id, child_id, start, end
         )
     except ValueError as e:
+        logger.error(f"Failed to get child custody stats: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="Failed to retrieve custody statistics"
         )
 
     return ChildCustodyStatsResponse(**stats)
@@ -222,9 +226,10 @@ async def get_family_custody_stats(
             db, family_file_id, start, end
         )
     except ValueError as e:
+        logger.error(f"Failed to get family custody stats: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="Failed to retrieve family custody statistics"
         )
 
     return FamilyCustodyStatsResponse(**stats)
@@ -264,9 +269,10 @@ async def get_parenting_report(
             db, family_file_id, start, end, str(current_user.id)
         )
     except ValueError as e:
+        logger.error(f"Failed to generate parenting report: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="Failed to generate parenting report"
         )
 
     return ParentingReportResponse(**report)

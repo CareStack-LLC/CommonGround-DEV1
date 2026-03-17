@@ -2,7 +2,11 @@
 User management endpoints.
 """
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
+
+logger = logging.getLogger(__name__)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -296,9 +300,10 @@ async def change_password(
     except HTTPException:
         raise
     except Exception as e:
+        logger.exception(f"Failed to change password: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to change password: {str(e)}"
+            detail="Failed to change password."
         )
 
 

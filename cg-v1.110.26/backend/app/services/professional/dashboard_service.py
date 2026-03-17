@@ -5,9 +5,12 @@ Business logic for aggregating dashboard data across all
 assigned cases for a professional.
 """
 
+import logging
 from datetime import datetime, timedelta
 from typing import Optional
 from uuid import uuid4
+
+logger = logging.getLogger(__name__)
 
 from sqlalchemy import select, and_, or_, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -370,7 +373,7 @@ class ProfessionalDashboardService:
                     "next_event_date": "Updated Daily"
                 })
             except Exception as e:
-                print(f"Error getting preview for {family_file_id}: {e}")
+                logger.error("Error getting preview for %s: %s", family_file_id, e)
                 continue
                 
         return priority_cases

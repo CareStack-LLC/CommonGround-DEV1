@@ -32,8 +32,8 @@ class Settings(BaseSettings):
 
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://www.find-commonground.com,https://find-commonground.com,https://common-ground-blue.vercel.app,https://common-ground-git-main-teejays-projects-caad17d8.vercel.app"
-    # Allow Vercel preview/branch URLs and production custom domain
-    CORS_ORIGIN_REGEX: str = r"https://(.*\.vercel\.app|find-commonground\.com|www\.find-commonground\.com)$"
+    # Allow only CommonGround Vercel preview/branch URLs and production custom domain
+    CORS_ORIGIN_REGEX: str = r"https://(common-ground[a-z0-9-]*\.vercel\.app|common-ground-git-[a-z0-9-]+\.vercel\.app|find-commonground\.com|www\.find-commonground\.com)$"
 
     @property
     def allowed_origins_list(self) -> List[str]:
@@ -102,6 +102,7 @@ class Settings(BaseSettings):
     # Email
     EMAIL_ENABLED: bool = False
     SENDGRID_API_KEY: Optional[str] = None
+    SENDGRID_WEBHOOK_VERIFICATION_KEY: Optional[str] = None  # For verifying webhook signatures
     FROM_EMAIL: str = "noreply@find-commonground.com"
     FROM_NAME: str = "CommonGround"
 

@@ -1205,13 +1205,10 @@ class EmailService:
         # Development mode - log to console
         if not self.enabled:
             logger.info(f"[EMAIL DEV MODE] To: {to_email} | Subject: {subject}")
-            print(f"\n{'='*60}")
-            print(f"EMAIL (Development Mode - Not Sent)")
-            print(f"{'='*60}")
-            print(f"To: {to_email}")
-            print(f"From: {sender_name} <{self.from_email}>")
-            print(f"Subject: {subject}")
-            print(f"{'='*60}\n")
+            logger.debug(
+                "EMAIL (Development Mode - Not Sent) | To: %s | From: %s <%s> | Subject: %s",
+                to_email, sender_name, self.from_email, subject,
+            )
             return None
 
         # Production mode - send via SendGrid

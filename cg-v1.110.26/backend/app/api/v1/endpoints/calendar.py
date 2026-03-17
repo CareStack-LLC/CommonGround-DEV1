@@ -29,6 +29,8 @@ from app.services.court import CourtEventService
 from sqlalchemy import select
 import logging
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 
@@ -198,10 +200,10 @@ async def get_calendar_data(
             limit=100  # Get all instances in date range
         )
 
-        print(f"[CALENDAR] Found {len(exchange_instances)} exchange instances for calendar")
+        logger.debug("Found %d exchange instances for calendar", len(exchange_instances))
         for instance in exchange_instances:
             exchange = instance.exchange
-            logging.info(f"  - Exchange instance: {instance.scheduled_time} | {exchange.title if exchange else 'No title'}")
+            logger.debug("Exchange instance: %s | %s", instance.scheduled_time, exchange.title if exchange else "No title")
             exchanges_list.append(CustodyExchangeInstanceForCalendar(
                 id=instance.id,
                 exchange_id=instance.exchange_id,

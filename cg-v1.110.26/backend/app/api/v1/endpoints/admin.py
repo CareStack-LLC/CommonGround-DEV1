@@ -709,7 +709,7 @@ async def get_billing_overview(
             }
     except Exception as e:
         logger.warning(f"Stripe API unavailable for billing overview: {e}")
-        stripe_live = {"stripe_available": False, "error": str(e)}
+        stripe_live = {"stripe_available": False, "error": "Stripe API unavailable."}
 
     await _log_admin_action(db, admin_user, "view_billing", "platform")
     await db.commit()
@@ -1060,7 +1060,7 @@ async def create_report_request(
         report_log.status = "failed"
         report_log.extra_metadata = {
             **report_log.extra_metadata,
-            "error": str(e),
+            "error": "Report generation failed.",
             "failed_at": datetime.utcnow().isoformat(),
         }
         await db.commit()
@@ -1236,7 +1236,8 @@ async def sync_stripe_customers(
         from app.services.stripe_service import StripeService
         stripe_svc = StripeService()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Stripe service unavailable: {e}")
+        logger.exception(f"Stripe service unavailable: {e}")
+        raise HTTPException(status_code=500, detail="Stripe service unavailable.")
 
     for profile, user in profiles_to_sync:
         if profile.stripe_customer_id:
@@ -1253,7 +1254,8 @@ async def sync_stripe_customers(
             synced += 1
         except Exception as e:
             failed += 1
-            errors.append({"user_id": str(user.id), "email": user.email, "error": str(e)})
+            logger.error(f"Failed to sync Stripe customer for user {user.id}: {e}")
+            errors.append({"user_id": str(user.id), "email": user.email, "error": "Sync failed."})
 
     await _log_admin_action(
         db, admin_user, "sync_stripe_customers", "platform",
@@ -1360,7 +1362,8 @@ async def sync_stripe_subscriptions(
                     # (could be a grant or manually assigned tier)
                     pass
         except Exception as e:
-            errors.append({"customer_id": profile.stripe_customer_id, "error": str(e)})
+            logger.error(f"Failed to audit Stripe customer {profile.stripe_customer_id}: {e}")
+            errors.append({"customer_id": profile.stripe_customer_id, "error": "Audit failed."})
 
     await _log_admin_action(
         db, admin_user, "sync_stripe_subscriptions", "platform",
@@ -1717,7 +1720,7 @@ async def generate_report_for_request(
         logger.error(f"Report generation failed for request {request_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Report generation failed: {str(e)}"
+            detail="Report generation failed."
         )
 
 
@@ -1911,7 +1914,7 @@ async def send_monthly_reports(
             failed_count += 1
             errors.append({
                 "family_file_id": str(ff.id),
-                "error": str(e),
+                "error": "Processing failed.",
             })
             logger.error(
                 f"Failed to generate/send monthly report for "

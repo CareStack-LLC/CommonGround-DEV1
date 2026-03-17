@@ -5,9 +5,12 @@ Endpoints for professional profiles, firms, memberships,
 case assignments, and related features.
 """
 
+import logging
 from datetime import datetime
 import io
 from typing import Optional, List
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status, Query, File, UploadFile
 from fastapi.responses import StreamingResponse
@@ -769,9 +772,10 @@ async def invite_firm_member(
     try:
         membership = await service.invite_member(firm_id, current_user.id, data)
     except ValueError as e:
+        logger.error(f"Failed to invite firm member: {e}")
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
     resp = _membership_to_response(membership)
@@ -833,9 +837,10 @@ async def remove_firm_member(
     try:
         await service.remove_member(membership_id)
     except ValueError as e:
+        logger.error(f"Failed to remove firm member: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
     return None
@@ -1322,14 +1327,13 @@ async def get_invitation_case_preview(
         )
         return preview
     except ValueError as e:
+        logger.error(f"Case preview not found: {e}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail="An error occurred while processing your request.",
         )
     except Exception as e:
-        import traceback
-        print(f"Error generating case preview: {str(e)}")
-        print(traceback.format_exc())
+        logger.exception(f"Error generating case preview: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate case preview"
@@ -1469,9 +1473,10 @@ async def request_case_access(
             message=data.message,
         )
     except ValueError as e:
+        logger.error(f"Failed to request access to case: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
     return _access_request_to_response(request)
@@ -1526,9 +1531,10 @@ async def accept_case_invitation(
     try:
         request = await service.professional_accept_invitation(request_id, profile.id)
     except ValueError as e:
+        logger.error(f"Failed to accept case invitation: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
     return _access_request_to_response(request)
@@ -1555,9 +1561,10 @@ async def decline_case_invitation(
             reason=reason,
         )
     except ValueError as e:
+        logger.error(f"Failed to decline case invitation: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
     return _access_request_to_response(request)
@@ -1962,9 +1969,10 @@ async def get_communications(
             offset=offset,
         )
     except ValueError as e:
+        logger.error(f"Failed to get communications: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -1993,9 +2001,10 @@ async def get_communication_threads(
             offset=offset,
         )
     except ValueError as e:
+        logger.error(f"Failed to get communication threads: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -2022,9 +2031,10 @@ async def get_communication_stats(
             days=days,
         )
     except ValueError as e:
+        logger.error(f"Failed to get communication stats: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -2057,9 +2067,10 @@ async def get_communication_detail(
             )
         return result
     except ValueError as e:
+        logger.error(f"Failed to get message detail: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -2212,9 +2223,10 @@ async def get_aria_thread_analysis(
             days=days,
         )
     except Exception as e:
+        logger.exception(f"ARIA thread analysis failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Analysis failed: {str(e)}",
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -2274,9 +2286,10 @@ async def get_compliance_dashboard(
             days=days,
         )
     except ValueError as e:
+        logger.error(f"Failed to get compliance dashboard: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -2303,9 +2316,10 @@ async def get_exchange_compliance(
             days=days,
         )
     except ValueError as e:
+        logger.error(f"Failed to get exchange compliance: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -2332,9 +2346,10 @@ async def get_financial_compliance(
             days=days,
         )
     except ValueError as e:
+        logger.error(f"Failed to get financial compliance: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -2361,9 +2376,10 @@ async def get_communication_compliance(
             days=days,
         )
     except ValueError as e:
+        logger.error(f"Failed to get communication compliance: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -2431,9 +2447,10 @@ async def get_case_messages(
             offset=offset,
         )
     except ValueError as e:
+        logger.error(f"Failed to get case messages: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -2459,9 +2476,10 @@ async def get_message_threads(
             offset=offset,
         )
     except ValueError as e:
+        logger.error(f"Failed to get message threads: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
 
@@ -2503,9 +2521,10 @@ async def send_message_to_client(
             sender_user_id=current_user.id,
         )
     except ValueError as e:
+        logger.error(f"Failed to send message to client: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e),
+            detail="Not authorized to access this resource.",
         )
 
     return ProfessionalMessageResponse(
@@ -3277,7 +3296,8 @@ async def preview_template(
         )
         return processed_content
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        logger.error(f"Failed to preview template: {e}")
+        raise HTTPException(status_code=404, detail="Template or case not found.")
 
 
 # =============================================================================
@@ -3722,7 +3742,8 @@ async def get_ocr_review(
     try:
         return await service.get_extraction_review(document_id)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to get OCR review: {e}")
+        raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
 @router.post(
@@ -3744,7 +3765,8 @@ async def submit_ocr_corrections(
         await db.commit()
         return {"status": "corrections_saved", "document_id": doc.id}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to submit OCR corrections: {e}")
+        raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
 @router.post(
@@ -3791,7 +3813,8 @@ async def approve_ocr_extraction(
             "locked_fields": len(locks),
         }
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to approve OCR extraction: {e}")
+        raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
 @router.post(
@@ -3811,7 +3834,8 @@ async def reject_ocr_extraction(
         await db.commit()
         return {"status": "rejected", "document_id": doc.id}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to reject OCR extraction: {e}")
+        raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
 # =============================================================================
@@ -3901,7 +3925,8 @@ async def unlock_field(
             "unlock_reason": reason,
         }
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to unlock field: {e}")
+        raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
 @router.post(
@@ -4107,7 +4132,8 @@ async def get_report_data(
         )
         return data
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to generate report data: {e}")
+        raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
 @router.get(

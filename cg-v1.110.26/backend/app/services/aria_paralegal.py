@@ -14,6 +14,7 @@ Key principles:
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 import json
+import logging
 
 import anthropic
 from openai import OpenAI
@@ -30,6 +31,8 @@ from app.models.case import Case
 from app.models.child import Child
 from app.models.user import User
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class AriaParalegalService:
@@ -390,7 +393,7 @@ Ready to begin? First, could you tell me a little about yourself and your situat
 
         except Exception as e:
             # Log error but don't expose details
-            print(f"ARIA Paralegal error: {e}")
+            logger.error(f"ARIA Paralegal error: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error processing message. Please try again."
@@ -586,7 +589,7 @@ Rules:
             return session.aria_summary
 
         except Exception as e:
-            print(f"Summary generation error: {e}")
+            logger.error(f"Summary generation error: {e}")
             return "Error generating summary. Please review the transcript directly."
 
     async def extract_form_data(
@@ -629,14 +632,14 @@ Rules:
             try:
                 await self.generate_summary(session)
             except Exception as e:
-                print(f"[complete_intake] Summary generation failed (non-fatal): {e}")
+                logger.warning(f"[complete_intake] Summary generation failed (non-fatal): {e}")
 
         # Extract form data (best-effort)
         for form_type in (session.target_forms or []):
             try:
                 await self.extract_form_data(session, form_type)
             except Exception as e:
-                print(f"[complete_intake] Form extraction failed for {form_type} (non-fatal): {e}")
+                logger.warning(f"[complete_intake] Form extraction failed for {form_type} (non-fatal): {e}")
 
         await self.db.refresh(session)
         return session

@@ -108,15 +108,15 @@ class SupabaseStorageService:
         )
 
         # Return the public URL for public buckets (avatars, kidcoms)
-        # For private buckets, return a signed URL that lasts 1 year
+        # For private buckets, return a signed URL with limited expiry
         if bucket in (StorageBucket.AVATARS, StorageBucket.KIDCOMS, StorageBucket.PROFESSIONAL_MEDIA):
             return self._get_storage_url(bucket, path)
         else:
-            # For private buckets, return a long-lived signed URL (1 year)
-            # This is stored in the database and used directly in the frontend
+            # For private buckets, return a signed URL (7 days)
+            # Short expiry reduces risk if URL is leaked
             signed = self.client.storage.from_(bucket).create_signed_url(
                 path=path,
-                expires_in=31536000  # 1 year in seconds
+                expires_in=604800  # 7 days in seconds
             )
             return signed.get("signedURL", f"{bucket}/{path}")
 

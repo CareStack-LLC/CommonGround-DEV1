@@ -13,9 +13,12 @@ Maps conversational intake responses to specific form fields for:
 - DV-110 (Temporary Restraining Order)
 """
 
+import logging
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 import json
+
+logger = logging.getLogger(__name__)
 
 from openai import OpenAI
 from sqlalchemy import select
@@ -474,7 +477,7 @@ Return a JSON object with the extracted data following the schema structure."""
             }
 
         except Exception as e:
-            print(f"Extraction error for {target_form}: {e}")
+            logger.error("Extraction error for %s: %s", target_form, e)
             return {
                 "form_type": target_form,
                 "error": "Extraction failed",

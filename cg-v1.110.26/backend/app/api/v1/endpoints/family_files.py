@@ -196,7 +196,7 @@ async def list_family_files(
         logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to list family files: {str(e)}"
+            detail="Failed to list family files."
         )
 
 
@@ -838,9 +838,10 @@ async def approve_professional_access_request(
         try:
             request = await access_service.approve_request(request_id, current_user.id)
         except ValueError as e:
+            logger.error(f"Failed to approve access request: {e}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(e)
+                detail="An error occurred while processing your request."
             )
 
     # If fully approved (both parents), create case assignment
@@ -865,9 +866,10 @@ async def approve_professional_access_request(
             await db.commit()
         except ValueError as e:
             # Assignment might already exist
+            logger.error(f"Failed to create case assignment: {e}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(e)
+                detail="An error occurred while processing your request."
             )
 
     return {
@@ -901,9 +903,10 @@ async def decline_professional_access_request(
     try:
         request = await access_service.decline_request(request_id, current_user.id, reason)
     except ValueError as e:
+        logger.error(f"Failed to decline access request: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
     return {
@@ -973,7 +976,7 @@ async def list_family_file_professionals(
         logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error getting family file: {str(e)}"
+            detail="An error occurred while processing your request."
         )
 
     try:
@@ -984,7 +987,7 @@ async def list_family_file_professionals(
         logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error listing assignments: {str(e)}"
+            detail="An error occurred while processing your request."
         )
 
     professionals = []
@@ -1088,16 +1091,17 @@ async def invite_professional(
                 "message": "Invitation sent to firm. Awaiting other parent approval and firm acceptance."
             }
         except ValueError as e:
+            logger.error(f"Failed to invite firm: {e}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(e)
+                detail="An error occurred while processing your request."
             )
         except Exception as e:
             logger.error(f"Error inviting firm: {e}")
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Error inviting firm: {str(e)}"
+                detail="An error occurred while processing your request."
             )
 
     # Email-based invitation (legacy flow)
@@ -1142,9 +1146,10 @@ async def invite_firm_from_directory(
             message=message,
         )
     except ValueError as e:
+        logger.error(f"Failed to invite firm from directory: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
     return {
@@ -1186,9 +1191,10 @@ async def remove_professional(
             revoker_user_id=str(current_user.id),
         )
     except ValueError as e:
+        logger.error(f"Failed to revoke professional access: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
     return {

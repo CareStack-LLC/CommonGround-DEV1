@@ -307,7 +307,7 @@ function PaymentsContent() {
       setWallet(walletData);
     } catch (err) {
       // No wallet yet - that's ok
-      console.log('No wallet found');
+      // console.log('No wallet found');
     }
   };
 

@@ -8,6 +8,7 @@ Calendar and event management for professionals including:
 - Case-linked events
 """
 
+import logging
 from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
@@ -30,6 +31,7 @@ from app.schemas.professional import (
 from app.services.professional.events_service import events_service
 from sqlalchemy import select
 
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -142,9 +144,10 @@ async def create_event(
             check_conflicts=check_conflicts,
         )
     except ValueError as e:
+        logger.error(f"Failed to create professional event: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="Failed to create event"
         )
 
     event_response = await events_service.to_response(db, event)
@@ -348,9 +351,10 @@ async def update_event(
             check_conflicts=check_conflicts,
         )
     except ValueError as e:
+        logger.error(f"Failed to update professional event: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="Failed to update event"
         )
 
     if not event:

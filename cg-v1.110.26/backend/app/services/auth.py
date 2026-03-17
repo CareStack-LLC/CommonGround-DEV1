@@ -48,7 +48,7 @@ class AuthService:
             HTTPException: If registration fails
         """
         try:
-            logger.info(f"🚀 Starting registration for: {request.email}")
+            logger.info(f"Starting registration for: {request.email}")
             
             # Check if user already exists
             result = await self.db.execute(
@@ -57,14 +57,14 @@ class AuthService:
             existing_user = result.scalar_one_or_none()
 
             if existing_user:
-                logger.warning(f"⚠️ Registration failed: Email {request.email} already exists")
+                logger.warning(f"Registration failed: Email {request.email} already exists")
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Email already registered"
                 )
 
             # Create user in Supabase Auth
-            logger.info(f"📡 Creating Supabase Auth account for {request.email}")
+            logger.info(f"Creating Supabase Auth account for {request.email}")
             auth_response = self.supabase.auth.sign_up({
                 "email": request.email,
                 "password": request.password,
@@ -77,17 +77,17 @@ class AuthService:
             })
 
             if not auth_response.user:
-                logger.error(f"❌ Supabase Auth failed for {request.email}: No user in response")
+                logger.error(f"Supabase Auth failed for {request.email}: No user in response")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Failed to create user in Supabase"
                 )
 
             supabase_user = auth_response.user
-            logger.info(f"✅ Supabase User created: {supabase_user.id}")
+            logger.info(f"Supabase User created: {supabase_user.id}")
 
             # 1. Create Stripe Customer
-            logger.info(f"💳 Creating Stripe customer for {request.email}")
+            logger.info(f"Creating Stripe customer for {request.email}")
             from app.services.stripe_service import StripeService
             stripe_service = StripeService()
             
@@ -96,7 +96,7 @@ class AuthService:
                 name=f"{request.first_name} {request.last_name}",
                 user_id=supabase_user.id
             )
-            logger.info(f"✅ Stripe Customer created: {stripe_customer['id']}")
+            logger.info(f"Stripe Customer created: {stripe_customer['id']}")
 
             # Create user in local database
             user = User(
@@ -121,12 +121,12 @@ class AuthService:
                 subscription_status="active" if not request.subscription_price_id else "trial"
             )
             self.db.add(profile)
-            logger.info(f"📝 Local database records prepared for {user.id}")
+            logger.info(f"Local database records prepared for {user.id}")
 
             # 2. Handle Subscription Checkout if needed
             checkout_url = None
             if request.subscription_price_id and "price_1T7Wgn" not in request.subscription_price_id:
-                logger.info(f"🛒 Initiating checkout for price: {request.subscription_price_id}")
+                logger.info(f"Initiating checkout for price: {request.subscription_price_id}")
                 is_free = request.subscription_price_id == "price_1T7WgnB3EXvvERPfyu40gtfE"
                 
                 if not is_free:
@@ -139,24 +139,24 @@ class AuthService:
                         metadata={"user_id": user.id}
                     )
                     checkout_url = checkout["url"]
-                    logger.info(f"🔗 Checkout URL generated: {checkout_url}")
+                    logger.info(f"Checkout URL generated: {checkout_url}")
 
             await self.db.commit()
-            logger.info(f"💾 Database transaction committed for {user.id}")
+            logger.info(f"Database transaction committed for {user.id}")
             await self.db.refresh(user)
 
             # Create JWT tokens
             access_token = create_access_token(data={"sub": user.id})
             refresh_token = create_refresh_token(data={"sub": user.id})
 
-            logger.info(f"✨ Registration successful for {request.email}")
+            logger.info(f"Registration successful for {request.email}")
             return user, access_token, refresh_token, checkout_url
 
         except HTTPException as e:
-            logger.warning(f"⚠️ Registration HTTP error for {request.email}: {e.detail}")
+            logger.warning(f"Registration HTTP error for {request.email}: {e.detail}")
             raise
         except Exception as e:
-            logger.error(f"💥 Unexpected registration error for {request.email}: {str(e)}", exc_info=True)
+            logger.error(f"Unexpected registration error for {request.email}: {str(e)}", exc_info=True)
             await self.db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -179,27 +179,27 @@ class AuthService:
             HTTPException: If login fails
         """
         try:
-            print(f"Attempting login for email: {request.email}")
+            logger.debug(f"Attempting login for email: {request.email}")
             # Authenticate with Supabase
             try:
                 auth_response = self.supabase.auth.sign_in_with_password({
                     "email": request.email,
                     "password": request.password,
                 })
-                print("Supabase auth successful")
+                logger.debug("Supabase auth successful")
             except Exception as supabase_error:
-                print(f"Supabase auth failed: {supabase_error}")
+                logger.error(f"Supabase auth failed: {supabase_error}")
                 raise supabase_error
 
             if not auth_response.user:
-                print("No user in auth response")
+                logger.debug("No user in auth response")
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid credentials"
                 )
 
             supabase_user = auth_response.user
-            print(f"Supabase user found: {supabase_user.id}")
+            logger.debug(f"Supabase user found: {supabase_user.id}")
 
             # First, try to get user by supabase_id
             try:
@@ -207,23 +207,23 @@ class AuthService:
                     select(User).where(User.supabase_id == supabase_user.id)
                 )
                 user = result.scalar_one_or_none()
-                print(f"Local user by ID search result: {user}")
+                logger.debug(f"Local user by ID search result: {user}")
             except Exception as db_error:
-                print(f"Database query by ID failed: {db_error}")
+                logger.error(f"Database query by ID failed: {db_error}")
                 raise db_error
 
             # If not found by supabase_id, try by email
             if not user:
-                print("User not found by ID, trying email")
+                logger.debug("User not found by ID, trying email")
                 result = await self.db.execute(
                     select(User).where(User.email == supabase_user.email)
                 )
                 user = result.scalar_one_or_none()
-                print(f"Local user by email search result: {user}")
+                logger.debug(f"Local user by email search result: {user}")
                 
                 # If found by email, sync the supabase_id
                 if user:
-                    print("Syncing supabase_id")
+                    logger.debug("Syncing supabase_id")
                     user.supabase_id = supabase_user.id
                     await self.db.commit()
                     await self.db.refresh(user)
@@ -236,7 +236,7 @@ class AuthService:
                     )
                     profile = result.scalar_one_or_none()
                     if not profile:
-                        print(f"Profile missing for existing user {user.id}, creating one")
+                        logger.debug(f"Profile missing for existing user {user.id}, creating one")
                         # Create Stripe customer for user missing profile
                         stripe_customer_id = None
                         try:
@@ -263,7 +263,7 @@ class AuthService:
                         await self.db.commit()
 
             if not user:
-                print("User not found locally, auto-creating")
+                logger.debug("User not found locally, auto-creating")
                 # Auto-create user if they exist in Supabase Auth but not locally
                 # This handles users created directly in Supabase or migrated databases
                 user_metadata = supabase_user.user_metadata or {}
@@ -300,9 +300,9 @@ class AuthService:
                         metadata={"platform": "commonground"},
                     )
                     stripe_customer_id = customer["id"]
-                    print(f"Stripe customer created for auto-created user: {stripe_customer_id}")
+                    logger.info(f"Stripe customer created for auto-created user: {stripe_customer_id}")
                 except Exception as stripe_err:
-                    print(f"Stripe customer creation failed (non-blocking): {stripe_err}")
+                    logger.warning(f"Stripe customer creation failed (non-blocking): {stripe_err}")
 
                 # Create user profile with Stripe customer ID
                 profile = UserProfile(
@@ -315,10 +315,10 @@ class AuthService:
 
                 await self.db.commit()
                 await self.db.refresh(user)
-                print(f"User created: {user.id}")
+                logger.debug(f"User created: {user.id}")
 
             if not user.is_active:
-                print("User is inactive")
+                logger.debug("User is inactive")
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="User account is inactive"
@@ -327,7 +327,7 @@ class AuthService:
             # Update last login timestamp
             user.last_login = datetime.utcnow()
             await self.db.commit()
-            print("Login flow completed successfully")
+            logger.debug("Login flow completed successfully")
 
             # Create JWT tokens
             access_token = create_access_token(data={"sub": user.id})
@@ -338,9 +338,7 @@ class AuthService:
         except HTTPException:
             raise
         except Exception as e:
-            print(f"Login failed with exception: {str(e)}")
-            import traceback
-            traceback.print_exc()
+            logger.error(f"Login failed with exception: {str(e)}", exc_info=True)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Login failed: {str(e)}"
@@ -512,7 +510,7 @@ class AuthService:
             )
             existing_profile = profile_result.scalar_one_or_none()
             if not existing_profile:
-                print(f"User {existing_user.id} missing profile. Creating one.")
+                logger.debug(f"User {existing_user.id} missing profile. Creating one.")
                 profile = UserProfile(
                     user_id=existing_user.id,
                     first_name=request.first_name or existing_user.first_name,
@@ -552,7 +550,7 @@ class AuthService:
                 )
                 stripe_customer_id = customer["id"]
             except Exception as stripe_err:
-                print(f"Stripe customer creation failed for OAuth user (non-blocking): {stripe_err}")
+                logger.warning(f"Stripe customer creation failed for OAuth user (non-blocking): {stripe_err}")
 
             # Create default profile for new OAuth users
             profile = UserProfile(

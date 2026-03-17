@@ -6,8 +6,11 @@ narrative summaries, communication lags, and fact extraction for professionals.
 """
 
 import json
+import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+
+logger = logging.getLogger(__name__)
 
 from sqlalchemy import select, and_, asc
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -160,7 +163,7 @@ Transcript:
             )
             return json.loads(response.choices[0].message.content)
         except Exception as e:
-            print(f"ARIA Analysis error: {e}")
+            logger.error("ARIA Analysis error: %s", e)
             return {
                 "narrative_summary": "Error analyzing thread.",
                 "tone_analysis": "Error",

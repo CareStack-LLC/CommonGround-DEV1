@@ -103,7 +103,7 @@ function CircleContactCallContent() {
 
   // Handle ARIA interventions
   const handleARIAIntervention = useCallback((intervention: ARIAIntervention) => {
-    console.log('[ARIA Shield] Contact call intervention:', intervention);
+    // console.log('[ARIA Shield] Contact call intervention:', intervention);
     setAriaWarning({
       type: intervention.type,
       message: intervention.message,
@@ -184,7 +184,7 @@ function CircleContactCallContent() {
 
       // If someone else starts theater mode and we're not in it, auto-enter
       if (message.data?.action === 'start' && message.data?.senderId !== circleUserId && !isTheaterMode) {
-        console.log('Theater: Auto-entering theater mode (other participant started)');
+        // console.log('Theater: Auto-entering theater mode (other participant started)');
         setIsTheaterMode(true);
       }
     };
@@ -249,7 +249,7 @@ function CircleContactCallContent() {
     try {
       callCreatedRef.current = true;
       setIsJoiningCall(true);
-      console.log('Creating Daily.co call object for circle contact...');
+      // console.log('Creating Daily.co call object for circle contact...');
 
       // Dynamically import Daily.co SDK
       const DailyIframe = (await import('@daily-co/daily-js')).default;
@@ -263,19 +263,19 @@ function CircleContactCallContent() {
 
       // Event handlers
       call.on('joined-meeting', () => {
-        console.log('Daily.co: Circle contact joined meeting');
+        // console.log('Daily.co: Circle contact joined meeting');
         setIsCallJoined(true);
         setIsJoiningCall(false);
         updateParticipants(call.participants());
       });
 
       call.on('participant-joined', () => {
-        console.log('Daily.co: participant-joined');
+        // console.log('Daily.co: participant-joined');
         updateParticipants(call.participants());
       });
 
       call.on('participant-left', () => {
-        console.log('Daily.co: participant-left');
+        // console.log('Daily.co: participant-left');
         updateParticipants(call.participants());
       });
 
@@ -284,17 +284,17 @@ function CircleContactCallContent() {
       });
 
       call.on('track-started', () => {
-        console.log('Daily.co: track-started');
+        // console.log('Daily.co: track-started');
         updateParticipants(call.participants());
       });
 
       call.on('track-stopped', () => {
-        console.log('Daily.co: track-stopped');
+        // console.log('Daily.co: track-stopped');
         updateParticipants(call.participants());
       });
 
       call.on('left-meeting', () => {
-        console.log('Daily.co: left-meeting');
+        // console.log('Daily.co: left-meeting');
         setIsCallJoined(false);
         handleEndCall();
       });
@@ -306,14 +306,14 @@ function CircleContactCallContent() {
       });
 
       // Join the call
-      console.log('Joining Daily.co room...', { roomUrl: callSession.roomUrl });
+      // console.log('Joining Daily.co room...', { roomUrl: callSession.roomUrl });
       await call.join({
         url: callSession.roomUrl,
         token: callSession.token,
         userName: callSession.contactName,
       });
 
-      console.log('Daily.co join completed for circle contact');
+      // console.log('Daily.co join completed for circle contact');
     } catch (err) {
       console.error('Error initializing Daily.co call:', err);
       setError('Failed to connect to call');

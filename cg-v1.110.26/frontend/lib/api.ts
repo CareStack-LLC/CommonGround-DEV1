@@ -6207,7 +6207,7 @@ export interface KidComsSettings {
   id: string;
   family_file_id: string;
   circle_approval_mode: 'both_parents' | 'either_parent';
-  availability_schedule?: Record<string, unknown>;
+  availability_schedule?: Record<string, { start: string; end: string }> | null;
   enforce_availability: boolean;
   require_parent_notification: boolean;
   notify_on_session_start: boolean;
@@ -6232,7 +6232,7 @@ export interface KidComsSettings {
 
 export interface KidComsSettingsUpdate {
   circle_approval_mode?: 'both_parents' | 'either_parent';
-  availability_schedule?: Record<string, unknown>;
+  availability_schedule?: Record<string, { start: string; end: string }> | null;
   enforce_availability?: boolean;
   require_parent_notification?: boolean;
   notify_on_session_start?: boolean;

@@ -5,9 +5,12 @@ Items tracked here are things parents would want documented for court
 if lost or damaged (Nintendo Switch, school laptops, tablets, etc.)
 """
 
+import logging
 from decimal import Decimal
 from typing import List
 import uuid
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -225,9 +228,10 @@ async def upload_item_photo(
     try:
         content = await file.read()
     except Exception as e:
+        logger.exception(f"Failed to read cubbie file: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to read file: {str(e)}"
+            detail="Failed to read file."
         )
 
     # Upload to Supabase Storage
@@ -239,9 +243,10 @@ async def upload_item_photo(
             content_type=file.content_type or "image/jpeg"
         )
     except Exception as e:
+        logger.exception(f"Failed to upload cubbie photo: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upload file: {str(e)}"
+            detail="Failed to upload file."
         )
 
     # Update item with photo URL

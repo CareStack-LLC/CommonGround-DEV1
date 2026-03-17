@@ -276,7 +276,7 @@ function UpcomingEventItem({ event }: { event: UpcomingEvent }) {
 function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
   const router = useRouter();
 
-  console.log('UpcomingEventsList received events:', events);
+  // console.log('UpcomingEventsList received events:', events);
 
   if (!events || events.length === 0) {
     return (
@@ -480,11 +480,11 @@ function DashboardContent() {
             unread_activity_count: validSummaries.reduce((sum, s) => sum + s.unread_activity_count, 0),
           };
 
-          console.log('Dashboard summaries merged from', validSummaries.length, 'family files');
-          console.log('Total upcoming events:', allUpcomingEvents.length);
+          // console.log('Dashboard summaries merged from', validSummaries.length, 'family files');
+          // console.log('Total upcoming events:', allUpcomingEvents.length);
           setDashboardSummary(mergedSummary);
         } else {
-          console.log('No dashboard summaries returned');
+          // console.log('No dashboard summaries returned');
         }
 
         // No family files with children
@@ -737,14 +737,14 @@ function DashboardContent() {
                             const dd = String(today.getDate()).padStart(2, '0');
                             const dateStr = `${yyyy}-${mm}-${dd}`;
 
-                            console.log('Initiating check-in for child:', id);
+                            // console.log('Initiating check-in for child:', id);
                             await custodyTimeAPI.overrideCustody(data.familyFile.id, {
                               child_id: id,
                               parent_id: user.id,
                               record_date: dateStr,
                               reason: "Dashboard Check-in"
                             });
-                            console.log('Check-in successful, refreshing dashboard...');
+                            // console.log('Check-in successful, refreshing dashboard...');
 
                             // Trigger refresh of all cards
                             setRefreshKey(prev => prev + 1);

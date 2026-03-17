@@ -4,6 +4,7 @@ ClearFund API endpoints - Purpose-locked financial obligations.
 Endpoints for managing obligations, funding, verification, and ledger entries.
 """
 
+import logging
 from typing import Optional
 import uuid
 from decimal import Decimal
@@ -47,6 +48,8 @@ from app.schemas.clearfund import (
 from app.services.clearfund import ClearFundService, LedgerService
 from app.services.activity import log_expense_activity
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 
@@ -85,7 +88,7 @@ async def create_obligation(
             )
         except Exception as e:
             # Don't fail obligation creation if activity logging fails
-            print(f"Failed to log expense activity: {e}")
+            logger.warning("Failed to log expense activity: %s", e)
 
     return ObligationResponse.model_validate(obligation)
 
@@ -435,9 +438,10 @@ async def upload_receipt_file(
             content_type=file.content_type or "image/jpeg"
         )
     except Exception as e:
+        logger.exception(f"Failed to upload receipt file: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upload file: {str(e)}"
+            detail="Failed to upload file."
         )
 
     # Create verification artifact

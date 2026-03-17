@@ -586,8 +586,8 @@ class RecordingService:
         Daily.co signs webhooks with HMAC-SHA256 using your webhook secret.
         """
         if not settings.DAILY_WEBHOOK_SECRET:
-            logger.warning("DAILY_WEBHOOK_SECRET not configured - skipping verification")
-            return True
+            logger.error("DAILY_WEBHOOK_SECRET not configured - rejecting webhook (fail closed)")
+            return False
 
         expected_signature = hmac.new(
             settings.DAILY_WEBHOOK_SECRET.encode(),

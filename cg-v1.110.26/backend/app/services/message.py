@@ -19,6 +19,9 @@ from app.services.email import EmailService
 from app.core.config import settings
 from app.core.websocket import manager
 import hashlib
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MessageService:
@@ -216,7 +219,7 @@ class MessageService:
                         )
             except Exception as email_error:
                 # Log email error but don't fail message send
-                print(f"Warning: Failed to send message notification email: {email_error}")
+                logger.warning(f"Failed to send message notification email: {email_error}")
 
             # Broadcast message via WebSocket to connected users
             try:
@@ -237,7 +240,7 @@ class MessageService:
                 )
             except Exception as ws_error:
                 # Log WebSocket error but don't fail message send
-                print(f"Warning: Failed to broadcast message via WebSocket: {ws_error}")
+                logger.warning(f"Failed to broadcast message via WebSocket: {ws_error}")
 
             return message
 

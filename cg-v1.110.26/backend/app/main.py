@@ -2,9 +2,12 @@
 FastAPI application entry point.
 """
 
+import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
 from app.core.database import init_db, close_db
 from app.api.v1.router import api_router
+from app.core.rate_limit import limiter, rate_limit_exceeded_handler
 
 # Create uploads directory
 UPLOADS_DIR = Path(__file__).parent.parent / "uploads"
@@ -26,15 +30,15 @@ async def lifespan(app: FastAPI):
     Lifespan context manager for startup and shutdown events.
     """
     # Startup
-    print(f"🚀 Starting {settings.APP_NAME} ({settings.ENVIRONMENT})")
-    print(f"🔓 CORS Allowed Origins: {settings.allowed_origins_list}")
-    print(f"🔓 CORS Origin Regex: {settings.CORS_ORIGIN_REGEX}")
+    logger.info(f"Starting {settings.APP_NAME} ({settings.ENVIRONMENT})")
+    logger.info(f"CORS Allowed Origins: {settings.allowed_origins_list}")
+    logger.debug(f"CORS Origin Regex: {settings.CORS_ORIGIN_REGEX}")
     if settings.is_development:
         await init_db()  # Auto-create tables in dev
-        print("✅ Database tables created")
+        logger.info("Database tables created")
     yield
     # Shutdown
-    print("👋 Shutting down...")
+    logger.info("Shutting down...")
     await close_db()
 
 
@@ -57,6 +61,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Rate limiting
+from slowapi import _rate_limit_exceeded_handler as _default_handler
+from slowapi.errors import RateLimitExceeded
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 # Activity tracking: update User.last_active on authenticated requests
 from app.middleware.activity import ActivityTrackingMiddleware
@@ -82,18 +92,22 @@ async def global_exception_handler(request: Request, exc: Exception):
     # Log the error for debugging
     error_msg = f"{type(exc).__name__}: {exc}"
     tb_str = traceback.format_exc()
-    print(f"🚨 Unhandled exception: {error_msg}")
-    print(tb_str)
+    logger.error(f"Unhandled exception: {error_msg}\n{tb_str}")
     
-    # Build response with CORS headers - always include details for debugging
-    response = JSONResponse(
-        status_code=500,
-        content={
-            "detail": str(exc),
-            "type": type(exc).__name__,
-            "traceback": tb_str.split("\n")[-5:] if not settings.DEBUG else tb_str.split("\n"),
-        }
-    )
+    # Build response with CORS headers - never expose internals in production
+    if settings.is_production:
+        response = JSONResponse(
+            status_code=500,
+            content={"detail": "Internal server error"}
+        )
+    else:
+        response = JSONResponse(
+            status_code=500,
+            content={
+                "detail": str(exc),
+                "type": type(exc).__name__,
+            }
+        )
     
     # Add CORS headers if origin is allowed
     if origin:
@@ -157,93 +171,70 @@ async def health_check():
     return {"status": overall, "checks": checks}
 
 
-@app.get("/debug/cors")
-async def debug_cors():
-    """Debug endpoint to check CORS configuration."""
-    return {
-        "allowed_origins_raw": settings.ALLOWED_ORIGINS,
-        "allowed_origins_list": settings.allowed_origins_list,
-        "regex": settings.CORS_ORIGIN_REGEX
-    }
+# Debug endpoints — only available in development
+if settings.is_development:
+    from sqlalchemy import text
+    from app.core.database import get_db
+    from sqlalchemy.ext.asyncio import AsyncSession
+    from fastapi import Depends
 
-from sqlalchemy import text
-from app.core.database import get_db
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends
-
-@app.get("/debug/db")
-async def debug_db(db: AsyncSession = Depends(get_db)):
-    """Debug endpoint to check the database connection and verify the active host."""
-    try:
-        # Get raw database URL (safely mask password)
-        raw_url = settings.DATABASE_URL
-        if "@" in raw_url:
-            masked_url = raw_url.split("://")[0] + "://***:***@" + raw_url.split("@")[1]
-        else:
-            masked_url = "Malformed or missing DATABASE_URL"
-
-        # Check if users table exists via raw SQL
-        result = await db.execute(text("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';"))
-        users_exists = result.scalar() == 1
-        
-        # Check current search path
-        path_result = await db.execute(text("SHOW search_path;"))
-        search_path = path_result.scalar()
-
+    @app.get("/debug/cors")
+    async def debug_cors():
+        """Debug endpoint to check CORS configuration (dev only)."""
         return {
-            "database_url_host": masked_url,
-            "public_users_table_exists": users_exists,
-            "search_path": search_path
+            "allowed_origins_raw": settings.ALLOWED_ORIGINS,
+            "allowed_origins_list": settings.allowed_origins_list,
+            "regex": settings.CORS_ORIGIN_REGEX
         }
-    except Exception as e:
-        return {"error": str(e), "type": str(type(e))}
 
+    @app.get("/debug/db")
+    async def debug_db(db: AsyncSession = Depends(get_db)):
+        """Debug endpoint to check database connection (dev only)."""
+        try:
+            raw_url = settings.DATABASE_URL
+            if "@" in raw_url:
+                masked_url = raw_url.split("://")[0] + "://***:***@" + raw_url.split("@")[1]
+            else:
+                masked_url = "Malformed or missing DATABASE_URL"
 
-@app.get("/debug/email-config")
-async def debug_email_config():
-    """Debug endpoint to check email configuration."""
-    return {
-        "email_enabled": settings.EMAIL_ENABLED,
-        "from_email": settings.FROM_EMAIL,
-        "from_name": settings.FROM_NAME,
-        "sendgrid_key_set": bool(settings.SENDGRID_API_KEY),
-        "sendgrid_key_prefix": settings.SENDGRID_API_KEY[:10] + "..." if settings.SENDGRID_API_KEY else None,
-    }
+            result = await db.execute(text("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users';"))
+            users_exists = result.scalar() == 1
+            path_result = await db.execute(text("SHOW search_path;"))
+            search_path = path_result.scalar()
 
-
-@app.post("/debug/test-email")
-async def test_email(to_email: str):
-    """Send a test email to verify SendGrid configuration."""
-    from app.services.email import email_service
-
-    # Check config
-    if not email_service.enabled:
-        return {
-            "success": False,
-            "error": "Email is disabled",
-            "config": {
-                "email_enabled": settings.EMAIL_ENABLED,
-                "api_key_set": bool(settings.SENDGRID_API_KEY),
+            return {
+                "database_url_host": masked_url,
+                "public_users_table_exists": users_exists,
+                "search_path": search_path
             }
+        except Exception as e:
+            return {"error": "Database check failed", "type": type(e).__name__}
+
+    @app.get("/debug/email-config")
+    async def debug_email_config():
+        """Debug endpoint to check email configuration (dev only)."""
+        return {
+            "email_enabled": settings.EMAIL_ENABLED,
+            "from_email": settings.FROM_EMAIL,
+            "from_name": settings.FROM_NAME,
+            "sendgrid_key_set": bool(settings.SENDGRID_API_KEY),
         }
 
-    try:
-        result = await email_service._send_email(
-            to_email=to_email,
-            subject="CommonGround Test Email",
-            html_body="""
-            <html>
-            <body style="font-family: Arial, sans-serif; padding: 20px;">
-                <h1 style="color: #6B8E6B;">Test Email from CommonGround</h1>
-                <p>If you're seeing this, SendGrid is configured correctly!</p>
-                <p style="color: #666;">Sent via CommonGround email service.</p>
-            </body>
-            </html>
-            """
-        )
-        return {"success": result, "message": "Email sent successfully" if result else "Email send failed"}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
+    @app.post("/debug/test-email")
+    async def test_email(to_email: str):
+        """Send a test email to verify SendGrid configuration (dev only)."""
+        from app.services.email import email_service
+        if not email_service.enabled:
+            return {"success": False, "error": "Email is disabled"}
+        try:
+            result = await email_service._send_email(
+                to_email=to_email,
+                subject="CommonGround Test Email",
+                html_body="<p>SendGrid test from CommonGround dev environment.</p>"
+            )
+            return {"success": result}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
 
 
 if __name__ == "__main__":

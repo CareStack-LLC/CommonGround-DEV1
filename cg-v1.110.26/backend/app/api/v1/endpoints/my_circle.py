@@ -14,12 +14,13 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Request, status, Query
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
+from app.core.rate_limit import limiter, CHILD_PIN_LIMIT, AUTH_LIMIT
 from app.core.security import get_current_user, get_current_circle_user, create_access_token
 from app.models.user import User
 from app.models.family_file import FamilyFile
@@ -355,9 +356,10 @@ async def assign_room_to_contact(
 
         return _room_to_response(room, contact)
     except ValueError as e:
+        logger.error(f"Failed to assign room: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -387,9 +389,10 @@ async def unassign_room(
         await db.commit()
         return _room_to_response(room)
     except ValueError as e:
+        logger.error(f"Failed to unassign room: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -604,9 +607,10 @@ async def invite_circle_user(
             room_number=contact.room_number,
         )
     except ValueError as e:
+        logger.error(f"Failed to invite circle user: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -774,9 +778,10 @@ async def create_and_invite_circle_user(
             room_number=contact.room_number,
         )
     except ValueError as e:
+        logger.error(f"Failed to create and invite circle user: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -1003,9 +1008,10 @@ async def accept_circle_invite(
             child_ids=child_ids,
         )
     except ValueError as e:
+        logger.error(f"Circle user login failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -1161,9 +1167,10 @@ async def reset_password(
             success=True,
         )
     except ValueError as e:
+        logger.error(f"Failed to reset circle user password: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -1563,9 +1570,10 @@ async def setup_child_user(
 
         return _child_user_to_response(child_user, child)
     except ValueError as e:
+        logger.error(f"Failed to setup child user: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -1611,9 +1619,10 @@ async def update_child_user(
 
         return _child_user_to_response(child_user, child)
     except ValueError as e:
+        logger.error(f"Failed to update child user: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -1650,7 +1659,9 @@ async def list_child_users(
     summary="Child user login",
     description="Login with username and PIN for children."
 )
+@limiter.limit(CHILD_PIN_LIMIT)
 async def child_user_login(
+    request: Request,
     login_data: ChildUserLoginRequest,
     db: AsyncSession = Depends(get_db)
 ):

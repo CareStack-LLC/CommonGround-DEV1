@@ -4,6 +4,7 @@ Court Access Mode API endpoints.
 Endpoints for court professional access, settings, events, and reports.
 """
 
+import logging
 from datetime import datetime
 from typing import Optional
 
@@ -97,6 +98,8 @@ from app.services.exchange_compliance import ExchangeComplianceService
 from app.models.message import Message, MessageFlag
 from sqlalchemy import select, and_, func
 from sqlalchemy.orm import selectinload
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -2944,9 +2947,10 @@ async def upload_custody_agreement(
             content_type="application/pdf"
         )
     except Exception as e:
+        logger.exception(f"Failed to upload court document: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upload file: {str(e)}"
+            detail="Failed to upload file."
         )
 
     # Create upload record
@@ -2987,7 +2991,7 @@ async def upload_custody_agreement(
                 await extraction_service.extract_from_pdf(upload.id, content)
             except Exception as e:
                 # Error is logged in the service
-                print(f"Extraction error for {upload.id}: {e}")
+                logger.warning("Extraction error for %s: %s", upload.id, e)
 
     background_tasks.add_task(run_extraction)
 
@@ -3566,9 +3570,7 @@ For children, extract all children listed in the forms.
 
     except Exception as e:
         # Log the error but try PDF form field extraction as fallback
-        import traceback
-        print(f"ARIA extraction failed: {e}")
-        traceback.print_exc()
+        logger.warning("ARIA extraction failed: %s", e, exc_info=True)
 
         # Try to extract from PDF form fields directly using pypdf
         try:
@@ -3689,7 +3691,7 @@ For children, extract all children listed in the forms.
                     if val and val != '/Off':
                         extracted_data["legal_custody_request"] = "Joint legal custody to both parents"
 
-            print(f"PDF form field extraction successful: {extracted_data}")
+            logger.debug("PDF form field extraction successful: %s", extracted_data)
 
             return {
                 "success": True,
@@ -3698,13 +3700,12 @@ For children, extract all children listed in the forms.
             }
 
         except Exception as pdf_err:
-            print(f"PDF field extraction also failed: {pdf_err}")
-            traceback.print_exc()
+            logger.warning("PDF field extraction also failed: %s", pdf_err, exc_info=True)
 
             return {
                 "success": False,
                 "extraction_method": "manual",
-                "error": str(e),
+                "error": "Extraction failed. Manual entry required.",
                 "data": {
                     "case_number": None,
                     "court_county": "California",

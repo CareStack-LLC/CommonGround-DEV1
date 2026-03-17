@@ -7,11 +7,14 @@ Supports three redaction levels:
 - enhanced: All PII including phone/email redacted
 """
 
+import logging
 import re
 from typing import Optional
 from dataclasses import dataclass
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+
+logger = logging.getLogger(__name__)
 
 from app.models.export import RedactionRule
 
@@ -155,7 +158,7 @@ class RedactionService:
                 )
             except re.error as e:
                 # Skip invalid patterns
-                print(f"Warning: Invalid regex pattern '{pattern.name}': {e}")
+                logger.warning("Invalid regex pattern '%s': %s", pattern.name, e)
 
         self._initialized = True
 

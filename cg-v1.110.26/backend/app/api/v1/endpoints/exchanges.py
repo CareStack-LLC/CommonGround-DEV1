@@ -4,6 +4,7 @@ Custody Exchange (Pickup/Dropoff) API endpoints.
 Dedicated endpoints for managing custody exchanges separate from regular events.
 """
 
+import logging
 from typing import List, Optional
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query
@@ -32,6 +33,8 @@ from app.schemas.custody_exchange import (
 from app.services.custody_exchange import CustodyExchangeService
 from app.services.geolocation import GeolocationService
 from app.services.activity import log_exchange_activity
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -109,9 +112,10 @@ async def create_exchange(
         return CustodyExchangeResponse(**filtered_data)
 
     except ValueError as e:
+        logger.error(f"Failed to create exchange: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="Failed to create exchange"
         )
 
 
@@ -443,7 +447,7 @@ async def check_in(
                 exchange_time=instance.completed_at,
             )
         except Exception as e:
-            print(f"Activity logging failed: {e}")
+            logger.warning("Activity logging failed: %s", e)
 
     # Get other parent info for perspective-aware display
     other_parent_name, other_parent_id = await CustodyExchangeService.get_other_parent_info(
@@ -797,9 +801,10 @@ async def confirm_qr(
             confirmation_token=confirmation.confirmation_token
         )
     except ValueError as e:
+        logger.error(f"Failed to confirm QR exchange: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="Failed to confirm QR exchange"
         )
 
     if not instance:
@@ -1035,7 +1040,7 @@ async def override_custody(
                 extra_data={"child_ids": override_data.child_ids}
             )
         except Exception as e:
-            print(f"Activity logging failed: {e}")
+            logger.warning("Activity logging failed: %s", e)
 
         return ManualCustodyOverrideResponse(
             success=True,
@@ -1043,14 +1048,16 @@ async def override_custody(
         )
 
     except ValueError as e:
+        logger.error(f"Failed to override custody: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="Failed to override custody"
         )
     except PermissionError as e:
+        logger.error(f"Permission denied for custody override: {e}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=str(e)
+            detail="Permission denied for custody override"
         )
 
 

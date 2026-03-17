@@ -5,7 +5,10 @@ Endpoints for managing wallets, deposits, obligation payments, payouts,
 and child wallet contributions.
 """
 
+import logging
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -92,7 +95,8 @@ async def create_wallet(
             updated_at=wallet.updated_at,
         )
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        logger.error(f"Failed to create wallet: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
 
 
 @router.get("/me")
@@ -254,9 +258,10 @@ async def start_onboarding(
         )
     except Exception as e:
         await db.rollback()
+        logger.exception(f"Failed to start onboarding: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to start onboarding: {str(e)}"
+            detail="Failed to start onboarding."
         )
 
 
@@ -291,9 +296,10 @@ async def sync_wallet(
         return result
     except Exception as e:
         await db.rollback()
+        logger.exception(f"Failed to sync wallet: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to sync: {str(e)}"
+            detail="Failed to sync wallet."
         )
 
 
@@ -352,12 +358,14 @@ async def deposit_funds(
         )
     except ValueError as e:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        logger.error(f"Deposit validation failed: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
     except Exception as e:
         await db.rollback()
+        logger.exception(f"Deposit failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Deposit failed: {str(e)}"
+            detail="Deposit failed."
         )
 
 
@@ -436,12 +444,14 @@ async def confirm_deposit(
         )
     except ValueError as e:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        logger.error(f"Payment confirmation validation failed: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
     except Exception as e:
         await db.rollback()
+        logger.exception(f"Payment confirmation failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Confirmation failed: {str(e)}"
+            detail="Confirmation failed."
         )
 
 
@@ -510,12 +520,14 @@ async def pay_obligation(
         )
     except ValueError as e:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        logger.error(f"Payment validation failed: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
     except Exception as e:
         await db.rollback()
+        logger.exception(f"Payment failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Payment failed: {str(e)}"
+            detail="Payment failed."
         )
 
 
@@ -742,7 +754,8 @@ async def create_child_wallet(
         )
     except ValueError as e:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        logger.error(f"Failed to create child wallet: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
 
 
 @router.get("/child/{child_id}")
@@ -875,12 +888,14 @@ async def contribute_to_child(
         )
     except ValueError as e:
         await db.rollback()
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        logger.error(f"Contribution validation failed: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
     except Exception as e:
         await db.rollback()
+        logger.exception(f"Contribution failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Contribution failed: {str(e)}"
+            detail="Contribution failed."
         )
 
 

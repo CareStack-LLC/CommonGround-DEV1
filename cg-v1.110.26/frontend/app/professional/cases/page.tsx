@@ -112,7 +112,7 @@ export default function CasesListPage() {
     });
     setShowCourtOrderUpload(false);
     // TODO: Navigate to case creation with pre-filled data
-    console.log("Extracted court order data:", data);
+    // TODO: Use extracted court order data for case creation
   };
 
   const [searchQuery, setSearchQuery] = useState("");

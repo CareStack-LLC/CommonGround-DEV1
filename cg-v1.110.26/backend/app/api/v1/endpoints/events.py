@@ -5,6 +5,7 @@ Events can be private or shared with the co-parent.
 Includes RSVP/attendance management.
 """
 
+import logging
 from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -28,6 +29,8 @@ from app.schemas.schedule import (
 )
 from app.services.event import EventService
 from app.services.activity import log_event_activity
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -92,7 +95,7 @@ async def create_event(
                 )
             except Exception as e:
                 # Don't fail event creation if activity logging fails
-                print(f"Failed to log event activity: {e}")
+                logger.warning("Failed to log event activity: %s", e)
 
         # Filter for creator (they own it)
         filtered_data = await EventService.filter_for_coparent(
@@ -104,9 +107,10 @@ async def create_event(
         return ScheduleEventResponse(**filtered_data)
 
     except ValueError as e:
+        logger.error(f"Failed to create event: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -195,9 +199,10 @@ async def list_events(
         return filtered_events
 
     except ValueError as e:
+        logger.error(f"Failed to list events: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -243,9 +248,10 @@ async def update_event(
         return ScheduleEventResponse(**filtered_data)
 
     except ValueError as e:
+        logger.error(f"Failed to update event: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -282,9 +288,10 @@ async def delete_event(
         return None
 
     except ValueError as e:
+        logger.error(f"Failed to delete event: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -320,9 +327,10 @@ async def update_rsvp(
         return EventAttendanceResponse.model_validate(attendance)
 
     except ValueError as e:
+        logger.error(f"Failed to update RSVP: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -355,9 +363,10 @@ async def get_event_attendance(
         ]
 
     except ValueError as e:
+        logger.error(f"Failed to get event attendance: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -424,11 +433,12 @@ async def request_swap(
             db=db
         )
         return ScheduleEventResponse(**filtered_data)
-        
+
     except ValueError as e:
+        logger.error(f"Failed to create swap request: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 @router.post(
@@ -462,11 +472,12 @@ async def respond_to_swap(
             db=db
         )
         return ScheduleEventResponse(**filtered_data)
-        
+
     except ValueError as e:
+        logger.error(f"Failed to respond to swap request: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 

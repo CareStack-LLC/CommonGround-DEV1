@@ -79,7 +79,7 @@ function WalletContent() {
             try {
               await walletAPI.syncWallet(walletIdFromUrl);
             } catch (err) {
-              console.log('Sync with URL wallet ID failed, trying getMyWallet');
+              // console.log('Sync with URL wallet ID failed, trying getMyWallet');
             }
           }
           // Load fresh wallet data

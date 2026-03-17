@@ -14,6 +14,7 @@ ARIA: "Great! Let me help you formalize this..."
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 import json
+import logging
 import uuid
 
 from openai import OpenAI
@@ -26,6 +27,8 @@ from app.models.family_file import FamilyFile, QuickAccord, generate_quick_accor
 from app.models.child import Child
 from app.models.user import User
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 # QuickAccord extraction schema for structured data
@@ -523,14 +526,14 @@ Return ONLY the JSON object, no other text."""
                 return response.content[0].text
             except Exception as e:
                 # Log the error and fall through to OpenAI
-                print(f"Claude API error, falling back to OpenAI: {e}")
+                logger.warning(f"Claude API error, falling back to OpenAI: {e}")
 
         # Fallback to OpenAI
         if self.openai:
             try:
                 return await self._get_openai_response(system_prompt, messages, user_message)
             except Exception as e:
-                print(f"OpenAI API error: {e}")
+                logger.error(f"OpenAI API error: {e}")
 
         # Ultimate fallback response
         return "I'd be happy to help you create a QuickAccord. What situation do you need to document?"
@@ -579,7 +582,7 @@ Return ONLY the JSON object, no other text."""
                 )
                 json_str = response.content[0].text
             except Exception as e:
-                print(f"Claude extraction error, falling back to OpenAI: {e}")
+                logger.warning(f"Claude extraction error, falling back to OpenAI: {e}")
 
         # Fallback to OpenAI if Claude failed or unavailable
         if json_str is None and self.openai:
@@ -594,7 +597,7 @@ Return ONLY the JSON object, no other text."""
                 )
                 json_str = response.choices[0].message.content
             except Exception as e:
-                print(f"OpenAI extraction error: {e}")
+                logger.error(f"OpenAI extraction error: {e}")
 
         # Parse JSON if we got a response
         if json_str:
@@ -607,7 +610,7 @@ Return ONLY the JSON object, no other text."""
 
                 return json.loads(json_str.strip())
             except json.JSONDecodeError as e:
-                print(f"JSON parsing error: {e}")
+                logger.warning(f"JSON parsing error: {e}")
 
         # Return partial data if extraction fails
         return {"is_ready_to_create": False, "missing_info": ["Unable to extract data"]}

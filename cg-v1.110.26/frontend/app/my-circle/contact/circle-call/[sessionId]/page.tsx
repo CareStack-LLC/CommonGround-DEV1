@@ -178,7 +178,7 @@ function ContactCircleCallContent() {
     try {
       callCreatedRef.current = true;
       setIsJoiningCall(true);
-      console.log('[Contact Circle Call] Creating Daily.co call object...');
+      // console.log('[Contact Circle Call] Creating Daily.co call object...');
 
       // Dynamically import Daily.co SDK
       const DailyIframe = (await import('@daily-co/daily-js')).default;
@@ -192,19 +192,19 @@ function ContactCircleCallContent() {
 
       // Event handlers
       call.on('joined-meeting', () => {
-        console.log('[Contact Circle Call] Joined meeting');
+        // console.log('[Contact Circle Call] Joined meeting');
         setIsCallJoined(true);
         setIsJoiningCall(false);
         updateParticipants(call.participants());
       });
 
       call.on('participant-joined', () => {
-        console.log('[Contact Circle Call] Participant joined');
+        // console.log('[Contact Circle Call] Participant joined');
         updateParticipants(call.participants());
       });
 
       call.on('participant-left', () => {
-        console.log('[Contact Circle Call] Participant left');
+        // console.log('[Contact Circle Call] Participant left');
         updateParticipants(call.participants());
       });
 
@@ -221,7 +221,7 @@ function ContactCircleCallContent() {
       });
 
       call.on('left-meeting', () => {
-        console.log('[Contact Circle Call] Left meeting');
+        // console.log('[Contact Circle Call] Left meeting');
         setIsCallJoined(false);
         handleEndCall();
       });
@@ -233,14 +233,14 @@ function ContactCircleCallContent() {
       });
 
       // Join the call
-      console.log('[Contact Circle Call] Joining room...', { roomUrl: callSession.roomUrl });
+      // console.log('[Contact Circle Call] Joining room...', { roomUrl: callSession.roomUrl });
       await call.join({
         url: callSession.roomUrl,
         token: callSession.token,
         userName: contactName,
       });
 
-      console.log('[Contact Circle Call] Join completed');
+      // console.log('[Contact Circle Call] Join completed');
     } catch (err) {
       console.error('[Contact Circle Call] Error initializing call:', err);
       setError('Failed to connect to call');

@@ -2,6 +2,7 @@
 My Time Collection endpoints for privacy-first schedule organization.
 """
 
+import logging
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,6 +16,8 @@ from app.schemas.schedule import (
     MyTimeCollectionResponse,
 )
 from app.services.collection import CollectionService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -58,9 +61,10 @@ async def create_collection(
         return MyTimeCollectionResponse(**filtered_data)
 
     except ValueError as e:
+        logger.error(f"Failed to create collection: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -144,9 +148,10 @@ async def list_collections(
         return filtered_collections
 
     except ValueError as e:
+        logger.error(f"Failed to list collections: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -187,9 +192,10 @@ async def update_collection(
         return MyTimeCollectionResponse(**filtered_data)
 
     except ValueError as e:
+        logger.error(f"Failed to update collection: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -225,9 +231,10 @@ async def delete_collection(
         return None
 
     except ValueError as e:
+        logger.error(f"Failed to delete collection: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 

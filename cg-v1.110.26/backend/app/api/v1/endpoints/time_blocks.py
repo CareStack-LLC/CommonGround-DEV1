@@ -5,6 +5,7 @@ PRIVACY RULE: Time blocks are NEVER shown to the other parent.
 They are only used for ARIA conflict detection.
 """
 
+import logging
 from typing import List
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -22,6 +23,8 @@ from app.schemas.schedule import (
     BusyPeriod,
 )
 from app.services.time_block import TimeBlockService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -69,9 +72,10 @@ async def create_time_block(
         return TimeBlockResponse.model_validate(block)
 
     except ValueError as e:
+        logger.error(f"Failed to create time block: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -132,9 +136,10 @@ async def list_time_blocks(
         return [TimeBlockResponse.model_validate(block) for block in blocks]
 
     except ValueError as e:
+        logger.error(f"Failed to list time blocks: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 
@@ -169,9 +174,10 @@ async def update_time_block(
         return TimeBlockResponse.model_validate(block)
 
     except ValueError as e:
+        logger.error(f"Failed to update time block: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
+            detail="An error occurred while processing your request."
         )
 
 

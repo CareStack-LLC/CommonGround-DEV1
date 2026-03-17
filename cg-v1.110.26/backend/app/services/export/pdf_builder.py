@@ -11,10 +11,13 @@ Uses ReportLab to create professional multi-page PDFs with:
 
 import io
 import base64
+import logging
 from io import BytesIO
 import hashlib
 from datetime import datetime
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
@@ -1311,7 +1314,7 @@ class ExportPDFBuilder:
             
             return img_buffer
         except Exception as e:
-            print(f"Error creating donut chart: {e}")
+            logger.error("Error creating donut chart: %s", e)
             return None
 
     def _render_dict(self, data: dict, level: int = 0) -> list:

@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List
 import hashlib
 import json
+import logging
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -32,6 +33,9 @@ from app.services.family_file import FamilyFileService
 from app.services.email import EmailService
 from app.core.config import settings
 from app.core.websocket import manager
+
+
+logger = logging.getLogger(__name__)
 
 
 class AgreementService:
@@ -728,7 +732,7 @@ class AgreementService:
                     )
             except Exception as email_error:
                 # Log email error but don't fail approval submission
-                print(f"Warning: Failed to send approval email: {email_error}")
+                logger.warning(f"Failed to send approval email: {email_error}")
 
             return agreement
 

@@ -4,10 +4,13 @@ Parenting Time section generator.
 Section 3: Exchange records, patterns, and timeliness analysis.
 """
 
+import logging
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict
 from sqlalchemy import select, func, and_, or_
 from sqlalchemy.orm import selectinload
+
+logger = logging.getLogger(__name__)
 
 from app.models.schedule import ScheduleEvent, ExchangeCheckIn
 from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
@@ -226,7 +229,7 @@ class ParentingTimeGenerator(BaseSectionGenerator):
                             if resp.status_code == 200:
                                 map_b64 = base64.b64encode(resp.content).decode('utf-8')
                     except Exception as e:
-                        print(f"Failed to fetch mapbox image: {e}")
+                        logger.warning("Failed to fetch mapbox image: %s", e)
                 
                 missed_exchange_details.append({
                     "date": self._format_date(instance.scheduled_time.date()),

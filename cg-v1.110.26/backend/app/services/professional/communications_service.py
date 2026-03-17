@@ -5,8 +5,11 @@ Business logic for professionals to view parent-to-parent
 communication history on cases they're assigned to.
 """
 
+import logging
 from datetime import datetime, timedelta
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 from sqlalchemy import select, and_, or_, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -384,7 +387,7 @@ class CommunicationsService:
             return res.get("signedURL", "")
         except Exception as e:
             # Fallback or log error
-            print(f"Error generating signed URL for {storage_path}: {e}")
+            logger.error("Error generating signed URL for %s: %s", storage_path, e)
             return ""
 
     async def _verify_access(

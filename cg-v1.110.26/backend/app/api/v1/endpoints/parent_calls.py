@@ -140,7 +140,7 @@ async def initiate_call(
         logger.error(f"Failed to create call session: {e}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(e)
+            detail="Failed to create call session"
         )
     except Exception as e:
         logger.error(f"Failed to create call session: {e}")
@@ -162,7 +162,7 @@ async def initiate_call(
         logger.error(f"Failed to join call: {e}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(e)
+            detail="Failed to join call session"
         )
     except Exception as e:
         logger.error(f"Failed to join call: {e}")
@@ -271,7 +271,7 @@ async def join_call(
         logger.error(f"Failed to join call: {e}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=str(e)
+            detail="Failed to join call session"
         )
     except Exception as e:
         logger.error(f"Failed to join call: {e}")

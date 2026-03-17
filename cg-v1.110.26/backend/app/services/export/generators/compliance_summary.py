@@ -20,11 +20,15 @@ from app.services.geolocation import GeolocationService
 import httpx
 import base64
 from io import BytesIO
+import logging
+
 from app.services.export.generators.base import (
     BaseSectionGenerator,
     GeneratorContext,
     SectionContent,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class ComplianceSummaryGenerator(BaseSectionGenerator):
@@ -527,7 +531,7 @@ class ComplianceSummaryGenerator(BaseSectionGenerator):
                             if resp.status_code == 200:
                                 map_b64 = base64.b64encode(resp.content).decode('utf-8')
                     except Exception as e:
-                        print(f"Failed to fetch mapbox image: {e}")
+                        logger.warning("Failed to fetch mapbox image: %s", e)
                 
                 missed_details.append({
                     "instance_id": instance.id,

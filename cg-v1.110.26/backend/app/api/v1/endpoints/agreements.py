@@ -2,6 +2,7 @@
 Agreement endpoints for custody agreement management.
 """
 
+import logging
 from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, Body, File, UploadFile, HTTPException, status, Response, Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,6 +24,8 @@ from app.schemas.agreement import (
 from app.services.agreement import AgreementService
 from app.services.aria_agreement import AriaAgreementService
 from app.services.agreement_activation import AgreementActivationService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -727,9 +730,6 @@ async def download_agreement_pdf(
     Returns:
         PDF file
     """
-    import logging
-    logger = logging.getLogger(__name__)
-
     try:
         agreement_service = AgreementService(db)
         agreement = await agreement_service.get_agreement(agreement_id, current_user)
@@ -760,10 +760,10 @@ async def download_agreement_pdf(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"PDF generation failed for agreement {agreement_id}: {str(e)}", exc_info=True)
+        logger.error(f"PDF generation failed for agreement {agreement_id}: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate PDF: {str(e)}"
+            detail="Failed to generate PDF"
         )
 
 
@@ -882,9 +882,10 @@ async def upload_aria_document(
             content_type=file.content_type or "application/pdf",
         )
     except Exception as e:
+        logger.error(f"Failed to upload file: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upload file: {str(e)}",
+            detail="Failed to upload file",
         )
 
     # Extract text from document
@@ -894,13 +895,15 @@ async def upload_aria_document(
         )
     except ValueError as e:
         # Image-only PDF or unsupported type
+        logger.error(f"Failed to extract text from document: {e}")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Failed to extract text from document"
         )
     except Exception as e:
+        logger.error(f"Failed to read document: {e}")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Failed to read document: {str(e)}",
+            detail="Failed to read document",
         )
 
     # Build attachment info

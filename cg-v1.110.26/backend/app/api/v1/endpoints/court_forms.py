@@ -5,8 +5,11 @@ Endpoints for California family court form workflow:
 FL-300, FL-311, FL-320, FL-340, FL-341, FL-342
 """
 
+import logging
 from datetime import datetime, date
 from typing import Optional, List
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -130,9 +133,10 @@ async def get_court_professional_id(
             detail="Token has expired",
         )
     except jwt.JWTError as e:
+        logger.error(f"Invalid court professional token: {e}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token: {str(e)}",
+            detail="Invalid token.",
         )
 
 
@@ -241,9 +245,10 @@ async def start_fl320(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to create FL-320 response: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -276,9 +281,10 @@ async def update_form(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to update court form: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -307,9 +313,10 @@ async def submit_form(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to submit court form for review: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -338,9 +345,10 @@ async def resubmit_form(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to resubmit court form: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -408,9 +416,10 @@ async def get_case_progress(
         progress = await service.get_case_form_progress(case_id)
         return progress
     except ValueError as e:
+        logger.error(f"Failed to get case form progress: {e}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Case not found.",
         )
 
 
@@ -523,9 +532,10 @@ async def allow_parent_edits(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to allow parent edits: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -557,9 +567,10 @@ async def revoke_parent_edits(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to revoke parent edits: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -590,9 +601,10 @@ async def approve_form(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to approve court form: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -619,9 +631,10 @@ async def reject_form(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to reject court form: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -649,9 +662,10 @@ async def request_resubmission(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to request form resubmission: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -680,9 +694,10 @@ async def mark_form_served(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to mark form as served: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -804,9 +819,10 @@ async def record_hearing_outcome(
         await db.commit()
         return hearing
     except ValueError as e:
+        logger.error(f"Failed to record hearing outcome: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -834,9 +850,10 @@ async def continue_hearing(
         await db.commit()
         return new_hearing
     except ValueError as e:
+        logger.error(f"Failed to continue hearing: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -899,9 +916,10 @@ async def attach_fl341(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to attach FL-341: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -931,9 +949,10 @@ async def attach_fl342(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to attach FL-342: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -962,9 +981,10 @@ async def finalize_fl340(
         await db.commit()
         return submission
     except ValueError as e:
+        logger.error(f"Failed to finalize FL-340 order: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )
 
 
@@ -1002,7 +1022,8 @@ async def activate_case(
             "message": "Case activated successfully",
         }
     except ValueError as e:
+        logger.error(f"Failed to activate case: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="An error occurred while processing your request.",
         )

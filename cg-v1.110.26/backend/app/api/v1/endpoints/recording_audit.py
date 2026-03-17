@@ -186,7 +186,8 @@ async def set_legal_hold(
         )
 
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to set legal hold: {e}")
+        raise HTTPException(status_code=400, detail="Failed to set legal hold")
 
 
 @router.delete("/{recording_id}/legal-hold", response_model=LegalHoldResponse)
@@ -235,7 +236,8 @@ async def release_legal_hold(
         )
 
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to release legal hold: {e}")
+        raise HTTPException(status_code=400, detail="Failed to release legal hold")
 
 
 @router.get("/{recording_id}/legal-hold", response_model=LegalHoldResponse)
@@ -627,7 +629,8 @@ async def export_evidence_package(
         return EvidenceExportResponse(**result)
 
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(f"Failed to export evidence package: {e}")
+        raise HTTPException(status_code=400, detail="Failed to export evidence package")
     except Exception as e:
         logger.exception(f"Failed to generate evidence package: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate evidence package")

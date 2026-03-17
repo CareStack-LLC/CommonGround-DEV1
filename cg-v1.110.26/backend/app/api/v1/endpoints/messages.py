@@ -5,13 +5,14 @@ Handles parent-to-parent communication with AI-powered conflict prevention.
 """
 
 from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, Request, status, Query, UploadFile, File, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, desc, text
 from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.rate_limit import limiter, ARIA_ANALYSIS_LIMIT
 from app.core.security import get_current_user
 from app.models.user import User
 from app.models.message import Message, MessageFlag, MessageThread
@@ -54,7 +55,9 @@ router = APIRouter()
 
 
 @router.post("/analyze", response_model=ARIAAnalysisResponse)
+@limiter.limit(ARIA_ANALYSIS_LIMIT)
 async def analyze_message_content(
+    request: Request,
     content: str = Query(..., min_length=1),
     case_id: Optional[str] = Query(None, description="Case ID for context (legacy)"),
     family_file_id: Optional[str] = Query(None, description="Family File ID for context"),
@@ -295,9 +298,9 @@ async def _store_reply_suggestions(
                 exclude_user=None
             )
         except Exception as e:
-            print(f"[ARIA v2] WebSocket push for reply suggestions failed: {e}")
+            logger.warning("ARIA v2 WebSocket push for reply suggestions failed: %s", e)
     except Exception as e:
-        print(f"[ARIA v2] _store_reply_suggestions background task failed: {e}")
+        logger.warning("ARIA v2 _store_reply_suggestions background task failed: %s", e)
 
 
 @router.post("/", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
@@ -782,7 +785,7 @@ async def send_message(
             )
         except Exception as e:
             # Don't fail message send if activity logging fails
-            print(f"Activity logging failed: {e}")
+            logger.warning("Activity logging failed: %s", e)
 
     # Broadcast via WebSocket to recipient
     if context_id:
@@ -801,7 +804,7 @@ async def send_message(
                 exclude_user=None  # Send to all including sender so all tabs update
             )
         except Exception as e:
-            print(f"WebSocket broadcast failed: {e}")
+            logger.warning("WebSocket broadcast failed: %s", e)
 
     # ARIA v2: Generate reply suggestions for recipient in background
     if aria_enabled and aria_mode != "off" and message_data.family_file_id:
@@ -831,7 +834,7 @@ async def send_message(
                 data={"message_id": str(new_message.id), "sender_id": str(current_user.id)}
             )
         except Exception as e:
-            print(f"Push notification failed: {e}")
+            logger.warning("Push notification failed: %s", e)
 
     return MessageResponse(
         id=new_message.id,

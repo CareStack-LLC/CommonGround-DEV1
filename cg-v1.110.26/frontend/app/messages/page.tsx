@@ -788,7 +788,7 @@ function MessagesContent() {
         try {
           await messagesAPI.markAsRead(fileToUse.id);
         } catch (markErr) {
-          console.log('Could not mark messages as read:', markErr);
+          // console.log('Could not mark messages as read:', markErr);
         }
       }
     } catch (err: any) {
@@ -814,7 +814,7 @@ function MessagesContent() {
         try {
           await messagesAPI.markAsRead(selectedFamilyFile.id);
         } catch (markErr) {
-          console.log('Could not mark messages as read:', markErr);
+          // console.log('Could not mark messages as read:', markErr);
         }
       }
     } catch (err: any) {

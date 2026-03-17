@@ -17,6 +17,10 @@ from app.schemas.case import CaseCreate, CaseUpdate
 from app.services.email import EmailService
 from app.core.config import settings
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class CaseService:
     """Service for handling case operations."""
@@ -141,7 +145,7 @@ class CaseService:
                 )
             except Exception as email_error:
                 # Log email error but don't fail case creation
-                print(f"Warning: Failed to send invitation email: {email_error}")
+                logger.warning("Failed to send invitation email: %s", email_error)
 
             return case, invitation_token
 

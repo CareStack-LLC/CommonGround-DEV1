@@ -89,7 +89,7 @@ async def handle_stripe_webhook(
         logger.error(f"Invalid webhook payload: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid payload: {str(e)}"
+            detail="Invalid payload."
         )
     except Exception as e:
         logger.error(f"Webhook handler error: {e}")

@@ -133,11 +133,24 @@ async def _validate_chat_permission(
             )
 
     if permission.allowed_start_time and permission.allowed_end_time:
-        current_time = now.strftime("%H:%M")
-        if not (permission.allowed_start_time <= current_time <= permission.allowed_end_time):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Chat is not available at this time",
+        from datetime import time as dt_time
+        current_time = now.time()
+        try:
+            # Parse stored times (may be "HH:MM" or "H:MM" format)
+            start_parts = permission.allowed_start_time.split(":")
+            end_parts = permission.allowed_end_time.split(":")
+            start_time = dt_time(int(start_parts[0]), int(start_parts[1]))
+            end_time = dt_time(int(end_parts[0]), int(end_parts[1]))
+            if not (start_time <= current_time <= end_time):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Chat is not available at this time",
+                )
+        except (ValueError, IndexError):
+            # If time parsing fails, allow the message through and log
+            import logging
+            logging.getLogger(__name__).warning(
+                f"Invalid time format in permission: start={permission.allowed_start_time}, end={permission.allowed_end_time}"
             )
 
     return permission

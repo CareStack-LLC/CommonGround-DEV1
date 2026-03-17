@@ -1130,13 +1130,23 @@ async def create_circle_contact_session(
                 detail="Calls are not allowed on this day"
             )
 
-    # Check allowed hours
+    # Check allowed hours (use proper time comparison, not string comparison)
     if permission.allowed_start_time and permission.allowed_end_time:
-        current_time = now.strftime("%H:%M")
-        if current_time < permission.allowed_start_time or current_time > permission.allowed_end_time:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Calls are only allowed between {permission.allowed_start_time} and {permission.allowed_end_time}"
+        from datetime import time as dt_time
+        current_time = now.time()
+        try:
+            start_parts = permission.allowed_start_time.split(":")
+            end_parts = permission.allowed_end_time.split(":")
+            start_time = dt_time(int(start_parts[0]), int(start_parts[1]))
+            end_time = dt_time(int(end_parts[0]), int(end_parts[1]))
+            if not (start_time <= current_time <= end_time):
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"Calls are only allowed between {permission.allowed_start_time} and {permission.allowed_end_time}"
+                )
+        except (ValueError, IndexError):
+            logger.warning(
+                f"Invalid time format in permission: start={permission.allowed_start_time}, end={permission.allowed_end_time}"
             )
 
     # Generate Daily.co room

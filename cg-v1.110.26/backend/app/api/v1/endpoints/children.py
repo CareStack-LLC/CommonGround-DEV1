@@ -7,12 +7,16 @@ Profiles start as pending_approval and become active when both parents approve.
 
 from typing import List, Optional
 import json
+import logging
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
+logger = logging.getLogger(__name__)
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.rate_limit import limiter, CHILD_PIN_LIMIT
 from app.core.security import get_current_user, create_access_token
 from app.models.user import User
 from app.models.kidcoms import ChildUser
@@ -220,7 +224,7 @@ async def approve_child(
                 action="approved",
             )
         except Exception as e:
-            print(f"Activity logging failed: {e}")
+            logger.warning(f"Activity logging failed: {e}")
 
     message = (
         "Profile is now active"
@@ -353,7 +357,7 @@ async def update_medical_info(
                 field_changed="medical info",
             )
         except Exception as e:
-            print(f"Activity logging failed: {e}")
+            logger.warning(f"Activity logging failed: {e}")
 
     return _child_to_full_response(child)
 
@@ -389,7 +393,7 @@ async def update_education_info(
                 field_changed="school info",
             )
         except Exception as e:
-            print(f"Activity logging failed: {e}")
+            logger.warning(f"Activity logging failed: {e}")
 
     return _child_to_full_response(child)
 
@@ -490,9 +494,10 @@ async def upload_photo(
     try:
         content = await file.read()
     except Exception as e:
+        logger.exception(f"Failed to read child photo file: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to read file: {str(e)}"
+            detail="Failed to read file."
         )
 
     # Upload to Supabase Storage
@@ -504,9 +509,10 @@ async def upload_photo(
             content_type=file.content_type or "image/jpeg"
         )
     except Exception as e:
+        logger.exception(f"Failed to upload child photo: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upload file: {str(e)}"
+            detail="Failed to upload file."
         )
 
     # Update child with photo URL
@@ -626,7 +632,9 @@ class ChildPinLoginResponse(BaseModel):
     summary="Child PIN login (KidsCom)",
     description="Simple PIN-based login for the KidsCom app. For demo/testing purposes."
 )
+@limiter.limit(CHILD_PIN_LIMIT)
 async def child_pin_login(
+    request: Request,
     login_data: ChildPinLoginRequest,
     db: AsyncSession = Depends(get_db)
 ):
@@ -640,29 +648,22 @@ async def child_pin_login(
     be combined with a username/family identifier.
     """
     from datetime import datetime
-    import logging
-    logger = logging.getLogger(__name__)
 
     # Get all active child users with their PIN hashes
-    logger.info(f"Child PIN login attempt")
+    logger.debug("Child PIN login attempt")
     result = await db.execute(
         select(ChildUser)
         .where(ChildUser.is_active == True)
         .where(ChildUser.pin_hash.isnot(None))
     )
     child_users = result.scalars().all()
-    logger.info(f"Found {len(child_users)} active child users with PINs")
 
     # Find matching PIN
     matched_child_user = None
     for child_user in child_users:
-        logger.info(f"Checking PIN for child user {child_user.id}, username: {child_user.username}")
         if verify_pin(login_data.pin, child_user.pin_hash):
             matched_child_user = child_user
-            logger.info(f"PIN matched for child user {child_user.id}")
             break
-        else:
-            logger.info(f"PIN did not match for child user {child_user.id}")
 
     if not matched_child_user:
         raise HTTPException(
@@ -759,10 +760,8 @@ async def get_child_circle(
     along with their permission settings.
     """
     from datetime import datetime
-    import logging
-    logger = logging.getLogger(__name__)
 
-    logger.info(f"Fetching circle contacts for child user {child_user.id}, family_file_id: {child_user.family_file_id}")
+    logger.debug(f"Fetching circle contacts for child {child_user.family_file_id}")
 
     # Get all active circle contacts for this family file
     result = await db.execute(

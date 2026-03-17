@@ -429,7 +429,7 @@ async def create_checkout_session(
         logger.error(f"CRITICAL: Failed to check existing subscriptions: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to check subscription status: {str(e)}"
+            detail="Failed to check subscription status."
         )
 
     # =========================================================================
@@ -474,7 +474,7 @@ async def create_checkout_session(
             logger.error(f"Failed to upgrade subscription: {e}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to upgrade subscription: {str(e)}"
+                detail="Failed to upgrade subscription."
             )
 
     # =========================================================================
@@ -511,7 +511,7 @@ async def create_checkout_session(
         logger.error(f"Failed to create checkout session: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create checkout session: {str(e)}"
+            detail="Failed to create checkout session."
         )
 
 
@@ -656,7 +656,7 @@ async def upgrade_subscription(
         logger.error(f"Failed to upgrade subscription: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upgrade subscription: {str(e)}"
+            detail="Failed to upgrade subscription."
         )
 
 

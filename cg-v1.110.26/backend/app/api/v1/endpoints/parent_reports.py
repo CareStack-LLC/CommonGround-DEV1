@@ -104,9 +104,10 @@ async def generate_parent_report(
             user_id=str(current_user.id),
         )
     except NotImplementedError as e:
+        logger.error(f"Report type not implemented: {e}")
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail=str(e)
+            detail="This report type is not yet available."
         )
     except Exception as e:
         logger.error(f"Error generating report: {e}")
@@ -185,9 +186,10 @@ async def generate_monthly_report(
             year=year,
         )
     except ValueError as e:
+        logger.error(f"Monthly report not found: {e}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
+            detail="Report data not found."
         )
     except Exception as e:
         logger.error(f"Error generating monthly report: {e}")
