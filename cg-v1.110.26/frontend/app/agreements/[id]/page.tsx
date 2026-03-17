@@ -10,6 +10,17 @@ import { agreementsAPI, Agreement, AgreementSection, AgreementQuickSummary } fro
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import {
+  CGCard,
+  CGCardHeader,
+  CGCardTitle,
+  CGCardDescription,
+  CGCardContent,
+  CGCardFooter,
+} from '@/components/cg/cg-card';
+import { CGButton } from '@/components/cg/cg-button';
+import { CGBadge } from '@/components/cg/cg-badge';
+import { CGPageHeader } from '@/components/cg/cg-page-header';
+import {
   FileText,
   Sparkles,
   CheckCircle,
@@ -30,6 +41,9 @@ import {
   Edit3,
   Calendar,
   Lock,
+  Info,
+  Hash,
+  Layers,
 } from 'lucide-react';
 import { useFeatureGate } from '@/hooks/use-feature-gate';
 import { TierBadge } from '@/components/tier-badge';
@@ -247,52 +261,38 @@ function formatSectionSummary(section: AgreementSection): string | null {
 }
 
 /* =============================================================================
-   HELPER COMPONENTS - Editorial/Legal Aesthetic
+   STATUS HELPERS
    ============================================================================= */
 
-function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { icon: React.ReactNode; className: string; label: string }> = {
-    active: {
-      icon: <CheckCircle className="h-4 w-4" />,
-      className: 'bg-cg-success text-white',
-      label: 'Active',
-    },
-    approved: {
-      icon: <CheckCircle className="h-4 w-4" />,
-      className: 'bg-cg-sage text-white',
-      label: 'Approved',
-    },
-    pending_approval: {
-      icon: <Clock className="h-4 w-4" />,
-      className: 'bg-cg-amber text-white',
-      label: 'Pending Approval',
-    },
-    draft: {
-      icon: <FileText className="h-4 w-4" />,
-      className: 'bg-cg-slate text-white',
-      label: 'Draft',
-    },
-    inactive: {
-      icon: <PowerOff className="h-4 w-4" />,
-      className: 'bg-muted text-muted-foreground',
-      label: 'Inactive',
-    },
-    rejected: {
-      icon: <AlertCircle className="h-4 w-4" />,
-      className: 'bg-cg-error text-white',
-      label: 'Rejected',
-    },
+type BadgeVariant = 'default' | 'success' | 'warning' | 'error' | 'info' | 'sage' | 'slate' | 'amber';
+
+function getStatusBadgeVariant(status: string): BadgeVariant {
+  const map: Record<string, BadgeVariant> = {
+    active: 'success',
+    approved: 'sage',
+    pending_approval: 'warning',
+    draft: 'slate',
+    inactive: 'default',
+    rejected: 'error',
   };
-
-  const { icon, className, label } = config[status] || config.draft;
-
-  return (
-    <span className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full ${className}`}>
-      {icon}
-      {label}
-    </span>
-  );
+  return map[status] || 'default';
 }
+
+function getStatusLabel(status: string): string {
+  const map: Record<string, string> = {
+    active: 'Active',
+    approved: 'Approved',
+    pending_approval: 'Pending Approval',
+    draft: 'Draft',
+    inactive: 'Inactive',
+    rejected: 'Rejected',
+  };
+  return map[status] || status;
+}
+
+/* =============================================================================
+   HELPER COMPONENTS
+   ============================================================================= */
 
 function ApprovalTracker({
   approvedByA,
@@ -302,29 +302,40 @@ function ApprovalTracker({
   approvedByB: boolean;
 }) {
   return (
-    <div className="flex items-center gap-6">
-      <div className="flex items-center gap-2">
+    <div className="space-y-3">
+      <div className="flex items-center gap-3">
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center ${approvedByA ? 'bg-cg-success text-white' : 'bg-muted text-muted-foreground'
-            }`}
+          className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+            approvedByA ? 'bg-cg-success text-white' : 'bg-muted text-muted-foreground'
+          }`}
         >
           {approvedByA ? <CheckCircle className="h-4 w-4" /> : <span className="text-xs font-medium">A</span>}
         </div>
-        <span className={`text-sm ${approvedByA ? 'text-cg-success font-medium' : 'text-muted-foreground'}`}>
-          Parent A {approvedByA ? 'Approved' : 'Pending'}
-        </span>
+        <div className="flex-1">
+          <span className={`text-sm ${approvedByA ? 'text-cg-success font-medium' : 'text-muted-foreground'}`}>
+            Parent A
+          </span>
+        </div>
+        <CGBadge variant={approvedByA ? 'success' : 'default'} size="sm">
+          {approvedByA ? 'Approved' : 'Pending'}
+        </CGBadge>
       </div>
-      <div className="h-px w-8 bg-border" />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center ${approvedByB ? 'bg-cg-success text-white' : 'bg-muted text-muted-foreground'
-            }`}
+          className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+            approvedByB ? 'bg-cg-success text-white' : 'bg-muted text-muted-foreground'
+          }`}
         >
           {approvedByB ? <CheckCircle className="h-4 w-4" /> : <span className="text-xs font-medium">B</span>}
         </div>
-        <span className={`text-sm ${approvedByB ? 'text-cg-success font-medium' : 'text-muted-foreground'}`}>
-          Parent B {approvedByB ? 'Approved' : 'Pending'}
-        </span>
+        <div className="flex-1">
+          <span className={`text-sm ${approvedByB ? 'text-cg-success font-medium' : 'text-muted-foreground'}`}>
+            Parent B
+          </span>
+        </div>
+        <CGBadge variant={approvedByB ? 'success' : 'default'} size="sm">
+          {approvedByB ? 'Approved' : 'Pending'}
+        </CGBadge>
       </div>
     </div>
   );
@@ -335,77 +346,105 @@ function AgreementSectionCard({
   sectionIndex,
   canEdit,
   onEdit,
+  defaultExpanded = false,
 }: {
   section: AgreementSection;
   sectionIndex: number;
   canEdit: boolean;
   onEdit: () => void;
+  defaultExpanded?: boolean;
 }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const summary = formatSectionSummary(section);
 
   return (
     <div
-      className={`border-l-4 transition-all duration-200 ${section.is_completed
-        ? 'border-l-cg-sage bg-card'
-        : 'border-l-muted bg-muted/30'
-        }`}
+      className={`border-l-4 transition-all duration-200 ${
+        section.is_completed
+          ? 'border-l-cg-sage bg-card'
+          : 'border-l-muted bg-muted/30'
+      }`}
     >
-      <div className="p-5">
-        <div className="flex items-start gap-4">
+      {/* Clickable header row */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full p-4 sm:p-5 text-left hover:bg-muted/20 transition-colors"
+      >
+        <div className="flex items-center gap-3 sm:gap-4">
           {/* Paragraph Number */}
-          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-cg-sand flex items-center justify-center">
-            <span className="font-mono text-sm font-semibold text-muted-foreground">
+          <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-cg-sand flex items-center justify-center">
+            <span className="font-mono text-xs sm:text-sm font-semibold text-muted-foreground">
               §{sectionIndex}
             </span>
           </div>
 
-          {/* Content */}
+          {/* Title */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h3 className="font-serif text-lg font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  {section.section_title}
-                </h3>
-                {section.is_required && (
-                  <span className="text-xs text-cg-amber font-medium">Required</span>
-                )}
-              </div>
+            <h3
+              className="font-serif text-base sm:text-lg font-semibold text-foreground truncate"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+            >
+              {section.section_title}
+            </h3>
+            {section.is_required && !isExpanded && (
+              <span className="text-xs text-cg-amber font-medium">Required</span>
+            )}
+          </div>
 
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {section.is_completed ? (
-                  <span className="px-2.5 py-1 bg-cg-success-subtle text-cg-success text-xs font-medium rounded-full flex items-center gap-1">
-                    <CheckCircle className="h-3 w-3" />
-                    Complete
-                  </span>
-                ) : (
-                  <span className="px-2.5 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-full">
-                    Incomplete
-                  </span>
-                )}
+          {/* Status + Expand */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <CGBadge
+              variant={section.is_completed ? 'success' : 'default'}
+              size="sm"
+            >
+              {section.is_completed ? 'Complete' : 'Incomplete'}
+            </CGBadge>
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            )}
+          </div>
+        </div>
+      </button>
 
-                {canEdit && (
-                  <button
-                    onClick={onEdit}
-                    className="p-2 rounded-lg hover:bg-cg-sage-subtle text-muted-foreground hover:text-cg-sage transition-colors"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            </div>
+      {/* Expandable content */}
+      <div
+        className={`overflow-hidden transition-all duration-200 ${
+          isExpanded ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-0">
+          <div className="pl-11 sm:pl-14">
+            {section.is_required && (
+              <span className="text-xs text-cg-amber font-medium mb-2 inline-block">Required</span>
+            )}
 
-            {/* Summary */}
             {summary && (
-              <p className="font-serif text-muted-foreground mt-3 leading-relaxed">
+              <p className="font-serif text-muted-foreground leading-relaxed text-sm">
                 {summary}
               </p>
             )}
 
             {!section.content && !section.structured_data && !section.is_completed && (
-              <p className="text-sm text-muted-foreground/60 mt-2 italic">
+              <p className="text-sm text-muted-foreground/60 italic">
                 This section has not been completed yet.
               </p>
+            )}
+
+            {canEdit && (
+              <CGButton
+                variant="ghost"
+                size="sm"
+                leftIcon={<Pencil className="h-3.5 w-3.5" />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                }}
+                className="mt-3"
+              >
+                Edit Section
+              </CGButton>
             )}
           </div>
         </div>
@@ -414,51 +453,51 @@ function AgreementSectionCard({
   );
 }
 
-function ActionButton({
-  onClick,
-  isLoading,
-  disabled,
-  variant = 'primary',
-  icon,
-  loadingText,
-  children,
-}: {
-  onClick: () => void;
-  isLoading?: boolean;
-  disabled?: boolean;
-  variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning';
-  icon: React.ReactNode;
-  loadingText?: string;
-  children: React.ReactNode;
-}) {
-  const variantClasses = {
-    primary: 'cg-btn-primary',
-    secondary: 'cg-btn-secondary',
-    success: 'bg-cg-success text-white hover:bg-cg-success/90 px-6 py-3 rounded-full font-medium transition-all duration-200',
-    danger: 'bg-cg-error text-white hover:bg-cg-error/90 px-6 py-3 rounded-full font-medium transition-all duration-200',
-    warning: 'bg-cg-amber text-white hover:bg-cg-amber/90 px-6 py-3 rounded-full font-medium transition-all duration-200',
-  };
+/* =============================================================================
+   MARKDOWN COMPONENTS (for summary rendering)
+   ============================================================================= */
 
-  return (
-    <button
-      onClick={onClick}
-      disabled={isLoading || disabled}
-      className={`${variantClasses[variant]} flex items-center justify-center gap-2 w-full disabled:opacity-50 disabled:cursor-not-allowed`}
-    >
-      {isLoading ? (
-        <>
-          <Loader2 className="h-4 w-4 animate-spin" />
-          {loadingText || 'Loading...'}
-        </>
-      ) : (
-        <>
-          {icon}
-          {children}
-        </>
-      )}
-    </button>
-  );
-}
+const markdownComponents = {
+  table: ({ node, ...props }: any) => (
+    <div className="my-4 w-full overflow-x-auto rounded-xl border border-border shadow-sm">
+      <table className="w-full text-xs md:text-sm text-left relative" {...props} />
+    </div>
+  ),
+  thead: ({ node, ...props }: any) => (
+    <thead className="bg-muted/30 text-[10px] md:text-xs uppercase tracking-wider font-bold text-muted-foreground border-b border-border" {...props} />
+  ),
+  th: ({ node, ...props }: any) => (
+    <th className="px-3 py-2 whitespace-nowrap" {...props} />
+  ),
+  td: ({ node, ...props }: any) => (
+    <td className="px-3 py-2 border-b border-border/50 last:border-0 align-top" {...props} />
+  ),
+  tr: ({ node, ...props }: any) => (
+    <tr className="hover:bg-muted/10 transition-colors" {...props} />
+  ),
+  h3: ({ node, ...props }: any) => {
+    const text = String(props.children);
+    let colorClass = "text-[var(--portal-primary)]";
+    if (text.includes("Holidays")) colorClass = "text-cg-amber";
+    if (text.includes("Decision")) colorClass = "text-cg-slate";
+    if (text.includes("Quick")) colorClass = "text-cg-sage";
+    return (
+      <h3
+        className={`text-[11px] md:text-xs font-bold uppercase tracking-widest ${colorClass} mt-6 mb-2 pb-1 border-b border-border/50 flex items-center gap-2`}
+        {...props}
+      />
+    );
+  },
+  ul: ({ node, ...props }: any) => (
+    <ul className="my-2 space-y-1.5 list-disc list-inside text-muted-foreground text-sm" {...props} />
+  ),
+  li: ({ node, ...props }: any) => (
+    <li className="leading-snug" {...props} />
+  ),
+  p: ({ node, ...props }: any) => (
+    <p className="mb-3 last:mb-0" {...props} />
+  ),
+};
 
 /* =============================================================================
    MAIN COMPONENT
@@ -532,7 +571,6 @@ function AgreementDetailsContent() {
     try {
       setIsApproving(true);
       setError(null);
-
       const data = await agreementsAPI.submit(agreementId);
       setAgreement(data.agreement);
       setSections(data.sections);
@@ -548,7 +586,6 @@ function AgreementDetailsContent() {
     try {
       setIsApproving(true);
       setError(null);
-
       const data = await agreementsAPI.approve(agreementId, undefined, true);
       setAgreement(data.agreement);
       setSections(data.sections);
@@ -565,9 +602,7 @@ function AgreementDetailsContent() {
     try {
       setIsGeneratingPDF(true);
       setError(null);
-
       const pdfBlob = await agreementsAPI.generatePDF(agreementId);
-
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = url;
@@ -588,7 +623,6 @@ function AgreementDetailsContent() {
     try {
       setIsActivating(true);
       setError(null);
-
       const data = await agreementsAPI.activate(agreementId);
       setAgreement(data.agreement);
       setSections(data.sections);
@@ -604,11 +638,9 @@ function AgreementDetailsContent() {
     if (!confirm('Are you sure you want to deactivate this agreement?')) {
       return;
     }
-
     try {
       setIsActivating(true);
       setError(null);
-
       const data = await agreementsAPI.deactivate(agreementId);
       setAgreement(data.agreement);
       setSections(data.sections);
@@ -624,14 +656,10 @@ function AgreementDetailsContent() {
     if (!confirm('Are you sure you want to delete this draft agreement? This cannot be undone.')) {
       return;
     }
-
     try {
       setIsDeleting(true);
       setError(null);
-
       await agreementsAPI.delete(agreementId);
-
-      // Return to agreements list so user can manage other agreements
       router.push('/agreements');
     } catch (err: any) {
       console.error('Failed to delete agreement:', err);
@@ -653,29 +681,85 @@ function AgreementDetailsContent() {
   };
 
   // Determine total sections based on agreement version
-  const isV2Agreement = agreement?.agreement_version?.startsWith('v2') ?? true; // Default to v2
+  const isV2Agreement = agreement?.agreement_version?.startsWith('v2') ?? true;
   const totalSections = isV2Agreement ? 7 : 18;
   const completedSections = sections.filter((s) => s.is_completed).length;
   const completionPercent = Math.round((completedSections / totalSections) * 100);
 
+  // Find first incomplete section index for auto-expand
+  const firstIncompleteIndex = sections.findIndex((s) => !s.is_completed);
+
+  // Primary action helper
+  const getPrimaryAction = () => {
+    if (!agreement) return null;
+    switch (agreement.status) {
+      case 'draft':
+        return (
+          <CGButton
+            variant="primary"
+            size="sm"
+            leftIcon={<Send className="h-4 w-4" />}
+            isLoading={isApproving}
+            onClick={handleSubmit}
+          >
+            Submit
+          </CGButton>
+        );
+      case 'pending_approval':
+        if (canApprove()) {
+          return (
+            <CGButton
+              variant="primary"
+              size="sm"
+              leftIcon={<CheckCircle className="h-4 w-4" />}
+              isLoading={isApproving}
+              onClick={() => setShowApprovalModal(true)}
+            >
+              Approve
+            </CGButton>
+          );
+        }
+        return null;
+      case 'approved':
+        return (
+          <CGButton
+            variant="primary"
+            size="sm"
+            leftIcon={<Power className="h-4 w-4" />}
+            isLoading={isActivating}
+            onClick={handleActivate}
+          >
+            Activate
+          </CGButton>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 lg:pb-0">
       <Navigation />
 
-      {/* Back Button */}
-      <div className="bg-card border-b border-border">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link
-            href="/agreements"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-cg-sage transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Agreements
-          </Link>
-        </div>
-      </div>
+      {/* Page Header */}
+      {agreement && (
+        <CGPageHeader
+          backHref="/agreements"
+          title={agreement.title}
+          subtitle={`Version ${agreement.version}`}
+          icon={<FileSignature className="h-5 w-5" />}
+          actions={
+            <div className="flex items-center gap-2">
+              <CGBadge variant={getStatusBadgeVariant(agreement.status)} size="md" dot>
+                {getStatusLabel(agreement.status)}
+              </CGBadge>
+              <span className="hidden sm:inline-flex">{getPrimaryAction()}</span>
+            </div>
+          }
+        />
+      )}
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-20">
@@ -688,371 +772,100 @@ function AgreementDetailsContent() {
 
         {/* Error State */}
         {error && !isLoading && (
-          <div className="cg-card p-6 bg-cg-error-subtle border-cg-error/20">
+          <CGCard className="bg-cg-error-subtle border-cg-error/20">
             <div className="flex items-start gap-4">
               <AlertCircle className="h-6 w-6 text-cg-error flex-shrink-0" />
-              <div>
+              <div className="flex-1">
                 <p className="font-semibold text-cg-error">Error Loading Agreement</p>
                 <p className="text-sm text-cg-error/80 mt-1">{error}</p>
               </div>
             </div>
-            <button onClick={loadAgreement} className="mt-4 cg-btn-secondary">
+            <CGButton variant="secondary" onClick={loadAgreement} className="mt-4">
               Try Again
-            </button>
-          </div>
+            </CGButton>
+          </CGCard>
         )}
 
-        {/* Agreement Content */}
+        {/* Agreement Content — Two-Column Grid */}
         {!isLoading && agreement && (
-          <div className="space-y-8">
-            {/* Document Header - Paper Texture Background */}
-            <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-              {/* Decorative Header Bar */}
-              <div className="h-2 bg-gradient-to-r from-cg-sage via-cg-amber to-cg-sage" />
-
-              <div className="p-8">
-                {/* Title and Status */}
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <FileSignature className="h-6 w-6 text-cg-sage" />
-                      <span className="text-sm text-muted-foreground font-mono">
-                        Version {agreement.version}
-                      </span>
-                      {isV2Agreement && (
-                        <span className="text-xs bg-cg-sage/10 text-cg-sage px-2 py-0.5 rounded-full">
-                          Simplified 7-Section
-                        </span>
-                      )}
-                    </div>
-                    <h1 className="font-serif text-3xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                      {agreement.title}
-                    </h1>
-                  </div>
-                  <StatusBadge status={agreement.status} />
-                </div>
-
-                {/* Meta Information */}
-                <div className="flex flex-wrap gap-6 text-sm text-muted-foreground border-t border-border pt-6">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    <span>
-                      Created {new Date(agreement.created_at).toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                  {agreement.effective_date && (
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-cg-success" />
-                      <span>
-                        Effective {new Date(agreement.effective_date).toLocaleDateString('en-US', {
-                          month: 'long',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Agreement Summary - Comprehensive markdown-formatted summary */}
-                {summary?.summary && (
-                  <div className="mt-6 pt-6 border-t border-border">
-                    <div className="flex items-start gap-3 mb-4">
-                      <Quote className="h-5 w-5 text-cg-sage flex-shrink-0 mt-0.5" />
-                      <h2 className="font-semibold text-foreground">Agreement Summary</h2>
-                    </div>
-
-                    {/* Render comprehensive markdown summary */}
-                    {/* Render comprehensive markdown summary with custom components */}
-                    <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-sm md:prose-p:text-base prose-strong:text-foreground prose-strong:font-semibold">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          table: ({ node, ...props }) => (
-                            <div className="my-4 w-full overflow-x-auto rounded-xl border border-border shadow-sm">
-                              <table className="w-full text-xs md:text-sm text-left relative" {...props} />
-                            </div>
-                          ),
-                          thead: ({ node, ...props }) => (
-                            <thead className="bg-muted/30 text-[10px] md:text-xs uppercase tracking-wider font-bold text-muted-foreground border-b border-border" {...props} />
-                          ),
-                          th: ({ node, ...props }) => (
-                            <th className="px-3 py-2 whitespace-nowrap" {...props} />
-                          ),
-                          td: ({ node, ...props }) => (
-                            <td className="px-3 py-2 border-b border-border/50 last:border-0 align-top" {...props} />
-                          ),
-                          tr: ({ node, ...props }) => (
-                            <tr className="hover:bg-muted/10 transition-colors" {...props} />
-                          ),
-                          h3: ({ node, ...props }) => {
-                            // Map specific keywords to colors to match dashboard
-                            const text = String(props.children);
-                            let colorClass = "text-[var(--portal-primary)]";
-                            if (text.includes("Holidays")) colorClass = "text-cg-amber";
-                            if (text.includes("Decision")) colorClass = "text-cg-slate";
-                            if (text.includes("Quick")) colorClass = "text-cg-sage";
-
-                            return (
-                              <h3
-                                className={`text-[11px] md:text-xs font-bold uppercase tracking-widest ${colorClass} mt-6 mb-2 pb-1 border-b border-border/50 flex items-center gap-2`}
-                                {...props}
-                              />
-                            );
-                          },
-                          ul: ({ node, ...props }) => (
-                            <ul className="my-2 space-y-1.5 list-disc list-inside text-muted-foreground text-sm" {...props} />
-                          ),
-                          li: ({ node, ...props }) => (
-                            <li className="leading-snug" {...props} />
-                          ),
-                          p: ({ node, ...props }) => (
-                            <p className="mb-3 last:mb-0" {...props} />
-                          )
-                        }}
-                      >
-                        {summary.summary}
-                      </ReactMarkdown>
-                    </div>
-
-
-                    {/* Quick Facts - Labeled Reference */}
-                    {summary.key_points && summary.key_points.length > 0 && (
-                      <div className="mt-6 p-5 bg-cg-sage-subtle/20 rounded-xl border border-cg-sage/10">
-                        <h3 className="text-base font-semibold text-foreground mb-4">Quick Facts</h3>
-
-                        {/* Key points with markdown labels */}
-                        <div className="space-y-2.5 text-sm leading-relaxed">
-                          {summary.key_points.map((point, idx) => (
-                            <div key={idx} className="text-foreground prose prose-sm max-w-none prose-strong:text-foreground prose-strong:font-semibold">
-                              <ReactMarkdown>{point}</ReactMarkdown>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Shared Expenses Table */}
-                        {summary.shared_expenses_table && (
-                          <div className="mt-4 pt-4 border-t border-border/30">
-                            <p className="text-sm font-semibold text-foreground mb-3">
-                              <strong>Shared Expenses:</strong> {summary.shared_expenses_table.split}
-                            </p>
-                            <div className="grid grid-cols-2 gap-3 text-xs">
-                              {/* Covered Column */}
-                              <div className="bg-green-50 dark:bg-green-900/10 rounded-lg p-3 border border-green-200 dark:border-green-800">
-                                <p className="font-semibold text-green-900 dark:text-green-100 mb-2">✓ Covered</p>
-                                <ul className="space-y-1.5 text-green-800 dark:text-green-200">
-                                  {summary.shared_expenses_table.covered?.map((item, idx) => (
-                                    <li key={idx}>• {item}</li>
-                                  ))}
-                                  {(!summary.shared_expenses_table.covered || summary.shared_expenses_table.covered.length === 0) && (
-                                    <li className="text-muted-foreground italic">None specified</li>
-                                  )}
-                                </ul>
-                              </div>
-
-                              {/* Not Covered Column */}
-                              <div className="bg-red-50 dark:bg-red-900/10 rounded-lg p-3 border border-red-200 dark:border-red-800">
-                                <p className="font-semibold text-red-900 dark:text-red-100 mb-2">✗ Not Covered</p>
-                                <ul className="space-y-1.5 text-red-800 dark:text-red-200">
-                                  {summary.shared_expenses_table.not_covered?.map((item, idx) => (
-                                    <li key={idx}>• {item}</li>
-                                  ))}
-                                  {(!summary.shared_expenses_table.not_covered || summary.shared_expenses_table.not_covered.length === 0) && (
-                                    <li className="text-muted-foreground italic">None specified</li>
-                                  )}
-                                </ul>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Approval Tracker */}
-                {agreement.status === 'pending_approval' && (
-                  <div className="mt-6 pt-6 border-t border-border">
-                    <p className="text-sm font-medium text-foreground mb-4">Approval Status</p>
-                    <ApprovalTracker
-                      approvedByA={!!agreement.approved_by_a}
-                      approvedByB={!!agreement.approved_by_b}
-                    />
-                  </div>
-                )}
-
-                {/* Completion Progress */}
-                <div className="mt-6 pt-6 border-t border-border">
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">
-                      {completedSections} of {totalSections} sections complete
-                    </span>
-                    <span className="font-semibold text-foreground">{completionPercent}%</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-cg-sage rounded-full transition-all duration-500"
-                      style={{ width: `${completionPercent}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-
-            {/* Actions Card */}
-            <div className="bg-card rounded-2xl border-2 border-border p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-              <h3 className="font-semibold text-foreground mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Actions</h3>
-              <div className="space-y-3">
-                {/* Draft Actions */}
-                {agreement.status === 'draft' && (
-                  <>
-                    <ActionButton
-                      onClick={handleSubmit}
-                      isLoading={isApproving}
-                      variant="success"
-                      icon={<Send className="h-4 w-4" />}
-                      loadingText="Submitting..."
-                    >
-                      Submit for Approval
-                    </ActionButton>
-                    <ActionButton
-                      onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
-                      variant="secondary"
-                      icon={<Edit3 className="h-4 w-4" />}
-                    >
-                      Continue Editing
-                    </ActionButton>
-                    <ActionButton
-                      onClick={handleDelete}
-                      isLoading={isDeleting}
-                      variant="danger"
-                      icon={<Trash2 className="h-4 w-4" />}
-                      loadingText="Deleting..."
-                    >
-                      Delete Draft
-                    </ActionButton>
-                  </>
-                )}
-
-                {/* Pending Approval Actions */}
-                {agreement.status === 'pending_approval' && (
-                  <>
-                    {canApprove() ? (
-                      <ActionButton
-                        onClick={() => setShowApprovalModal(true)}
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* ============================================================
+                LEFT COLUMN — Main Content
+                ============================================================ */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Mobile-only primary CTA */}
+              <div className="sm:hidden">
+                {getPrimaryAction() && (
+                  <div className="w-full [&>button]:w-full">
+                    {agreement.status === 'draft' && (
+                      <CGButton
+                        variant="primary"
+                        leftIcon={<Send className="h-4 w-4" />}
                         isLoading={isApproving}
-                        variant="success"
-                        icon={<CheckCircle className="h-4 w-4" />}
-                        loadingText="Approving..."
+                        onClick={handleSubmit}
+                        className="w-full"
+                      >
+                        Submit for Approval
+                      </CGButton>
+                    )}
+                    {agreement.status === 'pending_approval' && canApprove() && (
+                      <CGButton
+                        variant="primary"
+                        leftIcon={<CheckCircle className="h-4 w-4" />}
+                        isLoading={isApproving}
+                        onClick={() => setShowApprovalModal(true)}
+                        className="w-full"
                       >
                         Approve Agreement
-                      </ActionButton>
-                    ) : hasUserApproved() ? (
-                      <div className="p-4 bg-cg-sage-subtle rounded-xl text-center">
-                        <CheckCircle className="h-6 w-6 text-cg-sage mx-auto mb-2" />
-                        <p className="text-sm font-medium text-cg-sage">You've approved this agreement</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Waiting for the other parent's approval
-                        </p>
-                      </div>
-                    ) : null}
-                  </>
-                )}
-
-                {/* Approved Actions */}
-                {agreement.status === 'approved' && (
-                  <>
-                    <ActionButton
-                      onClick={handleActivate}
-                      isLoading={isActivating}
-                      variant="success"
-                      icon={<Power className="h-4 w-4" />}
-                      loadingText="Activating..."
-                    >
-                      Activate Agreement
-                    </ActionButton>
-                    {hasPdfAccess ? (
-                      <ActionButton
-                        onClick={handleGeneratePDF}
-                        isLoading={isGeneratingPDF}
-                        variant="secondary"
-                        icon={<Download className="h-4 w-4" />}
-                        loadingText="Generating..."
-                      >
-                        Download PDF
-                      </ActionButton>
-                    ) : (
-                      <button
-                        onClick={() => router.push('/settings/billing')}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-muted text-muted-foreground hover:bg-muted transition-colors"
-                      >
-                        <Lock className="h-4 w-4" />
-                        Download PDF
-                        <TierBadge tier="plus" size="sm" />
-                      </button>
+                      </CGButton>
                     )}
-                  </>
-                )}
-
-                {/* Active Actions */}
-                {agreement.status === 'active' && (
-                  <>
-                    <div className="p-4 bg-cg-success-subtle rounded-xl">
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="h-6 w-6 text-cg-success" />
-                        <div>
-                          <p className="font-medium text-cg-success">Agreement is Active</p>
-                          {agreement.effective_date && (
-                            <p className="text-xs text-cg-success/80">
-                              Effective since {new Date(agreement.effective_date).toLocaleDateString()}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {hasPdfAccess ? (
-                      <ActionButton
-                        onClick={handleGeneratePDF}
-                        isLoading={isGeneratingPDF}
-                        variant="secondary"
-                        icon={<Download className="h-4 w-4" />}
-                        loadingText="Generating..."
+                    {agreement.status === 'approved' && (
+                      <CGButton
+                        variant="primary"
+                        leftIcon={<Power className="h-4 w-4" />}
+                        isLoading={isActivating}
+                        onClick={handleActivate}
+                        className="w-full"
                       >
-                        Download PDF
-                      </ActionButton>
-                    ) : (
-                      <button
-                        onClick={() => router.push('/settings/billing')}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-muted text-muted-foreground hover:bg-muted transition-colors"
-                      >
-                        <Lock className="h-4 w-4" />
-                        Download PDF
-                        <TierBadge tier="plus" size="sm" />
-                      </button>
+                        Activate Agreement
+                      </CGButton>
                     )}
-                    <ActionButton
-                      onClick={handleDeactivate}
-                      isLoading={isActivating}
-                      variant="warning"
-                      icon={<PowerOff className="h-4 w-4" />}
-                      loadingText="Deactivating..."
-                    >
-                      Deactivate Agreement
-                    </ActionButton>
-                  </>
+                  </div>
                 )}
               </div>
-            </div>
 
-            {/* Tab Navigation for Active Agreements */}
-            {agreement.status === 'active' && (
-              <div className="bg-card rounded-2xl border-2 border-border overflow-hidden">
-                <div className="flex">
+              {/* Status Banner — conditional */}
+              {agreement.status === 'active' && (
+                <div className="p-4 bg-cg-success-subtle rounded-2xl border border-cg-success/20">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-cg-success flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-cg-success text-sm">Agreement is Active</p>
+                      {agreement.effective_date && (
+                        <p className="text-xs text-cg-success/80">
+                          Effective since {new Date(agreement.effective_date).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {agreement.status === 'pending_approval' && hasUserApproved() && (
+                <div className="p-4 bg-cg-sage-subtle rounded-2xl border border-cg-sage/20">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-cg-sage flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-cg-sage text-sm">You&apos;ve approved this agreement</p>
+                      <p className="text-xs text-muted-foreground">Waiting for the other parent&apos;s approval</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab Navigation — Active agreements only */}
+              {agreement.status === 'active' && (
+                <div className="flex rounded-xl bg-muted/50 p-1 overflow-x-auto">
                   {[
                     { key: 'details' as const, label: 'Agreement', icon: '📋' },
                     { key: 'implementation' as const, label: 'Implementation', icon: '⚡' },
@@ -1061,263 +874,568 @@ function AgreementDetailsContent() {
                     <button
                       key={tab.key}
                       onClick={() => setActiveTab(tab.key)}
-                      className={`flex-1 px-4 py-3 text-sm font-semibold transition-all ${
+                      className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${
                         activeTab === tab.key
-                          ? 'bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] border-b-2 border-[var(--portal-primary)]'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                          ? 'bg-card text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       {tab.icon} {tab.label}
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Implementation Tab - What's Been Set Up */}
-            {agreement.status === 'active' && activeTab === 'implementation' && activationSummary && (
-              <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg">
-                <div className="p-6 border-b border-border">
-                  <h3 className="font-serif text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                    What&apos;s Been Set Up
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    These items were automatically created from your agreement
-                  </p>
-                </div>
-                <div className="p-6 space-y-3">
-                  {/* Summary stats */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                    {activationSummary.summary.custody_exchanges > 0 && (
-                      <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 text-center">
-                        <div className="text-2xl font-bold text-blue-600">{activationSummary.summary.custody_exchanges}</div>
-                        <div className="text-xs text-blue-600/70">Exchanges</div>
-                      </div>
-                    )}
-                    {activationSummary.summary.holiday_events > 0 && (
-                      <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-center">
-                        <div className="text-2xl font-bold text-amber-600">{activationSummary.summary.holiday_events}</div>
-                        <div className="text-xs text-amber-600/70">Holidays</div>
-                      </div>
-                    )}
-                    {activationSummary.summary.activity_events > 0 && (
-                      <div className="p-3 rounded-xl bg-green-50 dark:bg-green-950/30 text-center">
-                        <div className="text-2xl font-bold text-green-600">{activationSummary.summary.activity_events}</div>
-                        <div className="text-xs text-green-600/70">Activities</div>
-                      </div>
-                    )}
-                    {activationSummary.summary.obligation_templates > 0 && (
-                      <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 text-center">
-                        <div className="text-2xl font-bold text-purple-600">{activationSummary.summary.obligation_templates}</div>
-                        <div className="text-xs text-purple-600/70">Obligations</div>
-                      </div>
-                    )}
-                  </div>
+              {/* Summary Card */}
+              {(agreement.status !== 'active' || activeTab === 'details') && summary?.summary && (
+                <CGCard variant="elevated">
+                  <CGCardHeader>
+                    <div className="flex items-start gap-3">
+                      <Quote className="h-5 w-5 text-cg-sage flex-shrink-0 mt-0.5" />
+                      <CGCardTitle>Agreement Summary</CGCardTitle>
+                    </div>
+                  </CGCardHeader>
+                  <CGCardContent className="mt-4">
+                    <div className="prose prose-sm max-w-none prose-headings:font-semibold prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:text-sm md:prose-p:text-base prose-strong:text-foreground prose-strong:font-semibold">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={markdownComponents}
+                      >
+                        {summary.summary}
+                      </ReactMarkdown>
+                    </div>
 
-                  {/* Item list */}
-                  {activationSummary.items.map((item: any, idx: number) => (
-                    <div key={idx} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors">
-                      <CheckCircle className="h-5 w-5 text-cg-success flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-foreground truncate">{item.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {item.type === 'exchange' && '📍 Calendar Exchange'}
-                          {item.type === 'holiday' && '🎄 Holiday Event'}
-                          {item.type === 'activity' && '⚽ Recurring Activity'}
-                          {item.type === 'custody_exchange' && '🔄 Custody Exchange'}
-                          {item.type === 'obligation_template' && `💰 ${item.amount ? `$${item.amount}` : 'Expense'}`}
+                    {/* Shared Expenses Table */}
+                    {summary.shared_expenses_table && (
+                      <div className="mt-5 pt-5 border-t border-border/30">
+                        <p className="text-sm font-semibold text-foreground mb-3">
+                          <strong>Shared Expenses:</strong> {summary.shared_expenses_table.split}
+                        </p>
+                        <div className="grid grid-cols-2 gap-3 text-xs">
+                          <div className="bg-green-50 dark:bg-green-900/10 rounded-lg p-3 border border-green-200 dark:border-green-800">
+                            <p className="font-semibold text-green-900 dark:text-green-100 mb-2">✓ Covered</p>
+                            <ul className="space-y-1.5 text-green-800 dark:text-green-200">
+                              {summary.shared_expenses_table.covered?.map((item: string, idx: number) => (
+                                <li key={idx}>• {item}</li>
+                              ))}
+                              {(!summary.shared_expenses_table.covered || summary.shared_expenses_table.covered.length === 0) && (
+                                <li className="text-muted-foreground italic">None specified</li>
+                              )}
+                            </ul>
+                          </div>
+                          <div className="bg-red-50 dark:bg-red-900/10 rounded-lg p-3 border border-red-200 dark:border-red-800">
+                            <p className="font-semibold text-red-900 dark:text-red-100 mb-2">✗ Not Covered</p>
+                            <ul className="space-y-1.5 text-red-800 dark:text-red-200">
+                              {summary.shared_expenses_table.not_covered?.map((item: string, idx: number) => (
+                                <li key={idx}>• {item}</li>
+                              ))}
+                              {(!summary.shared_expenses_table.not_covered || summary.shared_expenses_table.not_covered.length === 0) && (
+                                <li className="text-muted-foreground italic">None specified</li>
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </CGCardContent>
+                </CGCard>
+              )}
+
+              {/* Implementation Tab Content */}
+              {agreement.status === 'active' && activeTab === 'implementation' && activationSummary && (
+                <CGCard variant="elevated">
+                  <CGCardHeader>
+                    <CGCardTitle style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                      What&apos;s Been Set Up
+                    </CGCardTitle>
+                    <CGCardDescription>
+                      These items were automatically created from your agreement
+                    </CGCardDescription>
+                  </CGCardHeader>
+                  <CGCardContent className="mt-4 space-y-4">
+                    {/* Summary stats */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {activationSummary.summary.custody_exchanges > 0 && (
+                        <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/30 text-center">
+                          <div className="text-2xl font-bold text-blue-600">{activationSummary.summary.custody_exchanges}</div>
+                          <div className="text-xs text-blue-600/70">Exchanges</div>
+                        </div>
+                      )}
+                      {activationSummary.summary.holiday_events > 0 && (
+                        <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-center">
+                          <div className="text-2xl font-bold text-amber-600">{activationSummary.summary.holiday_events}</div>
+                          <div className="text-xs text-amber-600/70">Holidays</div>
+                        </div>
+                      )}
+                      {activationSummary.summary.activity_events > 0 && (
+                        <div className="p-3 rounded-xl bg-green-50 dark:bg-green-950/30 text-center">
+                          <div className="text-2xl font-bold text-green-600">{activationSummary.summary.activity_events}</div>
+                          <div className="text-xs text-green-600/70">Activities</div>
+                        </div>
+                      )}
+                      {activationSummary.summary.obligation_templates > 0 && (
+                        <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 text-center">
+                          <div className="text-2xl font-bold text-purple-600">{activationSummary.summary.obligation_templates}</div>
+                          <div className="text-xs text-purple-600/70">Obligations</div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Item list */}
+                    {activationSummary.items.map((item: any, idx: number) => (
+                      <div key={idx} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors">
+                        <CheckCircle className="h-5 w-5 text-cg-success flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm text-foreground truncate">{item.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.type === 'exchange' && '📍 Calendar Exchange'}
+                            {item.type === 'holiday' && '🎄 Holiday Event'}
+                            {item.type === 'activity' && '⚽ Recurring Activity'}
+                            {item.type === 'custody_exchange' && '🔄 Custody Exchange'}
+                            {item.type === 'obligation_template' && `💰 ${item.amount ? `$${item.amount}` : 'Expense'}`}
+                          </p>
+                        </div>
+                        <CGBadge
+                          variant={item.status === 'active' || item.status === 'scheduled' ? 'success' : 'default'}
+                          size="sm"
+                        >
+                          {item.status}
+                        </CGBadge>
+                      </div>
+                    ))}
+
+                    {activationSummary.items.length === 0 && (
+                      <p className="text-center text-muted-foreground py-8">No items have been auto-created yet.</p>
+                    )}
+                  </CGCardContent>
+                </CGCard>
+              )}
+
+              {/* Adherence Tab Content */}
+              {agreement.status === 'active' && activeTab === 'adherence' && (
+                <CGCard variant="elevated">
+                  <CGCardHeader>
+                    <CGCardTitle style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                      Agreement Adherence
+                    </CGCardTitle>
+                    <CGCardDescription>
+                      How well both parents are following the agreement
+                    </CGCardDescription>
+                  </CGCardHeader>
+                  <CGCardContent className="mt-4">
+                    {complianceData ? (
+                      <div className="space-y-6">
+                        {/* Overall Score */}
+                        <div className="text-center p-6 rounded-2xl bg-muted/30">
+                          <div className={`text-5xl font-bold ${
+                            complianceData.overall_score >= 90 ? 'text-green-600' :
+                            complianceData.overall_score >= 75 ? 'text-blue-600' :
+                            complianceData.overall_score >= 50 ? 'text-amber-600' :
+                            'text-red-600'
+                          }`}>
+                            {complianceData.overall_score}%
+                          </div>
+                          <div className="text-sm text-muted-foreground mt-1 capitalize">
+                            {complianceData.status?.replace('_', ' ')}
+                          </div>
+                        </div>
+
+                        {/* Exchange Compliance */}
+                        <div className="p-4 rounded-xl border border-border">
+                          <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                            <Calendar className="h-4 w-4" /> Exchange Compliance
+                          </h4>
+                          <div className="grid grid-cols-3 gap-3 text-center">
+                            <div>
+                              <div className="text-lg font-bold text-foreground">{complianceData.exchange_compliance.completed}</div>
+                              <div className="text-xs text-muted-foreground">Completed</div>
+                            </div>
+                            <div>
+                              <div className="text-lg font-bold text-foreground">{complianceData.exchange_compliance.missed}</div>
+                              <div className="text-xs text-muted-foreground">Missed</div>
+                            </div>
+                            <div>
+                              <div className="text-lg font-bold text-foreground">{complianceData.exchange_compliance.on_time_rate}%</div>
+                              <div className="text-xs text-muted-foreground">On-Time</div>
+                            </div>
+                          </div>
+                          <div className="mt-3">
+                            <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                              <span>Completion Rate</span>
+                              <span>{complianceData.exchange_compliance.completion_rate}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-blue-500 rounded-full transition-all"
+                                style={{ width: `${complianceData.exchange_compliance.completion_rate}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Financial Compliance */}
+                        <div className="p-4 rounded-xl border border-border">
+                          <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                            💰 Financial Compliance
+                          </h4>
+                          <div className="grid grid-cols-2 gap-3 text-center">
+                            <div>
+                              <div className="text-lg font-bold text-foreground">{complianceData.financial_compliance.funded}</div>
+                              <div className="text-xs text-muted-foreground">Funded</div>
+                            </div>
+                            <div>
+                              <div className="text-lg font-bold text-foreground">{complianceData.financial_compliance.total_obligations}</div>
+                              <div className="text-xs text-muted-foreground">Total</div>
+                            </div>
+                          </div>
+                          <div className="mt-3">
+                            <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                              <span>Funding Rate</span>
+                              <span>{complianceData.financial_compliance.completion_rate}%</span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-green-500 rounded-full transition-all"
+                                style={{ width: `${complianceData.financial_compliance.completion_rate}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">Adherence data will appear as exchanges and payments are tracked.</p>
+                      </div>
+                    )}
+                  </CGCardContent>
+                </CGCard>
+              )}
+
+              {/* Agreement Sections Card */}
+              {(agreement.status !== 'active' || activeTab === 'details') && (
+                <CGCard variant="default" noPadding>
+                  <div className="p-5 sm:p-6 border-b border-border">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3
+                          className="text-xl font-semibold text-foreground"
+                          style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+                        >
+                          Agreement Sections
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          The terms and conditions of your parenting agreement
                         </p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                        item.status === 'active' || item.status === 'scheduled'
-                          ? 'bg-green-100 text-green-700 dark:bg-green-950/50 dark:text-green-400'
-                          : 'bg-muted text-muted-foreground'
-                      }`}>
-                        {item.status}
-                      </span>
+                      {agreement.status === 'draft' && (
+                        <CGButton
+                          variant="ghost"
+                          size="sm"
+                          leftIcon={<Edit3 className="h-4 w-4" />}
+                          onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
+                        >
+                          Edit All
+                        </CGButton>
+                      )}
                     </div>
-                  ))}
+                  </div>
 
-                  {activationSummary.items.length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">No items have been auto-created yet.</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Adherence Tab */}
-            {agreement.status === 'active' && activeTab === 'adherence' && (
-              <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg">
-                <div className="p-6 border-b border-border">
-                  <h3 className="font-serif text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                    Agreement Adherence
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    How well both parents are following the agreement
-                  </p>
-                </div>
-                <div className="p-6">
-                  {complianceData ? (
-                    <div className="space-y-6">
-                      {/* Overall Score */}
-                      <div className="text-center p-6 rounded-2xl bg-muted/30">
-                        <div className={`text-5xl font-bold ${
-                          complianceData.overall_score >= 90 ? 'text-green-600' :
-                          complianceData.overall_score >= 75 ? 'text-blue-600' :
-                          complianceData.overall_score >= 50 ? 'text-amber-600' :
-                          'text-red-600'
-                        }`}>
-                          {complianceData.overall_score}%
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1 capitalize">
-                          {complianceData.status?.replace('_', ' ')}
-                        </div>
-                      </div>
-
-                      {/* Exchange Compliance */}
-                      <div className="p-4 rounded-xl border border-border">
-                        <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                          <Calendar className="h-4 w-4" /> Exchange Compliance
-                        </h4>
-                        <div className="grid grid-cols-3 gap-3 text-center">
-                          <div>
-                            <div className="text-lg font-bold text-foreground">{complianceData.exchange_compliance.completed}</div>
-                            <div className="text-xs text-muted-foreground">Completed</div>
-                          </div>
-                          <div>
-                            <div className="text-lg font-bold text-foreground">{complianceData.exchange_compliance.missed}</div>
-                            <div className="text-xs text-muted-foreground">Missed</div>
-                          </div>
-                          <div>
-                            <div className="text-lg font-bold text-foreground">{complianceData.exchange_compliance.on_time_rate}%</div>
-                            <div className="text-xs text-muted-foreground">On-Time</div>
-                          </div>
-                        </div>
-                        {/* Progress bar */}
-                        <div className="mt-3">
-                          <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                            <span>Completion Rate</span>
-                            <span>{complianceData.exchange_compliance.completion_rate}%</span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-blue-500 rounded-full transition-all"
-                              style={{ width: `${complianceData.exchange_compliance.completion_rate}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Financial Compliance */}
-                      <div className="p-4 rounded-xl border border-border">
-                        <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
-                          💰 Financial Compliance
-                        </h4>
-                        <div className="grid grid-cols-2 gap-3 text-center">
-                          <div>
-                            <div className="text-lg font-bold text-foreground">{complianceData.financial_compliance.funded}</div>
-                            <div className="text-xs text-muted-foreground">Funded</div>
-                          </div>
-                          <div>
-                            <div className="text-lg font-bold text-foreground">{complianceData.financial_compliance.total_obligations}</div>
-                            <div className="text-xs text-muted-foreground">Total</div>
-                          </div>
-                        </div>
-                        <div className="mt-3">
-                          <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                            <span>Funding Rate</span>
-                            <span>{complianceData.financial_compliance.completion_rate}%</span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-green-500 rounded-full transition-all"
-                              style={{ width: `${complianceData.financial_compliance.completion_rate}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
+                  {sections.length === 0 ? (
+                    <div className="p-12 text-center">
+                      <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground mb-4">No sections completed yet</p>
+                      <CGButton
+                        variant="primary"
+                        onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
+                      >
+                        Start Building
+                      </CGButton>
                     </div>
                   ) : (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground">Adherence data will appear as exchanges and payments are tracked.</p>
+                    <div className="divide-y divide-border">
+                      {sections.map((section, index) => {
+                        const editIndex = getSectionEditIndex(section.section_type, section.section_number);
+                        const canEdit = agreement.status === 'draft' && editIndex >= 0;
+
+                        return (
+                          <AgreementSectionCard
+                            key={section.id}
+                            section={section}
+                            sectionIndex={index + 1}
+                            canEdit={canEdit}
+                            onEdit={() => router.push(`/agreements/${agreementId}/builder-v2`)}
+                            defaultExpanded={index === firstIncompleteIndex}
+                          />
+                        );
+                      })}
                     </div>
                   )}
-                </div>
-              </div>
-            )}
-
-            {/* Sections - The Living Document */}
-            {(agreement.status !== 'active' || activeTab === 'details') && (
-            <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-              <div className="p-6 border-b border-border">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-serif text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                      Agreement Sections
-                    </h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      The terms and conditions of your parenting agreement
-                    </p>
-                  </div>
-                  {agreement.status === 'draft' && (
-                    <button
-                      onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
-                      className="cg-btn-secondary text-sm py-2 px-4"
-                    >
-                      <Edit3 className="h-4 w-4 mr-2" />
-                      Edit All
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {sections.length === 0 ? (
-                <div className="p-12 text-center">
-                  <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">No sections completed yet</p>
-                  <button
-                    onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
-                    className="cg-btn-primary"
-                  >
-                    Start Building
-                  </button>
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {sections.map((section, index) => {
-                    const editIndex = getSectionEditIndex(section.section_type, section.section_number);
-                    const canEdit = agreement.status === 'draft' && editIndex >= 0;
-
-                    return (
-                      <AgreementSectionCard
-                        key={section.id}
-                        section={section}
-                        sectionIndex={index + 1}
-                        canEdit={canEdit}
-                        onEdit={() => router.push(`/agreements/${agreementId}/builder-v2`)}
-                      />
-                    );
-                  })}
-                </div>
+                </CGCard>
               )}
             </div>
-            )}
 
-            {/* Floating Propose Change Button - Future Feature */}
-            {agreement.status === 'active' && (
-              <div className="fixed bottom-24 right-6 sm:bottom-8 sm:right-8">
-                <button
-                  className="w-14 h-14 rounded-full bg-cg-amber text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center aria-glow"
-                  title="Propose Change (Coming Soon)"
-                  onClick={() => alert('Propose Change feature coming soon!')}
-                >
-                  <Quote className="h-6 w-6" />
-                </button>
-              </div>
-            )}
+            {/* ============================================================
+                RIGHT COLUMN — Sidebar
+                ============================================================ */}
+            <div className="space-y-6">
+              {/* Metadata Card */}
+              <CGCard>
+                <CGCardHeader>
+                  <CGCardTitle className="text-base">Details</CGCardTitle>
+                </CGCardHeader>
+                <CGCardContent className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    <CGBadge variant={getStatusBadgeVariant(agreement.status)} size="sm" dot>
+                      {getStatusLabel(agreement.status)}
+                    </CGBadge>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Version</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-foreground">{agreement.version}</span>
+                      {isV2Agreement && (
+                        <CGBadge variant="sage" size="sm">v2</CGBadge>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Type</span>
+                    <CGBadge variant="info" size="sm">
+                      {isV2Agreement ? '7-Section' : 'Legacy'}
+                    </CGBadge>
+                  </div>
+
+                  <div className="border-t border-border pt-4">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4 flex-shrink-0" />
+                      <span>Created {new Date(agreement.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}</span>
+                    </div>
+                    {agreement.effective_date && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                        <CheckCircle className="h-4 w-4 flex-shrink-0 text-cg-success" />
+                        <span>Effective {new Date(agreement.effective_date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}</span>
+                      </div>
+                    )}
+                  </div>
+                </CGCardContent>
+              </CGCard>
+
+              {/* Approval Tracker Card */}
+              {agreement.status === 'pending_approval' && (
+                <CGCard>
+                  <CGCardHeader>
+                    <CGCardTitle className="text-base">Approval Status</CGCardTitle>
+                  </CGCardHeader>
+                  <CGCardContent className="mt-4">
+                    <ApprovalTracker
+                      approvedByA={!!agreement.approved_by_a}
+                      approvedByB={!!agreement.approved_by_b}
+                    />
+                  </CGCardContent>
+                </CGCard>
+              )}
+
+              {/* Completion Progress Card */}
+              <CGCard>
+                <CGCardHeader>
+                  <CGCardTitle className="text-base">Progress</CGCardTitle>
+                </CGCardHeader>
+                <CGCardContent className="mt-4">
+                  <div className="flex items-center justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">
+                      {completedSections} of {totalSections} sections
+                    </span>
+                    <span className="font-semibold text-foreground">{completionPercent}%</span>
+                  </div>
+                  <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-cg-sage rounded-full transition-all duration-500"
+                      style={{ width: `${completionPercent}%` }}
+                    />
+                  </div>
+                </CGCardContent>
+              </CGCard>
+
+              {/* Quick Facts Card */}
+              {summary?.key_points && summary.key_points.length > 0 && (
+                <CGCard>
+                  <CGCardHeader>
+                    <CGCardTitle className="text-base">Quick Facts</CGCardTitle>
+                  </CGCardHeader>
+                  <CGCardContent className="mt-4">
+                    <div className="space-y-2.5 text-sm leading-relaxed">
+                      {summary.key_points.map((point: string, idx: number) => (
+                        <div key={idx} className="text-foreground prose prose-sm max-w-none prose-strong:text-foreground prose-strong:font-semibold">
+                          <ReactMarkdown>{point}</ReactMarkdown>
+                        </div>
+                      ))}
+                    </div>
+                  </CGCardContent>
+                </CGCard>
+              )}
+
+              {/* Actions Card */}
+              <CGCard>
+                <CGCardHeader>
+                  <CGCardTitle className="text-base">Actions</CGCardTitle>
+                </CGCardHeader>
+                <CGCardContent className="mt-4 space-y-3">
+                  {/* Draft Actions */}
+                  {agreement.status === 'draft' && (
+                    <>
+                      <CGButton
+                        variant="primary"
+                        leftIcon={<Send className="h-4 w-4" />}
+                        isLoading={isApproving}
+                        onClick={handleSubmit}
+                        className="w-full"
+                      >
+                        Submit for Approval
+                      </CGButton>
+                      <CGButton
+                        variant="secondary"
+                        leftIcon={<Edit3 className="h-4 w-4" />}
+                        onClick={() => router.push(`/agreements/${agreementId}/builder-v2`)}
+                        className="w-full"
+                      >
+                        Continue Editing
+                      </CGButton>
+                      <CGButton
+                        variant="danger"
+                        leftIcon={<Trash2 className="h-4 w-4" />}
+                        isLoading={isDeleting}
+                        onClick={handleDelete}
+                        className="w-full"
+                      >
+                        Delete Draft
+                      </CGButton>
+                    </>
+                  )}
+
+                  {/* Pending Approval Actions */}
+                  {agreement.status === 'pending_approval' && (
+                    <>
+                      {canApprove() ? (
+                        <CGButton
+                          variant="primary"
+                          leftIcon={<CheckCircle className="h-4 w-4" />}
+                          isLoading={isApproving}
+                          onClick={() => setShowApprovalModal(true)}
+                          className="w-full"
+                        >
+                          Approve Agreement
+                        </CGButton>
+                      ) : hasUserApproved() ? (
+                        <div className="p-4 bg-cg-sage-subtle rounded-xl text-center">
+                          <CheckCircle className="h-5 w-5 text-cg-sage mx-auto mb-2" />
+                          <p className="text-sm font-medium text-cg-sage">You&apos;ve approved</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Waiting for the other parent
+                          </p>
+                        </div>
+                      ) : null}
+                    </>
+                  )}
+
+                  {/* Approved Actions */}
+                  {agreement.status === 'approved' && (
+                    <>
+                      <CGButton
+                        variant="primary"
+                        leftIcon={<Power className="h-4 w-4" />}
+                        isLoading={isActivating}
+                        onClick={handleActivate}
+                        className="w-full"
+                      >
+                        Activate Agreement
+                      </CGButton>
+                      {hasPdfAccess ? (
+                        <CGButton
+                          variant="secondary"
+                          leftIcon={<Download className="h-4 w-4" />}
+                          isLoading={isGeneratingPDF}
+                          onClick={handleGeneratePDF}
+                          className="w-full"
+                        >
+                          Download PDF
+                        </CGButton>
+                      ) : (
+                        <button
+                          onClick={() => router.push('/settings/billing')}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors text-sm font-medium"
+                        >
+                          <Lock className="h-4 w-4" />
+                          Download PDF
+                          <TierBadge tier="plus" size="sm" />
+                        </button>
+                      )}
+                    </>
+                  )}
+
+                  {/* Active Actions */}
+                  {agreement.status === 'active' && (
+                    <>
+                      {hasPdfAccess ? (
+                        <CGButton
+                          variant="secondary"
+                          leftIcon={<Download className="h-4 w-4" />}
+                          isLoading={isGeneratingPDF}
+                          onClick={handleGeneratePDF}
+                          className="w-full"
+                        >
+                          Download PDF
+                        </CGButton>
+                      ) : (
+                        <button
+                          onClick={() => router.push('/settings/billing')}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition-colors text-sm font-medium"
+                        >
+                          <Lock className="h-4 w-4" />
+                          Download PDF
+                          <TierBadge tier="plus" size="sm" />
+                        </button>
+                      )}
+                      <CGButton
+                        variant="danger"
+                        leftIcon={<PowerOff className="h-4 w-4" />}
+                        isLoading={isActivating}
+                        onClick={handleDeactivate}
+                        className="w-full"
+                      >
+                        Deactivate Agreement
+                      </CGButton>
+                    </>
+                  )}
+                </CGCardContent>
+              </CGCard>
+            </div>
           </div>
         )}
       </main>
+
+      {/* Floating Propose Change Button — Active agreements only */}
+      {agreement?.status === 'active' && (
+        <div className="fixed bottom-24 right-6 sm:bottom-8 sm:right-8 z-30">
+          <button
+            className="w-14 h-14 rounded-full bg-cg-amber text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center"
+            title="Propose Change (Coming Soon)"
+            onClick={() => alert('Propose Change feature coming soon!')}
+          >
+            <Quote className="h-6 w-6" />
+          </button>
+        </div>
+      )}
 
       {/* Approval Disclaimer Modal */}
       <ApprovalDisclaimerModal
