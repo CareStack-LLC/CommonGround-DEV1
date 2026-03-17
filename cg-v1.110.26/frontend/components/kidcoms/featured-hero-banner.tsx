@@ -59,7 +59,7 @@ export function FeaturedHeroBanner({
     <div
       className={cn(
         'relative w-full rounded-2xl overflow-hidden',
-        'bg-slate-900 shadow-2xl',
+        'shadow-2xl',
         'aspect-[3/4] sm:aspect-[16/9]',
         className
       )}

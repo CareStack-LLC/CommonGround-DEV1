@@ -103,16 +103,16 @@ export function MemoryGame() {
     <div className="p-4 pb-8">
       {/* Stats Header */}
       <div className="max-w-2xl mx-auto mb-5">
-        <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-5">
+        <div className="rounded-2xl p-5" style={{ background: 'var(--portal-surface, #1e293b)', border: '1px solid var(--portal-border, #334155)' }}>
           <div className="flex items-center justify-between">
             <div className="flex gap-5">
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 text-amber-400" />
-                <span className="font-bold text-white text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{moves} Moves</span>
+                <span className="font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading, #fff)' }}>{moves} Moves</span>
               </div>
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-emerald-400" />
-                <span className="font-bold text-white text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{matchedPairs}/{CARD_EMOJIS.length} Pairs</span>
+                <span className="font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading, #fff)' }}>{matchedPairs}/{CARD_EMOJIS.length} Pairs</span>
               </div>
             </div>
             <button
@@ -138,7 +138,7 @@ export function MemoryGame() {
                 'aspect-square rounded-xl shadow-lg transition-all duration-300 ease-out',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400',
                 card.isFlipped || card.isMatched
-                  ? 'bg-slate-700/60 border border-slate-600/50'
+                  ? ''
                   : 'bg-gradient-to-br from-purple-600/40 to-pink-600/40 border border-purple-500/30 hover:scale-105 hover:shadow-xl active:scale-95',
                 card.isMatched && 'opacity-50'
               )}
@@ -159,12 +159,12 @@ export function MemoryGame() {
       {/* Win Modal */}
       {isGameWon && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="rounded-2xl shadow-2xl p-8 max-w-md w-full text-center" style={{ background: 'var(--portal-surface, #1e293b)', border: '1px solid var(--portal-border, #334155)' }}>
             <Trophy className="w-16 h-16 mx-auto text-amber-400 mb-4" />
-            <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            <h2 className="text-2xl font-black mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading, #fff)' }}>
               YOU WON!
             </h2>
-            <p className="text-slate-400 mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="mb-6" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted, #94A3B8)' }}>
               All pairs matched in <span className="font-bold text-purple-400">{moves} moves</span>!
             </p>
             <button

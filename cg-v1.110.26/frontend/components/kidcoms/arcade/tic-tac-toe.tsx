@@ -141,9 +141,9 @@ export function TicTacToe() {
     <div className="p-4 pb-8">
       {/* Score + Status */}
       <div className="max-w-lg mx-auto mb-5">
-        <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-5">
+        <div className="rounded-2xl p-5" style={{ background: 'var(--portal-surface, #1e293b)', border: '1px solid var(--portal-border, #334155)' }}>
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-slate-300 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-sm font-medium" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-text, #E2E8F0)' }}>
               {winner
                 ? winner === 'draw' ? "It's a draw!" : winner === 'X' ? 'You won!' : 'AI won!'
                 : isPlayerTurn ? "Your turn (X)" : "AI thinking..."}
@@ -172,7 +172,7 @@ export function TicTacToe() {
 
       {/* Board */}
       <div className="max-w-lg mx-auto">
-        <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-5">
+        <div className="rounded-2xl p-5" style={{ background: 'var(--portal-surface, #1e293b)', border: '1px solid var(--portal-border, #334155)' }}>
           <div className="grid grid-cols-3 gap-3">
             {board.map((cell, index) => (
               <button
@@ -183,8 +183,8 @@ export function TicTacToe() {
                   'aspect-square rounded-xl transition-all duration-200',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400',
                   cell === null && !winner
-                    ? 'bg-slate-700/60 hover:bg-slate-600/60 hover:scale-105 active:scale-95 cursor-pointer'
-                    : 'bg-slate-700/40',
+                    ? 'hover:scale-105 active:scale-95 cursor-pointer'
+                    : '',
                   winningLine.includes(index) && 'bg-amber-500/20 border-2 border-amber-400/50'
                 )}
                 aria-label={`Cell ${index + 1}${cell ? `, ${cell}` : ', empty'}`}
@@ -202,7 +202,7 @@ export function TicTacToe() {
       {/* Win Modal */}
       {winner && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+          <div className="rounded-2xl shadow-2xl p-8 max-w-md w-full text-center" style={{ background: 'var(--portal-surface, #1e293b)', border: '1px solid var(--portal-border, #334155)' }}>
             <div className="mb-4">
               {winner === 'X' && <Trophy className="w-16 h-16 mx-auto text-amber-400" />}
               {winner === 'O' && <Circle className="w-16 h-16 mx-auto text-red-400" />}
@@ -213,12 +213,12 @@ export function TicTacToe() {
                 </div>
               )}
             </div>
-            <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+            <h2 className="text-2xl font-black mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading, #fff)' }}>
               {winner === 'X' && 'YOU WON!'}
               {winner === 'O' && 'AI WON!'}
               {winner === 'draw' && "IT'S A DRAW!"}
             </h2>
-            <p className="text-slate-400 mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="mb-6" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted, #94A3B8)' }}>
               {winner === 'X' && 'Great job! You beat the AI!'}
               {winner === 'O' && 'Good try! Want to play again?'}
               {winner === 'draw' && 'Well played! Try again?'}

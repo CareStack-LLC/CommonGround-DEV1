@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { theaterContent } from '@/lib/theater-content';
+import { OriginalsBadge } from '@/components/kidcoms/originals-badge';
 
 interface ChildUserData {
   userId: string;
@@ -142,15 +143,18 @@ export default function MoviePlayerPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push('/my-circle/child/movies')}
-            className="text-white hover:text-purple-300 transition-colors"
+            className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/20 transition-colors"
             aria-label="Back to movies"
           >
-            <ArrowLeft className="w-8 h-8" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
-          <div>
-            <h1 className="text-white text-xl font-bold">{video.title}</h1>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-white text-lg font-bold truncate" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{video.title}</h1>
+              <OriginalsBadge size="sm" />
+            </div>
             {video.description && (
-              <p className="text-gray-300 text-sm">{video.description}</p>
+              <p className="text-gray-300 text-xs truncate" style={{ fontFamily: 'Inter, sans-serif' }}>{video.description}</p>
             )}
           </div>
         </div>
@@ -176,7 +180,7 @@ export default function MoviePlayerPage() {
           <div className="absolute inset-0 flex items-center justify-center">
             <button
               onClick={togglePlay}
-              className="w-20 h-20 rounded-full bg-purple-500 hover:bg-purple-600 flex items-center justify-center shadow-2xl transition-transform hover:scale-110"
+              className="w-20 h-20 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-teal-500/30 transition-all hover:scale-110 active:scale-95"
               aria-label="Play video"
             >
               <Play className="w-10 h-10 text-white ml-1" fill="white" />
@@ -203,7 +207,7 @@ export default function MoviePlayerPage() {
               onChange={handleSeek}
               className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
               style={{
-                background: `linear-gradient(to right, #A855F7 0%, #A855F7 ${
+                background: `linear-gradient(to right, #14B8A6 0%, #06B6D4 ${
                   (currentTime / duration) * 100
                 }%, #4B5563 ${(currentTime / duration) * 100}%, #4B5563 100%)`,
               }}
@@ -220,7 +224,7 @@ export default function MoviePlayerPage() {
               {/* Play/Pause */}
               <button
                 onClick={togglePlay}
-                className="text-white hover:text-purple-400 transition-colors"
+                className="text-white hover:text-cyan-400 transition-colors"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? (
@@ -234,7 +238,7 @@ export default function MoviePlayerPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={toggleMute}
-                  className="text-white hover:text-purple-400 transition-colors"
+                  className="text-white hover:text-cyan-400 transition-colors"
                   aria-label={isMuted ? 'Unmute' : 'Mute'}
                 >
                   {isMuted || volume === 0 ? (
@@ -259,7 +263,7 @@ export default function MoviePlayerPage() {
               {/* Fullscreen */}
               <button
                 onClick={toggleFullscreen}
-                className="text-white hover:text-purple-400 transition-colors"
+                className="text-white hover:text-cyan-400 transition-colors"
                 aria-label="Fullscreen"
               >
                 <Maximize className="w-6 h-6" />

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { theaterContent } from '@/lib/theater-content';
+import { OriginalsBadge } from '@/components/kidcoms/originals-badge';
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -102,20 +103,21 @@ export default function BookReaderPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="text-lg text-gray-700">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--portal-background)' }}>
+        <div className="text-lg" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Loading...</div>
       </div>
     );
   }
 
   if (!book) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--portal-background)' }}>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Book not found</h1>
+          <h1 className="text-2xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Book not found</h1>
           <button
             onClick={() => router.push('/my-circle/child/library')}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-bold"
+            className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-full font-bold hover:scale-105 active:scale-95 transition-all"
+            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
           >
             Back to Library
           </button>
@@ -125,46 +127,53 @@ export default function BookReaderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="min-h-screen" style={{ background: 'var(--portal-background)' }}>
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b-2 border-blue-100 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 py-4">
+      <header className="backdrop-blur-lg sticky top-0 z-10" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
+        <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push('/my-circle/child/library')}
-                className="text-gray-700 hover:text-blue-600 transition-colors"
+                className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
+                style={{ background: 'var(--portal-surface)', color: 'var(--portal-text-heading)' }}
                 aria-label="Back to library"
               >
-                <ArrowLeft className="w-6 h-6" />
+                <ArrowLeft className="w-5 h-5" />
               </button>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">{book.title}</h1>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-lg font-bold truncate" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+                    {book.title}
+                  </h1>
+                  <OriginalsBadge size="sm" />
+                </div>
                 {book.author && (
-                  <p className="text-sm text-gray-600">by {book.author}</p>
+                  <p className="text-xs truncate" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>by {book.author}</p>
                 )}
               </div>
             </div>
 
-            {/* Controls */}
-            <div className="flex items-center gap-3">
-              {/* Zoom Controls */}
+            {/* Zoom Controls */}
+            <div className="flex items-center gap-2">
               <button
                 onClick={zoomOut}
-                className="p-2 rounded-lg bg-white hover:bg-gray-100 border border-gray-300 transition-colors"
+                className="p-2 rounded-xl transition-colors"
+                style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)', color: 'var(--portal-text)' }}
                 aria-label="Zoom out"
               >
-                <ZoomOut className="w-5 h-5 text-gray-700" />
+                <ZoomOut className="w-4 h-4" />
               </button>
-              <span className="text-sm font-semibold text-gray-700">
+              <span className="text-xs font-bold min-w-[3rem] text-center" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-text)' }}>
                 {Math.round(scale * 100)}%
               </span>
               <button
                 onClick={zoomIn}
-                className="p-2 rounded-lg bg-white hover:bg-gray-100 border border-gray-300 transition-colors"
+                className="p-2 rounded-xl transition-colors"
+                style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)', color: 'var(--portal-text)' }}
                 aria-label="Zoom in"
               >
-                <ZoomIn className="w-5 h-5 text-gray-700" />
+                <ZoomIn className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -172,15 +181,16 @@ export default function BookReaderPage() {
       </header>
 
       {/* PDF Viewer */}
-      <main className="max-w-5xl mx-auto px-6 py-8">
-        <div className="bg-white rounded-3xl shadow-xl p-6 min-h-[600px]">
+      <main className="max-w-5xl mx-auto px-4 py-6">
+        <div className="rounded-2xl shadow-xl p-4 min-h-[600px]" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)' }}>
           {error ? (
             <div className="flex items-center justify-center h-[600px]">
               <div className="text-center">
-                <p className="text-red-600 font-semibold mb-4">{error}</p>
+                <p className="text-red-500 font-semibold mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>{error}</p>
                 <button
                   onClick={() => router.push('/my-circle/child/library')}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-bold"
+                  className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-full font-bold hover:scale-105 active:scale-95 transition-all"
+                  style={{ fontFamily: 'Space Grotesk, sans-serif' }}
                 >
                   Back to Library
                 </button>
@@ -196,7 +206,7 @@ export default function BookReaderPage() {
                   onLoadError={onDocumentLoadError}
                   loading={
                     <div className="flex items-center justify-center h-[600px]">
-                      <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                      <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
                     </div>
                   }
                 >
@@ -219,17 +229,18 @@ export default function BookReaderPage() {
                     className={cn(
                       'p-3 rounded-full shadow-lg transition-all',
                       pageNumber <= 1
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-500 hover:bg-blue-600 text-white hover:scale-110'
+                        ? 'opacity-40 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:scale-110 active:scale-95'
                     )}
+                    style={pageNumber <= 1 ? { background: 'var(--portal-surface)', color: 'var(--portal-muted)' } : undefined}
                     aria-label="Previous page"
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
 
-                  <div className="bg-white px-6 py-2 rounded-full shadow-md border-2 border-blue-200">
-                    <span className="text-lg font-bold text-gray-800">
-                      Page {pageNumber} of {numPages}
+                  <div className="px-5 py-2 rounded-full" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)' }}>
+                    <span className="text-sm font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-text-heading)' }}>
+                      {pageNumber} / {numPages}
                     </span>
                   </div>
 
@@ -239,9 +250,10 @@ export default function BookReaderPage() {
                     className={cn(
                       'p-3 rounded-full shadow-lg transition-all',
                       pageNumber >= numPages
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-500 hover:bg-blue-600 text-white hover:scale-110'
+                        ? 'opacity-40 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:scale-110 active:scale-95'
                     )}
+                    style={pageNumber >= numPages ? { background: 'var(--portal-surface)', color: 'var(--portal-muted)' } : undefined}
                     aria-label="Next page"
                   >
                     <ChevronRight className="w-6 h-6" />

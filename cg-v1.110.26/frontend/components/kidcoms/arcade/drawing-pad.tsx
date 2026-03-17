@@ -128,11 +128,11 @@ export function DrawingPad() {
     <div className="p-4 pb-8">
       {/* Toolbar */}
       <div className="max-w-4xl mx-auto mb-4">
-        <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 p-4">
+        <div className="rounded-2xl p-4" style={{ background: 'var(--portal-surface, #1e293b)', border: '1px solid var(--portal-border, #334155)' }}>
           <div className="flex items-center justify-between flex-wrap gap-3">
             {/* Brush sizes */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>Brush:</span>
+              <span className="text-xs font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted, #94A3B8)' }}>Brush:</span>
               {BRUSH_SIZES.map((size) => (
                 <button
                   key={size.value}
@@ -142,7 +142,7 @@ export function DrawingPad() {
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400',
                     brushSize === size.value
                       ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/30'
-                      : 'bg-slate-700/60 text-slate-300 hover:bg-slate-600/60'
+                      : ''
                   )}
                 >
                   {size.name}
@@ -201,8 +201,8 @@ export function DrawingPad() {
 
           {/* Current color indicator */}
           <div className="mt-3 flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full border-2 border-slate-600" style={{ backgroundColor: currentColor }} />
-            <span className="text-xs text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <div className="w-5 h-5 rounded-full" style={{ backgroundColor: currentColor, border: '2px solid var(--portal-border, #475569)' }} />
+            <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted, #94A3B8)' }}>
               Current color
             </span>
           </div>
@@ -211,7 +211,7 @@ export function DrawingPad() {
 
       {/* Canvas */}
       <div className="max-w-4xl mx-auto">
-        <div className="bg-slate-800 rounded-2xl border border-slate-700/50 overflow-hidden" style={{ height: '450px' }}>
+        <div className="rounded-2xl overflow-hidden" style={{ height: '450px', background: 'var(--portal-surface, #1e293b)', border: '1px solid var(--portal-border, #334155)' }}>
           <canvas
             ref={canvasRef}
             onMouseDown={startDrawing}

@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
-import { Gamepad2, Trophy, Play } from 'lucide-react';
+import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
+import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
+import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
+import { Gamepad2, Trophy, Play, Users, Zap, Star } from 'lucide-react';
 
 interface ChildUserData {
   userId: string;
@@ -19,36 +22,57 @@ interface GameScores {
   drawing?: { drawingsCreated: number };
 }
 
+const GAME_GRADIENTS: Record<string, { border: string; glow: string; accent: string }> = {
+  tictactoe: {
+    border: 'linear-gradient(135deg, #06b6d4, #0891b2, #22d3ee)',
+    glow: 'rgba(6, 182, 212, 0.25)',
+    accent: '#22d3ee',
+  },
+  memory: {
+    border: 'linear-gradient(135deg, #a855f7, #7c3aed, #c084fc)',
+    glow: 'rgba(168, 85, 247, 0.25)',
+    accent: '#c084fc',
+  },
+  drawing: {
+    border: 'linear-gradient(135deg, #ec4899, #db2777, #f472b6)',
+    glow: 'rgba(236, 72, 153, 0.25)',
+    accent: '#f472b6',
+  },
+};
+
+const DIFFICULTY_CONFIG: Record<string, { label: string; color: string; dots: number }> = {
+  Easy: { label: 'Easy', color: '#4ade80', dots: 1 },
+  Medium: { label: 'Medium', color: '#facc15', dots: 2 },
+  Hard: { label: 'Hard', color: '#f87171', dots: 3 },
+};
+
 const games = [
   {
     id: 'tictactoe',
     title: 'Tic-Tac-Toe',
     description: 'Get three in a row!',
     difficulty: 'Medium',
+    players: '1 Player',
     poster: '/kidsComms/posters/videogame-posters/IMG_2307.jpg',
-    difficultyColor: 'text-yellow-400',
     badge: '⭐ Featured',
-    badgeBg: 'bg-cyan-500',
   },
   {
     id: 'memory',
     title: 'Memory Match',
     description: 'Flip and match the cards!',
     difficulty: 'Easy',
+    players: '1 Player',
     poster: '/kidsComms/posters/videogame-posters/IMG_2308.jpg',
-    difficultyColor: 'text-green-400',
     badge: null,
-    badgeBg: '',
   },
   {
     id: 'drawing',
     title: 'Drawing Pad',
     description: 'Draw and create anything!',
     difficulty: 'Easy',
+    players: '1 Player',
     poster: '/kidsComms/posters/videogame-posters/IMG_2309.jpg',
-    difficultyColor: 'text-green-400',
     badge: null,
-    badgeBg: '',
   },
 ];
 
@@ -111,204 +135,333 @@ export default function ArcadePage() {
   const avatarGradient = AVATAR_COLORS[(userData?.childName?.length || 0) % AVATAR_COLORS.length];
 
   const featuredGame = games[0];
+  const otherGames = games.slice(1);
   const totalGamesPlayed = (scores.tictactoe?.gamesPlayed || 0) + (scores.memory?.gamesCompleted || 0);
   const hasScores = totalGamesPlayed > 0 || (scores.drawing?.drawingsCreated || 0) > 0;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--portal-background)' }}>
         <div className="text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center mx-auto animate-pulse">
             <Gamepad2 className="w-8 h-8 text-white" strokeWidth={1.5} />
           </div>
-          <p className="text-slate-400 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>Loading arcade...</p>
+          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Loading arcade...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-24">
+    <div className="min-h-screen pb-24" style={{ background: 'var(--portal-background)' }}>
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60">
+      <header className="sticky top-0 z-40 backdrop-blur-lg" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-              <Gamepad2 className="w-5 h-5 text-white" strokeWidth={2} />
-            </div>
+            <KidComsLogo size="sm" showText={false} />
             <div>
-              <h1 className="font-black text-white text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Arcade</h1>
-              <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <h1 className="font-black text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Arcade</h1>
+              <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
                 {games.length} games ready to play
               </p>
             </div>
           </div>
 
-          <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-offset-slate-950 ring-cyan-500/50`}>
-            <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              {userInitial}
-            </span>
+          <div className="flex items-center gap-2">
+            <KidSpaceThemeToggle size="sm" />
+            <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center ring-2 ring-offset-2 ring-cyan-500/50`} style={{ ['--tw-ring-offset-color' as any]: 'var(--portal-background)' }}>
+              <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                {userInitial}
+              </span>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="space-y-8 pt-6 pb-4 px-4">
 
-        {/* ── Your Scores ── */}
-        <section>
-          <div className="bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
-                <Trophy className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-white text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Your Scores</h3>
-                <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {hasScores ? `${totalGamesPlayed} games played` : 'Play games to see your scores here!'}
-                </p>
-              </div>
-            </div>
-
-            {hasScores && (
-              <div className="grid grid-cols-3 gap-2">
-                {scores.tictactoe && scores.tictactoe.gamesPlayed > 0 && (
-                  <div className="bg-slate-700/40 rounded-xl p-3 text-center">
-                    <div className="text-lg font-black text-cyan-400" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                      {scores.tictactoe.wins}W
-                    </div>
-                    <div className="text-[10px] text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-                      Tic-Tac-Toe
-                    </div>
-                  </div>
-                )}
-                {scores.memory && scores.memory.gamesCompleted > 0 && (
-                  <div className="bg-slate-700/40 rounded-xl p-3 text-center">
-                    <div className="text-lg font-black text-purple-400" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                      {scores.memory.bestMoves}
-                    </div>
-                    <div className="text-[10px] text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-                      Best Moves
-                    </div>
-                  </div>
-                )}
-                {scores.drawing && scores.drawing.drawingsCreated > 0 && (
-                  <div className="bg-slate-700/40 rounded-xl p-3 text-center">
-                    <div className="text-lg font-black text-pink-400" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                      {scores.drawing.drawingsCreated}
-                    </div>
-                    <div className="text-[10px] text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-                      Drawings
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* ── Featured Game ── */}
+        {/* ── Featured Game Hero ── */}
         <section>
           <h2
-            className="text-xl font-bold text-white mb-4 flex items-center gap-2"
-            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+            className="text-xl font-bold mb-4 flex items-center gap-2"
+            style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}
           >
-            <span className="w-1 h-5 bg-cyan-500 rounded-full" />
+            <Star className="w-5 h-5" style={{ color: GAME_GRADIENTS[featuredGame.id].accent }} />
             Featured Game
           </h2>
 
           <button
             onClick={() => handleGameSelect(featuredGame)}
-            className="relative w-full rounded-2xl overflow-hidden group hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 shadow-2xl shadow-black/40"
+            className="relative w-full rounded-2xl overflow-hidden group hover:scale-[1.01] active:scale-[0.99] transition-all duration-200"
+            style={{
+              padding: '2px',
+              background: GAME_GRADIENTS[featuredGame.id].border,
+              boxShadow: `0 8px 32px ${GAME_GRADIENTS[featuredGame.id].glow}, 0 0 0 1px ${GAME_GRADIENTS[featuredGame.id].glow}`,
+            }}
           >
-            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={featuredGame.poster}
-                alt={featuredGame.title}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="rounded-[14px] overflow-hidden" style={{ background: 'var(--portal-surface)' }}>
+              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={featuredGame.poster}
+                  alt={featuredGame.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-              <div className="absolute top-3 left-3">
-                <span className="px-3 py-1 rounded-full bg-cyan-500 text-white text-xs font-bold shadow-lg">
-                  ⭐ Featured
-                </span>
-              </div>
-
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center shadow-2xl">
-                  <Play className="w-10 h-10 text-white ml-1" fill="currentColor" />
+                {/* Featured badge */}
+                <div className="absolute top-3 left-3">
+                  <span
+                    className="px-3 py-1 rounded-full text-white text-xs font-bold shadow-lg backdrop-blur-sm"
+                    style={{
+                      background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
+                    }}
+                  >
+                    ⭐ Featured
+                  </span>
                 </div>
-              </div>
 
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="font-black text-white text-2xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                  {featuredGame.title}
-                </h3>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className={`text-xs font-semibold ${featuredGame.difficultyColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
-                    {featuredGame.difficulty}
+                {/* Player count badge */}
+                <div className="absolute top-3 right-3">
+                  <span
+                    className="px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 backdrop-blur-sm"
+                    style={{
+                      background: 'var(--portal-surface)',
+                      color: 'var(--portal-text)',
+                      border: '1px solid var(--portal-border)',
+                    }}
+                  >
+                    <Users className="w-3 h-3" />
+                    {featuredGame.players}
                   </span>
-                  <span className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    {featuredGame.description}
-                  </span>
+                </div>
+
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center shadow-2xl">
+                    <Play className="w-10 h-10 text-white ml-1" fill="currentColor" />
+                  </div>
+                </div>
+
+                {/* Bottom info */}
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <h3 className="font-black text-white text-2xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                    {featuredGame.title}
+                  </h3>
+                  <div className="flex items-center gap-3 mt-1.5">
+                    {/* Difficulty indicator */}
+                    <DifficultyBadge difficulty={featuredGame.difficulty} />
+                    <span className="text-slate-300 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+                      {featuredGame.description}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </button>
         </section>
 
+        {/* ── Your Scores Leaderboard ── */}
+        <section>
+          <div
+            className="rounded-2xl p-4"
+            style={{
+              background: 'var(--portal-surface)',
+              border: '1px solid var(--portal-border)',
+            }}
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20">
+                <Trophy className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Your Scores</h3>
+                <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                  {hasScores ? `${totalGamesPlayed} games played` : 'Play games to see your scores here!'}
+                </p>
+              </div>
+            </div>
+
+            {hasScores ? (
+              <div className="space-y-2">
+                {scores.tictactoe && scores.tictactoe.gamesPlayed > 0 && (
+                  <div
+                    className="flex items-center justify-between rounded-xl px-4 py-3"
+                    style={{ background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)' }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ background: `${GAME_GRADIENTS.tictactoe.glow}`, border: `1px solid ${GAME_GRADIENTS.tictactoe.accent}40` }}
+                      >
+                        <span className="text-sm">❌</span>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Tic-Tac-Toe</div>
+                        <div className="text-[10px]" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                          {scores.tictactoe.gamesPlayed} games
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                      <span style={{ color: '#4ade80' }}>{scores.tictactoe.wins}W</span>
+                      <span style={{ color: '#f87171' }}>{scores.tictactoe.losses}L</span>
+                      <span style={{ color: 'var(--portal-muted)' }}>{scores.tictactoe.draws}D</span>
+                    </div>
+                  </div>
+                )}
+
+                {scores.memory && scores.memory.gamesCompleted > 0 && (
+                  <div
+                    className="flex items-center justify-between rounded-xl px-4 py-3"
+                    style={{ background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)' }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ background: `${GAME_GRADIENTS.memory.glow}`, border: `1px solid ${GAME_GRADIENTS.memory.accent}40` }}
+                      >
+                        <span className="text-sm">🧠</span>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Memory Match</div>
+                        <div className="text-[10px]" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                          {scores.memory.gamesCompleted} completed
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: GAME_GRADIENTS.memory.accent }}>
+                        {scores.memory.bestMoves} moves
+                      </div>
+                      <div className="text-[10px]" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>best score</div>
+                    </div>
+                  </div>
+                )}
+
+                {scores.drawing && scores.drawing.drawingsCreated > 0 && (
+                  <div
+                    className="flex items-center justify-between rounded-xl px-4 py-3"
+                    style={{ background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)' }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ background: `${GAME_GRADIENTS.drawing.glow}`, border: `1px solid ${GAME_GRADIENTS.drawing.accent}40` }}
+                      >
+                        <span className="text-sm">🎨</span>
+                      </div>
+                      <div>
+                        <div className="text-xs font-semibold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Drawing Pad</div>
+                        <div className="text-[10px]" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>creative mode</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: GAME_GRADIENTS.drawing.accent }}>
+                        {scores.drawing.drawingsCreated}
+                      </div>
+                      <div className="text-[10px]" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>drawings</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div
+                className="rounded-xl p-6 text-center"
+                style={{ background: 'var(--portal-input-bg)', border: '1px dashed var(--portal-input-border)' }}
+              >
+                <Gamepad2 className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--portal-muted)' }} />
+                <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                  No scores yet. Start playing to track your progress!
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
         {/* ── All Games ── */}
         <section>
           <h2
-            className="text-xl font-bold text-white mb-4 flex items-center gap-2"
-            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+            className="text-xl font-bold mb-4 flex items-center gap-2"
+            style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}
           >
-            <span className="w-1 h-5 bg-teal-500 rounded-full" />
+            <Zap className="w-5 h-5" style={{ color: '#2dd4bf' }} />
             All Games
           </h2>
 
           <div className="grid grid-cols-2 gap-4">
-            {games.map(game => (
-              <button
-                key={game.id}
-                onClick={() => handleGameSelect(game)}
-                className="relative rounded-2xl overflow-hidden group hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-black/30"
-              >
-                <div className="relative w-full" style={{ paddingBottom: '75%' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={game.poster}
-                    alt={game.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+            {games.map(game => {
+              const gradient = GAME_GRADIENTS[game.id];
+              const diffConfig = DIFFICULTY_CONFIG[game.difficulty];
 
-                  {game.badge && (
-                    <div className="absolute top-2 left-2">
-                      <span className="px-2 py-0.5 rounded-full bg-cyan-500 text-white text-[10px] font-bold">
-                        {game.badge}
-                      </span>
-                    </div>
-                  )}
+              return (
+                <button
+                  key={game.id}
+                  onClick={() => handleGameSelect(game)}
+                  className="relative rounded-2xl overflow-hidden group hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-left"
+                  style={{
+                    padding: '2px',
+                    background: gradient.border,
+                    boxShadow: `0 4px 20px ${gradient.glow}`,
+                  }}
+                >
+                  <div className="rounded-[14px] overflow-hidden" style={{ background: 'var(--portal-surface)' }}>
+                    <div className="relative w-full" style={{ paddingBottom: '75%' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={game.poster}
+                        alt={game.title}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                      <Play className="w-6 h-6 text-white ml-0.5" fill="currentColor" />
+                      {/* Player count badge */}
+                      <div className="absolute top-2 right-2">
+                        <span
+                          className="px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1 backdrop-blur-sm"
+                          style={{
+                            background: 'rgba(0,0,0,0.5)',
+                            color: '#fff',
+                            border: '1px solid rgba(255,255,255,0.15)',
+                          }}
+                        >
+                          <Users className="w-2.5 h-2.5" />
+                          {game.players}
+                        </span>
+                      </div>
+
+                      {game.badge && (
+                        <div className="absolute top-2 left-2">
+                          <span
+                            className="px-2 py-0.5 rounded-full text-white text-[10px] font-bold"
+                            style={{ background: 'linear-gradient(135deg, #06b6d4, #0891b2)' }}
+                          >
+                            {game.badge}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Play hover overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-12 h-12 rounded-full bg-white/25 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                          <Play className="w-6 h-6 text-white ml-0.5" fill="currentColor" />
+                        </div>
+                      </div>
+
+                      {/* Bottom info */}
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <h3 className="font-bold text-white text-sm leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                          {game.title}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <DifficultyBadge difficulty={game.difficulty} compact />
+                        </div>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="absolute bottom-0 left-0 right-0 p-3">
-                    <h3 className="font-bold text-white text-sm leading-tight" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                      {game.title}
-                    </h3>
-                    <span className={`text-[10px] font-semibold ${game.difficultyColor}`} style={{ fontFamily: 'Inter, sans-serif' }}>
-                      {game.difficulty}
-                    </span>
-                  </div>
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </section>
 
@@ -316,5 +469,32 @@ export default function ArcadePage() {
 
       <KidBottomNav />
     </div>
+  );
+}
+
+/** Difficulty indicator with colored dots */
+function DifficultyBadge({ difficulty, compact }: { difficulty: string; compact?: boolean }) {
+  const config = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.Easy;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 ${compact ? 'text-[10px]' : 'text-xs'} font-semibold`}
+      style={{ fontFamily: 'Inter, sans-serif', color: config.color }}
+    >
+      <span className="flex items-center gap-0.5">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <span
+            key={i}
+            className="inline-block rounded-full"
+            style={{
+              width: compact ? '4px' : '5px',
+              height: compact ? '4px' : '5px',
+              background: i < config.dots ? config.color : 'rgba(255,255,255,0.2)',
+            }}
+          />
+        ))}
+      </span>
+      {config.label}
+    </span>
   );
 }

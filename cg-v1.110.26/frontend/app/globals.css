@@ -436,6 +436,18 @@
   --portal-font-mono: 'JetBrains Mono', 'SF Mono', monospace;
   --portal-font-size-base: 1rem;
   --portal-line-height: 1.6;
+
+  /* Extended — for KidSpace theme migration */
+  --portal-surface-dim: rgba(241, 245, 249, 0.6);
+  --portal-surface-hover: #F1F5F9;
+  --portal-muted: #64748B;
+  --portal-card-hover: rgba(20, 184, 166, 0.06);
+  --portal-gradient-start: #14B8A6;
+  --portal-gradient-end: #06B6D4;
+  --portal-input-bg: #F1F5F9;
+  --portal-input-border: #CBD5E1;
+  --portal-overlay: rgba(0, 0, 0, 0.5);
+  --portal-divider: #E2E8F0;
 }
 
 /* Child Portal - Dark Mode */
@@ -460,6 +472,18 @@
   --portal-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
   --portal-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
   --portal-shadow-xl: 0 16px 24px rgba(0, 0, 0, 0.6);
+
+  /* Extended — dark mode overrides */
+  --portal-surface-dim: rgba(30, 41, 59, 0.4);
+  --portal-surface-hover: #334155;
+  --portal-muted: #94A3B8;
+  --portal-card-hover: rgba(45, 212, 191, 0.06);
+  --portal-gradient-start: #2DD4BF;
+  --portal-gradient-end: #22D3EE;
+  --portal-input-bg: #1E293B;
+  --portal-input-border: #475569;
+  --portal-overlay: rgba(0, 0, 0, 0.7);
+  --portal-divider: #334155;
 }
 
 /* SuperAdmin Portal - "Dark Command Center" */

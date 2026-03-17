@@ -1,14 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Bell, Users, Phone, Video, X } from 'lucide-react';
+import { Search, Bell, Users, Phone, Video, X, Play, Star, Sparkles } from 'lucide-react';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
+import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
+import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
+import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
 import { FeaturedHeroBanner } from '@/components/kidcoms/featured-hero-banner';
 import { HorizontalScrollRow } from '@/components/kidcoms/horizontal-scroll-row';
 import { StreamingMovieCard } from '@/components/kidcoms/streaming-movie-card';
+import { OriginalsBadge } from '@/components/kidcoms/originals-badge';
 import { kidcomsAPI } from '@/lib/api';
 import { theaterContent, VideoCategory, videoCategories } from '@/lib/theater-content';
+import type { VideoContent } from '@/lib/theater-content';
 import type { WatchProgress, VideoStats } from '@/lib/watch-progress';
 
 interface ChildUserData {
@@ -113,6 +118,23 @@ export default function MoviesPage() {
     return true;
   });
 
+  // Group videos by genre for the Netflix-style rows
+  const videosByGenre = useMemo(() => {
+    const grouped: Record<VideoCategory, VideoContent[]> = {
+      comedy: [],
+      adventure: [],
+      educational: [],
+      animation: [],
+      action: [],
+    };
+    theaterContent.videos.forEach(v => {
+      if (grouped[v.category]) {
+        grouped[v.category].push(v);
+      }
+    });
+    return grouped;
+  }, []);
+
   async function handleWatchTogetherCall(contact: ChildContact, movie: any) {
     if (isStartingCall) return;
     setIsStartingCall(true);
@@ -120,7 +142,7 @@ export default function MoviesPage() {
       const response = await kidcomsAPI.createChildSession({
         contact_type: contact.contact_type,
         contact_id: contact.contact_id,
-        session_type: 'video_call', // Default to video for watch together
+        session_type: 'video_call',
       });
 
       localStorage.setItem('child_call_session', JSON.stringify({
@@ -149,25 +171,26 @@ export default function MoviesPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-slate-400 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>Loading...</div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--portal-background)' }}>
+        <div className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Loading...</div>
       </div>
     );
   }
 
+  // Determine if we are in the "browse all" home view vs filtered/search
+  const isHomeView = selectedCategory === 'all' && !searchQuery;
+
   return (
-    <div className="min-h-screen bg-slate-950 pb-20">
-      {/* Dark Header */}
-      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60">
+    <div className="min-h-screen pb-20" style={{ background: 'var(--portal-background)' }}>
+      {/* Header */}
+      <header className="sticky top-0 z-40 backdrop-blur-lg" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
         <div className="px-4 py-3">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-lg shadow-red-500/30">
-                <span className="text-white text-lg">🎬</span>
-              </div>
+              <KidComsLogo size="sm" showText={false} />
               <div>
-                <h1 className="font-black text-white text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Movies</h1>
-                <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <h1 className="font-black text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>Movies</h1>
+                <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
                   {stats.totalWatched > 0 ? `${stats.totalWatched} watched · ${stats.totalCompleted} completed` : 'Watch something fun!'}
                 </p>
               </div>
@@ -175,28 +198,30 @@ export default function MoviesPage() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowSearch(!showSearch)}
-                className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                style={{ background: 'var(--portal-surface)', color: 'var(--portal-muted)' }}
               >
                 <Search className="w-4 h-4" />
               </button>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center ring-2 ring-offset-2 ring-offset-slate-950 ring-red-500/50">
+              <KidSpaceThemeToggle size="sm" />
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center ring-2 ring-offset-2 ring-red-500/50" style={{ ['--tw-ring-offset-color' as any]: 'var(--portal-background)' }}>
                 <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>{userInitial}</span>
               </div>
             </div>
           </div>
 
-          {/* Search Bar — toggles */}
+          {/* Search Bar */}
           {showSearch && (
             <div className="relative mb-3">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--portal-muted)' }} />
               <input
                 type="text"
                 placeholder="Search movies..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 autoFocus
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
               />
             </div>
           )}
@@ -216,9 +241,12 @@ export default function MoviesPage() {
                 onClick={() => setSelectedCategory(key as any)}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 ${selectedCategory === key
                   ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/30'
-                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                  : ''
                   }`}
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                style={selectedCategory !== key
+                  ? { fontFamily: 'Inter, sans-serif', background: 'var(--portal-surface)', color: 'var(--portal-muted)' }
+                  : { fontFamily: 'Inter, sans-serif' }
+                }
               >
                 {label}
               </button>
@@ -227,29 +255,93 @@ export default function MoviesPage() {
         </div>
       </header>
 
-      <main className="space-y-6 pt-4 pb-6">
-        {/* Featured Hero Banner — auto-rotates */}
-        {!searchQuery && selectedCategory === 'all' && (
-          <div className="px-4">
+      <main className="space-y-8 pt-4 pb-6">
 
-            <FeaturedHeroBanner
-              content={{
-                id: featuredVideo.id,
-                title: featuredVideo.title,
-                cover: featuredVideo.thumbnail,
-                description: featuredVideo.description,
-                duration: featuredVideo.duration ? parseInt(featuredVideo.duration) : undefined,
-                type: 'video',
-                category: featuredVideo.category,
-                rating: 4.5 - (featuredIndex * 0.1),
-                ratingCount: 2400 - (featuredIndex * 200),
-              }}
-              badge={featuredIndex === 0 ? '🔥 Trending' : featuredIndex === 1 ? '⭐ Popular' : '✨ Featured'}
-              onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
-              onFavorite={() => { }}
-              isFavorite={favoritesSet.has(featuredVideo.id)}
-              onWatchTogether={() => setWatchTogetherMovie(featuredVideo)}
-            />
+        {/* ── HERO BANNER ── Large cinematic banner for the featured video */}
+        {isHomeView && (
+          <section className="relative px-4">
+            <div
+              className="relative rounded-2xl overflow-hidden"
+              style={{ minHeight: '320px' }}
+            >
+              {/* Backdrop image */}
+              <div className="absolute inset-0">
+                {featuredVideo.thumbnail ? (
+                  <img
+                    src={featuredVideo.thumbnail}
+                    alt={featuredVideo.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full" style={{ background: 'var(--portal-surface)' }} />
+                )}
+                {/* Cinematic gradient overlays */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+              </div>
+
+              {/* Hero content */}
+              <div className="relative z-10 flex flex-col justify-end p-6" style={{ minHeight: '320px' }}>
+                {/* Badge row */}
+                <div className="flex items-center gap-2 mb-3">
+                  <OriginalsBadge size="md" />
+                  <span className="text-xs font-bold text-amber-400 flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-amber-400" />
+                    {(4.5 - featuredIndex * 0.1).toFixed(1)}
+                  </span>
+                  {featuredVideo.ageRange && (
+                    <span className="text-[10px] font-bold text-white/70 px-2 py-0.5 rounded border border-white/20">
+                      {featuredVideo.ageRange}
+                    </span>
+                  )}
+                </div>
+
+                {/* Title */}
+                <h2
+                  className="text-3xl md:text-4xl font-black text-white mb-2 leading-tight drop-shadow-lg"
+                  style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+                >
+                  {featuredVideo.title}
+                </h2>
+
+                {/* Description */}
+                {featuredVideo.description && (
+                  <p
+                    className="text-sm text-white/80 mb-4 max-w-md line-clamp-2"
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    {featuredVideo.description}
+                  </p>
+                )}
+
+                {/* CTA buttons */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm text-white shadow-lg shadow-red-500/30 transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-red-500/40 active:scale-95"
+                    style={{
+                      fontFamily: 'Space Grotesk, sans-serif',
+                      background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                    }}
+                  >
+                    <Play className="w-5 h-5" fill="currentColor" />
+                    Watch Now
+                  </button>
+                  <button
+                    onClick={() => setWatchTogetherMovie(featuredVideo)}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-white/90 backdrop-blur-md transition-all duration-200 hover:scale-105 active:scale-95"
+                    style={{
+                      fontFamily: 'Space Grotesk, sans-serif',
+                      background: 'rgba(255,255,255,0.15)',
+                      border: '1px solid rgba(255,255,255,0.25)',
+                    }}
+                  >
+                    <Users className="w-4 h-4" />
+                    Watch Together
+                  </button>
+                </div>
+              </div>
+            </div>
 
             {/* Dots indicator */}
             <div className="flex gap-1.5 justify-center mt-3">
@@ -257,17 +349,71 @@ export default function MoviesPage() {
                 <button
                   key={i}
                   onClick={() => setFeaturedIndex(i)}
-                  className={`rounded-full transition-all duration-300 ${i === featuredIndex ? 'w-6 h-1.5 bg-cyan-500' : 'w-1.5 h-1.5 bg-slate-600 hover:bg-slate-500'
+                  className={`rounded-full transition-all duration-300 ${i === featuredIndex ? 'w-6 h-1.5 bg-cyan-500' : 'w-1.5 h-1.5'
                     }`}
+                  style={i !== featuredIndex ? { background: 'var(--portal-border)' } : undefined}
                 />
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Continue Watching Horizontal Row */}
-        {continueWatching.length > 0 && selectedCategory === 'all' && !searchQuery && (
-          <div className="px-4">
+        {/* ── COMMONGROUND ORIGINALS ROW ── */}
+        {isHomeView && (
+          <section className="px-4">
+            <HorizontalScrollRow
+              title="CommonGround Originals"
+              items={theaterContent.videos}
+              showViewAll={false}
+              cardClassName="w-36"
+              renderCard={(video) => (
+                <div className="relative group">
+                  {/* Glowing border effect for originals */}
+                  <div
+                    className="absolute -inset-[2px] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"
+                    style={{ background: 'linear-gradient(135deg, #14b8a6, #06b6d4, #14b8a6)' }}
+                  />
+                  <div className="relative rounded-xl overflow-hidden" style={{ border: '2px solid transparent', background: 'var(--portal-surface)' }}>
+                    <button
+                      onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
+                      className="w-full focus:outline-none"
+                    >
+                      <div className="relative aspect-[2/3]">
+                        {video.thumbnail ? (
+                          <img
+                            src={video.thumbnail}
+                            alt={video.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--portal-surface)' }}>
+                            <Play className="w-8 h-8" style={{ color: 'var(--portal-muted)' }} />
+                          </div>
+                        )}
+                        {/* Originals badge overlay */}
+                        <div className="absolute top-2 left-2 z-10">
+                          <OriginalsBadge size="sm" />
+                        </div>
+                        {/* Bottom gradient */}
+                        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/80 to-transparent" />
+                        {/* Title over image */}
+                        <div className="absolute bottom-2 left-2 right-2">
+                          <p className="text-white text-xs font-bold line-clamp-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                            {video.title}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              )}
+            />
+          </section>
+        )}
+
+        {/* ── CONTINUE WATCHING ROW ── */}
+        {continueWatching.length > 0 && isHomeView && (
+          <section className="px-4">
             <HorizontalScrollRow
               title="Continue Watching"
               items={continueWatching}
@@ -287,43 +433,137 @@ export default function MoviesPage() {
                 );
               }}
             />
-          </div>
+          </section>
         )}
 
-        {/* Main Movies Grid */}
-        <section className="px-4">
-          {selectedCategory === 'all' && !searchQuery ? (
-            <h2 className="text-xl font-bold text-white mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-              All Movies
-            </h2>
-          ) : (
-            <h2 className="text-xl font-bold text-white mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        {/* ── GENRE ROWS (Netflix-style) ── Only on home view */}
+        {isHomeView && (
+          <>
+            {(Object.entries(videoCategories) as [VideoCategory, typeof videoCategories[VideoCategory]][]).map(([category, meta]) => {
+              const genreVideos = videosByGenre[category];
+              if (!genreVideos || genreVideos.length === 0) return null;
+              return (
+                <section key={category} className="px-4">
+                  <HorizontalScrollRow
+                    title={`${meta.emoji} ${meta.name}`}
+                    items={genreVideos}
+                    onViewAll={() => setSelectedCategory(category)}
+                    cardClassName="w-40"
+                    renderCard={(video) => (
+                      <StreamingMovieCard
+                        video={video}
+                        onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
+                        progress={progressMap[video.id]?.progress}
+                        isFavorite={favoritesSet.has(video.id)}
+                        onWatchTogether={() => setWatchTogetherMovie(video)}
+                      />
+                    )}
+                  />
+                </section>
+              );
+            })}
+          </>
+        )}
+
+        {/* ── WATCH TOGETHER CTA CARD ── */}
+        {isHomeView && (
+          <section className="px-4">
+            <div
+              className="relative rounded-2xl overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, var(--portal-surface), var(--portal-background))',
+                border: '1px solid var(--portal-border)',
+              }}
+            >
+              {/* Decorative background pattern */}
+              <div className="absolute inset-0 opacity-[0.04]" style={{
+                backgroundImage: 'radial-gradient(circle at 20% 50%, var(--portal-primary) 1px, transparent 1px), radial-gradient(circle at 80% 20%, var(--portal-primary) 1px, transparent 1px)',
+                backgroundSize: '40px 40px',
+              }} />
+              {/* Glow accent */}
+              <div
+                className="absolute -top-20 -right-20 w-60 h-60 rounded-full blur-3xl opacity-20"
+                style={{ background: 'var(--portal-primary)' }}
+              />
+
+              <div className="relative z-10 flex items-center gap-5 p-6">
+                {/* Icon */}
+                <div
+                  className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, #06b6d4, #14b8a6)',
+                    boxShadow: '0 8px 32px rgba(6, 182, 212, 0.3)',
+                  }}
+                >
+                  <span className="text-3xl">🍿</span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3
+                    className="text-lg font-black mb-1"
+                    style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}
+                  >
+                    Watch with someone!
+                  </h3>
+                  <p
+                    className="text-xs leading-relaxed mb-3"
+                    style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}
+                  >
+                    Pick a movie and invite someone from your circle to watch together on a video call.
+                  </p>
+                  <button
+                    onClick={() => {
+                      // Pick the first video as a default for the Watch Together flow
+                      if (theaterContent.videos.length > 0) {
+                        setWatchTogetherMovie(theaterContent.videos[0]);
+                      }
+                    }}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                    style={{
+                      fontFamily: 'Space Grotesk, sans-serif',
+                      background: 'linear-gradient(135deg, #06b6d4, #14b8a6)',
+                      boxShadow: '0 4px 16px rgba(6, 182, 212, 0.3)',
+                    }}
+                  >
+                    <Users className="w-4 h-4" />
+                    Start Watch Party
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── FILTERED / SEARCH GRID ── Shown when a category or search is active */}
+        {!isHomeView && (
+          <section className="px-4">
+            <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
               {filteredVideos.length} {filteredVideos.length === 1 ? 'Movie' : 'Movies'}
             </h2>
-          )}
 
-          {filteredVideos.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="text-6xl mb-4">🎬</div>
-              <p className="text-slate-400 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {searchQuery ? 'No movies found' : 'No movies in this category'}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredVideos.map(video => (
-                <StreamingMovieCard
-                  key={video.id}
-                  video={video}
-                  onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
-                  progress={progressMap[video.id]?.progress}
-                  isFavorite={favoritesSet.has(video.id)}
-                  onWatchTogether={() => setWatchTogetherMovie(video)}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+            {filteredVideos.length === 0 ? (
+              <div className="text-center py-20">
+                <div className="text-6xl mb-4">🎬</div>
+                <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                  {searchQuery ? 'No movies found' : 'No movies in this category'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredVideos.map(video => (
+                  <StreamingMovieCard
+                    key={video.id}
+                    video={video}
+                    onClick={() => router.push(`/my-circle/child/movies/${video.id}`)}
+                    progress={progressMap[video.id]?.progress}
+                    isFavorite={favoritesSet.has(video.id)}
+                    onWatchTogether={() => setWatchTogetherMovie(video)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
       </main>
 
       <KidBottomNav />
@@ -331,26 +571,29 @@ export default function MoviesPage() {
       {/* ── Watch Together Contact Picker Modal ── */}
       {watchTogetherMovie && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4"
+          className="fixed inset-0 z-50 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4"
+          style={{ background: 'var(--portal-overlay)' }}
           onClick={() => setWatchTogetherMovie(null)}
         >
           <div
-            className="w-full max-w-lg bg-slate-900 rounded-t-3xl sm:rounded-3xl border-t sm:border border-slate-700 shadow-2xl overflow-hidden"
+            className="w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden"
+            style={{ background: 'var(--portal-surface-elevated)', border: '1px solid var(--portal-border)' }}
             onClick={e => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+            <div className="px-6 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid var(--portal-divider)', background: 'var(--portal-surface-elevated)' }}>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                <h3 className="text-xl font-bold mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
                   Watch Together 🎬
                 </h3>
-                <p className="text-slate-400 text-xs truncate max-w-[240px]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <p className="text-xs truncate max-w-[240px]" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
                   Invite someone to watch <span className="text-cyan-400 font-bold">{watchTogetherMovie.title}</span>
                 </p>
               </div>
               <button
                 onClick={() => setWatchTogetherMovie(null)}
-                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-colors"
+                style={{ background: 'var(--portal-surface)', color: 'var(--portal-muted)' }}
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
@@ -361,7 +604,7 @@ export default function MoviesPage() {
             <div className="p-4 max-h-[60vh] overflow-y-auto scrollbar-hide space-y-3">
               {contacts.length === 0 ? (
                 <div className="text-center py-10 px-6">
-                  <p className="text-slate-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
                     No contacts found. Ask a parent to add someone to your circle!
                   </p>
                 </div>
@@ -374,16 +617,17 @@ export default function MoviesPage() {
                       key={contact.contact_id}
                       onClick={() => handleWatchTogetherCall(contact, watchTogetherMovie)}
                       disabled={!contact.can_video_call}
-                      className="w-full flex items-center gap-4 bg-slate-800/40 hover:bg-slate-800 border border-slate-700/50 rounded-2xl p-4 transition-all group disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-full flex items-center gap-4 rounded-2xl p-4 transition-all group disabled:opacity-40 disabled:cursor-not-allowed"
+                      style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)' }}
                     >
                       <div className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br ${avatarColor} shadow-lg flex-shrink-0 group-hover:scale-110 transition-transform`}>
                         <span className="text-white font-bold text-lg">{contact.display_name.charAt(0).toUpperCase()}</span>
                       </div>
                       <div className="flex-1 text-left min-w-0">
-                        <h4 className="text-white font-bold text-sm truncate" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                        <h4 className="font-bold text-sm truncate" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
                           {contact.display_name}
                         </h4>
-                        <p className="text-slate-500 text-xs capitalize" style={{ fontFamily: 'Inter, sans-serif' }}>
+                        <p className="text-xs capitalize" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
                           {contact.relationship?.replace('_', ' ') || 'Circle Member'}
                         </p>
                       </div>
@@ -397,11 +641,11 @@ export default function MoviesPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-6 bg-slate-950/30 border-t border-slate-800">
+            <div className="p-6" style={{ borderTop: '1px solid var(--portal-divider)', background: 'var(--portal-surface)' }}>
               <button
                 onClick={() => setWatchTogetherMovie(null)}
-                className="w-full py-4 rounded-2xl bg-slate-800 text-slate-300 font-bold hover:bg-slate-700 transition-colors"
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                className="w-full py-4 rounded-2xl font-bold transition-colors"
+                style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-surface-hover)', color: 'var(--portal-text-light)' }}
               >
                 Cancel
               </button>
@@ -421,7 +665,7 @@ export default function MoviesPage() {
               <h2 className="text-2xl font-black text-white mb-2" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                 Connecting...
               </h2>
-              <p className="text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-slate-300" style={{ fontFamily: 'Inter, sans-serif' }}>
                 Getting ready to watch together! 🎬
               </p>
             </div>

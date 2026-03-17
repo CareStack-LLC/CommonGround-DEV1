@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, ArrowLeft, Delete, LogIn } from 'lucide-react';
 import { myCircleAPI, ChildAvatar } from '@/lib/api';
 import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
+import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
+import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
+import { ARIAHelper } from '@/components/kidcoms/aria-helper';
 
 const DEFAULT_AVATARS: ChildAvatar[] = [
   { id: 'lion', emoji: '🦁', name: 'Lion' },
@@ -123,23 +126,27 @@ function ChildLoginContent() {
 
   if (!familyFileId) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, var(--portal-background), var(--portal-surface), var(--portal-background))' }}>
         {/* Subtle decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
-          <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
-          <div className="absolute top-64 right-0 w-3/4 h-px bg-[#F5A623]" />
+          <div className="absolute top-32 left-0 w-full h-px" style={{ background: 'var(--portal-border)' }} />
+          <div className="absolute top-64 right-0 w-3/4 h-px" style={{ background: 'var(--portal-border)' }} />
         </div>
 
-        <div className="relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full text-center">
-          <KidComsLogo size="md" className="mb-6" />
+        <div className="relative z-10 backdrop-blur-sm rounded-3xl p-8 max-w-md w-full text-center" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)', boxShadow: 'var(--portal-shadow-lg)' }}>
+          <KidComsLogo size="lg" className="mb-6 justify-center" />
+          <p className="text-sm font-medium mb-4" style={{ color: 'var(--portal-muted)', fontFamily: 'Inter, sans-serif' }}>
+            KidSpace by CommonGround
+          </p>
           <div className="text-6xl mb-4">🔍</div>
-          <h1 className="text-2xl font-bold text-[#2C5F5D] mb-2">Oops!</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--portal-text-heading)', fontFamily: 'Space Grotesk, sans-serif' }}>Oops!</h1>
+          <p className="mb-6" style={{ color: 'var(--portal-muted)', fontFamily: 'Inter, sans-serif' }}>
             We need your family code to log you in. Ask a parent to help you scan the QR code.
           </p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-3 bg-[#2C5F5D] text-white rounded-full font-semibold hover:bg-[#2C5F5D]/90 transition-all hover:scale-105"
+            className="px-6 py-3 text-white rounded-full font-semibold transition-all duration-300 hover:scale-105 active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #06b6d4, #14b8a6)', fontFamily: 'Inter, sans-serif' }}
           >
             Go Home
           </button>
@@ -149,23 +156,43 @@ function ChildLoginContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden" style={{ background: 'linear-gradient(to bottom, var(--portal-background), var(--portal-surface), var(--portal-background))' }}>
       {/* Subtle decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
-        <div className="absolute top-32 left-0 w-full h-px bg-[#2C5F5D]" />
-        <div className="absolute top-64 right-0 w-3/4 h-px bg-[#F5A623]" />
-        <div className="absolute bottom-32 left-0 w-2/3 h-px bg-[#2C5F5D]" />
+        <div className="absolute top-32 left-0 w-full h-px" style={{ background: 'var(--portal-border)' }} />
+        <div className="absolute top-64 right-0 w-3/4 h-px" style={{ background: 'var(--portal-border)' }} />
+        <div className="absolute bottom-32 left-0 w-2/3 h-px" style={{ background: 'var(--portal-border)' }} />
       </div>
 
-      <div className="relative z-10 bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200 p-8 max-w-md w-full">
+      {/* Large KidComsLogo at top */}
+      <div className="relative z-10 text-center mb-8">
+        <KidComsLogo size="lg" showText={true} className="mb-3 justify-center" />
+        <p
+          className="text-sm font-medium tracking-wide"
+          style={{
+            color: 'var(--portal-muted)',
+            fontFamily: 'Inter, sans-serif',
+            letterSpacing: '0.05em',
+          }}
+        >
+          KidSpace by CommonGround
+        </p>
+      </div>
+
+      <div className="relative z-10 backdrop-blur-sm rounded-3xl p-8 max-w-md w-full" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)', boxShadow: 'var(--portal-shadow-lg)' }}>
         {step === 'username' ? (
           <>
             {/* Username Selection */}
             <div className="text-center mb-6">
-              <KidComsLogo size="md" className="mb-4" />
-              <div className="text-6xl mb-2">👋</div>
-              <h1 className="text-3xl font-bold text-[#2C5F5D]">Hi there!</h1>
-              <p className="text-gray-600 mt-1">Who are you?</p>
+              <h1
+                className="text-3xl font-bold"
+                style={{ color: 'var(--portal-text-heading)', fontFamily: 'Space Grotesk, sans-serif' }}
+              >
+                Hi there!
+              </h1>
+              <p className="mt-1" style={{ color: 'var(--portal-muted)', fontFamily: 'Inter, sans-serif' }}>
+                Who are you?
+              </p>
             </div>
 
             {/* Avatar Grid */}
@@ -174,10 +201,16 @@ function ChildLoginContent() {
                 <button
                   key={avatar.id}
                   onClick={() => handleUsernameSelect(avatar.name)}
-                  className="flex flex-col items-center p-3 rounded-2xl bg-gray-50 hover:bg-[#2C5F5D]/10 hover:scale-105 transition-all border border-transparent hover:border-[#2C5F5D]/20"
+                  className="flex flex-col items-center p-3 rounded-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+                  style={{ background: 'var(--portal-background)', border: '1px solid transparent' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--portal-border)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'transparent'; }}
                 >
                   <span className="text-4xl">{avatar.emoji}</span>
-                  <span className="text-xs text-gray-600 mt-1 truncate w-full text-center">
+                  <span
+                    className="text-xs mt-1 truncate w-full text-center"
+                    style={{ color: 'var(--portal-muted)', fontFamily: 'Inter, sans-serif' }}
+                  >
                     {avatar.name}
                   </span>
                 </button>
@@ -196,12 +229,21 @@ function ChildLoginContent() {
                     setStep('pin');
                   }
                 }}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#2C5F5D] focus:outline-none text-lg"
+                className="w-full px-4 py-3 rounded-xl focus:outline-none text-lg transition-all duration-200"
+                style={{
+                  background: 'var(--portal-background)',
+                  border: '2px solid var(--portal-border)',
+                  color: 'var(--portal-text)',
+                  fontFamily: 'Inter, sans-serif',
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = '#14b8a6'; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--portal-border)'; }}
               />
               {username && (
                 <button
                   onClick={() => setStep('pin')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-[#2C5F5D] text-white rounded-lg hover:bg-[#2C5F5D]/90 hover:scale-105 transition-all"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-white rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                  style={{ background: 'linear-gradient(135deg, #06b6d4, #14b8a6)' }}
                 >
                   <LogIn className="h-5 w-5" />
                 </button>
@@ -218,13 +260,20 @@ function ChildLoginContent() {
                   setPin('');
                   setError(null);
                 }}
-                className="absolute top-4 left-4 p-2 text-gray-500 hover:text-[#2C5F5D] transition-colors"
+                className="absolute top-4 left-4 p-2 transition-all duration-200 hover:scale-110 active:scale-95"
+                style={{ color: 'var(--portal-muted)' }}
               >
                 <ArrowLeft className="h-6 w-6" />
               </button>
-              <div className="text-6xl mb-2">🔐</div>
-              <h1 className="text-2xl font-bold text-[#2C5F5D]">Hi {username}!</h1>
-              <p className="text-gray-600 mt-1">Enter your secret PIN</p>
+              <h1
+                className="text-2xl font-bold"
+                style={{ color: 'var(--portal-text-heading)', fontFamily: 'Space Grotesk, sans-serif' }}
+              >
+                Hi {username}!
+              </h1>
+              <p className="mt-1" style={{ color: 'var(--portal-muted)', fontFamily: 'Inter, sans-serif' }}>
+                Enter your secret PIN
+              </p>
             </div>
 
             {/* PIN Display */}
@@ -232,11 +281,20 @@ function ChildLoginContent() {
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className={`w-14 h-14 rounded-2xl border-3 flex items-center justify-center text-2xl font-bold transition-all ${
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold transition-all duration-300"
+                  style={
                     pin[i]
-                      ? 'bg-[#2C5F5D] border-[#2C5F5D] text-white'
-                      : 'bg-gray-100 border-gray-200'
-                  }`}
+                      ? {
+                          background: 'linear-gradient(135deg, #06b6d4, #14b8a6)',
+                          border: '3px solid #14b8a6',
+                          color: '#ffffff',
+                          transform: 'scale(1.05)',
+                        }
+                      : {
+                          background: 'var(--portal-background)',
+                          border: '3px solid var(--portal-border)',
+                        }
+                  }
                 >
                   {pin[i] ? '●' : ''}
                 </div>
@@ -245,7 +303,15 @@ function ChildLoginContent() {
 
             {/* Error */}
             {error && (
-              <div className="mb-4 p-3 bg-red-100 text-red-600 rounded-xl text-center text-sm">
+              <div
+                className="mb-4 p-3 rounded-xl text-center text-sm transition-all duration-300"
+                style={{
+                  background: 'color-mix(in srgb, var(--portal-surface) 90%, #ef4444)',
+                  color: '#ef4444',
+                  border: '1px solid color-mix(in srgb, var(--portal-border) 80%, #ef4444)',
+                  fontFamily: 'Inter, sans-serif',
+                }}
+              >
                 {error}
               </div>
             )}
@@ -257,7 +323,13 @@ function ChildLoginContent() {
                   key={digit}
                   onClick={() => handlePinDigit(digit.toString())}
                   disabled={isLoading}
-                  className="p-4 text-2xl font-bold bg-gray-100 hover:bg-[#2C5F5D]/10 hover:border-[#2C5F5D]/20 border border-transparent rounded-2xl transition-all disabled:opacity-50"
+                  className="p-4 text-2xl font-bold rounded-2xl transition-all duration-200 active:scale-95 disabled:opacity-50 hover:brightness-95"
+                  style={{
+                    background: 'var(--portal-background)',
+                    border: '1px solid var(--portal-border)',
+                    color: 'var(--portal-text)',
+                    fontFamily: 'Space Grotesk, sans-serif',
+                  }}
                 >
                   {digit}
                 </button>
@@ -265,21 +337,38 @@ function ChildLoginContent() {
               <button
                 onClick={handlePinClear}
                 disabled={isLoading}
-                className="p-4 text-sm font-semibold bg-red-100 hover:bg-red-200 text-red-600 rounded-2xl transition-colors disabled:opacity-50"
+                className="p-4 text-sm font-semibold rounded-2xl transition-all duration-200 active:scale-95 disabled:opacity-50"
+                style={{
+                  background: 'color-mix(in srgb, var(--portal-surface) 85%, #ef4444)',
+                  color: '#ef4444',
+                  border: '1px solid var(--portal-border)',
+                  fontFamily: 'Inter, sans-serif',
+                }}
               >
                 Clear
               </button>
               <button
                 onClick={() => handlePinDigit('0')}
                 disabled={isLoading}
-                className="p-4 text-2xl font-bold bg-gray-100 hover:bg-[#2C5F5D]/10 hover:border-[#2C5F5D]/20 border border-transparent rounded-2xl transition-all disabled:opacity-50"
+                className="p-4 text-2xl font-bold rounded-2xl transition-all duration-200 active:scale-95 disabled:opacity-50 hover:brightness-95"
+                style={{
+                  background: 'var(--portal-background)',
+                  border: '1px solid var(--portal-border)',
+                  color: 'var(--portal-text)',
+                  fontFamily: 'Space Grotesk, sans-serif',
+                }}
               >
                 0
               </button>
               <button
                 onClick={handlePinBackspace}
                 disabled={isLoading}
-                className="p-4 bg-[#F5A623]/20 hover:bg-[#F5A623]/30 text-[#F5A623] rounded-2xl transition-colors flex items-center justify-center disabled:opacity-50"
+                className="p-4 rounded-2xl transition-all duration-200 active:scale-95 flex items-center justify-center disabled:opacity-50"
+                style={{
+                  background: 'color-mix(in srgb, var(--portal-surface) 85%, #f59e0b)',
+                  color: '#f59e0b',
+                  border: '1px solid var(--portal-border)',
+                }}
               >
                 <Delete className="h-6 w-6" />
               </button>
@@ -287,19 +376,22 @@ function ChildLoginContent() {
 
             {/* Loading */}
             {isLoading && (
-              <div className="mt-6 flex items-center justify-center gap-2 text-[#2C5F5D]">
+              <div className="mt-6 flex items-center justify-center gap-2" style={{ color: 'var(--portal-text-heading)' }}>
                 <Loader2 className="h-5 w-5 animate-spin" />
-                <span>Logging in...</span>
+                <span style={{ fontFamily: 'Inter, sans-serif' }}>Logging in...</span>
               </div>
             )}
           </>
         )}
 
         {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-400">
+        <div className="mt-8 text-center text-sm" style={{ color: 'var(--portal-muted)', fontFamily: 'Inter, sans-serif' }}>
           Need help? Ask a grown-up!
         </div>
       </div>
+
+      {/* ARIA Helper */}
+      <ARIAHelper message="Welcome back! Enter your PIN to get started" mood="waving" position="bottom-right" />
     </div>
   );
 }
@@ -308,8 +400,8 @@ export default function ChildLoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9] flex items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[#2C5F5D]" />
+        <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--portal-background)' }}>
+          <Loader2 className="h-12 w-12 animate-spin" style={{ color: 'var(--portal-text-heading)' }} />
         </div>
       }
     >

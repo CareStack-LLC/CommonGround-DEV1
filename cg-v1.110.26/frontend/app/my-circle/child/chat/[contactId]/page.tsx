@@ -7,6 +7,9 @@ import { circleMessagesAPI, CircleMessageData, CircleARIAInterventionPayload } f
 import { ARIARewriteModal, ARIARewritePayload } from '@/components/messages/aria-rewrite-modal';
 import { useRealtimeCircleMessages } from '@/hooks/use-realtime-circle-messages';
 import { KidBottomNav } from '@/components/kidcoms/kid-bottom-nav';
+import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
+import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
+import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
 import { cn } from '@/lib/utils';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
@@ -249,15 +252,16 @@ export default function ChildChatPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-slate-950">
+    <div className="h-screen flex flex-col" style={{ background: 'var(--portal-background)' }}>
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 py-3 bg-slate-900/90 backdrop-blur-sm border-b border-slate-800 sticky top-0 z-10">
+      <header className="flex items-center gap-3 px-4 py-3 backdrop-blur-sm sticky top-0 z-10" style={{ background: 'var(--portal-surface-elevated)', borderBottom: '1px solid var(--portal-border)' }}>
         <button
           onClick={() => router.push('/my-circle/child/my-circle-page')}
-          className="p-2 rounded-xl hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-xl transition-colors"
+          style={{ color: 'var(--portal-text-heading)' }}
           aria-label="Back"
         >
-          <ArrowLeft className="w-5 h-5 text-white" />
+          <ArrowLeft className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -266,12 +270,12 @@ export default function ChildChatPage() {
           </div>
           <div className="min-w-0">
             <h1
-              className="font-bold text-white truncate"
-              style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+              className="font-bold truncate"
+              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}
             >
               {contactName || 'Chat'}
             </h1>
-            <div className="flex items-center gap-1 text-xs text-slate-400">
+            <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--portal-muted)' }}>
               <Shield className="w-3 h-3 text-teal-400" />
               <span style={{ fontFamily: 'Inter, sans-serif' }}>Protected by ARIA</span>
             </div>
@@ -287,16 +291,16 @@ export default function ChildChatPage() {
           </div>
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--portal-surface)' }}>
               <Send className="w-8 h-8 text-teal-400" />
             </div>
             <p
-              className="text-white font-semibold mb-1"
-              style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+              className="font-semibold mb-1"
+              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}
             >
               Say hi! 👋
             </p>
-            <p className="text-sm text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
               Send a message to {contactName || 'your contact'}.
             </p>
           </div>
@@ -327,7 +331,7 @@ export default function ChildChatPage() {
 
       {/* ARIA Intervention Modal */}
       {ariaIntervention && (
-        <div className="px-4 py-3 bg-slate-900/95 border-t border-slate-800">
+        <div className="px-4 py-3" style={{ background: 'var(--portal-surface-elevated)', borderTop: '1px solid var(--portal-border)' }}>
           <ARIARewriteModal
             payload={{
               aria_flagged: true,
@@ -350,12 +354,13 @@ export default function ChildChatPage() {
 
       {/* Attachment Preview */}
       {attachmentPreview && (
-        <div className="px-4 py-2 bg-slate-900/90 border-t border-slate-800">
+        <div className="px-4 py-2" style={{ background: 'var(--portal-surface-elevated)', borderTop: '1px solid var(--portal-border)' }}>
           <div className="relative inline-block">
             <img
               src={attachmentPreview}
               alt="Attachment preview"
-              className="h-20 w-20 object-cover rounded-lg border border-slate-700"
+              className="h-20 w-20 object-cover rounded-lg"
+              style={{ border: '1px solid var(--portal-border)' }}
             />
             <button
               onClick={clearAttachment}
@@ -365,14 +370,14 @@ export default function ChildChatPage() {
               <X className="w-3 h-3 text-white" />
             </button>
           </div>
-          <p className="text-xs text-slate-400 mt-1" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <p className="text-xs mt-1" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
             {pendingAttachment?.name} ({((pendingAttachment?.size || 0) / 1024).toFixed(0)} KB)
           </p>
         </div>
       )}
 
       {/* Compose Area */}
-      <div className="px-4 py-3 bg-slate-900/90 backdrop-blur-sm border-t border-slate-800 mb-16">
+      <div className="px-4 py-3 backdrop-blur-sm mb-16" style={{ background: 'var(--portal-surface-elevated)', borderTop: '1px solid var(--portal-border)' }}>
         <div className="flex items-center gap-2 max-w-3xl mx-auto">
           {/* Hidden file input */}
           <input
@@ -387,7 +392,8 @@ export default function ChildChatPage() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isSending}
-            className="p-3 rounded-xl hover:bg-slate-800 transition-colors text-slate-400 hover:text-teal-400"
+            className="p-3 rounded-xl transition-colors hover:text-teal-400"
+            style={{ color: 'var(--portal-muted)' }}
             aria-label="Attach image"
           >
             <Paperclip className="w-5 h-5" />
@@ -401,8 +407,8 @@ export default function ChildChatPage() {
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             maxLength={2000}
-            className="flex-1 px-4 py-3 bg-slate-800 rounded-xl border border-slate-700 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors text-white placeholder:text-slate-500"
-            style={{ fontFamily: 'Inter, sans-serif' }}
+            className="flex-1 px-4 py-3 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-colors"
+            style={{ fontFamily: 'Inter, sans-serif', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
             disabled={isSending}
           />
           <button
@@ -412,8 +418,9 @@ export default function ChildChatPage() {
               'p-3 rounded-xl transition-all duration-200',
               (newMessage.trim() || pendingAttachment)
                 ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-md shadow-teal-500/30 hover:scale-105 active:scale-95'
-                : 'bg-slate-800 text-slate-500 cursor-not-allowed',
+                : 'cursor-not-allowed',
             )}
+            style={(newMessage.trim() || pendingAttachment) ? undefined : { background: 'var(--portal-surface)', color: 'var(--portal-muted)' }}
             aria-label="Send message"
           >
             {isSending ? (
@@ -446,14 +453,14 @@ function ChildMessageBubble({
   if (message.is_hidden) {
     return (
       <div className={cn('flex', isMine ? 'justify-end' : 'justify-start')}>
-        <div className="max-w-[75%] px-4 py-2.5 rounded-2xl bg-slate-800/50 border border-slate-700">
+        <div className="max-w-[75%] px-4 py-2.5 rounded-2xl" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)' }}>
           <div className="flex items-center gap-1.5">
             <Shield className="w-3.5 h-3.5 text-teal-400" />
-            <p className="text-sm text-slate-400 italic" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-sm italic" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
               ARIA filtered this message for your safety
             </p>
           </div>
-          <span className="text-[10px] text-slate-500 mt-1 block">{time}</span>
+          <span className="text-[10px] mt-1 block" style={{ color: 'var(--portal-text-light)' }}>{time}</span>
         </div>
       </div>
     );
@@ -466,8 +473,9 @@ function ChildMessageBubble({
           'max-w-[75%] px-4 py-2.5 rounded-2xl',
           isMine
             ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white'
-            : 'bg-slate-800 text-white',
+            : '',
         )}
+        style={!isMine ? { background: 'var(--portal-surface)', color: 'var(--portal-text)' } : undefined}
       >
         {!isMine && (
           <p
@@ -498,8 +506,9 @@ function ChildMessageBubble({
             rel="noopener noreferrer"
             className={cn(
               'flex items-center gap-2 mb-2 px-3 py-2 rounded-lg text-sm',
-              isMine ? 'bg-white/20 hover:bg-white/30' : 'bg-slate-700 hover:bg-slate-600',
+              isMine ? 'bg-white/20 hover:bg-white/30' : '',
             )}
+            style={!isMine ? { background: 'var(--portal-surface-elevated)' } : undefined}
           >
             <FileText className="w-4 h-4 flex-shrink-0" />
             <span className="truncate">{message.attachment_name || 'File'}</span>
@@ -519,8 +528,9 @@ function ChildMessageBubble({
           <span
             className={cn(
               'text-[10px]',
-              isMine ? 'text-white/70' : 'text-slate-500',
+              isMine ? 'text-white/70' : '',
             )}
+            style={!isMine ? { color: 'var(--portal-text-light)' } : undefined}
           >
             {time}
           </span>

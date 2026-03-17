@@ -31,8 +31,8 @@ export function HorizontalScrollRow<T>({
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4">
         <h2
-          className={cn('text-xl md:text-2xl font-bold', titleClassName || 'text-white')}
-          style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+          className={cn('text-xl md:text-2xl font-bold', titleClassName)}
+          style={{ fontFamily: 'Space Grotesk, sans-serif', color: titleClassName ? undefined : 'var(--portal-text-heading, #fff)' }}
         >
           {title}
         </h2>
@@ -84,8 +84,8 @@ export function HorizontalScrollRow<T>({
         </div>
       ) : (
         // Empty State
-        <div className="flex items-center justify-center h-48 bg-slate-900 rounded-xl border border-slate-800">
-          <p className="text-slate-500 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div className="flex items-center justify-center h-48 rounded-xl" style={{ background: 'var(--portal-surface, #0F172A)', border: '1px solid var(--portal-border, #1E293B)' }}>
+          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted, #64748B)' }}>
             No items to display
           </p>
         </div>

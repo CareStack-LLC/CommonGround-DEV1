@@ -5,6 +5,7 @@ import { BookOpen, Bookmark, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { StarRating } from '@/components/kidcoms/star-rating';
+import { OriginalsBadge } from '@/components/kidcoms/originals-badge';
 
 interface StreamingBookCardProps {
   book: {
@@ -28,6 +29,7 @@ interface StreamingBookCardProps {
     completed: boolean;
   } | null;
   isBookmarked?: boolean;
+  isOriginal?: boolean;
 }
 
 export function StreamingBookCard({
@@ -36,7 +38,8 @@ export function StreamingBookCard({
   onBookmarkToggle,
   className,
   progress,
-  isBookmarked: initialBookmarked
+  isBookmarked: initialBookmarked,
+  isOriginal = true
 }: StreamingBookCardProps) {
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked ?? false);
   const [isHovered, setIsHovered] = useState(false);
@@ -63,14 +66,22 @@ export function StreamingBookCard({
       <button
         onClick={onClick}
         className={cn(
-          'relative w-full bg-slate-800 rounded-xl overflow-hidden shadow-lg border border-slate-700/50',
+          'relative w-full rounded-xl overflow-hidden',
           'transition-all duration-300 ease-out',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
-          'group-hover:scale-[1.03] group-hover:shadow-xl group-hover:shadow-cyan-500/10 group-hover:border-slate-600'
+          'group-hover:scale-[1.03] group-hover:shadow-xl group-hover:shadow-cyan-500/10'
         )}
+        style={{ background: 'var(--portal-surface, #1E293B)', border: '1px solid var(--portal-border, #334155)', boxShadow: 'var(--portal-shadow-md)' }}
       >
         {/* Book Cover - Portrait 2:3 ratio */}
-        <div className="relative aspect-[2/3] bg-slate-700">
+        <div className="relative aspect-[2/3]" style={{ background: 'var(--portal-surface-elevated, #334155)' }}>
+          {/* Originals Badge */}
+          {isOriginal && (
+            <div className="absolute top-2 right-2 z-20">
+              <OriginalsBadge size="sm" />
+            </div>
+          )}
+
           {book.cover ? (
             <Image
               src={book.cover}
@@ -129,14 +140,14 @@ export function StreamingBookCard({
           </div>
         </div>
 
-        {/* Info Section — Dark */}
-        <div className="p-2.5 bg-slate-800">
-          <h3 className="font-bold text-white text-xs line-clamp-1 mb-0.5" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+        {/* Info Section */}
+        <div className="p-2.5" style={{ background: 'var(--portal-surface, #1E293B)' }}>
+          <h3 className="font-bold text-xs line-clamp-1 mb-0.5" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading, #fff)' }}>
             {book.title}
           </h3>
 
           {book.author && (
-            <div className="flex items-center gap-1 text-[10px] text-slate-400 mb-1.5">
+            <div className="flex items-center gap-1 text-[10px] mb-1.5" style={{ color: 'var(--portal-muted, #94A3B8)' }}>
               <User className="w-2.5 h-2.5" />
               <span className="line-clamp-1">{book.author}</span>
             </div>
@@ -148,7 +159,7 @@ export function StreamingBookCard({
               {progress.completed ? '✓ Finished' : `${Math.round(progressPercentage)}% read`}
             </div>
           ) : book.pages ? (
-            <div className="text-[10px] text-slate-500 font-medium">
+            <div className="text-[10px] font-medium" style={{ color: 'var(--portal-muted, #64748B)' }}>
               ~{Math.max(1, Math.round(book.pages * 0.5))} min read
             </div>
           ) : null}

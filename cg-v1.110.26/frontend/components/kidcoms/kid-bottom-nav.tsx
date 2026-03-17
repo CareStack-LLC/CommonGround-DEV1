@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Film, BookOpen, Gamepad2, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
+import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
+import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
 
 interface NavItem {
   href: string;
@@ -19,47 +22,112 @@ const navItems: NavItem[] = [
   { href: '/my-circle/child/movies', icon: Film, label: 'Movies' },
 ];
 
+function NavLink({ item, isActive }: { item: NavItem; isActive: boolean }) {
+  const Icon = item.icon;
+
+  return (
+    <Link
+      href={item.href}
+      className={cn(
+        'relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl',
+        'min-w-[56px] justify-center',
+        'transition-all duration-300 ease-in-out',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-1',
+        isActive ? 'scale-105' : 'active:scale-95 hover:scale-102'
+      )}
+      style={{
+        color: isActive ? 'var(--portal-text-heading)' : 'var(--portal-muted)',
+      }}
+      aria-label={item.label}
+      aria-current={isActive ? 'page' : undefined}
+    >
+      <Icon
+        className={cn(
+          'w-5 h-5 transition-all duration-300 ease-in-out',
+          isActive && 'scale-110 drop-shadow-sm'
+        )}
+        strokeWidth={isActive ? 2.2 : 1.5}
+      />
+      <span
+        className={cn(
+          'transition-all duration-300 ease-in-out',
+          isActive ? 'font-semibold' : 'font-medium'
+        )}
+        style={{
+          fontSize: '11px',
+          fontFamily: 'Inter, DM Sans, sans-serif',
+          color: isActive ? 'var(--portal-text-heading)' : 'var(--portal-muted)',
+        }}
+      >
+        {item.label}
+      </span>
+      {/* Gradient underline for active tab */}
+      <div
+        className={cn(
+          'absolute -bottom-1 left-1/2 -translate-x-1/2 h-[2.5px] rounded-full',
+          'transition-all duration-300 ease-in-out',
+          isActive ? 'w-8 opacity-100' : 'w-0 opacity-0'
+        )}
+        style={{
+          background: 'linear-gradient(90deg, #06b6d4, #14b8a6, #2dd4bf)',
+        }}
+      />
+    </Link>
+  );
+}
+
 export function KidBottomNav() {
   const pathname = usePathname();
+  const { resolvedTheme } = useKidSpaceTheme();
+
+  // Split nav items: first 2 on left, last 2 on right, logo in center
+  const leftItems = navItems.slice(0, 2);
+  const rightItems = navItems.slice(3, 5);
+  const homeItem = navItems[2]; // Home stays in center area conceptually but we place logo center
+
+  const isActiveCheck = (href: string) =>
+    pathname === href || pathname?.startsWith(href + '/');
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800"
-      style={{ height: '64px' }}
+      className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-lg border-t"
+      style={{
+        height: '64px',
+        background: 'var(--portal-surface)',
+        borderColor: 'var(--portal-border)',
+      }}
     >
       <div className="flex items-center justify-around h-full px-2">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href || pathname?.startsWith(item.href + '/');
-          const Icon = item.icon;
+        {leftItems.map((item) => (
+          <NavLink
+            key={item.href}
+            item={item}
+            isActive={isActiveCheck(item.href)}
+          />
+        ))}
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200',
-                'min-w-[56px] justify-center',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-900',
-                isActive
-                  ? 'text-white bg-gradient-to-r from-cyan-500 to-teal-500 scale-105 shadow-lg shadow-cyan-500/30'
-                  : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800 active:scale-95'
-              )}
-              aria-label={item.label}
-              aria-current={isActive ? 'page' : undefined}
-            >
-              <Icon
-                className={cn('w-5 h-5 transition-transform duration-150', isActive && 'scale-110')}
-                strokeWidth={isActive ? 2 : 1.5}
-              />
-              <span
-                className={cn('font-medium transition-all duration-150', isActive && 'font-semibold')}
-                style={{ fontSize: '11px', fontFamily: 'Inter, DM Sans, sans-serif' }}
-              >
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
+        {/* Home nav item */}
+        <NavLink
+          item={homeItem}
+          isActive={isActiveCheck(homeItem.href)}
+        />
+
+        {/* Center Logo Mark */}
+        <div className="flex flex-col items-center justify-center min-w-[40px]">
+          <KidComsLogo
+            variant={resolvedTheme === 'dark' ? 'dark' : 'light'}
+            showText={false}
+            size="sm"
+          />
+        </div>
+
+        {rightItems.map((item) => (
+          <NavLink
+            key={item.href}
+            item={item}
+            isActive={isActiveCheck(item.href)}
+          />
+        ))}
       </div>
     </nav>
   );

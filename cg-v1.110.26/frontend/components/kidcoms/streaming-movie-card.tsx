@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Play, Heart, Clock, Info, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { OriginalsBadge } from './originals-badge';
 
 interface StreamingMovieCardProps {
   video: {
@@ -22,6 +23,7 @@ interface StreamingMovieCardProps {
   progress?: number; // 0-100 percentage
   isFavorite?: boolean;
   onWatchTogether?: () => void;
+  isOriginal?: boolean;
 }
 
 export function StreamingMovieCard({
@@ -31,7 +33,8 @@ export function StreamingMovieCard({
   className,
   progress,
   isFavorite: initialFavorite,
-  onWatchTogether
+  onWatchTogether,
+  isOriginal = true
 }: StreamingMovieCardProps) {
   const [isFavorite, setIsFavorite] = useState(initialFavorite ?? false);
   const [isHovered, setIsHovered] = useState(false);
@@ -52,14 +55,14 @@ export function StreamingMovieCard({
       <button
         onClick={onClick}
         className={cn(
-          'relative w-full bg-slate-900 rounded-lg overflow-hidden',
+          'relative w-full rounded-lg overflow-hidden',
           'transition-all duration-300 ease-out',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2',
           'group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-red-500/20'
         )}
       >
         {/* Poster Image - Portrait 2:3 ratio */}
-        <div className="relative aspect-[2/3] bg-slate-800">
+        <div className="relative aspect-[2/3]" style={{ background: 'var(--portal-surface, #1E293B)' }}>
           {video.thumbnail ? (
             <Image
               src={video.thumbnail}
@@ -71,6 +74,13 @@ export function StreamingMovieCard({
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
               <Play className="w-16 h-16 text-slate-600" />
+            </div>
+          )}
+
+          {/* Originals Badge */}
+          {isOriginal && (
+            <div className="absolute top-2 left-2 z-20">
+              <OriginalsBadge size="sm" />
             </div>
           )}
 
@@ -134,14 +144,14 @@ export function StreamingMovieCard({
         </div>
 
         {/* Info Section - Below Poster */}
-        <div className="p-3 bg-slate-900">
+        <div className="p-3" style={{ background: 'var(--portal-surface, #0F172A)' }}>
           {/* Title */}
-          <h3 className="font-bold text-white text-sm line-clamp-1 mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <h3 className="font-bold text-sm line-clamp-1 mb-1" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading, #fff)' }}>
             {video.title}
           </h3>
 
           {/* Metadata Row */}
-          <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+          <div className="flex items-center gap-2 text-xs mb-2" style={{ color: 'var(--portal-muted, #94A3B8)' }}>
             {video.duration && (
               <>
                 <span className="font-mono">{video.duration}</span>
@@ -149,7 +159,7 @@ export function StreamingMovieCard({
               </>
             )}
             {video.ageRange && (
-              <span className="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300 font-medium">
+              <span className="px-1.5 py-0.5 rounded font-medium" style={{ background: 'var(--portal-surface-elevated, #334155)', color: 'var(--portal-text, #E2E8F0)' }}>
                 {video.ageRange}
               </span>
             )}
@@ -157,16 +167,16 @@ export function StreamingMovieCard({
 
           {/* Description */}
           {video.description && (
-            <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-xs line-clamp-2 leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted, #94A3B8)' }}>
               {video.description}
             </p>
           )}
 
           {/* Progress Indicator Text */}
           {progress !== undefined && progress > 0 && (
-            <div className="mt-2 pt-2 border-t border-slate-800">
+            <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--portal-border, #334155)' }}>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <span style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted, #94A3B8)' }}>
                   {progress >= 90 ? 'Watched' : 'Continue watching'}
                 </span>
                 <span className="text-red-400 font-bold font-mono">

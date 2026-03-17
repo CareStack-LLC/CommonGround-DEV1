@@ -8,6 +8,10 @@ import { AuthorAvatar } from '@/components/kidcoms/author-avatar';
 import { HorizontalScrollRow } from '@/components/kidcoms/horizontal-scroll-row';
 import { theaterContent, BookCategory, bookCategories } from '@/lib/theater-content';
 import { BookOpen, Search, Trophy, Target, Zap } from 'lucide-react';
+import { ARIAHelper } from '@/components/kidcoms/aria-helper';
+import { KidSpaceThemeToggle } from '@/components/kidcoms/kidspace-theme-toggle';
+import { KidComsLogo } from '@/components/kidcoms/kidcoms-logo';
+import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
 
 import type { ReadingProgress, ReadingStats } from '@/lib/reading-progress';
 
@@ -50,6 +54,7 @@ function getAuthors(books: typeof theaterContent.storybooks) {
 
 export default function LibraryPage() {
   const router = useRouter();
+  const { resolvedTheme } = useKidSpaceTheme();
   const [userData, setUserData] = useState<ChildUserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<BookCategory | 'all' | 'reading'>('all');
@@ -118,10 +123,10 @@ export default function LibraryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--portal-background)' }}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <div className="text-xl font-bold text-white" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+          <div className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
             Loading Library...
           </div>
         </div>
@@ -130,45 +135,62 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-24">
+    <div className="min-h-screen pb-24" style={{ background: 'var(--portal-background)' }}>
       {/* Dark Header */}
-      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-lg border-b border-slate-800/60">
+      <header
+        className="sticky top-0 z-40 backdrop-blur-lg border-b"
+        style={{ background: 'var(--portal-background)', borderColor: 'var(--portal-border)' }}
+      >
         <div className="px-4 py-3">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
                 <BookOpen className="w-5 h-5 text-white" strokeWidth={2.5} />
               </div>
+              <KidComsLogo
+                variant={resolvedTheme === 'dark' ? 'dark' : 'light'}
+                showText={false}
+                size="sm"
+              />
               <div>
-                <h1 className="font-black text-white text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                <h1 className="font-black text-xl" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
                   Library
                 </h1>
-                <p className="text-slate-400 text-xs" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
                   {books.length} books to explore
                 </p>
               </div>
             </div>
 
-            {/* Profile Avatar */}
-            <div
-              className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center flex-shrink-0 ring-2 ring-offset-2 ring-offset-slate-950 ring-cyan-500/50`}
-            >
-              <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
-                {userInitial}
-              </span>
+            {/* Theme Toggle + Profile Avatar */}
+            <div className="flex items-center gap-2">
+              <KidSpaceThemeToggle />
+              <div
+                className={`w-9 h-9 rounded-full bg-gradient-to-br ${avatarGradient} flex items-center justify-center flex-shrink-0 ring-2 ring-offset-2 ring-cyan-500/50`}
+                style={{ ['--tw-ring-offset-color' as string]: 'var(--portal-background)' }}
+              >
+                <span className="text-white font-bold text-sm" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                  {userInitial}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Search Bar — Dark */}
+          {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--portal-muted)' }} />
             <input
               type="text"
               placeholder="Search books or authors..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
-              style={{ fontFamily: 'Inter, sans-serif' }}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                background: 'var(--portal-input-bg)',
+                border: '1px solid var(--portal-input-border)',
+                color: 'var(--portal-text)',
+              }}
             />
           </div>
         </div>
@@ -186,9 +208,14 @@ export default function LibraryPage() {
                 onClick={() => setSelectedCategory(key as any)}
                 className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${selectedCategory === key
                   ? 'bg-gradient-to-r from-amber-500 to-orange-400 text-white shadow-lg shadow-amber-500/30'
-                  : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200 border border-slate-700/50'
+                  : ''
                   }`}
-                style={{ fontFamily: 'Inter, sans-serif' }}
+                style={selectedCategory !== key ? {
+                  fontFamily: 'Inter, sans-serif',
+                  background: 'var(--portal-input-bg)',
+                  color: 'var(--portal-muted)',
+                  border: '1px solid var(--portal-border)',
+                } : { fontFamily: 'Inter, sans-serif' }}
               >
                 {label}
               </button>
@@ -198,10 +225,16 @@ export default function LibraryPage() {
       </header>
 
       <main className="space-y-6 pt-4 pb-4">
-        {/* Reading Stats — dark card */}
+        {/* Reading Stats card */}
         {stats.booksRead > 0 && (
           <div className="px-4">
-            <div className="bg-slate-800/60 rounded-2xl p-4 border border-slate-700/50">
+            <div
+              className="rounded-2xl p-4"
+              style={{
+                background: 'var(--portal-surface)',
+                border: '1px solid var(--portal-border)',
+              }}
+            >
               <h3
                 className="font-bold text-amber-400 mb-3 text-sm flex items-center gap-2"
                 style={{ fontFamily: 'Space Grotesk, sans-serif' }}
@@ -221,7 +254,7 @@ export default function LibraryPage() {
                         {value}
                       </div>
                     </div>
-                    <div className="text-xs text-slate-400" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    <div className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
                       {label}
                     </div>
                   </div>
@@ -231,33 +264,48 @@ export default function LibraryPage() {
           </div>
         )}
 
-        {/* Popular Authors */}
+        {/* Author Spotlight */}
         {selectedCategory === 'all' && !searchQuery && authors.length > 0 && (
           <div className="px-4">
-            <HorizontalScrollRow
-              title="Popular Authors"
-              items={authors}
-              cardClassName="w-24"
-              renderCard={(author) => (
-                <AuthorAvatar
-                  name={author.name}
-                  avatar={author.avatar}
-                  size="lg"
+            <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}>
+              ✍️ Author Spotlight
+            </h2>
+            <div className="grid grid-cols-3 gap-3">
+              {authors.map((author) => (
+                <button
+                  key={author.name}
                   onClick={() => setSearchQuery(author.name)}
-                />
-              )}
-            />
+                  className="rounded-2xl p-3 text-center transition-all duration-200 hover:scale-[1.02] active:scale-95"
+                  style={{
+                    background: 'var(--portal-surface)',
+                    border: '1px solid var(--portal-border)',
+                  }}
+                >
+                  <AuthorAvatar
+                    name={author.name}
+                    avatar={author.avatar}
+                    size="lg"
+                  />
+                  <p className="text-xs font-semibold mt-2 line-clamp-1" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-text)' }}>
+                    {author.name}
+                  </p>
+                  <p className="text-[10px] mt-0.5" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                    {author.bookCount} {author.bookCount === 1 ? 'book' : 'books'}
+                  </p>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* New Books — first 6 in a horizontal row */}
-        {selectedCategory === 'all' && !searchQuery && (
+        {/* Continue Reading — horizontal row for books in progress */}
+        {selectedCategory === 'all' && !searchQuery && currentlyReading.length > 0 && (
           <div className="px-4">
             <HorizontalScrollRow
-              title="New &amp; Featured"
-              items={books.slice(0, 6)}
-              onViewAll={() => { }}
-              cardClassName="w-32"
+              title="📖 Continue Reading"
+              items={books.filter(b => currentlyReading.find(p => p.bookId === b.id))}
+              cardClassName="w-36"
+              showViewAll={false}
               renderCard={(book) => (
                 <StreamingBookCard
                   book={book}
@@ -269,42 +317,75 @@ export default function LibraryPage() {
           </div>
         )}
 
-        {/* All Books Grid */}
-        <section className="px-4">
-          <h2
-            className="text-xl font-bold text-white mb-4"
-            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
-          >
-            {selectedCategory === 'all' && !searchQuery
-              ? 'All Books'
-              : selectedCategory === 'reading'
+        {/* Genre Sections — horizontal scroll rows per category */}
+        {selectedCategory === 'all' && !searchQuery ? (
+          <>
+            {Object.entries(bookCategories).map(([key, cat]) => {
+              const genreBooks = books.filter(b => b.category === key);
+              if (genreBooks.length === 0) return null;
+              return (
+                <div key={key} className="px-4">
+                  <HorizontalScrollRow
+                    title={`${cat.emoji} ${cat.name}`}
+                    items={genreBooks}
+                    onViewAll={() => setSelectedCategory(key as BookCategory)}
+                    cardClassName="w-36"
+                    renderCard={(book) => (
+                      <StreamingBookCard
+                        book={book}
+                        onClick={() => router.push(`/my-circle/child/library/${book.id}`)}
+                        progress={progressMap[book.id]}
+                      />
+                    )}
+                  />
+                </div>
+              );
+            })}
+          </>
+        ) : (
+          /* Filtered / Search / Category View — grid layout */
+          <section className="px-4">
+            <h2
+              className="text-xl font-bold mb-4"
+              style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'var(--portal-text-heading)' }}
+            >
+              {selectedCategory === 'reading'
                 ? 'Currently Reading'
                 : searchQuery
                   ? `${filteredBooks.length} Results`
                   : bookCategories[selectedCategory as BookCategory]?.name || 'Books'}
-          </h2>
+            </h2>
 
-          {filteredBooks.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="text-6xl mb-4">📚</div>
-              <p className="text-slate-400 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {searchQuery ? 'No books found' : 'No books in this category'}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-              {filteredBooks.map(book => (
-                <StreamingBookCard
-                  key={book.id}
-                  book={book}
-                  onClick={() => router.push(`/my-circle/child/library/${book.id}`)}
-                  progress={progressMap[book.id]}
-                />
-              ))}
-            </div>
-          )}
-        </section>
+            {filteredBooks.length === 0 ? (
+              <div className="text-center py-20">
+                <div className="text-6xl mb-4">📚</div>
+                <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                  {searchQuery ? 'No books found' : 'No books in this category'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                {filteredBooks.map(book => (
+                  <StreamingBookCard
+                    key={book.id}
+                    book={book}
+                    onClick={() => router.push(`/my-circle/child/library/${book.id}`)}
+                    progress={progressMap[book.id]}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
       </main>
+
+      {/* ARIA Greeting */}
+      <ARIAHelper
+        message="Happy reading! Pick a book to start an adventure 📚"
+        mood="happy"
+        position="bottom-right"
+        dismissDelay={5000}
+      />
 
       <KidBottomNav />
 
