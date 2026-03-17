@@ -29,8 +29,8 @@ export function detectPortalFromPath(pathname: string): PortalType {
     return 'professional';
   }
 
-  // Child portal - KidComs and child-focused features
-  if (pathname.startsWith('/my-circle/child') || pathname.startsWith('/kidcoms')) {
+  // Child portal - child-focused features only
+  if (pathname.startsWith('/my-circle/child')) {
     return 'child';
   }
 

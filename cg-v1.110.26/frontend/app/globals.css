@@ -438,6 +438,30 @@
   --portal-line-height: 1.6;
 }
 
+/* Child Portal - Dark Mode */
+.dark .child-portal {
+  --portal-primary: #2DD4BF; /* Teal-300 */
+  --portal-primary-hover: #14B8A6;
+  --portal-primary-light: #5EEAD4;
+  --portal-secondary: #A78BFA; /* Violet-400 */
+  --portal-secondary-light: #7C3AED;
+  --portal-accent: #94A3B8; /* Slate-400 */
+  --portal-accent-hover: #CBD5E1;
+  --portal-background: #0F172A; /* Slate-900 */
+  --portal-surface: #1E293B; /* Slate-800 */
+  --portal-surface-elevated: #334155; /* Slate-700 */
+  --portal-border: #334155; /* Slate-700 */
+  --portal-border-hover: #475569; /* Slate-600 */
+  --portal-text: #E2E8F0; /* Slate-200 */
+  --portal-text-light: #94A3B8; /* Slate-400 */
+  --portal-text-heading: #F8FAFC; /* Slate-50 */
+
+  --portal-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --portal-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --portal-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --portal-shadow-xl: 0 16px 24px rgba(0, 0, 0, 0.6);
+}
+
 /* SuperAdmin Portal - "Dark Command Center" */
 .superadmin-portal {
   --portal-primary: #7c3aed;
