@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.rate_limit import limiter, AUTH_LIMIT
 from app.core.security import get_current_user
 from app.models.user import User
 from app.schemas.auth import (
@@ -30,7 +29,6 @@ router = APIRouter()
 
 
 @router.post("/register", response_model=LoginResponse, status_code=status.HTTP_201_CREATED)
-@limiter.limit(AUTH_LIMIT)
 async def register(
     http_request: Request,
     request: RegisterRequest,
@@ -133,7 +131,6 @@ async def logout(
 
 
 @router.post("/refresh", response_model=LoginResponse)
-@limiter.limit(AUTH_LIMIT)
 async def refresh_token(
     request: Request,
     refresh_token: str = Body(..., embed=True),
@@ -198,7 +195,6 @@ async def get_current_user_info(
 
 
 @router.post("/password-reset/request", status_code=status.HTTP_200_OK)
-@limiter.limit(AUTH_LIMIT)
 async def request_password_reset(
     http_request: Request,
     request: PasswordResetRequest,
@@ -245,7 +241,6 @@ async def confirm_password_reset(
 
 
 @router.post("/magic-link", status_code=status.HTTP_200_OK)
-@limiter.limit(AUTH_LIMIT)
 async def send_magic_link(
     request: Request,
     email: str = Body(..., embed=True),
@@ -277,7 +272,6 @@ async def send_magic_link(
 
 
 @router.post("/oauth/sync", response_model=LoginResponse)
-@limiter.limit(AUTH_LIMIT)
 async def oauth_sync(
     http_request: Request,
     request: OAuthSyncRequest,

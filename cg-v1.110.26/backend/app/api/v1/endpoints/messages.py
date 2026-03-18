@@ -12,7 +12,6 @@ from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.rate_limit import limiter, ARIA_ANALYSIS_LIMIT
 from app.core.security import get_current_user
 from app.models.user import User
 from app.models.message import Message, MessageFlag, MessageThread
@@ -55,7 +54,6 @@ router = APIRouter()
 
 
 @router.post("/analyze", response_model=ARIAAnalysisResponse)
-@limiter.limit(ARIA_ANALYSIS_LIMIT)
 async def analyze_message_content(
     request: Request,
     content: str = Query(..., min_length=1),

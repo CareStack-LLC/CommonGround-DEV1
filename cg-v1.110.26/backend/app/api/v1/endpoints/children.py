@@ -16,7 +16,6 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status, UploadFi
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.rate_limit import limiter, CHILD_PIN_LIMIT
 from app.core.security import get_current_user, create_access_token
 from app.models.user import User
 from app.models.kidcoms import ChildUser
@@ -659,7 +658,6 @@ class ChildPinLoginResponse(BaseModel):
     summary="Child PIN login (KidsCom)",
     description="Simple PIN-based login for the KidsCom app. For demo/testing purposes."
 )
-@limiter.limit(CHILD_PIN_LIMIT)
 async def child_pin_login(
     request: Request,
     login_data: ChildPinLoginRequest,

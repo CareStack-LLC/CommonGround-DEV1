@@ -81,7 +81,8 @@ from fastapi.middleware.gzip import GZipMiddleware
 
 from app.core.database import init_db, close_db
 from app.api.v1.router import api_router
-from app.core.rate_limit import limiter, rate_limit_exceeded_handler
+# Rate limiting disabled temporarily — slowapi crashes on Render
+# from app.core.rate_limit import limiter, rate_limit_exceeded_handler
 
 
 @asynccontextmanager
@@ -124,11 +125,11 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "X-Requested-With", "X-Request-ID"],
 )
 
-# Rate limiting
-from slowapi import _rate_limit_exceeded_handler as _default_handler
-from slowapi.errors import RateLimitExceeded
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+# Rate limiting disabled temporarily — slowapi crashes on Render
+# from slowapi import _rate_limit_exceeded_handler as _default_handler
+# from slowapi.errors import RateLimitExceeded
+# app.state.limiter = limiter
+# app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
 # Request ID tracing + canonical log lines (wide events)
 from app.middleware.request_id import RequestIDMiddleware

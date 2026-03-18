@@ -20,7 +20,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
-from app.core.rate_limit import limiter, CHILD_PIN_LIMIT, AUTH_LIMIT
 from app.core.security import get_current_user, get_current_circle_user, create_access_token
 from app.models.user import User
 from app.models.family_file import FamilyFile
@@ -1659,7 +1658,6 @@ async def list_child_users(
     summary="Child user login",
     description="Login with username and PIN for children."
 )
-@limiter.limit(CHILD_PIN_LIMIT)
 async def child_user_login(
     request: Request,
     login_data: ChildUserLoginRequest,
