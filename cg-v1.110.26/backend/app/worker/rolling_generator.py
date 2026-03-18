@@ -50,8 +50,9 @@ async def run_rolling_generator():
         try:
             exchanges_created = await _roll_exchange_instances(db)
             obligations_created = await _roll_obligation_instances(db)
+            reports_sent = await _send_anniversary_monthly_reports(db)
             await db.commit()
-            print(f"Done: {exchanges_created} exchange instances, {obligations_created} obligation instances created")
+            print(f"Done: {exchanges_created} exchanges, {obligations_created} obligations, {reports_sent} monthly reports emailed")
         except Exception as e:
             await db.rollback()
             print(f"Rolling generator failed: {e}")
@@ -200,6 +201,109 @@ async def _roll_obligation_instances(db: AsyncSession) -> int:
 
     await db.flush()
     return created
+
+
+async def _send_anniversary_monthly_reports(db: AsyncSession) -> int:
+    """
+    Send monthly reports to parents on their signup anniversary date.
+
+    If a user signed up on the 7th, they get a monthly report on the 7th
+    of every month. Runs daily as part of the rolling generator.
+    """
+    from app.models.user import User, UserProfile
+    from app.models.family_file import FamilyFile
+    import calendar as cal
+
+    today = date.today()
+    current_day = today.day
+
+    # Handle end-of-month edge cases (e.g., signed up on 31st but current month has 28 days)
+    last_day_of_month = cal.monthrange(today.year, today.month)[1]
+
+    # Find users whose signup day matches today (or last day if their signup day exceeds month length)
+    result = await db.execute(
+        select(UserProfile, User).join(User, UserProfile.user_id == User.id).where(
+            User.is_active == True,
+            UserProfile.subscription_status.in_(["active", "trialing"]),
+        )
+    )
+    rows = result.all()
+
+    if not rows:
+        return 0
+
+    sent = 0
+    for profile, user in rows:
+        # Determine the user's anniversary day
+        signup_date = user.created_at if hasattr(user, 'created_at') and user.created_at else None
+        if not signup_date:
+            continue
+
+        anniversary_day = signup_date.day
+        # If signup day exceeds current month length, use last day of month
+        effective_day = min(anniversary_day, last_day_of_month)
+
+        if current_day != effective_day:
+            continue
+
+        # Skip if user has no active family files
+        ff_result = await db.execute(
+            select(FamilyFile).where(
+                FamilyFile.status == "active",
+                (FamilyFile.parent_a_id == str(user.id)) | (FamilyFile.parent_b_id == str(user.id))
+            )
+        )
+        family_files = ff_result.scalars().all()
+
+        if not family_files:
+            continue
+
+        # Determine report period (previous month)
+        if today.month == 1:
+            report_month = 12
+            report_year = today.year - 1
+        else:
+            report_month = today.month - 1
+            report_year = today.year
+
+        month_name = cal.month_name[report_month]
+
+        for ff in family_files:
+            try:
+                # Generate the monthly report PDF
+                from app.services.reports.monthly_report_service import MonthlyReportService
+                service = MonthlyReportService(db)
+                pdf_bytes, summary = await service.generate_monthly_report(
+                    family_file_id=str(ff.id),
+                    month=report_month,
+                    year=report_year,
+                )
+
+                # Email the parent
+                from app.services.email import email_service
+                await email_service.send_monthly_report(
+                    to_email=user.email,
+                    to_name=user.first_name or "Parent",
+                    month_name=month_name,
+                    year=report_year,
+                    family_file_name=ff.title or "Family File",
+                    compliance_rate=summary.get("compliance_rate", 0) if isinstance(summary, dict) else 0,
+                    total_exchanges=summary.get("total_exchanges", 0) if isinstance(summary, dict) else 0,
+                    on_time_count=summary.get("on_time_count", 0) if isinstance(summary, dict) else 0,
+                    completed_exchanges=summary.get("completed_exchanges", 0) if isinstance(summary, dict) else 0,
+                    missed_exchanges=summary.get("missed_exchanges", 0) if isinstance(summary, dict) else 0,
+                    gps_verified_count=summary.get("gps_verified_count", 0) if isinstance(summary, dict) else 0,
+                    message_count=summary.get("message_count", 0) if isinstance(summary, dict) else 0,
+                    full_report_url=f"{email_service.frontend_url}/reports",
+                )
+                sent += 1
+                print(f"Monthly report emailed to {user.email} for {ff.title} ({month_name} {report_year})")
+
+            except Exception as e:
+                logger.warning(f"Failed to send monthly report to {user.email} for family file {ff.id}: {e}")
+                continue
+
+    return sent
 
 
 if __name__ == "__main__":

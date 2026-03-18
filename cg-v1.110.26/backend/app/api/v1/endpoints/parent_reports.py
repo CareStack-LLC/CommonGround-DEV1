@@ -127,6 +127,23 @@ async def generate_parent_report(
     report_name = report_names.get(report_type, "Report")
     filename = f"CommonGround-{report_name}-{date.today().isoformat()}.pdf"
 
+    # Email the parent a report-ready notification (non-blocking)
+    try:
+        from app.services.email import email_service
+        report_display = report_name.replace("-", " ")
+        await email_service.send_report_ready(
+            to_email=current_user.email,
+            to_name=current_user.first_name or "Parent",
+            report_type=report_display,
+            report_highlights=[
+                f"Period: {date_start.strftime('%b %d')} – {date_end.strftime('%b %d, %Y')}",
+                f"Report ID: {result.report_id}",
+            ],
+            download_url=f"{email_service.frontend_url}/reports",
+        )
+    except Exception as e:
+        logger.warning(f"Failed to send report-ready email: {e}")
+
     return StreamingResponse(
         io.BytesIO(result.pdf_bytes),
         media_type="application/pdf",
@@ -167,7 +184,7 @@ async def generate_monthly_report(
     Returns the PDF file as a streaming response for immediate download.
     """
     # Verify access
-    await verify_family_file_access(db, str(current_user.id), family_file_id)
+    family_file = await verify_family_file_access(db, str(current_user.id), family_file_id)
 
     # Validate the requested month is not in the future
     now = datetime.utcnow()
@@ -201,6 +218,27 @@ async def generate_monthly_report(
     # Generate filename
     month_name = calendar.month_name[month]
     filename = f"CommonGround-Monthly-Report-{month_name}-{year}.pdf"
+
+    # Email the parent a report-ready notification
+    try:
+        from app.services.email import email_service
+        await email_service.send_monthly_report(
+            to_email=current_user.email,
+            to_name=current_user.first_name or "Parent",
+            month_name=month_name,
+            year=year,
+            family_file_name=family_file.title if hasattr(family_file, 'title') else "Family File",
+            compliance_rate=0,
+            total_exchanges=0,
+            on_time_count=0,
+            completed_exchanges=0,
+            missed_exchanges=0,
+            gps_verified_count=0,
+            message_count=0,
+            full_report_url=f"{email_service.frontend_url}/reports",
+        )
+    except Exception as e:
+        logger.warning(f"Failed to send monthly report email: {e}")
 
     return StreamingResponse(
         io.BytesIO(pdf_bytes),
