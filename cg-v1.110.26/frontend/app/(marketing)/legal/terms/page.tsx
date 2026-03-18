@@ -59,7 +59,7 @@ const disclaimers = [
 ];
 
 export default function TermsOfServicePage() {
-  const lastUpdated = 'January 24, 2026';
+  const lastUpdated = 'March 18, 2026';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
@@ -521,7 +521,7 @@ export default function TermsOfServicePage() {
               { title: 'No Waiver', desc: 'Our failure to enforce any right does not waive that right or any other provision.' },
               { title: 'Assignment', desc: 'You may not assign these Terms. We may assign our rights without restriction.' },
               { title: 'Changes', desc: 'We may update these Terms with notice. Continued use after changes constitutes acceptance.' },
-              { title: 'Contact', desc: 'Questions? Email legal@find-commonground.com' },
+              { title: 'Contact', desc: 'CommonGround, Inc. | Los Angeles, CA | legal@find-commonground.com' },
             ].map((item) => (
               <div
                 key={item.title}
@@ -544,8 +544,11 @@ export default function TermsOfServicePage() {
           >
             Questions about these terms?
           </h2>
-          <p className="text-white/80 mb-8 max-w-xl mx-auto">
+          <p className="text-white/80 mb-2 max-w-xl mx-auto">
             Our legal team is here to help clarify anything.
+          </p>
+          <p className="text-white/60 text-sm mb-8">
+            CommonGround, Inc. &middot; Los Angeles, CA
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

@@ -32,6 +32,10 @@ const faqCategories = [
         question: 'What if my co-parent won\'t join?',
         answer: 'You can still document communications, track your schedule, and build agreements. If needed, you can export records for court. Some parents find that demonstrating the platform\'s benefits helps convince the other parent to join.',
       },
+      {
+        question: 'What if my co-parent refuses to use CommonGround?',
+        answer: 'You can still use the calendar, expense tracking, and court documentation on your own. When they join, everything syncs automatically. Many parents find that once they see the structured communication, they\'re willing to try.',
+      },
     ],
   },
   {
@@ -139,6 +143,10 @@ const faqCategories = [
         question: 'Can my attorney access my case?',
         answer: 'Yes. Grant time-limited access to attorneys, GALs, and mediators. They get read-only access and all activity is logged.',
       },
+      {
+        question: 'Can I use CommonGround if there\'s a restraining order?',
+        answer: 'CommonGround can be used as the communication channel specified in a restraining order. Messages are documented, timestamped, and ARIA ensures all communication stays appropriate and focused on the children.',
+      },
     ],
   },
   {
@@ -161,6 +169,14 @@ const faqCategories = [
       {
         question: 'Can I delete my account?',
         answer: 'Yes. Request account deletion from your settings. Your data will be removed within 90 days, except where legally required.',
+      },
+      {
+        question: 'What happens if there\'s a data breach?',
+        answer: 'We follow industry-standard incident response procedures. In the unlikely event of a breach, we will notify affected users within 72 hours, explain what happened, and provide steps to protect their accounts.',
+      },
+      {
+        question: 'Can I export all my data?',
+        answer: 'Yes. You can request a full data export from your account settings at any time. We also support GDPR and CCPA data portability requests.',
       },
     ],
   },

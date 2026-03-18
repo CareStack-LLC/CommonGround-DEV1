@@ -54,7 +54,7 @@ const neverDo = [
 ];
 
 export default function PrivacyPolicyPage() {
-  const lastUpdated = 'January 24, 2026';
+  const lastUpdated = 'March 18, 2026';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
@@ -406,6 +406,49 @@ export default function PrivacyPolicyPage() {
                 the US, your information will be transferred to and processed in the US. We comply
                 with applicable data protection laws.
               </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
+              <h3 className="font-semibold text-[#1E3A4A] mb-2">European Users (GDPR)</h3>
+              <p className="text-gray-600 text-sm mb-3">
+                If you are located in the European Economic Area (EEA), United Kingdom, or Switzerland,
+                you have additional rights under the General Data Protection Regulation (GDPR):
+              </p>
+              <div className="mb-3">
+                <h4 className="font-medium text-[#1E3A4A] text-sm mb-1">Lawful Basis for Processing</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• <strong>Consent:</strong> When you opt in to optional features such as location-based exchange check-ins</li>
+                  <li>• <strong>Contractual necessity:</strong> To provide the co-parenting services you signed up for</li>
+                  <li>• <strong>Legitimate interest:</strong> To improve security, prevent fraud, and enhance our services</li>
+                </ul>
+              </div>
+              <div className="mb-3">
+                <h4 className="font-medium text-[#1E3A4A] text-sm mb-1">Additional EU Rights</h4>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>• Right to erasure (right to be forgotten)</li>
+                  <li>• Right to data portability in a machine-readable format</li>
+                  <li>• Right to restrict or object to certain processing</li>
+                  <li>• Right to lodge a complaint with your local supervisory authority</li>
+                </ul>
+              </div>
+              <div className="mb-3">
+                <h4 className="font-medium text-[#1E3A4A] text-sm mb-1">International Data Transfers</h4>
+                <p className="text-sm text-gray-600">
+                  Your data is processed in the United States. We rely on Standard Contractual Clauses
+                  (SCCs) approved by the European Commission to safeguard your data during international
+                  transfers.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-[#1E3A4A] text-sm mb-1">Data Processing Agreements</h4>
+                <p className="text-sm text-gray-600">
+                  We maintain Data Processing Agreements (DPAs) with all sub-processors who handle
+                  personal data on our behalf. To request a copy of our DPA, contact{' '}
+                  <a href="mailto:privacy@find-commonground.com" className="text-[var(--portal-primary)] hover:underline">
+                    privacy@find-commonground.com
+                  </a>.
+                </p>
+              </div>
             </div>
 
             <div className="bg-white rounded-2xl p-6 border-2 border-[var(--portal-primary)]/10">
