@@ -1,4 +1,5 @@
 """
+from app.utils.sentry_helpers import capture_error
 ARIA Unified Chat Monitor Service
 
 Provides content moderation for ALL messaging channels:
@@ -405,6 +406,7 @@ If the message is safe, respond with: {{"labels": [], "severity": 0.0, "action":
 
         except Exception as e:
             logger.error(f"[ARIA] LLM analysis failed: {e}")
+            capture_error(e)
             return self._safe_result(int((time.time() - start_time) * 1000))
 
     async def analyze_message_hybrid(

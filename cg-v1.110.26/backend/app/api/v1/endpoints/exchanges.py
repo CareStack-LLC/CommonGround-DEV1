@@ -34,6 +34,7 @@ from app.services.custody_exchange import CustodyExchangeService
 from app.services.geolocation import GeolocationService
 from app.services.activity import log_exchange_activity
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -113,6 +114,7 @@ async def create_exchange(
 
     except ValueError as e:
         logger.error(f"Failed to create exchange: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to create exchange"
@@ -802,6 +804,7 @@ async def confirm_qr(
         )
     except ValueError as e:
         logger.error(f"Failed to confirm QR exchange: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to confirm QR exchange"
@@ -1049,12 +1052,14 @@ async def override_custody(
 
     except ValueError as e:
         logger.error(f"Failed to override custody: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to override custody"
         )
     except PermissionError as e:
         logger.error(f"Permission denied for custody override: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permission denied for custody override"

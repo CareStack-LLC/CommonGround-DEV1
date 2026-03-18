@@ -1,4 +1,5 @@
 """
+from app.utils.sentry_helpers import capture_error
 Child Profile Service - Business logic for child profile management.
 
 This service handles:
@@ -666,7 +667,7 @@ class ChildService:
         if child.field_contributors:
             try:
                 return json.loads(child.field_contributors)
-            except:
+            except Exception:
                 return {}
         return {}
 
@@ -681,7 +682,7 @@ class ChildService:
 
         try:
             restricted_fields = json.loads(child.court_restricted_fields)
-        except:
+        except Exception:
             return child
 
         for field in restricted_fields:

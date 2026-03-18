@@ -46,6 +46,7 @@ from app.services.aria_violation_tracker import (
     InterventionDecision,
 )
 from app.services.daily_video import DailyVideoService
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -183,6 +184,7 @@ class ARIACallMonitor:
             toxicity_score = await self._quick_toxicity_analysis(chunk.content)
         except Exception as e:
             logger.error(f"AI toxicity analysis failed: {e}")
+            capture_error(e)
             # Fallback scoring based on categories detected
             base_score = 0.5
             # Severe categories get higher base
@@ -271,6 +273,7 @@ Score:"""
             return max(0.0, min(1.0, score))
         except Exception as e:
             logger.error(f"OpenAI toxicity analysis error: {e}")
+            capture_error(e)
             raise
 
     async def handle_violation(

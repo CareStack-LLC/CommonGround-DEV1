@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.database import get_db
 from app.services.invitation import InvitationService
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +58,7 @@ def verify_sendgrid_signature(request: Request, body: bytes) -> bool:
         return hmac.compare_digest(signature, expected_b64)
     except Exception as e:
         logger.error(f"SendGrid signature verification failed: {e}")
+        capture_error(e)
         return False
 
 
@@ -128,10 +130,12 @@ async def handle_sendgrid_webhook(
 
             except Exception as e:
                 logger.error(f"Error processing SendGrid event: {e}")
+                capture_error(e)
                 continue
 
         return {"status": "ok", "events_processed": len(events)}
 
     except Exception as e:
         logger.error(f"SendGrid webhook error: {e}")
+        capture_error(e)
         return {"status": "error", "message": "Webhook processing failed"}

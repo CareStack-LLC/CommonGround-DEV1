@@ -57,6 +57,7 @@ from app.services.storage import storage_service, StorageBucket
 from app.core.config import settings
 from app.core.websocket import manager
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -204,12 +205,14 @@ async def initiate_circle_call(
     except ValueError as e:
         # ValueError indicates permission or configuration issue
         logger.error(f"Failed to create circle call session: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to create call session"
         )
     except Exception as e:
         logger.error(f"Failed to create circle call session: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create call session"
@@ -226,12 +229,14 @@ async def initiate_circle_call(
         )
     except ValueError as e:
         logger.error(f"Failed to join circle call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to join call session"
         )
     except Exception as e:
         logger.error(f"Failed to join circle call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to join call session"
@@ -376,12 +381,14 @@ async def join_circle_call(
         )
     except ValueError as e:
         logger.error(f"Failed to join circle call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to join call session"
         )
     except Exception as e:
         logger.error(f"Failed to join circle call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to join call session"
@@ -413,6 +420,7 @@ async def join_circle_call(
 
         except Exception as e:
             logger.error(f"Failed to start recording/transcription for session {session_id}: {e}")
+            capture_error(e)
             # Don't fail the join if recording/transcription fails
 
         # Notify parents that call has started
@@ -613,6 +621,7 @@ async def end_circle_call(
         logger.info(f"Stopped recording and transcription for circle call session {session_id}")
     except Exception as e:
         logger.error(f"Failed to stop recording/transcription: {e}")
+        capture_error(e)
 
     # End the call
     try:
@@ -624,6 +633,7 @@ async def end_circle_call(
         )
     except Exception as e:
         logger.error(f"Failed to end circle call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to end call session"
@@ -757,6 +767,7 @@ async def terminate_circle_call(
             logger.info(f"Stopped recording/transcription for terminated session {session_id}")
         except Exception as e:
             logger.error(f"Failed to stop recording/transcription during terminate: {e}")
+            capture_error(e)
 
     # Update session status
     session.status = CircleCallStatus.TERMINATED_BY_PARENT.value
@@ -830,6 +841,7 @@ async def terminate_circle_call(
             )
         except Exception as e:
             logger.error(f"Failed to send push to child: {e}")
+            capture_error(e)
 
     # Push to contact
     if circle_user:
@@ -842,6 +854,7 @@ async def terminate_circle_call(
             )
         except Exception as e:
             logger.error(f"Failed to send push to contact: {e}")
+            capture_error(e)
 
     # Schedule post-call processing
     if session.status == CircleCallStatus.TERMINATED_BY_PARENT.value:
@@ -960,6 +973,7 @@ async def process_circle_call_transcript_chunk(
 
         except Exception as e:
             logger.error(f"ARIA child safety analysis failed: {e}")
+            capture_error(e)
             # Continue even if ARIA fails
 
     return {
@@ -1035,6 +1049,7 @@ async def upload_circle_call_recording(
         logger.info(f"Received circle call recording: {len(recording_data)} bytes")
     except Exception as e:
         logger.error(f"Failed to read recording: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid recording data"
@@ -1071,6 +1086,7 @@ async def upload_circle_call_recording(
 
     except Exception as e:
         logger.error(f"Failed to upload circle call recording: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload recording"
@@ -1282,6 +1298,7 @@ async def get_circle_call_report(
         )
     except Exception as e:
         logger.error(f"Failed to generate circle call report: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate call report"
@@ -1376,6 +1393,7 @@ async def analyze_circle_call_video_frame(
         )
     except Exception as e:
         logger.error(f"Vision analysis failed: {e}")
+        capture_error(e)
         return {"message": "Vision analysis failed", "flagged": False}
 
     # Create frame analysis record
@@ -1391,6 +1409,7 @@ async def analyze_circle_call_video_frame(
         )
     except Exception as e:
         logger.error(f"Failed to create frame analysis record: {e}")
+        capture_error(e)
         return {"message": "Failed to store analysis", "flagged": False}
 
     # If flagged, handle violation
@@ -1405,6 +1424,7 @@ async def analyze_circle_call_video_frame(
             )
         except Exception as e:
             logger.error(f"Failed to store flagged frame: {e}")
+            capture_error(e)
 
         # Handle through circle monitor's video violation handler
         try:
@@ -1442,6 +1462,7 @@ async def analyze_circle_call_video_frame(
 
         except Exception as e:
             logger.error(f"Failed to handle video violation: {e}")
+            capture_error(e)
             await db.commit()
             return {"message": "Frame flagged but intervention failed", "flagged": True}
 
@@ -1648,6 +1669,7 @@ async def _process_circle_call_complete(
 
         except Exception as e:
             logger.error(f"Failed to download/store circle call recording for session {session_id}: {e}")
+            capture_error(e)
 
         # Run ARIA child safety summary
         try:
@@ -1680,3 +1702,4 @@ async def _process_circle_call_complete(
 
         except Exception as e:
             logger.error(f"Post-call ARIA child safety analysis failed for session {session_id}: {e}")
+            capture_error(e)

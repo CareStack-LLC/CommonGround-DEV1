@@ -24,6 +24,7 @@ from app.models.circle import CircleContact
 from app.models.child import Child
 from app.models.kidcoms import CirclePermission, KidComsSettings
 from app.services.daily_video import daily_service
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -188,6 +189,7 @@ class CircleCallService:
                 return room
             except Exception as e:
                 logger.error(f"Could not verify Daily.co room: {e}")
+                capture_error(e)
                 raise ValueError(f"Failed to verify video room: {str(e)}")
 
         # Create new permanent room
@@ -225,6 +227,7 @@ class CircleCallService:
 
         except Exception as e:
             logger.error(f"Failed to create circle call room: {e}")
+            capture_error(e)
             await db.rollback()
             raise
 

@@ -28,6 +28,7 @@ from app.schemas.export import (
 )
 from app.models.professional import ProfessionalProfile
 from datetime import timedelta
+from app.utils.sentry_helpers import capture_error
 
 router = APIRouter()
 

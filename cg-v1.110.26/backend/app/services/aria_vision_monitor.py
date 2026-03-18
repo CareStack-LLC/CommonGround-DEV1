@@ -25,6 +25,7 @@ from app.core.config import settings
 from app.models.call_video_flag import VideoFrameAnalysis, VideoViolationType
 from app.services.storage import StorageBucket
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -249,12 +250,14 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
 
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse vision response JSON: {e}")
+            capture_error(e)
             return FrameAnalysisResult(
                 is_flagged=False,
                 processing_time_ms=int((time.time() - start_time) * 1000),
             )
         except Exception as e:
             logger.error(f"Claude Vision API error: {e}")
+            capture_error(e)
             return FrameAnalysisResult(
                 is_flagged=False,
                 processing_time_ms=int((time.time() - start_time) * 1000),
@@ -302,6 +305,7 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
 
         except Exception as e:
             logger.error(f"Failed to store flagged frame: {e}")
+            capture_error(e)
             return None
 
     async def create_frame_analysis_record(

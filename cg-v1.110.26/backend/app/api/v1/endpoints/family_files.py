@@ -33,6 +33,7 @@ from app.services.agreement import AgreementService
 from app.services.professional import ProfessionalAccessService, CaseAssignmentService
 from app.services.parent_call import parent_call_service
 from app.schemas.professional import CaseAssignmentCreate, AssignmentRole
+from app.utils.sentry_helpers import capture_error
 import logging
 
 logger = logging.getLogger(__name__)
@@ -138,6 +139,7 @@ async def create_family_file(
     except Exception as e:
         # Log error but don't fail family file creation
         logger.error(f"Failed to create permanent call room for family file {family_file.id}: {e}")
+        capture_error(e)
 
     response = _build_family_file_response(family_file)
     response["message"] = "Family File created successfully"
@@ -193,6 +195,7 @@ async def list_family_files(
         raise
     except Exception as e:
         logger.error(f"Error listing family files: {e}")
+        capture_error(e)
         logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=500,
@@ -839,6 +842,7 @@ async def approve_professional_access_request(
             request = await access_service.approve_request(request_id, current_user.id)
         except ValueError as e:
             logger.error(f"Failed to approve access request: {e}")
+            capture_error(e)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="An error occurred while processing your request."
@@ -867,6 +871,7 @@ async def approve_professional_access_request(
         except ValueError as e:
             # Assignment might already exist
             logger.error(f"Failed to create case assignment: {e}")
+            capture_error(e)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="An error occurred while processing your request."
@@ -904,6 +909,7 @@ async def decline_professional_access_request(
         request = await access_service.decline_request(request_id, current_user.id, reason)
     except ValueError as e:
         logger.error(f"Failed to decline access request: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -973,6 +979,7 @@ async def list_family_file_professionals(
         await ff_service.get_family_file(family_file_id, current_user)
     except Exception as e:
         logger.error(f"Error getting family file: {e}")
+        capture_error(e)
         logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -984,6 +991,7 @@ async def list_family_file_professionals(
         assignments = await assignment_service.list_assignments_for_family_file(family_file_id)
     except Exception as e:
         logger.error(f"Error listing assignments: {e}")
+        capture_error(e)
         logger.error(traceback.format_exc())
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -1092,12 +1100,14 @@ async def invite_professional(
             }
         except ValueError as e:
             logger.error(f"Failed to invite firm: {e}")
+            capture_error(e)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="An error occurred while processing your request."
             )
         except Exception as e:
             logger.error(f"Error inviting firm: {e}")
+            capture_error(e)
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -1147,6 +1157,7 @@ async def invite_firm_from_directory(
         )
     except ValueError as e:
         logger.error(f"Failed to invite firm from directory: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -1192,6 +1203,7 @@ async def remove_professional(
         )
     except ValueError as e:
         logger.error(f"Failed to revoke professional access: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."

@@ -13,6 +13,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from app.core.config import settings
 from app.templates.emails.images.email_icons import EMAIL_ICONS
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -1156,6 +1157,7 @@ class EmailService:
             return None
         except Exception as e:
             logger.error(f"Failed to send email to {to_email}: {str(e)}")
+            capture_error(e)
 
             # Report to Sentry
             try:

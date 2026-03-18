@@ -13,6 +13,7 @@ from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 import secrets
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 from app.core.database import get_db
@@ -267,6 +268,7 @@ async def create_session(
         room_url = room_data.get("url", f"https://{daily_service.domain}/{room_name}")
     except Exception as e:
         logger.error(f"Failed to create Daily.co room: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to create video room. Please try again later."
@@ -579,6 +581,7 @@ async def join_session(
         )
     except Exception as e:
         logger.error(f"Failed to create meeting token: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to generate meeting token. Please try again."
@@ -788,6 +791,7 @@ async def create_child_session(
         room_url = room_data.get("url", f"https://{daily_service.domain}/{room_name}")
     except Exception as e:
         logger.error(f"Failed to create Daily.co room: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to create video room. Please try again later."
@@ -846,6 +850,7 @@ async def create_child_session(
         )
     except Exception as e:
         logger.error(f"Failed to create meeting token: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to generate meeting token. Please try again."
@@ -1004,6 +1009,7 @@ async def child_join_session(
         )
     except Exception as e:
         logger.error(f"Failed to create meeting token: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to generate meeting token. Please try again."
@@ -1192,6 +1198,7 @@ async def create_circle_contact_session(
         room_url = room_data.get("url", f"https://{daily_service.domain}/{room_name}")
     except Exception as e:
         logger.error(f"Failed to create Daily.co room: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to create video room. Please try again later."
@@ -1241,6 +1248,7 @@ async def create_circle_contact_session(
         )
     except Exception as e:
         logger.error(f"Failed to create meeting token: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to generate meeting token. Please try again."
@@ -1626,6 +1634,7 @@ async def accept_incoming_call(
         )
     except Exception as e:
         logger.error(f"Failed to create meeting token: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to generate meeting token. Please try again."
@@ -1777,6 +1786,7 @@ async def accept_incoming_call_as_circle(
         )
     except Exception as e:
         logger.error(f"Failed to create meeting token: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to generate meeting token. Please try again."
@@ -2155,6 +2165,7 @@ async def process_transcript_chunk(
 
     except Exception as e:
         logger.error(f"ARIA analysis failed for KidComs session {session_id}: {e}")
+        capture_error(e)
         # Continue even if ARIA fails - don't block the call
 
     # Update session message count

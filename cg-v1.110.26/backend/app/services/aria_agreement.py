@@ -1,4 +1,5 @@
 """
+from app.utils.sentry_helpers import capture_error
 ARIA Agreement Builder Service
 
 Conversational approach to building custody agreements.

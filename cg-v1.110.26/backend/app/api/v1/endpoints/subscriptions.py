@@ -38,6 +38,7 @@ from app.schemas.subscription import (
 from app.services.feature_gate import feature_gate, FEATURE_DEFINITIONS, TIER_DISPLAY_NAMES
 from app.services.stripe_service import stripe_service
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -237,6 +238,7 @@ async def get_current_subscription(
 
         except Exception as e:
             logger.error(f"Failed proactive Stripe sync for user {current_user.id}: {e}")
+            capture_error(e)
             # Non-blocking, continue with local data if sync fails
             pass
 
@@ -427,6 +429,7 @@ async def create_checkout_session(
         raise
     except Exception as e:
         logger.error(f"CRITICAL: Failed to check existing subscriptions: {e}", exc_info=True)
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to check subscription status."
@@ -472,6 +475,7 @@ async def create_checkout_session(
 
         except Exception as e:
             logger.error(f"Failed to upgrade subscription: {e}")
+            capture_error(e)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to upgrade subscription."
@@ -509,6 +513,7 @@ async def create_checkout_session(
         )
     except Exception as e:
         logger.error(f"Failed to create checkout session: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create checkout session."
@@ -654,6 +659,7 @@ async def upgrade_subscription(
 
     except Exception as e:
         logger.error(f"Failed to upgrade subscription: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upgrade subscription."
@@ -1071,6 +1077,7 @@ async def sync_subscription_from_stripe(
 
     except Exception as e:
         logger.error(f"Failed to sync subscription from Stripe: {e}", exc_info=True)
+        capture_error(e)
         # Don't raise - return current status
 
     return await get_current_subscription(current_user, db)

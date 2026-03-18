@@ -32,6 +32,7 @@ from app.services.storage import (
     build_recording_path,
 )
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -325,6 +326,7 @@ class RecordingService:
 
         except Exception as e:
             logger.error(f"Failed to generate signed URL for {recording_id}: {e}")
+            capture_error(e)
             return None
 
     async def delete_recording_file(
@@ -361,6 +363,7 @@ class RecordingService:
 
         except Exception as e:
             logger.error(f"Failed to delete recording file for {recording_id}: {e}")
+            capture_error(e)
             return False
 
     async def get_family_recordings(
@@ -561,6 +564,7 @@ class RecordingService:
 
         except Exception as e:
             logger.error(f"Failed to verify recording {recording_id}: {e}")
+            capture_error(e)
             return {
                 "verified": False,
                 "status": "error",

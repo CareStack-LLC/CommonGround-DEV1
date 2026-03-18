@@ -21,6 +21,7 @@ from app.models.parent_call import (
 )
 from app.models.family_file import FamilyFile
 from app.services.daily_video import daily_service
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -78,9 +79,11 @@ class ParentCallService:
             except ValueError as e:
                 # ValueError means API key not configured - must fail
                 logger.error(f"Cannot verify Daily.co room: {e}")
+                capture_error(e)
                 raise
             except Exception as e:
                 logger.error(f"Could not verify Daily.co room: {e}")
+                capture_error(e)
                 raise ValueError(f"Failed to verify video room: {str(e)}")
 
         # Get family file to construct room name
@@ -126,6 +129,7 @@ class ParentCallService:
 
         except Exception as e:
             logger.error(f"Failed to create permanent room: {e}")
+            capture_error(e)
             await db.rollback()
             raise
 

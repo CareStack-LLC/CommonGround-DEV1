@@ -26,6 +26,7 @@ from app.schemas.schedule import (
 )
 from app.services.schedule import ScheduleService
 from sqlalchemy import select, and_
+from app.utils.sentry_helpers import capture_error
 
 router = APIRouter()
 

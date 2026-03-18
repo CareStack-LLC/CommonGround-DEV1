@@ -9,6 +9,7 @@ from app.core.security import get_current_user
 from app.models.user import User
 from app.models.agreement import Agreement, ComplianceLog
 from app.services.smart_schedule import SmartScheduleGenerator
+from app.utils.sentry_helpers import capture_error
 
 router = APIRouter()
 

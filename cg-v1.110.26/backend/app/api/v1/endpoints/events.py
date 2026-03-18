@@ -30,6 +30,7 @@ from app.schemas.schedule import (
 from app.services.event import EventService
 from app.services.activity import log_event_activity
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -108,6 +109,7 @@ async def create_event(
 
     except ValueError as e:
         logger.error(f"Failed to create event: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -200,6 +202,7 @@ async def list_events(
 
     except ValueError as e:
         logger.error(f"Failed to list events: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -249,6 +252,7 @@ async def update_event(
 
     except ValueError as e:
         logger.error(f"Failed to update event: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -289,6 +293,7 @@ async def delete_event(
 
     except ValueError as e:
         logger.error(f"Failed to delete event: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -328,6 +333,7 @@ async def update_rsvp(
 
     except ValueError as e:
         logger.error(f"Failed to update RSVP: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -364,6 +370,7 @@ async def get_event_attendance(
 
     except ValueError as e:
         logger.error(f"Failed to get event attendance: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -436,6 +443,7 @@ async def request_swap(
 
     except ValueError as e:
         logger.error(f"Failed to create swap request: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -475,6 +483,7 @@ async def respond_to_swap(
 
     except ValueError as e:
         logger.error(f"Failed to respond to swap request: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."

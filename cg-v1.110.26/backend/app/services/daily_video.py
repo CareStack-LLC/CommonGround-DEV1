@@ -12,6 +12,7 @@ import logging
 
 from app.core.config import settings
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 # Daily.co API base URL
@@ -111,6 +112,7 @@ class DailyVideoService:
             raise
         except Exception as e:
             logger.error(f"Daily.co API error: {e}")
+            capture_error(e)
             raise ValueError(f"Failed to create video room: {str(e)}")
 
     async def get_room(self, room_name: str) -> Optional[Dict[str, Any]]:
@@ -148,6 +150,7 @@ class DailyVideoService:
 
         except Exception as e:
             logger.error(f"Error getting room: {e}")
+            capture_error(e)
             return None
 
     async def delete_room(self, room_name: str) -> bool:
@@ -180,6 +183,7 @@ class DailyVideoService:
 
         except Exception as e:
             logger.error(f"Error deleting room: {e}")
+            capture_error(e)
             return False
 
     async def create_meeting_token(
@@ -271,6 +275,7 @@ class DailyVideoService:
             raise
         except Exception as e:
             logger.error(f"Daily.co API error: {e}")
+            capture_error(e)
             raise ValueError(f"Failed to generate meeting token: {str(e)}")
 
     async def get_room_presence(self, room_name: str) -> Dict[str, Any]:
@@ -301,6 +306,7 @@ class DailyVideoService:
 
         except Exception as e:
             logger.error(f"Error getting room presence: {e}")
+            capture_error(e)
             return {"total_count": 0, "data": []}
 
     async def create_room_if_not_exists(
@@ -368,6 +374,7 @@ class DailyVideoService:
 
         except Exception as e:
             logger.error(f"Error starting recording: {e}")
+            capture_error(e)
             raise
 
     async def start_session_recording(
@@ -432,6 +439,7 @@ class DailyVideoService:
 
         except Exception as e:
             logger.error(f"Error stopping recording: {e}")
+            capture_error(e)
             return False
 
     async def get_recordings(self, room_name: str) -> List[Dict[str, Any]]:
@@ -465,6 +473,7 @@ class DailyVideoService:
 
         except Exception as e:
             logger.error(f"Error getting recordings: {e}")
+            capture_error(e)
             return []
 
     async def start_transcription(
@@ -513,6 +522,7 @@ class DailyVideoService:
 
         except Exception as e:
             logger.error(f"Error starting transcription: {e}")
+            capture_error(e)
             raise
 
     async def stop_transcription(self, room_name: str) -> bool:
@@ -552,6 +562,7 @@ class DailyVideoService:
 
         except Exception as e:
             logger.error(f"Error stopping transcription: {e}")
+            capture_error(e)
             return False
 
     async def end_session(self, room_name: str) -> bool:
@@ -586,6 +597,7 @@ class DailyVideoService:
 
         except Exception as e:
             logger.error(f"Error ending sessions: {e}")
+            capture_error(e)
             return False
 
 

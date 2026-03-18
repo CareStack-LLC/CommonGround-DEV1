@@ -19,6 +19,7 @@ from app.core.config import settings
 
 import logging
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 

@@ -12,6 +12,7 @@ from typing import Optional, Tuple
 import httpx
 
 from app.core.config import settings
+from app.utils.sentry_helpers import capture_error
 
 
 class GeolocationService:

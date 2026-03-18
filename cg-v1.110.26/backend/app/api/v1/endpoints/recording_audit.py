@@ -20,6 +20,7 @@ from app.services.recording import recording_service
 from app.services.recording_audit import recording_audit_service
 from app.services.evidence_export import evidence_export_service
 from app.services.family_file import get_user_family_file
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -187,6 +188,7 @@ async def set_legal_hold(
 
     except ValueError as e:
         logger.error(f"Failed to set legal hold: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="Failed to set legal hold")
 
 
@@ -237,6 +239,7 @@ async def release_legal_hold(
 
     except ValueError as e:
         logger.error(f"Failed to release legal hold: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="Failed to release legal hold")
 
 
@@ -630,6 +633,7 @@ async def export_evidence_package(
 
     except ValueError as e:
         logger.error(f"Failed to export evidence package: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="Failed to export evidence package")
     except Exception as e:
         logger.exception(f"Failed to generate evidence package: {e}")

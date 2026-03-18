@@ -12,6 +12,7 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Optional
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -592,6 +593,7 @@ async def get_partner_dashboard(
                     aria_interventions += blocked_count
                 except Exception as e:
                     logger.error(f"Failed to query blocked interventions from aria_events: {e}")
+                    capture_error(e)
                     pass
         
         # Get schedule count

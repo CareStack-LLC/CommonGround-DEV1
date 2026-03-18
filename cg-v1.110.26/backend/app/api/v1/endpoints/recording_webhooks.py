@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.models.recording import RecordingStatus
 from app.services.recording import recording_service
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +56,7 @@ async def handle_daily_recording_webhook(
         payload = await request.json()
     except Exception as e:
         logger.error(f"Failed to parse webhook payload: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="Invalid JSON payload")
 
     event_type = payload.get("type")
@@ -87,6 +89,7 @@ async def handle_daily_recording_webhook(
 
     except Exception as e:
         logger.error(f"Error processing webhook {event_type}: {e}")
+        capture_error(e)
         # Return 200 to prevent retries for handled errors
         return {"status": "error", "message": "An error occurred while processing the webhook."}
 
@@ -214,6 +217,7 @@ async def download_and_store_recording(data: Dict[str, Any]):
 
         except httpx.HTTPError as e:
             logger.error(f"Failed to download recording {daily_recording_id}: {e}")
+            capture_error(e)
             if recording:
                 await recording_service.update_recording_failed(
                     db, recording.id, f"Download failed: {str(e)}"
@@ -221,6 +225,7 @@ async def download_and_store_recording(data: Dict[str, Any]):
 
         except Exception as e:
             logger.error(f"Failed to process recording {daily_recording_id}: {e}")
+            capture_error(e)
             if recording:
                 await recording_service.update_recording_failed(
                     db, recording.id, f"Processing failed: {str(e)}"
@@ -270,6 +275,7 @@ async def handle_daily_transcription_webhook(
         payload = await request.json()
     except Exception as e:
         logger.error(f"Failed to parse webhook payload: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="Invalid JSON payload")
 
     event_type = payload.get("type")
@@ -294,6 +300,7 @@ async def handle_daily_transcription_webhook(
 
     except Exception as e:
         logger.error(f"Error processing transcription webhook {event_type}: {e}")
+        capture_error(e)
         return {"status": "error", "message": "An error occurred while processing the webhook."}
 
 
@@ -349,6 +356,7 @@ async def handle_transcription_message(db: AsyncSession, data: Dict[str, Any]):
             logger.debug(f"ARIA analysis completed for webhook transcript chunk in room {room_name}")
     except Exception as e:
         logger.error(f"ARIA webhook transcript analysis failed for room {room_name}: {e}")
+        capture_error(e)
 
 
 async def handle_transcription_stopped(db: AsyncSession, data: Dict[str, Any]):

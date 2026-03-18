@@ -13,6 +13,7 @@ from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance

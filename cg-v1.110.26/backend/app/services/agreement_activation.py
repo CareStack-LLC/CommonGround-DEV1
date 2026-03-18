@@ -47,6 +47,7 @@ from app.schemas.parenting_schedule import (
     parse_transition_time,
 )
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -125,6 +126,7 @@ class AgreementActivationService:
                 logger.info(f"Created {len(exchanges)} custody exchanges for agreement {agreement.id}")
             except Exception as e:
                 logger.error(f"Failed to create exchanges for agreement {agreement.id}: {e}")
+                capture_error(e)
                 result.errors.append(f"Failed to create exchanges: {str(e)}")
 
         # Set expense split ratio on family file
@@ -139,6 +141,7 @@ class AgreementActivationService:
                 logger.info(f"Set expense split ratio {expense_data.split_ratio} for family file {family_file.id}")
             except Exception as e:
                 logger.error(f"Failed to set split ratio for agreement {agreement.id}: {e}")
+                capture_error(e)
                 result.errors.append(f"Failed to set split ratio: {str(e)}")
 
         # Set default exchange location on family file
@@ -152,6 +155,7 @@ class AgreementActivationService:
                 logger.info(f"Set exchange location for family file {family_file.id}")
             except Exception as e:
                 logger.error(f"Failed to set exchange location for agreement {agreement.id}: {e}")
+                capture_error(e)
                 result.errors.append(f"Failed to set exchange location: {str(e)}")
 
         # Create recurring child support obligations
@@ -173,6 +177,7 @@ class AgreementActivationService:
                     )
             except Exception as e:
                 logger.error(f"Failed to create child support obligations for agreement {agreement.id}: {e}")
+                capture_error(e)
                 result.errors.append(f"Failed to create child support obligations: {str(e)}")
 
         # Create recurring expense templates (volleyball, medicine, etc.)
@@ -194,6 +199,7 @@ class AgreementActivationService:
                     )
             except Exception as e:
                 logger.error(f"Failed to create recurring expense templates for agreement {agreement.id}: {e}")
+                capture_error(e)
                 result.errors.append(f"Failed to create recurring expense templates: {str(e)}")
 
         # Step 5: Create ScheduleEvents for calendar visibility of exchanges
@@ -211,6 +217,7 @@ class AgreementActivationService:
                 logger.info(f"Created {events_count} exchange schedule events for agreement {agreement.id}")
             except Exception as e:
                 logger.error(f"Failed to create exchange schedule events for agreement {agreement.id}: {e}")
+                capture_error(e)
                 result.errors.append(f"Failed to create exchange schedule events: {str(e)}")
 
         # Step 6: Create holiday ScheduleEvents
@@ -226,6 +233,7 @@ class AgreementActivationService:
                 logger.info(f"Created {holiday_count} holiday events for agreement {agreement.id}")
         except Exception as e:
             logger.error(f"Failed to create holiday events for agreement {agreement.id}: {e}")
+            capture_error(e)
             result.errors.append(f"Failed to create holiday events: {str(e)}")
 
         # Step 7: Create recurring activity ScheduleEvents + optional Obligations
@@ -242,6 +250,7 @@ class AgreementActivationService:
                 logger.info(f"Created {activity_count} activity events for agreement {agreement.id}")
         except Exception as e:
             logger.error(f"Failed to create activity events for agreement {agreement.id}: {e}")
+            capture_error(e)
             result.errors.append(f"Failed to create activity events: {str(e)}")
 
         # Step 8: Store communication preferences on FamilyFile
@@ -255,6 +264,7 @@ class AgreementActivationService:
                 logger.info(f"Stored communication preferences for agreement {agreement.id}")
         except Exception as e:
             logger.error(f"Failed to store communication preferences for agreement {agreement.id}: {e}")
+            capture_error(e)
             result.errors.append(f"Failed to store communication preferences: {str(e)}")
 
         await self.db.commit()
@@ -1762,6 +1772,7 @@ class AgreementActivationService:
                     total_instances += instances_count
             except Exception as e:
                 logger.error(f"Failed to create expense template for {expense.get('category')}: {e}")
+                capture_error(e)
                 continue
 
         return templates_created, total_instances

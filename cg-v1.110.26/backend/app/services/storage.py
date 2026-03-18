@@ -308,6 +308,7 @@ class SupabaseStorageService:
 
 
 import re
+from app.utils.sentry_helpers import capture_error
 
 def sanitize_filename(filename: str) -> str:
     """

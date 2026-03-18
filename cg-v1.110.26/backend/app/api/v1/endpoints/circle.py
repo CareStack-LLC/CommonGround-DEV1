@@ -1,4 +1,5 @@
 """
+from app.utils.sentry_helpers import capture_error
 Circle API endpoints for managing approved child contacts.
 
 The Circle is a list of trusted contacts (grandparents, family friends, etc.)
@@ -135,6 +136,7 @@ async def _create_event_log(
         db.add(event_log)
     except Exception as e:
         logger.error(f"Failed to create EventLog ({event_type}): {e}")
+        capture_error(e)
 
 
 async def get_approval_mode(db: AsyncSession, family_file_id: str) -> ApprovalMode:
@@ -433,6 +435,7 @@ async def delete_circle_contact(
             )
         except Exception as e:
             logger.error(f"Failed to send contact-blocked notification: {e}")
+            capture_error(e)
 
     # Activity feed entry
     try:
@@ -451,6 +454,7 @@ async def delete_circle_contact(
         )
     except Exception as e:
         logger.error(f"Failed to log circle contact-blocked activity: {e}")
+        capture_error(e)
 
     await db.commit()
 

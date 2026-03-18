@@ -84,6 +84,7 @@ from app.core.config import settings
 import hashlib
 import json
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -187,6 +188,7 @@ async def _create_event_log(
         db.add(event_log)
     except Exception as e:
         logger.error(f"Failed to create EventLog ({event_type}): {e}")
+        capture_error(e)
 
 
 def _room_to_response(room: KidComsRoom, contact: Optional[CircleContact] = None) -> KidComsRoomResponse:
@@ -356,6 +358,7 @@ async def assign_room_to_contact(
         return _room_to_response(room, contact)
     except ValueError as e:
         logger.error(f"Failed to assign room: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -389,6 +392,7 @@ async def unassign_room(
         return _room_to_response(room)
     except ValueError as e:
         logger.error(f"Failed to unassign room: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -591,6 +595,7 @@ async def invite_circle_user(
             )
         except Exception as e:
             logger.error(f"Failed to log circle invite activity: {e}")
+            capture_error(e)
 
         await db.commit()
 
@@ -607,6 +612,7 @@ async def invite_circle_user(
         )
     except ValueError as e:
         logger.error(f"Failed to invite circle user: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -762,6 +768,7 @@ async def create_and_invite_circle_user(
             )
         except Exception as e:
             logger.error(f"Failed to log circle invite activity: {e}")
+            capture_error(e)
 
         await db.commit()
 
@@ -778,6 +785,7 @@ async def create_and_invite_circle_user(
         )
     except ValueError as e:
         logger.error(f"Failed to create and invite circle user: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -958,8 +966,10 @@ async def accept_circle_invite(
                                 )
                             except Exception as e:
                                 logger.error(f"Failed to send invite-accepted notification to parent {parent_id}: {e}")
+                                capture_error(e)
             except Exception as e:
                 logger.error(f"Failed to send invite-accepted notifications: {e}")
+                capture_error(e)
 
             # Court-evidence EventLog entry
             await _create_event_log(
@@ -993,6 +1003,7 @@ async def accept_circle_invite(
                 )
             except Exception as e:
                 logger.error(f"Failed to log circle invite-accepted activity: {e}")
+                capture_error(e)
 
             await db.commit()
 
@@ -1008,6 +1019,7 @@ async def accept_circle_invite(
         )
     except ValueError as e:
         logger.error(f"Circle user login failed: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -1122,6 +1134,7 @@ async def forgot_password(
             logger.info(f"Password reset email sent to {circle_user.email}")
         except Exception as e:
             logger.error(f"Failed to send password reset email: {e}")
+            capture_error(e)
             # Don't expose email sending failures to client
 
     # Always return success (security best practice)
@@ -1167,6 +1180,7 @@ async def reset_password(
         )
     except ValueError as e:
         logger.error(f"Failed to reset circle user password: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -1570,6 +1584,7 @@ async def setup_child_user(
         return _child_user_to_response(child_user, child)
     except ValueError as e:
         logger.error(f"Failed to setup child user: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -1619,6 +1634,7 @@ async def update_child_user(
         return _child_user_to_response(child_user, child)
     except ValueError as e:
         logger.error(f"Failed to update child user: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -2003,6 +2019,7 @@ async def update_permission(
         )
     except Exception as e:
         logger.error(f"Failed to log circle permission activity: {e}")
+        capture_error(e)
 
     await db.commit()
     await db.refresh(permission)

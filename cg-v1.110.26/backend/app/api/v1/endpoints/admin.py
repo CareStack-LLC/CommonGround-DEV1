@@ -35,6 +35,7 @@ from app.core.security import get_current_admin_user
 from app.models.user import User, UserProfile
 from app.models.audit import AuditLog
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -1057,6 +1058,7 @@ async def create_report_request(
         }
     except Exception as e:
         logger.error(f"Report generation failed: {e}")
+        capture_error(e)
         report_log.status = "failed"
         report_log.extra_metadata = {
             **report_log.extra_metadata,
@@ -1255,6 +1257,7 @@ async def sync_stripe_customers(
         except Exception as e:
             failed += 1
             logger.error(f"Failed to sync Stripe customer for user {user.id}: {e}")
+            capture_error(e)
             errors.append({"user_id": str(user.id), "email": user.email, "error": "Sync failed."})
 
     await _log_admin_action(
@@ -1363,6 +1366,7 @@ async def sync_stripe_subscriptions(
                     pass
         except Exception as e:
             logger.error(f"Failed to audit Stripe customer {profile.stripe_customer_id}: {e}")
+            capture_error(e)
             errors.append({"customer_id": profile.stripe_customer_id, "error": "Audit failed."})
 
     await _log_admin_action(
@@ -1718,6 +1722,7 @@ async def generate_report_for_request(
         r.admin_notes = f"Generation failed: {str(e)}"
         await db.commit()
         logger.error(f"Report generation failed for request {request_id}: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Report generation failed."
@@ -1781,6 +1786,7 @@ async def deliver_report(
             )
     except Exception as e:
         logger.error(f"Failed to send delivery notification for {request_id}: {e}")
+        capture_error(e)
 
     await _log_admin_action(
         db, admin_user, "deliver_report", "report_request", request_id,

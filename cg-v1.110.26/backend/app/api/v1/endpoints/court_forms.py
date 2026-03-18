@@ -74,6 +74,7 @@ from app.schemas.court_form import (
     CaseFormsListResponse,
 )
 from app.services.court_form import CourtFormService
+from app.utils.sentry_helpers import capture_error
 
 router = APIRouter()
 
@@ -134,6 +135,7 @@ async def get_court_professional_id(
         )
     except jwt.JWTError as e:
         logger.error(f"Invalid court professional token: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token.",
@@ -246,6 +248,7 @@ async def start_fl320(
         return submission
     except ValueError as e:
         logger.error(f"Failed to create FL-320 response: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -282,6 +285,7 @@ async def update_form(
         return submission
     except ValueError as e:
         logger.error(f"Failed to update court form: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -314,6 +318,7 @@ async def submit_form(
         return submission
     except ValueError as e:
         logger.error(f"Failed to submit court form for review: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -346,6 +351,7 @@ async def resubmit_form(
         return submission
     except ValueError as e:
         logger.error(f"Failed to resubmit court form: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -414,6 +420,7 @@ async def download_form_pdf(
         )
     except Exception as e:
         logger.error(f"PDF generation failed for {submission_id}: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate court form PDF",
@@ -470,6 +477,7 @@ async def get_case_progress(
         return progress
     except ValueError as e:
         logger.error(f"Failed to get case form progress: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Case not found.",
@@ -586,6 +594,7 @@ async def allow_parent_edits(
         return submission
     except ValueError as e:
         logger.error(f"Failed to allow parent edits: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -621,6 +630,7 @@ async def revoke_parent_edits(
         return submission
     except ValueError as e:
         logger.error(f"Failed to revoke parent edits: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -655,6 +665,7 @@ async def approve_form(
         return submission
     except ValueError as e:
         logger.error(f"Failed to approve court form: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -685,6 +696,7 @@ async def reject_form(
         return submission
     except ValueError as e:
         logger.error(f"Failed to reject court form: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -716,6 +728,7 @@ async def request_resubmission(
         return submission
     except ValueError as e:
         logger.error(f"Failed to request form resubmission: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -748,6 +761,7 @@ async def mark_form_served(
         return submission
     except ValueError as e:
         logger.error(f"Failed to mark form as served: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -873,6 +887,7 @@ async def record_hearing_outcome(
         return hearing
     except ValueError as e:
         logger.error(f"Failed to record hearing outcome: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -904,6 +919,7 @@ async def continue_hearing(
         return new_hearing
     except ValueError as e:
         logger.error(f"Failed to continue hearing: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -970,6 +986,7 @@ async def attach_fl341(
         return submission
     except ValueError as e:
         logger.error(f"Failed to attach FL-341: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -1003,6 +1020,7 @@ async def attach_fl342(
         return submission
     except ValueError as e:
         logger.error(f"Failed to attach FL-342: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -1035,6 +1053,7 @@ async def finalize_fl340(
         return submission
     except ValueError as e:
         logger.error(f"Failed to finalize FL-340 order: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -1076,6 +1095,7 @@ async def activate_case(
         }
     except ValueError as e:
         logger.error(f"Failed to activate case: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",

@@ -29,6 +29,7 @@ from app.schemas.professional import (
     CalendarSummary,
 )
 from app.services.professional.events_service import events_service
+from app.utils.sentry_helpers import capture_error
 from sqlalchemy import select
 
 logger = logging.getLogger(__name__)
@@ -145,6 +146,7 @@ async def create_event(
         )
     except ValueError as e:
         logger.error(f"Failed to create professional event: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to create event"
@@ -352,6 +354,7 @@ async def update_event(
         )
     except ValueError as e:
         logger.error(f"Failed to update professional event: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to update event"

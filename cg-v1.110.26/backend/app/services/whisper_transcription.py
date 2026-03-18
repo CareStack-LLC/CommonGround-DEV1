@@ -16,6 +16,7 @@ from openai import AsyncOpenAI
 
 from app.core.config import settings
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -100,6 +101,7 @@ class WhisperTranscriptionService:
 
         except Exception as e:
             logger.error(f"Whisper transcription failed: {e}")
+            capture_error(e)
             return None, 0.0
 
     async def transcribe_audio_stream(

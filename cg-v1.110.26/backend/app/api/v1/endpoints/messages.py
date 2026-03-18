@@ -47,6 +47,7 @@ import hashlib
 import logging
 import json
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -1675,6 +1676,7 @@ async def upload_message_attachment(
         )
     except Exception as e:
         logger.error(f"Failed to upload attachment: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload file to storage"
@@ -1811,6 +1813,7 @@ async def upload_message_attachment(
                 await db.commit()
             except Exception as e:
                 logger.error(f"Failed to log ARIA BLOCK event: {e}")
+                capture_error(e)
                 # Try to commit the deletion at least
                 try: 
                     await db.commit()
@@ -1859,6 +1862,7 @@ async def upload_message_attachment(
             await db.commit()
         except Exception as e:
             logger.error(f"Failed to log ARIA event: {e}")
+            capture_error(e)
 
     # ---------------------------------
 

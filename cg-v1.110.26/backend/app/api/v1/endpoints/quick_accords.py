@@ -23,6 +23,7 @@ from app.schemas.family_file import (
 from app.services.quick_accord import QuickAccordService
 from app.services.aria_quick_accord import AriaQuickAccordService
 from app.schemas.family_file import ARIAQuickAccordMessage
+from app.utils.sentry_helpers import capture_error
 
 router = APIRouter()
 

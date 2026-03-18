@@ -18,6 +18,7 @@ from sqlalchemy import select, or_
 from sqlalchemy.orm import selectinload
 
 router = APIRouter()
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -47,6 +48,7 @@ async def get_user_from_token(token: str, db: AsyncSession) -> Optional[User]:
         return user
     except Exception as e:
         logger.error(f"Token verification failed: {e}")
+        capture_error(e)
         return None
 
 
@@ -147,6 +149,7 @@ async def websocket_endpoint(
         })
     except Exception as e:
         logger.error(f"Error sending connection confirmation: {e}")
+        capture_error(e)
 
     try:
         while True:
@@ -247,8 +250,9 @@ async def websocket_endpoint(
     except Exception as e:
         # Unexpected error
         logger.error(f"WebSocket error for user {user.id}: {e}")
+        capture_error(e)
         manager.disconnect(websocket, user.id)
         try:
             await websocket.close()
-        except:
+        except Exception:
             pass

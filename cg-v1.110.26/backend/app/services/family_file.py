@@ -36,6 +36,7 @@ from app.schemas.family_file import (
 )
 from app.services.email import email_service as _email_service_singleton
 from app.core.config import settings
+from app.utils.sentry_helpers import capture_error
 
 
 class FamilyFileService:

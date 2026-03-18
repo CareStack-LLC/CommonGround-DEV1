@@ -13,6 +13,7 @@ from app.schemas.marketing import (
     ContactFormResponse,
 )
 from app.services.email import email_service
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,7 @@ async def subscribe_newsletter(request: NewsletterSubscribeRequest):
         )
     except Exception as e:
         logger.error(f"Newsletter subscription failed for {request.email}: {str(e)}")
+        capture_error(e)
         return NewsletterSubscribeResponse(
             success=False,
             message="We couldn't process your subscription right now. Please try again later."
@@ -102,6 +104,7 @@ async def submit_contact_form(request: ContactFormRequest):
         )
     except Exception as e:
         logger.error(f"Contact form submission failed for {request.email}: {str(e)}")
+        capture_error(e)
         return ContactFormResponse(
             success=False,
             message="We couldn't send your message right now. Please try again later."

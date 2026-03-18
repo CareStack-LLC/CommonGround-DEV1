@@ -28,6 +28,7 @@ from app.models.child import Child
 from app.models.user import User
 from app.core.config import settings
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -534,6 +535,7 @@ Return ONLY the JSON object, no other text."""
                 return await self._get_openai_response(system_prompt, messages, user_message)
             except Exception as e:
                 logger.error(f"OpenAI API error: {e}")
+                capture_error(e)
 
         # Ultimate fallback response
         return "I'd be happy to help you create a QuickAccord. What situation do you need to document?"
@@ -598,6 +600,7 @@ Return ONLY the JSON object, no other text."""
                 json_str = response.choices[0].message.content
             except Exception as e:
                 logger.error(f"OpenAI extraction error: {e}")
+                capture_error(e)
 
         # Parse JSON if we got a response
         if json_str:

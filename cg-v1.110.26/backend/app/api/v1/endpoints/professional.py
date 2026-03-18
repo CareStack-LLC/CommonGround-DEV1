@@ -1,4 +1,5 @@
 """
+from app.utils.sentry_helpers import capture_error
 Professional Portal API endpoints.
 
 Endpoints for professional profiles, firms, memberships,
@@ -773,6 +774,7 @@ async def invite_firm_member(
         membership = await service.invite_member(firm_id, current_user.id, data)
     except ValueError as e:
         logger.error(f"Failed to invite firm member: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="An error occurred while processing your request.",
@@ -838,6 +840,7 @@ async def remove_firm_member(
         await service.remove_member(membership_id)
     except ValueError as e:
         logger.error(f"Failed to remove firm member: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -1328,6 +1331,7 @@ async def get_invitation_case_preview(
         return preview
     except ValueError as e:
         logger.error(f"Case preview not found: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="An error occurred while processing your request.",
@@ -1474,6 +1478,7 @@ async def request_case_access(
         )
     except ValueError as e:
         logger.error(f"Failed to request access to case: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -1532,6 +1537,7 @@ async def accept_case_invitation(
         request = await service.professional_accept_invitation(request_id, profile.id)
     except ValueError as e:
         logger.error(f"Failed to accept case invitation: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -1562,6 +1568,7 @@ async def decline_case_invitation(
         )
     except ValueError as e:
         logger.error(f"Failed to decline case invitation: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request.",
@@ -1970,6 +1977,7 @@ async def get_communications(
         )
     except ValueError as e:
         logger.error(f"Failed to get communications: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2002,6 +2010,7 @@ async def get_communication_threads(
         )
     except ValueError as e:
         logger.error(f"Failed to get communication threads: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2032,6 +2041,7 @@ async def get_communication_stats(
         )
     except ValueError as e:
         logger.error(f"Failed to get communication stats: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2068,6 +2078,7 @@ async def get_communication_detail(
         return result
     except ValueError as e:
         logger.error(f"Failed to get message detail: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2287,6 +2298,7 @@ async def get_compliance_dashboard(
         )
     except ValueError as e:
         logger.error(f"Failed to get compliance dashboard: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2317,6 +2329,7 @@ async def get_exchange_compliance(
         )
     except ValueError as e:
         logger.error(f"Failed to get exchange compliance: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2347,6 +2360,7 @@ async def get_financial_compliance(
         )
     except ValueError as e:
         logger.error(f"Failed to get financial compliance: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2377,6 +2391,7 @@ async def get_communication_compliance(
         )
     except ValueError as e:
         logger.error(f"Failed to get communication compliance: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2448,6 +2463,7 @@ async def get_case_messages(
         )
     except ValueError as e:
         logger.error(f"Failed to get case messages: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2477,6 +2493,7 @@ async def get_message_threads(
         )
     except ValueError as e:
         logger.error(f"Failed to get message threads: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -2522,6 +2539,7 @@ async def send_message_to_client(
         )
     except ValueError as e:
         logger.error(f"Failed to send message to client: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this resource.",
@@ -3297,6 +3315,7 @@ async def preview_template(
         return processed_content
     except ValueError as e:
         logger.error(f"Failed to preview template: {e}")
+        capture_error(e)
         raise HTTPException(status_code=404, detail="Template or case not found.")
 
 
@@ -3743,6 +3762,7 @@ async def get_ocr_review(
         return await service.get_extraction_review(document_id)
     except ValueError as e:
         logger.error(f"Failed to get OCR review: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
@@ -3766,6 +3786,7 @@ async def submit_ocr_corrections(
         return {"status": "corrections_saved", "document_id": doc.id}
     except ValueError as e:
         logger.error(f"Failed to submit OCR corrections: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
@@ -3814,6 +3835,7 @@ async def approve_ocr_extraction(
         }
     except ValueError as e:
         logger.error(f"Failed to approve OCR extraction: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
@@ -3835,6 +3857,7 @@ async def reject_ocr_extraction(
         return {"status": "rejected", "document_id": doc.id}
     except ValueError as e:
         logger.error(f"Failed to reject OCR extraction: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
@@ -3926,6 +3949,7 @@ async def unlock_field(
         }
     except ValueError as e:
         logger.error(f"Failed to unlock field: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 
@@ -4133,6 +4157,7 @@ async def get_report_data(
         return data
     except ValueError as e:
         logger.error(f"Failed to generate report data: {e}")
+        capture_error(e)
         raise HTTPException(status_code=400, detail="An error occurred while processing your request.")
 
 

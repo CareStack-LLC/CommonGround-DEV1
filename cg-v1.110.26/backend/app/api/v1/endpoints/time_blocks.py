@@ -23,6 +23,7 @@ from app.schemas.schedule import (
     BusyPeriod,
 )
 from app.services.time_block import TimeBlockService
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +74,7 @@ async def create_time_block(
 
     except ValueError as e:
         logger.error(f"Failed to create time block: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -137,6 +139,7 @@ async def list_time_blocks(
 
     except ValueError as e:
         logger.error(f"Failed to list time blocks: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -175,6 +178,7 @@ async def update_time_block(
 
     except ValueError as e:
         logger.error(f"Failed to update time block: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."

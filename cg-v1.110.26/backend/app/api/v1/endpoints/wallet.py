@@ -41,6 +41,7 @@ from app.schemas.wallet import (
     WalletAnalytics,
 )
 from app.services.wallet_service import wallet_service
+from app.utils.sentry_helpers import capture_error
 
 router = APIRouter()
 
@@ -96,6 +97,7 @@ async def create_wallet(
         )
     except ValueError as e:
         logger.error(f"Failed to create wallet: {e}")
+        capture_error(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
 
 
@@ -359,6 +361,7 @@ async def deposit_funds(
     except ValueError as e:
         await db.rollback()
         logger.error(f"Deposit validation failed: {e}")
+        capture_error(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
     except Exception as e:
         await db.rollback()
@@ -445,6 +448,7 @@ async def confirm_deposit(
     except ValueError as e:
         await db.rollback()
         logger.error(f"Payment confirmation validation failed: {e}")
+        capture_error(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
     except Exception as e:
         await db.rollback()
@@ -521,6 +525,7 @@ async def pay_obligation(
     except ValueError as e:
         await db.rollback()
         logger.error(f"Payment validation failed: {e}")
+        capture_error(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
     except Exception as e:
         await db.rollback()
@@ -755,6 +760,7 @@ async def create_child_wallet(
     except ValueError as e:
         await db.rollback()
         logger.error(f"Failed to create child wallet: {e}")
+        capture_error(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
 
 
@@ -889,6 +895,7 @@ async def contribute_to_child(
     except ValueError as e:
         await db.rollback()
         logger.error(f"Contribution validation failed: {e}")
+        capture_error(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
     except Exception as e:
         await db.rollback()

@@ -29,6 +29,7 @@ from app.services.export.redaction import RedactionService
 from app.services.export.pdf_builder import ExportPDFBuilder, calculate_content_hash
 from app.services.export.generators.base import GeneratorContext, SectionContent
 from app.services.export.generators import get_registry
+from app.utils.sentry_helpers import capture_error
 
 
 class CaseExportService:
@@ -292,6 +293,7 @@ class CaseExportService:
             return url
         except Exception as e:
             logger.error(f"Failed to upload court export to Supabase: {e}")
+            capture_error(e)
             # Fallback to local storage for dev environments
             storage_path = self.EXPORT_STORAGE_PATH
             storage_path.mkdir(parents=True, exist_ok=True)

@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.audit import AuditLog
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -80,6 +81,7 @@ async def log_audit_event(
     except Exception as e:
         # Never let audit logging failure break the main flow
         logger.error(f"Failed to write audit log: {e}")
+        capture_error(e)
         try:
             await db.rollback()
         except Exception:

@@ -49,6 +49,7 @@ from app.services.storage import storage_service, StorageBucket, build_recording
 from app.core.config import settings
 from app.core.websocket import manager
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -138,12 +139,14 @@ async def initiate_call(
     except ValueError as e:
         # ValueError indicates configuration issue (e.g., missing API key)
         logger.error(f"Failed to create call session: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to create call session"
         )
     except Exception as e:
         logger.error(f"Failed to create call session: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create call session"
@@ -160,12 +163,14 @@ async def initiate_call(
     except ValueError as e:
         # ValueError indicates configuration issue (e.g., missing API key)
         logger.error(f"Failed to join call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to join call session"
         )
     except Exception as e:
         logger.error(f"Failed to join call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to join call session"
@@ -269,12 +274,14 @@ async def join_call(
     except ValueError as e:
         # ValueError indicates configuration issue (e.g., missing API key)
         logger.error(f"Failed to join call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Failed to join call session"
         )
     except Exception as e:
         logger.error(f"Failed to join call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to join call session"
@@ -306,6 +313,7 @@ async def join_call(
 
         except Exception as e:
             logger.error(f"Failed to start recording/transcription for session {session_id}: {e}")
+            capture_error(e)
             # Don't fail the join if recording/transcription fails
 
     logger.info(f"User {current_user.id} joined call session {session_id}")
@@ -527,6 +535,7 @@ async def end_call(
             logger.info(f"Stopped recording and transcription for session {session_id}")
         except Exception as e:
             logger.error(f"Failed to stop recording/transcription: {e}")
+            capture_error(e)
 
     # End the call
     try:
@@ -538,6 +547,7 @@ async def end_call(
         )
     except Exception as e:
         logger.error(f"Failed to end call: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to end call session"
@@ -608,6 +618,7 @@ async def process_transcript_chunk(
         )
     except Exception as e:
         logger.error(f"Failed to store transcript chunk: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to process transcript chunk"
@@ -654,6 +665,7 @@ async def process_transcript_chunk(
 
         except Exception as e:
             logger.error(f"ARIA analysis failed: {e}")
+            capture_error(e)
             # Continue even if ARIA fails
 
     return {
@@ -710,6 +722,7 @@ async def process_audio_chunk(
         logger.info(f"Received audio chunk: {len(audio_data)} bytes, format: {audio.content_type}")
     except Exception as e:
         logger.error(f"Failed to read audio data: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid audio data"
@@ -766,6 +779,7 @@ async def process_audio_chunk(
         )
     except Exception as e:
         logger.error(f"Failed to store transcript chunk: {e}")
+        capture_error(e)
         # Continue even if storage fails - we still want to analyze
 
     # Real-time ARIA analysis (if enabled and chunk was stored)
@@ -803,6 +817,7 @@ async def process_audio_chunk(
 
         except Exception as e:
             logger.error(f"ARIA analysis failed: {e}")
+            capture_error(e)
             # Continue even if ARIA fails
 
     return {
@@ -860,6 +875,7 @@ async def upload_recording(
         logger.info(f"Received recording: {len(recording_data)} bytes")
     except Exception as e:
         logger.error(f"Failed to read recording: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid recording data"
@@ -900,6 +916,7 @@ async def upload_recording(
 
     except Exception as e:
         logger.error(f"Failed to upload recording: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload recording"
@@ -1120,6 +1137,7 @@ async def get_call_report(
         )
     except Exception as e:
         logger.error(f"Failed to generate call report: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate call report"
@@ -1259,6 +1277,7 @@ async def analyze_video_frame(
         )
     except Exception as e:
         logger.error(f"Vision analysis failed: {e}")
+        capture_error(e)
         return {"message": "Vision analysis failed", "flagged": False}
 
     # Create frame analysis record
@@ -1274,6 +1293,7 @@ async def analyze_video_frame(
         )
     except Exception as e:
         logger.error(f"Failed to create frame analysis record: {e}")
+        capture_error(e)
         return {"message": "Failed to store analysis", "flagged": False}
 
     # If flagged, handle violation through tracker
@@ -1293,6 +1313,7 @@ async def analyze_video_frame(
                 )
         except Exception as e:
             logger.error(f"Failed to store flagged frame: {e}")
+            capture_error(e)
 
         # Handle through call monitor's video violation handler
         try:
@@ -1320,6 +1341,7 @@ async def analyze_video_frame(
 
         except Exception as e:
             logger.error(f"Failed to handle video violation: {e}")
+            capture_error(e)
             await db.commit()
             return {"message": "Frame flagged but intervention failed", "flagged": True}
 
@@ -1497,6 +1519,7 @@ async def _process_post_call_complete(
 
         except Exception as e:
             logger.error(f"Failed to download/store recording for session {session_id}: {e}")
+            capture_error(e)
 
         # Run ARIA analysis
         try:
@@ -1507,3 +1530,4 @@ async def _process_post_call_complete(
             logger.info(f"Post-call ARIA analysis completed for session {session_id}")
         except Exception as e:
             logger.error(f"Post-call ARIA analysis failed for session {session_id}: {e}")
+            capture_error(e)

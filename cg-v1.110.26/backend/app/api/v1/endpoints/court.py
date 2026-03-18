@@ -99,6 +99,7 @@ from app.models.message import Message, MessageFlag
 from sqlalchemy import select, and_, func
 from sqlalchemy.orm import selectinload
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -3793,7 +3794,7 @@ async def create_case_from_extraction(
         if dob_str:
             try:
                 dob = date.fromisoformat(dob_str)
-            except:
+            except Exception:
                 pass
 
         child = Child(

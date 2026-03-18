@@ -20,6 +20,7 @@ from app.services.aria_sanitize import (
 # In a real deployment, this would be in os.environ ("OPENAI_API_KEY")
 import logging
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -110,6 +111,7 @@ def analyze_message_with_llm(
 
     except Exception as e:
         logger.error(f"ARIA Inference Error: {e}")
+        capture_error(e)
         # Fallback safe response
         return {
             "labels": [],
@@ -185,6 +187,7 @@ def analyze_image_with_llm(
 
     except Exception as e:
         logger.error(f"ARIA Vision Error: {e}")
+        capture_error(e)
         return {
             "labels": [],
             "severity": 0.0,

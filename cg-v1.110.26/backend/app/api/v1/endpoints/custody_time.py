@@ -28,6 +28,7 @@ from app.schemas.custody_time import (
     CustodyTimelineResponse,
 )
 from app.services.custody_time import CustodyTimeService, get_period_dates
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -144,6 +145,7 @@ async def get_child_custody_stats(
         )
     except ValueError as e:
         logger.error(f"Failed to get child custody stats: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to retrieve custody statistics"
@@ -227,6 +229,7 @@ async def get_family_custody_stats(
         )
     except ValueError as e:
         logger.error(f"Failed to get family custody stats: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to retrieve family custody statistics"
@@ -270,6 +273,7 @@ async def get_parenting_report(
         )
     except ValueError as e:
         logger.error(f"Failed to generate parenting report: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Failed to generate parenting report"

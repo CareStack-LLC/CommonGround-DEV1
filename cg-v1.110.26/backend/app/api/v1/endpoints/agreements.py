@@ -25,6 +25,7 @@ from app.services.agreement import AgreementService
 from app.services.aria_agreement import AriaAgreementService
 from app.services.agreement_activation import AgreementActivationService
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -892,6 +893,7 @@ async def download_agreement_pdf(
         raise
     except Exception as e:
         logger.error(f"PDF generation failed for agreement {agreement_id}: {e}", exc_info=True)
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate PDF"
@@ -1014,6 +1016,7 @@ async def upload_aria_document(
         )
     except Exception as e:
         logger.error(f"Failed to upload file: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload file",
@@ -1027,11 +1030,13 @@ async def upload_aria_document(
     except ValueError as e:
         # Image-only PDF or unsupported type
         logger.error(f"Failed to extract text from document: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Failed to extract text from document"
         )
     except Exception as e:
         logger.error(f"Failed to read document: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Failed to read document",

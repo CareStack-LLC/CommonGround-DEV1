@@ -16,6 +16,7 @@ from app.schemas.schedule import (
     MyTimeCollectionResponse,
 )
 from app.services.collection import CollectionService
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,7 @@ async def create_collection(
 
     except ValueError as e:
         logger.error(f"Failed to create collection: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -149,6 +151,7 @@ async def list_collections(
 
     except ValueError as e:
         logger.error(f"Failed to list collections: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -193,6 +196,7 @@ async def update_collection(
 
     except ValueError as e:
         logger.error(f"Failed to update collection: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."
@@ -232,6 +236,7 @@ async def delete_collection(
 
     except ValueError as e:
         logger.error(f"Failed to delete collection: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="An error occurred while processing your request."

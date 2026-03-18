@@ -57,6 +57,7 @@ from app.services.storage import (
     ALLOWED_IMAGE_TYPES,
 )
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -217,6 +218,7 @@ async def _send_message_notifications(
             )
         except Exception as e:
             logger.error(f"Failed to send parent notification: {e}")
+            capture_error(e)
 
     # Notify the recipient (if they have a user account)
     # Circle contacts have their own user context; children see messages in-app
@@ -232,6 +234,7 @@ async def _send_message_notifications(
                 logger.info(f"Circle contact {circle_user.email} has new message from {message.sender_name}")
         except Exception as e:
             logger.error(f"Failed to process recipient notification: {e}")
+            capture_error(e)
 
 
 async def _create_event_log(
@@ -302,6 +305,7 @@ async def _create_event_log(
         db.add(event_log)
     except Exception as e:
         logger.error(f"Failed to create EventLog ({event_type}): {e}")
+        capture_error(e)
 
 
 async def _create_communication_log(
@@ -329,6 +333,7 @@ async def _create_communication_log(
         db.add(log)
     except Exception as e:
         logger.error(f"Failed to create communication log: {e}")
+        capture_error(e)
 
 
 # ============================================================
@@ -402,6 +407,7 @@ async def upload_circle_attachment(
         )
     except Exception as e:
         logger.error(f"Failed to upload circle attachment: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload file",
@@ -460,6 +466,7 @@ async def upload_circle_attachment_as_child(
         )
     except Exception as e:
         logger.error(f"Failed to upload circle attachment (child): {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload file",
@@ -518,6 +525,7 @@ async def upload_circle_attachment_as_contact(
         )
     except Exception as e:
         logger.error(f"Failed to upload circle attachment (contact): {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to upload file",
@@ -839,6 +847,7 @@ async def send_circle_message_as_child(
         )
     except Exception as e:
         logger.error(f"Failed to log circle message activity: {e}")
+        capture_error(e)
 
     # Court-evidence EventLog entry
     await _create_event_log(
@@ -879,6 +888,7 @@ async def send_circle_message_as_child(
         )
     except Exception as e:
         logger.error(f"Failed to broadcast realtime event: {e}")
+        capture_error(e)
 
     await db.commit()
     await db.refresh(message)
@@ -1026,6 +1036,7 @@ async def send_circle_message_as_contact(
         )
     except Exception as e:
         logger.error(f"Failed to log circle message activity: {e}")
+        capture_error(e)
 
     # Court-evidence EventLog entry
     await _create_event_log(
@@ -1067,6 +1078,7 @@ async def send_circle_message_as_contact(
         )
     except Exception as e:
         logger.error(f"Failed to broadcast realtime event: {e}")
+        capture_error(e)
 
     await db.commit()
     await db.refresh(message)
@@ -1218,6 +1230,7 @@ async def send_circle_message_as_parent(
             )
         except Exception as e:
             logger.error(f"Failed to notify other parent: {e}")
+            capture_error(e)
 
     # Activity feed logging
     try:
@@ -1237,6 +1250,7 @@ async def send_circle_message_as_parent(
         )
     except Exception as e:
         logger.error(f"Failed to log circle message activity: {e}")
+        capture_error(e)
 
     # Court-evidence EventLog entry
     await _create_event_log(
@@ -1278,6 +1292,7 @@ async def send_circle_message_as_parent(
         )
     except Exception as e:
         logger.error(f"Failed to broadcast realtime event: {e}")
+        capture_error(e)
 
     await db.commit()
     await db.refresh(message)

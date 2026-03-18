@@ -49,6 +49,7 @@ from app.services.aria_violation_tracker import (
     InterventionDecision,
 )
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -169,6 +170,7 @@ class ARIACircleMonitor:
 
         except Exception as e:
             logger.error(f"Failed to analyze transcript chunk {chunk.id}: {e}")
+            capture_error(e)
             await db.rollback()
             return None
 
@@ -249,6 +251,7 @@ Be very sensitive to child safety but avoid false positives on normal family con
 
         except Exception as e:
             logger.error(f"Claude API call failed: {e}")
+            capture_error(e)
             return {
                 "toxicity_score": 0.0,
                 "severity": "safe",

@@ -29,6 +29,7 @@ from app.services.court import CourtEventService
 from sqlalchemy import select
 import logging
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()

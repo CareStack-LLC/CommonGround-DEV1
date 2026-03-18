@@ -28,6 +28,7 @@ from app.models.wallet import (
 from app.models.user import User, UserProfile
 from app.models.subscription import SubscriptionPlan
 from app.schemas.wallet import WebhookHandlerResponse
+from app.utils.sentry_helpers import capture_error
 from sqlalchemy.orm import selectinload
 
 logger = logging.getLogger(__name__)
@@ -87,12 +88,14 @@ async def handle_stripe_webhook(
 
     except ValueError as e:
         logger.error(f"Invalid webhook payload: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid payload."
         )
     except Exception as e:
         logger.error(f"Webhook handler error: {e}")
+        capture_error(e)
         # Return 200 to prevent Stripe retries for application errors
         # Log the error for investigation
         return WebhookHandlerResponse(

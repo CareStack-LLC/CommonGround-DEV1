@@ -22,6 +22,7 @@ from app.core.security import get_current_user
 from app.models.user import User
 from app.models.family_file import FamilyFile
 from app.services.email import EmailService
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -226,12 +227,14 @@ async def request_professional_report(
 
     except stripe.error.StripeError as e:
         logger.error(f"Stripe error creating checkout session: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create payment session. Please try again."
         )
     except Exception as e:
         logger.error(f"Error requesting professional report: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred. Please try again."
@@ -426,3 +429,4 @@ async def _send_report_request_notification(
     except Exception as e:
         # Don't fail the request if email fails - just log it
         logger.error(f"Failed to send report request notification email: {e}")
+        capture_error(e)

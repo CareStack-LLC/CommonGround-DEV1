@@ -21,6 +21,7 @@ from app.services.recording import recording_service
 from app.services.recording_audit import recording_audit_service
 from app.services.family_file import get_user_family_file
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 router = APIRouter()

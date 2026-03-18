@@ -22,6 +22,7 @@ from app.models.user import User
 from app.models.family_file import FamilyFile
 from app.services.reports import ParentReportService
 from app.services.reports.monthly_report_service import MonthlyReportService
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -105,12 +106,14 @@ async def generate_parent_report(
         )
     except NotImplementedError as e:
         logger.error(f"Report type not implemented: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
             detail="This report type is not yet available."
         )
     except Exception as e:
         logger.error(f"Error generating report: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate report. Please try again."
@@ -204,12 +207,14 @@ async def generate_monthly_report(
         )
     except ValueError as e:
         logger.error(f"Monthly report not found: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Report data not found."
         )
     except Exception as e:
         logger.error(f"Error generating monthly report: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to generate monthly report. Please try again."

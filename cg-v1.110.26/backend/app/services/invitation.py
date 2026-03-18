@@ -27,6 +27,7 @@ from app.models.invitation import (
 from app.models.family_file import FamilyFile
 from app.models.user import User, UserProfile
 from app.services.email import email_service as _email_service_singleton
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -197,6 +198,7 @@ class InvitationService:
 
             except Exception as e:
                 logger.error(f"Failed to send invitation email: {e}")
+                capture_error(e)
                 # Don't fail the invitation creation, just log the error
         else:
             logger.info(
@@ -302,6 +304,7 @@ class InvitationService:
                 })
             except Exception as e:
                 logger.error(f"Supabase magic link failed: {e}")
+                capture_error(e)
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Failed to send authentication email"
@@ -585,6 +588,7 @@ class InvitationService:
             invitation.status = InvitationStatus.RESENT.value
         except Exception as e:
             logger.error(f"Failed to resend invitation: {e}")
+            capture_error(e)
 
         # Create case event
         if invitation.family_file_id:
@@ -688,6 +692,7 @@ class InvitationService:
 
         except Exception as e:
             logger.error(f"Failed to send delayed invitation {invitation.id}: {e}")
+            capture_error(e)
 
         return invitation
 

@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models.push_subscription import PushSubscription
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -126,6 +127,7 @@ class PushNotificationService:
             except WebPushException as e:
                 failure_count += 1
                 logger.error(f"Push failed for subscription {subscription.id}: {e}")
+                capture_error(e)
 
                 # Check if subscription expired (410 Gone or 404 Not Found)
                 if e.response and e.response.status_code in [404, 410]:
@@ -135,6 +137,7 @@ class PushNotificationService:
             except Exception as e:
                 failure_count += 1
                 logger.error(f"Unexpected error sending push to {subscription.id}: {e}")
+                capture_error(e)
 
         # Mark expired subscriptions as inactive
         for subscription in expired_subscriptions:

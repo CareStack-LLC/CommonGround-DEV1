@@ -23,6 +23,7 @@ from app.models.clearfund import Obligation
 from app.models.schedule import ScheduleEvent
 from app.models.user import User, UserProfile
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 # Default timezone for custody day determination

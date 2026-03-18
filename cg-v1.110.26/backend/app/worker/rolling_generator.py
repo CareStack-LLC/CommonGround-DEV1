@@ -20,6 +20,7 @@ from datetime import datetime, timedelta, date
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select, func, and_
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ async def run_rolling_generator():
     )
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
-    print(f"Rolling Generator started at {datetime.utcnow().isoformat()}")
+    logger.info(f"Rolling Generator started at {datetime.utcnow().isoformat()}")
 
     async with async_session() as db:
         try:
@@ -69,10 +70,11 @@ async def run_rolling_generator():
             obligations_created = await _roll_obligation_instances(db)
             reports_sent = await _send_anniversary_monthly_reports(db)
             await db.commit()
-            print(f"Done: {exchanges_created} exchanges, {obligations_created} obligations, {reports_sent} monthly reports emailed")
+            logger.info(f"Done: {exchanges_created} exchanges, {obligations_created} obligations, {reports_sent} monthly reports emailed")
         except Exception as e:
             await db.rollback()
             logger.error(f"Rolling generator failed: {e}", exc_info=True)
+            capture_error(e)
             try:
                 import sentry_sdk
                 sentry_sdk.capture_exception(e)
@@ -318,7 +320,7 @@ async def _send_anniversary_monthly_reports(db: AsyncSession) -> int:
                     full_report_url=f"{email_service.frontend_url}/reports",
                 )
                 sent += 1
-                print(f"Monthly report emailed to {user.email} for {ff.title} ({month_name} {report_year})")
+                logger.info(f"Monthly report emailed to {user.email} for {ff.title} ({month_name} {report_year})")
 
             except Exception as e:
                 logger.warning(f"Failed to send monthly report to {user.email} for family file {ff.id}: {e}")

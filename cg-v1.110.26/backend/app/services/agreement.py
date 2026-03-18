@@ -35,6 +35,7 @@ from app.core.config import settings
 from app.core.websocket import manager
 
 
+from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
 
@@ -636,6 +637,7 @@ class AgreementService:
 
         except Exception as e:
             logger.error(f"Failed to generate PDF for agreement {agreement.id}: {str(e)}", exc_info=True)
+            capture_error(e)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to generate PDF: {str(e)}"

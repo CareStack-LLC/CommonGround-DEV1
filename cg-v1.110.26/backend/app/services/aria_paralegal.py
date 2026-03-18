@@ -31,6 +31,7 @@ from app.models.case import Case
 from app.models.child import Child
 from app.models.user import User
 from app.core.config import settings
+from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
 
@@ -394,6 +395,7 @@ Ready to begin? First, could you tell me a little about yourself and your situat
         except Exception as e:
             # Log error but don't expose details
             logger.error(f"ARIA Paralegal error: {e}")
+            capture_error(e)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error processing message. Please try again."
@@ -590,6 +592,7 @@ Rules:
 
         except Exception as e:
             logger.error(f"Summary generation error: {e}")
+            capture_error(e)
             return "Error generating summary. Please review the transcript directly."
 
     async def extract_form_data(
