@@ -99,6 +99,24 @@ async def lifespan(app: FastAPI):
     if settings.is_development:
         await init_db()  # Auto-create tables in dev
         logger.info("Database tables created")
+
+    # Run safe column migrations (idempotent ALTER TABLE IF NOT EXISTS)
+    try:
+        from app.core.database import engine
+        from sqlalchemy import text
+        async with engine.begin() as conn:
+            migrations = [
+                "ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMP",
+                "ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS terms_version VARCHAR(20)",
+                "ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS privacy_policy_accepted_at TIMESTAMP",
+                "ALTER TABLE agreements ADD COLUMN IF NOT EXISTS is_default BOOLEAN DEFAULT FALSE",
+            ]
+            for sql in migrations:
+                await conn.execute(text(sql))
+            logger.info("Startup column migrations applied successfully")
+    except Exception as e:
+        logger.warning(f"Startup migration warning (may already exist): {e}")
+
     yield
     # Shutdown
     logger.info("Shutting down...")
