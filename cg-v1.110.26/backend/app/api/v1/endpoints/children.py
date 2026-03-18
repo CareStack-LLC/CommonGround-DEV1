@@ -75,7 +75,7 @@ def _child_to_full_response(child) -> ChildProfileResponse:
         try:
             contacts_data = json.loads(child.emergency_contacts)
             emergency_contacts = [EmergencyContact(**c) for c in contacts_data]
-        except:
+        except Exception:
             emergency_contacts = None
 
     # Parse field contributors
@@ -83,7 +83,7 @@ def _child_to_full_response(child) -> ChildProfileResponse:
     if child.field_contributors:
         try:
             field_contributors = json.loads(child.field_contributors)
-        except:
+        except Exception:
             field_contributors = None
 
     # Parse court restricted fields
@@ -91,7 +91,7 @@ def _child_to_full_response(child) -> ChildProfileResponse:
     if child.court_restricted_fields:
         try:
             court_restricted_fields = json.loads(child.court_restricted_fields)
-        except:
+        except Exception:
             court_restricted_fields = None
 
     return ChildProfileResponse(
@@ -827,7 +827,7 @@ async def get_child_circle(
         if permission and hasattr(permission, 'is_within_allowed_time'):
             try:
                 is_within_time = permission.is_within_allowed_time()
-            except:
+            except Exception:
                 is_within_time = True
 
         contact_responses.append(ChildCircleContactResponse(

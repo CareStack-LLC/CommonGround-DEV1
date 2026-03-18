@@ -182,6 +182,54 @@ def tag_family_file(family_file_id: str):
 # STRUCTURED LOGGING (SDK 2.35+)
 # ──────────────────────────────────────────────
 
+def capture_error(exc: Exception, context: Optional[dict] = None, tags: Optional[dict] = None):
+    """
+    Capture an exception in Sentry with optional context and tags.
+
+    Usage:
+        try:
+            do_something()
+        except Exception as e:
+            capture_error(e, context={"user_id": "abc"}, tags={"service": "aria"})
+    """
+    try:
+        if tags:
+            for k, v in tags.items():
+                sentry_sdk.set_tag(k, v)
+        if context:
+            sentry_sdk.set_context("error_context", context)
+        sentry_sdk.capture_exception(exc)
+    except Exception:
+        logger.error(f"Failed to capture error in Sentry: {exc}")
+
+
+@contextmanager
+def safe_operation(operation_name: str, service: str = "unknown", **extra_tags):
+    """
+    Context manager that captures exceptions to Sentry automatically.
+
+    Usage:
+        with safe_operation("generate_report", service="reports", family_file_id="abc"):
+            pdf = generate_pdf(...)
+
+    On exception: logs error, captures in Sentry with tags, re-raises.
+    """
+    try:
+        yield
+    except Exception as e:
+        logger.error(f"{service}.{operation_name} failed: {e}")
+        try:
+            sentry_sdk.set_tag("service", service)
+            sentry_sdk.set_tag("operation", operation_name)
+            for k, v in extra_tags.items():
+                sentry_sdk.set_tag(k, str(v))
+            sentry_sdk.capture_exception(e)
+            metric_increment(f"{service}.errors", tags={"operation": operation_name})
+        except Exception:
+            pass
+        raise
+
+
 def sentry_log(level: str, message: str, **attrs):
     """
     Send a structured log to Sentry Logs (Explore > Logs).

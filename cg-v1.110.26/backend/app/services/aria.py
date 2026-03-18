@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models.message import Message, MessageFlag
+from app.utils.sentry_helpers import capture_error, metric_increment, metric_distribution
 
 logger = logging.getLogger(__name__)
 
@@ -299,6 +300,7 @@ class ARIAService:
             await db.commit()
         except Exception as e:
             logger.error(f"Failed to log ARIA event: {e}")
+            capture_error(e, tags={"service": "aria", "operation": "log_event"})
 
     async def analyze_message_hybrid(
         self,
@@ -383,6 +385,7 @@ class ARIAService:
             
         except Exception as e:
             logger.error(f"Failed to queue ARIA job: {e}")
+            capture_error(e, tags={"service": "aria", "operation": "queue_job"})
 
         return regex_result
 
@@ -422,6 +425,7 @@ class ARIAService:
             
         except Exception as e:
             logger.error(f"Failed to queue ARIA image job: {e}")
+            capture_error(e, tags={"service": "aria", "operation": "queue_image_job"})
 
 
     def analyze_message(
@@ -821,6 +825,7 @@ Respond in JSON format:
         except Exception as e:
             # Fallback to regex analysis
             logger.error(f"OpenAI analysis failed: {e}")
+            capture_error(e, tags={"service": "aria", "operation": "openai_analysis"})
             regex_analysis = self.analyze_message(message)
             return {
                 "ai_powered": False,
@@ -1113,6 +1118,7 @@ If the original message had zero constructive content (pure abuse), suggest:
 
         except Exception as e:
             logger.error(f"[ARIA v2] generate_contextual_rewrite (Claude) failed: {e}")
+            capture_error(e, tags={"service": "aria", "operation": "contextual_rewrite"})
             
             # Fallback to OpenAI if Anthropic fails
             try:
@@ -1212,6 +1218,7 @@ Respond in valid JSON only:
 
         except Exception as e:
             logger.error(f"[ARIA v2] generate_reply_suggestion (Claude) failed: {e}")
+            capture_error(e, tags={"service": "aria", "operation": "reply_suggestion"})
             
             # Fallback to OpenAI if Anthropic fails
             try:

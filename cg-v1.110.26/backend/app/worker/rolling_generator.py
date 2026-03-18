@@ -23,6 +23,23 @@ from sqlalchemy import select, func, and_
 
 logger = logging.getLogger(__name__)
 
+# Initialize Sentry for worker process
+_sentry_dsn = os.environ.get("SENTRY_DSN")
+if _sentry_dsn:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+        sentry_sdk.init(
+            dsn=_sentry_dsn,
+            environment=os.environ.get("ENVIRONMENT", "production"),
+            release=f"commonground-worker@rolling",
+            traces_sample_rate=1.0,
+            integrations=[SqlalchemyIntegration()],
+        )
+        logger.info("Sentry initialized for rolling_generator worker")
+    except Exception as e:
+        logger.warning(f"Failed to init Sentry for worker: {e}")
+
 # Add project root to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -55,8 +72,12 @@ async def run_rolling_generator():
             print(f"Done: {exchanges_created} exchanges, {obligations_created} obligations, {reports_sent} monthly reports emailed")
         except Exception as e:
             await db.rollback()
-            print(f"Rolling generator failed: {e}")
             logger.error(f"Rolling generator failed: {e}", exc_info=True)
+            try:
+                import sentry_sdk
+                sentry_sdk.capture_exception(e)
+            except Exception:
+                pass
 
     await engine.dispose()
 

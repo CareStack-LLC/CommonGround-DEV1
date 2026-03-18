@@ -151,11 +151,19 @@ async def run_worker():
                 print(f"✅ Job {job.id} Completed. Action: {analysis.get('action')}")
 
             except Exception as e:
+                # Report to Sentry
+                try:
+                    import sentry_sdk as _sentry
+                    _sentry.set_context("aria_job", {"job_id": str(job.id)})
+                    _sentry.capture_exception(e)
+                except Exception:
+                    pass
+
                 retry_count = getattr(job, 'retry_count', 0) or 0
                 new_retry = retry_count + 1
                 if new_retry >= 3:
                     # Max retries exceeded — move to dead letter
-                    print(f"💀 Job {job.id} dead-lettered after {new_retry} attempts: {e}")
+                    print(f"Job {job.id} dead-lettered after {new_retry} attempts: {e}")
                     await conn.execute(text("""
                         UPDATE aria_jobs SET status = 'dead_letter', error_message = :err,
                                retry_count = :retry WHERE id = :id

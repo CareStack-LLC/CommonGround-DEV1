@@ -17,6 +17,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .parent_report_service import ParentReportService, TEMPLATE_DIR
+from app.utils.sentry_helpers import capture_error, metric_increment
 
 logger = logging.getLogger(__name__)
 
@@ -205,6 +206,7 @@ class MonthlyReportService:
             circle_stats["flagged_messages"] = flagged_count.scalar() or 0
         except Exception as e:
             logger.warning(f"Failed to gather circle stats for monthly report: {e}")
+            capture_error(e, tags={"service": "reports", "operation": "circle_stats"})
 
         # -----------------------------------------------------------------
         # 4. Schedule Data
@@ -283,6 +285,7 @@ class MonthlyReportService:
             pdf_bytes = report_result.pdf_bytes
         except Exception as e:
             logger.warning(f"Monthly report persistence failed (non-blocking): {e}")
+            capture_error(e, tags={"service": "reports", "operation": "monthly_persistence"})
 
         # Build summary dict for email notifications
         summary = {

@@ -2,6 +2,7 @@
 Authentication service for user registration, login, and token management.
 """
 
+import logging
 from datetime import datetime
 from typing import Tuple, Optional
 
@@ -13,6 +14,9 @@ from app.core.config import settings
 from app.core.security import create_access_token, create_refresh_token, decode_token
 from app.core.supabase import get_supabase_client
 from app.models.user import User, UserProfile
+from app.utils.sentry_helpers import capture_error, metric_increment, metric_set
+
+logger = logging.getLogger(__name__)
 from app.schemas.auth import RegisterRequest, LoginRequest, OAuthSyncRequest
 import logging
 
@@ -170,9 +174,12 @@ class AuthService:
 
         except HTTPException as e:
             logger.warning(f"Registration HTTP error for {request.email}: {e.detail}")
+            metric_increment("auth.register.failure", tags={"reason": "http_error"})
             raise
         except Exception as e:
             logger.error(f"Unexpected registration error for {request.email}: {str(e)}", exc_info=True)
+            capture_error(e, context={"email": request.email}, tags={"service": "auth", "operation": "register"})
+            metric_increment("auth.register.failure", tags={"reason": "unexpected"})
             await self.db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -352,9 +359,12 @@ class AuthService:
             return user, access_token, refresh_token
 
         except HTTPException:
+            metric_increment("auth.login.failure", tags={"reason": "http_error"})
             raise
         except Exception as e:
             logger.error(f"Login failed with exception: {type(e).__name__}: {str(e)}", exc_info=True)
+            capture_error(e, tags={"service": "auth", "operation": "login"})
+            metric_increment("auth.login.failure", tags={"reason": "unexpected"})
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Login error: {type(e).__name__}: {str(e)}"
