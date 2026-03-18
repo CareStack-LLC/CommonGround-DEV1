@@ -68,8 +68,6 @@ if settings.SENTRY_DSN:
         ],
         # Scrub sensitive data (emails, tokens, etc.)
         send_default_pii=False,
-        # Attach request data for debugging (medium = first 10KB)
-        request_bodies="medium",
         # Filter noise and enrich events
         before_send=_sentry_before_send,
         before_send_transaction=_sentry_before_send_transaction,
