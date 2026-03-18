@@ -43,7 +43,7 @@ export function detectPortalFromPath(pathname: string): PortalType {
     '/login',
     '/register',
     '/blog',
-    '/contact',
+    '/help/contact',
     '/faq',
     '/privacy',
     '/terms'

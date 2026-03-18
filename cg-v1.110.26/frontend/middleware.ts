@@ -44,10 +44,10 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - Public marketing pages (/, /features, /pricing, /about, /contact, /blog, /professionals)
+     * - Public marketing pages (/, /features, /pricing, /about, /help/contact, /blog, /professionals)
      *   are excluded to avoid the ~200ms Supabase getUser() latency on first paint.
      *   Auth state for those pages is handled client-side by AuthProvider.
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$)(?!$)(?!features$|pricing$|about$|contact$|blog$|professionals$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$)(?!$)(?!features$|pricing$|about$|contact$|help/contact$|blog$|professionals$).*)',
   ],
 }

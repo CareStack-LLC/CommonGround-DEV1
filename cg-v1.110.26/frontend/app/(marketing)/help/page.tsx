@@ -120,7 +120,7 @@ export default function HelpCenterPage() {
           <div className="grid sm:grid-cols-3 gap-4">
             {[
               { icon: HelpCircle, title: 'FAQ', description: 'Quick answers', href: '/help/faq' },
-              { icon: MessageSquare, title: 'Contact Us', description: 'Get in touch', href: '/contact' },
+              { icon: MessageSquare, title: 'Contact Us', description: 'Get in touch', href: '/help/contact' },
               { icon: BookOpen, title: 'Tutorials', description: 'Video guides', href: '/help/tutorials' },
             ].map((item) => {
               const Icon = item.icon;
@@ -225,7 +225,7 @@ export default function HelpCenterPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/contact"
+                href="/help/contact"
                 className="inline-flex items-center justify-center px-8 py-4 bg-[#F5A623] text-white font-semibold rounded-full hover:bg-[#c26647] transition-all shadow-lg hover:-translate-y-0.5 group"
               >
                 <Mail className="w-5 h-5 mr-2" />

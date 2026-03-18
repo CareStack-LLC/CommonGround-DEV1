@@ -120,7 +120,7 @@ export default function ProfessionalsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/contact?type=demo"
+              href="/help/contact?type=demo"
               className="inline-flex items-center justify-center px-8 py-4 bg-[#1E3A4A] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
             >
               Schedule a Demo
@@ -390,7 +390,7 @@ export default function ProfessionalsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/contact?type=demo"
+              href="/help/contact?type=demo"
               className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#E09520] transition-all shadow-2xl hover:-translate-y-1 group"
             >
               Schedule a Demo

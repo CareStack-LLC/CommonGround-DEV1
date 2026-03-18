@@ -60,7 +60,7 @@ const marketingLinks: TopNavLink[] = [
   { name: 'Features', path: '/features', icon: Sparkles },
   { name: 'Pricing', path: '/pricing', icon: DollarSign },
   { name: 'About', path: '/about', icon: Info },
-  { name: 'Contact', path: '/contact', icon: Mail },
+  { name: 'Contact', path: '/help/contact', icon: Mail },
 ];
 
 // Logo component - Two overlapping circles representing two parents finding common ground
