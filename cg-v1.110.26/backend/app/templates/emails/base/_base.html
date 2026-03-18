@@ -78,8 +78,10 @@
             <td style="text-align: center; padding: 0 20px;">
               <p style="margin: 0; font-size: 11px; color: #94A3A0; line-height: 1.5;">
                 {% block legal_footer %}
-                This email was sent by CommonGround, Inc.<br>
-                © {{ current_year | default('2026') }} CommonGround. All rights reserved.
+                This email was sent by CommonGround, Inc. | Atlanta, GA<br>
+                © {{ current_year | default('2026') }} CommonGround. All rights reserved.<br>
+                <a href="{{ frontend_url }}/unsubscribe" style="color: #94A3A0; text-decoration: underline;">Unsubscribe</a> |
+                <a href="{{ frontend_url }}/privacy" style="color: #94A3A0; text-decoration: underline;">Privacy Policy</a>
                 {% endblock %}
               </p>
             </td>

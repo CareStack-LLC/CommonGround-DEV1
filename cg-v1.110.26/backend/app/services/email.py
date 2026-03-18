@@ -7,7 +7,7 @@ Uses Jinja2 templates for consistent, branded email rendering.
 import logging
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
@@ -322,7 +322,7 @@ class EmailService:
             'review_url': approval_link,
             'requester_name': other_parent_name,
             'sections_updated': sections_updated,
-            'deadline': (datetime.now().replace(day=datetime.now().day + 7)).strftime('%B %d, %Y')
+            'deadline': (datetime.now() + timedelta(days=7)).strftime('%B %d, %Y')
         })
 
         return await self._send_email(to_email, subject, html_body)
@@ -1088,9 +1088,13 @@ class EmailService:
         html_body: str,
         text_body: Optional[str] = None,
         from_name_override: Optional[str] = None,
+        _retry_count: int = 0,
     ) -> Optional[str]:
         """
         Send email via SendGrid or log in development mode.
+
+        Includes retry logic (up to 2 retries with exponential backoff)
+        and Sentry error tracking for production monitoring.
 
         Args:
             to_email: Recipient email
@@ -1100,17 +1104,15 @@ class EmailService:
             from_name_override: Custom From Name (e.g., "Jane Smith via CommonGround")
 
         Returns:
-            SendGrid message ID for tracking, or True/False for dev mode
+            SendGrid message ID for tracking, or None on failure
         """
+        import asyncio
+        MAX_RETRIES = 2
         sender_name = from_name_override or self.from_name
 
         # Development mode - log to console
         if not self.enabled:
             logger.info(f"[EMAIL DEV MODE] To: {to_email} | Subject: {subject}")
-            logger.debug(
-                "EMAIL (Development Mode - Not Sent) | To: %s | From: %s <%s> | Subject: %s",
-                to_email, sender_name, self.from_email, subject,
-            )
             return None
 
         # Production mode - send via SendGrid
@@ -1129,12 +1131,24 @@ class EmailService:
             response = sg.send(message)
 
             if response.status_code in [200, 201, 202]:
-                logger.info(f"Email sent successfully to {to_email}: {subject}")
-                # Extract message ID from response headers for tracking
+                logger.info(f"Email sent to {to_email}: {subject}")
+                # Track success metric
+                try:
+                    from app.utils.sentry_helpers import metric_increment
+                    metric_increment("email.sent", tags={"subject_prefix": subject[:30]})
+                except Exception:
+                    pass
                 msg_id = response.headers.get("X-Message-Id")
                 return msg_id
             else:
                 logger.error(f"SendGrid returned status {response.status_code} for {to_email}")
+                # Retry on server errors (5xx)
+                if response.status_code >= 500 and _retry_count < MAX_RETRIES:
+                    await asyncio.sleep(2 ** (_retry_count + 1))  # 2s, 4s backoff
+                    return await self._send_email(
+                        to_email, subject, html_body, text_body,
+                        from_name_override, _retry_count + 1
+                    )
                 return None
 
         except ImportError:
@@ -1142,6 +1156,24 @@ class EmailService:
             return None
         except Exception as e:
             logger.error(f"Failed to send email to {to_email}: {str(e)}")
+
+            # Report to Sentry
+            try:
+                import sentry_sdk
+                sentry_sdk.capture_exception(e)
+                from app.utils.sentry_helpers import metric_increment
+                metric_increment("email.failed", tags={"error": type(e).__name__})
+            except Exception:
+                pass
+
+            # Retry on transient errors
+            if _retry_count < MAX_RETRIES:
+                import asyncio
+                await asyncio.sleep(2 ** (_retry_count + 1))
+                return await self._send_email(
+                    to_email, subject, html_body, text_body,
+                    from_name_override, _retry_count + 1
+                )
             return None
 
 

@@ -14,7 +14,7 @@ from app.models.case import Case, CaseParticipant
 from app.models.child import Child
 from app.models.user import User
 from app.schemas.case import CaseCreate, CaseUpdate
-from app.services.email import EmailService
+from app.services.email import email_service as _email_service_singleton
 from app.core.config import settings
 
 import logging
@@ -33,7 +33,7 @@ class CaseService:
             db: Database session
         """
         self.db = db
-        self.email_service = EmailService()
+        self.email_service = _email_service_singleton
 
     async def create_case(
         self,

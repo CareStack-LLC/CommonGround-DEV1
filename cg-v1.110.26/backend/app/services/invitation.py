@@ -26,7 +26,7 @@ from app.models.invitation import (
 )
 from app.models.family_file import FamilyFile
 from app.models.user import User, UserProfile
-from app.services.email import EmailService
+from app.services.email import email_service as _email_service_singleton
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class InvitationService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.email_service = EmailService()
+        self.email_service = _email_service_singleton
 
     def _generate_token(self) -> str:
         """Generate a cryptographically secure invitation token."""

@@ -30,7 +30,7 @@ from app.schemas.agreement import SECTION_TEMPLATES, AgreementSectionUpdate
 from app.schemas.agreement_v2 import SECTION_TEMPLATES_V2, get_section_templates
 from app.services.case import CaseService
 from app.services.family_file import FamilyFileService
-from app.services.email import EmailService
+from app.services.email import email_service as _email_service_singleton
 from app.core.config import settings
 from app.core.websocket import manager
 
@@ -51,7 +51,7 @@ class AgreementService:
         self.db = db
         self.case_service = CaseService(db)
         self.family_file_service = FamilyFileService(db)
-        self.email_service = EmailService()
+        self.email_service = _email_service_singleton
 
     async def create_agreement(
         self,

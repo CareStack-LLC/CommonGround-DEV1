@@ -15,7 +15,7 @@ from app.models.user import User
 from app.schemas.message import MessageCreate, InterventionAction
 from app.services.aria import ARIAService, ToxicityLevel
 from app.services.case import CaseService
-from app.services.email import EmailService
+from app.services.email import email_service as _email_service_singleton
 from app.core.config import settings
 from app.core.websocket import manager
 import hashlib
@@ -37,7 +37,7 @@ class MessageService:
         self.db = db
         self.aria = ARIAService()
         self.case_service = CaseService(db)
-        self.email_service = EmailService()
+        self.email_service = _email_service_singleton
 
     async def analyze_message(
         self,

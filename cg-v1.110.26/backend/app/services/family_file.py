@@ -34,7 +34,7 @@ from app.schemas.family_file import (
     ChildBasic,
     CourtCustodyCaseCreate,
 )
-from app.services.email import EmailService
+from app.services.email import email_service as _email_service_singleton
 from app.core.config import settings
 
 
@@ -49,7 +49,7 @@ class FamilyFileService:
             db: Database session
         """
         self.db = db
-        self.email_service = EmailService()
+        self.email_service = _email_service_singleton
 
     async def create_family_file(
         self,
