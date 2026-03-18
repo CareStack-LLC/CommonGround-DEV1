@@ -169,7 +169,7 @@ async def global_exception_handler(request: Request, exc: Exception):
     if settings.is_production:
         response = JSONResponse(
             status_code=500,
-            content={"detail": "Internal server error"}
+            content={"detail": "Internal server error", "error_type": type(exc).__name__}
         )
     else:
         response = JSONResponse(
