@@ -5,9 +5,14 @@ import { NewsletterForm } from '@/components/marketing/newsletter-form';
 import { blogPosts, formatDate, getCategoryStyles } from '@/lib/blog-data';
 
 export const metadata: Metadata = {
-  title: 'Blog | CommonGround',
+  title: 'Co-Parenting Blog | Tips, Advice & Expert Insights | CommonGround',
   description:
-    'Co-parenting tips, communication strategies, and expert advice for separated families.',
+    'Expert co-parenting advice, communication strategies, custody planning tips, and insights for separated families raising children together, apart.',
+  openGraph: {
+    title: 'Co-Parenting Blog | Tips, Advice & Expert Insights | CommonGround',
+    description:
+      'Expert co-parenting advice, communication strategies, custody planning tips, and insights for separated families raising children together, apart.',
+  },
 };
 
 /**
@@ -32,9 +37,9 @@ export default function BlogPage() {
   const recentPosts = blogPosts.filter((post) => !post.featured);
 
   return (
-    <div className="bg-background">
+    <div className="bg-[#F4F8F7]">
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-24 bg-card border-b border-border overflow-hidden">
+      <section className="relative py-20 lg:py-24 bg-white border-b border-gray-200 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-cg-sage/5 blur-3xl" />
           <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-amber/5 blur-3xl" />
@@ -42,10 +47,10 @@ export default function BlogPage() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl animate-blog-fade-in">
-            <h1 className="text-4xl sm:text-5xl font-serif font-semibold text-foreground mb-6">
+            <h1 className="text-4xl sm:text-5xl font-serif font-semibold text-[#1E3A4A] mb-6">
               The CommonGround Blog
             </h1>
-            <p className="text-xl text-muted-foreground">
+            <p className="text-xl text-gray-600">
               Expert advice, practical tips, and insights for co-parents navigating the journey of
               raising children together, apart.
             </p>
@@ -54,7 +59,7 @@ export default function BlogPage() {
       </section>
 
       {/* Category Filter */}
-      <section className="py-6 border-b border-border sticky top-16 bg-background/95 backdrop-blur z-40">
+      <section className="py-6 border-b border-gray-200 sticky top-16 bg-[#F4F8F7]/95 backdrop-blur z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
@@ -63,7 +68,7 @@ export default function BlogPage() {
                 className={`px-4 py-2 text-sm rounded-full transition-all duration-300 ${
                   category === 'All'
                     ? 'bg-cg-sage text-white'
-                    : 'bg-card border border-border hover:border-cg-sage/30 text-foreground'
+                    : 'bg-white border border-gray-200 hover:border-cg-sage/30 text-[#1E3A4A]'
                 }`}
               >
                 {category}
@@ -76,7 +81,7 @@ export default function BlogPage() {
       {/* Featured Posts */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-semibold text-foreground mb-8 animate-blog-fade-in">
+          <h2 className="text-2xl font-semibold text-[#1E3A4A] mb-8 animate-blog-fade-in">
             Featured Articles
           </h2>
 
@@ -96,11 +101,11 @@ export default function BlogPage() {
                 >
                   {featuredPosts[0].category}
                 </div>
-                <h3 className="text-2xl font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-3">
+                <h3 className="text-2xl font-semibold text-[#1E3A4A] group-hover:text-cg-sage transition-colors mb-3">
                   {featuredPosts[0].title}
                 </h3>
-                <p className="text-muted-foreground mb-4">{featuredPosts[0].excerpt}</p>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <p className="text-gray-600 mb-4">{featuredPosts[0].excerpt}</p>
+                <div className="flex items-center gap-4 text-sm text-gray-600">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
                     {formatDate(featuredPosts[0].date)}
@@ -133,10 +138,10 @@ export default function BlogPage() {
                   >
                     {post.category}
                   </div>
-                  <h3 className="font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-2">
+                  <h3 className="font-semibold text-[#1E3A4A] group-hover:text-cg-sage transition-colors mb-2">
                     {post.title}
                   </h3>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-3 text-xs text-gray-600">
                     <span>{formatDate(post.date)}</span>
                     <span>{post.readTime}</span>
                   </div>
@@ -148,16 +153,16 @@ export default function BlogPage() {
       </section>
 
       {/* Recent Posts */}
-      <section className="py-16 bg-card">
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-semibold text-foreground mb-8">Recent Articles</h2>
+          <h2 className="text-2xl font-semibold text-[#1E3A4A] mb-8">Recent Articles</h2>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {recentPosts.map((post, index) => (
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className={`group bg-background rounded-xl border border-border/50 overflow-hidden blog-card-hover animate-blog-fade-in stagger-${index + 1}`}
+                className={`group bg-[#F4F8F7] rounded-xl border border-gray-200/50 overflow-hidden blog-card-hover animate-blog-fade-in stagger-${index + 1}`}
               >
                 <div className="aspect-[16/10] overflow-hidden">
                   <img
@@ -172,11 +177,11 @@ export default function BlogPage() {
                   >
                     {post.category}
                   </div>
-                  <h3 className="font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-2">
+                  <h3 className="font-semibold text-[#1E3A4A] group-hover:text-cg-sage transition-colors mb-2">
                     {post.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{post.excerpt}</p>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">{post.excerpt}</p>
+                  <div className="flex items-center gap-3 text-xs text-gray-600">
                     <span>{formatDate(post.date)}</span>
                     <span>{post.readTime}</span>
                   </div>
@@ -191,26 +196,26 @@ export default function BlogPage() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-cg-sage-subtle to-cg-amber-subtle rounded-2xl p-8 lg:p-12 text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-4">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[#1E3A4A] mb-4">
               Get co-parenting tips in your inbox
             </h2>
-            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+            <p className="text-gray-600 mb-8 max-w-xl mx-auto">
               Join thousands of parents receiving weekly advice on communication, scheduling, and
               building a better co-parenting relationship.
             </p>
             <NewsletterForm />
-            <p className="text-xs text-muted-foreground mt-4">No spam. Unsubscribe anytime.</p>
+            <p className="text-xs text-gray-600 mt-4">No spam. Unsubscribe anytime.</p>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-card border-t border-border">
+      <section className="py-16 bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">
+          <h2 className="text-2xl font-semibold text-[#1E3A4A] mb-4">
             Ready to put these tips into practice?
           </h2>
-          <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+          <p className="text-gray-600 mb-8 max-w-xl mx-auto">
             CommonGround gives you the tools to communicate better, track agreements, and co-parent
             more effectively.
           </p>
