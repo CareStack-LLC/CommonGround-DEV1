@@ -93,9 +93,8 @@ const nextConfig: NextConfig = {
 export default withSentryConfig(nextConfig, {
   // Suppress source map upload warnings in CI
   silent: true,
-  // Don't widen existing Next.js source maps (prevents build slowdown)
-  widenClientFileUpload: false,
   // Disable source map upload (no auth token configured yet)
-  disableServerWebpackPlugin: true,
-  disableClientWebpackPlugin: true,
+  sourcemaps: {
+    disable: true,
+  },
 });
