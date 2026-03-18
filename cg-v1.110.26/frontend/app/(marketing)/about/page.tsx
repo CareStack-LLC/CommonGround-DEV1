@@ -247,6 +247,63 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Founder Story */}
+      <section className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white py-16 sm:py-20 my-12">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <Heart className="h-5 w-5 text-[#F5A623]" />
+              <span className="text-sm font-semibold text-[#F5A623] uppercase tracking-wide">
+                Our Story
+              </span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-serif mb-4" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+              Why CommonGround <span className="text-[#F5A623]">exists</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-[auto_1fr] gap-10 items-start max-w-4xl mx-auto">
+            {/* Photo placeholder */}
+            <div className="flex flex-col items-center gap-3 md:sticky md:top-8">
+              <div className="h-32 w-32 rounded-full bg-gradient-to-br from-[#F5A623] to-[#E8960E] flex items-center justify-center shadow-xl border-4 border-white/20">
+                <span className="text-4xl font-bold text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  TW
+                </span>
+              </div>
+              <div className="text-center">
+                <p className="text-white font-semibold text-lg">Thomas Wilform</p>
+                <p className="text-white/60 text-sm">Founder &amp; CEO</p>
+              </div>
+            </div>
+
+            {/* Story content */}
+            <div className="space-y-5 text-white/85 leading-relaxed">
+              <p>
+                CommonGround wasn't born in a boardroom. It started in the real, everyday experience of
+                co-parenting. Thomas Wilform — a Black man from Compton, California with over 15 years in
+                business and technology — built CommonGround because he lived the problem firsthand. When he
+                went looking for tools to help him co-parent, all he found were glorified ledgers. Apps that
+                tracked things but didn't actually <em>help</em>. Most didn't even have a way for a parent
+                to connect directly with their child.
+              </p>
+              <p>
+                He wanted something different: technology that auto-schedules exchanges, automates payments,
+                keeps agreements at your fingertips, and genuinely makes co-parenting easier — not just
+                documented. He built KidSpace so he could watch movies with his son even when they weren't in
+                the same room. That blend of fun and function, of heart and practicality, runs through every
+                part of the platform.
+              </p>
+              <p>
+                Thomas also runs the 4Ever Forward Foundation, a nonprofit dedicated to helping other
+                nonprofits with IT infrastructure — the same belief that technology should serve people, not
+                the other way around. His philosophy is simple: tech should aide co-parenting, not take it
+                over. CommonGround was made to help parents, parent better.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* The Impact */}
       <section className="bg-gradient-to-br from-[#FEF7ED] to-[#F5A623]/10 py-16 sm:py-20">
         <div className="max-w-5xl mx-auto px-6">
@@ -261,7 +318,7 @@ export default function AboutPage() {
               Real families finding <span className="text-[#F5A623]">real peace</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Thousands of families use CommonGround to bring calm and structure
+              Families use CommonGround to bring calm and structure
               to their co-parenting, giving their children the stability they deserve.
             </p>
           </div>
@@ -270,21 +327,21 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-3 gap-8 mb-12">
             <div className="text-center">
               <div className="text-5xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                10K+
+                Growing
               </div>
-              <p className="text-gray-700 font-medium">Families supported</p>
+              <p className="text-gray-700 font-medium">Families finding their way</p>
             </div>
             <div className="text-center">
               <div className="text-5xl font-bold text-[#F5A623] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                85%
+                Calmer
               </div>
-              <p className="text-gray-700 font-medium">Report calmer co-parenting</p>
+              <p className="text-gray-700 font-medium">Parents report calmer days</p>
             </div>
             <div className="text-center">
               <div className="text-5xl font-bold text-[var(--portal-primary)] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                500K+
+                Every
               </div>
-              <p className="text-gray-700 font-medium">Messages supported by ARIA</p>
+              <p className="text-gray-700 font-medium">Message guided by ARIA</p>
             </div>
           </div>
 
@@ -317,7 +374,7 @@ export default function AboutPage() {
             <span className="text-[#F5A623]">Yours can start today.</span>
           </h2>
           <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-            Join thousands of families who've found a calmer way to co-parent.
+            Join families who've found a calmer way to co-parent.
             Structure, clarity, and peace for your children.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -340,8 +397,8 @@ export default function AboutPage() {
           </p>
           <p className="text-sm text-gray-400 mt-3">
             Family law professional?{' '}
-            <Link href="/lawyers" className="text-[var(--portal-primary)] hover:underline">
-              Learn about our attorney partnership program
+            <Link href="/professionals" className="text-[var(--portal-primary)] hover:underline">
+              Learn about our professional partnership program
             </Link>.
           </p>
         </div>

@@ -20,14 +20,14 @@ export default function ContactPage() {
       icon: Mail,
       title: 'General Inquiries',
       email: 'hello@find-commonground.com',
-      description: 'Questions about CommonGround or how it works',
+      description: 'Wondering if CommonGround is right for your family? Ask us anything.',
       color: '#F5A623'
     },
     {
       icon: Mail,
       title: 'Professional Partnerships',
       email: 'partnerships@find-commonground.com',
-      description: 'Law firms, courts, mediators, or organizational access',
+      description: 'Attorneys, mediators, and courts looking to bring better tools to their families',
       color: 'var(--portal-primary)'
     }
   ];
@@ -70,14 +70,14 @@ export default function ContactPage() {
             className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            We're here
+            You're not in
             <br />
-            <span className="text-[var(--portal-primary)]">to help</span>
+            <span className="text-[var(--portal-primary)]">this alone</span>
           </h1>
 
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-            Whether you need support, have a question, or want to explore partnerships—
-            <span className="font-medium text-[#F5A623]"> we're listening.</span>
+            Whether you need technical help, want to learn how CommonGround fits your family, or want to bring better tools to your practice —
+            <span className="font-medium text-[#F5A623]"> real people respond within 24 hours.</span>
           </p>
         </div>
       </section>
@@ -111,7 +111,7 @@ export default function ContactPage() {
             className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-12 text-center"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Get in touch
+            Reach us directly
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -250,13 +250,13 @@ export default function ContactPage() {
             className="text-4xl sm:text-5xl font-serif mb-6 leading-tight"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            {user ? 'Back to your dashboard' : 'Ready to get started?'}
+            {user ? 'Back to your dashboard' : 'Your family deserves calmer days ahead'}
           </h2>
 
           <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
             {user
               ? 'Return to CommonGround and manage your co-parenting.'
-              : 'Join thousands of families making co-parenting easier.'}
+              : 'Start free and see how structure brings calm to your family.'}
           </p>
 
           <button

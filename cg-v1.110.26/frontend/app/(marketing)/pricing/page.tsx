@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { Check } from 'lucide-react';
+import { Check, Clock, DollarSign, Scale } from 'lucide-react';
 
 export default function PricingPage() {
   const router = useRouter();
@@ -14,15 +14,15 @@ export default function PricingPage() {
     {
       name: 'Web Starter',
       code: 'web_starter',
-      tagline: 'For getting started',
-      whoFor: 'Parents ready for a calmer path',
+      tagline: 'Everything you need to start',
+      whoFor: 'Parents beginning their co-parenting journey',
       monthly: 0,
       annual: 0,
       features: [
-        'ARIA messaging (flagging only)',
-        'Basic calendar view',
-        'ClearFund tracking (no fees)',
-        'Web-only access'
+        'ARIA-assisted messaging',
+        'Shared custody calendar',
+        'ClearFund expense tracking',
+        'Full web access'
       ],
       color: 'var(--portal-primary)',
       cta: 'Start Free'
@@ -30,8 +30,8 @@ export default function PricingPage() {
     {
       name: 'Plus',
       code: 'plus',
-      tagline: 'For structure & stability',
-      whoFor: 'Parents who want automation',
+      tagline: 'Automate the hard parts',
+      whoFor: 'Parents ready to stop coordinating and start co-parenting',
       monthly: 17.99,
       annual: 199.99,
       popular: true,
@@ -49,8 +49,8 @@ export default function PricingPage() {
     {
       name: 'Complete',
       code: 'complete',
-      tagline: 'For complete family peace',
-      whoFor: 'Parents who want full protection and clarity',
+      tagline: 'Peace of mind, documented',
+      whoFor: 'Parents who need verified exchanges and court-ready records',
       monthly: 34.99,
       annual: 349.99,
       features: [
@@ -250,7 +250,7 @@ export default function PricingPage() {
               Custom pricing for attorneys, mediators, and law firms. Includes the Professional Portal, court-ready exports, and firm directory listing.
             </p>
             <button
-              onClick={() => router.push('/lawyers')}
+              onClick={() => router.push('/professionals')}
               className="px-6 py-3 bg-[var(--portal-primary)] text-white rounded-xl font-medium hover:bg-[#2D6A8F] transition-all duration-200 shadow-md hover:shadow-lg"
             >
               Schedule a Demo
@@ -271,7 +271,9 @@ export default function PricingPage() {
 
           <div className="grid md:grid-cols-3 gap-6 mt-12">
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="text-3xl mb-3">⏰</div>
+              <div className="h-14 w-14 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-3">
+                <Clock className="h-7 w-7 text-[var(--portal-primary)]" />
+              </div>
               <h3 className="font-serif text-xl text-[#1E3A4A] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Stop coordinating
               </h3>
@@ -281,7 +283,9 @@ export default function PricingPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="text-3xl mb-3">💰</div>
+              <div className="h-14 w-14 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-3">
+                <DollarSign className="h-7 w-7 text-[#F5A623]" />
+              </div>
               <h3 className="font-serif text-xl text-[#1E3A4A] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Keep finances clear
               </h3>
@@ -291,7 +295,9 @@ export default function PricingPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="text-3xl mb-3">⚖️</div>
+              <div className="h-14 w-14 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-3">
+                <Scale className="h-7 w-7 text-[var(--portal-primary)]" />
+              </div>
               <h3 className="font-serif text-xl text-[#1E3A4A] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Be court-ready
               </h3>
@@ -329,7 +335,7 @@ export default function PricingPage() {
               },
               {
                 q: 'Do you offer financial hardship discounts?',
-                a: 'Yes. We believe everyone deserves better tools. Email us to discuss options.'
+                a: 'Yes. Every family deserves access to these tools, regardless of finances. Email support@find-commonground.com and we\'ll work with you.'
               }
             ].map((faq) => (
               <details key={faq.q} className="group bg-gray-50 rounded-xl p-6">
@@ -362,7 +368,7 @@ export default function PricingPage() {
           </h2>
 
           <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-            Join 10,000+ families who automated their co-parenting.
+            Join the families who've found a calmer way.
           </p>
 
           <button

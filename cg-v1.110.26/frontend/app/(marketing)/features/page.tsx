@@ -262,8 +262,8 @@ export default function FeaturesPage() {
           </p>
           <p className="mt-3 text-sm text-gray-400">
             Family law professional?{' '}
-            <button onClick={() => router.push('/lawyers')} className="text-[var(--portal-primary)] hover:underline">
-              See how attorneys use CommonGround
+            <button onClick={() => router.push('/professionals')} className="text-[var(--portal-primary)] hover:underline">
+              See how professionals use CommonGround
             </button>
           </p>
         </div>

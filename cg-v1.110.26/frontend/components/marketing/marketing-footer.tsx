@@ -18,7 +18,7 @@ const footerLinks = {
       { label: 'How It Works', href: '/how-it-works' },
       { label: 'Security', href: '/security' },
       { label: 'About ARIA', href: '/aria' },
-      { label: 'KidSpace', href: '/kids-com' },
+      { label: 'KidSpace', href: '/kidspace' },
     ],
   },
   solutions: {
@@ -59,7 +59,7 @@ const footerLinks = {
 function Logo() {
   return (
     <Link href="/" className="flex items-center">
-      <span className="text-xl text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+      <span className="text-xl text-foreground" style={{ fontFamily: "var(--font-dm-serif-display), Georgia, serif" }}>
         <span className="font-bold">Common</span><span className="font-normal text-[#3DAA8A]">Ground</span>
       </span>
     </Link>

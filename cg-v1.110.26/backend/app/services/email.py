@@ -163,6 +163,7 @@ class EmailService:
             'to_name': to_name,
             'inviter_name': inviter_name,
             'family_file_name': case_name,
+            'accept_url': invitation_link,
             'invitation_link': invitation_link,
             'children_names': children_names,
             'expiry_days': 7
@@ -283,7 +284,9 @@ class EmailService:
             'family_file_name': case_name,
             'message_preview': message_preview,
             'message_url': message_link,
+            'aria_flagged': was_flagged,
             'aria_reviewed': was_flagged,
+            'sent_at': datetime.now().strftime('%B %d at %I:%M %p'),
             'sent_time': datetime.now().strftime('%B %d at %I:%M %p')
         })
 
@@ -361,6 +364,7 @@ class EmailService:
             'to_name': to_name,
             'family_file_name': case_name,
             'agreement_title': agreement_title,
+            'view_url': agreement_url,
             'agreement_url': agreement_url,
             'parent_a_name': parent_a_name,
             'parent_b_name': parent_b_name,
@@ -443,6 +447,7 @@ class EmailService:
             'to_name': to_name,
             'caller_name': caller_name,
             'child_name': child_name,
+            'join_url': call_link,
             'call_url': call_link,
             'caller_relationship': caller_relationship
         })
@@ -483,8 +488,11 @@ class EmailService:
         html_body = self._render_template('reports/report_ready.html', {
             'to_name': to_name,
             'report_type': report_type,
+            'report_title': f"{report_type} Report",
+            'period': date_range,
             'date_range': date_range,
             'family_file_name': family_file_name,
+            'view_url': download_url,
             'download_url': download_url,
             'highlights': highlights,
             'expiry_date': expiry_date
@@ -713,9 +721,12 @@ class EmailService:
             'to_name': to_name,
             'expense_title': expense_title,
             'expense_category': expense_category,
+            'amount': f"${total_amount:.2f}",
             'total_amount': total_amount,
+            'approved_by': approver_name,
             'approver_name': approver_name,
             'approved_date': approved_date,
+            'view_url': expense_url,
             'expense_url': expense_url,
             'parent_a_name': parent_a_name,
             'parent_a_amount': parent_a_amount,
@@ -759,8 +770,10 @@ class EmailService:
 
         html_body = self._render_template('clearfund/payment_reminder.html', {
             'to_name': to_name,
+            'expense_title': 'Outstanding Balance',
             'amount_due': amount_due,
             'due_date': due_date,
+            'pay_url': payment_url,
             'payment_url': payment_url,
             'is_overdue': is_overdue,
             'outstanding_items': outstanding_items or []
@@ -896,10 +909,12 @@ class EmailService:
 
     # ==================== Marketing Emails ====================
 
-    async def send_newsletter_welcome(self, to_email: str) -> bool:
+    async def send_newsletter_welcome(self, to_email: str, to_name: str = "there") -> bool:
         """Send welcome email to new newsletter subscriber."""
         subject = "Welcome to the CommonGround Newsletter!"
-        html_body = self._render_template('marketing/newsletter_welcome.html', {})
+        html_body = self._render_template('marketing/newsletter_welcome.html', {
+            'to_name': to_name,
+        })
         return await self._send_email(to_email, subject, html_body)
 
     async def send_contact_form_notification(
@@ -914,11 +929,14 @@ class EmailService:
         """Send contact form contents to the appropriate internal team email."""
         email_subject = f"Contact Form: {subject or inquiry_type.capitalize() + ' Inquiry'} from {name}"
         html_body = self._render_template('marketing/contact_internal.html', {
+            'from_name': name,
+            'from_email': email,
             'name': name,
             'email': email,
             'inquiry_type': inquiry_type,
             'subject': subject,
             'message': message,
+            'submitted_at': datetime.now().strftime('%B %d, %Y at %I:%M %p'),
         })
         return await self._send_email(internal_email, email_subject, html_body)
 
@@ -965,6 +983,7 @@ class EmailService:
             'to_name': to_name,
             'plan_name': plan_name,
             'features': features or [],
+            'manage_url': f"{self.frontend_url}/settings/subscription",
             'dashboard_url': f"{self.frontend_url}/dashboard",
         })
         return await self._send_email(to_email, subject, html_body)
@@ -982,6 +1001,7 @@ class EmailService:
             'to_name': to_name,
             'plan_name': plan_name,
             'end_date': end_date,
+            'reactivate_url': f"{self.frontend_url}/settings/subscription",
             'resubscribe_url': f"{self.frontend_url}/settings/subscription",
         })
         return await self._send_email(to_email, subject, html_body)
@@ -998,6 +1018,8 @@ class EmailService:
         html_body = self._render_template('notifications/payment_failed.html', {
             'to_name': to_name,
             'plan_name': plan_name,
+            'amount': '',
+            'next_attempt_date': '',
             'retry_url': retry_url or f"{self.frontend_url}/settings/billing",
         })
         return await self._send_email(to_email, subject, html_body)
@@ -1014,8 +1036,10 @@ class EmailService:
         subject = "ARIA flagged a message in your conversation"
         html_body = self._render_template('notifications/aria_intervention.html', {
             'to_name': to_name,
+            'flagged_reason': category,
             'category': category,
             'suggestion': suggestion,
+            'review_url': conversation_url or f"{self.frontend_url}/messages",
             'conversation_url': conversation_url or f"{self.frontend_url}/messages",
         })
         return await self._send_email(to_email, subject, html_body)
@@ -1036,6 +1060,7 @@ class EmailService:
             'event_title': event_title,
             'event_date': event_date,
             'event_time': event_time,
+            'created_by': creator_name,
             'creator_name': creator_name,
             'calendar_url': f"{self.frontend_url}/calendar",
         })
@@ -1053,9 +1078,11 @@ class EmailService:
         subject = f"Your agreement expires in {days_remaining} days"
         html_body = self._render_template('notifications/agreement_expiring.html', {
             'to_name': to_name,
+            'agreement_title': agreement_name,
             'agreement_name': agreement_name,
             'expiry_date': expiry_date,
             'days_remaining': days_remaining,
+            'renew_url': f"{self.frontend_url}/agreements",
             'agreement_url': f"{self.frontend_url}/agreements",
         })
         return await self._send_email(to_email, subject, html_body)
@@ -1074,7 +1101,11 @@ class EmailService:
         html_body = self._render_template('reports/professional_report.html', {
             'to_name': to_name,
             'report_type': report_type,
+            'report_title': f"{report_type} Report",
             'family_name': family_name,
+            'case_reference': '',
+            'professional_name': to_name,
+            'view_url': download_url,
             'download_url': download_url,
             'generated_date': generated_date or datetime.now().strftime('%B %d, %Y'),
         })

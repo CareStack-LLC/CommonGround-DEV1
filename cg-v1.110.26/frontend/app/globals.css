@@ -28,15 +28,15 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Font families */
-  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --font-serif: 'DM Serif Display', Georgia, serif;
+  /* Font families — powered by next/font CSS variables for zero render-blocking */
+  --font-sans: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-dm-serif-display), Georgia, serif;
   --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
 
   /* KidSpace Modern Fonts (Pre-teen) */
-  --font-kid-body: 'Inter', 'DM Sans', system-ui, sans-serif;
-  --font-kid-heading: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
-  --font-kid-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --font-kid-body: var(--font-inter), var(--font-dm-sans), system-ui, sans-serif;
+  --font-kid-heading: var(--font-space-grotesk), var(--font-dm-sans), system-ui, sans-serif;
+  --font-kid-mono: var(--font-jetbrains-mono), 'SF Mono', monospace;
 
   /* Sidebar colors */
   --color-sidebar-ring: var(--sidebar-ring);
@@ -111,6 +111,14 @@
 
 :root {
   --radius: 1rem;
+
+  /* Portal variable defaults — provides fallback for pages without a portal class
+     (e.g. marketing / landing pages). Overridden by .parent-portal, .child-portal, etc. */
+  --portal-primary: #3DAA8A;
+  --portal-primary-hover: #2D8A70;
+  --portal-primary-light: #5BC4A0;
+  --portal-secondary: #2D6A8F;
+  --portal-accent: #F5A623;
 
   /* Backgrounds - Soft White */
   --background: #F4F8F7;
@@ -313,8 +321,8 @@
   --portal-spacing-element: 1rem;
 
   /* Typography */
-  --portal-font-heading: 'DM Serif Display', Georgia, serif;
-  --portal-font-body: 'DM Sans', system-ui, sans-serif;
+  --portal-font-heading: var(--font-dm-serif-display), Georgia, serif;
+  --portal-font-body: var(--font-dm-sans), system-ui, sans-serif;
 }
 
 /* Parent Portal - Dark Mode */
@@ -379,8 +387,8 @@
   --portal-spacing-element: 0.75rem;
 
   /* Typography */
-  --portal-font-heading: 'DM Serif Display', Georgia, serif;
-  --portal-font-body: 'DM Sans', system-ui, sans-serif;
+  --portal-font-heading: var(--font-dm-serif-display), Georgia, serif;
+  --portal-font-body: var(--font-dm-sans), system-ui, sans-serif;
 }
 
 /* Child Portal - "Modern Pre-Teen App" */
@@ -431,10 +439,10 @@
   --portal-spacing-element: 1rem;
 
   /* Typography - Modern font stack */
-  --portal-font-heading: 'Space Grotesk', 'DM Sans', system-ui, sans-serif;
-  --portal-font-body: 'Inter', 'DM Sans', system-ui, sans-serif;
-  --portal-font-mono: 'JetBrains Mono', 'SF Mono', monospace;
-  --portal-font-display: 'DM Serif Display', Georgia, serif;
+  --portal-font-heading: var(--font-space-grotesk), var(--font-dm-sans), system-ui, sans-serif;
+  --portal-font-body: var(--font-inter), var(--font-dm-sans), system-ui, sans-serif;
+  --portal-font-mono: var(--font-jetbrains-mono), 'SF Mono', monospace;
+  --portal-font-display: var(--font-dm-serif-display), Georgia, serif;
   --portal-font-size-base: 1rem;
   --portal-line-height: 1.6;
 
@@ -520,8 +528,8 @@
   --portal-spacing-card: 1rem;
   --portal-spacing-element: 0.75rem;
 
-  --portal-font-heading: 'Inter', 'DM Sans', system-ui, sans-serif;
-  --portal-font-body: 'Inter', 'DM Sans', system-ui, sans-serif;
+  --portal-font-heading: var(--font-inter), var(--font-dm-sans), system-ui, sans-serif;
+  --portal-font-body: var(--font-inter), var(--font-dm-sans), system-ui, sans-serif;
 }
 
 /* Court Portal - "Legal Authority" */
@@ -562,8 +570,8 @@
   --portal-spacing-element: 0.75rem;
 
   /* Typography */
-  --portal-font-heading: 'DM Serif Display', Georgia, serif;
-  --portal-font-body: 'DM Sans', system-ui, sans-serif;
+  --portal-font-heading: var(--font-dm-serif-display), Georgia, serif;
+  --portal-font-body: var(--font-dm-sans), system-ui, sans-serif;
 }
 
 /* ============================================================================
