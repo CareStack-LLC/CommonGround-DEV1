@@ -26,6 +26,10 @@ from app.schemas.user import (
     PasswordChangeResponse,
     PrivacySettings,
     PrivacySettingsResponse,
+    AcceptTermsRequest,
+    AcceptTermsResponse,
+    DataExportResponse,
+    DeletionRequestResponse,
 )
 
 router = APIRouter()
@@ -438,4 +442,220 @@ async def update_privacy_settings(
         last_seen=profile.privacy_last_seen,
         analytics_enabled=profile.privacy_analytics,
         crash_reporting=profile.privacy_crash_reporting,
+    )
+
+
+@router.post("/accept-terms", response_model=AcceptTermsResponse)
+async def accept_terms(
+    request: AcceptTermsRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Accept Terms of Service and Privacy Policy.
+
+    Records the user's acceptance with a timestamp and version identifiers
+    for compliance tracking (GDPR/CCPA consent records).
+    """
+    from datetime import datetime
+
+    # Load user with profile
+    result = await db.execute(
+        select(User)
+        .options(selectinload(User.profile))
+        .where(User.id == current_user.id)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user or not user.profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User profile not found",
+        )
+
+    now = datetime.utcnow()
+    user.profile.terms_accepted_at = now
+    user.profile.terms_version = request.terms_version
+    user.profile.privacy_policy_accepted_at = now
+
+    await db.commit()
+
+    logger.info(
+        f"User {current_user.id} accepted terms v{request.terms_version} "
+        f"and privacy policy v{request.privacy_version}"
+    )
+
+    return AcceptTermsResponse(accepted=True, accepted_at=now)
+
+
+@router.get("/export-data", response_model=DataExportResponse)
+async def export_user_data(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Export all user data (GDPR Article 20 / CCPA right to data portability).
+
+    Returns a JSON export of the user's personal data. Message content is
+    excluded to protect the privacy of other conversation participants.
+    """
+    from datetime import datetime
+
+    # Load user with profile
+    result = await db.execute(
+        select(User)
+        .options(selectinload(User.profile))
+        .where(User.id == current_user.id)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user or not user.profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User profile not found",
+        )
+
+    profile = user.profile
+
+    # Gather message count (without content for privacy of other party)
+    from app.models.messaging import Message
+
+    msg_result = await db.execute(
+        select(Message).where(Message.sender_id == current_user.id)
+    )
+    messages_sent = len(msg_result.scalars().all())
+
+    # Gather family file metadata
+    family_files_metadata: list[dict] = []
+    try:
+        from app.models.family_file import FamilyFile
+
+        ff_result = await db.execute(
+            select(FamilyFile).where(FamilyFile.uploaded_by == current_user.id)
+        )
+        for ff in ff_result.scalars().all():
+            family_files_metadata.append(
+                {
+                    "id": str(ff.id),
+                    "file_name": ff.file_name,
+                    "file_type": ff.file_type,
+                    "created_at": ff.created_at.isoformat() if ff.created_at else None,
+                }
+            )
+    except Exception:
+        # Family file model may not exist or may differ; gracefully degrade
+        pass
+
+    return DataExportResponse(
+        profile={
+            "first_name": profile.first_name,
+            "last_name": profile.last_name,
+            "preferred_name": profile.preferred_name,
+            "email": user.email,
+            "phone": user.phone,
+            "timezone": profile.timezone,
+            "locale": profile.locale,
+            "address_line1": profile.address_line1,
+            "address_line2": profile.address_line2,
+            "city": profile.city,
+            "state": profile.state,
+            "zip_code": profile.zip_code,
+            "country": profile.country,
+            "avatar_url": profile.avatar_url,
+            "created_at": profile.created_at.isoformat() if profile.created_at else None,
+        },
+        subscription={
+            "tier": profile.subscription_tier,
+            "status": profile.subscription_status,
+            "ends_at": profile.subscription_ends_at.isoformat()
+            if profile.subscription_ends_at
+            else None,
+        },
+        login_history={
+            "last_login": user.last_login.isoformat() if user.last_login else None,
+            "last_active": user.last_active.isoformat() if user.last_active else None,
+            "mfa_enabled": user.mfa_enabled,
+        },
+        family_file_metadata=family_files_metadata,
+        privacy_settings={
+            "read_receipts": profile.privacy_read_receipts,
+            "typing_indicator": profile.privacy_typing_indicator,
+            "last_seen": profile.privacy_last_seen,
+            "analytics_enabled": profile.privacy_analytics,
+            "crash_reporting": profile.privacy_crash_reporting,
+        },
+        notification_preferences={
+            "email": profile.notification_email,
+            "sms": profile.notification_sms,
+            "push": profile.notification_push,
+        },
+        exported_at=datetime.utcnow(),
+    )
+
+
+@router.post("/request-deletion", response_model=DeletionRequestResponse)
+async def request_account_deletion(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Request account deletion with a 30-day grace period.
+
+    Marks the account for deletion but does not immediately remove data.
+    The user can cancel by contacting support within the grace period.
+    A confirmation email is sent to the user's registered address.
+    """
+    from datetime import datetime, timedelta
+
+    # Load user
+    result = await db.execute(
+        select(User).where(User.id == current_user.id)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    if user.is_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Account is already marked for deletion",
+        )
+
+    now = datetime.utcnow()
+    deletion_date = now + timedelta(days=30)
+
+    # Mark the deletion request timestamp (reuse deleted_at to track the request)
+    user.deleted_at = deletion_date
+    await db.commit()
+
+    # Send confirmation email
+    try:
+        from app.services.email_service import send_email
+
+        await send_email(
+            to=user.email,
+            subject="CommonGround - Account Deletion Requested",
+            body=(
+                f"Hi {user.first_name},\n\n"
+                "We received your request to delete your CommonGround account. "
+                f"Your account and data will be permanently deleted on {deletion_date.strftime('%B %d, %Y')}.\n\n"
+                "If you did not make this request or wish to cancel, please contact "
+                "our support team at support@commonground.co within the next 30 days.\n\n"
+                "Thank you,\nThe CommonGround Team"
+            ),
+        )
+    except Exception as e:
+        logger.warning(f"Failed to send deletion confirmation email: {e}")
+
+    logger.info(
+        f"User {current_user.id} requested account deletion, scheduled for {deletion_date.isoformat()}"
+    )
+
+    return DeletionRequestResponse(
+        deletion_scheduled=True,
+        deletion_date=deletion_date.strftime("%Y-%m-%d"),
     )

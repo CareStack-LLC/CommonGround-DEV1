@@ -104,6 +104,8 @@ async def login(
     except Exception as e:
         import traceback
         logger.error(f"Login error: {traceback.format_exc()}")
+        if settings.ENVIRONMENT == "production":
+            raise HTTPException(status_code=500, detail="Login failed. Please try again later.")
         raise HTTPException(status_code=500, detail=f"Login failed: {type(e).__name__}: {str(e)}")
 
 
@@ -208,9 +210,11 @@ async def test_email(
     template: str = Body("welcome", embed=True),
 ):
     """
-    Send a test email. Debug endpoint — remove before final production.
+    Send a test email. Debug endpoint — only available in non-production environments.
     Supported templates: welcome, password_reset, security_alert
     """
+    if settings.ENVIRONMENT == "production":
+        raise HTTPException(status_code=404, detail="Not found")
     from app.services.email import EmailService
     email_service = EmailService()
     logger.info(f"Test email '{template}' requested to {email}")

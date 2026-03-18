@@ -123,3 +123,36 @@ class PrivacySettingsResponse(PrivacySettings):
 
     class Config:
         from_attributes = True
+
+
+class AcceptTermsRequest(BaseModel):
+    """Request to accept terms of service and privacy policy."""
+
+    terms_version: str = Field(..., max_length=20, examples=["2026.1"])
+    privacy_version: str = Field(..., max_length=20, examples=["2026.1"])
+
+
+class AcceptTermsResponse(BaseModel):
+    """Response after accepting terms."""
+
+    accepted: bool
+    accepted_at: datetime
+
+
+class DataExportResponse(BaseModel):
+    """Response containing exported user data."""
+
+    profile: dict
+    subscription: dict
+    login_history: dict
+    family_file_metadata: list
+    privacy_settings: dict
+    notification_preferences: dict
+    exported_at: datetime
+
+
+class DeletionRequestResponse(BaseModel):
+    """Response after requesting account deletion."""
+
+    deletion_scheduled: bool
+    deletion_date: str

@@ -162,7 +162,7 @@ class EvidenceExportService:
         package_url = await storage_service.get_signed_url(
             bucket=StorageBucket.DOCUMENTS,
             path=package_path,
-            expires_in=604800,  # 7 days
+            expires_in=7200,  # 2 hours (sensitive document)
         )
 
         # Log the export

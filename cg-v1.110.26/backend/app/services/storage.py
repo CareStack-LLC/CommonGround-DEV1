@@ -113,11 +113,19 @@ class SupabaseStorageService:
         if bucket in (StorageBucket.AVATARS, StorageBucket.KIDCOMS, StorageBucket.PROFESSIONAL_MEDIA):
             return self._get_storage_url(bucket, path)
         else:
-            # For private buckets, return a signed URL (7 days)
-            # Short expiry reduces risk if URL is leaked
+            # Sensitive buckets get 2-hour expiry; less-sensitive get 24 hours
+            sensitive_buckets = (
+                StorageBucket.DOCUMENTS,
+                StorageBucket.RECEIPTS,
+                StorageBucket.CALL_RECORDINGS,
+                StorageBucket.REPORTS,
+                StorageBucket.ARIA_FRAME_EVIDENCE,
+                StorageBucket.MESSAGE_ATTACHMENTS,
+            )
+            expires_in = 7200 if bucket in sensitive_buckets else 86400  # 2h or 24h
             signed = self.client.storage.from_(bucket).create_signed_url(
                 path=path,
-                expires_in=604800  # 7 days in seconds
+                expires_in=expires_in
             )
             return signed.get("signedURL", f"{bucket}/{path}")
 

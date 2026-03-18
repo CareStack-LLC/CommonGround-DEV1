@@ -1,85 +1,157 @@
 """
-Rate limiting middleware using slowapi.
+Custom in-memory rate limiting middleware.
 
-Provides per-user and per-endpoint rate limits to prevent abuse.
-Critical limits:
-- Child PIN login: 5 attempts per 15 minutes (brute-force protection for 4-digit PINs)
-- ARIA analysis: 10 per minute (prevent LLM API abuse)
-- General API: 100 requests per minute per user
-- Unauthenticated: 30 requests per minute per IP
+Replaces slowapi which crashes on Render. Uses a simple dict-based
+approach with automatic cleanup to prevent memory leaks.
+
+Limits:
+- Auth endpoints (login, register, password reset): 10 requests/minute per IP
+- General API: 100 requests/minute per IP
 """
 
 import logging
-import os
-from typing import Optional
+import time
+from collections import defaultdict
+from typing import Dict, List, Tuple
 
-from fastapi import Request
-from slowapi import Limiter
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 from starlette.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
 
+# Auth-related path fragments that get stricter rate limits
+AUTH_PATHS = {
+    "/auth/login",
+    "/auth/register",
+    "/auth/password-reset",
+    "/auth/magic-link",
+    "/auth/oauth/sync",
+}
 
-def get_user_or_ip(request: Request) -> str:
+# Rate limit settings: (max_requests, window_seconds)
+AUTH_RATE_LIMIT: Tuple[int, int] = (10, 60)       # 10 requests per 60 seconds
+GENERAL_RATE_LIMIT: Tuple[int, int] = (100, 60)   # 100 requests per 60 seconds
+
+# Cleanup interval in seconds (remove stale entries every 5 minutes)
+CLEANUP_INTERVAL = 300
+
+
+class InMemoryRateLimiter:
     """
-    Extract user identifier for rate limiting.
-    Uses authenticated user ID if available, otherwise falls back to IP.
+    Simple in-memory rate limiter using a sliding window approach.
+
+    Stores timestamps of recent requests per client IP. Periodically
+    cleans up expired entries to prevent unbounded memory growth.
     """
-    # Check for Authorization header — extract user from JWT if present
-    auth_header = request.headers.get("authorization", "")
-    if auth_header.startswith("Bearer "):
-        token = auth_header[7:]
-        try:
-            from app.core.security import decode_access_token
-            payload = decode_access_token(token)
-            if payload and "sub" in payload:
-                return f"user:{payload['sub']}"
-        except Exception:
-            pass
 
-    # Fall back to IP address
-    return get_remote_address(request)
+    def __init__(self):
+        # Key: (ip, path_category) -> List of request timestamps
+        self._requests: Dict[str, List[float]] = defaultdict(list)
+        self._last_cleanup: float = time.time()
+
+    def _cleanup(self, now: float) -> None:
+        """Remove entries older than the largest window (60s) + buffer."""
+        cutoff = now - 120  # 2 minutes — generous buffer
+        keys_to_delete = []
+        for key, timestamps in self._requests.items():
+            # Filter out old timestamps
+            self._requests[key] = [t for t in timestamps if t > cutoff]
+            if not self._requests[key]:
+                keys_to_delete.append(key)
+        for key in keys_to_delete:
+            del self._requests[key]
+        self._last_cleanup = now
+
+    def is_rate_limited(self, client_ip: str, path: str) -> Tuple[bool, int]:
+        """
+        Check if a request should be rate limited.
+
+        Args:
+            client_ip: The client's IP address
+            path: The request path
+
+        Returns:
+            Tuple of (is_limited, retry_after_seconds)
+        """
+        now = time.time()
+
+        # Periodic cleanup to prevent memory leak
+        if now - self._last_cleanup > CLEANUP_INTERVAL:
+            self._cleanup(now)
+
+        # Determine which rate limit applies
+        is_auth = any(auth_path in path for auth_path in AUTH_PATHS)
+        max_requests, window = AUTH_RATE_LIMIT if is_auth else GENERAL_RATE_LIMIT
+
+        # Build key: separate buckets for auth vs general per IP
+        category = "auth" if is_auth else "general"
+        key = f"{client_ip}:{category}"
+
+        # Filter timestamps within the current window
+        window_start = now - window
+        self._requests[key] = [t for t in self._requests[key] if t > window_start]
+
+        # Check if over limit
+        if len(self._requests[key]) >= max_requests:
+            # Calculate retry-after from the oldest request in window
+            oldest = self._requests[key][0]
+            retry_after = int(oldest + window - now) + 1
+            return True, max(retry_after, 1)
+
+        # Record this request
+        self._requests[key].append(now)
+        return False, 0
 
 
-# Initialize the limiter with user-or-IP key function
-# Use in-memory storage if Redis is unavailable to prevent crashes
-_redis_url = os.environ.get("REDIS_URL")
-_storage_uri = "memory://"
-if _redis_url:
-    try:
-        import redis as redis_lib
-        r = redis_lib.from_url(_redis_url, socket_timeout=2)
-        r.ping()
-        _storage_uri = _redis_url
-        logger.info("Rate limiter using Redis storage")
-    except Exception as e:
-        logger.warning(f"Redis unavailable for rate limiter, falling back to memory: {e}")
-
-limiter = Limiter(
-    key_func=get_user_or_ip,
-    default_limits=["100/minute"],
-    storage_uri=_storage_uri,
-)
+# Global instance
+_rate_limiter = InMemoryRateLimiter()
 
 
-async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSONResponse:
-    """Custom handler for rate limit exceeded errors."""
-    logger.warning(f"Rate limit exceeded: {get_user_or_ip(request)} on {request.url.path}")
-    return JSONResponse(
-        status_code=429,
-        content={
-            "detail": "Too many requests. Please try again later.",
-            "retry_after": exc.detail,
-        }
-    )
+def _get_client_ip(request: Request) -> str:
+    """
+    Extract the real client IP from the request.
+
+    Checks X-Forwarded-For header (set by Render/load balancers) first,
+    then falls back to the direct client address.
+    """
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        # X-Forwarded-For can contain multiple IPs; the first is the client
+        return forwarded.split(",")[0].strip()
+    if request.client:
+        return request.client.host
+    return "unknown"
 
 
-# Decorator shortcuts for common limits
-# Usage: @child_pin_limit (on the endpoint)
-CHILD_PIN_LIMIT = "5/15minutes"
-ARIA_ANALYSIS_LIMIT = "10/minute"
-AUTH_LIMIT = "10/minute"
-GENERAL_LIMIT = "100/minute"
-UNAUTHENTICATED_LIMIT = "30/minute"
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware that enforces per-IP rate limits.
+
+    - 10 req/min for auth endpoints (login, register, password reset)
+    - 100 req/min for all other endpoints
+    - Returns 429 with Retry-After header when exceeded
+    """
+
+    async def dispatch(self, request: Request, call_next):
+        # Skip rate limiting for health checks and OPTIONS (CORS preflight)
+        if request.url.path in ("/", "/health") or request.method == "OPTIONS":
+            return await call_next(request)
+
+        client_ip = _get_client_ip(request)
+        is_limited, retry_after = _rate_limiter.is_rate_limited(client_ip, request.url.path)
+
+        if is_limited:
+            logger.warning(
+                f"Rate limit exceeded: {client_ip} on {request.url.path}"
+            )
+            return JSONResponse(
+                status_code=429,
+                content={
+                    "detail": "Too many requests. Please try again later.",
+                    "retry_after": retry_after,
+                },
+                headers={"Retry-After": str(retry_after)},
+            )
+
+        return await call_next(request)
