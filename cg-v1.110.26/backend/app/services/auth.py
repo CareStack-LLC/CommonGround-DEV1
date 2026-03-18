@@ -155,14 +155,6 @@ class AuthService:
 
             logger.info(f"Registration successful for {request.email}")
 
-            # Audit log
-            from app.services.audit_service import log_audit_event
-            await log_audit_event(
-                self.db, action="user.register", resource_type="user",
-                user_id=user.id, user_email=request.email,
-                description=f"New user registered: {request.email}",
-            )
-
             return user, access_token, refresh_token, checkout_url
 
         except HTTPException as e:
@@ -345,14 +337,6 @@ class AuthService:
             # Create JWT tokens
             access_token = create_access_token(data={"sub": user.id})
             refresh_token = create_refresh_token(data={"sub": user.id})
-
-            # Audit log
-            from app.services.audit_service import log_audit_event
-            await log_audit_event(
-                self.db, action="user.login", resource_type="user",
-                user_id=user.id, user_email=user.email,
-                description=f"User logged in: {user.email}",
-            )
 
             return user, access_token, refresh_token
 

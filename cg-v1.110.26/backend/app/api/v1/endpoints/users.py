@@ -73,14 +73,6 @@ async def delete_account(
         user.profile.state = None
         user.profile.zip_code = None
 
-    # Audit log
-    from app.services.audit_service import log_audit_event
-    await log_audit_event(
-        db, action="user.delete", resource_type="user",
-        user_id=str(current_user.id), user_email=current_user.email,
-        description="User account deleted (GDPR/CCPA erasure)",
-    )
-
     # Delete from Supabase Auth
     try:
         from app.core.supabase import get_supabase_admin_client
