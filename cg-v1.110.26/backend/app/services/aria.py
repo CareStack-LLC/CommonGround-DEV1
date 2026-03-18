@@ -335,8 +335,18 @@ class ARIAService:
         # 1. Fast Regex Check
         regex_result = self.analyze_message(message_text, context, sensitivity_offset)
 
+        # Track ARIA metrics
+        from app.utils.sentry_helpers import metric_increment, metric_distribution
+        metric_increment("aria.analysis.total", tags={"method": "regex"})
+        if regex_result.toxicity_score > 0:
+            metric_distribution("aria.toxicity_score", regex_result.toxicity_score,
+                                unit="none", tags={"method": "regex"})
+
         # 2. If already blocked, no need for ML
         if regex_result.block_send:
+            metric_increment("aria.blocks", tags={
+                "toxicity": regex_result.toxicity_level.value if regex_result.toxicity_level else "unknown",
+            })
             # LOG IT Synchronously because application will raise 400 and drop it
             await self.log_event(
                 db=db,

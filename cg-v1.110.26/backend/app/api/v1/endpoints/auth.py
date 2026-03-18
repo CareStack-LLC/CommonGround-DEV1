@@ -77,8 +77,13 @@ async def login(
         LoginResponse with user data and JWT tokens
     """
     try:
+        from app.utils.sentry_helpers import metric_increment, metric_set
         auth_service = AuthService(db)
         user, access_token, refresh_token = await auth_service.login_user(request)
+
+        # Track login metrics
+        metric_increment("auth.login.success")
+        metric_set("auth.active_users", str(user.id))
 
         return LoginResponse(
             access_token=access_token,
@@ -93,6 +98,8 @@ async def login(
             )
         )
     except HTTPException:
+        from app.utils.sentry_helpers import metric_increment
+        metric_increment("auth.login.failure")
         raise
     except Exception as e:
         import traceback

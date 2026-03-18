@@ -59,15 +59,37 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
 
             # Emit canonical log line (one wide event per request)
             status_code = response.status_code if response else 500
+            path = request.url.path
             log_data = {
                 "request_id": request_id,
                 "method": request.method,
-                "path": request.url.path,
+                "path": path,
                 "status": status_code,
                 "duration_ms": duration_ms,
                 "user_id": user_data.get("id"),
                 "client_ip": request.client.host if request.client else None,
             }
+
+            # Sentry Metrics — track response time and status codes
+            try:
+                from app.utils.sentry_helpers import metric_distribution, metric_increment
+                # Normalize path for metric grouping (strip IDs)
+                import re
+                metric_path = re.sub(
+                    r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',
+                    ':id', path
+                )
+                metric_distribution("http.response_time", duration_ms, tags={
+                    "method": request.method,
+                    "path": metric_path,
+                    "status": str(status_code),
+                })
+                if status_code >= 500:
+                    metric_increment("http.errors.5xx", tags={"path": metric_path})
+                elif status_code >= 400:
+                    metric_increment("http.errors.4xx", tags={"path": metric_path})
+            except Exception:
+                pass
 
             # Log level based on status code and duration
             if error or status_code >= 500:

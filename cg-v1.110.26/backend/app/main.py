@@ -46,13 +46,25 @@ if settings.SENTRY_DSN:
         dsn=settings.SENTRY_DSN,
         environment=settings.ENVIRONMENT,
         release=f"commonground@{settings.API_VERSION}",
-        # Performance: sample 20% in prod, 100% in dev
-        traces_sample_rate=0.2 if settings.is_production else 1.0,
-        # Session tracking for crash-free rate metrics
+
+        # ── Traces (Performance Monitoring) ──
+        # Sample 30% of transactions in prod, 100% in dev
+        traces_sample_rate=0.3 if settings.is_production else 1.0,
+
+        # ── Profiling ──
+        # Profile 20% of sampled transactions for CPU/memory insights
+        profiles_sample_rate=0.2 if settings.is_production else 0.0,
+
+        # ── Logs (SDK 2.35+) ──
+        # Stream Python logs to Sentry Logs (viewable in Explore > Logs)
+        _experiments={
+            "enable_logs": True,
+        },
+
+        # ── Session Tracking ──
         auto_session_tracking=True,
-        # Profile 10% of sampled transactions in production
-        profiles_sample_rate=0.1 if settings.is_production else 0.0,
-        # Capture INFO+ logs as breadcrumbs, ERROR+ as events
+
+        # ── Integrations ──
         integrations=[
             StarletteIntegration(transaction_style="endpoint"),
             FastApiIntegration(
@@ -61,14 +73,16 @@ if settings.SENTRY_DSN:
             ),
             SqlalchemyIntegration(),
             LoggingIntegration(
-                level=logging.INFO,
-                event_level=logging.ERROR,
+                level=logging.INFO,       # Breadcrumbs from INFO+
+                event_level=logging.ERROR, # Sentry events from ERROR+
             ),
             HttpxIntegration(),
         ],
-        # Scrub sensitive data (emails, tokens, etc.)
+
+        # ── Privacy ──
         send_default_pii=False,
-        # Filter noise and enrich events
+
+        # ── Filtering ──
         before_send=_sentry_before_send,
         before_send_transaction=_sentry_before_send_transaction,
     )
