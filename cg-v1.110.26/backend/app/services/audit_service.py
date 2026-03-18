@@ -75,10 +75,15 @@ async def log_audit_event(
             is_suspicious=is_suspicious,
         )
         db.add(audit_log)
-        await db.flush()
+        # Don't flush here — let it commit with the parent transaction.
+        # Flushing can corrupt the session if the audit_logs table doesn't exist yet.
     except Exception as e:
         # Never let audit logging failure break the main flow
         logger.error(f"Failed to write audit log: {e}")
+        try:
+            await db.rollback()
+        except Exception:
+            pass
 
 
 def get_client_ip(request) -> Optional[str]:
