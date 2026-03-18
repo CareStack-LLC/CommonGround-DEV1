@@ -717,6 +717,25 @@ async def handle_checkout_completed(db: AsyncSession, event_data: dict) -> None:
         f"subscription={subscription_id}, payment_status={payment_status}"
     )
 
+    # Send subscription activated email
+    if customer_id and payment_status == "paid":
+        try:
+            from app.services.email import email_service
+            from sqlalchemy import select
+            from app.models.user import User
+            user = (await db.execute(select(User).where(User.stripe_customer_id == customer_id))).scalar_one_or_none()
+            if user:
+                plan_name = metadata.get("plan_name", "CommonGround Pro")
+                await email_service.send_subscription_activated(
+                    to_email=user.email,
+                    to_name=user.first_name or "there",
+                    plan_name=plan_name,
+                    features=["Unlimited messaging with ARIA", "Full compliance reports", "ClearFund expense tracking", "Priority support"],
+                    manage_url=f"{email_service.frontend_url}/dashboard/settings/subscription"
+                )
+        except Exception as e:
+            logger.warning(f"Failed to send subscription activated email: {e}")
+
 
 async def _handle_professional_report_checkout(db: AsyncSession, event_data: dict) -> None:
     """
