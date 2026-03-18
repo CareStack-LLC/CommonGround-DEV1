@@ -48,6 +48,6 @@ export const config = {
      *   are excluded to avoid the ~200ms Supabase getUser() latency on first paint.
      *   Auth state for those pages is handled client-side by AuthProvider.
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$)(?!$)(?!features$|pricing$|about$|contact$|help/contact$|blog$|professionals$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$)(?!$)(?!features$|pricing$|about$|contact$|help/contact$|blog$|professionals$|auth/callback|auth/sync|login$|register$|forgot-password$|reset-password$).*)',
   ],
 }

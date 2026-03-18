@@ -499,6 +499,7 @@ export const authAPI = {
    * Called after successful OAuth authentication to create/update user in our database
    */
   async oauthSync(data: {
+    access_token: string;
     supabase_id: string;
     email: string;
     first_name: string;

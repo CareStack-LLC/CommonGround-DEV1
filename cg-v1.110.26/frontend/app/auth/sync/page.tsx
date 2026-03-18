@@ -42,6 +42,7 @@ function AuthSyncContent() {
 
                 // Sync user with our backend
                 const response = await authAPI.oauthSync({
+                    access_token: session.access_token,
                     supabase_id: user.id,
                     email: user.email || '',
                     first_name:
