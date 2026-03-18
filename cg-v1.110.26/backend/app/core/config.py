@@ -3,6 +3,7 @@ Application configuration using Pydantic Settings.
 """
 
 from typing import List, Optional
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,6 +16,12 @@ class Settings(BaseSettings):
         case_sensitive=True,
         extra="ignore"
     )
+
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def strip_database_url(cls, v: str) -> str:
+        """Strip whitespace/newlines from DATABASE_URL (Render env vars can have trailing newlines)."""
+        return v.strip() if isinstance(v, str) else v
 
     # Application
     APP_NAME: str = "CommonGround"
