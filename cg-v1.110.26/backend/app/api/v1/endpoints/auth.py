@@ -2,9 +2,13 @@
 Authentication endpoints.
 """
 
-from fastapi import APIRouter, Depends, Request, status, Body
+import logging
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status, Body
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 from app.core.config import settings
 from app.core.database import get_db
@@ -59,8 +63,7 @@ async def register(
     )
 
 
-@router.post("/login", response_model=LoginResponse)
-@limiter.limit(AUTH_LIMIT)
+@router.post("/login")
 async def login(
     http_request: Request,
     request: LoginRequest,
@@ -75,21 +78,28 @@ async def login(
     Returns:
         LoginResponse with user data and JWT tokens
     """
-    auth_service = AuthService(db)
-    user, access_token, refresh_token = await auth_service.login_user(request)
+    try:
+        auth_service = AuthService(db)
+        user, access_token, refresh_token = await auth_service.login_user(request)
 
-    return LoginResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer",
-        user=UserResponse(
-            id=user.id,
-            email=user.email,
-            email_verified=user.email_verified,
-            first_name=user.first_name,
-            last_name=user.last_name,
+        return LoginResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_type="bearer",
+            user=UserResponse(
+                id=user.id,
+                email=user.email,
+                email_verified=user.email_verified,
+                first_name=user.first_name,
+                last_name=user.last_name,
+            )
         )
-    )
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        logger.error(f"Login error: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Login failed: {type(e).__name__}: {str(e)}")
 
 
 @router.post("/logout")
