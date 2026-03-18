@@ -6,18 +6,11 @@
 {% block preheader %}Your CommonGround account is ready. Here's what's waiting for you.{% endblock %}
 
 {% block content %}
-<!-- Welcome Icon -->
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-  <tr>
-    <td align="center" style="padding-bottom: 20px;">
-      <img src="{{ icons.welcome }}" alt="" width="64" height="64" style="display: block; width: 64px; height: 64px;">
-    </td>
-  </tr>
-</table>
-
 <!-- Greeting -->
 {{ c.heading('Welcome' ~ (', ' ~ user_name ~ '!' if user_name else '!')) }}
 {{ c.subheading('Your CommonGround account is ready. Here\'s what\'s waiting for you.') }}
+
+{{ c.divider() }}
 
 <!-- Features -->
 {{ c.feature(icons.document, 'Good Faith Agreement', 'A default agreement is already in place so you can start messaging right away. You can review or customize it anytime.') }}

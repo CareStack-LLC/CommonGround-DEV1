@@ -37,7 +37,7 @@ class EmailService:
         self.from_email = settings.FROM_EMAIL
         self.from_name = getattr(settings, 'FROM_NAME', 'CommonGround')
         self.api_key = settings.SENDGRID_API_KEY
-        self.frontend_url = getattr(settings, 'FRONTEND_URL', 'https://common-ground-blue.vercel.app')
+        self.frontend_url = getattr(settings, 'FRONTEND_URL', 'https://www.find-commonground.com')
 
         # Validate configuration
         if self.enabled and not self.api_key:

@@ -16,6 +16,7 @@ class StorageBucket:
     PROFESSIONAL_MEDIA = "professional-media"
     REPORTS = "reports"
     ARIA_FRAME_EVIDENCE = "aria-frame-evidence"
+    EMAIL_ASSETS = "email-assets"
 
 async def initialize_storage():
     """Ensure all required Supabase Storage buckets exist and are correctly configured."""
@@ -41,6 +42,7 @@ async def initialize_storage():
         (StorageBucket.PROFESSIONAL_MEDIA, True),  # Public
         (StorageBucket.REPORTS, False),              # Private
         (StorageBucket.ARIA_FRAME_EVIDENCE, False),  # Private
+        (StorageBucket.EMAIL_ASSETS, True),             # Public — email logos/icons
     ]
 
     print("\n📦 Initializing Storage Buckets...")
