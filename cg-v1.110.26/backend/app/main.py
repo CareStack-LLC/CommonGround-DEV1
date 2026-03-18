@@ -9,19 +9,81 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+# Initialize Sentry before anything else
+from app.core.config import settings
+
+
+def _sentry_before_send(event, hint):
+    """Filter and enrich Sentry error events."""
+    # Don't send 404s or rate limit errors to Sentry
+    if "exc_info" in hint:
+        exc_type, exc_value, _ = hint["exc_info"]
+        from fastapi import HTTPException
+        if isinstance(exc_value, HTTPException) and exc_value.status_code in (404, 429):
+            return None
+    # Tag the event with the platform
+    event.setdefault("tags", {})["platform"] = "commonground"
+    return event
+
+
+def _sentry_before_send_transaction(event, hint):
+    """Filter noisy transactions (health checks, static assets)."""
+    transaction_name = event.get("transaction", "")
+    if transaction_name in ("/health", "/", "/health/"):
+        return None
+    return event
+
+
+if settings.SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.fastapi import FastApiIntegration
+    from sentry_sdk.integrations.starlette import StarletteIntegration
+    from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+    from sentry_sdk.integrations.logging import LoggingIntegration
+    from sentry_sdk.integrations.httpx import HttpxIntegration
+
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        environment=settings.ENVIRONMENT,
+        release=f"commonground@{settings.API_VERSION}",
+        # Performance: sample 20% in prod, 100% in dev
+        traces_sample_rate=0.2 if settings.is_production else 1.0,
+        # Session tracking for crash-free rate metrics
+        auto_session_tracking=True,
+        # Profile 10% of sampled transactions in production
+        profiles_sample_rate=0.1 if settings.is_production else 0.0,
+        # Capture INFO+ logs as breadcrumbs, ERROR+ as events
+        integrations=[
+            StarletteIntegration(transaction_style="endpoint"),
+            FastApiIntegration(
+                transaction_style="endpoint",
+                failed_request_status_codes=[range(400, 600)],
+            ),
+            SqlalchemyIntegration(),
+            LoggingIntegration(
+                level=logging.INFO,
+                event_level=logging.ERROR,
+            ),
+            HttpxIntegration(),
+        ],
+        # Scrub sensitive data (emails, tokens, etc.)
+        send_default_pii=False,
+        # Attach request data for debugging (medium = first 10KB)
+        request_bodies="medium",
+        # Filter noise and enrich events
+        before_send=_sentry_before_send,
+        before_send_transaction=_sentry_before_send_transaction,
+    )
+    logger.info(f"Sentry initialized for {settings.ENVIRONMENT}")
+
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.staticfiles import StaticFiles
 
-from app.core.config import settings
 from app.core.database import init_db, close_db
 from app.api.v1.router import api_router
 from app.core.rate_limit import limiter, rate_limit_exceeded_handler
-
-# Create uploads directory
-UPLOADS_DIR = Path(__file__).parent.parent / "uploads"
-UPLOADS_DIR.mkdir(exist_ok=True)
 
 
 @asynccontextmanager
@@ -33,6 +95,8 @@ async def lifespan(app: FastAPI):
     logger.info(f"Starting {settings.APP_NAME} ({settings.ENVIRONMENT})")
     logger.info(f"CORS Allowed Origins: {settings.allowed_origins_list}")
     logger.debug(f"CORS Origin Regex: {settings.CORS_ORIGIN_REGEX}")
+    if settings.SENDGRID_API_KEY and not settings.EMAIL_ENABLED:
+        logger.warning("SENDGRID_API_KEY is set but EMAIL_ENABLED is False — all emails will be silently suppressed")
     if settings.is_development:
         await init_db()  # Auto-create tables in dev
         logger.info("Database tables created")
@@ -58,8 +122,8 @@ app.add_middleware(
     allow_origins=settings.allowed_origins_list,
     allow_origin_regex=settings.CORS_ORIGIN_REGEX,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "X-Request-ID"],
 )
 
 # Rate limiting
@@ -67,6 +131,10 @@ from slowapi import _rate_limit_exceeded_handler as _default_handler
 from slowapi.errors import RateLimitExceeded
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+
+# Request ID tracing + canonical log lines (wide events)
+from app.middleware.request_id import RequestIDMiddleware
+app.add_middleware(RequestIDMiddleware)
 
 # Activity tracking: update User.last_active on authenticated requests
 from app.middleware.activity import ActivityTrackingMiddleware
@@ -89,10 +157,15 @@ async def global_exception_handler(request: Request, exc: Exception):
     # Get the origin from the request
     origin = request.headers.get("origin", "")
     
-    # Log the error for debugging
+    # Log the error and report to Sentry
     error_msg = f"{type(exc).__name__}: {exc}"
     tb_str = traceback.format_exc()
     logger.error(f"Unhandled exception: {error_msg}\n{tb_str}")
+
+    # Capture in Sentry with request context
+    if settings.SENTRY_DSN:
+        import sentry_sdk
+        sentry_sdk.capture_exception(exc)
     
     # Build response with CORS headers - never expose internals in production
     if settings.is_production:
@@ -132,10 +205,6 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Include API router
 app.include_router(api_router, prefix=f"/api/{settings.API_VERSION}")
 
-# Mount static files for uploads
-app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
-
-
 @app.get("/")
 async def root():
     """Root endpoint - health check."""
@@ -165,6 +234,15 @@ async def health_check():
         checks["database"] = "healthy"
     except Exception:
         checks["database"] = "unhealthy"
+
+    # Check Redis connectivity
+    try:
+        import redis
+        r = redis.from_url(settings.REDIS_URL, socket_timeout=2)
+        r.ping()
+        checks["redis"] = "healthy"
+    except Exception:
+        checks["redis"] = "unhealthy"
 
     overall = "healthy" if all(v == "healthy" for v in checks.values()) else "degraded"
 

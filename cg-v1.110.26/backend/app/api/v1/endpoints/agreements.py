@@ -127,6 +127,82 @@ async def get_agreements_by_family_file(
     return response
 
 
+@router.get("/template/download", summary="Download agreement template questionnaire")
+async def download_agreement_template(
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Download a PDF template with all the questions parents need to answer
+    to create a full SharedCare Agreement. Parents can fill this out offline
+    and use it as a reference when building their agreement on the platform.
+    """
+    from app.services.agreement import SECTION_TEMPLATES
+    from fastapi.responses import Response
+
+    # Build HTML questionnaire from section templates
+    sections_html = ""
+    for i, section in enumerate(SECTION_TEMPLATES):
+        sections_html += f"""
+        <div style="margin-bottom: 24px; page-break-inside: avoid;">
+            <h3 style="color: #1a5c4c; margin-bottom: 8px;">
+                Section {i + 1}: {section['section_title']}
+            </h3>
+            <p style="color: #666; font-size: 12px; margin-bottom: 12px;">
+                Type: {section['section_type']} | {'Required' if section.get('is_required') else 'Optional'}
+            </p>
+            <div style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; background: #f9f9f9;">
+                <p style="color: #333; white-space: pre-line;">{section.get('template', 'Describe your agreement for this section.')}</p>
+            </div>
+            <div style="margin-top: 12px; border-bottom: 1px dashed #ccc; padding-bottom: 40px;">
+                <p style="color: #999; font-size: 11px;">Your answer:</p>
+            </div>
+        </div>
+        """
+
+    html = f"""
+    <html>
+    <head><style>
+        body {{ font-family: 'Helvetica', sans-serif; max-width: 700px; margin: 0 auto; padding: 40px; }}
+        h1 {{ color: #1a5c4c; border-bottom: 3px solid #3DAA8A; padding-bottom: 12px; }}
+        h2 {{ color: #333; margin-top: 32px; }}
+    </style></head>
+    <body>
+        <h1>SharedCare Agreement Template</h1>
+        <p style="color: #666;">
+            Use this template to prepare your answers before creating your agreement
+            on CommonGround. Fill in each section with your proposed arrangement.
+            Both parents will need to review and approve the final agreement.
+        </p>
+        <hr style="margin: 24px 0;" />
+        <h2>Agreement Sections</h2>
+        {sections_html}
+        <div style="margin-top: 40px; padding: 20px; background: #f0f7f5; border-radius: 8px;">
+            <p style="color: #1a5c4c; font-weight: bold;">Next Steps</p>
+            <p style="color: #333;">
+                Once you've filled out this template, log into CommonGround and create
+                a new SharedCare Agreement. You can enter your answers section by section,
+                and ARIA will help refine the language for clarity and fairness.
+            </p>
+        </div>
+    </body>
+    </html>
+    """
+
+    try:
+        from app.services.pdf_generator import PDFGenerator
+        pdf_gen = PDFGenerator()
+        pdf_bytes = pdf_gen.generate_from_html(html)
+    except Exception:
+        # Fallback: return HTML if PDF generation fails
+        return Response(content=html, media_type="text/html")
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": 'attachment; filename="SharedCare_Agreement_Template.pdf"'},
+    )
+
+
 @router.get("/{agreement_id}/versions", response_model=List[AgreementVersionResponse])
 async def get_agreement_versions(
     agreement_id: str,
@@ -417,6 +493,17 @@ async def activate_agreement(
     # First, activate the agreement (status change)
     agreement = await agreement_service.activate_agreement(agreement_id, current_user)
 
+    # Default good-faith agreements skip all activation side effects
+    if agreement.is_default:
+        return {
+            "id": agreement.id,
+            "status": agreement.status,
+            "effective_date": agreement.effective_date,
+            "message": "Default good-faith agreement activated. No custody exchanges or obligations created.",
+            "is_default": True,
+            "activation_details": None,
+        }
+
     # Then, process activation side effects (create exchanges, set split ratio, etc.)
     activation_result = await activation_service.activate_agreement(
         agreement=agreement,
@@ -440,6 +527,50 @@ async def activate_agreement(
             "obligation_instances_created": activation_result.obligation_instances_created,
             "errors": activation_result.errors if activation_result.errors else None
         }
+    }
+
+
+@router.post("/{agreement_id}/accept-default")
+async def accept_default_agreement(
+    agreement_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Accept a default good-faith agreement as the second parent.
+
+    When Parent B joins a family file that has a default agreement,
+    they must accept it. This sets respondent_approved and activates
+    the agreement without creating exchanges or obligations.
+    """
+    from datetime import datetime
+
+    result = await db.execute(
+        select(Agreement).where(Agreement.id == agreement_id)
+    )
+    agreement = result.scalar_one_or_none()
+
+    if not agreement:
+        raise HTTPException(status_code=404, detail="Agreement not found")
+
+    if not agreement.is_default:
+        raise HTTPException(status_code=400, detail="This endpoint is only for default agreements")
+
+    if agreement.respondent_approved:
+        return {"message": "Already accepted", "status": agreement.status}
+
+    agreement.respondent_approved = True
+    agreement.respondent_approved_at = datetime.utcnow()
+    agreement.status = "active"
+    agreement.effective_date = datetime.utcnow()
+
+    await db.commit()
+
+    return {
+        "id": str(agreement.id),
+        "status": "active",
+        "message": "Good Faith agreement accepted and activated",
+        "is_default": True,
     }
 
 

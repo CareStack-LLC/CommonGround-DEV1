@@ -692,9 +692,20 @@ class AgreementService:
             pdf_hash = hashlib.sha256(pdf_bytes).hexdigest()
             agreement.pdf_hash = pdf_hash
 
-            # TODO: Upload PDF to storage and set pdf_url
-            # For now, we'll just store the hash
-            agreement.pdf_url = f"/agreements/{agreement_id}/document.pdf"
+            # Upload PDF to Supabase Storage
+            try:
+                from app.services.storage import storage_service, StorageBucket
+                pdf_path = f"{agreement.family_file_id}/agreements/{agreement_id}.pdf"
+                url = await storage_service.upload_file(
+                    bucket=StorageBucket.DOCUMENTS,
+                    path=pdf_path,
+                    file_content=pdf_bytes,
+                    content_type="application/pdf",
+                )
+                agreement.pdf_url = url
+            except Exception as e:
+                logger.warning(f"Failed to upload agreement PDF to storage: {e}")
+                agreement.pdf_url = None
 
             # Update status
             agreement.status = "pending_approval"
@@ -1510,3 +1521,99 @@ AGREEMENT SECTIONS:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to create agreement: {str(e)}"
             ) from e
+
+    async def create_default_agreement(
+        self,
+        family_file_id: str,
+        user: User,
+    ) -> Agreement:
+        """
+        Create a default good-faith agreement for a family file.
+
+        Minimal 3-section agreement that establishes a co-parenting baseline.
+        Does NOT create exchanges, obligations, or events when activated.
+        Creating parent auto-approves; other parent must accept when they join.
+        """
+        from app.models.agreement import generate_shared_care_number
+
+        agreement = Agreement(
+            family_file_id=family_file_id,
+            case_id=None,
+            agreement_number=generate_shared_care_number(),
+            title="Good Faith Co-Parenting Agreement",
+            agreement_type="good_faith",
+            agreement_version="default",
+            is_default=True,
+            status="pending_approval",
+            petitioner_approved=True,
+            petitioner_approved_at=datetime.utcnow(),
+            created_by=user.id,
+        )
+        self.db.add(agreement)
+        await self.db.flush()
+
+        for i, section_data in enumerate(DEFAULT_GOODFAITH_SECTIONS):
+            section = AgreementSection(
+                agreement_id=agreement.id,
+                section_number=i + 1,
+                section_title=section_data["title"],
+                section_type=section_data["type"],
+                display_order=i + 1,
+                is_required=True,
+                is_completed=True,
+                content=section_data["content"],
+            )
+            self.db.add(section)
+
+        await self.db.commit()
+        await self.db.refresh(agreement)
+        return agreement
+
+
+DEFAULT_GOODFAITH_SECTIONS = [
+    {
+        "title": "Communication Guidelines",
+        "type": "communication",
+        "content": (
+            "Both parents agree to communicate respectfully through the CommonGround platform. "
+            "All messages are monitored by ARIA, our AI safety system, to help maintain a "
+            "constructive tone. Messages should be focused on the children's wellbeing and "
+            "practical co-parenting matters.\n\n"
+            "Guidelines:\n"
+            "- Keep messages child-focused and factual\n"
+            "- Respond within a reasonable timeframe\n"
+            "- Use the platform as the primary communication channel\n"
+            "- Avoid inflammatory language, blame, or personal attacks\n"
+            "- ARIA will suggest rewrites if a message may escalate conflict"
+        ),
+    },
+    {
+        "title": "Good Faith Commitment",
+        "type": "general",
+        "content": (
+            "Both parents commit to acting in the best interest of their children. "
+            "This agreement establishes a baseline of cooperation and mutual respect. "
+            "It can be replaced at any time by a detailed SharedCare Agreement.\n\n"
+            "By accepting this agreement, both parents affirm:\n"
+            "- A commitment to prioritize the children's wellbeing\n"
+            "- Willingness to cooperate on scheduling, decisions, and daily needs\n"
+            "- Openness to resolving disagreements constructively\n"
+            "- Understanding that this is a starting point, not a binding custody order"
+        ),
+    },
+    {
+        "title": "Platform Usage & Evidence",
+        "type": "legal",
+        "content": (
+            "Both parents acknowledge and agree to the following:\n\n"
+            "- All communications through the platform are logged with timestamps\n"
+            "- Messages, call recordings, and exchange check-ins may be used as evidence\n"
+            "- ARIA AI monitors all interactions for safety and compliance\n"
+            "- Custody exchange check-ins with GPS create verifiable records\n"
+            "- Both parents can generate PDF reports of platform activity at any time\n\n"
+            "This agreement does not constitute a legal custody order. For formal custody "
+            "arrangements, consult a family law attorney and create a detailed SharedCare "
+            "Agreement through the platform."
+        ),
+    },
+]

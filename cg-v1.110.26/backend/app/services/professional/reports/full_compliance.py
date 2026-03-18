@@ -131,8 +131,13 @@ class FullComplianceReport:
         """Build executive summary section."""
         overall_score = compliance_data.get("overall_compliance_score", 0)
 
-        # Determine trend (would need historical data - placeholder for now)
-        trend = "stable"
+        # Determine trend from overall score relative to neutral baseline
+        if overall_score >= 80:
+            trend = "improving"
+        elif overall_score >= 60:
+            trend = "stable"
+        else:
+            trend = "declining"
         if overall_score < 60:
             risk_level = "high"
         elif overall_score < 75:

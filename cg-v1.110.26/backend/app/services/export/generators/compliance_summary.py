@@ -458,8 +458,8 @@ class ComplianceSummaryGenerator(BaseSectionGenerator):
                 exchange = instance.exchange
                 
                 # Determine scheduled location
-                center_lat = exchange.location_lat or 37.7749 # Fallback SF
-                center_lng = exchange.location_lng or -122.4194
+                center_lat = exchange.location_lat or 0.0  # No location set
+                center_lng = exchange.location_lng or 0.0
                 
                 # Determine Responsible Parent
                 is_from_missing = not instance.from_parent_checked_in
@@ -467,17 +467,15 @@ class ComplianceSummaryGenerator(BaseSectionGenerator):
                 
                 responsible_name = "Both"
                 if is_from_missing and not is_to_missing:
-                    # Fetch name (hacky: optimize later)
-                    p_name = "Parent A" # Placeholder, we need logic
-                    # We need to look up User objects. 
-                    # Participants list has (participant, user).
+                    # Look up from_parent name from participants
+                    p_name = "From Parent"  # Fallback if not found in participants
                     for p, u in participants:
                         if u.id == exchange.from_parent_id:
                             p_name = f"{u.first_name} {u.last_name}"
                     responsible_name = await self._redact(p_name, context)
                 elif is_to_missing and not is_from_missing:
-                    # Fetch name
-                    p_name = "Parent B"
+                    # Look up to_parent name from participants
+                    p_name = "To Parent"  # Fallback if not found in participants
                     for p, u in participants:
                         if u.id == exchange.to_parent_id:
                             p_name = f"{u.first_name} {u.last_name}"

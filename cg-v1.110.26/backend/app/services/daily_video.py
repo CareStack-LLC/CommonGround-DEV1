@@ -343,8 +343,8 @@ class DailyVideoService:
             Recording start response
         """
         if not self.api_key:
-            logger.warning("Daily.co API key not configured, cannot start recording")
-            return {"mock": True}
+            logger.error("CRITICAL: DAILY_API_KEY not set — call recording is DISABLED for room %s", room_name)
+            return {"recording_disabled": True, "reason": "DAILY_API_KEY not configured"}
 
         try:
             payload: Dict[str, Any] = {}
@@ -483,8 +483,8 @@ class DailyVideoService:
             Transcription start response
         """
         if not self.api_key:
-            logger.warning("Daily.co API key not configured, cannot start transcription")
-            return {"mock": True}
+            logger.error("CRITICAL: DAILY_API_KEY not set — transcription/ARIA monitoring is DISABLED")
+            return {"transcription_disabled": True, "reason": "DAILY_API_KEY not configured"}
 
         try:
             payload = {

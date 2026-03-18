@@ -10,6 +10,7 @@ Critical limits:
 """
 
 import logging
+import os
 from typing import Optional
 
 from fastapi import Request
@@ -46,7 +47,7 @@ def get_user_or_ip(request: Request) -> str:
 limiter = Limiter(
     key_func=get_user_or_ip,
     default_limits=["100/minute"],
-    storage_uri="memory://",  # Use in-memory storage; switch to Redis in production for multi-instance
+    storage_uri=os.environ.get("REDIS_URL", "memory://"),
 )
 
 

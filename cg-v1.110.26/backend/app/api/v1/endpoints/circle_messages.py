@@ -97,6 +97,21 @@ async def _validate_chat_permission(
             detail="Contact is blocked or has been removed",
         )
 
+    # Verify contact has full approval based on family settings
+    from app.models.kidcoms import KidComsSettings
+    settings_result = await db.execute(
+        select(KidComsSettings).where(
+            KidComsSettings.family_file_id == family_file_id
+        )
+    )
+    kidcoms_settings = settings_result.scalar_one_or_none()
+    approval_mode = kidcoms_settings.circle_approval_mode if kidcoms_settings else "both_parents"
+    if not contact.can_communicate(approval_mode):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This contact has not been fully approved yet",
+        )
+
     result = await db.execute(
         select(CirclePermission).where(
             and_(
@@ -209,7 +224,7 @@ async def _send_message_notifications(
     if message.recipient_type == SenderType.CIRCLE_CONTACT:
         try:
             result = await db.execute(
-                select(CircleUser).where(CircleUser.contact_id == message.recipient_id)
+                select(CircleUser).where(CircleUser.circle_contact_id == message.recipient_id)
             )
             circle_user = result.scalar_one_or_none()
             if circle_user and circle_user.email:

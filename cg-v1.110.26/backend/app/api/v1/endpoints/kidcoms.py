@@ -199,7 +199,16 @@ async def create_session(
     - **session_type**: video_call, theater, arcade, whiteboard, or mixed
     - **child_id**: The child initiating/participating in the session
     - **invited_contact_ids**: Circle contacts to invite
+
+    Requires Complete subscription.
     """
+    from app.services.feature_gate import feature_gate
+    if not feature_gate.has_feature(current_user, "kidcoms_access"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=feature_gate.get_upgrade_message("kidcoms_access")
+        )
+
     # Verify access
     family_file = await get_family_file_with_access(
         db, session_data.family_file_id, current_user.id
@@ -743,6 +752,21 @@ async def create_child_session(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Circle contact not found or not active"
             )
+
+        # Verify contact is approved based on family approval mode
+        kidcoms_settings_result = await db.execute(
+            select(KidComsSettings).where(
+                KidComsSettings.family_file_id == family_file_id
+            )
+        )
+        kidcoms_settings = kidcoms_settings_result.scalar_one_or_none()
+        approval_mode = kidcoms_settings.circle_approval_mode if kidcoms_settings else "both_parents"
+        if not circle_contact.can_communicate(approval_mode):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This contact has not been fully approved yet"
+            )
+
         target_user_name = circle_contact.contact_name
         target_circle_contact_id = circle_contact.id
 
@@ -2047,17 +2071,28 @@ async def process_transcript_chunk(
 
     # Run ARIA analysis using the call monitor
     try:
-        # Create a mock chunk object for the ARIA call monitor
-        from types import SimpleNamespace
-        chunk_obj = SimpleNamespace(
-            id=message.id,
+        # Create a lightweight chunk object matching the interface expected by ARIA
+        from dataclasses import dataclass, field
+        @dataclass
+        class TranscriptChunkProxy:
+            id: str
+            session_id: str
+            speaker_id: str
+            speaker_name: str
+            content: str
+            confidence: float
+            start_time: float
+            end_time: float
+
+        chunk_obj = TranscriptChunkProxy(
+            id=str(message.id),
             session_id=session_id,
-            speaker_id=chunk_data.speaker_id,
-            speaker_name=chunk_data.speaker_name,
+            speaker_id=chunk_data.speaker_id or "",
+            speaker_name=chunk_data.speaker_name or "",
             content=chunk_data.content,
-            confidence=chunk_data.confidence,
-            start_time=chunk_data.start_time,
-            end_time=chunk_data.end_time,
+            confidence=chunk_data.confidence or 1.0,
+            start_time=chunk_data.start_time or 0.0,
+            end_time=chunk_data.end_time or 0.0,
         )
 
         flag = await aria_call_monitor.analyze_transcript_chunk_realtime(
@@ -2223,6 +2258,27 @@ async def get_family_summary(
 
         last_session = child_sessions[0] if child_sessions else None
 
+        # Calculate favorite contacts by session count
+        contact_session_counts = {}
+        for s in child_sessions:
+            if s.circle_contact_id:
+                contact_session_counts[s.circle_contact_id] = contact_session_counts.get(s.circle_contact_id, 0) + 1
+        top_contacts = sorted(contact_session_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+        fav_contact_names = []
+        for contact_id, _ in top_contacts:
+            for c in contacts:
+                if c.id == contact_id:
+                    fav_contact_names.append(c.contact_name)
+                    break
+
+        # Determine last session partner
+        last_session_partner = None
+        if last_session and last_session.circle_contact_id:
+            for c in contacts:
+                if c.id == last_session.circle_contact_id:
+                    last_session_partner = c.contact_name
+                    break
+
         child_summaries.append(KidComsChildSummary(
             child_id=child.id,
             child_name=child.display_name,
@@ -2230,11 +2286,11 @@ async def get_family_summary(
             sessions_this_week=len(child_sessions_week),
             total_duration_minutes=total_duration // 60,
             circle_contacts_count=len(contacts),
-            favorite_contacts=[],  # TODO: Calculate based on usage
+            favorite_contacts=fav_contact_names,
             messages_sent=total_messages,
             messages_flagged=flagged_messages,
             last_session_at=last_session.created_at if last_session else None,
-            last_session_with=None,  # TODO: Determine from participants
+            last_session_with=last_session_partner,
         ))
 
     # Aggregate feature usage
@@ -2304,3 +2360,107 @@ def _session_to_response(session: KidComsSession) -> KidComsSessionResponse:
         created_at=session.created_at,
         updated_at=session.updated_at,
     )
+
+
+# =============================================================================
+# Media Progress Persistence (cross-device sync)
+# =============================================================================
+
+@router.get(
+    "/progress/{child_user_id}",
+    summary="Get media progress for a child",
+    description="Returns saved watch/reading progress for cross-device resume."
+)
+async def get_media_progress(
+    child_user_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_child: ChildUser = Depends(get_current_child_user),
+):
+    """Get all media progress records for this child."""
+    if str(current_child.id) != child_user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    from app.models.kidcoms import KidComsSession
+    # Return progress from completed/active theater sessions
+    result = await db.execute(
+        select(KidComsSession).where(
+            and_(
+                KidComsSession.child_id == current_child.child_id,
+                KidComsSession.session_type.in_(["theater", "mixed"]),
+            )
+        ).order_by(KidComsSession.created_at.desc()).limit(50)
+    )
+    sessions = result.scalars().all()
+
+    progress_items = []
+    for s in sessions:
+        if s.category_data and isinstance(s.category_data, dict):
+            media_id = s.category_data.get("media_id")
+            if media_id:
+                progress_items.append({
+                    "media_id": media_id,
+                    "media_type": s.category_data.get("media_type", "video"),
+                    "progress": s.category_data.get("progress", 0),
+                    "current_position": s.category_data.get("current_position", 0),
+                    "completed": s.category_data.get("completed", False),
+                    "last_watched": s.updated_at.isoformat() if s.updated_at else None,
+                })
+
+    return {"progress": progress_items}
+
+
+@router.post(
+    "/progress/{child_user_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Save media progress for a child",
+    description="Persists watch/reading progress for cross-device resume."
+)
+async def save_media_progress(
+    child_user_id: str,
+    progress_data: dict = Body(...),
+    db: AsyncSession = Depends(get_db),
+    current_child: ChildUser = Depends(get_current_child_user),
+):
+    """Save media progress (video position, book page, completion status)."""
+    if str(current_child.id) != child_user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    media_id = progress_data.get("media_id")
+    if not media_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="media_id required")
+
+    # Find or create a theater session for this media item
+    from app.models.kidcoms import KidComsSession
+    result = await db.execute(
+        select(KidComsSession).where(
+            and_(
+                KidComsSession.child_id == current_child.child_id,
+                KidComsSession.session_type == "theater",
+                KidComsSession.category_data["media_id"].as_string() == media_id,
+            )
+        ).order_by(KidComsSession.created_at.desc()).limit(1)
+    )
+    session = result.scalar_one_or_none()
+
+    category_data = {
+        "media_id": media_id,
+        "media_type": progress_data.get("media_type", "video"),
+        "progress": progress_data.get("progress", 0),
+        "current_position": progress_data.get("current_position", 0),
+        "completed": progress_data.get("completed", False),
+    }
+
+    if session:
+        session.category_data = category_data
+    else:
+        session = KidComsSession(
+            family_file_id=current_child.family_file_id,
+            child_id=current_child.child_id,
+            session_type="theater",
+            status="completed",
+            category_data=category_data,
+        )
+        db.add(session)
+
+    await db.commit()
+    return {"saved": True, "media_id": media_id}

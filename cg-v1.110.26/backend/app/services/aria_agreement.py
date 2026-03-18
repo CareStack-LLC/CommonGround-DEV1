@@ -48,6 +48,18 @@ class AriaAgreementService:
         self.db = db
         self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
+    async def _get_children_names(self, family_file_id: str) -> list:
+        """Get children names for this family file."""
+        try:
+            from app.models.child import Child
+            result = await self.db.execute(
+                select(Child).where(Child.family_file_id == family_file_id)
+            )
+            children = result.scalars().all()
+            return [c.display_name for c in children if c.display_name]
+        except Exception:
+            return []
+
     async def get_or_create_conversation(
         self, agreement_id: str, user: User
     ) -> AgreementConversation:
@@ -189,7 +201,7 @@ Start by warmly greeting the parent and letting them know they'll fill in names 
         case = case_result.scalar_one_or_none()
 
         # Get children names (would need to join with children table)
-        children_names = []  # TODO: Query children
+        children_names = await self._get_children_names(agreement.family_file_id)
 
         # Add user message to conversation
         conversation.messages.append({
@@ -301,7 +313,7 @@ Start by warmly greeting the parent and letting them know they'll fill in names 
             select(Case).where(Case.id == agreement.case_id)
         )
         case = case_result.scalar_one_or_none()
-        children_names = []  # TODO: Query children
+        children_names = await self._get_children_names(agreement.family_file_id)
 
         filename = attachment_info.get("filename", "document")
 
@@ -1008,7 +1020,7 @@ Start warmly and explain you'll help them build a simple, clear agreement."""
         )
         case = case_result.scalar_one_or_none()
 
-        children_names = []  # TODO: Query children
+        children_names = await self._get_children_names(agreement.family_file_id)
 
         # Add user message
         conversation.messages.append({

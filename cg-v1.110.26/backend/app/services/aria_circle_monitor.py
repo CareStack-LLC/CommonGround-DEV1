@@ -179,12 +179,12 @@ class ARIACircleMonitor:
     ) -> Dict[str, Any]:
         """Analyze text using Claude API for child safety."""
         if not self.anthropic_api_key:
-            logger.warning("ANTHROPIC_API_KEY not set - using mock analysis")
+            logger.error("CRITICAL: ANTHROPIC_API_KEY not set — ARIA child safety monitoring is DISABLED")
             return {
                 "toxicity_score": 0.0,
                 "severity": "safe",
                 "categories": [],
-                "reason": "Mock analysis - API key not configured",
+                "reason": "Safety monitoring unavailable - API key not configured",
             }
 
         prompt = f"""You are ARIA, a child safety AI assistant monitoring a video call between a circle contact (grandparent, aunt, family friend, etc.) and a child.
@@ -222,11 +222,16 @@ Be very sensitive to child safety but avoid false positives on normal family con
 
             client = anthropic.Anthropic(api_key=self.anthropic_api_key)
 
-            response = client.messages.create(
-                model="claude-sonnet-4-5-20250514",
-                max_tokens=500,
-                messages=[{"role": "user", "content": prompt}],
-            )
+            from app.utils.sentry_helpers import ai_span
+            with ai_span("child_safety_analysis", "claude-sonnet-4-5-20250514") as span:
+                response = client.messages.create(
+                    model="claude-sonnet-4-5-20250514",
+                    max_tokens=500,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                if hasattr(response, 'usage'):
+                    span.set_data("input_tokens", response.usage.input_tokens)
+                    span.set_data("output_tokens", response.usage.output_tokens)
 
             result_text = response.content[0].text
             start_idx = result_text.find("{")

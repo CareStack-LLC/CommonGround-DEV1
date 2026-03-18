@@ -89,6 +89,9 @@ class Agreement(Base, UUIDMixin, TimestampMixin):
         String(36), nullable=True
     )  # Points to AgreementVersion
 
+    # Default good-faith agreement flag
+    is_default: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+
     # Status
     status: Mapped[str] = mapped_column(
         String(20), default="draft"

@@ -609,13 +609,16 @@ async def handle_invoice_paid(db: AsyncSession, event_data: dict) -> None:
     if not customer_id:
         return
 
+    # Check consumer profile first, then professional
     profile = await _get_profile_by_stripe_customer(db, customer_id)
-    if not profile:
-        return
-
-    # Confirm subscription is active
-    if profile.subscription_status in ("past_due", "cancelling"):
-        profile.subscription_status = "active"
+    if profile:
+        if profile.subscription_status in ("past_due", "cancelling"):
+            profile.subscription_status = "active"
+    else:
+        # Check professional profile
+        pro_profile = await _get_professional_by_stripe_customer(db, customer_id)
+        if pro_profile and pro_profile.subscription_status in ("past_due", "cancelling"):
+            pro_profile.subscription_status = "active"
 
     logger.info(f"Invoice paid for subscription {subscription_id}: ${amount_paid}, reason={billing_reason}")
 
@@ -636,12 +639,14 @@ async def handle_invoice_payment_failed(db: AsyncSession, event_data: dict) -> N
     if not customer_id:
         return
 
+    # Check consumer profile first, then professional
     profile = await _get_profile_by_stripe_customer(db, customer_id)
-    if not profile:
-        return
-
-    # Mark as past_due
-    profile.subscription_status = "past_due"
+    if profile:
+        profile.subscription_status = "past_due"
+    else:
+        pro_profile = await _get_professional_by_stripe_customer(db, customer_id)
+        if pro_profile:
+            pro_profile.subscription_status = "past_due"
 
     logger.warning(f"Invoice payment failed for subscription {subscription_id}, attempt {attempt_count}")
 

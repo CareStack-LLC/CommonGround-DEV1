@@ -150,6 +150,23 @@ async def get_current_user(
     """
     token = credentials.credentials
 
+    # Check if token has been blacklisted (logout)
+    try:
+        import hashlib
+        import redis
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        r = redis.from_url(settings.REDIS_URL, socket_timeout=1)
+        if r.get(f"blacklist:{token_hash}"):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+    except HTTPException:
+        raise
+    except Exception:
+        pass  # Redis unavailable — allow token (fail-open for availability)
+
     # Decode token
     payload = decode_token(token)
 
@@ -191,7 +208,30 @@ async def get_current_user(
             detail="Inactive user",
         )
 
+    # Set Sentry user context for error tracking
+    import sentry_sdk as _sentry
+    _sentry.set_user({"id": str(user.id)})
+    if user.profile:
+        _sentry.set_tag("subscription_tier", user.profile.subscription_tier or "unknown")
+
     return user
+
+
+async def get_current_verified_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """
+    Get the current authenticated user with verified email.
+
+    Use this dependency for sensitive operations that require
+    email verification (message sending, export generation, etc.).
+    """
+    if not current_user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Please verify your email address before performing this action.",
+        )
+    return current_user
 
 
 async def get_current_admin_user(
@@ -292,6 +332,10 @@ async def get_current_child_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Inactive child user",
         )
+
+    import sentry_sdk as _sentry
+    _sentry.set_user({"id": str(child_user.id)})
+    _sentry.set_tag("user_type", "child")
 
     return child_user
 

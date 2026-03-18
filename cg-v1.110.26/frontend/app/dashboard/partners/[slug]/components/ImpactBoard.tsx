@@ -324,7 +324,7 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
 
                 {/* Closing CTA */}
                 <div className="rounded-3xl bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 p-12 text-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('/assets/grain.png')] opacity-10" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
                     <div className="relative z-10 max-w-3xl mx-auto">
                         <h2 className="text-3xl font-black text-white mb-4">Want your organization to create this kind of impact?</h2>
                         <p className="text-lg text-gray-400 mb-8 leading-relaxed">

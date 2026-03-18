@@ -400,15 +400,17 @@ class StripeService:
 
         Returns dict with customer details.
         """
-        customer = stripe.Customer.create(
-            email=email,
-            name=name,
-            metadata={
-                "user_id": user_id or "",
-                "platform": "commonground",
-                **(metadata or {}),
-            },
-        )
+        from app.utils.sentry_helpers import external_api_span
+        with external_api_span("stripe", "create_customer"):
+            customer = stripe.Customer.create(
+                email=email,
+                name=name,
+                metadata={
+                    "user_id": user_id or "",
+                    "platform": "commonground",
+                    **(metadata or {}),
+                },
+            )
 
         return {
             "id": customer.id,

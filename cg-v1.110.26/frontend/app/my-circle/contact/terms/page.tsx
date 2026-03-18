@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Shield, Eye, Video, Scale, Users, CheckCircle2 } from 'lucide-react';
-import Image from 'next/image';
 import { myCircleAPI } from '@/lib/api';
 
 export default function ContactTermsPage() {
@@ -41,13 +40,9 @@ export default function ContactTermsPage() {
         {/* Logo + Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Image
-              src="/commonground-logo.svg"
-              alt="CommonGround"
-              width={40}
-              height={40}
-              className="dark:invert"
-            />
+            <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-white" />
+            </div>
             <h1
               className="text-2xl font-bold text-foreground"
               style={{ fontFamily: 'Space Grotesk, sans-serif' }}

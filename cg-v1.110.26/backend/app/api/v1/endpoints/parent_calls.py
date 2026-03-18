@@ -1092,13 +1092,25 @@ async def get_call_report(
             detail="Family file not found"
         )
 
-    # Verify user is a parent or has legal access
-    # TODO: Add legal professional access check
-    if current_user.id not in [family_file.parent_a_id, family_file.parent_b_id]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You don't have access to this call report"
+    # Verify user is a parent or has approved legal professional access
+    is_parent = current_user.id in [family_file.parent_a_id, family_file.parent_b_id]
+    if not is_parent:
+        from app.models.professional import ProfessionalAccessRequest
+        from sqlalchemy import and_
+        pro_result = await db.execute(
+            select(ProfessionalAccessRequest).where(
+                and_(
+                    ProfessionalAccessRequest.family_file_id == family_file.id,
+                    ProfessionalAccessRequest.professional_user_id == current_user.id,
+                    ProfessionalAccessRequest.status == "approved",
+                )
+            )
         )
+        if not pro_result.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have access to this call report"
+            )
 
     # Generate report
     try:

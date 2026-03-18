@@ -75,18 +75,30 @@ class CircleCallService:
         if call_type == "audio" and not permission.can_voice_call:
             return False, "Voice calling not allowed for this contact", permission
 
-        # Check time window (if restrictions set)
+        # Check time window using family's local time (not UTC)
         if permission.allowed_start_time and permission.allowed_end_time:
-            current_time = datetime.utcnow().time()
+            from app.utils.timezone import DEFAULT_TIMEZONE
+            try:
+                from zoneinfo import ZoneInfo
+            except ImportError:
+                from backports.zoneinfo import ZoneInfo
+            local_now = datetime.now(ZoneInfo(DEFAULT_TIMEZONE))
+            current_time = local_now.time()
             allowed_start = permission.allowed_start_time
             allowed_end = permission.allowed_end_time
 
             if not (allowed_start <= current_time <= allowed_end):
-                return False, f"Calls only allowed between {allowed_start.strftime('%H:%M')} and {allowed_end.strftime('%H:%M')}", permission
+                return False, f"Calls only allowed between {allowed_start.strftime('%I:%M %p')} and {allowed_end.strftime('%I:%M %p')}", permission
 
-        # Check allowed days (if restrictions set)
+        # Check allowed days using family's local time
         if permission.allowed_days:
-            current_day = datetime.utcnow().weekday()  # 0=Monday, 6=Sunday
+            from app.utils.timezone import DEFAULT_TIMEZONE
+            try:
+                from zoneinfo import ZoneInfo
+            except ImportError:
+                from backports.zoneinfo import ZoneInfo
+            local_now = datetime.now(ZoneInfo(DEFAULT_TIMEZONE))
+            current_day = local_now.weekday()  # 0=Monday, 6=Sunday
             if current_day not in permission.allowed_days:
                 day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
                 allowed_day_names = [day_names[d] for d in permission.allowed_days]

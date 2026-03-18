@@ -140,6 +140,11 @@ class UserProfile(Base, UUIDMixin, TimestampMixin):
     notification_sms: Mapped[bool] = mapped_column(Boolean, default=False)
     notification_push: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # Legal Consent
+    terms_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    terms_version: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    privacy_policy_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     # Privacy Settings
     privacy_read_receipts: Mapped[bool] = mapped_column(Boolean, default=True)
     privacy_typing_indicator: Mapped[bool] = mapped_column(Boolean, default=True)

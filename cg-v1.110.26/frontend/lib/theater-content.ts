@@ -115,7 +115,7 @@ export const theaterContent: TheaterContentLibrary = {
     {
       id: 'johnny-express',
       title: 'Johnny Express',
-      url: '/kidsComms/Johnny Express.mp4',
+      url: '/kidsComms/johnny-express.mp4',
       thumbnail: '/kidsComms/posters/johnny-express-poster.jpg',
       duration: '5:15',
       description: 'Funny space delivery adventure',
@@ -125,7 +125,7 @@ export const theaterContent: TheaterContentLibrary = {
     {
       id: 'the-bread',
       title: 'The Bread',
-      url: '/kidsComms/The Bread.mp4',
+      url: '/kidsComms/the-bread.mp4',
       thumbnail: '/kidsComms/posters/the-bread-poster.jpg',
       duration: '2:45',
       description: 'Charming animated story about bread',
@@ -138,29 +138,9 @@ export const theaterContent: TheaterContentLibrary = {
       url: '/kidsComms/minions-clip.mp4',
       thumbnail: '/kidsComms/posters/minions-poster.jpg',
       duration: '3:24',
-      description: 'Fun minions adventure clip',
+      description: 'Fun animated adventure clip',
       category: 'comedy',
       ageRange: '6-12'
-    },
-    {
-      id: 'sonic',
-      title: 'Sonic The Hedgehog',
-      url: '/kidsComms/Sonic The Hedgehog.mp4',
-      thumbnail: '/kidsComms/posters/sonic-poster.jpg',
-      duration: '4:15',
-      description: 'Sonic movie clip',
-      category: 'action',
-      ageRange: '8-14'
-    },
-    {
-      id: 'mario',
-      title: 'Super Mario Bros',
-      url: '/kidsComms/Super Marios Bros.mp4',
-      thumbnail: '/kidsComms/posters/mario-poster.jpg',
-      duration: '5:02',
-      description: 'Super Mario Bros movie clip',
-      category: 'action',
-      ageRange: '8-14'
     },
   ],
   storybooks: [
@@ -227,7 +207,7 @@ export const theaterContent: TheaterContentLibrary = {
     {
       id: 'soap-boat',
       title: 'Soap Boat',
-      url: '/kidsComms/Soap Boat.pdf',
+      url: '/kidsComms/soap-boat.pdf',
       cover: '/kidsComms/covers/soap-boat-cover.jpg',
       pages: 8,
       category: 'fiction',

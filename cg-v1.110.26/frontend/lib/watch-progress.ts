@@ -54,6 +54,25 @@ export function saveWatchProgress(
     JSON.stringify(watchProgress)
   );
 
+  // Sync to server for cross-device persistence (non-blocking)
+  try {
+    const token = localStorage.getItem('child_access_token');
+    const childUserId = localStorage.getItem('child_user_id');
+    if (token && childUserId) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/kidcoms/progress/${childUserId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          media_id: videoId,
+          media_type: 'video',
+          progress,
+          current_position: currentTime,
+          completed,
+        }),
+      }).catch(() => {}); // Silent fail — localStorage is the primary store
+    }
+  } catch {}
+
   // Update stats
   updateVideoStats(videoId, completed);
 }

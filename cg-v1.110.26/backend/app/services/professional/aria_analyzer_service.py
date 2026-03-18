@@ -7,7 +7,7 @@ narrative summaries, communication lags, and fact extraction for professionals.
 
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -67,9 +67,7 @@ class ARIAAnalyzerService:
         days: int
     ) -> List[Message]:
         """Fetch messages for analysis."""
-        since = datetime.utcnow() - (datetime.utcnow() - datetime.utcnow()) # placeholder
-        import datetime as dt
-        since = dt.datetime.utcnow() - dt.timedelta(days=days)
+        since = datetime.utcnow() - timedelta(days=days)
 
         query = select(Message).where(Message.family_file_id == family_file_id)
         if thread_id:

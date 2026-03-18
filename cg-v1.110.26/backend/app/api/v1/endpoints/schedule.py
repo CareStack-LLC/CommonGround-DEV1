@@ -211,6 +211,51 @@ async def update_event(
     )
 
 
+@router.delete("/events/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_event(
+    event_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Delete a schedule event.
+
+    Agreement-derived events (auto-created from activated agreements) cannot be deleted.
+    Only user-created events can be removed.
+    """
+    from sqlalchemy import and_
+    result = await db.execute(
+        select(ScheduleEvent).where(ScheduleEvent.id == event_id)
+    )
+    event = result.scalar_one_or_none()
+
+    if not event:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
+
+    # Verify user has access (is a participant in the family file)
+    from app.models.family_file import FamilyFile
+    ff_result = await db.execute(
+        select(FamilyFile).where(
+            and_(
+                FamilyFile.id == event.family_file_id,
+                (FamilyFile.parent_a_id == current_user.id) | (FamilyFile.parent_b_id == current_user.id)
+            )
+        )
+    )
+    if not ff_result.scalar_one_or_none():
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have access to this event")
+
+    # Don't allow deleting agreement-derived events
+    if getattr(event, 'is_agreement_derived', False):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Agreement-derived events cannot be deleted. Deactivate the agreement instead."
+        )
+
+    await db.delete(event)
+    await db.commit()
+
+
 @router.post("/check-ins", status_code=status.HTTP_201_CREATED, response_model=ExchangeCheckInResponse)
 async def create_check_in(
     check_in_data: ExchangeCheckInCreate,

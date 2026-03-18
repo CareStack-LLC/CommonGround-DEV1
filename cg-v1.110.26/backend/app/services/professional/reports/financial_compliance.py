@@ -101,8 +101,7 @@ class FinancialComplianceReport:
             },
             "arrears_calculation": {
                 "total_arrears": float(outstanding_amount),
-                "interest_accrued": 0,  # Placeholder - would need interest calculation logic
-                "total_owed_with_interest": float(outstanding_amount),
+                "total_outstanding": float(outstanding_amount),
                 "days_overdue": self._calculate_days_overdue(financial_data)
             },
             "recommendations": self._build_recommendations(financial_data, outstanding_amount)
@@ -121,7 +120,6 @@ class FinancialComplianceReport:
 
     def _calculate_days_overdue(self, financial_data: dict) -> int:
         """Calculate average days overdue."""
-        # This would need actual payment date data - placeholder
         return financial_data.get("avg_days_late", 0)
 
     def _build_recommendations(self, financial_data: dict, outstanding_amount: float) -> list:

@@ -148,7 +148,16 @@ async def create_export(
 
     The export will be generated asynchronously. Poll the GET endpoint
     to check status and download when ready.
+
+    Requires Plus or Complete subscription.
     """
+    from app.services.feature_gate import feature_gate
+    if not feature_gate.has_feature(current_user, "pdf_summaries"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=feature_gate.get_upgrade_message("pdf_summaries")
+        )
+
     # Verify user is a case participant
     await verify_case_participant(db, current_user.id, data.case_id)
 

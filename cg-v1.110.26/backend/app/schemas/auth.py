@@ -131,6 +131,7 @@ class OAuthSyncRequest(BaseModel):
     to create or update the user in our database.
     """
 
+    access_token: str = Field(..., min_length=1, description="Supabase access token from OAuth session")
     supabase_id: str = Field(..., min_length=1, description="Supabase user ID")
     email: EmailStr = Field(..., description="User's email from OAuth provider")
     first_name: str = Field(..., min_length=1, max_length=100)

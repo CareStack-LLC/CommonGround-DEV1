@@ -9,6 +9,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.security import create_access_token, create_refresh_token, decode_token
 from app.core.supabase import get_supabase_client
 from app.models.user import User, UserProfile
@@ -111,14 +112,17 @@ class AuthService:
             )
             self.db.add(user)
 
-            # Create user profile
+            # Create user profile with terms acceptance
             profile = UserProfile(
                 user_id=user.id,
                 first_name=request.first_name,
                 last_name=request.last_name,
                 stripe_customer_id=stripe_customer["id"],
-                subscription_tier="web_starter", # Default to free tier initially
-                subscription_status="active" if not request.subscription_price_id else "trial"
+                subscription_tier="web_starter",
+                subscription_status="active" if not request.subscription_price_id else "trial",
+                terms_accepted_at=datetime.utcnow(),
+                terms_version="1.0",
+                privacy_policy_accepted_at=datetime.utcnow(),
             )
             self.db.add(profile)
             logger.info(f"Local database records prepared for {user.id}")
@@ -150,6 +154,15 @@ class AuthService:
             refresh_token = create_refresh_token(data={"sub": user.id})
 
             logger.info(f"Registration successful for {request.email}")
+
+            # Audit log
+            from app.services.audit_service import log_audit_event
+            await log_audit_event(
+                self.db, action="user.register", resource_type="user",
+                user_id=user.id, user_email=request.email,
+                description=f"New user registered: {request.email}",
+            )
+
             return user, access_token, refresh_token, checkout_url
 
         except HTTPException as e:
@@ -160,7 +173,7 @@ class AuthService:
             await self.db.rollback()
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Registration failed: {str(e)}"
+                detail="Registration failed. Please try again."
             ) from e
 
     async def login_user(self, request: LoginRequest) -> Tuple[User, str, str]:
@@ -333,6 +346,14 @@ class AuthService:
             access_token = create_access_token(data={"sub": user.id})
             refresh_token = create_refresh_token(data={"sub": user.id})
 
+            # Audit log
+            from app.services.audit_service import log_audit_event
+            await log_audit_event(
+                self.db, action="user.login", resource_type="user",
+                user_id=user.id, user_email=user.email,
+                description=f"User logged in: {user.email}",
+            )
+
             return user, access_token, refresh_token
 
         except HTTPException:
@@ -341,7 +362,7 @@ class AuthService:
             logger.error(f"Login failed with exception: {str(e)}", exc_info=True)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Login failed: {str(e)}"
+                detail="Invalid email or password."
             ) from e
 
     async def refresh_access_token(self, refresh_token: str) -> Tuple[str, str]:
@@ -405,7 +426,7 @@ class AuthService:
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=f"Token refresh failed: {str(e)}"
+                detail="Token refresh failed. Please log in again."
             ) from e
 
     async def logout_user(self, user_id: str) -> None:
@@ -443,7 +464,7 @@ class AuthService:
             self.supabase.auth.reset_password_for_email(
                 email,
                 options={
-                    "redirect_to": "https://commonground.app/reset-password"
+                    "redirect_to": f"{settings.FRONTEND_URL}/reset-password"
                 }
             )
         except Exception:
@@ -454,19 +475,37 @@ class AuthService:
         """
         Confirm password reset with token.
 
-        Verifies the reset token and updates the password.
+        Verifies the reset token via Supabase and updates the password.
 
         Args:
-            token: Password reset token from email
+            token: Password reset token (access_token from recovery link)
             new_password: New password to set
 
         Raises:
             HTTPException: If reset fails
         """
         try:
-            # Supabase handles token verification and password update
-            self.supabase.auth.update_user({"password": new_password})
+            # Use the admin client to verify the token and get the user
+            from app.core.supabase import get_supabase_admin_client
+            admin_client = get_supabase_admin_client()
+
+            # Verify the recovery token is valid by getting the user it belongs to
+            verified = admin_client.auth.get_user(token)
+            if not verified or not verified.user:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid or expired reset token"
+                )
+
+            # Update the password using the admin client with the verified user ID
+            admin_client.auth.admin.update_user_by_id(
+                str(verified.user.id),
+                {"password": new_password}
+            )
+        except HTTPException:
+            raise
         except Exception as e:
+            logger.error(f"Password reset confirmation failed: {e}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid or expired reset token"
@@ -476,8 +515,8 @@ class AuthService:
         """
         Sync OAuth user with backend database.
 
-        Creates or updates user in local database after OAuth authentication.
-        OAuth users don't have passwords - they authenticate via Supabase OAuth.
+        Verifies the Supabase access token, then creates or updates user
+        in local database. OAuth users authenticate via Supabase OAuth.
 
         Args:
             request: OAuth sync request with user data from Supabase
@@ -485,6 +524,31 @@ class AuthService:
         Returns:
             Tuple of (User, access_token, refresh_token)
         """
+        # Verify the Supabase access token matches the claimed user
+        try:
+            from app.core.supabase import get_supabase_admin_client
+            admin_client = get_supabase_admin_client()
+            verified_user = admin_client.auth.get_user(request.access_token)
+            if not verified_user or not verified_user.user:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid or expired OAuth token"
+                )
+            if str(verified_user.user.id) != request.supabase_id:
+                logger.warning(f"OAuth sync: token user {verified_user.user.id} does not match claimed {request.supabase_id}")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token does not match claimed user"
+                )
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"OAuth token verification failed: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="OAuth token verification failed"
+            )
+
         # Check if user already exists by Supabase ID or email
         result = await self.db.execute(
             select(User).where(

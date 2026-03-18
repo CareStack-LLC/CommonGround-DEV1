@@ -959,13 +959,52 @@ class AgreementActivationService:
         now = datetime.utcnow()
         current_year = now.year
 
+        # Pre-load child birthdays for birthday event handling
+        child_birthdays = {}
+        if child_ids:
+            from app.models.child import Child
+            children_result = await self.db.execute(
+                select(Child).where(Child.id.in_(child_ids))
+            )
+            for child in children_result.scalars().all():
+                if child.date_of_birth:
+                    child_birthdays[child.id] = child.date_of_birth
+
         for holiday in holidays:
+            # Handle birthday events using actual child birth dates
+            if "birthday" in holiday.holiday_name.lower():
+                for child_id, dob in child_birthdays.items():
+                    birthday_date = datetime(current_year, dob.month, dob.day, 9, 0)
+                    if birthday_date < now:
+                        birthday_date = datetime(current_year + 1, dob.month, dob.day, 9, 0)
+                    arrangement_desc = self._describe_arrangement(holiday.arrangement)
+                    event = ScheduleEvent(
+                        family_file_id=family_file.id,
+                        title=f"{holiday.holiday_name} - Child Birthday",
+                        event_type="holiday",
+                        event_category="birthday",
+                        start_time=birthday_date,
+                        end_time=birthday_date + timedelta(hours=12),
+                        all_day=True,
+                        description=f"Birthday custody arrangement: {arrangement_desc}\n\nFrom SharedCare Agreement",
+                        visibility="co_parent",
+                        created_by_id=created_by,
+                        child_ids=[child_id],
+                        is_exchange=False,
+                        agreement_id=agreement.id,
+                        is_agreement_derived=True,
+                        status="scheduled",
+                    )
+                    self.db.add(event)
+                    events_created += 1
+                continue
+
             # Get approximate date for this holiday
             holiday_date = self._get_holiday_date(holiday.holiday_name, current_year)
             if not holiday_date:
                 # Unknown holiday, skip but log
-                logger.info(f"Unknown holiday '{holiday.holiday_name}', creating event on Jan 1 as placeholder")
-                holiday_date = datetime(current_year, 1, 1, 9, 0)
+                logger.info(f"Unknown holiday '{holiday.holiday_name}', skipping — no date mapping available")
+                continue
 
             # If the holiday already passed this year, use next year
             if holiday_date < now:

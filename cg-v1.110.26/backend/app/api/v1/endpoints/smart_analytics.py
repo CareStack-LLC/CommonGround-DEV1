@@ -23,8 +23,29 @@ async def get_custody_time_stats(
     """
     Get Scheduled vs. Actual custody time percentages.
     """
-    # 1. Verify Access
-    # TODO: Check if user has access to this agreement
+    # 1. Verify user has access to this agreement's family file
+    agreement_result = await db.execute(
+        select(Agreement).where(Agreement.id == agreement_id)
+    )
+    agreement_obj = agreement_result.scalar_one_or_none()
+    if not agreement_obj:
+        raise HTTPException(status_code=404, detail="Agreement not found")
+
+    from app.models.family_file import FamilyFile
+    from sqlalchemy import and_, or_
+    ff_check = await db.execute(
+        select(FamilyFile).where(
+            and_(
+                FamilyFile.id == agreement_obj.family_file_id,
+                or_(
+                    FamilyFile.parent_a_id == current_user.id,
+                    FamilyFile.parent_b_id == current_user.id,
+                )
+            )
+        )
+    )
+    if not ff_check.scalar_one_or_none():
+        raise HTTPException(status_code=403, detail="You do not have access to this agreement")
 
     # 2. Calculate Scheduled Time (from Smart Rules)
     generator = SmartScheduleGenerator(db)
@@ -39,9 +60,54 @@ async def get_custody_time_stats(
     parent_a_days = sum(1 for e in scheduled_events if e.get("custodian_id") == "parent_a") # Placeholder logic
     parent_b_days = sum(1 for e in scheduled_events if e.get("custodian_id") == "parent_b")
     
-    # 3. Calculate Actuals (from ComplianceLogs)
-    # TODO: aggregating verified check-ins
-    
+    # 3. Calculate Actuals from CustodyDayRecord data
+    actual_parent_a_percent = 0.0
+    actual_parent_b_percent = 0.0
+    data_quality = "low_data"
+
+    try:
+        # Look up the agreement's family file and children
+        agreement_result = await db.execute(
+            select(Agreement).where(Agreement.id == agreement_id)
+        )
+        agreement = agreement_result.scalar_one_or_none()
+        if agreement and agreement.family_file_id:
+            from app.models.family_file import FamilyFile
+            ff_result = await db.execute(
+                select(FamilyFile).where(FamilyFile.id == agreement.family_file_id)
+            )
+            family_file = ff_result.scalar_one_or_none()
+            if family_file and family_file.parent_a_id and family_file.parent_b_id:
+                from app.models.child import Child
+                children_result = await db.execute(
+                    select(Child).where(Child.family_file_id == family_file.id)
+                )
+                children = children_result.scalars().all()
+                if children:
+                    from app.services.custody_time import CustodyTimeService
+                    # Aggregate across all children
+                    total_a = 0.0
+                    total_b = 0.0
+                    child_count = 0
+                    for child in children:
+                        stats = await CustodyTimeService.get_custody_time_stats(
+                            db, family_file.id, child.id,
+                            start_date.date() if hasattr(start_date, 'date') else start_date,
+                            end_date.date() if hasattr(end_date, 'date') else end_date,
+                            family_file.parent_a_id, family_file.parent_b_id
+                        )
+                        if stats.get("total_days", 0) > 0:
+                            total_a += stats.get("parent_a_percent", 0)
+                            total_b += stats.get("parent_b_percent", 0)
+                            child_count += 1
+                    if child_count > 0:
+                        actual_parent_a_percent = round(total_a / child_count, 1)
+                        actual_parent_b_percent = round(total_b / child_count, 1)
+                        data_quality = "good" if child_count > 0 and total_days > 7 else "partial"
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Failed to calculate actual custody time: {e}")
+
     return {
         "period": {
             "start": start_date,
@@ -53,9 +119,9 @@ async def get_custody_time_stats(
             "parent_b_percent": round(parent_b_days / total_days * 100, 1) if total_days else 0
         },
         "actual": {
-            "parent_a_percent": 0.0, # Placeholder
-            "parent_b_percent": 0.0, # Placeholder
-            "data_quality": "low_data" # metadata
+            "parent_a_percent": actual_parent_a_percent,
+            "parent_b_percent": actual_parent_b_percent,
+            "data_quality": data_quality
         }
     }
 

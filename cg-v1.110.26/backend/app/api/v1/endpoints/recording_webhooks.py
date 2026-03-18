@@ -316,12 +316,39 @@ async def handle_transcription_message(db: AsyncSession, data: Dict[str, Any]):
 
     logger.debug(f"Transcription chunk for {room_name}: {text[:50]}...")
 
-    # TODO: Implement ARIA real-time analysis here
-    # This is where you'd:
-    # 1. Look up the active session/recording by room_name
-    # 2. Create a TranscriptionChunk
-    # 3. Run ARIA analysis on the chunk
-    # 4. Flag if concerning content detected
+    # Run ARIA analysis on the transcript chunk
+    try:
+        from app.models.circle_call import CircleCallSession, CircleCallStatus
+        from app.services.aria_circle_monitor import aria_circle_monitor
+
+        # Look up active session by room name
+        session_result = await db.execute(
+            select(CircleCallSession).where(
+                CircleCallSession.room_name == room_name,
+                CircleCallSession.status == CircleCallStatus.ACTIVE.value,
+            )
+        )
+        session = session_result.scalar_one_or_none()
+
+        if session:
+            # Run ARIA child safety analysis on this transcript chunk
+            import types
+            chunk = types.SimpleNamespace(
+                content=text,
+                speaker_name=data.get("participant_id", "unknown"),
+                speaker_label=data.get("participant_id", "unknown"),
+                start_time=float(data.get("timestamp", 0)),
+                end_time=float(data.get("timestamp", 0)),
+            )
+            await aria_circle_monitor.analyze_transcript_chunk(
+                db=db,
+                session=session,
+                chunk=chunk,
+                family_file_id=str(session.family_file_id),
+            )
+            logger.debug(f"ARIA analysis completed for webhook transcript chunk in room {room_name}")
+    except Exception as e:
+        logger.error(f"ARIA webhook transcript analysis failed for room {room_name}: {e}")
 
 
 async def handle_transcription_stopped(db: AsyncSession, data: Dict[str, Any]):

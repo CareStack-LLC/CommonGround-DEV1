@@ -376,6 +376,59 @@ async def get_form(
 
 
 @router.get(
+    "/{submission_id}/pdf",
+    summary="Download filled court form PDF",
+)
+async def download_form_pdf(
+    submission_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Generate and download a filled court form PDF.
+
+    Takes the stored form_data from the submission and fills the official
+    California Judicial Council PDF template with it.
+
+    Returns the filled PDF as a downloadable file.
+    """
+    service = CourtFormService(db)
+    submission = await service.get_submission(submission_id)
+    if not submission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Form submission not found",
+        )
+
+    # Get form data
+    form_data = submission.form_data or {}
+    form_type = submission.form_type  # e.g., "fl300", "fl311"
+
+    try:
+        from app.services.court_form_pdf_filler import court_form_pdf_filler
+        pdf_bytes = court_form_pdf_filler.fill_form(form_type, form_data)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
+    except Exception as e:
+        logger.error(f"PDF generation failed for {submission_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate court form PDF",
+        )
+
+    from fastapi.responses import Response
+    filename = f"{form_type.upper()}_{submission.case_id or 'draft'}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get(
     "/case/{case_id}",
     response_model=CaseFormsListResponse,
     summary="List forms for case",

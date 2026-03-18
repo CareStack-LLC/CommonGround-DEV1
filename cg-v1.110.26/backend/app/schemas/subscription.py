@@ -123,6 +123,20 @@ class CheckoutRequest(BaseModel):
 
     model_config = {"populate_by_name": True}
 
+    @field_validator("success_url", "cancel_url", mode="before")
+    @classmethod
+    def validate_redirect_urls(cls, v: str) -> str:
+        """Validate redirect URLs belong to allowed domains."""
+        from app.core.config import settings
+        allowed_prefixes = [
+            settings.FRONTEND_URL,
+            "http://localhost:3000",
+            "http://localhost:3001",
+        ]
+        if not any(v.startswith(prefix) for prefix in allowed_prefixes):
+            raise ValueError(f"Redirect URL must start with an allowed domain")
+        return v
+
     @field_validator("period", mode="before")
     @classmethod
     def normalize_period(cls, v: str) -> str:

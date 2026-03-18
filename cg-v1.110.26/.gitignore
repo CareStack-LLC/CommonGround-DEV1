@@ -1,1 +1,47 @@
+# Vercel
 .vercel
+
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# SQLite test databases
+*.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+
+# Uploads (local dev only)
+backend/uploads/

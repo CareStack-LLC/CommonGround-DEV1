@@ -180,7 +180,7 @@ export default function GrantPartnershipPage() {
 
                     {/* Grant Value Box */}
                     <div className="mt-12 overflow-hidden rounded-2xl bg-gradient-to-br from-[#F5A623] to-[#c99943] text-white shadow-xl relative">
-                        <div className="absolute inset-0 bg-[url('/assets/grain.png')] opacity-20 hover:opacity-10 transition-opacity"></div>
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent hover:opacity-50 transition-opacity"></div>
                         <div className="p-8 text-center md:p-12 relative z-10">
                             <h3 className="mb-2 font-serif text-3xl font-bold text-white/90" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Total Partnership Value</h3>
                             <div className="my-6 font-serif text-6xl md:text-7xl font-bold text-white drop-shadow-sm" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>$5,249</div>

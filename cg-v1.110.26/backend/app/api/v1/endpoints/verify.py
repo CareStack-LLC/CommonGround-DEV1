@@ -43,6 +43,8 @@ CATEGORY_LABELS = {
     "professional": "Professional Report",
     "court_export": "Court Export",
     "investigation": "Investigation Report",
+    "monthly_comprehensive": "Monthly Comprehensive Report",
+    "monthly": "Monthly Report",
 }
 
 # SHA-256 hash pattern: exactly 64 hex characters

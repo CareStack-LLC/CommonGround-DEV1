@@ -89,7 +89,32 @@ class ARIAService:
             MODERN_SLANG_PATTERNS,
             PROFANITY_PATTERNS,
             EVASION_PATTERNS,
+            EMOTIONAL_MANIPULATION_PATTERNS,
         )
+
+        # Regex patterns for sarcasm, blame, dismissive, passive-aggressive detection
+        # These provide a fallback when the LLM worker is down
+        SARCASM_PATTERNS = [
+            r"\byeah\s+right\b", r"\boh\s+sure\b", r"\bwhatever\b",
+            r"\bthanks\s+a\s+lot\b", r"\bgreat\s+job\b.*\bnot\b",
+            r"\breal\s+nice\b", r"\bhow\s+thoughtful\b",
+        ]
+        BLAME_PATTERNS = [
+            r"\byour\s+fault\b", r"\byou\s+always\b", r"\byou\s+never\b",
+            r"\bbecause\s+of\s+you\b", r"\bthanks\s+to\s+you\b",
+            r"\byou\s+caused\b", r"\byou\s+ruined\b", r"\byou\s+made\s+me\b",
+        ]
+        DISMISSIVE_PATTERNS = [
+            r"\bi\s+don'?t\s+care\b", r"\bnot\s+my\s+problem\b",
+            r"\bdeal\s+with\s+it\b", r"\bget\s+over\s+it\b",
+            r"\bwho\s+cares\b", r"\bnone\s+of\s+your\s+business\b",
+        ]
+        PASSIVE_AGGRESSIVE_PATTERNS = [
+            r"\bfine\.?\s*$", r"\bwhatever\s+you\s+say\b",
+            r"\bif\s+that'?s\s+what\s+you\s+want\b",
+            r"\bi\s+guess\s+i'?ll\s+just\b", r"\bno\s+worries\b.*\bi\b",
+            r"\bmust\s+be\s+nice\b", r"\bi'?m\s+sorry\s+you\s+feel\b",
+        ]
 
         return {
             ToxicityCategory.HATE_SPEECH: [
@@ -111,14 +136,29 @@ class ARIAService:
                 re.compile(p, re.IGNORECASE) for p in HOSTILITY_PATTERNS
             ],
             ToxicityCategory.INSULT: [
-                re.compile(p, re.IGNORECASE) for p in MODERN_SLANG_PATTERNS # Combined Slang + Insults logic
+                re.compile(p, re.IGNORECASE) for p in MODERN_SLANG_PATTERNS
             ],
             ToxicityCategory.PROFANITY: [
                 re.compile(p, re.IGNORECASE) for p in PROFANITY_PATTERNS
             ],
-            # Reuse profanity/hostility for evasion detection in regex fallbacks
             ToxicityCategory.ALL_CAPS: [
                 re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS
+            ],
+            # Nuanced categories — regex fallback when LLM worker is unavailable
+            ToxicityCategory.SARCASM: [
+                re.compile(p, re.IGNORECASE) for p in SARCASM_PATTERNS
+            ],
+            ToxicityCategory.BLAME: [
+                re.compile(p, re.IGNORECASE) for p in BLAME_PATTERNS
+            ],
+            ToxicityCategory.DISMISSIVE: [
+                re.compile(p, re.IGNORECASE) for p in DISMISSIVE_PATTERNS
+            ],
+            ToxicityCategory.PASSIVE_AGGRESSIVE: [
+                re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_PATTERNS
+            ],
+            ToxicityCategory.MANIPULATION: [
+                re.compile(p, re.IGNORECASE) for p in EMOTIONAL_MANIPULATION_PATTERNS
             ],
         }
 
@@ -736,17 +776,22 @@ Respond in JSON format:
     "suggestions": ["Brief, Informative, Friendly, Firm alternative"]
 }}"""
 
-            # Call OpenAI API
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7,
-                max_tokens=1024,
-                response_format={"type": "json_object"}
-            )
+            # Call OpenAI API with Sentry AI span
+            from app.utils.sentry_helpers import ai_span
+            with ai_span("message_analysis", "gpt-4", "openai") as span:
+                response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.7,
+                    max_tokens=1024,
+                    response_format={"type": "json_object"}
+                )
+                if hasattr(response, 'usage') and response.usage:
+                    span.set_data("input_tokens", response.usage.prompt_tokens)
+                    span.set_data("output_tokens", response.usage.completion_tokens)
 
             # Parse response
             response_text = response.choices[0].message.content

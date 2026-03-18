@@ -124,6 +124,19 @@ class FamilyFileService:
             await self.db.commit()
             await self.db.refresh(family_file)
 
+            # Create default good-faith agreement if opted in
+            if getattr(data, 'create_default_agreement', False):
+                try:
+                    from app.services.agreement import AgreementService
+                    agreement_service = AgreementService(self.db)
+                    await agreement_service.create_default_agreement(
+                        family_file_id=str(family_file.id),
+                        user=creator,
+                    )
+                    logger.info(f"Default good-faith agreement created for family file {family_file.id}")
+                except Exception as e:
+                    logger.warning(f"Failed to create default agreement (non-blocking): {e}")
+
             # Send invitation email if Parent B email provided
             if data.parent_b_email:
                 await self._send_parent_b_invitation(family_file, creator)

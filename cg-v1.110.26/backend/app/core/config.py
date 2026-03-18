@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "CommonGround"
     ENVIRONMENT: str = "development"
-    DEBUG: bool = True
+    DEBUG: bool = False
     SECRET_KEY: str
     API_VERSION: str = "v1"
 

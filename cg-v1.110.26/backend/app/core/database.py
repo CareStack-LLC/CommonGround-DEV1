@@ -66,6 +66,30 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
+# Slow query detection — log queries taking more than 1 second
+import logging as _logging
+import time as _time
+from sqlalchemy import event as _sa_event
+
+_db_logger = _logging.getLogger("commonground.db")
+
+@_sa_event.listens_for(engine.sync_engine, "before_cursor_execute")
+def _before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    conn.info.setdefault("query_start_time", []).append(_time.time())
+
+@_sa_event.listens_for(engine.sync_engine, "after_cursor_execute")
+def _after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+    start_times = conn.info.get("query_start_time", [])
+    if start_times:
+        elapsed = _time.time() - start_times.pop()
+        if elapsed > 1.0:
+            _db_logger.warning(
+                "Slow query (%.2fs): %s",
+                elapsed,
+                statement[:300],
+            )
+
+
 async def init_db() -> None:
     """
     Initialize database - create all tables.

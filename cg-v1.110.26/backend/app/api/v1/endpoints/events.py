@@ -635,6 +635,21 @@ async def create_child_event(
     await db.commit()
     await db.refresh(event)
 
+    # Notify parents about the child-created event
+    try:
+        from app.services.push import push_service
+        parent_ids = [pid for pid in [family_file.parent_a_id, family_file.parent_b_id] if pid]
+        for parent_id in parent_ids:
+            await push_service.send_notification(
+                db=db,
+                user_id=parent_id,
+                title="New Event from Your Child",
+                body=f"{child.display_name} added \"{event.title}\" to the family calendar",
+                data={"type": "child_event", "event_id": str(event.id)},
+            )
+    except Exception as e:
+        logger.warning(f"Failed to send child event push notification: {e}")
+
     return {
         "id": str(event.id),
         "title": event.title,

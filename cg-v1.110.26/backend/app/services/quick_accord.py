@@ -11,9 +11,12 @@ They can be created conversationally via ARIA chat.
 """
 
 from datetime import datetime, timedelta
+import logging
 from decimal import Decimal
 from typing import List, Optional, Dict, Any
 import uuid
+
+logger = logging.getLogger(__name__)
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, and_
@@ -293,7 +296,29 @@ class QuickAccordService:
         await self.db.commit()
         await self.db.refresh(quick_accord)
 
-        # TODO: Send notification to other parent
+        # Notify the other parent about the QuickAccord submission
+        try:
+            from app.services.push import push_service
+            from app.models.family_file import FamilyFile
+            ff_result = await self.db.execute(
+                select(FamilyFile).where(FamilyFile.id == quick_accord.family_file_id)
+            )
+            family_file = ff_result.scalar_one_or_none()
+            if family_file:
+                other_parent_id = (
+                    family_file.parent_b_id if user.id == family_file.parent_a_id
+                    else family_file.parent_a_id
+                )
+                if other_parent_id:
+                    await push_service.send_notification(
+                        db=self.db,
+                        user_id=other_parent_id,
+                        title="QuickAccord Needs Your Review",
+                        body=f"{user.first_name} submitted a {quick_accord.accord_type} QuickAccord for your approval",
+                        data={"type": "quick_accord", "id": str(quick_accord.id)},
+                    )
+        except Exception as e:
+            logger.warning(f"Failed to send QuickAccord notification: {e}")
 
         return quick_accord
 

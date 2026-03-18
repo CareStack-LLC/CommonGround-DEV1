@@ -23,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models.call_video_flag import VideoFrameAnalysis, VideoViolationType
+from app.services.storage import StorageBucket
 
 logger = logging.getLogger(__name__)
 
@@ -287,7 +288,7 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
 
             frame_bytes = base64.b64decode(frame_b64)
 
-            supabase.storage.from_("aria-frame-evidence").upload(
+            supabase.storage.from_(StorageBucket.ARIA_FRAME_EVIDENCE).upload(
                 path=path,
                 file=frame_bytes,
                 file_options={"content-type": "image/jpeg"},
@@ -296,7 +297,7 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
             frame_analysis.frame_storage_path = path
             await db.flush()
 
-            logger.info(f"Stored flagged frame at: aria-frame-evidence/{path}")
+            logger.info(f"Stored flagged frame at: {StorageBucket.ARIA_FRAME_EVIDENCE}/{path}")
             return path
 
         except Exception as e:

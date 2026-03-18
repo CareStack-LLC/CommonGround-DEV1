@@ -9,11 +9,12 @@ import hashlib
 import json
 import logging
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy import select, and_, or_, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
@@ -171,7 +172,15 @@ async def create_circle_contact(
     - **child_id**: If null, contact is approved for ALL children
     - **relationship**: grandparent, aunt, uncle, etc.
     - Contact will be pending approval from other parent (based on settings)
+
+    Requires Plus or Complete subscription.
     """
+    from app.services.feature_gate import feature_gate
+    if not feature_gate.has_feature(current_user, "circle_contacts_limit"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=feature_gate.get_upgrade_message("circle_contacts_limit")
+        )
     # Verify access to family file
     family_file = await get_family_file_with_access(
         db, contact_data.family_file_id, current_user.id
@@ -542,26 +551,41 @@ async def send_circle_invite(
 
     await db.commit()
 
-    # TODO: Integrate with email/SMS service (SendGrid, Twilio)
-    # For now, just return success
-
     email_sent = False
     sms_sent = False
+    verification_url = f"{settings.FRONTEND_URL}/my-circle/verify/{verification_token}"
 
     if invite_data.send_email and contact.contact_email:
-        # TODO: Send email via SendGrid
-        email_sent = True
+        try:
+            from app.services.email import email_service
+            await email_service.send_email(
+                to_email=contact.contact_email,
+                subject=f"You've been added to a child's trusted circle on CommonGround",
+                template_name="circle_invite",
+                template_data={
+                    "contact_name": contact.contact_name,
+                    "child_name": contact.child.display_name if hasattr(contact, 'child') and contact.child else "a child",
+                    "parent_name": f"{current_user.first_name} {current_user.last_name}",
+                    "verification_url": verification_url,
+                },
+            )
+            email_sent = True
+        except Exception as e:
+            logger.warning(f"Failed to send circle invite email to {contact.contact_email}: {e}")
 
     if invite_data.send_sms and contact.contact_phone:
-        # TODO: Send SMS via Twilio
-        sms_sent = True
+        # SMS not currently supported — email is the primary invite channel
+        logger.info(f"SMS invite requested for {contact.contact_phone} — SMS delivery not available, use email instead")
+        sms_sent = False
+
+    expires_at = datetime.utcnow() + timedelta(days=7)
 
     return CircleContactInviteResponse(
         success=email_sent or sms_sent,
         message="Verification invite sent" if (email_sent or sms_sent) else "No contact method available",
         email_sent=email_sent,
         sms_sent=sms_sent,
-        verification_expires_at=datetime.utcnow()  # TODO: Add proper expiry
+        verification_expires_at=expires_at,
     )
 
 

@@ -14,6 +14,8 @@ class StorageBucket:
     MESSAGE_ATTACHMENTS = "message_attachments"
     CALL_RECORDINGS = "call_recordings"
     PROFESSIONAL_MEDIA = "professional-media"
+    REPORTS = "reports"
+    ARIA_FRAME_EVIDENCE = "aria-frame-evidence"
 
 async def initialize_storage():
     """Ensure all required Supabase Storage buckets exist and are correctly configured."""
@@ -36,7 +38,9 @@ async def initialize_storage():
         (StorageBucket.KIDCOMS, True),            # Public
         (StorageBucket.MESSAGE_ATTACHMENTS, False),# Private
         (StorageBucket.CALL_RECORDINGS, False),   # Private
-        (StorageBucket.PROFESSIONAL_MEDIA, True)  # Public
+        (StorageBucket.PROFESSIONAL_MEDIA, True),  # Public
+        (StorageBucket.REPORTS, False),              # Private
+        (StorageBucket.ARIA_FRAME_EVIDENCE, False),  # Private
     ]
 
     print("\n📦 Initializing Storage Buckets...")

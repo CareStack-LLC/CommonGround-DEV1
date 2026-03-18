@@ -100,18 +100,21 @@ async def create_quick_accord(
     QuickAccords are for situational agreements:
     - travel: Taking kids on a trip
     - schedule_swap: Trading custody days
+
     - special_event: Birthday parties, events
     - overnight: One-off overnight stays
     - expense: Shared expense agreements
     - other: Other situational needs
 
-    Args:
-        family_file_id: ID of the Family File
-        data: QuickAccord details
-
-    Returns:
-        Created QuickAccord in draft status
+    Requires Plus or Complete subscription.
     """
+    from app.services.feature_gate import feature_gate
+    if not feature_gate.has_feature(current_user, "quick_accords"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=feature_gate.get_upgrade_message("quick_accords")
+        )
+
     service = QuickAccordService(db)
     quick_accord = await service.create_quick_accord(family_file_id, data, current_user)
 

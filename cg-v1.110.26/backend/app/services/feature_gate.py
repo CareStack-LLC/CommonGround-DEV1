@@ -134,9 +134,8 @@ class FeatureGate:
 
         # Check for active grant first
         if profile.subscription_status == "grant" and profile.active_grant_id:
-            # Grant provides Plus tier (or whatever the grant specifies)
-            # For now, all grants give "plus" access
-            return "plus"
+            # Grant provides the tier specified by the grant code
+            return profile.subscription_tier or "plus"
 
         # Check subscription status
         # Note: Stripe returns "trialing" not "trial", and we set "cancelling" for cancel_at_period_end

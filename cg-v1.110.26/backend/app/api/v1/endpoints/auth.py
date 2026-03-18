@@ -2,10 +2,13 @@
 Authentication endpoints.
 """
 
-from fastapi import APIRouter, Depends, status, Body
+from fastapi import APIRouter, Depends, Request, status, Body
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.database import get_db
+from app.core.rate_limit import limiter, AUTH_LIMIT
 from app.core.security import get_current_user
 from app.models.user import User
 from app.schemas.auth import (
@@ -23,7 +26,9 @@ router = APIRouter()
 
 
 @router.post("/register", response_model=LoginResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit(AUTH_LIMIT)
 async def register(
+    http_request: Request,
     request: RegisterRequest,
     db: AsyncSession = Depends(get_db)
 ):
@@ -55,7 +60,9 @@ async def register(
 
 
 @router.post("/login", response_model=LoginResponse)
+@limiter.limit(AUTH_LIMIT)
 async def login(
+    http_request: Request,
     request: LoginRequest,
     db: AsyncSession = Depends(get_db)
 ):
@@ -87,17 +94,28 @@ async def login(
 
 @router.post("/logout")
 async def logout(
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
     Logout user.
 
-    Signs out from Supabase. Client should discard tokens.
+    Signs out from Supabase and blacklists the JWT token.
 
     Returns:
         Success message
     """
+    # Blacklist the current token in Redis
+    try:
+        import hashlib
+        import redis as redis_lib
+        token_hash = hashlib.sha256(credentials.credentials.encode()).hexdigest()
+        r = redis_lib.from_url(settings.REDIS_URL, socket_timeout=1)
+        r.setex(f"blacklist:{token_hash}", settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60, "1")
+    except Exception:
+        pass  # Non-blocking — token will expire naturally
+
     auth_service = AuthService(db)
     await auth_service.logout_user(current_user.id)
 
@@ -105,7 +123,9 @@ async def logout(
 
 
 @router.post("/refresh", response_model=LoginResponse)
+@limiter.limit(AUTH_LIMIT)
 async def refresh_token(
+    request: Request,
     refresh_token: str = Body(..., embed=True),
     db: AsyncSession = Depends(get_db)
 ):
@@ -168,7 +188,9 @@ async def get_current_user_info(
 
 
 @router.post("/password-reset/request", status_code=status.HTTP_200_OK)
+@limiter.limit(AUTH_LIMIT)
 async def request_password_reset(
+    http_request: Request,
     request: PasswordResetRequest,
     db: AsyncSession = Depends(get_db)
 ):
@@ -213,7 +235,9 @@ async def confirm_password_reset(
 
 
 @router.post("/magic-link", status_code=status.HTTP_200_OK)
+@limiter.limit(AUTH_LIMIT)
 async def send_magic_link(
+    request: Request,
     email: str = Body(..., embed=True),
     db: AsyncSession = Depends(get_db)
 ):
@@ -243,7 +267,9 @@ async def send_magic_link(
 
 
 @router.post("/oauth/sync", response_model=LoginResponse)
+@limiter.limit(AUTH_LIMIT)
 async def oauth_sync(
+    http_request: Request,
     request: OAuthSyncRequest,
     db: AsyncSession = Depends(get_db)
 ):

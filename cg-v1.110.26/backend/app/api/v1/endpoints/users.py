@@ -30,6 +30,70 @@ from app.schemas.user import (
 router = APIRouter()
 
 
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_account(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Delete the current user's account (GDPR/CCPA right to erasure).
+
+    Soft-deletes the user and clears PII. This action is irreversible.
+    """
+    from datetime import datetime
+
+    # Load user with profile
+    result = await db.execute(
+        select(User)
+        .options(selectinload(User.profile))
+        .where(User.id == current_user.id)
+    )
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    # Soft-delete and clear PII
+    user.is_active = False
+    user.is_deleted = True
+    user.deleted_at = datetime.utcnow()
+    user.email = f"deleted_{user.id}@deleted.local"
+    user.first_name = "Deleted"
+    user.last_name = "User"
+    user.phone = None
+
+    # Clear profile PII
+    if user.profile:
+        user.profile.first_name = "Deleted"
+        user.profile.last_name = "User"
+        user.profile.preferred_name = None
+        user.profile.avatar_url = None
+        user.profile.address_line1 = None
+        user.profile.address_line2 = None
+        user.profile.city = None
+        user.profile.state = None
+        user.profile.zip_code = None
+
+    # Audit log
+    from app.services.audit_service import log_audit_event
+    await log_audit_event(
+        db, action="user.delete", resource_type="user",
+        user_id=str(current_user.id), user_email=current_user.email,
+        description="User account deleted (GDPR/CCPA erasure)",
+    )
+
+    # Delete from Supabase Auth
+    try:
+        from app.core.supabase import get_supabase_admin_client
+        admin_client = get_supabase_admin_client()
+        if user.supabase_id:
+            admin_client.auth.admin.delete_user(user.supabase_id)
+    except Exception as e:
+        logger.warning(f"Failed to delete Supabase auth user: {e}")
+
+    await db.commit()
+    logger.info(f"User account deleted: {current_user.id}")
+
+
 @router.get("/me/profile", response_model=UserProfileResponse)
 async def get_user_profile(
     current_user: User = Depends(get_current_user),

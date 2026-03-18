@@ -135,7 +135,7 @@ class ProfessionalComplianceService:
             **communication_metrics,
             # Normalize rates to 0-1 for frontend and map fields
             "intervention_rate": communication_metrics.get("flag_rate", 0) / 100.0,
-            "avg_response_time_hours": 0.0,  # Placeholder until implemented
+            "avg_response_time_hours": communication_metrics.get("avg_response_time_hours", 0.0),
             "good_faith_score": communication_metrics.get("good_faith_rate", 100) / 100.0,
             "by_parent": comm_by_parent
         }

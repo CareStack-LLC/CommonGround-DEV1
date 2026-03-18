@@ -202,7 +202,7 @@ export default function PartnersDirectoryPage() {
                         website="jenesse.org"
                         contact="info@jenesse.org"
                         location="Los Angeles, CA"
-                        logoUrl="/assets/marketing/jenesse-hero.jpg"
+                        logoUrl="/assets/marketing/empowering_father_son.png"
                     />
 
                     {/* Left Right 4 U Foundation Card */}
@@ -213,7 +213,7 @@ export default function PartnersDirectoryPage() {
                         website="leftright4u.org"
                         contact="info@leftright4u.org"
                         location="San Bernardino, CA"
-                        logoUrl="/assets/marketing/demo-partner-logo.png"
+                        logoUrl="/assets/marketing/lr4u_hero_nano_banana_1772567466304.png"
                     />
 
                     {/* Interval House Long Beach Card */}
@@ -224,7 +224,7 @@ export default function PartnersDirectoryPage() {
                         website="intervalhouse.org"
                         contact="admin@intervalhouse.org"
                         location="Long Beach, CA"
-                        logoUrl="/assets/marketing/interval-house-hero.jpg"
+                        logoUrl="/assets/marketing/empowering_father_son.png"
                     />
 
                     {/* Call to Action for new partners */}

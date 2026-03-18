@@ -159,6 +159,54 @@ class MonthlyReportService:
         expense_stats = self.parent_service._calculate_expense_stats(obligations)
 
         # -----------------------------------------------------------------
+        # 3b. Circle/KidSpace Communication Data
+        # -----------------------------------------------------------------
+        circle_stats = {"total_sessions": 0, "total_messages": 0, "flagged_messages": 0}
+        try:
+            from app.models.kidcoms import KidComsSession
+            from app.models.circle_message import CircleMessage
+            from sqlalchemy import func, and_
+
+            # Count circle call sessions
+            session_count = await self.parent_service.db.execute(
+                select(func.count(KidComsSession.id)).where(
+                    and_(
+                        KidComsSession.family_file_id == family_file_id,
+                        KidComsSession.created_at >= date_start,
+                        KidComsSession.created_at <= date_end,
+                    )
+                )
+            )
+            circle_stats["total_sessions"] = session_count.scalar() or 0
+
+            # Count circle messages
+            msg_count = await self.parent_service.db.execute(
+                select(func.count(CircleMessage.id)).where(
+                    and_(
+                        CircleMessage.family_file_id == family_file_id,
+                        CircleMessage.created_at >= date_start,
+                        CircleMessage.created_at <= date_end,
+                    )
+                )
+            )
+            circle_stats["total_messages"] = msg_count.scalar() or 0
+
+            # Count flagged circle messages
+            flagged_count = await self.parent_service.db.execute(
+                select(func.count(CircleMessage.id)).where(
+                    and_(
+                        CircleMessage.family_file_id == family_file_id,
+                        CircleMessage.created_at >= date_start,
+                        CircleMessage.created_at <= date_end,
+                        CircleMessage.aria_flagged == True,
+                    )
+                )
+            )
+            circle_stats["flagged_messages"] = flagged_count.scalar() or 0
+        except Exception as e:
+            logger.warning(f"Failed to gather circle stats for monthly report: {e}")
+
+        # -----------------------------------------------------------------
         # 4. Schedule Data
         # -----------------------------------------------------------------
         schedule_stats = self.parent_service._calculate_schedule_stats(
@@ -210,6 +258,8 @@ class MonthlyReportService:
             expense_stats=expense_stats,
             # Schedule
             schedule_stats=schedule_stats,
+            # Circle/KidSpace
+            circle_stats=circle_stats,
             # Overall
             overall_compliance=overall_compliance,
             highlights=highlights,
@@ -218,6 +268,21 @@ class MonthlyReportService:
 
         # Convert to PDF
         pdf_bytes, _ = self.parent_service._html_to_pdf(html_content)
+
+        # Persist to storage and database for /verify endpoint
+        try:
+            report_result = await self.parent_service._persist_report(
+                pdf_bytes=pdf_bytes,
+                report_type="monthly",
+                report_category="monthly_comprehensive",
+                family_file_id=str(family_file.id),
+                user_id=str(family_file.parent_a_id or "system"),
+                date_start=date(year, month, 1),
+                date_end=date(year, month, calendar.monthrange(year, month)[1]),
+            )
+            pdf_bytes = report_result.pdf_bytes
+        except Exception as e:
+            logger.warning(f"Monthly report persistence failed (non-blocking): {e}")
 
         # Build summary dict for email notifications
         summary = {

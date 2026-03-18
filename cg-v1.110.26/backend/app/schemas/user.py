@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class UserProfileResponse(BaseModel):
@@ -34,16 +34,24 @@ class UserProfileResponse(BaseModel):
 class UserProfileUpdate(BaseModel):
     """User profile update request."""
 
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    preferred_name: Optional[str] = None
-    phone: Optional[str] = None
-    timezone: Optional[str] = None
-    address_line1: Optional[str] = None
-    address_line2: Optional[str] = None
-    city: Optional[str] = None
-    state: Optional[str] = None
-    zip_code: Optional[str] = None
+    first_name: Optional[str] = Field(None, max_length=100)
+    last_name: Optional[str] = Field(None, max_length=100)
+    preferred_name: Optional[str] = Field(None, max_length=100)
+    phone: Optional[str] = Field(None, max_length=20)
+    timezone: Optional[str] = Field(None, max_length=50)
+    address_line1: Optional[str] = Field(None, max_length=200)
+    address_line2: Optional[str] = Field(None, max_length=200)
+    city: Optional[str] = Field(None, max_length=100)
+    state: Optional[str] = Field(None, max_length=50)
+    zip_code: Optional[str] = Field(None, max_length=20)
+
+    @field_validator('first_name', 'last_name', 'preferred_name', 'city', 'state', 'address_line1', 'address_line2', mode='before')
+    @classmethod
+    def sanitize_fields(cls, v):
+        if v is None:
+            return v
+        from app.utils.sanitize import sanitize_text
+        return sanitize_text(v, max_length=200)
 
 
 class NotificationPreferences(BaseModel):

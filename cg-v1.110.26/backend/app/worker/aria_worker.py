@@ -15,6 +15,20 @@ from sqlalchemy import text
 # Add project root to path
 sys.path.append(os.path.join(os.getcwd(), 'backend'))
 
+# Initialize Sentry for the worker process
+sentry_dsn = os.environ.get("SENTRY_DSN")
+if sentry_dsn:
+    import sentry_sdk
+    from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        environment=os.environ.get("ENVIRONMENT", "production"),
+        release=f"commonground-worker@v1",
+        traces_sample_rate=0.5,
+        integrations=[SqlalchemyIntegration()],
+        send_default_pii=False,
+    )
+
 # Import the inference service
 from app.services.aria_inference import analyze_message_with_llm
 
@@ -51,11 +65,16 @@ async def run_worker():
             # 1. Fetch pending job (FOR UPDATE SKIP LOCKED pattern is best, 
             # but simple update returning is fine for this simulated MVP)
             
-            # Simple optimistic locking: Find one pending job
+            # Find pending jobs OR failed jobs eligible for retry (max 3 attempts)
             result = await conn.execute(text("""
-                SELECT id, message_id, message_text, context 
-                FROM aria_jobs 
-                WHERE status = 'pending' 
+                SELECT id, message_id, message_text, context,
+                       COALESCE(retry_count, 0) as retry_count
+                FROM aria_jobs
+                WHERE status = 'pending'
+                   OR (status = 'failed' AND COALESCE(retry_count, 0) < 3)
+                ORDER BY
+                    CASE WHEN status = 'pending' THEN 0 ELSE 1 END,
+                    created_at ASC
                 LIMIT 1
                 FOR UPDATE SKIP LOCKED
             """))
@@ -132,10 +151,22 @@ async def run_worker():
                 print(f"✅ Job {job.id} Completed. Action: {analysis.get('action')}")
 
             except Exception as e:
-                print(f"❌ Job {job.id} Failed: {e}")
-                await conn.execute(text("""
-                    UPDATE aria_jobs SET status = 'failed', error_message = :err WHERE id = :id
-                """), {"id": job.id, "err": str(e)})
+                retry_count = getattr(job, 'retry_count', 0) or 0
+                new_retry = retry_count + 1
+                if new_retry >= 3:
+                    # Max retries exceeded — move to dead letter
+                    print(f"💀 Job {job.id} dead-lettered after {new_retry} attempts: {e}")
+                    await conn.execute(text("""
+                        UPDATE aria_jobs SET status = 'dead_letter', error_message = :err,
+                               retry_count = :retry WHERE id = :id
+                    """), {"id": job.id, "err": str(e), "retry": new_retry})
+                else:
+                    # Mark as failed with incremented retry count — will be picked up again
+                    print(f"❌ Job {job.id} Failed (attempt {new_retry}/3): {e}")
+                    await conn.execute(text("""
+                        UPDATE aria_jobs SET status = 'failed', error_message = :err,
+                               retry_count = :retry WHERE id = :id
+                    """), {"id": job.id, "err": str(e), "retry": new_retry})
 
         # Small sleep between loops
         await asyncio.sleep(0.5)

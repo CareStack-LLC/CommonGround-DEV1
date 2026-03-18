@@ -104,7 +104,7 @@ class RecordingListResponse(BaseModel):
 # Endpoints
 # =============================================================================
 
-@router.get("/family/{family_file_id}", response_model=RecordingListResponse)
+@router.get("/family-file/{family_file_id}", response_model=RecordingListResponse)
 async def get_family_recordings(
     family_file_id: str,
     recording_type: Optional[str] = Query(None, description="Filter by type: kidcoms, parent_call"),

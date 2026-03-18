@@ -23,6 +23,7 @@ from app.models.family_file import FamilyFile
 from app.models.message import Message, MessageThread, MessageFlag
 from app.models.user import User
 from app.core.config import settings
+from app.services.storage import StorageBucket
 from supabase import create_client, Client
 
 
@@ -381,7 +382,7 @@ class CommunicationsService:
             return ""
         try:
             # Create signed URL valid for 1 hour (3600 seconds)
-            res = self.supabase.storage.from_("message_attachments").create_signed_url(
+            res = self.supabase.storage.from_(StorageBucket.MESSAGE_ATTACHMENTS).create_signed_url(
                 storage_path, 3600
             )
             return res.get("signedURL", "")
@@ -569,8 +570,6 @@ class CommunicationsService:
             query = query.where(Message.created_at >= since)
 
         result = await self.db.execute(query)
-        # If no threads or mostly general, maybe mock some data for demo if needed?
-        # But let's return actual data
         data = {row[0]: row[1] for row in result.fetchall()}
         
         # If empty (likely due to no thread linking), try to infer from content keywords?

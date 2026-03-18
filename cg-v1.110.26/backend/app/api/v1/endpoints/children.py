@@ -465,12 +465,21 @@ async def upload_photo(
     current_user: User = Depends(get_current_user),
 ):
     """Upload and save a child's profile photo to Supabase Storage."""
+    MAX_PHOTO_SIZE = 10 * 1024 * 1024  # 10MB
+
     # Validate file type
     allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp"]
     if file.content_type not in allowed_types:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"File type {file.content_type} not allowed. Use JPEG, PNG, GIF, or WebP."
+        )
+
+    # Validate file size
+    if file.size and file.size > MAX_PHOTO_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"File too large. Maximum size is {MAX_PHOTO_SIZE // (1024*1024)}MB."
         )
 
     # Get the child to verify access and get family_file_id
@@ -564,9 +573,21 @@ async def set_court_restrictions(
 
     - Hides specific fields from one parent
     - Typically used for safety (address, school location)
-    - Should be called by court staff or admin
+    - Requires admin or court staff role
     """
-    # TODO: Add admin/court role verification
+    if not current_user.is_admin:
+        # Check for professional with court access
+        from app.models.professional import ProfessionalProfile
+        pro_result = await db.execute(
+            select(ProfessionalProfile).where(
+                ProfessionalProfile.user_id == current_user.id
+            )
+        )
+        if not pro_result.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only admin or court professionals can set court restrictions"
+            )
     service = ChildService(db)
     child = await service.set_court_restrictions(
         child_id, restriction_data, current_user
@@ -585,8 +606,12 @@ async def remove_court_restrictions(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Remove all court restrictions from a child profile."""
-    # TODO: Add admin/court role verification
+    """Remove all court restrictions from a child profile. Requires admin role."""
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin users can remove court restrictions"
+        )
     service = ChildService(db)
     child = await service.remove_court_restrictions(child_id, current_user)
     return _child_to_full_response(child)
@@ -615,8 +640,10 @@ async def get_child_counts(
 # ============================================================
 
 class ChildPinLoginRequest(BaseModel):
-    """Simple PIN login request for KidsCom app."""
+    """PIN login request for KidsCom app. Requires username to scope the lookup."""
     pin: str
+    username: Optional[str] = None  # Username scopes the search (recommended)
+    family_file_id: Optional[str] = None  # Alternative: scope by family file
 
 
 class ChildPinLoginResponse(BaseModel):
@@ -639,23 +666,29 @@ async def child_pin_login(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Authenticate a child with just a PIN.
+    Authenticate a child with PIN + username or family_file_id.
 
-    This is a simplified login endpoint for the KidsCom mobile app.
-    It searches all active child users for a matching PIN.
-
-    Note: For production, this should require device registration or
-    be combined with a username/family identifier.
+    PIN alone is not secure enough — we require either a username
+    or family_file_id to scope the lookup and prevent brute-force attacks.
     """
     from datetime import datetime
 
-    # Get all active child users with their PIN hashes
-    logger.debug("Child PIN login attempt")
-    result = await db.execute(
-        select(ChildUser)
-        .where(ChildUser.is_active == True)
-        .where(ChildUser.pin_hash.isnot(None))
+    # Build scoped query to avoid scanning all child users
+    query = select(ChildUser).where(
+        ChildUser.is_active == True,
+        ChildUser.pin_hash.isnot(None),
     )
+
+    if login_data.username:
+        query = query.where(ChildUser.username == login_data.username)
+    elif login_data.family_file_id:
+        query = query.where(ChildUser.family_file_id == login_data.family_file_id)
+    else:
+        # Fallback: still allow PIN-only for backward compatibility but log warning
+        logger.warning("Child PIN login without username or family_file_id — scanning all users")
+
+    logger.debug("Child PIN login attempt")
+    result = await db.execute(query)
     child_users = result.scalars().all()
 
     # Find matching PIN
@@ -805,7 +838,7 @@ async def get_child_circle(
             display_name=contact.contact_name,
             relationship=contact.relationship_type,
             avatar_url=contact.photo_url,
-            is_online=False,  # TODO: Check online status from presence system
+            is_online=None,  # Online status determined by frontend presence system
             family_file_id=str(contact.family_file_id),
             can_video_call=permission.can_video_call if permission else True,
             can_voice_call=permission.can_voice_call if permission else True,

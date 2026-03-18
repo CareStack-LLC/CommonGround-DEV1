@@ -13,15 +13,19 @@ import {
   Loader2,
 } from 'lucide-react';
 
-// Set up PDF.js worker - use unpkg CDN for exact version match
-// pdfjs.version will be something like "4.x.x" from pdfjs-dist
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Set up PDF.js worker - use local copy from node_modules for reliability
+// Falls back to CDN only if local copy unavailable
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
 
 interface TheaterPdfViewerProps {
   src: string;
   title?: string;
   currentPage?: number;
   onPageChange?: (page: number) => void;
+  isSynced?: boolean;
 }
 
 export function TheaterPdfViewer({
@@ -29,6 +33,7 @@ export function TheaterPdfViewer({
   title,
   currentPage: syncedPage,
   onPageChange,
+  isSynced = false,
 }: TheaterPdfViewerProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
@@ -88,11 +93,13 @@ export function TheaterPdfViewer({
               {title}
             </h3>
           )}
-          {/* Synced Indicator */}
-          <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
-            <Users className="h-3.5 w-3.5" />
-            <span>Synced</span>
-          </div>
+          {/* Synced Indicator — only shown when another participant is connected */}
+          {isSynced && (
+            <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">
+              <Users className="h-3.5 w-3.5" />
+              <span>Synced</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-2">

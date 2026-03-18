@@ -91,6 +91,7 @@ class FamilyFileCreate(BaseModel):
     state: Optional[str] = Field(None, min_length=2, max_length=2)
     county: Optional[str] = Field(None, max_length=100)
     children: List[ChildBasic] = Field(default_factory=list)
+    create_default_agreement: bool = Field(default=False, description="Start with a default Good Faith agreement")
 
     @field_validator('title')
     @classmethod

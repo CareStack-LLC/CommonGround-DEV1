@@ -278,21 +278,28 @@ class CaseExportService:
 
         return None
 
-    async def _store_pdf(self, export_number: str, pdf_bytes: bytes) -> str:
-        """Store PDF file and return URL/path."""
-        # Ensure storage directory exists
-        storage_path = self.EXPORT_STORAGE_PATH
-        storage_path.mkdir(parents=True, exist_ok=True)
-
-        # Save file
-        filename = f"{export_number}.pdf"
-        file_path = storage_path / filename
-
-        with open(file_path, "wb") as f:
-            f.write(pdf_bytes)
-
-        # Return relative path as URL (in production, this would be a real URL)
-        return f"/exports/{filename}"
+    async def _store_pdf(self, export_number: str, pdf_bytes: bytes, family_file_id: str = None) -> str:
+        """Store PDF file to Supabase Storage and return signed URL."""
+        try:
+            from app.services.storage import storage_service, StorageBucket
+            path = f"exports/{family_file_id or 'general'}/{export_number}.pdf"
+            url = await storage_service.upload_file(
+                bucket=StorageBucket.DOCUMENTS,
+                path=path,
+                file_content=pdf_bytes,
+                content_type="application/pdf",
+            )
+            return url
+        except Exception as e:
+            logger.error(f"Failed to upload court export to Supabase: {e}")
+            # Fallback to local storage for dev environments
+            storage_path = self.EXPORT_STORAGE_PATH
+            storage_path.mkdir(parents=True, exist_ok=True)
+            filename = f"{export_number}.pdf"
+            file_path = storage_path / filename
+            with open(file_path, "wb") as f:
+                f.write(pdf_bytes)
+            return f"/exports/{filename}"
 
     def _count_pages(self, pdf_bytes: bytes) -> int:
         """Count pages in PDF (approximate)."""

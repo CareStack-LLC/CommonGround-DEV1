@@ -35,6 +35,7 @@ class StorageBucket:
     CALL_RECORDINGS = "call_recordings"  # Private bucket for parent call recordings
     PROFESSIONAL_MEDIA = "professional-media"  # Public bucket for firm logos, videos, and professional headshots
     REPORTS = "reports"  # Private bucket for generated PDF reports
+    ARIA_FRAME_EVIDENCE = "aria-frame-evidence"  # Private bucket for ARIA video frame captures
 
 
 class SupabaseStorageService:
@@ -413,14 +414,16 @@ ALLOWED_VIDEO_TYPES = {"video/mp4", "video/quicktime", "video/x-msvideo", "video
 
 def validate_attachment(
     content_type: str,
-    file_size: int
+    file_size: int,
+    file_content: Optional[bytes] = None
 ) -> Tuple[bool, Optional[str], Optional[str]]:
     """
     Validate attachment file type and size.
 
     Args:
-        content_type: MIME type of the file
+        content_type: MIME type of the file (from client)
         file_size: Size of the file in bytes
+        file_content: Optional file bytes for magic byte verification
 
     Returns:
         Tuple of (is_valid, category, error_message)
@@ -429,6 +432,21 @@ def validate_attachment(
     # Check file size
     if file_size > MAX_ATTACHMENT_SIZE:
         return False, None, f"File size {file_size} bytes exceeds maximum {MAX_ATTACHMENT_SIZE} bytes (50 MB)"
+
+    # Verify magic bytes match declared content type (if content provided)
+    if file_content:
+        try:
+            import magic
+            detected_type = magic.from_buffer(file_content[:8192], mime=True)
+            # Allow minor variations (e.g., image/jpeg vs image/jpg)
+            declared_base = content_type.split("/")[0] if "/" in content_type else ""
+            detected_base = detected_type.split("/")[0] if "/" in detected_type else ""
+            if declared_base and detected_base and declared_base != detected_base:
+                return False, None, f"File content does not match declared type (declared: {content_type}, detected: {detected_type})"
+        except ImportError:
+            pass  # python-magic not installed — skip verification
+        except Exception:
+            pass  # Magic detection failed — allow through
 
     # Determine category and validate
     if content_type in ALLOWED_IMAGE_TYPES:
