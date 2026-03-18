@@ -205,22 +205,38 @@ async def get_current_user_info(
 async def test_email(
     email: str = Body(..., embed=True),
     name: str = Body("Friend", embed=True),
+    template: str = Body("welcome", embed=True),
 ):
     """
-    Send a test welcome email. Debug endpoint — remove before final production.
+    Send a test email. Debug endpoint — remove before final production.
+    Supported templates: welcome, password_reset, security_alert
     """
     from app.services.email import EmailService
     email_service = EmailService()
-    logger.info(f"Test email requested to {email}, enabled={email_service.enabled}, api_key={'SET' if email_service.api_key else 'NOT SET'}")
-    result = await email_service.send_welcome_email(
-        to_email=email,
-        user_name=name,
-    )
+    logger.info(f"Test email '{template}' requested to {email}")
+
+    result = None
+    if template == "welcome":
+        result = await email_service.send_welcome_email(to_email=email, user_name=name)
+    elif template == "password_reset":
+        result = await email_service.send_password_reset(
+            to_email=email, reset_link=f"{email_service.frontend_url}/reset-password?token=test-token-123"
+        )
+    elif template == "security_alert":
+        result = await email_service.send_security_alert(
+            to_email=email, user_name=name,
+            alert_type="New Login Detected", is_critical=False,
+            details={"timestamp": "March 18, 2026 6:45 AM PST", "device": "Chrome on macOS", "location": "Los Angeles, CA", "ip_address": "192.168.1.x"},
+            action_url=f"{email_service.frontend_url}/settings/security"
+        )
+    else:
+        return {"error": f"Unknown template: {template}", "available": ["welcome", "password_reset", "security_alert"]}
+
     return {
         "sent": result is not None,
         "message_id": result,
+        "template": template,
         "email_enabled": email_service.enabled,
-        "api_key_set": bool(email_service.api_key),
     }
 
 
