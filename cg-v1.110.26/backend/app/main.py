@@ -42,6 +42,22 @@ if settings.SENTRY_DSN:
     from sentry_sdk.integrations.logging import LoggingIntegration
     from sentry_sdk.integrations.httpx import HttpxIntegration
 
+    # AI Agent Monitoring — auto-instruments Anthropic + OpenAI calls
+    _ai_integrations = []
+    try:
+        from sentry_sdk.integrations.anthropic import AnthropicIntegration
+        _ai_integrations.append(AnthropicIntegration())
+        logger.info("Sentry: Anthropic AI monitoring enabled")
+    except ImportError:
+        logger.debug("Sentry: AnthropicIntegration not available (SDK too old?)")
+
+    try:
+        from sentry_sdk.integrations.openai import OpenAIIntegration
+        _ai_integrations.append(OpenAIIntegration())
+        logger.info("Sentry: OpenAI AI monitoring enabled")
+    except ImportError:
+        logger.debug("Sentry: OpenAIIntegration not available (SDK too old?)")
+
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
         environment=settings.ENVIRONMENT,
@@ -77,16 +93,19 @@ if settings.SENTRY_DSN:
                 event_level=logging.ERROR, # Sentry events from ERROR+
             ),
             HttpxIntegration(),
+            *_ai_integrations,  # Anthropic + OpenAI auto-instrumentation
         ],
 
-        # ── Privacy ──
-        send_default_pii=False,
+        # ── AI Monitoring ──
+        # Capture LLM inputs/outputs for ARIA debugging
+        # (prompts, responses, token counts, model, latency)
+        send_default_pii=True,
 
         # ── Filtering ──
         before_send=_sentry_before_send,
         before_send_transaction=_sentry_before_send_transaction,
     )
-    logger.info(f"Sentry initialized for {settings.ENVIRONMENT}")
+    logger.info(f"Sentry initialized for {settings.ENVIRONMENT} (AI monitoring: {len(_ai_integrations)} providers)")
 
 
 from fastapi import FastAPI
