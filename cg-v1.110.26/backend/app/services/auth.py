@@ -343,10 +343,10 @@ class AuthService:
         except HTTPException:
             raise
         except Exception as e:
-            logger.error(f"Login failed with exception: {str(e)}", exc_info=True)
+            logger.error(f"Login failed with exception: {type(e).__name__}: {str(e)}", exc_info=True)
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password."
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Login error: {type(e).__name__}: {str(e)}"
             ) from e
 
     async def refresh_access_token(self, refresh_token: str) -> Tuple[str, str]:
