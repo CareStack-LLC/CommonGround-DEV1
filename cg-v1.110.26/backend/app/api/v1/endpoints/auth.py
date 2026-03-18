@@ -220,14 +220,20 @@ async def test_email(
         result = await email_service.send_welcome_email(to_email=email, user_name=name)
     elif template == "password_reset":
         result = await email_service.send_password_reset(
-            to_email=email, reset_link=f"{email_service.frontend_url}/reset-password?token=test-token-123"
+            to_email=email, to_name=name,
+            reset_link=f"{email_service.frontend_url}/reset-password?token=test-token-123"
         )
     elif template == "security_alert":
         result = await email_service.send_security_alert(
-            to_email=email, user_name=name,
-            alert_type="New Login Detected", is_critical=False,
-            details={"timestamp": "March 18, 2026 6:45 AM PST", "device": "Chrome on macOS", "location": "Los Angeles, CA", "ip_address": "192.168.1.x"},
-            action_url=f"{email_service.frontend_url}/settings/security"
+            to_email=email, to_name=name,
+            alert_type="New Login Detected",
+            alert_message="A new sign-in to your account was detected from a device we haven't seen before.",
+            secure_account_url=f"{email_service.frontend_url}/settings/security",
+            event_timestamp="March 18, 2026 at 8:45 AM PST",
+            device_info="Chrome on macOS",
+            location="Los Angeles, CA",
+            ip_address="192.168.1.x",
+            is_critical=False
         )
     else:
         return {"error": f"Unknown template: {template}", "available": ["welcome", "password_reset", "security_alert"]}
