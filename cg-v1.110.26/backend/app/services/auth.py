@@ -155,6 +155,17 @@ class AuthService:
 
             logger.info(f"Registration successful for {request.email}")
 
+            # Send welcome email (non-blocking — don't fail registration if email fails)
+            try:
+                from app.services.email import email_service
+                await email_service.send_welcome_email(
+                    to_email=user.email,
+                    user_name=request.first_name or "there",
+                    dashboard_url=f"{settings.FRONTEND_URL}/dashboard",
+                )
+            except Exception as e:
+                logger.warning(f"Failed to send welcome email to {user.email}: {e}")
+
             return user, access_token, refresh_token, checkout_url
 
         except HTTPException as e:

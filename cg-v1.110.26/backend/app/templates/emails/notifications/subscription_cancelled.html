@@ -1,0 +1,49 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Subscription Cancelled{% endblock %}
+
+{% block preheader %}Your {{ plan_name }} subscription has been cancelled. You have access until {{ end_date }}.{% endblock %}
+
+{% block content %}
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Subscription Cancelled
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  Hi {{ to_name }}, we've confirmed your cancellation.
+</p>
+
+<!-- Access Info Card -->
+<div style="background-color: #E8F0EC; border: 1px solid #4A6C58; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-bottom: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Plan</span><br>
+        <strong style="color: #2D3A35;">{{ plan_name }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0;">
+        <span style="color: #6B7B74; font-size: 14px;">Access Until</span><br>
+        <strong style="color: #4A6C58; font-size: 18px;">{{ end_date }}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p style="color: #2D3A35; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+  You'll continue to have full access to your {{ plan_name }} features until <strong>{{ end_date }}</strong>. After that, your account will move to the free tier.
+</p>
+
+<p style="color: #2D3A35; font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
+  If you change your mind, you can resubscribe anytime.
+</p>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ resubscribe_url | default(frontend_url ~ '/settings/billing') }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    Resubscribe
+  </a>
+</div>
+{% endblock %}

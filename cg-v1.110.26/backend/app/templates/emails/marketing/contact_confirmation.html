@@ -1,0 +1,38 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}We Received Your Message{% endblock %}
+
+{% block preheader %}Thanks for reaching out, {{ name }}. We'll get back to you within 1-2 business days.{% endblock %}
+
+{% block content %}
+<!-- Checkmark Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <div style="display: inline-block; width: 80px; height: 80px; background-color: #E8F0EC; border-radius: 50%; line-height: 80px;">
+    <img src="{{ icons.checkmark }}" alt="" width="40" height="40" style="display: inline-block; vertical-align: middle;">
+  </div>
+</div>
+
+<h1 style="color: #4A6C58; text-align: center; margin-bottom: 8px;">
+  Message Received
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  Thanks for reaching out, {{ name }}.
+</p>
+
+<p style="color: #2D3A35; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+  We've received your message and a member of our team will get back to you within <strong>1-2 business days</strong>.
+</p>
+
+<p style="color: #2D3A35; font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
+  In the meantime, you can explore our site to learn more about how CommonGround supports co-parenting families.
+</p>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ frontend_url | default('https://commonground.family') }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    Visit CommonGround
+  </a>
+</div>
+{% endblock %}

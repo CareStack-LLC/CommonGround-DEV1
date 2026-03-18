@@ -25,7 +25,7 @@ from app.models.wallet import (
     ChildWalletContribution,
     Payout,
 )
-from app.models.user import UserProfile
+from app.models.user import User, UserProfile
 from app.models.subscription import SubscriptionPlan
 from app.schemas.wallet import WebhookHandlerResponse
 from sqlalchemy.orm import selectinload
@@ -590,6 +590,23 @@ async def handle_subscription_deleted(db: AsyncSession, event_data: dict) -> Non
 
     logger.info(f"Subscription {subscription_id} deleted for customer {customer_id}, downgraded to starter")
 
+    # Send cancellation email
+    try:
+        from app.services.email import email_service
+        user_result = await db.execute(
+            select(User).join(UserProfile).where(UserProfile.stripe_customer_id == customer_id)
+        )
+        user = user_result.scalar_one_or_none()
+        if user:
+            await email_service.send_subscription_cancelled(
+                to_email=user.email,
+                to_name=user.first_name or "there",
+                plan_name=profile.subscription_tier if profile else "your plan",
+                end_date=profile.subscription_ends_at.strftime('%B %d, %Y') if profile and profile.subscription_ends_at else "now",
+            )
+    except Exception as e:
+        logger.warning(f"Failed to send cancellation email: {e}")
+
 
 async def handle_invoice_paid(db: AsyncSession, event_data: dict) -> None:
     """
@@ -649,6 +666,22 @@ async def handle_invoice_payment_failed(db: AsyncSession, event_data: dict) -> N
             pro_profile.subscription_status = "past_due"
 
     logger.warning(f"Invoice payment failed for subscription {subscription_id}, attempt {attempt_count}")
+
+    # Send payment failed email
+    try:
+        from app.services.email import email_service
+        user_result = await db.execute(
+            select(User).join(UserProfile).where(UserProfile.stripe_customer_id == customer_id)
+        )
+        user = user_result.scalar_one_or_none()
+        if user:
+            await email_service.send_payment_failed(
+                to_email=user.email,
+                to_name=user.first_name or "there",
+                plan_name=profile.subscription_tier if profile else "your plan",
+            )
+    except Exception as e:
+        logger.warning(f"Failed to send payment failed email: {e}")
 
 
 async def handle_checkout_completed(db: AsyncSession, event_data: dict) -> None:

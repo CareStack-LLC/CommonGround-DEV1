@@ -1,0 +1,61 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}New Event: {{ event_title }}{% endblock %}
+
+{% block preheader %}{{ creator_name }} added "{{ event_title }}" on {{ event_date }}.{% endblock %}
+
+{% block content %}
+<!-- Calendar Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <div style="display: inline-block; width: 80px; height: 80px; background-color: #E8F0EC; border-radius: 50%; line-height: 80px;">
+    <img src="{{ icons.calendar }}" alt="" width="40" height="40" style="display: inline-block; vertical-align: middle;">
+  </div>
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  New Event Added
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  Hi {{ to_name }}, {{ creator_name }} added a new event to your shared calendar.
+</p>
+
+<!-- Event Details Card -->
+<div style="background-color: #E8F0EC; border: 1px solid #4A6C58; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <h2 style="color: #4A6C58; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">
+    Event Details
+  </h2>
+  <p style="color: #2D3A35; font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">
+    {{ event_title }}
+  </p>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Date</span><br>
+        <strong style="color: #2D3A35;">{{ event_date }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Time</span><br>
+        <strong style="color: #2D3A35;">{{ event_time }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #C5D9CC;">
+        <span style="color: #6B7B74; font-size: 14px;">Added By</span><br>
+        <strong style="color: #2D3A35;">{{ creator_name }}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ calendar_url | default(frontend_url ~ '/calendar') }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    View Calendar
+  </a>
+</div>
+{% endblock %}

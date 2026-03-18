@@ -1,0 +1,56 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}ARIA Flagged a Message{% endblock %}
+
+{% block preheader %}ARIA flagged a message in your conversation for {{ category }}.{% endblock %}
+
+{% block content %}
+<!-- Warning Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <div style="display: inline-block; width: 80px; height: 80px; background-color: #FEF7ED; border-radius: 50%; line-height: 80px;">
+    <img src="{{ icons.warning }}" alt="" width="40" height="40" style="display: inline-block; vertical-align: middle;">
+  </div>
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Message Flagged by ARIA
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  Hi {{ to_name }}, ARIA reviewed a message in your conversation and flagged it for review.
+</p>
+
+<p style="color: #2D3A35; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+  ARIA, your co-parenting assistant, helps keep conversations constructive and focused on what matters most: your children. When a message may not align with that goal, ARIA steps in.
+</p>
+
+<!-- Category Card -->
+<div style="background-color: #FEF7ED; border: 1px solid #D4A574; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <h3 style="color: #D4A574; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">
+    Flagged For
+  </h3>
+  <p style="color: #2D3A35; font-size: 18px; font-weight: 600; margin: 0;">
+    {{ category }}
+  </p>
+</div>
+
+{% if suggestion %}
+<!-- Suggestion -->
+<div style="background-color: #E8F0EC; border: 1px solid #4A6C58; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <h3 style="color: #4A6C58; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">
+    ARIA's Suggestion
+  </h3>
+  <p style="color: #2D3A35; font-size: 15px; line-height: 1.6; margin: 0;">
+    {{ suggestion }}
+  </p>
+</div>
+{% endif %}
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ conversation_url | default(frontend_url ~ '/messages') }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    View Conversation
+  </a>
+</div>
+{% endblock %}

@@ -625,15 +625,14 @@ class FamilyFileService:
             # Build invitation link
             invite_link = f"{settings.FRONTEND_URL}/family-files/{family_file.id}/accept"
 
-            await self.email_service.send_email(
+            inviter_name = f"{inviter.first_name} {inviter.last_name}"
+            await self.email_service.send_case_invitation(
                 to_email=family_file.parent_b_email,
-                subject=f"You've been invited to {family_file.title} on CommonGround",
-                template_name="family_file_invitation",
-                context={
-                    "inviter_name": f"{inviter.first_name} {inviter.last_name}",
-                    "family_file_title": family_file.title,
-                    "invite_link": invite_link,
-                }
+                to_name=family_file.parent_b_name or "Co-Parent",
+                inviter_name=inviter_name,
+                case_name=family_file.title,
+                invitation_link=invite_link,
+                children_names=[],
             )
         except Exception:
             # Don't fail the operation if email fails

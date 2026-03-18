@@ -1,0 +1,61 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}Agreement Expiring Soon{% endblock %}
+
+{% block preheader %}Your agreement "{{ agreement_name }}" expires in {{ days_remaining }} days on {{ expiry_date }}.{% endblock %}
+
+{% block header_style %}background: linear-gradient(135deg, #D4A574 0%, #C4956A 100%);{% endblock %}
+
+{% block content %}
+<!-- Document Icon -->
+<div style="text-align: center; margin-bottom: 16px;">
+  <div style="display: inline-block; width: 80px; height: 80px; background-color: #FEF7ED; border-radius: 50%; line-height: 80px;">
+    <img src="{{ icons.document }}" alt="" width="40" height="40" style="display: inline-block; vertical-align: middle;">
+  </div>
+</div>
+
+<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
+  Agreement Expiring Soon
+</h1>
+
+<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
+  Hi {{ to_name }}, one of your agreements needs attention.
+</p>
+
+<!-- Warning Card -->
+<div style="background-color: #FEF7ED; border: 1px solid #D4A574; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+  <h2 style="color: #D4A574; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px 0;">
+    Expiring Agreement
+  </h2>
+  <p style="color: #2D3A35; font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">
+    {{ agreement_name }}
+  </p>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #E8D5C0;">
+        <span style="color: #6B7B74; font-size: 14px;">Expires On</span><br>
+        <strong style="color: #D4A574; font-size: 18px;">{{ expiry_date }}</strong>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 0; border-top: 1px solid #E8D5C0;">
+        <span style="color: #6B7B74; font-size: 14px;">Days Remaining</span><br>
+        <strong style="color: #D4A574; font-size: 18px;">{{ days_remaining }}</strong>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p style="color: #2D3A35; font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
+  Review your agreement and coordinate with your co-parent to renew or update the terms before it expires.
+</p>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+  <a href="{{ agreement_url | default(frontend_url ~ '/agreements') }}"
+     style="display: inline-block; padding: 16px 48px; background-color: #D4A574; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
+    Review Agreement
+  </a>
+</div>
+{% endblock %}

@@ -810,79 +810,15 @@ class EmailService:
         else:
             subject = f"{inviter_name} invited you to CommonGround"
 
-        # Build branded HTML
-        firm_line = f"<p style='color: #64748b; font-size: 14px; margin: 0;'>{attorney_firm}</p>" if attorney_firm else ""
-        children_section = ""
-        if children_names:
-            names = ", ".join(children_names)
-            children_section = f"""
-            <div style="background: #f0f9ff; border-radius: 8px; padding: 16px; margin: 20px 0;">
-                <p style="margin: 0; color: #1e3a4a; font-size: 14px;">
-                    <strong>Children:</strong> {names}
-                </p>
-            </div>
-            """
-
-        resend_note = ""
-        if is_resend:
-            resend_note = """
-            <div style="background: #fef3c7; border-radius: 8px; padding: 12px; margin: 16px 0;">
-                <p style="margin: 0; color: #92400e; font-size: 13px;">
-                    This is a friendly reminder. Your invitation is still waiting.
-                </p>
-            </div>
-            """
-
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>You're Invited to CommonGround</title>
-        </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8fafc;">
-            <div style="background: linear-gradient(135deg, #1E3A4A 0%, #2D6A8F 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0 0 8px 0; font-family: Georgia, serif; font-size: 24px;">CommonGround</h1>
-                <p style="color: #5BC4A0; margin: 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Co-Parenting, Reimagined</p>
-            </div>
-
-            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
-                <p style="margin-top: 0; font-size: 16px;">Hi {to_name},</p>
-
-                {resend_note}
-
-                <p><strong>{inviter_name}</strong> has invited you to use CommonGround — a secure platform designed to make co-parenting communication easier, more organized, and focused on what matters most: your children.</p>
-
-                {children_section}
-
-                <p>CommonGround helps you:</p>
-                <ul style="color: #475569; padding-left: 20px;">
-                    <li>Communicate with AI-assisted message guidance</li>
-                    <li>Track schedules and custody exchanges</li>
-                    <li>Manage shared expenses transparently</li>
-                    <li>Build agreements that work for everyone</li>
-                </ul>
-
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{magic_link}" style="display: inline-block; background: linear-gradient(135deg, #3DAA8A, #5BC4A0); color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 8px rgba(61, 170, 138, 0.3);">
-                        Get Started — It's Free
-                    </a>
-                </div>
-
-                <p style="color: #64748b; font-size: 13px; text-align: center;">One tap to activate. No password needed.</p>
-
-                {firm_line}
-
-                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
-
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
-                    This invitation expires in 7 days. If you have questions, reply to this email or contact support at support@find-commonground.com.
-                </p>
-            </div>
-        </body>
-        </html>
-        """
+        html_body = self._render_template('invitations/attorney_invite.html', {
+            'to_name': to_name,
+            'inviter_name': inviter_name,
+            'magic_link': magic_link,
+            'children_names': children_names,
+            'attorney_name': attorney_name,
+            'attorney_firm': attorney_firm,
+            'resend_note': is_resend,
+        })
 
         return await self._send_email(
             to_email,
@@ -949,107 +885,20 @@ class EmailService:
         to_name: str,
         reset_link: str
     ) -> bool:
-        """
-        Send password reset email.
-
-        Args:
-            to_email: Recipient email
-            to_name: Recipient name
-            reset_link: Link to reset password
-
-        Returns:
-            Success status
-        """
+        """Send password reset email with 1-hour expiry."""
         subject = "Reset Your CommonGround Password"
-
-        # Simple HTML email for password reset
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Reset Your Password</title>
-        </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #4A6C58 0%, #3d5a4a 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 24px;">Password Reset</h1>
-            </div>
-            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
-                <p style="margin-top: 0;">Hi {to_name},</p>
-                <p>We received a request to reset your My Circle password. Click the button below to create a new password:</p>
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{reset_link}" style="display: inline-block; background: #4A6C58; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">Reset Password</a>
-                </div>
-                <p style="color: #64748b; font-size: 14px;">This link will expire in 1 hour for security reasons.</p>
-                <p style="color: #64748b; font-size: 14px;">If you didn't request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>
-                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">This email was sent by CommonGround. If you have questions, please contact support.</p>
-            </div>
-        </body>
-        </html>
-        """
-
+        html_body = self._render_template('auth/password_reset.html', {
+            'to_name': to_name,
+            'reset_link': reset_link,
+        })
         return await self._send_email(to_email, subject, html_body)
 
     # ==================== Marketing Emails ====================
 
     async def send_newsletter_welcome(self, to_email: str) -> bool:
-        """
-        Send welcome email to new newsletter subscriber.
-
-        Args:
-            to_email: Subscriber email address
-
-        Returns:
-            Success status
-        """
+        """Send welcome email to new newsletter subscriber."""
         subject = "Welcome to the CommonGround Newsletter!"
-
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Welcome to CommonGround</title>
-        </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8fafc;">
-            <div style="background: linear-gradient(135deg, #1E3A4A 0%, #2D6A8F 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0 0 8px 0; font-family: Georgia, serif; font-size: 24px;">CommonGround</h1>
-                <p style="color: #5BC4A0; margin: 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Co-Parenting, Reimagined</p>
-            </div>
-
-            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
-                <h2 style="margin-top: 0; color: #1E3A4A;">You're on the list!</h2>
-
-                <p>Thanks for subscribing to the CommonGround newsletter. We're glad to have you.</p>
-
-                <p>Here's what you can expect:</p>
-                <ul style="color: #475569; padding-left: 20px;">
-                    <li>Co-parenting tips and insights</li>
-                    <li>Platform updates and new features</li>
-                    <li>Resources for healthier family communication</li>
-                    <li>Stories from the CommonGround community</li>
-                </ul>
-
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{self.frontend_url}" style="display: inline-block; background: linear-gradient(135deg, #3DAA8A, #5BC4A0); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
-                        Visit CommonGround
-                    </a>
-                </div>
-
-                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
-
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
-                    You received this email because you subscribed to the CommonGround newsletter.
-                    If you no longer wish to receive these emails, you can unsubscribe at any time.
-                </p>
-            </div>
-        </body>
-        </html>
-        """
-
+        html_body = self._render_template('marketing/newsletter_welcome.html', {})
         return await self._send_email(to_email, subject, html_body)
 
     async def send_contact_form_notification(
@@ -1061,120 +910,173 @@ class EmailService:
         message: str,
         internal_email: str,
     ) -> bool:
-        """
-        Send contact form contents to the appropriate internal team email.
-
-        Args:
-            name: Submitter's name
-            email: Submitter's email
-            inquiry_type: Type of inquiry
-            subject: Optional subject line
-            message: Message body
-            internal_email: Internal email address to route to
-
-        Returns:
-            Success status
-        """
+        """Send contact form contents to the appropriate internal team email."""
         email_subject = f"Contact Form: {subject or inquiry_type.capitalize() + ' Inquiry'} from {name}"
-
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>New Contact Form Submission</title>
-        </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: #1E3A4A; padding: 20px; border-radius: 12px 12px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 20px;">New Contact Form Submission</h1>
-            </div>
-
-            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
-                    <tr>
-                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9; width: 120px;">Name</td>
-                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;">{name}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9;">Email</td>
-                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;"><a href="mailto:{email}">{email}</a></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9;">Type</td>
-                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;">{inquiry_type.capitalize()}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 12px; font-weight: 600; color: #475569; border-bottom: 1px solid #f1f5f9;">Subject</td>
-                        <td style="padding: 8px 12px; border-bottom: 1px solid #f1f5f9;">{subject or 'N/A'}</td>
-                    </tr>
-                </table>
-
-                <h3 style="color: #1E3A4A; margin-bottom: 8px;">Message</h3>
-                <div style="background: #f8fafc; border-radius: 8px; padding: 16px; white-space: pre-wrap;">{message}</div>
-
-                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
-                    This message was submitted via the CommonGround contact form.
-                </p>
-            </div>
-        </body>
-        </html>
-        """
-
+        html_body = self._render_template('marketing/contact_internal.html', {
+            'name': name,
+            'email': email,
+            'inquiry_type': inquiry_type,
+            'subject': subject,
+            'message': message,
+        })
         return await self._send_email(internal_email, email_subject, html_body)
 
     async def send_contact_form_confirmation(self, to_email: str, name: str) -> bool:
-        """
-        Send confirmation email to contact form submitter.
-
-        Args:
-            to_email: Submitter's email
-            name: Submitter's name
-
-        Returns:
-            Success status
-        """
+        """Send confirmation email to contact form submitter."""
         subject = "We received your message — CommonGround"
+        html_body = self._render_template('marketing/contact_confirmation.html', {
+            'name': name,
+        })
+        return await self._send_email(to_email, subject, html_body)
 
-        html_body = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Message Received</title>
-        </head>
-        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8fafc;">
-            <div style="background: linear-gradient(135deg, #1E3A4A 0%, #2D6A8F 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0 0 8px 0; font-family: Georgia, serif; font-size: 24px;">CommonGround</h1>
-                <p style="color: #5BC4A0; margin: 0; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">Co-Parenting, Reimagined</p>
-            </div>
+    # ==================== System Notification Emails ====================
 
-            <div style="background: #ffffff; padding: 30px; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;">
-                <p style="margin-top: 0;">Hi {name},</p>
+    async def send_generic_notification(
+        self,
+        to_email: str,
+        to_name: str,
+        subject: str,
+        message: str,
+        cta_url: Optional[str] = None,
+        cta_text: str = "View Details",
+        title: Optional[str] = None,
+    ) -> bool:
+        """Send a generic notification email with optional CTA."""
+        html_body = self._render_template('notifications/generic_notification.html', {
+            'to_name': to_name,
+            'title': title or subject,
+            'message': message,
+            'cta_url': cta_url,
+            'cta_text': cta_text,
+        })
+        return await self._send_email(to_email, subject, html_body)
 
-                <p>Thank you for reaching out to CommonGround. We've received your message and a member of our team will get back to you within 1-2 business days.</p>
+    async def send_subscription_activated(
+        self,
+        to_email: str,
+        to_name: str,
+        plan_name: str,
+        features: Optional[List[str]] = None,
+    ) -> bool:
+        """Send subscription activation confirmation."""
+        subject = f"Your {plan_name} plan is active!"
+        html_body = self._render_template('notifications/subscription_activated.html', {
+            'to_name': to_name,
+            'plan_name': plan_name,
+            'features': features or [],
+            'dashboard_url': f"{self.frontend_url}/dashboard",
+        })
+        return await self._send_email(to_email, subject, html_body)
 
-                <p>In the meantime, feel free to explore our platform or check out our resources:</p>
+    async def send_subscription_cancelled(
+        self,
+        to_email: str,
+        to_name: str,
+        plan_name: str,
+        end_date: str,
+    ) -> bool:
+        """Send subscription cancellation confirmation."""
+        subject = "Your CommonGround subscription has been cancelled"
+        html_body = self._render_template('notifications/subscription_cancelled.html', {
+            'to_name': to_name,
+            'plan_name': plan_name,
+            'end_date': end_date,
+            'resubscribe_url': f"{self.frontend_url}/settings/subscription",
+        })
+        return await self._send_email(to_email, subject, html_body)
 
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{self.frontend_url}" style="display: inline-block; background: linear-gradient(135deg, #3DAA8A, #5BC4A0); color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                        Visit CommonGround
-                    </a>
-                </div>
+    async def send_payment_failed(
+        self,
+        to_email: str,
+        to_name: str,
+        plan_name: str,
+        retry_url: Optional[str] = None,
+    ) -> bool:
+        """Send payment failure notification."""
+        subject = "Action needed: Payment issue with your CommonGround subscription"
+        html_body = self._render_template('notifications/payment_failed.html', {
+            'to_name': to_name,
+            'plan_name': plan_name,
+            'retry_url': retry_url or f"{self.frontend_url}/settings/billing",
+        })
+        return await self._send_email(to_email, subject, html_body)
 
-                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;">
+    async def send_aria_intervention(
+        self,
+        to_email: str,
+        to_name: str,
+        category: str,
+        suggestion: Optional[str] = None,
+        conversation_url: Optional[str] = None,
+    ) -> bool:
+        """Send ARIA intervention notification when a message is flagged."""
+        subject = "ARIA flagged a message in your conversation"
+        html_body = self._render_template('notifications/aria_intervention.html', {
+            'to_name': to_name,
+            'category': category,
+            'suggestion': suggestion,
+            'conversation_url': conversation_url or f"{self.frontend_url}/messages",
+        })
+        return await self._send_email(to_email, subject, html_body)
 
-                <p style="color: #94a3b8; font-size: 12px; margin-bottom: 0;">
-                    This is an automated confirmation. Please do not reply directly to this email.
-                    If you need immediate assistance, contact us at support@find-commonground.com.
-                </p>
-            </div>
-        </body>
-        </html>
-        """
+    async def send_event_created(
+        self,
+        to_email: str,
+        to_name: str,
+        event_title: str,
+        event_date: str,
+        event_time: Optional[str] = None,
+        creator_name: Optional[str] = None,
+    ) -> bool:
+        """Send notification when a new shared calendar event is created."""
+        subject = f"New event: {event_title}"
+        html_body = self._render_template('notifications/event_created.html', {
+            'to_name': to_name,
+            'event_title': event_title,
+            'event_date': event_date,
+            'event_time': event_time,
+            'creator_name': creator_name,
+            'calendar_url': f"{self.frontend_url}/calendar",
+        })
+        return await self._send_email(to_email, subject, html_body)
 
+    async def send_agreement_expiring(
+        self,
+        to_email: str,
+        to_name: str,
+        agreement_name: str,
+        expiry_date: str,
+        days_remaining: int,
+    ) -> bool:
+        """Send notification when an agreement is approaching its expiry date."""
+        subject = f"Your agreement expires in {days_remaining} days"
+        html_body = self._render_template('notifications/agreement_expiring.html', {
+            'to_name': to_name,
+            'agreement_name': agreement_name,
+            'expiry_date': expiry_date,
+            'days_remaining': days_remaining,
+            'agreement_url': f"{self.frontend_url}/agreements",
+        })
+        return await self._send_email(to_email, subject, html_body)
+
+    async def send_professional_report_delivered(
+        self,
+        to_email: str,
+        to_name: str,
+        report_type: str,
+        family_name: str,
+        download_url: str,
+        generated_date: Optional[str] = None,
+    ) -> bool:
+        """Send notification when a professional report is ready for download."""
+        subject = f"Your {report_type} report is ready"
+        html_body = self._render_template('reports/professional_report.html', {
+            'to_name': to_name,
+            'report_type': report_type,
+            'family_name': family_name,
+            'download_url': download_url,
+            'generated_date': generated_date or datetime.now().strftime('%B %d, %Y'),
+        })
         return await self._send_email(to_email, subject, html_body)
 
     # ==================== Internal Methods ====================

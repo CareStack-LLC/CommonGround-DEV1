@@ -558,16 +558,15 @@ async def send_circle_invite(
     if invite_data.send_email and contact.contact_email:
         try:
             from app.services.email import email_service
-            await email_service.send_email(
+            child_name = contact.child.display_name if hasattr(contact, 'child') and contact.child else "a child"
+            parent_name = f"{current_user.first_name} {current_user.last_name}"
+            await email_service.send_circle_invitation(
                 to_email=contact.contact_email,
-                subject=f"You've been added to a child's trusted circle on CommonGround",
-                template_name="circle_invite",
-                template_data={
-                    "contact_name": contact.contact_name,
-                    "child_name": contact.child.display_name if hasattr(contact, 'child') and contact.child else "a child",
-                    "parent_name": f"{current_user.first_name} {current_user.last_name}",
-                    "verification_url": verification_url,
-                },
+                to_name=contact.contact_name,
+                inviter_name=parent_name,
+                child_name=child_name,
+                invitation_link=verification_url,
+                relationship=contact.relationship or "family member",
             )
             email_sent = True
         except Exception as e:
