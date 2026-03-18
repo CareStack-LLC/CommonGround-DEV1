@@ -44,10 +44,23 @@ def get_user_or_ip(request: Request) -> str:
 
 
 # Initialize the limiter with user-or-IP key function
+# Use in-memory storage if Redis is unavailable to prevent crashes
+_redis_url = os.environ.get("REDIS_URL")
+_storage_uri = "memory://"
+if _redis_url:
+    try:
+        import redis as redis_lib
+        r = redis_lib.from_url(_redis_url, socket_timeout=2)
+        r.ping()
+        _storage_uri = _redis_url
+        logger.info("Rate limiter using Redis storage")
+    except Exception as e:
+        logger.warning(f"Redis unavailable for rate limiter, falling back to memory: {e}")
+
 limiter = Limiter(
     key_func=get_user_or_ip,
     default_limits=["100/minute"],
-    storage_uri=os.environ.get("REDIS_URL", "memory://"),
+    storage_uri=_storage_uri,
 )
 
 
