@@ -15,7 +15,7 @@ export default function GrantPartnershipPage() {
             <section className="relative overflow-hidden pt-24 pb-32 lg:pt-32 lg:pb-40">
                 {/* Background Blobs - matching Pricing page */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#3DAA8A] rounded-full blur-3xl"></div>
                     <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
                 </div>
 
@@ -29,13 +29,13 @@ export default function GrantPartnershipPage() {
                     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
                         <Link
                             href="#apply"
-                            className="px-8 py-4 bg-[var(--portal-primary)] text-white rounded-full font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
+                            className="px-8 py-4 bg-[#3DAA8A] text-white rounded-full font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
                         >
                             Become a Partner
                         </Link>
                         <Link
                             href="#how-it-works"
-                            className="px-8 py-4 bg-white text-[var(--portal-primary)] border-2 border-[var(--portal-primary)] rounded-full font-medium text-lg hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+                            className="px-8 py-4 bg-white text-[#3DAA8A] border-2 border-[#3DAA8A] rounded-full font-medium text-lg hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
                         >
                             Learn More
                         </Link>
@@ -48,19 +48,19 @@ export default function GrantPartnershipPage() {
                 <div className="container mx-auto">
                     <div className="grid grid-cols-1 gap-8 rounded-2xl bg-white p-8 shadow-xl md:grid-cols-2 lg:grid-cols-4 border border-gray-100">
                         <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>$5,249</div>
-                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Value Per Partner (25 codes)</div>
+                            <div className="mb-2 font-serif text-4xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>25</div>
+                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Free Codes Per Partner</div>
                         </div>
                         <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>68%</div>
-                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Conflict Reduction</div>
+                            <div className="mb-2 font-serif text-4xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>180</div>
+                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Days of Full Access</div>
                         </div>
                         <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>24/7</div>
-                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">AI Mediation Support</div>
+                            <div className="mb-2 font-serif text-4xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>24/7</div>
+                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">AI-Assisted Support</div>
                         </div>
                         <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Zero</div>
+                            <div className="mb-2 font-serif text-4xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Zero</div>
                             <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Cost to Your Organization</div>
                         </div>
                     </div>
@@ -111,7 +111,7 @@ export default function GrantPartnershipPage() {
                             },
                         ].map((item, i) => (
                             <div key={i} className="group bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/10 to-[#F5A623]/20 text-[var(--portal-primary)] group-hover:from-[var(--portal-primary)] group-hover:to-[#F5A623] group-hover:text-white transition-all duration-300">
+                                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#F5A623]/20 text-[#3DAA8A] group-hover:from-[#3DAA8A] group-hover:to-[#F5A623] group-hover:text-white transition-all duration-300">
                                     <item.icon className="h-7 w-7" />
                                 </div>
                                 <h3 className="mb-3 font-serif text-2xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h3>
@@ -135,7 +135,7 @@ export default function GrantPartnershipPage() {
                     <div className="grid gap-8 lg:grid-cols-2">
                         {/* Your Organization Provides */}
                         <div className="rounded-2xl bg-[#F4F8F7] p-8 md:p-10 border border-gray-100 shadow-sm">
-                            <h3 className="mb-6 border-b-2 border-[var(--portal-primary)]/20 pb-4 font-serif text-3xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Your Organization Provides</h3>
+                            <h3 className="mb-6 border-b-2 border-[#3DAA8A]/20 pb-4 font-serif text-3xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Your Organization Provides</h3>
                             <ul className="space-y-4">
                                 {[
                                     "Distribute grant codes to eligible families",
@@ -145,7 +145,7 @@ export default function GrantPartnershipPage() {
                                     "Provide feedback for continuous improvement",
                                 ].map((item, i) => (
                                     <li key={i} className="flex items-start gap-3">
-                                        <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--portal-primary)]/10 text-[var(--portal-primary)]">
+                                        <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A]">
                                             <Check className="h-4 w-4" />
                                         </div>
                                         <span className="text-lg text-gray-700">{item}</span>
@@ -156,8 +156,8 @@ export default function GrantPartnershipPage() {
 
                         {/* CommonGround Provides */}
                         <div className="rounded-2xl bg-white p-8 md:p-10 border border-gray-200 shadow-xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--portal-primary)]/5 rounded-bl-full pointer-events-none"></div>
-                            <h3 className="mb-6 border-b-2 border-[var(--portal-primary)]/20 pb-4 font-serif text-3xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>CommonGround Provides</h3>
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#3DAA8A]/5 rounded-bl-full pointer-events-none"></div>
+                            <h3 className="mb-6 border-b-2 border-[#3DAA8A]/20 pb-4 font-serif text-3xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>CommonGround Provides</h3>
                             <ul className="space-y-4">
                                 {[
                                     "Free Complete tier for 180 days ($210 value per family)",
@@ -168,7 +168,7 @@ export default function GrantPartnershipPage() {
                                     "Priority customer support for your clients",
                                 ].map((item, i) => (
                                     <li key={i} className="flex items-start gap-3">
-                                        <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--portal-primary)] text-white">
+                                        <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A] text-white">
                                             <Check className="h-4 w-4" />
                                         </div>
                                         <span className="text-lg text-gray-700">{item}</span>
@@ -209,7 +209,7 @@ export default function GrantPartnershipPage() {
                             {
                                 icon: BrainCircuit,
                                 title: "ARIA AI Mediation",
-                                desc: "Real-time message analysis helps keep 80% of conversations constructive",
+                                desc: "Real-time message coaching helps keep conversations constructive and child-focused",
                             },
                             {
                                 icon: Users,
@@ -248,11 +248,11 @@ export default function GrantPartnershipPage() {
                             },
                         ].map((item, i) => (
                             <div key={i} className="flex gap-4 p-4 rounded-xl hover:bg-white/50 transition-colors">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm text-[var(--portal-primary)] border border-gray-100">
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm text-[#3DAA8A] border border-gray-100">
                                     <item.icon className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <h4 className="mb-2 font-serif text-xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
+                                    <h4 className="mb-2 font-serif text-xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
                                     <p className="text-sm leading-relaxed text-gray-600">{item.desc}</p>
                                 </div>
                             </div>
@@ -262,7 +262,7 @@ export default function GrantPartnershipPage() {
             </section>
 
             {/* Outcomes Section */}
-            <section className="bg-[var(--portal-primary)] text-white py-24 relative overflow-hidden">
+            <section className="bg-[#3DAA8A] text-white py-24 relative overflow-hidden">
                 {/* Background blobs for visual interest */}
                 <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 opacity-50"></div>
@@ -315,10 +315,10 @@ export default function GrantPartnershipPage() {
                             { num: "5", title: "Launch", desc: "Begin distributing codes. Access your dashboard to track real-time engagement." },
                         ].map((item, i) => (
                             <div key={i} className="relative z-10 text-center bg-white md:bg-transparent md:p-0 p-6 rounded-xl border md:border-0 border-gray-100 shadow-sm md:shadow-none">
-                                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[var(--portal-primary)] to-[#2C5F5D] text-3xl font-bold text-white shadow-xl shadow-[var(--portal-primary)]/20 font-serif" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2C5F5D] text-3xl font-bold text-white shadow-xl shadow-[#3DAA8A]/20 font-serif" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                                     {item.num}
                                 </div>
-                                <h4 className="mb-3 font-serif text-xl font-bold text-[var(--portal-primary)]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
+                                <h4 className="mb-3 font-serif text-xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
                                 <p className="text-sm text-gray-500">{item.desc}</p>
                             </div>
                         ))}
@@ -327,7 +327,7 @@ export default function GrantPartnershipPage() {
             </section>
 
             {/* CTA Section */}
-            <section id="apply" className="py-24 text-center bg-gradient-to-br from-[var(--portal-primary)] to-[#234846] text-white relative overflow-hidden">
+            <section id="apply" className="py-24 text-center bg-gradient-to-br from-[#3DAA8A] to-[#234846] text-white relative overflow-hidden">
                 {/* Abstract shapes matching pricing page */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
@@ -342,7 +342,7 @@ export default function GrantPartnershipPage() {
                     <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <Link
                             href="mailto:partnerships@find-commonground.com?subject=Grant Partnership Application"
-                            className="px-8 py-4 bg-white text-[var(--portal-primary)] rounded-full font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
+                            className="px-8 py-4 bg-white text-[#3DAA8A] rounded-full font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
                         >
                             Apply for Partnership
                         </Link>

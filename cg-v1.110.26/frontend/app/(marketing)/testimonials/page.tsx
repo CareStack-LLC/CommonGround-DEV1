@@ -82,56 +82,18 @@ export default function ImpactStoriesPage() {
         </div>
       </section>
 
-      {/* The Grant Program */}
-      <section className="py-16 lg:py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl border border-gray-200 p-8 lg:p-12 shadow-sm">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 rounded-full bg-[#F5A623]/10 flex items-center justify-center flex-shrink-0">
-                <Heart className="w-6 h-6 text-[#F5A623]" />
-              </div>
-              <div>
-                <h2
-                  className="text-2xl sm:text-3xl font-semibold text-[#1E3A4A] mb-2"
-                  style={{ fontFamily: 'var(--font-dm-serif, "DM Serif Display", serif)' }}
-                >
-                  The 4Ever Forward Foundation Partnership
-                </h2>
-                <p className="text-sm text-[#3DAA8A] font-medium">Beta Grant Program</p>
-              </div>
-            </div>
-            <div className="space-y-4 text-gray-600 leading-relaxed">
-              <p>
-                CommonGround partnered with the 4Ever Forward Foundation — Thomas Wilform's
-                nonprofit dedicated to strengthening families — to run a beta grant program
-                for parents navigating high-conflict co-parenting situations.
-              </p>
-              <p>
-                The program provided free access to CommonGround's full platform, including
-                ARIA-assisted messaging, shared calendars, and KidSpace. The goal was simple:
-                could technology genuinely help families who were struggling to communicate?
-              </p>
-              <p className="text-[#1E3A4A] font-medium">
-                The answer was yes.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Case Studies */}
+      {/* Stories from the Program — merged with grant context */}
       <section className="py-16 lg:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-8">
             <h2
-              className="text-3xl sm:text-4xl font-semibold text-[#1E3A4A] mb-4"
-              style={{ fontFamily: 'var(--font-dm-serif, "DM Serif Display", serif)' }}
+              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
-              Stories from the program
+              Stories from the <span className="text-[#3DAA8A]">grant program</span>
             </h2>
-            <p className="text-gray-600 max-w-xl mx-auto">
-              These are real families from the beta. Names have been changed to
-              protect their privacy, but their experiences are genuine.
+            <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Through a partnership with the 4Ever Forward Foundation, CommonGround provided free access to families in high-conflict co-parenting situations. The program included ARIA-assisted messaging, shared calendars, and KidSpace. Names have been changed to protect privacy, but these experiences are genuine.
             </p>
           </div>
 
