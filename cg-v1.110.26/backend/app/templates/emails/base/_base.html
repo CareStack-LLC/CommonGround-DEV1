@@ -21,7 +21,7 @@
 
   {% include 'base/_styles.html' %}
 </head>
-<body style="margin: 0; padding: 0; background-color: #F5F0E8; font-family: Arial, Helvetica, sans-serif;">
+<body style="margin: 0; padding: 0; background-color: #F4F8F7; font-family: 'DM Sans', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
   <!-- Preheader Text (hidden preview text) -->
   <div style="display: none; max-height: 0; overflow: hidden;">
     {% block preheader %}{% endblock %}
@@ -29,18 +29,18 @@
   </div>
 
   <!-- Email Wrapper -->
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #F5F0E8;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #F4F8F7;">
     <tr>
       <td align="center" style="padding: 40px 20px;">
 
         <!-- Email Container -->
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="email-container" style="background-color: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="email-container" style="background-color: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(30, 58, 74, 0.06);">
 
           <!-- Header -->
           <tr>
-            <td class="header-{{ header_color | default('sage') }}" style="padding: 32px; text-align: center; {% block header_style %}background: linear-gradient(135deg, #4A6C58 0%, #6B9B7A 100%);{% endblock %}">
+            <td class="header-{{ header_color | default('sage') }}" style="padding: 28px 32px; text-align: center; {% block header_style %}background: linear-gradient(135deg, #3DAA8A 0%, #5BC4A0 100%);{% endblock %}">
               {% block header %}
-              <img src="{{ icons.logo }}" alt="CommonGround" width="180" height="45" style="display: block; margin: 0 auto;">
+              <img src="{{ icons.logo }}" alt="CommonGround" width="200" height="44" style="display: block; margin: 0 auto;">
               {% endblock %}
             </td>
           </tr>
@@ -54,16 +54,16 @@
 
           <!-- Footer -->
           <tr>
-            <td class="footer" style="background-color: #F5F0E8; padding: 24px 32px; text-align: center;">
+            <td class="footer" style="background-color: #F4F8F7; padding: 24px 32px; text-align: center; border-top: 1px solid #D6ECE8;">
               {% block footer %}
-              <p style="margin: 0 0 8px 0; font-size: 14px; color: #6B7B74;">
-                CommonGround — Peaceful co-parenting starts here
+              <p style="margin: 0 0 8px 0; font-size: 14px; color: #6B8F80; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
+                CommonGround — Co-parenting, reimagined.
               </p>
-              <p style="margin: 0; font-size: 12px; color: #94A3A0;">
+              <p style="margin: 0; font-size: 12px; color: #8CA0A8; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
                 {% if unsubscribe_url %}
-                <a href="{{ unsubscribe_url }}" style="color: #94A3A0; text-decoration: underline;">Manage preferences</a> |
+                <a href="{{ unsubscribe_url }}" style="color: #3DAA8A; text-decoration: underline;">Manage preferences</a> &middot;
                 {% endif %}
-                <a href="{{ support_url | default('https://commonground.family/support') }}" style="color: #94A3A0; text-decoration: underline;">Get help</a>
+                <a href="{{ frontend_url }}/support" style="color: #3DAA8A; text-decoration: underline;">Get help</a>
               </p>
               {% endblock %}
             </td>
@@ -76,12 +76,12 @@
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="margin-top: 16px;">
           <tr>
             <td style="text-align: center; padding: 0 20px;">
-              <p style="margin: 0; font-size: 11px; color: #94A3A0; line-height: 1.5;">
+              <p style="margin: 0; font-size: 11px; color: #8CA0A8; line-height: 1.5; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
                 {% block legal_footer %}
-                This email was sent by CommonGround, Inc. | Atlanta, GA<br>
-                © {{ current_year | default('2026') }} CommonGround. All rights reserved.<br>
-                <a href="{{ frontend_url }}/unsubscribe" style="color: #94A3A0; text-decoration: underline;">Unsubscribe</a> |
-                <a href="{{ frontend_url }}/privacy" style="color: #94A3A0; text-decoration: underline;">Privacy Policy</a>
+                This email was sent by CommonGround, Inc. &middot; Atlanta, GA<br>
+                &copy; {{ current_year | default('2026') }} CommonGround. All rights reserved.<br>
+                <a href="{{ frontend_url }}/unsubscribe" style="color: #8CA0A8; text-decoration: underline;">Unsubscribe</a> &middot;
+                <a href="{{ frontend_url }}/privacy" style="color: #8CA0A8; text-decoration: underline;">Privacy Policy</a>
                 {% endblock %}
               </p>
             </td>

@@ -2,20 +2,20 @@
 
 {% block title %}Welcome to CommonGround{% endblock %}
 
-{% block preheader %}Welcome to CommonGround, {{ user_name }}! Your account is ready — here's how to get started.{% endblock %}
+{% block preheader %}Welcome to CommonGround, {{ user_name }}! Your co-parenting dashboard is ready.{% endblock %}
 
 {% block content %}
 <!-- Welcome Icon -->
 <div style="text-align: center; margin-bottom: 24px;">
-  <img src="{{ icons.welcome }}" alt="" width="100" height="100" style="display: inline-block;">
+  <img src="{{ icons.welcome }}" alt="" width="72" height="72" style="display: inline-block;">
 </div>
 
 <!-- Welcome Message -->
-<h1 style="text-align: center; color: #2D3A35; margin-bottom: 8px;">
+<h1 style="text-align: center; color: #1E3A4A; margin-bottom: 8px; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
   Welcome{% if user_name %}, {{ user_name }}{% endif %}!
 </h1>
 
-<p style="text-align: center; color: #6B7B74; font-size: 18px; margin-bottom: 32px;">
+<p style="text-align: center; color: #4A6B7A; font-size: 17px; margin-bottom: 32px; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif; line-height: 1.5;">
   Your CommonGround account is ready. Here's what's waiting for you.
 </p>
 
@@ -23,18 +23,18 @@
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
   <!-- Feature 1: Good Faith Agreement -->
   <tr>
-    <td style="padding: 16px 0; border-bottom: 1px solid #E8E3DB;">
+    <td style="padding: 16px 0; border-bottom: 1px solid #D6ECE8;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
           <td width="48" valign="top">
             <img src="{{ icons.document }}" alt="" width="40" height="40">
           </td>
           <td style="padding-left: 16px;">
-            <h3 style="margin: 0 0 4px 0; color: #2D3A35; font-size: 16px; font-weight: 600;">
+            <h3 style="margin: 0 0 4px 0; color: #1E3A4A; font-size: 15px; font-weight: 600; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
               Good Faith Agreement
             </h3>
-            <p style="margin: 0; color: #6B7B74; font-size: 14px;">
-              A default agreement is already in place so you can start messaging right away. You can review or customize it anytime.
+            <p style="margin: 0; color: #4A6B7A; font-size: 14px; line-height: 1.5; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
+              A default agreement is in place so you can start messaging right away. Customize it anytime.
             </p>
           </td>
         </tr>
@@ -44,18 +44,18 @@
 
   <!-- Feature 2: ARIA -->
   <tr>
-    <td style="padding: 16px 0; border-bottom: 1px solid #E8E3DB;">
+    <td style="padding: 16px 0; border-bottom: 1px solid #D6ECE8;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
           <td width="48" valign="top">
-            <img src="{{ icons.message }}" alt="" width="40" height="40">
+            <img src="{{ icons.aria }}" alt="" width="40" height="40">
           </td>
           <td style="padding-left: 16px;">
-            <h3 style="margin: 0 0 4px 0; color: #2D3A35; font-size: 16px; font-weight: 600;">
-              ARIA, Your Co-Parenting Assistant
+            <h3 style="margin: 0 0 4px 0; color: #1E3A4A; font-size: 15px; font-weight: 600; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
+              Meet ARIA
             </h3>
-            <p style="margin: 0; color: #6B7B74; font-size: 14px;">
-              ARIA helps keep conversations constructive and child-focused, so every exchange stays productive.
+            <p style="margin: 0; color: #4A6B7A; font-size: 14px; line-height: 1.5; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
+              Your co-parenting assistant keeps conversations constructive and child-focused.
             </p>
           </td>
         </tr>
@@ -65,18 +65,18 @@
 
   <!-- Feature 3: Shared Calendar -->
   <tr>
-    <td style="padding: 16px 0; border-bottom: 1px solid #E8E3DB;">
+    <td style="padding: 16px 0; border-bottom: 1px solid #D6ECE8;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
           <td width="48" valign="top">
             <img src="{{ icons.calendar }}" alt="" width="40" height="40">
           </td>
           <td style="padding-left: 16px;">
-            <h3 style="margin: 0 0 4px 0; color: #2D3A35; font-size: 16px; font-weight: 600;">
+            <h3 style="margin: 0 0 4px 0; color: #1E3A4A; font-size: 15px; font-weight: 600; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
               Shared Calendar
             </h3>
-            <p style="margin: 0; color: #6B7B74; font-size: 14px;">
-              Coordinate schedules, track exchanges, and keep everyone on the same page with a shared family calendar.
+            <p style="margin: 0; color: #4A6B7A; font-size: 14px; line-height: 1.5; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
+              Coordinate schedules, track exchanges, and stay on the same page.
             </p>
           </td>
         </tr>
@@ -93,11 +93,11 @@
             <img src="{{ icons.money }}" alt="" width="40" height="40">
           </td>
           <td style="padding-left: 16px;">
-            <h3 style="margin: 0 0 4px 0; color: #2D3A35; font-size: 16px; font-weight: 600;">
+            <h3 style="margin: 0 0 4px 0; color: #1E3A4A; font-size: 15px; font-weight: 600; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
               ClearFund
             </h3>
-            <p style="margin: 0; color: #6B7B74; font-size: 14px;">
-              Track shared expenses, request reimbursements, and keep finances transparent and documented.
+            <p style="margin: 0; color: #4A6B7A; font-size: 14px; line-height: 1.5; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
+              Track shared expenses, request reimbursements, and keep finances transparent.
             </p>
           </td>
         </tr>
@@ -108,16 +108,16 @@
 
 <!-- CTA Button -->
 <div style="text-align: center; margin-top: 32px;">
-  <a href="{{ app_url | default('https://commonground.family/dashboard') }}"
+  <a href="{{ dashboard_url | default(frontend_url + '/dashboard') }}"
      class="btn btn-primary"
-     style="display: inline-block; padding: 16px 40px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
-    Go to Dashboard
+     style="display: inline-block; padding: 16px 44px; background-color: #3DAA8A; color: #FFFFFF; text-decoration: none; border-radius: 10px; font-size: 15px; font-weight: 600; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif; letter-spacing: 0.2px;">
+    Go to Dashboard &rarr;
   </a>
 </div>
 
 <!-- Help Note -->
-<p style="text-align: center; color: #94A3A0; font-size: 14px; margin-top: 24px;">
-  Questions? Our support team is here to help.<br>
-  <a href="{{ support_url | default('https://commonground.family/support') }}" style="color: #4A6C58;">Visit our Help Center</a>
+<p style="text-align: center; color: #8CA0A8; font-size: 13px; margin-top: 24px; font-family: 'DM Sans', 'Segoe UI', Arial, sans-serif;">
+  Questions? We're here to help.<br>
+  <a href="{{ frontend_url }}/support" style="color: #3DAA8A; text-decoration: none; font-weight: 500;">Visit our Help Center</a>
 </p>
 {% endblock %}
