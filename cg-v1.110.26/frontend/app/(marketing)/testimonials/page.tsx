@@ -60,46 +60,39 @@ const impactStatements = [
 
 export default function ImpactStoriesPage() {
   return (
-    <div className="bg-background">
+    <div className="min-h-screen bg-[#F4F8F7]">
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-28 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-[10%] w-72 h-72 rounded-full bg-[#3DAA8A]/8 blur-3xl" />
-          <div className="absolute bottom-10 left-[5%] w-56 h-56 rounded-full bg-[#F5A623]/6 blur-3xl" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <p className="text-[#3DAA8A] font-medium mb-4 tracking-wide uppercase text-sm">
-              Impact Stories
-            </p>
-            <h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6"
-              style={{ fontFamily: 'var(--font-dm-serif, "DM Serif Display", serif)' }}
-            >
-              Real families.{' '}
-              <span className="text-[#3DAA8A]">Real impact.</span>
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Through the 4Ever Forward Foundation grant program, CommonGround helped
-              families in high-conflict situations find something they thought they had lost —
-              peace of mind.
-            </p>
-          </div>
+      <section className="pt-12 pb-16 lg:pt-20 lg:pb-24">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <p className="text-[#3DAA8A] font-medium mb-4 tracking-wide uppercase text-sm">
+            Impact Stories
+          </p>
+          <h1
+            className="text-4xl sm:text-5xl lg:text-6xl text-[#1E3A4A] mb-6 leading-tight"
+            style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+          >
+            Real families.{' '}
+            <span className="text-[#3DAA8A]">Real impact.</span>
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Through the 4Ever Forward Foundation grant program, CommonGround helped
+            families in high-conflict situations find something they thought they had lost —
+            peace of mind.
+          </p>
         </div>
       </section>
 
       {/* The Grant Program */}
       <section className="py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-card rounded-2xl border border-border/50 p-8 lg:p-12">
+          <div className="bg-white rounded-2xl border border-gray-200 p-8 lg:p-12 shadow-sm">
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 rounded-full bg-[#F5A623]/10 flex items-center justify-center flex-shrink-0">
                 <Heart className="w-6 h-6 text-[#F5A623]" />
               </div>
               <div>
                 <h2
-                  className="text-2xl sm:text-3xl font-semibold text-foreground mb-2"
+                  className="text-2xl sm:text-3xl font-semibold text-[#1E3A4A] mb-2"
                   style={{ fontFamily: 'var(--font-dm-serif, "DM Serif Display", serif)' }}
                 >
                   The 4Ever Forward Foundation Partnership
@@ -107,7 +100,7 @@ export default function ImpactStoriesPage() {
                 <p className="text-sm text-[#3DAA8A] font-medium">Beta Grant Program</p>
               </div>
             </div>
-            <div className="space-y-4 text-muted-foreground leading-relaxed">
+            <div className="space-y-4 text-gray-600 leading-relaxed">
               <p>
                 CommonGround partnered with the 4Ever Forward Foundation — Thomas Wilform's
                 nonprofit dedicated to strengthening families — to run a beta grant program
@@ -118,7 +111,7 @@ export default function ImpactStoriesPage() {
                 ARIA-assisted messaging, shared calendars, and KidSpace. The goal was simple:
                 could technology genuinely help families who were struggling to communicate?
               </p>
-              <p className="text-foreground font-medium">
+              <p className="text-[#1E3A4A] font-medium">
                 The answer was yes.
               </p>
             </div>
@@ -127,16 +120,16 @@ export default function ImpactStoriesPage() {
       </section>
 
       {/* Case Studies */}
-      <section className="py-16 lg:py-20 bg-card">
+      <section className="py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2
-              className="text-3xl sm:text-4xl font-semibold text-foreground mb-4"
+              className="text-3xl sm:text-4xl font-semibold text-[#1E3A4A] mb-4"
               style={{ fontFamily: 'var(--font-dm-serif, "DM Serif Display", serif)' }}
             >
               Stories from the program
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
+            <p className="text-gray-600 max-w-xl mx-auto">
               These are real families from the beta. Names have been changed to
               protect their privacy, but their experiences are genuine.
             </p>
@@ -148,26 +141,26 @@ export default function ImpactStoriesPage() {
               return (
                 <div
                   key={study.name}
-                  className="bg-background rounded-2xl border border-border/50 p-8 lg:p-10"
+                  className="bg-[#F4F8F7] rounded-2xl border border-gray-200 p-8 lg:p-10"
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center">
                       <IconComponent className="w-5 h-5 text-[#3DAA8A]" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold text-foreground">
+                      <h3 className="text-xl font-semibold text-[#1E3A4A]">
                         {study.name}
                       </h3>
-                      <p className="text-sm text-muted-foreground">{study.tagline}</p>
+                      <p className="text-sm text-gray-600">{study.tagline}</p>
                     </div>
                   </div>
 
-                  <p className="text-muted-foreground leading-relaxed mt-4 mb-5">
+                  <p className="text-gray-600 leading-relaxed mt-4 mb-5">
                     {study.story}
                   </p>
 
                   <div className="bg-[#3DAA8A]/5 rounded-lg px-5 py-3 border-l-4 border-[#3DAA8A]">
-                    <p className="text-foreground font-medium text-sm italic">
+                    <p className="text-[#1E3A4A] font-medium text-sm italic">
                       {study.highlight}
                     </p>
                   </div>
@@ -183,12 +176,12 @@ export default function ImpactStoriesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2
-              className="text-3xl sm:text-4xl font-semibold text-foreground mb-4"
+              className="text-3xl sm:text-4xl font-semibold text-[#1E3A4A] mb-4"
               style={{ fontFamily: 'var(--font-dm-serif, "DM Serif Display", serif)' }}
             >
               What parents reported
             </h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
+            <p className="text-gray-600 max-w-xl mx-auto">
               From the beta program — in their own words, not our numbers.
             </p>
           </div>
@@ -199,15 +192,15 @@ export default function ImpactStoriesPage() {
               return (
                 <div
                   key={item.statement}
-                  className="bg-card rounded-xl border border-border/50 p-6"
+                  className="bg-white rounded-xl border border-gray-200 p-6"
                 >
                   <div className="w-10 h-10 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center mb-4">
                     <IconComponent className="w-5 h-5 text-[#3DAA8A]" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h3 className="font-semibold text-[#1E3A4A] mb-1">
                     {item.statement}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-600">
                     {item.detail}
                   </p>
                 </div>
@@ -218,7 +211,7 @@ export default function ImpactStoriesPage() {
       </section>
 
       {/* Grant Partnership CTA */}
-      <section className="py-16 lg:py-20 bg-card">
+      <section className="py-16 lg:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto bg-gradient-to-br from-[#1E3A4A] to-[#2a5060] rounded-2xl p-8 lg:p-12 text-center">
             <h2
@@ -244,15 +237,15 @@ export default function ImpactStoriesPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 border-t border-border">
+      <section className="py-20 border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2
-            className="text-3xl sm:text-4xl font-semibold text-foreground mb-6"
+            className="text-3xl sm:text-4xl font-semibold text-[#1E3A4A] mb-6"
             style={{ fontFamily: 'var(--font-dm-serif, "DM Serif Display", serif)' }}
           >
             Start your own calmer chapter
           </h2>
-          <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
+          <p className="text-lg text-gray-600 mb-10 max-w-xl mx-auto">
             Every family's story is different. CommonGround is here to help you
             write a better next page.
           </p>
