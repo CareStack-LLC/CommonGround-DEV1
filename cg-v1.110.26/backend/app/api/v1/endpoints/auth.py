@@ -215,28 +215,65 @@ async def test_email(
     email_service = EmailService()
     logger.info(f"Test email '{template}' requested to {email}")
 
+    url = email_service.frontend_url
     result = None
+
     if template == "welcome":
         result = await email_service.send_welcome_email(to_email=email, user_name=name)
+    elif template == "getting_started":
+        result = await email_service.send_getting_started_email(to_email=email, user_name=name, completed_steps=["Create account", "Set up profile"], total_steps=5)
     elif template == "password_reset":
-        result = await email_service.send_password_reset(
-            to_email=email, to_name=name,
-            reset_link=f"{email_service.frontend_url}/reset-password?token=test-token-123"
-        )
+        result = await email_service.send_password_reset(to_email=email, to_name=name, reset_link=f"{url}/reset-password?token=test-123")
     elif template == "security_alert":
-        result = await email_service.send_security_alert(
-            to_email=email, to_name=name,
-            alert_type="New Login Detected",
-            alert_message="A new sign-in to your account was detected from a device we haven't seen before.",
-            secure_account_url=f"{email_service.frontend_url}/settings/security",
-            event_timestamp="March 18, 2026 at 8:45 AM PST",
-            device_info="Chrome on macOS",
-            location="Los Angeles, CA",
-            ip_address="192.168.1.x",
-            is_critical=False
-        )
+        result = await email_service.send_security_alert(to_email=email, to_name=name, alert_type="New Login Detected", alert_message="A new sign-in was detected from a device we haven't seen before.", secure_account_url=f"{url}/settings/security", event_timestamp="March 18, 2026 at 8:45 AM PST", device_info="Chrome on macOS", location="Los Angeles, CA", ip_address="192.168.1.x")
+    elif template == "parent_invite":
+        result = await email_service.send_case_invitation(to_email=email, to_name=name, inviter_name="Sarah Johnson", case_name="Johnson Family", invitation_link=f"{url}/invite/test-123", children_names=["Emma", "Liam"])
+    elif template == "professional_invite":
+        result = await email_service.send_professional_invitation(to_email=email, to_name=name, inviter_name="Sarah Johnson", case_name="Johnson Family", invitation_link=f"{url}/invite/test-123", role="Mediator", access_description="View custody schedules and communication logs")
+    elif template == "circle_invite":
+        result = await email_service.send_circle_invitation(to_email=email, to_name=name, inviter_name="Sarah Johnson", child_name="Emma", invitation_link=f"{url}/invite/test-123", relationship="Grandmother")
+    elif template == "attorney_invite":
+        result = await email_service.send_attorney_case_invitation(to_email=email, to_name=name, inviter_name="Sarah Johnson", family_file_title="Johnson Family", magic_link=f"{url}/attorney/test-123", children_names=["Emma", "Liam"], attorney_name="Robert Chen", firm_name="Chen Family Law")
+    elif template == "message_notification":
+        result = await email_service.send_message_notification(to_email=email, to_name=name, sender_name="Sarah Johnson", case_name="Johnson Family", message_preview="Hi, I wanted to discuss the schedule for next week...", message_link=f"{url}/messages")
+    elif template == "agreement_approval":
+        result = await email_service.send_agreement_approval_needed(to_email=email, to_name=name, case_name="Johnson Family", agreement_title="Holiday Schedule 2026", approval_link=f"{url}/agreements/test-123", other_parent_name="Sarah Johnson")
+    elif template == "agreement_finalized":
+        result = await email_service.send_agreement_finalized(to_email=email, to_name=name, case_name="Johnson Family", agreement_title="Custody Agreement", agreement_url=f"{url}/agreements/test-123", parent_a_name="TJ", parent_b_name="Sarah Johnson")
+    elif template == "exchange_reminder":
+        from datetime import datetime, timedelta
+        result = await email_service.send_exchange_reminder(to_email=email, to_name=name, event_title="Weekend Exchange", event_time=datetime.now() + timedelta(hours=24), location="123 Main St, Los Angeles, CA", children_names=["Emma", "Liam"])
+    elif template == "kidcoms_call":
+        result = await email_service.send_kidcoms_call_notification(to_email=email, to_name=name, caller_name="Grandma Rose", child_name="Emma", call_link=f"{url}/kidspace/call/test-123", caller_relationship="Grandmother")
+    elif template == "expense_request":
+        result = await email_service.send_expense_request(to_email=email, to_name=name, requester_name="Sarah Johnson", expense_title="School Supplies", expense_category="Education", total_amount=85.50, your_share=42.75, approval_link=f"{url}/clearfund/test-123")
+    elif template == "expense_approved":
+        result = await email_service.send_expense_approved(to_email=email, to_name=name, expense_title="School Supplies", expense_category="Education", total_amount=85.50, approver_name="TJ", approved_date="March 18, 2026", view_link=f"{url}/clearfund")
+    elif template == "payment_reminder":
+        result = await email_service.send_payment_reminder(to_email=email, to_name=name, amount_due=42.75, due_date="March 25, 2026", payment_url=f"{url}/clearfund/pay")
+    elif template == "subscription_activated":
+        result = await email_service.send_subscription_activated(to_email=email, to_name=name, plan_name="CommonGround Pro", features=["Unlimited messaging", "Court-ready reports", "Priority ARIA analysis", "Professional access"])
+    elif template == "subscription_cancelled":
+        result = await email_service.send_subscription_cancelled(to_email=email, to_name=name, plan_name="CommonGround Pro", end_date="April 18, 2026")
+    elif template == "payment_failed":
+        result = await email_service.send_payment_failed(to_email=email, to_name=name, plan_name="CommonGround Pro", retry_url=f"{url}/settings/billing")
+    elif template == "aria_intervention":
+        result = await email_service.send_aria_intervention(to_email=email, to_name=name, category="Hostile Language", suggestion="Consider rephrasing to focus on the children's needs.", conversation_url=f"{url}/messages")
+    elif template == "event_created":
+        result = await email_service.send_event_created(to_email=email, to_name=name, event_title="Parent-Teacher Conference", event_date="March 25, 2026", event_time="3:00 PM", creator_name="Sarah Johnson")
+    elif template == "agreement_expiring":
+        result = await email_service.send_agreement_expiring(to_email=email, to_name=name, agreement_name="Summer Schedule Agreement", expiry_date="April 1, 2026", days_remaining=14)
+    elif template == "report_ready":
+        result = await email_service.send_report_ready(to_email=email, to_name=name, report_type="Monthly Compliance Report", date_range="February 2026", family_file_name="Johnson Family", download_url=f"{url}/reports/test-123")
+    elif template == "compliance_monthly":
+        result = await email_service.send_compliance_report(to_email=email, to_name=name, case_name="Johnson Family", on_time_rate=94.5, total_exchanges=18, report_link=f"{url}/reports/test-123", month_name="February")
+    elif template == "newsletter_welcome":
+        result = await email_service.send_newsletter_welcome(to_email=email)
+    elif template == "contact_confirmation":
+        result = await email_service.send_contact_form_confirmation(to_email=email, name=name)
     else:
-        return {"error": f"Unknown template: {template}", "available": ["welcome", "password_reset", "security_alert"]}
+        templates = ["welcome", "getting_started", "password_reset", "security_alert", "parent_invite", "professional_invite", "circle_invite", "attorney_invite", "message_notification", "agreement_approval", "agreement_finalized", "exchange_reminder", "kidcoms_call", "expense_request", "expense_approved", "payment_reminder", "subscription_activated", "subscription_cancelled", "payment_failed", "aria_intervention", "event_created", "agreement_expiring", "report_ready", "compliance_monthly", "newsletter_welcome", "contact_confirmation"]
+        return {"error": f"Unknown template: {template}", "available": templates}
 
     return {
         "sent": result is not None,
