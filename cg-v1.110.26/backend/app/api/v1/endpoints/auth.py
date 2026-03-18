@@ -201,6 +201,29 @@ async def get_current_user_info(
     )
 
 
+@router.post("/test-email", status_code=status.HTTP_200_OK)
+async def test_email(
+    email: str = Body(..., embed=True),
+    name: str = Body("Friend", embed=True),
+):
+    """
+    Send a test welcome email. Debug endpoint — remove before final production.
+    """
+    from app.services.email import EmailService
+    email_service = EmailService()
+    logger.info(f"Test email requested to {email}, enabled={email_service.enabled}, api_key={'SET' if email_service.api_key else 'NOT SET'}")
+    result = await email_service.send_welcome_email(
+        to_email=email,
+        user_name=name,
+    )
+    return {
+        "sent": result is not None,
+        "message_id": result,
+        "email_enabled": email_service.enabled,
+        "api_key_set": bool(email_service.api_key),
+    }
+
+
 @router.post("/password-reset/request", status_code=status.HTTP_200_OK)
 async def request_password_reset(
     http_request: Request,
