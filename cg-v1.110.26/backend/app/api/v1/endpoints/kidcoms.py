@@ -8,7 +8,7 @@ play games, and use collaborative whiteboards with their approved circle.
 import logging
 from typing import List, Optional
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, status, Query
 from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 import secrets
