@@ -1,57 +1,29 @@
 {% extends 'base/_base.html' %}
+{% import 'base/_components.html' as c %}
 
 {% block title %}New Contact Form Submission{% endblock %}
 
-{% block preheader %}New {{ inquiry_type }} inquiry from {{ name }}: {{ subject }}{% endblock %}
-
-{% block header_style %}background: linear-gradient(135deg, #475569 0%, #64748B 100%);{% endblock %}
+{% block preheader %}New contact form submission from {{ from_name }} — {{ subject }}{% endblock %}
 
 {% block content %}
-<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
-  New Contact Form Submission
-</h1>
+{{ c.heading('New Contact Form Submission', '24px') }}
+{{ c.subheading('A new inquiry has been received through the website contact form.') }}
 
-<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
-  A new inquiry has been received through the website contact form.
-</p>
+{% call c.info_card() %}
+{{ c.detail_row('Name', from_name) }}
+{{ c.detail_row('Email', from_email) }}
+{{ c.detail_row('Subject', subject) }}
+{{ c.detail_row('Submitted', submitted_at) }}
+{% endcall %}
 
-<!-- Contact Details Table -->
-<div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr>
-      <td style="padding: 10px 0; border-bottom: 1px solid #E8E3DB;">
-        <span style="color: #6B7B74; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Name</span><br>
-        <strong style="color: #2D3A35;">{{ name }}</strong>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 10px 0; border-bottom: 1px solid #E8E3DB;">
-        <span style="color: #6B7B74; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Email</span><br>
-        <strong style="color: #2D3A35;">
-          <a href="mailto:{{ email }}" style="color: #4A6C58; text-decoration: none;">{{ email }}</a>
-        </strong>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 10px 0; border-bottom: 1px solid #E8E3DB;">
-        <span style="color: #6B7B74; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Inquiry Type</span><br>
-        <strong style="color: #2D3A35;">{{ inquiry_type }}</strong>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 10px 0; border-bottom: 1px solid #E8E3DB;">
-        <span style="color: #6B7B74; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Subject</span><br>
-        <strong style="color: #2D3A35;">{{ subject }}</strong>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 10px 0;">
-        <span style="color: #6B7B74; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">Message</span><br>
-        <p style="color: #2D3A35; font-size: 15px; line-height: 1.6; margin: 8px 0 0 0;">
-          {{ message }}
-        </p>
-      </td>
-    </tr>
-  </table>
-</div>
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin: 0 0 24px; font-family: Arial, Helvetica, sans-serif;">
+  <tr>
+    <td style="padding: 20px 24px; background-color: #F4F8F7; border: 1px solid #D6ECE8; border-radius: 10px;">
+      <p style="margin: 0 0 8px; font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #6B8A9A; text-transform: uppercase; letter-spacing: 1px;">Message</p>
+      <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #1E3A4A; line-height: 1.6;">{{ message }}</p>
+    </td>
+  </tr>
+</table>
+
+{{ c.button('mailto:' ~ from_email, 'Reply to ' ~ from_name, '#2D6A8F') }}
 {% endblock %}

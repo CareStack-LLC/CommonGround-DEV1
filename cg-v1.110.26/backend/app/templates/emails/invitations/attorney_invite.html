@@ -1,62 +1,68 @@
 {% extends 'base/_base.html' %}
+{% import 'base/_components.html' as c %}
 
 {% block title %}You're Invited to CommonGround{% endblock %}
 
-{% block preheader %}{{ inviter_name }} has invited you to use CommonGround for your family.{% endblock %}
+{% block preheader %}{{ inviter_name }} has invited you to use CommonGround — secure co-parenting coordination for your family.{% endblock %}
 
-{% block header_style %}style="background: linear-gradient(135deg, #1E3A4A 0%, #2D6A8F 100%);"{% endblock %}
+{% block header %}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+  <tr>
+    <td align="center" style="padding: 28px 32px; background-color: #1E3A4A;">
+      <img src="{{ icons.logo }}" alt="CommonGround" width="180" height="40" style="display: block; margin: 0 auto; max-width: 180px; height: auto;">
+    </td>
+  </tr>
+</table>
+{% endblock %}
 
 {% block content %}
-<p style="margin-top: 0; font-size: 16px; color: #2D3A35;">Hi {{ to_name }},</p>
+<p style="margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; color: #1E3A4A; line-height: 1.5;">Hi {{ to_name }},</p>
 
 {% if resend_note %}
-<div style="background: #FEF7ED; border-radius: 8px; padding: 12px; margin: 16px 0; border-left: 4px solid #D4A574;">
-  <p style="margin: 0; color: #92400E; font-size: 13px;">
-    This is a friendly reminder. Your invitation is still waiting.
-  </p>
-</div>
+{{ c.notice("This is a friendly reminder — your invitation is still waiting.", '#F5A623', '#FEF7ED') }}
 {% endif %}
 
-<p style="color: #6B7B74;">
-  <strong>{{ inviter_name }}</strong> has invited you to use CommonGround — a secure platform
-  designed to make co-parenting communication easier, more organized, and focused on what
-  matters most: your children.
+<p style="margin: 0 0 24px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #6B8A9A; line-height: 1.6;">
+  <strong style="font-family: Arial, Helvetica, sans-serif; color: #1E3A4A;">{{ inviter_name }}</strong> has invited you to use CommonGround — a secure, court-ready platform designed to make co-parenting communication easier, more organized, and focused on what matters most: your children.
 </p>
 
 {% if children_names %}
-<div style="background: #E8F0EC; border-radius: 8px; padding: 16px; margin: 20px 0;">
-  <p style="margin: 0; color: #4A6C58; font-size: 14px;">
-    <strong>Children:</strong> {{ children_names | join(', ') }}
-  </p>
-</div>
+{% call c.info_card() %}
+<p style="margin: 0 0 4px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #3DAA8A; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3;">Children</p>
+<p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 600; color: #1E3A4A; line-height: 1.4;">{{ children_names | join(', ') }}</p>
+{% endcall %}
 {% endif %}
 
-<p style="color: #6B7B74;">CommonGround helps you:</p>
-<ul style="color: #6B7B74; padding-left: 20px; line-height: 1.8;">
-  <li>Communicate with AI-assisted message guidance</li>
-  <li>Track schedules and custody exchanges</li>
-  <li>Manage shared expenses transparently</li>
-  <li>Build agreements that work for everyone</li>
-</ul>
-
-<!-- CTA Button -->
-<div style="text-align: center; margin: 32px 0;">
-  <a href="{{ magic_link }}"
-     style="display: inline-block; background-color: #4A6C58; color: #FFFFFF; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
-    Get Started — It's Free
-  </a>
-</div>
-
-<p style="color: #94A3A0; font-size: 13px; text-align: center;">One tap to activate. No password needed.</p>
-
+{% if attorney_name or attorney_firm %}
+{{ c.detail_row("Referred By", attorney_name | default('Your Attorney')) }}
 {% if attorney_firm %}
-<p style="color: #94A3A0; font-size: 14px; margin-top: 16px;">{{ attorney_firm }}</p>
+{{ c.detail_row("Firm", attorney_firm) }}
+{% endif %}
 {% endif %}
 
-<hr style="border: none; border-top: 1px solid #E8E3DB; margin: 24px 0;">
+{{ c.divider() }}
 
-<p style="color: #94A3A0; font-size: 12px; margin-bottom: 0;">
-  This invitation expires in 7 days. If you have questions, reply to this email
-  or contact support at support@find-commonground.com.
+<p style="margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 600; color: #1E3A4A; line-height: 1.3; text-align: center;">CommonGround helps you</p>
+
+{{ c.feature(icons.message, "AI-Assisted Messaging", "Communicate with guidance that keeps conversations productive and documented.") }}
+{{ c.feature(icons.calendar, "Schedule Coordination", "Track custody schedules and exchanges with full verification.") }}
+{{ c.feature(icons.document, "Agreements and Expenses", "Build parenting agreements and manage shared expenses transparently.") }}
+{{ c.feature(icons.security, "Court-Ready Records", "Every interaction is securely logged with SHA-256 integrity verification.") }}
+
+{{ c.button(magic_link, "Get Started — It's Free") }}
+
+<p style="margin: 0 0 24px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #8CA0A8; text-align: center; line-height: 1.5;">
+  One tap to activate. No password needed — your link is unique and secure.
 </p>
+
+{% call c.info_card(bg='#F4F8F7', border='#D6ECE8') %}
+<p style="margin: 0 0 4px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 600; color: #1E3A4A; line-height: 1.3;">Security Note</p>
+<p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #6B8A9A; line-height: 1.6;">
+  This magic link is unique to you and expires after use. Do not forward this email. All platform data is encrypted and court-admissible.
+</p>
+{% endcall %}
+
+{{ c.notice("This invitation expires in 7 days. If you have questions, reply to this email or contact support.") }}
+
+{{ c.help_note(frontend_url) }}
 {% endblock %}

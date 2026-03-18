@@ -1,52 +1,24 @@
 {% extends 'base/_base.html' %}
+{% import 'base/_components.html' as c %}
 
-{% block title %}Payment Update Needed{% endblock %}
+{% block title %}Payment Failed{% endblock %}
 
-{% block preheader %}We had trouble processing your payment for {{ plan_name }}. Please update your payment method.{% endblock %}
-
-{% block header_style %}background: linear-gradient(135deg, #D4A574 0%, #C4956A 100%);{% endblock %}
+{% block preheader %}We couldn't process your payment of {{ amount }}. Please update your payment method.{% endblock %}
 
 {% block content %}
-<!-- Warning Icon -->
-<div style="text-align: center; margin-bottom: 16px;">
-  <div style="display: inline-block; width: 80px; height: 80px; background-color: #FEF7ED; border-radius: 50%; line-height: 80px;">
-    <img src="{{ icons.warning }}" alt="" width="40" height="40" style="display: inline-block; vertical-align: middle;">
-  </div>
-</div>
+{{ c.heading('Payment Failed') }}
+{{ c.subheading('Hi ' ~ to_name ~ ', we had trouble processing your latest payment.') }}
 
-<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
-  Payment Update Needed
-</h1>
+{{ c.notice('Action required: update your payment method to avoid service interruption.', color='#F5A623', bg='#FEF7ED') }}
 
-<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
-  Hi {{ to_name }}, we had trouble processing your latest payment.
-</p>
+{% call c.info_card(bg='#FEF7ED', border='#F5A623') %}
+{{ c.detail_row('Amount', amount) }}
+{% if next_attempt_date %}
+{{ c.detail_row('Next Retry', next_attempt_date) }}
+{% endif %}
+{% endcall %}
 
-<!-- Warning Card -->
-<div style="background-color: #FEF7ED; border: 1px solid #D4A574; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-    <tr>
-      <td style="padding: 8px 0;">
-        <span style="color: #6B7B74; font-size: 14px;">Plan</span><br>
-        <strong style="color: #2D3A35;">{{ plan_name }}</strong>
-      </td>
-    </tr>
-  </table>
-  <p style="color: #2D3A35; font-size: 14px; line-height: 1.6; margin: 12px 0 0 0;">
-    Please update your payment method to avoid any interruption to your service. We'll automatically retry the charge once updated.
-  </p>
-</div>
+{{ c.button(retry_url, 'Update Payment Method', color='#F5A623') }}
 
-<!-- CTA Button -->
-<div style="text-align: center; margin: 32px 0;">
-  <a href="{{ retry_url }}"
-     style="display: inline-block; padding: 16px 48px; background-color: #D4A574; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
-    Update Payment Method
-  </a>
-</div>
-
-<p style="color: #94A3A0; font-size: 13px; text-align: center; margin: 0;">
-  If you believe this is an error, please contact your bank or
-  <a href="{{ support_url | default('https://commonground.family/support') }}" style="color: #4A6C58;">reach out to our support team</a>.
-</p>
+{{ c.help_note(frontend_url) }}
 {% endblock %}

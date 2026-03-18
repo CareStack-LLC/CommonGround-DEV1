@@ -1,135 +1,59 @@
 {% extends 'base/_base.html' %}
+{% import 'base/_components.html' as c %}
 
 {% block title %}Complete Your CommonGround Setup{% endblock %}
 
-{% block preheader %}You're almost there! Complete these steps to get the most out of CommonGround.{% endblock %}
+{% block preheader %}You've completed {{ completed_steps | default(1) }} of {{ total_steps | default(4) }} steps — keep going to unlock everything CommonGround offers your family.{% endblock %}
 
 {% block content %}
-<h1 style="color: #2D3A35; margin-bottom: 8px;">
-  Hi {{ first_name | default('there') }},
-</h1>
+{{ c.heading('Hi ' ~ (user_name | default('there')) ~ ',') }}
+{{ c.subheading("You're making great progress setting up your family's space. Here's where you stand.") }}
 
-<p style="color: #6B7B74; font-size: 18px; margin-bottom: 32px;">
-  You're making great progress! Complete these steps to unlock all of CommonGround's features.
-</p>
-
-<!-- Progress Indicator -->
-<div style="background-color: #F5F0E8; border-radius: 12px; padding: 20px; margin-bottom: 32px;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-    <span style="font-weight: 600; color: #2D3A35;">Your Progress</span>
-    <span style="font-weight: 700; color: #4A6C58;">{{ completed_steps | default(1) }}/{{ total_steps | default(4) }} complete</span>
-  </div>
-  <div style="background-color: #E8E3DB; border-radius: 4px; height: 8px; overflow: hidden;">
-    <div style="background-color: #4A6C58; height: 100%; width: {{ ((completed_steps | default(1)) / (total_steps | default(4)) * 100) | int }}%; border-radius: 4px;"></div>
-  </div>
-</div>
-
-<!-- Setup Checklist -->
-<h2 style="color: #2D3A35; font-size: 18px; margin-bottom: 20px;">
-  Your Setup Checklist
-</h2>
-
+{# ── Progress Bar ── #}
+{% call c.info_card() %}
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-  <!-- Step 1: Profile -->
   <tr>
-    <td style="padding: 16px; background-color: {% if profile_complete %}#E8F0EC{% else %}#FFFBF5{% endif %}; border-radius: 8px; margin-bottom: 8px;">
+    <td style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 600; color: #1E3A4A; padding-bottom: 10px;">
+      Your Progress
+    </td>
+    <td align="right" style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 700; color: #3DAA8A; padding-bottom: 10px;">
+      {{ completed_steps | default(1) }}/{{ total_steps | default(4) }} complete
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="padding: 0;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #D6ECE8; border-radius: 4px;">
+        <tr>
+          <td style="height: 8px; width: {{ progress_percent | default(25) }}%; background-color: #3DAA8A; border-radius: 4px; font-size: 0; line-height: 0;">&nbsp;</td>
+          <td style="height: 8px; font-size: 0; line-height: 0;">&nbsp;</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+{% endcall %}
+
+{{ c.divider() }}
+
+{# ── Checklist Heading ── #}
+<p style="margin: 0 0 20px; font-family: Arial, Helvetica, sans-serif; font-size: 18px; font-weight: 700; color: #1E3A4A; line-height: 1.3;">Your Setup Checklist</p>
+
+{# ── Step 1: Profile ── #}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 8px;">
+  <tr>
+    <td style="padding: 16px; background-color: {% if profile_complete %}#E8F4F0{% else %}#F4F8F7{% endif %}; border-radius: 8px;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
-          <td width="32" valign="top">
+          <td width="32" valign="top" style="font-family: Arial, Helvetica, sans-serif;">
             {% if profile_complete %}
-            <img src="{{ icons.checkmark }}" alt="Complete" width="24" height="24">
+            <img src="{{ icons.checkmark }}" alt="Complete" width="24" height="24" style="display: block; width: 24px; height: 24px;">
             {% else %}
-            <div style="width: 24px; height: 24px; border: 2px solid #D9D4CC; border-radius: 50%;"></div>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="width: 24px; height: 24px; border: 2px solid #D9D4CC; border-radius: 50%; font-size: 0; line-height: 0;">&nbsp;</td></tr></table>
             {% endif %}
           </td>
-          <td style="padding-left: 12px;">
-            <span style="font-weight: 600; color: {% if profile_complete %}#4A6C58{% else %}#2D3A35{% endif %};">
-              Complete your profile
-            </span>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
-              Add your name, contact info, and preferences
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-
-  <tr><td style="height: 8px;"></td></tr>
-
-  <!-- Step 2: Invite Co-parent -->
-  <tr>
-    <td style="padding: 16px; background-color: {% if coparent_invited %}#E8F0EC{% else %}#FFFBF5{% endif %}; border-radius: 8px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-        <tr>
-          <td width="32" valign="top">
-            {% if coparent_invited %}
-            <img src="{{ icons.checkmark }}" alt="Complete" width="24" height="24">
-            {% else %}
-            <div style="width: 24px; height: 24px; border: 2px solid #D9D4CC; border-radius: 50%;"></div>
-            {% endif %}
-          </td>
-          <td style="padding-left: 12px;">
-            <span style="font-weight: 600; color: {% if coparent_invited %}#4A6C58{% else %}#2D3A35{% endif %};">
-              Invite your co-parent
-            </span>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
-              Send an invitation to collaborate on your family file
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-
-  <tr><td style="height: 8px;"></td></tr>
-
-  <!-- Step 3: Add Children -->
-  <tr>
-    <td style="padding: 16px; background-color: {% if children_added %}#E8F0EC{% else %}#FFFBF5{% endif %}; border-radius: 8px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-        <tr>
-          <td width="32" valign="top">
-            {% if children_added %}
-            <img src="{{ icons.checkmark }}" alt="Complete" width="24" height="24">
-            {% else %}
-            <div style="width: 24px; height: 24px; border: 2px solid #D9D4CC; border-radius: 50%;"></div>
-            {% endif %}
-          </td>
-          <td style="padding-left: 12px;">
-            <span style="font-weight: 600; color: {% if children_added %}#4A6C58{% else %}#2D3A35{% endif %};">
-              Add your children
-            </span>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
-              Create profiles for each child to track their schedules
-            </p>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-
-  <tr><td style="height: 8px;"></td></tr>
-
-  <!-- Step 4: Create Agreement -->
-  <tr>
-    <td style="padding: 16px; background-color: {% if agreement_started %}#E8F0EC{% else %}#FFFBF5{% endif %}; border-radius: 8px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-        <tr>
-          <td width="32" valign="top">
-            {% if agreement_started %}
-            <img src="{{ icons.checkmark }}" alt="Complete" width="24" height="24">
-            {% else %}
-            <div style="width: 24px; height: 24px; border: 2px solid #D9D4CC; border-radius: 50%;"></div>
-            {% endif %}
-          </td>
-          <td style="padding-left: 12px;">
-            <span style="font-weight: 600; color: {% if agreement_started %}#4A6C58{% else %}#2D3A35{% endif %};">
-              Start your agreement
-            </span>
-            <p style="margin: 4px 0 0 0; font-size: 14px; color: #6B7B74;">
-              Begin building your parenting plan together
-            </p>
+          <td style="padding-left: 12px; font-family: Arial, Helvetica, sans-serif;">
+            <p style="margin: 0 0 4px; font-size: 15px; font-weight: 600; color: {% if profile_complete %}#3DAA8A{% else %}#1E3A4A{% endif %}; font-family: Arial, Helvetica, sans-serif; line-height: 1.3;">Complete your profile</p>
+            <p style="margin: 0; font-size: 14px; color: #6B8A9A; font-family: Arial, Helvetica, sans-serif; line-height: 1.5;">Add your name, contact info, and preferences</p>
           </td>
         </tr>
       </table>
@@ -137,19 +61,84 @@
   </tr>
 </table>
 
-<!-- CTA Button -->
-<div style="text-align: center; margin-top: 32px;">
-  <a href="{{ continue_url | default(app_url) | default('https://commonground.family/dashboard') }}"
-     style="display: inline-block; padding: 16px 40px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
-    Continue Setup
-  </a>
-</div>
+{# ── Step 2: Invite Co-parent ── #}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 8px;">
+  <tr>
+    <td style="padding: 16px; background-color: {% if coparent_invited %}#E8F4F0{% else %}#F4F8F7{% endif %}; border-radius: 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="32" valign="top" style="font-family: Arial, Helvetica, sans-serif;">
+            {% if coparent_invited %}
+            <img src="{{ icons.checkmark }}" alt="Complete" width="24" height="24" style="display: block; width: 24px; height: 24px;">
+            {% else %}
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="width: 24px; height: 24px; border: 2px solid #D9D4CC; border-radius: 50%; font-size: 0; line-height: 0;">&nbsp;</td></tr></table>
+            {% endif %}
+          </td>
+          <td style="padding-left: 12px; font-family: Arial, Helvetica, sans-serif;">
+            <p style="margin: 0 0 4px; font-size: 15px; font-weight: 600; color: {% if coparent_invited %}#3DAA8A{% else %}#1E3A4A{% endif %}; font-family: Arial, Helvetica, sans-serif; line-height: 1.3;">Invite your co-parent</p>
+            <p style="margin: 0; font-size: 14px; color: #6B8A9A; font-family: Arial, Helvetica, sans-serif; line-height: 1.5;">Send an invitation to collaborate on your family file</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
 
-<!-- Help Note -->
-<div style="background-color: #FFFBF5; border: 1px solid #E8E3DB; border-radius: 8px; padding: 16px; margin-top: 24px; text-align: center;">
-  <p style="margin: 0; font-size: 14px; color: #6B7B74;">
-    <strong>Need help?</strong> Our team is here to guide you through setup.<br>
-    <a href="{{ support_url | default('https://commonground.family/support') }}" style="color: #4A6C58;">Contact Support</a>
-  </p>
-</div>
+{# ── Step 3: Add Children ── #}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 8px;">
+  <tr>
+    <td style="padding: 16px; background-color: {% if children_added %}#E8F4F0{% else %}#F4F8F7{% endif %}; border-radius: 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="32" valign="top" style="font-family: Arial, Helvetica, sans-serif;">
+            {% if children_added %}
+            <img src="{{ icons.checkmark }}" alt="Complete" width="24" height="24" style="display: block; width: 24px; height: 24px;">
+            {% else %}
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="width: 24px; height: 24px; border: 2px solid #D9D4CC; border-radius: 50%; font-size: 0; line-height: 0;">&nbsp;</td></tr></table>
+            {% endif %}
+          </td>
+          <td style="padding-left: 12px; font-family: Arial, Helvetica, sans-serif;">
+            <p style="margin: 0 0 4px; font-size: 15px; font-weight: 600; color: {% if children_added %}#3DAA8A{% else %}#1E3A4A{% endif %}; font-family: Arial, Helvetica, sans-serif; line-height: 1.3;">Add your children</p>
+            <p style="margin: 0; font-size: 14px; color: #6B8A9A; font-family: Arial, Helvetica, sans-serif; line-height: 1.5;">Create profiles for each child to track their schedules</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+{# ── Step 4: Start Agreement ── #}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 8px;">
+  <tr>
+    <td style="padding: 16px; background-color: {% if agreement_started %}#E8F4F0{% else %}#F4F8F7{% endif %}; border-radius: 8px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+          <td width="32" valign="top" style="font-family: Arial, Helvetica, sans-serif;">
+            {% if agreement_started %}
+            <img src="{{ icons.checkmark }}" alt="Complete" width="24" height="24" style="display: block; width: 24px; height: 24px;">
+            {% else %}
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="width: 24px; height: 24px; border: 2px solid #D9D4CC; border-radius: 50%; font-size: 0; line-height: 0;">&nbsp;</td></tr></table>
+            {% endif %}
+          </td>
+          <td style="padding-left: 12px; font-family: Arial, Helvetica, sans-serif;">
+            <p style="margin: 0 0 4px; font-size: 15px; font-weight: 600; color: {% if agreement_started %}#3DAA8A{% else %}#1E3A4A{% endif %}; font-family: Arial, Helvetica, sans-serif; line-height: 1.3;">Start your agreement</p>
+            <p style="margin: 0; font-size: 14px; color: #6B8A9A; font-family: Arial, Helvetica, sans-serif; line-height: 1.5;">Begin building your parenting plan together</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+{{ c.button(continue_url | default(frontend_url ~ '/dashboard'), 'Continue Setup') }}
+
+{{ c.divider() }}
+
+{{ c.notice('Need help getting started? Our support team is here to walk you through every step.') }}
+
+<p style="margin: 8px 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #6B8A9A; text-align: center; line-height: 1.5;">
+  <a href="{{ support_url | default(frontend_url ~ '/support') }}" style="color: #3DAA8A; text-decoration: underline; font-family: Arial, Helvetica, sans-serif;">Contact Support</a>
+</p>
+
+{{ c.help_note(frontend_url) }}
 {% endblock %}

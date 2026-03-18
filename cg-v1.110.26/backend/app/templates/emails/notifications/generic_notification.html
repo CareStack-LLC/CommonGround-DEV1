@@ -1,36 +1,22 @@
 {% extends 'base/_base.html' %}
+{% import 'base/_components.html' as c %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ subject }}{% endblock %}
 
 {% block preheader %}{{ message | truncate(100) }}{% endblock %}
 
 {% block content %}
-<!-- Icon -->
-<div style="text-align: center; margin-bottom: 16px;">
-  <div style="display: inline-block; width: 80px; height: 80px; background-color: #E8F0EC; border-radius: 50%; line-height: 80px;">
-    <img src="{{ icon | default(icons.checkmark) }}" alt="" width="40" height="40" style="display: inline-block; vertical-align: middle;">
-  </div>
-</div>
+{{ c.heading(subject) }}
 
-<h1 style="color: #2D3A35; text-align: center; margin-bottom: 8px;">
-  {{ title }}
-</h1>
+{% if to_name %}
+<p style="margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; color: #6B8A9A; line-height: 1.5;">Hi {{ to_name }},</p>
+{% endif %}
 
-<p style="color: #6B7B74; font-size: 16px; text-align: center; margin-bottom: 32px;">
-  {% if to_name %}Hi {{ to_name }},{% endif %}
-</p>
-
-<p style="color: #2D3A35; font-size: 16px; line-height: 1.6; margin-bottom: 32px;">
-  {{ message }}
-</p>
+<p style="margin: 0 0 24px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; color: #1E3A4A; line-height: 1.6;">{{ message }}</p>
 
 {% if cta_url and cta_text %}
-<!-- CTA Button -->
-<div style="text-align: center; margin: 32px 0;">
-  <a href="{{ cta_url }}"
-     style="display: inline-block; padding: 16px 48px; background-color: #4A6C58; color: #FFFFFF; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600;">
-    {{ cta_text }}
-  </a>
-</div>
+{{ c.button(cta_url, cta_text) }}
 {% endif %}
+
+{{ c.help_note(frontend_url) }}
 {% endblock %}

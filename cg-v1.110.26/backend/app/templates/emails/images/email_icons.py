@@ -136,6 +136,32 @@ _ICONS = {
   <rect x="26" y="46" width="26" height="2" rx="1" fill="#3DAA8A" opacity="0.4"/>
   <rect x="26" y="54" width="18" height="6" rx="2" fill="#F5A623"/>
 </svg>''',
+
+    "lock": '''<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="38" fill="#E0EFF8"/>
+  <rect x="24" y="36" width="32" height="26" rx="4" fill="#2D6A8F"/>
+  <path d="M30 36 L30 28 C30 20 34 16 40 16 C46 16 50 20 50 28 L50 36" stroke="#2D6A8F" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <circle cx="40" cy="48" r="4" fill="white"/>
+  <rect x="38" y="48" width="4" height="8" rx="2" fill="white"/>
+</svg>''',
+
+    "bell": '''<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="38" fill="#E0EFF8"/>
+  <path d="M40 16 C30 16 22 24 22 34 L22 46 L18 52 L62 52 L58 46 L58 34 C58 24 50 16 40 16 Z" fill="#4BA8C8"/>
+  <circle cx="40" cy="58" r="5" fill="#2D6A8F"/>
+  <rect x="38" y="10" width="4" height="8" rx="2" fill="#4BA8C8"/>
+</svg>''',
+
+    "email_icon": '''<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="38" fill="#E8F4F0"/>
+  <rect x="14" y="22" width="52" height="36" rx="4" fill="#3DAA8A"/>
+  <path d="M14 26 L40 44 L66 26" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>''',
+
+    "star": '''<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+  <circle cx="40" cy="40" r="38" fill="#FEF7ED"/>
+  <path d="M40 14 L46 30 L64 30 L50 40 L54 56 L40 46 L26 56 L30 40 L16 30 L34 30 Z" fill="#F5A623"/>
+</svg>''',
 }
 
 
@@ -161,6 +187,10 @@ ICON_WARNING = _svg_to_data_uri(_ICONS["warning"])
 ICON_ARROW_RIGHT = _svg_to_data_uri(_ICONS["arrow_right"])
 ICON_ARIA = _svg_to_data_uri(_ICONS["aria"])
 ICON_REPORT = _svg_to_data_uri(_ICONS["report"])
+ICON_LOCK = _svg_to_data_uri(_ICONS["lock"])
+ICON_BELL = _svg_to_data_uri(_ICONS["bell"])
+ICON_EMAIL = _svg_to_data_uri(_ICONS["email_icon"])
+ICON_STAR = _svg_to_data_uri(_ICONS["star"])
 
 # Dictionary for template access
 EMAIL_ICONS = {
@@ -178,4 +208,8 @@ EMAIL_ICONS = {
     "arrow_right": ICON_ARROW_RIGHT,
     "aria": ICON_ARIA,
     "report": ICON_REPORT,
+    "lock": ICON_LOCK,
+    "bell": ICON_BELL,
+    "email_icon": ICON_EMAIL,
+    "star": ICON_STAR,
 }
