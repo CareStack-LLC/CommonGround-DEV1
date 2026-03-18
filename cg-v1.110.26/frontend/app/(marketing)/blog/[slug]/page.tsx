@@ -116,7 +116,9 @@ export default async function BlogPostPage({ params }: PageProps) {
       {/* Content */}
       <section className="py-12 animate-blog-fade-in stagger-2">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <BlogContent slug={slug} />
+          <div className="prose prose-lg max-w-none prose-headings:text-[#1E3A4A] prose-headings:font-semibold prose-p:text-gray-700 prose-p:leading-relaxed prose-li:text-gray-700 prose-strong:text-[#1E3A4A] prose-a:text-[#3DAA8A] prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-[#3DAA8A] prose-blockquote:text-gray-600 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3">
+            <BlogContent slug={slug} />
+          </div>
 
           {/* Share */}
           <div className="mt-12 pt-8 border-t border-gray-200">
