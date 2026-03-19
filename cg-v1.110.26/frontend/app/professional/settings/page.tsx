@@ -629,11 +629,26 @@ function SubscriptionTab({
                 </div>
               </div>
               <p className="text-[11px] text-slate-400 pt-1">
-                For detailed invoices and payment methods, visit your{" "}
-                <a href="https://billing.stripe.com/p/login/test" target="_blank" rel="noopener noreferrer"
-                  className="text-[#3DAA8A] hover:underline font-medium">
-                  Stripe billing portal
-                </a>.
+                For detailed invoices and payment methods,{" "}
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!token) return;
+                    try {
+                      const res = await fetch(`${API_BASE}/api/v1/professional/subscription/portal`, {
+                        method: "POST",
+                        headers: { Authorization: `Bearer ${token}` },
+                      });
+                      const data = await res.json();
+                      if (data.portal_url) window.open(data.portal_url, "_blank");
+                    } catch (err) {
+                      console.error("Portal error:", err);
+                    }
+                  }}
+                  className="text-[#3DAA8A] hover:underline font-medium"
+                >
+                  open billing portal
+                </button>.
               </p>
             </div>
           )}

@@ -240,10 +240,10 @@ export default function CasesListPage() {
   };
 
   const statusColors: Record<string, string> = {
-    active: "bg-emerald-50 text-emerald-900 border-2 border-emerald-900/30",
-    on_hold: "bg-amber-50 text-amber-900 border-2 border-amber-900/30",
-    completed: "bg-blue-50 text-blue-900 border-2 border-blue-900/30",
-    withdrawn: "bg-slate-50 text-slate-600 border-2 border-slate-300",
+    active: "bg-[#F4F8F7] text-[#1E3A4A] border border-[#3DAA8A]/20",
+    on_hold: "bg-amber-50 text-amber-700 border border-amber-200",
+    completed: "bg-blue-50 text-blue-700 border border-blue-200",
+    withdrawn: "bg-slate-50 text-slate-500 border border-slate-200",
   };
 
   return (
@@ -594,7 +594,7 @@ function CaseRow({
 
       <div className="hidden md:flex items-center gap-2 shrink-0">
         {caseItem.can_control_aria && (
-          <div className="p-1.5 bg-purple-100 text-purple-700 rounded-sm border border-purple-900/20" title="ARIA Control">
+          <div className="p-1.5 bg-[#F4F8F7] text-[#3DAA8A] rounded-sm border border-[#3DAA8A]/20" title="ARIA Control">
             <Bot className="h-3.5 w-3.5" strokeWidth={2} />
           </div>
         )}
@@ -604,7 +604,7 @@ function CaseRow({
           </div>
         )}
         {caseItem.access_scopes?.includes("schedule") && (
-          <div className="p-1.5 bg-amber-100 text-amber-700 rounded-sm border border-amber-900/20" title="Schedule Access">
+          <div className="p-1.5 bg-amber-50 text-amber-600 rounded-sm border border-amber-200" title="Schedule Access">
             <Calendar className="h-3.5 w-3.5" strokeWidth={2} />
           </div>
         )}

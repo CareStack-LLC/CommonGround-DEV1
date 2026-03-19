@@ -132,12 +132,12 @@ const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string; icon: Re
   filing_deadline: { label: "Filing Deadline", color: "#F59E0B", icon: <FileText className="h-4 w-4" /> },
   meeting: { label: "Client Meeting", color: "#3B82F6", icon: <Users className="h-4 w-4" /> },
   custody_exchange: { label: "Custody Exchange", color: "#3DAA8A", icon: <CalendarIcon className="h-4 w-4" /> },
-  intake_session: { label: "Intake Session", color: "#8B5CF6", icon: <Briefcase className="h-4 w-4" /> },
+  intake_session: { label: "Intake Session", color: "#3DAA8A", icon: <Briefcase className="h-4 w-4" /> },
   video_call: { label: "Video Call", color: "#10B981", icon: <Video className="h-4 w-4" /> },
   document_deadline: { label: "Document Deadline", color: "#F59E0B", icon: <FileText className="h-4 w-4" /> },
   consultation: { label: "Consultation", color: "#2D6A8F", icon: <Briefcase className="h-4 w-4" /> },
-  deposition: { label: "Deposition", color: "#6366F1", icon: <Scale className="h-4 w-4" /> },
-  mediation: { label: "Mediation", color: "#EC4899", icon: <Users className="h-4 w-4" /> },
+  deposition: { label: "Deposition", color: "#1E3A4A", icon: <Scale className="h-4 w-4" /> },
+  mediation: { label: "Mediation", color: "#2D6A8F", icon: <Users className="h-4 w-4" /> },
   other: { label: "Other", color: "#6B7280", icon: <CalendarIcon className="h-4 w-4" /> },
 };
 

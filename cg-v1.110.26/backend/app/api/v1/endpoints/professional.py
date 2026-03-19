@@ -1202,11 +1202,11 @@ async def accept_firm_invitation(
             "message": "Professional assigned" if invitation.status == AccessRequestStatus.PENDING.value else "Invitation accepted and access granted",
         }
     except Exception as e:
-        import traceback
-        error_detail = f"{type(e).__name__}: {str(e)}\n{traceback.format_exc()}"
+        logger.exception(f"Failed to accept invitation: {e}")
+        capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=error_detail,
+            detail="Failed to process invitation. Please try again.",
         )
 
 
@@ -1676,16 +1676,20 @@ async def list_cases(
 
     service = CaseAssignmentService(db)
 
-    status = None
+    assignment_status = None
     if status_filter:
         try:
-            status = AssignmentStatus(status_filter)
+            assignment_status = AssignmentStatus(status_filter)
         except ValueError:
-            pass
+            logger.warning(f"Invalid status filter: {status_filter}")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid status filter: '{status_filter}'. Valid values: {[s.value for s in AssignmentStatus]}",
+            )
 
     assignments = await service.list_assignments_for_professional(
         profile.id,
-        status=status,
+        status=assignment_status,
         firm_id=firm_id,
         include_inactive=include_inactive,
     )
