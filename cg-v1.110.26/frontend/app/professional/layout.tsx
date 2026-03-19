@@ -522,6 +522,22 @@ function ProfessionalNavigation({
                   {dashboardData.pending_intakes} pending intake{dashboardData.pending_intakes !== 1 ? "s" : ""}
                 </Badge>
               )}
+              {activeFirm && (
+                <Link
+                  href="/professional/firm"
+                  className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
+                  title="Firm Management"
+                >
+                  <Building2 className="h-4 w-4" />
+                </Link>
+              )}
+              <Link
+                href="/professional/settings/subscription"
+                className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
+                title="Settings"
+              >
+                <Settings className="h-4 w-4" />
+              </Link>
               <Link
                 href="/professional/help"
                 className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
