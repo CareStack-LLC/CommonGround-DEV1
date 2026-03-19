@@ -262,41 +262,30 @@ export default function CasesListPage() {
 
       <div className="cases-wrapper">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-          {/* Distinguished Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b-2 border-[#1E3A4A]/20">
-            <div className="flex items-start gap-5">
-              <div className="p-4 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] border-2 border-[#1E3A4A]/40 rounded-sm shadow-xl shrink-0">
-                <Briefcase className="h-8 w-8 text-[#F4F8F7]" strokeWidth={1.5} />
-              </div>
-              <div>
-                <div className="flex items-baseline gap-3 mb-1">
-                  <span className="sans text-xs font-bold text-[#1E3A4A]/60 tracking-[0.2em] uppercase">
-                    Case Docket
-                  </span>
-                  <div className="h-px w-8 bg-[#1E3A4A]/30"></div>
-                </div>
-                <h1 className="serif text-4xl font-bold text-slate-900 leading-tight">
-                  Case Files
-                </h1>
-                <p className="sans text-slate-600 mt-1 text-sm">
-                  {isLoading ? "Loading..." : `${filteredCases.length} file${filteredCases.length !== 1 ? "s" : ""} matching current view`}
-                </p>
-              </div>
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                Case Files
+              </h1>
+              <p className="text-sm text-slate-500 mt-1">
+                {isLoading ? "Loading..." : `${filteredCases.length} file${filteredCases.length !== 1 ? "s" : ""} matching current view`}
+              </p>
             </div>
             <div className="flex gap-2">
               <Link href="/professional/cases/new">
-                <Button className="bg-[#1E3A4A] hover:bg-[#1E3A4A] text-white sans font-semibold px-6 h-11 shadow-lg border-2 border-[#1E3A4A]/40">
-                  <FolderOpen className="h-4 w-4 mr-2" strokeWidth={2} />
+                <Button className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
+                  <FolderOpen className="h-4 w-4 mr-2" />
                   New Case
                 </Button>
               </Link>
               <Button
                 onClick={() => setShowCourtOrderUpload(true)}
                 variant="outline"
-                className="sans font-semibold px-5 h-11 border-2 border-[#1E3A4A]/30 text-[#1E3A4A] hover:bg-[#F4F8F7] gap-2"
+                className="font-semibold px-5 h-10 rounded-xl border-slate-200 text-slate-700 hover:bg-[#F4F8F7] gap-2"
               >
-                <FileText className="h-4 w-4" strokeWidth={2} />
-                From Court Order
+                <FileText className="h-4 w-4" />
+                Import Order
               </Button>
             </div>
           </div>

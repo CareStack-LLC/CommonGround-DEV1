@@ -26,7 +26,7 @@ const REPORT_TYPES = [
   {
     id: "full_compliance",
     title: "Full Compliance Report",
-    description: "Comprehensive evidence package for court submission",
+    description: "Comprehensive evidence package for case documentation",
     icon: FileText,
     color: "from-blue-500 to-indigo-600",
     bgColor: "bg-blue-50",
@@ -58,7 +58,7 @@ const REPORT_TYPES = [
   {
     id: "exchange_compliance",
     title: "Exchange Compliance Report",
-    description: "Focused analysis of custody exchange violations",
+    description: "Focused analysis of custody exchange patterns",
     icon: RefreshCw,
     color: "from-emerald-500 to-teal-600",
     bgColor: "bg-emerald-50",
@@ -197,21 +197,13 @@ export default function ReportsPage() {
       />
 
       {/* Header */}
-      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#1E3A4A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#D4A853] to-[#3DAA8A]" />
-        <div className="flex items-start gap-5">
-          <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
-            <FileText className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
-          </div>
-          <div>
-            <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
-              Court-Ready Reports
-            </h1>
-            <p className="sans text-sm text-[#E8F4F0] mt-2">
-              Generate SHA-256 verified evidence packages for court submission
-            </p>
-          </div>
-        </div>
+      <div className="pb-2">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          Reports
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">
+          Generate verified evidence packages and compliance summaries
+        </p>
       </div>
 
       {/* Report Type Cards */}
@@ -221,21 +213,20 @@ export default function ReportsPage() {
           return (
             <Card
               key={reportType.id}
-              className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white hover:shadow-2xl transition-all duration-200 relative"
+              className="border border-slate-200 bg-white hover:shadow-md transition-all duration-200 rounded-2xl overflow-hidden"
             >
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
-              <CardHeader className="border-b-2 border-[#1E3A4A]/10">
+              <CardHeader className="border-b border-slate-100">
                 <div className="flex items-start gap-4">
                   <div
-                    className={`p-3 bg-gradient-to-br ${reportType.color} text-white rounded-sm shadow-md border-2 border-white/20`}
+                    className={`p-3 bg-gradient-to-br ${reportType.color} text-white rounded-xl shadow-sm`}
                   >
-                    <Icon className="h-6 w-6" />
+                    <Icon className="h-5 w-5" />
                   </div>
                   <div className="flex-1">
-                    <CardTitle className="serif text-lg text-slate-900 font-bold">
+                    <CardTitle className="text-base text-slate-900 font-semibold">
                       {reportType.title}
                     </CardTitle>
-                    <CardDescription className="sans text-sm mt-1">
+                    <CardDescription className="text-sm mt-1">
                       {reportType.description}
                     </CardDescription>
                   </div>
@@ -260,7 +251,7 @@ export default function ReportsPage() {
                 {/* Generate Button */}
                 <div className="flex items-center gap-2">
                   <Link href={`/professional/reports/generate?type=${reportType.id}`} className="flex-1">
-                    <Button className="w-full bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white border-2 border-[#1E3A4A]/40 shadow-lg sans font-semibold">
+                    <Button className="w-full bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
                       Generate Report
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>

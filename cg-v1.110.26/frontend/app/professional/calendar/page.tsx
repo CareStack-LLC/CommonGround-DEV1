@@ -348,68 +348,59 @@ export default function ProfessionalCalendarPage() {
       `}</style>
 
       {/* Header */}
-      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#1E3A4A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#D4A853] to-[#3DAA8A]" />
-        <div className="flex items-center justify-between">
-          <div className="flex items-start gap-5">
-            <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
-              <CalendarIcon className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
-            </div>
-            <div>
-              <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
-                Calendar
-              </h1>
-              <p className="sans text-[#E8F4F0] mt-2 text-sm tracking-wide leading-relaxed">
-                Hearings, Meetings & Case Deadlines
-              </p>
-            </div>
-          </div>
-          <Button onClick={() => setShowEventForm(true)} className="bg-white hover:bg-[#F4F8F7] text-[#1E3A4A] border-2 border-white/20 shadow-lg sans">
-            <Plus className="h-4 w-4 mr-2" />
-            New Event
-          </Button>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Calendar
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Events, meetings & important deadlines
+          </p>
         </div>
+        <Button onClick={() => setShowEventForm(true)} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
+          <Plus className="h-4 w-4 mr-2" />
+          New Event
+        </Button>
       </div>
 
       {/* Calendar Summary Cards */}
       {summary && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-md">
+          <Card className="border border-slate-200 bg-white shadow-sm rounded-2xl">
             <CardContent className="pt-4">
-              <div className="serif text-2xl font-bold text-[#1E3A4A]">{summary.active_events}</div>
-              <div className="sans text-xs text-slate-600 tracking-[0.1em] uppercase font-bold">Events This Month</div>
+              <div className="text-2xl font-bold text-slate-900">{summary.active_events}</div>
+              <div className="text-xs text-slate-500 uppercase font-semibold tracking-wide mt-1">Events This Month</div>
             </CardContent>
           </Card>
-          <Card className="border-2 border-red-900/30 bg-gradient-to-br from-red-50 to-red-100/50 shadow-md">
+          <Card className="border border-red-200 bg-red-50/50 shadow-sm rounded-2xl">
             <CardContent className="pt-4">
-              <div className="serif text-2xl font-bold text-red-900">
+              <div className="text-2xl font-bold text-red-700">
                 {summary.events_by_type?.court_hearing || 0}
               </div>
-              <div className="sans text-xs text-red-900/60 tracking-[0.1em] uppercase font-bold">Court Hearings</div>
+              <div className="text-xs text-red-600/70 uppercase font-semibold tracking-wide mt-1">Hearings</div>
             </CardContent>
           </Card>
-          <Card className="border-2 border-blue-900/30 bg-gradient-to-br from-blue-50 to-blue-100/50 shadow-md">
+          <Card className="border border-blue-200 bg-blue-50/50 shadow-sm rounded-2xl">
             <CardContent className="pt-4">
-              <div className="serif text-2xl font-bold text-blue-900">
+              <div className="text-2xl font-bold text-blue-700">
                 {summary.events_by_type?.meeting || 0}
               </div>
-              <div className="sans text-xs text-blue-900/60 tracking-[0.1em] uppercase font-bold">Meetings</div>
+              <div className="text-xs text-blue-600/70 uppercase font-semibold tracking-wide mt-1">Meetings</div>
             </CardContent>
           </Card>
-          <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-[#F4F8F7] to-[#E8F4F0]/50 shadow-md">
+          <Card className="border border-[#3DAA8A]/20 bg-[#F4F8F7]/50 shadow-sm rounded-2xl">
             <CardContent className="pt-4">
-              <div className="serif text-2xl font-bold text-[#1E3A4A]">
+              <div className="text-2xl font-bold text-[#1E3A4A]">
                 {summary.events_by_type?.document_deadline || 0}
               </div>
-              <div className="sans text-xs text-[#1E3A4A]/60 tracking-[0.1em] uppercase font-bold">Deadlines</div>
+              <div className="text-xs text-slate-500 uppercase font-semibold tracking-wide mt-1">Deadlines</div>
             </CardContent>
           </Card>
         </div>
       )}
 
       {/* Calendar Navigation */}
-      <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+      <Card className="border border-slate-200 bg-white shadow-sm rounded-2xl overflow-hidden">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

@@ -255,29 +255,19 @@ export default function MessagesPage() {
       `}</style>
 
       {/* Header */}
-      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#1E3A4A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#D4A853] to-[#3DAA8A]" />
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-5">
-            <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
-              <FileText className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
-            </div>
-            <div>
-              <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
-                Correspondence
-              </h1>
-              <p className="sans text-[#E8F4F0] mt-2 text-sm tracking-wide leading-relaxed">
-                Secure Client Communications — Not monitored by ARIA
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={fetchMessages} className="border-2 border-white/20 hover:bg-white/10 text-white sans">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Messages
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Secure client communications
+          </p>
         </div>
+        <Button variant="outline" size="sm" onClick={fetchMessages} className="border-slate-200 text-slate-700 hover:bg-[#F4F8F7] rounded-xl h-9">
+          <RefreshCw className="h-3.5 w-3.5 mr-2" />
+          Refresh
+        </Button>
       </div>
 
       {/* Stats */}
