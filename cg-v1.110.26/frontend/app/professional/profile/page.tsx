@@ -176,7 +176,7 @@ const US_STATES = [
 ];
 
 const PROFESSIONAL_TYPES: Record<string, { label: string; color: string }> = {
-  attorney: { label: "Attorney", color: "bg-amber-50 text-amber-900 border-2 border-amber-900/30" },
+  attorney: { label: "Attorney", color: "bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30" },
   paralegal: { label: "Paralegal", color: "bg-blue-50 text-blue-900 border-2 border-blue-900/30" },
   mediator: { label: "Mediator", color: "bg-purple-50 text-purple-900 border-2 border-purple-900/30" },
   parenting_coordinator: {
@@ -672,17 +672,17 @@ export default function ProfilePage() {
         {/* LEFT COLUMN: EDITOR */}
         <div className="flex-1 space-y-8 min-w-0 pb-20">
           {/* Header */}
-          <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+          <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#D4AF37] to-[#2D6A8F]" />
             <div className="flex items-start gap-5">
-              <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
-                <Scale className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+              <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
+                <Scale className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
               </div>
               <div>
                 <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
                   Directory Presence Manager
                 </h1>
-                <p className="sans text-sm text-amber-100 mt-2 max-w-3xl">
+                <p className="sans text-sm text-[#E8F4F0] mt-2 max-w-3xl">
                   Control how parents see you in the professional directory
                 </p>
               </div>
@@ -694,7 +694,7 @@ export default function ProfilePage() {
               {!isEditing ? (
                 <Button
                   onClick={() => setIsEditing(true)}
-                  className="bg-amber-900 hover:bg-amber-800 text-white shadow-lg border-2 border-amber-900/40 sans font-semibold"
+                  className="bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white shadow-lg border-2 border-[#1E3A4A]/40 sans font-semibold"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Profile
@@ -712,7 +712,7 @@ export default function ProfilePage() {
                   <Button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="bg-amber-900 hover:bg-amber-800 text-white shadow-lg border-2 border-amber-900/40 sans font-semibold"
+                    className="bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white shadow-lg border-2 border-[#1E3A4A]/40 sans font-semibold"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     {isSaving ? "Saving..." : "Save Profile"}
@@ -724,14 +724,14 @@ export default function ProfilePage() {
 
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
             {/* Attorney Identity Section */}
-            <div className="bg-gradient-to-br from-white via-amber-50/30 to-white rounded-sm shadow-lg border-2 border-amber-900/30 overflow-hidden relative">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-              <div className="border-b-2 border-amber-900/10 bg-gradient-to-r from-amber-50 to-white px-6 py-4 flex items-center justify-between">
+            <div className="bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white rounded-sm shadow-lg border-2 border-[#1E3A4A]/30 overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+              <div className="border-b-2 border-[#1E3A4A]/10 bg-gradient-to-r from-[#F4F8F7] to-white px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-2 serif font-bold text-slate-900">
-                  <User className="h-5 w-5 text-amber-900" strokeWidth={2} />
+                  <User className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
                   Individual Attorney Details
                 </div>
-                <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 sans">
+                <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans">
                   Private & Public Mix
                 </Badge>
               </div>
@@ -871,11 +871,11 @@ export default function ProfilePage() {
             </div>
 
             {/* Expertise Section */}
-            <div className="bg-gradient-to-br from-white via-amber-50/30 to-white rounded-sm shadow-lg border-2 border-amber-900/30 overflow-hidden relative">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-              <div className="border-b-2 border-amber-900/10 bg-gradient-to-r from-amber-50 to-white px-6 py-4">
+            <div className="bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white rounded-sm shadow-lg border-2 border-[#1E3A4A]/30 overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+              <div className="border-b-2 border-[#1E3A4A]/10 bg-gradient-to-r from-[#F4F8F7] to-white px-6 py-4">
                 <div className="flex items-center gap-2 serif font-bold text-slate-900">
-                  <Gavel className="h-5 w-5 text-amber-900" strokeWidth={2} />
+                  <Gavel className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
                   Expertise & Academic Background
                 </div>
               </div>
@@ -897,8 +897,8 @@ export default function ProfilePage() {
                         onClick={() => togglePracticeArea(area)}
                         className={
                           formData.practice_areas.includes(area)
-                            ? "bg-amber-900 hover:bg-amber-800 text-white border-2 border-amber-900/40 sans font-semibold"
-                            : "border-2 border-slate-300 sans hover:border-amber-900/40 hover:bg-amber-50"
+                            ? "bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white border-2 border-[#1E3A4A]/40 sans font-semibold"
+                            : "border-2 border-slate-300 sans hover:border-[#1E3A4A]/40 hover:bg-[#F4F8F7]"
                         }
                       >
                         {area.replace(/_/g, " ")}
@@ -973,11 +973,11 @@ export default function ProfilePage() {
             </div>
 
             {/* Firm Presence Section */}
-            <div className="bg-gradient-to-br from-white via-amber-50/30 to-white rounded-sm shadow-lg border-2 border-amber-900/30 overflow-hidden relative">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-              <div className="border-b-2 border-amber-900/10 bg-gradient-to-r from-amber-900 via-amber-800 to-amber-950 px-6 py-4">
+            <div className="bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white rounded-sm shadow-lg border-2 border-[#1E3A4A]/30 overflow-hidden relative">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+              <div className="border-b-2 border-[#1E3A4A]/10 bg-gradient-to-r from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-6 py-4">
                 <div className="flex items-center gap-2 serif font-bold text-white">
-                  <Building2 className="h-5 w-5 text-amber-50" strokeWidth={2} />
+                  <Building2 className="h-5 w-5 text-[#F4F8F7]" strokeWidth={2} />
                   Firm-Wide Identity
                 </div>
               </div>
@@ -1099,7 +1099,7 @@ export default function ProfilePage() {
                       <Button
                         onClick={handleSaveFirm}
                         disabled={isSavingFirm}
-                        className="bg-amber-900 hover:bg-amber-800 text-white min-w-[200px] shadow-lg border-2 border-amber-900/40 sans font-semibold"
+                        className="bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white min-w-[200px] shadow-lg border-2 border-[#1E3A4A]/40 sans font-semibold"
                       >
                         <Save className="h-4 w-4 mr-2" />
                         {isSavingFirm
@@ -1107,7 +1107,7 @@ export default function ProfilePage() {
                           : "Save Firm Profile"}
                       </Button>
                       {firmSaveSuccess && (
-                        <span className="sans text-sm font-semibold text-amber-900 flex items-center gap-1.5 animate-in fade-in">
+                        <span className="sans text-sm font-semibold text-[#1E3A4A] flex items-center gap-1.5 animate-in fade-in">
                           <CheckCircle2 className="h-4 w-4" /> Published
                         </span>
                       )}
@@ -1126,29 +1126,29 @@ export default function ProfilePage() {
               <h3 className="serif text-xl font-bold text-slate-900">
                 Live Directory Preview
               </h3>
-              <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 uppercase text-[9px] tracking-widest sans font-bold">
+              <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 uppercase text-[9px] tracking-widest sans font-bold">
                 Real-time
               </Badge>
             </div>
 
-            <div className="space-y-8 bg-gradient-to-br from-amber-50/30 to-white p-6 rounded-sm border-2 border-dashed border-amber-900/20 shadow-inner">
+            <div className="space-y-8 bg-gradient-to-br from-[#F4F8F7]/30 to-white p-6 rounded-sm border-2 border-dashed border-[#1E3A4A]/20 shadow-inner">
               <div className="space-y-2">
-                <p className="sans text-[10px] font-bold text-amber-900/60 uppercase tracking-widest text-center">
+                <p className="sans text-[10px] font-bold text-[#1E3A4A]/60 uppercase tracking-widest text-center">
                   Mobile Search Result Card
                 </p>
                 <MobileDirectoryCard profile={profile} formData={formData} />
               </div>
 
-              <div className="space-y-4 pt-4 border-t-2 border-amber-900/20">
-                <p className="sans text-[10px] font-bold text-amber-900/60 uppercase tracking-widest text-center">
+              <div className="space-y-4 pt-4 border-t-2 border-[#1E3A4A]/20">
+                <p className="sans text-[10px] font-bold text-[#1E3A4A]/60 uppercase tracking-widest text-center">
                   Firm Page Overview
                 </p>
-                <Card className="p-4 shadow-lg border-2 border-amber-900/30 overflow-hidden relative bg-gradient-to-br from-white via-amber-50/20 to-white">
-                  <div className="h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900 absolute top-0 left-0 right-0" />
+                <Card className="p-4 shadow-lg border-2 border-[#1E3A4A]/30 overflow-hidden relative bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
+                  <div className="h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A] absolute top-0 left-0 right-0" />
                   <h4 className="serif font-bold text-sm text-slate-900 group">
                     {firms.find((f) => f.id === selectedFirmId)?.name ||
                       "Your Firm"}
-                    <Globe className="h-3 w-3 inline ml-2 text-amber-900/40" />
+                    <Globe className="h-3 w-3 inline ml-2 text-[#1E3A4A]/40" />
                   </h4>
                   <p className="sans text-[10px] text-slate-600 mt-0.5 line-clamp-1 italic">
                     {firmFormData.headline || "Headline placeholder..."}
@@ -1157,7 +1157,7 @@ export default function ProfilePage() {
                     {firmFormData.practice_areas.slice(0, 3).map((a) => (
                       <div
                         key={a}
-                        className="sans text-[9px] px-1.5 py-0.5 bg-amber-50 border-2 border-amber-900/20 rounded-sm text-amber-900"
+                        className="sans text-[9px] px-1.5 py-0.5 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm text-[#1E3A4A]"
                       >
                         {a}
                       </div>
@@ -1183,9 +1183,9 @@ export default function ProfilePage() {
               </Card>
             </div>
 
-            <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-sm border-2 border-amber-900/30 flex gap-3 shadow-sm">
-              <AlertTriangle className="h-4 w-4 text-amber-900 shrink-0 mt-0.5" />
-              <p className="sans text-[11px] text-amber-900 leading-relaxed font-medium">
+            <div className="p-4 bg-gradient-to-br from-[#F4F8F7] to-[#E8F4F0] rounded-sm border-2 border-[#1E3A4A]/30 flex gap-3 shadow-sm">
+              <AlertTriangle className="h-4 w-4 text-[#1E3A4A] shrink-0 mt-0.5" />
+              <p className="sans text-[11px] text-[#1E3A4A] leading-relaxed font-medium">
                 The information provided above will be indexed by search engines
                 and visible to all CommonGround users. Review your bio and
                 headline for clarity.

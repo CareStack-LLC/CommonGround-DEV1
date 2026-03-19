@@ -149,17 +149,17 @@ export default function ReportsPage() {
       />
 
       {/* Header */}
-      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#1E3A4A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#D4A853] to-[#3DAA8A]" />
         <div className="flex items-start gap-5">
-          <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
-            <FileText className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+          <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
+            <FileText className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
           </div>
           <div>
             <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
               Court-Ready Reports
             </h1>
-            <p className="sans text-sm text-amber-100 mt-2">
+            <p className="sans text-sm text-[#E8F4F0] mt-2">
               Generate SHA-256 verified evidence packages for court submission
             </p>
           </div>
@@ -173,10 +173,10 @@ export default function ReportsPage() {
           return (
             <Card
               key={reportType.id}
-              className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white hover:shadow-2xl transition-all duration-200 relative"
+              className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white hover:shadow-2xl transition-all duration-200 relative"
             >
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-              <CardHeader className="border-b-2 border-amber-900/10">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+              <CardHeader className="border-b-2 border-[#1E3A4A]/10">
                 <div className="flex items-start gap-4">
                   <div
                     className={`p-3 bg-gradient-to-br ${reportType.color} text-white rounded-sm shadow-md border-2 border-white/20`}
@@ -212,7 +212,7 @@ export default function ReportsPage() {
                 {/* Generate Button */}
                 <div className="flex items-center gap-2">
                   <Link href={`/professional/reports/generate?type=${reportType.id}`} className="flex-1">
-                    <Button className="w-full bg-amber-900 hover:bg-amber-800 text-white border-2 border-amber-900/40 shadow-lg sans font-semibold">
+                    <Button className="w-full bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white border-2 border-[#1E3A4A]/40 shadow-lg sans font-semibold">
                       Generate Report
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -233,7 +233,7 @@ export default function ReportsPage() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="serif text-lg font-bold text-slate-900 flex items-center gap-2">
-            <div className="h-1 w-6 bg-amber-900 rounded-full" />
+            <div className="h-1 w-6 bg-[#1E3A4A] rounded-full" />
             Recent Reports
           </h2>
           <Button variant="outline" size="sm" onClick={fetchRecentReports} disabled={isLoading} className="border-2 border-slate-300 sans">
@@ -242,9 +242,9 @@ export default function ReportsPage() {
         </div>
 
         {recentReports.length === 0 ? (
-          <Card className="border-dashed border-2 border-amber-900/30 bg-gradient-to-br from-amber-50/30 to-white shadow-sm">
+          <Card className="border-dashed border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-[#F4F8F7]/30 to-white shadow-sm">
             <CardContent className="py-12 text-center">
-              <FileText className="h-12 w-12 mx-auto text-amber-900/40 mb-3" />
+              <FileText className="h-12 w-12 mx-auto text-[#1E3A4A]/40 mb-3" />
               <p className="serif text-slate-900 font-bold">No reports generated yet</p>
               <p className="sans text-sm text-slate-600 mt-1">
                 Select a report type above to get started
@@ -258,8 +258,8 @@ export default function ReportsPage() {
               const Icon = reportTypeInfo.icon;
 
               return (
-                <Card key={report.id} className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white hover:shadow-lg transition-all relative">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
+                <Card key={report.id} className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white hover:shadow-lg transition-all relative">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
                   <CardContent className="pt-5">
                     <div className="flex items-start gap-3 mb-3">
                       <div className={`p-2 bg-gradient-to-br ${reportTypeInfo.color} text-white rounded-sm border-2 border-white/20`}>
@@ -270,7 +270,7 @@ export default function ReportsPage() {
                           {report.title || reportTypeInfo.title}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <Calendar className="h-3 w-3 text-amber-900" />
+                          <Calendar className="h-3 w-3 text-[#1E3A4A]" />
                           <span className="sans text-xs text-slate-600">
                             {new Date(report.created_at).toLocaleDateString("en-US", {
                               month: "short",
@@ -284,8 +284,8 @@ export default function ReportsPage() {
 
                     {/* SHA-256 Hash */}
                     {report.sha256_hash && (
-                      <div className="flex items-center gap-1.5 mb-3 px-2 py-1.5 bg-amber-50 rounded-sm border-2 border-amber-900/20">
-                        <Hash className="h-3 w-3 text-amber-900 shrink-0" />
+                      <div className="flex items-center gap-1.5 mb-3 px-2 py-1.5 bg-[#F4F8F7] rounded-sm border-2 border-[#1E3A4A]/20">
+                        <Hash className="h-3 w-3 text-[#1E3A4A] shrink-0" />
                         <span className="text-[10px] font-mono text-slate-600 truncate">
                           {report.sha256_hash.slice(0, 24)}...
                         </span>
@@ -296,7 +296,7 @@ export default function ReportsPage() {
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
-                        className="flex-1 sans text-xs bg-amber-900 hover:bg-amber-800 text-white border-2 border-amber-900/40"
+                        className="flex-1 sans text-xs bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white border-2 border-[#1E3A4A]/40"
                         onClick={() => downloadReport(report.id)}
                       >
                         <Download className="h-3.5 w-3.5 mr-1.5" />

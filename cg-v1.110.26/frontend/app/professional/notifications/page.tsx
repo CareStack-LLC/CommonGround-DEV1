@@ -104,14 +104,14 @@ function NotificationItem({
     return (
         <div
             className={`group flex items-start gap-3 p-4 rounded-sm border-2 transition-all cursor-pointer ${notification.is_read
-                    ? "bg-gradient-to-br from-white via-amber-50/20 to-white border-amber-900/20 hover:shadow-sm"
-                    : "bg-amber-50 border-amber-900/40 hover:border-amber-900/60 shadow-md"
+                    ? "bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white border-[#1E3A4A]/20 hover:shadow-sm"
+                    : "bg-[#F4F8F7] border-[#1E3A4A]/40 hover:border-[#1E3A4A]/60 shadow-md"
                 }`}
             onClick={handleClick}
         >
             {/* Unread dot */}
             <div className="mt-1 shrink-0 relative">
-                <div className="p-2 bg-white border-2 border-amber-900/20 rounded-sm shadow-sm">
+                <div className="p-2 bg-white border-2 border-[#1E3A4A]/20 rounded-sm shadow-sm">
                     {TYPE_ICONS[notification.type] || TYPE_ICONS.system}
                 </div>
                 {!notification.is_read && (
@@ -149,7 +149,7 @@ function NotificationItem({
                     <Trash2 className="h-3.5 w-3.5" />
                 </button>
                 {notification.action_url && (
-                    <div className="p-1.5 text-amber-900/40">
+                    <div className="p-1.5 text-[#1E3A4A]/40">
                         <ChevronRight className="h-3.5 w-3.5" />
                     </div>
                 )}
@@ -248,21 +248,21 @@ export default function NotificationsPage() {
             />
 
             {/* Header */}
-            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#D4AF37] to-[#2D6A8F]" />
                 <div className="flex items-center justify-between gap-4">
                     <div className="flex items-start gap-5">
-                        <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
-                            <Bell className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+                        <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
+                            <Bell className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
                         </div>
                         <div>
                             <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight flex items-center gap-3">
                                 Notifications
                                 {unreadCount > 0 && (
-                                    <Badge className="bg-white text-amber-900 border-2 border-amber-900/20 sans text-xs font-bold">{unreadCount} new</Badge>
+                                    <Badge className="bg-white text-[#1E3A4A] border-2 border-[#1E3A4A]/20 sans text-xs font-bold">{unreadCount} new</Badge>
                                 )}
                             </h1>
-                            <p className="sans text-sm text-amber-100 mt-2">Your activity history and alerts</p>
+                            <p className="sans text-sm text-[#E8F4F0] mt-2">Your activity history and alerts</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -283,12 +283,12 @@ export default function NotificationsPage() {
             </div>
 
             {/* Filters */}
-            <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white shadow-sm">
+            <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white shadow-sm">
                 <CardContent className="py-3">
                     <div className="flex gap-3 flex-wrap">
                         <Select value={typeFilter} onValueChange={setTypeFilter}>
                             <SelectTrigger className="w-44 h-8 sans text-xs border-2 border-slate-300">
-                                <Filter className="h-3.5 w-3.5 mr-1.5 text-amber-900" />
+                                <Filter className="h-3.5 w-3.5 mr-1.5 text-[#1E3A4A]" />
                                 <SelectValue placeholder="All Types" />
                             </SelectTrigger>
                             <SelectContent>
@@ -323,9 +323,9 @@ export default function NotificationsPage() {
                     ))}
                 </div>
             ) : notifications.length === 0 ? (
-                <Card className="border-dashed border-2 border-amber-900/30 bg-gradient-to-br from-amber-50/30 to-white shadow-sm">
+                <Card className="border-dashed border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-[#F4F8F7]/30 to-white shadow-sm">
                     <CardContent className="py-16 text-center">
-                        <Bell className="h-12 w-12 mx-auto mb-3 text-amber-900/40" />
+                        <Bell className="h-12 w-12 mx-auto mb-3 text-[#1E3A4A]/40" />
                         <p className="serif text-slate-900 font-bold">No notifications</p>
                         <p className="sans text-xs text-slate-600 mt-1">You're all caught up!</p>
                     </CardContent>
@@ -334,7 +334,7 @@ export default function NotificationsPage() {
                 <div className="space-y-6">
                     {GROUP_ORDER.filter(g => grouped[g]?.length > 0).map(group => (
                         <div key={group}>
-                            <h3 className="sans text-xs font-bold text-amber-900/60 uppercase tracking-widest mb-2 px-1">{group}</h3>
+                            <h3 className="sans text-xs font-bold text-[#1E3A4A]/60 uppercase tracking-widest mb-2 px-1">{group}</h3>
                             <div className="space-y-2">
                                 {grouped[group].map(n => (
                                     <NotificationItem

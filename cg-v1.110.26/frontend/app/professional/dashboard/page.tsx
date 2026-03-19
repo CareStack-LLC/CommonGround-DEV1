@@ -83,7 +83,7 @@ export default function ProfessionalDashboardPage() {
   if (!dashboardData) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-900" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1E3A4A]" />
       </div>
     );
   }
@@ -117,7 +117,7 @@ export default function ProfessionalDashboardPage() {
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
         .dashboard-wrapper {
-          background: linear-gradient(135deg, #fef9f3 0%, #faf5ed 100%);
+          background: linear-gradient(135deg, #F4F8F7 0%, #E8F4F0 100%);
           min-height: 100vh;
         }
 
@@ -131,8 +131,8 @@ export default function ProfessionalDashboardPage() {
           width: 10rem;
           height: 10rem;
           border-radius: 50%;
-          border: 2px solid rgba(146, 64, 14, 0.1);
-          background: radial-gradient(circle, rgba(217, 119, 6, 0.05) 0%, transparent 70%);
+          border: 2px solid rgba(30, 58, 74, 0.1);
+          background: radial-gradient(circle, rgba(61, 170, 138, 0.05) 0%, transparent 70%);
           animation: seal-pulse 3s ease-in-out infinite;
         }
 
@@ -153,12 +153,12 @@ export default function ProfessionalDashboardPage() {
           left: 0;
           right: 0;
           height: 3px;
-          background: linear-gradient(90deg, #92400e, #d97706);
+          background: linear-gradient(90deg, #1E3A4A, #3DAA8A);
         }
 
         .legal-divider {
           height: 2px;
-          background: linear-gradient(90deg, #92400e 0%, #d97706 20%, transparent 100%);
+          background: linear-gradient(90deg, #1E3A4A 0%, #3DAA8A 20%, transparent 100%);
         }
 
         @keyframes fadeIn {
@@ -177,13 +177,13 @@ export default function ProfessionalDashboardPage() {
           {pendingFirmInvitations.length > 0 && (
             <div className="space-y-3 animate-fade-in">
               <div className="flex items-center justify-between">
-                <h2 className="sans text-xs font-bold text-amber-900 uppercase tracking-[0.15em] flex items-center gap-3">
-                  <div className="h-px w-8 bg-amber-900 rounded-full" />
+                <h2 className="sans text-xs font-bold text-[#1E3A4A] uppercase tracking-[0.15em] flex items-center gap-3">
+                  <div className="h-px w-8 bg-[#1E3A4A] rounded-full" />
                   Pending Case Invitations ({pendingFirmInvitations.length})
                 </h2>
                 <Link
                   href="/professional/intake?tab=invitations"
-                  className="sans text-xs font-bold text-amber-900 hover:text-amber-950 transition-colors border-b border-amber-900/20 hover:border-amber-900/40"
+                  className="sans text-xs font-bold text-[#1E3A4A] hover:text-[#1E3A4A] transition-colors border-b border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40"
                 >
                   View All
                 </Link>
@@ -211,7 +211,7 @@ export default function ProfessionalDashboardPage() {
 
           {/* Assignment Dialog */}
           <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
-            <DialogContent className="sm:max-w-md border-2 border-amber-900/20">
+            <DialogContent className="sm:max-w-md border-2 border-[#1E3A4A]/20">
               <AssignProfessionalDialog
                 token={token}
                 firmId={activeFirm?.id || ""}
@@ -224,22 +224,22 @@ export default function ProfessionalDashboardPage() {
           </Dialog>
 
           {/* Distinguished Header */}
-          <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
+          <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#1E3A4A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
             <div className="legal-header-seal" />
 
             {/* Decorative legal elements */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-950/20 rounded-full -mb-16 -ml-16 blur-2xl" />
-            <div className="absolute top-0 right-0 w-40 h-40 bg-amber-700/10 rounded-full -mt-20 -mr-20 blur-3xl" />
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#D4A853] to-[#3DAA8A]" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#1E3A4A]/20 rounded-full -mb-16 -ml-16 blur-2xl" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#3DAA8A]/10 rounded-full -mt-20 -mr-20 blur-3xl" />
 
             <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="flex items-start gap-5">
-                <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
-                  <Scale className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+                <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
+                  <Scale className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
                 </div>
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="sans text-[10px] font-bold text-amber-200 uppercase tracking-[0.2em]">
+                    <span className="sans text-[10px] font-bold text-[#D4A853] uppercase tracking-[0.2em]">
                       {dateLabel}
                     </span>
                     {pendingFirmInvitations.length > 0 && (
@@ -253,12 +253,12 @@ export default function ProfessionalDashboardPage() {
                   <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight">
                     {activeFirm?.name || `${profile?.user_first_name || "Professional"}'s Practice`}
                   </h1>
-                  <div className="flex items-center gap-3 mt-2 text-sm text-amber-100">
+                  <div className="flex items-center gap-3 mt-2 text-sm text-[#E8F4F0]">
                     <span className="sans flex items-center gap-1.5">
                       <FolderOpen className="h-4 w-4" strokeWidth={2} />
                       {allCases.length} active case{allCases.length !== 1 ? "s" : ""}
                     </span>
-                    <span className="text-amber-300">•</span>
+                    <span className="text-[#D4A853]">•</span>
                     <span className="sans flex items-center gap-1.5">
                       <Gavel className="h-4 w-4" strokeWidth={2} />
                       {courtEventCount} upcoming court date{courtEventCount !== 1 ? "s" : ""}
@@ -288,13 +288,13 @@ export default function ProfessionalDashboardPage() {
           {/* Lead Pipeline Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="sans text-xs font-bold text-amber-900 uppercase tracking-[0.15em] flex items-center gap-3">
-                <div className="h-px w-8 bg-amber-900" />
+              <h2 className="sans text-xs font-bold text-[#1E3A4A] uppercase tracking-[0.15em] flex items-center gap-3">
+                <div className="h-px w-8 bg-[#1E3A4A]" />
                 Lead Pipeline
               </h2>
               <Link
                 href="/professional/cases"
-                className="sans text-xs font-bold text-amber-900 hover:text-amber-950 transition-colors flex items-center gap-1.5 border-b border-amber-900/20 hover:border-amber-900/40"
+                className="sans text-xs font-bold text-[#1E3A4A] hover:text-[#1E3A4A] transition-colors flex items-center gap-1.5 border-b border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40"
               >
                 All Cases
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -387,7 +387,7 @@ export default function ProfessionalDashboardPage() {
                   </span>
                 </div>
                 <CardTitle className="serif text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-amber-900" strokeWidth={2} />
+                  <TrendingUp className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
                   Recent Activity
                 </CardTitle>
                 <CardDescription className="sans text-xs text-slate-600">Latest case updates</CardDescription>
@@ -523,7 +523,7 @@ function CompactActivityItem({ activity }: { activity: any }) {
 
   return (
     <Link href={getHref()}>
-      <div className="flex items-center gap-3 py-2.5 px-3 -mx-3 rounded-sm hover:bg-amber-50/40 transition-colors cursor-pointer border border-transparent hover:border-amber-900/10">
+      <div className="flex items-center gap-3 py-2.5 px-3 -mx-3 rounded-sm hover:bg-[#F4F8F7]/40 transition-colors cursor-pointer border border-transparent hover:border-[#1E3A4A]/10">
         <div className="shrink-0">
           {typeIcons[activity.activity_type] || (
             <Clock className="h-3.5 w-3.5 text-slate-400" strokeWidth={2} />

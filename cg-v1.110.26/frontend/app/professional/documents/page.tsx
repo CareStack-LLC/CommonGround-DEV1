@@ -160,18 +160,18 @@ export default function ProfessionalDocumentsPage() {
             />
 
             {/* Header */}
-            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#D4AF37] to-[#2D6A8F]" />
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="flex items-start gap-5">
-                        <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
-                            <FileText className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+                        <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
+                            <FileText className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
                         </div>
                         <div>
                             <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
                                 Document Library
                             </h1>
-                            <p className="sans text-sm text-amber-100 mt-2">
+                            <p className="sans text-sm text-[#E8F4F0] mt-2">
                                 Central repository for all case documents — court orders, agreements, evidence.
                             </p>
                         </div>
@@ -190,7 +190,7 @@ export default function ProfessionalDocumentsPage() {
                                 OCR Court Order
                             </Button>
                         </Link>
-                        <Button onClick={() => setShowUpload(true)} className="bg-white text-amber-900 hover:bg-amber-50 border-2 border-amber-900/20 shadow-lg sans font-semibold">
+                        <Button onClick={() => setShowUpload(true)} className="bg-white text-[#1E3A4A] hover:bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 shadow-lg sans font-semibold">
                             <Upload className="h-4 w-4 mr-2" />
                             Upload
                         </Button>
@@ -205,13 +205,13 @@ export default function ProfessionalDocumentsPage() {
                         key={t.value}
                         onClick={() => setTypeFilter(t.value)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm sans text-sm border-2 transition-all ${typeFilter === t.value
-                            ? "bg-amber-900 text-white border-amber-900/40 shadow-md font-semibold"
-                            : "bg-gradient-to-br from-white via-amber-50/20 to-white text-slate-900 border-amber-900/20 hover:border-amber-900/40 hover:shadow-sm"
+                            ? "bg-[#1E3A4A] text-white border-[#1E3A4A]/40 shadow-md font-semibold"
+                            : "bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white text-slate-900 border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40 hover:shadow-sm"
                             }`}
                     >
                         {t.icon}
                         {t.label}
-                        <span className={`serif text-xs font-bold ${typeFilter === t.value ? "text-amber-200" : "text-amber-900/70"}`}>
+                        <span className={`serif text-xs font-bold ${typeFilter === t.value ? "text-[#E8F4F0]" : "text-[#1E3A4A]/70"}`}>
                             {typeCounts[t.value] ?? 0}
                         </span>
                     </button>
@@ -242,21 +242,21 @@ export default function ProfessionalDocumentsPage() {
             ) : filtered.length === 0 ? (
                 <Card className="border-dashed border-slate-200 bg-slate-50">
                     <CardContent className="py-16 text-center">
-                        <FilePlus className="h-10 w-10 mx-auto text-amber-900/40 mb-3" />
+                        <FilePlus className="h-10 w-10 mx-auto text-[#1E3A4A]/40 mb-3" />
                         <p className="sans text-slate-600 mb-2">
                             {searchQuery ? "No documents match your search." : "No documents yet."}
                         </p>
-                        <Button onClick={() => setShowUpload(true)} className="bg-amber-900 hover:bg-amber-800 text-white border-2 border-amber-900/40 sans font-semibold">
+                        <Button onClick={() => setShowUpload(true)} className="bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white border-2 border-[#1E3A4A]/40 sans font-semibold">
                             <Upload className="h-4 w-4 mr-2" />
                             Upload your first document
                         </Button>
                     </CardContent>
                 </Card>
             ) : (
-                <Card className="border-2 border-amber-900/30 overflow-hidden bg-gradient-to-br from-white via-amber-50/20 to-white shadow-lg relative">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
+                <Card className="border-2 border-[#1E3A4A]/30 overflow-hidden bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white shadow-lg relative">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
                     <table className="w-full text-sm">
-                        <thead className="bg-gradient-to-r from-amber-50 to-white border-b-2 border-amber-900/10">
+                        <thead className="bg-gradient-to-r from-[#F4F8F7] to-white border-b-2 border-[#1E3A4A]/10">
                             <tr>
                                 <th className="text-left px-4 py-3 text-slate-900 serif font-bold">Title</th>
                                 <th className="text-left px-4 py-3 text-slate-900 serif font-bold hidden md:table-cell">Type</th>
@@ -266,13 +266,13 @@ export default function ProfessionalDocumentsPage() {
                                 <th className="px-4 py-3" />
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-amber-900/10">
+                        <tbody className="divide-y divide-[#1E3A4A]/10">
                             {filtered.map((doc) => (
                                 <tr key={doc.id} className="hover:bg-slate-50/50 transition-colors group">
                                     <td className="px-4 py-3">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-1.5 bg-amber-50 border-2 border-amber-900/20 rounded-sm shrink-0">
-                                                <FileText className="h-4 w-4 text-amber-900" />
+                                            <div className="p-1.5 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shrink-0">
+                                                <FileText className="h-4 w-4 text-[#1E3A4A]" />
                                             </div>
                                             <div className="min-w-0">
                                                 <p className="serif font-bold text-slate-900 truncate">{doc.title || doc.filename}</p>

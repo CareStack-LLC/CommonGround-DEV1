@@ -249,7 +249,7 @@ export default function HelpCenterPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                        <div className="p-3 bg-gradient-to-br from-violet-500 to-violet-600 text-white rounded-xl shadow-lg shadow-violet-500/20">
+                        <div className="p-3 bg-gradient-to-br from-[#3DAA8A] to-[#1E3A4A] text-white rounded-xl shadow-lg shadow-[#3DAA8A]/20">
                             <HelpCircle className="h-6 w-6" />
                         </div>
                         Help Center
@@ -265,7 +265,7 @@ export default function HelpCenterPage() {
                     placeholder="Search help articles..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10 border-slate-200 focus:border-violet-400"
+                    className="pl-10 border-slate-200 focus:border-[#3DAA8A]"
                 />
             </div>
 
@@ -281,7 +281,7 @@ export default function HelpCenterPage() {
                         key={tab.id}
                         onClick={() => { setActiveCategory(tab.id); setSearch(""); }}
                         className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-all ${activeCategory === tab.id
-                            ? "bg-violet-600 text-white border-violet-600 shadow-sm"
+                            ? "bg-[#3DAA8A] text-white border-[#3DAA8A] shadow-sm"
                             : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                             }`}
                     >
@@ -311,14 +311,14 @@ export default function HelpCenterPage() {
                                     onClick={() => setSelectedArticle(article)}
                                     className="w-full text-left group"
                                 >
-                                    <Card className="border-slate-200 hover:shadow-md hover:border-violet-200 transition-all">
+                                    <Card className="border-slate-200 hover:shadow-md hover:border-[#3DAA8A]/30 transition-all">
                                         <CardContent className="pt-4 pb-4">
                                             <div className="flex items-start gap-3">
                                                 <div className={`p-2 rounded-lg border shrink-0 ${cfg.color}`}>
                                                     {cfg.icon}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-semibold text-slate-900 group-hover:text-violet-700 transition-colors">
+                                                    <p className="font-semibold text-slate-900 group-hover:text-[#2D8A6E] transition-colors">
                                                         {article.title}
                                                     </p>
                                                     {article.excerpt && (
@@ -340,7 +340,7 @@ export default function HelpCenterPage() {
                                                         </Badge>
                                                     </div>
                                                 </div>
-                                                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-violet-500 transition-colors shrink-0 mt-1" />
+                                                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#5BC4A0] transition-colors shrink-0 mt-1" />
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -353,7 +353,7 @@ export default function HelpCenterPage() {
                 {/* Tours sidebar */}
                 <div className="space-y-3">
                     <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                        <div className="h-1 w-6 bg-violet-500 rounded-full" />
+                        <div className="h-1 w-6 bg-[#3DAA8A] rounded-full" />
                         In-App Tours
                     </h2>
                     {TOURS.map(tour => {
@@ -362,7 +362,7 @@ export default function HelpCenterPage() {
                             <Card key={tour.id} className="border-slate-200">
                                 <CardContent className="pt-4 pb-4">
                                     <div className="flex items-start gap-3">
-                                        <div className={`p-2 rounded-lg shrink-0 ${isDone ? "bg-emerald-50 text-emerald-600" : "bg-violet-50 text-violet-600"}`}>
+                                        <div className={`p-2 rounded-lg shrink-0 ${isDone ? "bg-emerald-50 text-emerald-600" : "bg-[#E8F4F0] text-[#3DAA8A]"}`}>
                                             <PlayCircle className="h-4 w-4" />
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -375,7 +375,7 @@ export default function HelpCenterPage() {
                                         size="sm"
                                         className={`w-full mt-3 gap-1.5 text-xs ${isDone
                                             ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
-                                            : "bg-violet-600 hover:bg-violet-700 text-white"
+                                            : "bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white"
                                             }`}
                                         onClick={() => startTour(tour)}
                                     >

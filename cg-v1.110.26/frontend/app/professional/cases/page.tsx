@@ -252,7 +252,7 @@ export default function CasesListPage() {
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
         .cases-wrapper {
-          background: linear-gradient(135deg, #fef9f3 0%, #faf5ed 100%);
+          background: linear-gradient(135deg, #F4F8F7 0%, #E8F4F0 100%);
           min-height: 100vh;
         }
 
@@ -263,17 +263,17 @@ export default function CasesListPage() {
       <div className="cases-wrapper">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
           {/* Distinguished Header */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b-2 border-amber-900/20">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 border-b-2 border-[#1E3A4A]/20">
             <div className="flex items-start gap-5">
-              <div className="p-4 bg-gradient-to-br from-amber-900 to-amber-800 border-2 border-amber-900/40 rounded-sm shadow-xl shrink-0">
-                <Briefcase className="h-8 w-8 text-amber-50" strokeWidth={1.5} />
+              <div className="p-4 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] border-2 border-[#1E3A4A]/40 rounded-sm shadow-xl shrink-0">
+                <Briefcase className="h-8 w-8 text-[#F4F8F7]" strokeWidth={1.5} />
               </div>
               <div>
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="sans text-xs font-bold text-amber-900/60 tracking-[0.2em] uppercase">
+                  <span className="sans text-xs font-bold text-[#1E3A4A]/60 tracking-[0.2em] uppercase">
                     Case Docket
                   </span>
-                  <div className="h-px w-8 bg-amber-900/30"></div>
+                  <div className="h-px w-8 bg-[#1E3A4A]/30"></div>
                 </div>
                 <h1 className="serif text-4xl font-bold text-slate-900 leading-tight">
                   Case Files
@@ -285,7 +285,7 @@ export default function CasesListPage() {
             </div>
             <div className="flex gap-2">
               <Link href="/professional/cases/new">
-                <Button className="bg-amber-900 hover:bg-amber-950 text-white sans font-semibold px-6 h-11 shadow-lg border-2 border-amber-900/40">
+                <Button className="bg-[#1E3A4A] hover:bg-[#1E3A4A] text-white sans font-semibold px-6 h-11 shadow-lg border-2 border-[#1E3A4A]/40">
                   <FolderOpen className="h-4 w-4 mr-2" strokeWidth={2} />
                   New Case
                 </Button>
@@ -293,7 +293,7 @@ export default function CasesListPage() {
               <Button
                 onClick={() => setShowCourtOrderUpload(true)}
                 variant="outline"
-                className="sans font-semibold px-5 h-11 border-2 border-amber-900/30 text-amber-900 hover:bg-amber-50 gap-2"
+                className="sans font-semibold px-5 h-11 border-2 border-[#1E3A4A]/30 text-[#1E3A4A] hover:bg-[#F4F8F7] gap-2"
               >
                 <FileText className="h-4 w-4" strokeWidth={2} />
                 From Court Order
@@ -321,7 +321,7 @@ export default function CasesListPage() {
                     placeholder="Search by file number, name, or firm..."
                     value={searchQuery}
                     onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-                    className="pl-10 sans border-2 border-slate-300 focus:border-amber-900"
+                    className="pl-10 sans border-2 border-slate-300 focus:border-[#1E3A4A]"
                   />
                 </div>
                 <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
@@ -393,11 +393,11 @@ export default function CasesListPage() {
 
           {/* Bulk Actions Bar */}
           {selectedIds.size > 0 && (
-            <div className="flex items-center gap-3 px-5 py-4 bg-amber-50 border-2 border-amber-900/30 rounded-sm shadow-md">
-              <span className="sans text-sm font-bold text-amber-900">
+            <div className="flex items-center gap-3 px-5 py-4 bg-[#E8F4F0] border-2 border-[#1E3A4A]/30 rounded-sm shadow-md">
+              <span className="sans text-sm font-bold text-[#1E3A4A]">
                 {selectedIds.size} file{selectedIds.size !== 1 ? "s" : ""} selected
               </span>
-              <div className="h-5 w-px bg-amber-900/20" />
+              <div className="h-5 w-px bg-[#1E3A4A]/20" />
               <Button size="sm" variant="outline" className="gap-1.5 sans font-medium border-2" onClick={() => bulkAction("assign")}>
                 <Users className="h-3.5 w-3.5" strokeWidth={2} />
                 Assign
@@ -425,7 +425,7 @@ export default function CasesListPage() {
             <div className="flex items-center gap-4 px-3 py-2 text-xs sans font-bold text-slate-500 uppercase tracking-[0.15em]">
               <button onClick={toggleAll} className="shrink-0">
                 {allSelected
-                  ? <CheckSquare className="h-4.5 w-4.5 text-amber-900" strokeWidth={2} />
+                  ? <CheckSquare className="h-4.5 w-4.5 text-[#1E3A4A]" strokeWidth={2} />
                   : <Square className="h-4.5 w-4.5 text-slate-400" strokeWidth={2} />}
               </button>
               <span className="flex-1">Case File</span>
@@ -466,8 +466,8 @@ export default function CasesListPage() {
           ) : (
             <Card className="border-2 border-dashed border-slate-300 bg-slate-50/50">
               <CardContent className="py-20 text-center">
-                <div className="p-5 bg-gradient-to-br from-amber-100 to-amber-200 rounded-sm w-fit mx-auto mb-6 border-2 border-amber-900/20">
-                  <Briefcase className="h-12 w-12 text-amber-900" strokeWidth={1.5} />
+                <div className="p-5 bg-gradient-to-br from-[#E8F4F0] to-[#d4ede5] rounded-sm w-fit mx-auto mb-6 border-2 border-[#1E3A4A]/20">
+                  <Briefcase className="h-12 w-12 text-[#1E3A4A]" strokeWidth={1.5} />
                 </div>
                 <h3 className="serif text-xl font-bold text-slate-900 mb-2">No cases found</h3>
                 <p className="sans text-slate-600 max-w-sm mx-auto">
@@ -547,19 +547,19 @@ function CaseRow({
   return (
     <div
       className={`group flex items-center gap-4 p-5 bg-white rounded-sm border-2 border-slate-300 border-l-4 transition-all hover:shadow-xl ${statusAccent[caseItem.status] || "border-l-slate-300"
-        } ${selected ? "ring-2 ring-amber-900/30 border-amber-900/40" : ""}`}
+        } ${selected ? "ring-2 ring-[#1E3A4A]/30 border-[#1E3A4A]/40" : ""}`}
     >
       <button
         onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleSelect(); }}
         className="shrink-0 transition-colors"
       >
         {selected
-          ? <CheckSquare className="h-5 w-5 text-amber-900" strokeWidth={2} />
-          : <Square className="h-5 w-5 text-slate-300 hover:text-amber-900" strokeWidth={2} />}
+          ? <CheckSquare className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
+          : <Square className="h-5 w-5 text-slate-300 hover:text-[#1E3A4A]" strokeWidth={2} />}
       </button>
 
       <Link href={`/professional/cases/${caseItem.family_file_id}`} className="flex-1 min-w-0 flex items-center gap-4">
-        <div className="p-3 bg-gradient-to-br from-amber-900 to-amber-800 text-amber-50 rounded-sm shadow-md border border-amber-900/40 shrink-0">
+        <div className="p-3 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-[#F4F8F7] rounded-sm shadow-md border border-[#1E3A4A]/40 shrink-0">
           <Scale className="h-5 w-5" strokeWidth={1.5} />
         </div>
         <div className="flex-1 min-w-0">

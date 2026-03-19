@@ -209,17 +209,17 @@ export default function IntakePage() {
             `}</style>
 
             {/* Header */}
-            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#1E3A4A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#D4A853] to-[#3DAA8A]" />
                 <div className="flex items-start gap-5">
-                    <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
-                        <Gavel className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+                    <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
+                        <Gavel className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
                     </div>
                     <div>
                         <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
                             Intake Center
                         </h1>
-                        <p className="sans text-amber-100 mt-2 text-sm tracking-wide leading-relaxed">
+                        <p className="sans text-[#E8F4F0] mt-2 text-sm tracking-wide leading-relaxed">
                             Case Invitations & Client Intake Administration
                         </p>
                     </div>
@@ -227,22 +227,22 @@ export default function IntakePage() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <TabsList className="grid w-full grid-cols-2 max-w-md bg-amber-50/50 border-2 border-amber-900/10 p-1">
+                <TabsList className="grid w-full grid-cols-2 max-w-md bg-[#F4F8F7]/50 border-2 border-[#1E3A4A]/10 p-1">
                     <TabsTrigger
                         value="invitations"
-                        className="relative serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-amber-900/20 data-[state=active]:text-amber-900"
+                        className="relative serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#1E3A4A]/20 data-[state=active]:text-[#1E3A4A]"
                     >
                         <Scale className="h-4 w-4 mr-2" strokeWidth={1.5} />
                         Case Invitations
                         {pendingInvitations.length > 0 && (
-                            <Badge className="ml-2 bg-amber-900 text-amber-50 px-1.5 py-0 text-[10px] min-w-[20px]">
+                            <Badge className="ml-2 bg-[#1E3A4A] text-[#F4F8F7] px-1.5 py-0 text-[10px] min-w-[20px]">
                                 {pendingInvitations.length}
                             </Badge>
                         )}
                     </TabsTrigger>
                     <TabsTrigger
                         value="aria"
-                        className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-amber-900/20 data-[state=active]:text-amber-900"
+                        className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#1E3A4A]/20 data-[state=active]:text-[#1E3A4A]"
                     >
                         <FileText className="h-4 w-4 mr-2" strokeWidth={1.5} />
                         ARIA Sessions
@@ -251,9 +251,9 @@ export default function IntakePage() {
 
                 {/* Case Invitations Tab */}
                 <TabsContent value="invitations" className="space-y-4">
-                    <div className="flex items-center justify-between border-b-2 border-amber-900/10 pb-3">
+                    <div className="flex items-center justify-between border-b-2 border-[#1E3A4A]/10 pb-3">
                         <div>
-                            <p className="sans text-xs font-bold text-amber-900/60 tracking-[0.15em] uppercase mb-1">
+                            <p className="sans text-xs font-bold text-[#1E3A4A]/60 tracking-[0.15em] uppercase mb-1">
                                 Pending Matters
                             </p>
                             <p className="sans text-sm text-slate-600 leading-relaxed">
@@ -265,7 +265,7 @@ export default function IntakePage() {
                             size="sm"
                             onClick={fetchInvitations}
                             disabled={invitationsLoading}
-                            className="border-2 border-amber-900/20 hover:bg-amber-50"
+                            className="border-2 border-[#1E3A4A]/20 hover:bg-[#F4F8F7]"
                         >
                             <RefreshCw className={`h-4 w-4 ${invitationsLoading ? "animate-spin" : ""}`} />
                         </Button>
@@ -273,12 +273,12 @@ export default function IntakePage() {
 
                     {invitationsLoading ? (
                         <div className="flex items-center justify-center min-h-[40vh]">
-                            <Loader2 className="h-8 w-8 animate-spin text-amber-900" />
+                            <Loader2 className="h-8 w-8 animate-spin text-[#1E3A4A]" />
                         </div>
                     ) : pendingInvitations.length === 0 ? (
-                        <Card className="border-2 border-dashed border-amber-900/20 bg-gradient-to-br from-amber-50/30 to-white shadow-sm">
+                        <Card className="border-2 border-dashed border-[#1E3A4A]/20 bg-gradient-to-br from-[#F4F8F7]/30 to-white shadow-sm">
                             <CardContent className="py-16 text-center">
-                                <Bell className="h-12 w-12 mx-auto text-amber-900/30 mb-3" />
+                                <Bell className="h-12 w-12 mx-auto text-[#1E3A4A]/30 mb-3" />
                                 <p className="serif text-lg font-bold text-slate-900 mb-1">No Pending Invitations</p>
                                 <p className="sans text-sm text-slate-500 mt-1">
                                     Case invitations will appear here when parties request representation
@@ -303,9 +303,9 @@ export default function IntakePage() {
 
                 {/* ARIA Sessions Tab */}
                 <TabsContent value="aria" className="space-y-6">
-                    <div className="flex items-center justify-between border-b-2 border-amber-900/10 pb-3">
+                    <div className="flex items-center justify-between border-b-2 border-[#1E3A4A]/10 pb-3">
                         <div>
-                            <p className="sans text-xs font-bold text-amber-900/60 tracking-[0.15em] uppercase mb-1">
+                            <p className="sans text-xs font-bold text-[#1E3A4A]/60 tracking-[0.15em] uppercase mb-1">
                                 AI-Assisted Sessions
                             </p>
                             <p className="sans text-sm text-slate-600 leading-relaxed">
@@ -320,13 +320,13 @@ export default function IntakePage() {
                                     fetchLinks();
                                     fetchStats();
                                 }}
-                                className="border-2 border-amber-900/20 hover:bg-amber-50"
+                                className="border-2 border-[#1E3A4A]/20 hover:bg-[#F4F8F7]"
                             >
                                 <RefreshCw className="h-4 w-4" />
                             </Button>
                             <Button
                                 onClick={() => router.push("/professional/intake/new")}
-                                className="bg-amber-900 hover:bg-amber-950 text-amber-50 border-2 border-amber-900/40 shadow-lg"
+                                className="bg-[#1E3A4A] hover:bg-[#1E3A4A] text-[#F4F8F7] border-2 border-[#1E3A4A]/40 shadow-lg"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 New ARIA Intake
@@ -361,14 +361,14 @@ export default function IntakePage() {
                             <p className="serif text-2xl font-bold text-emerald-900">{stats.completed}</p>
                         </CardContent>
                     </Card>
-                    <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-amber-50 to-amber-100/50 shadow-md">
+                    <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-[#F4F8F7] to-[#E8F4F0]/50 shadow-md">
                         <CardContent className="pt-4">
                             <div className="flex items-center justify-between mb-1">
-                                <p className="sans text-xs font-bold text-amber-900/60 tracking-[0.15em] uppercase">Completion</p>
-                                <TrendingUp className="h-3.5 w-3.5 text-amber-900" strokeWidth={2} />
+                                <p className="sans text-xs font-bold text-[#1E3A4A]/60 tracking-[0.15em] uppercase">Completion</p>
+                                <TrendingUp className="h-3.5 w-3.5 text-[#1E3A4A]" strokeWidth={2} />
                             </div>
-                            <p className="serif text-2xl font-bold text-amber-900">{completionRate}%</p>
-                            <Progress value={completionRate} className="h-1.5 mt-1 bg-amber-900/20" />
+                            <p className="serif text-2xl font-bold text-[#1E3A4A]">{completionRate}%</p>
+                            <Progress value={completionRate} className="h-1.5 mt-1 bg-[#1E3A4A]/20" />
                         </CardContent>
                     </Card>
                     </div>
@@ -376,7 +376,7 @@ export default function IntakePage() {
 
                     {/* Filter Row */}
             <div className="flex items-center gap-2 mb-4">
-                <p className="sans text-xs font-bold text-amber-900/60 tracking-[0.15em] uppercase">Filter:</p>
+                <p className="sans text-xs font-bold text-[#1E3A4A]/60 tracking-[0.15em] uppercase">Filter:</p>
                 {["all", "pending", "active", "completed", "cancelled"].map((s) => (
                     <Button
                         key={s}
@@ -385,8 +385,8 @@ export default function IntakePage() {
                         onClick={() => setStatusFilter(s)}
                         className={
                             statusFilter === s
-                                ? "bg-amber-900 text-amber-50 border-2 border-amber-900/40 shadow-sm sans"
-                                : "border-2 border-slate-300 text-slate-600 hover:bg-amber-50 sans"
+                                ? "bg-[#1E3A4A] text-[#F4F8F7] border-2 border-[#1E3A4A]/40 shadow-sm sans"
+                                : "border-2 border-slate-300 text-slate-600 hover:bg-[#F4F8F7] sans"
                         }
                     >
                         {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}

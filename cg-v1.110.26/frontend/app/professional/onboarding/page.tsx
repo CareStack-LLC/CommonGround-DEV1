@@ -203,11 +203,11 @@ export default function ProfessionalOnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-background py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] to-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center p-3 bg-emerald-100 text-emerald-600 rounded-xl mb-4">
+          <div className="inline-flex items-center justify-center p-3 bg-[#E8F4F0] text-[#3DAA8A] rounded-xl mb-4">
             <Briefcase className="h-8 w-8" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">Welcome to CommonGround Pro</h1>
@@ -223,9 +223,9 @@ export default function ProfessionalOnboardingPage() {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                   index < currentStepIndex
-                    ? "bg-emerald-500 text-white"
+                    ? "bg-[#5BC4A0] text-white"
                     : index === currentStepIndex
-                    ? "bg-emerald-600 text-white"
+                    ? "bg-[#3DAA8A] text-white"
                     : "bg-muted text-muted-foreground"
                 }`}
               >
@@ -238,7 +238,7 @@ export default function ProfessionalOnboardingPage() {
               {index < steps.length - 1 && (
                 <div
                   className={`w-12 h-0.5 ${
-                    index < currentStepIndex ? "bg-emerald-500" : "bg-muted"
+                    index < currentStepIndex ? "bg-[#5BC4A0]" : "bg-muted"
                   }`}
                 />
               )}
@@ -268,8 +268,8 @@ export default function ProfessionalOnboardingPage() {
                       }
                       className={`flex items-center gap-4 p-4 rounded-lg border text-left transition-all ${
                         formData.professional_type === type.value
-                          ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/20"
-                          : "border-border hover:border-emerald-300 hover:bg-muted/50"
+                          ? "border-[#5BC4A0] bg-[#F4F8F7] ring-2 ring-[#5BC4A0]/20"
+                          : "border-border hover:border-[#5BC4A0] hover:bg-muted/50"
                       }`}
                     >
                       <span className="text-2xl">{type.icon}</span>
@@ -278,7 +278,7 @@ export default function ProfessionalOnboardingPage() {
                         <p className="text-sm text-muted-foreground">{type.description}</p>
                       </div>
                       {formData.professional_type === type.value && (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                        <CheckCircle2 className="h-5 w-5 text-[#5BC4A0]" />
                       )}
                     </button>
                   ))}
@@ -345,7 +345,7 @@ export default function ProfessionalOnboardingPage() {
                           onClick={() => togglePracticeArea(area.value)}
                           className={
                             formData.practice_areas.includes(area.value)
-                              ? "bg-emerald-600 hover:bg-emerald-700"
+                              ? "bg-[#3DAA8A] hover:bg-[#2D8A6E]"
                               : ""
                           }
                         >
@@ -391,11 +391,11 @@ export default function ProfessionalOnboardingPage() {
                       }
                       className={`p-4 rounded-lg border text-center transition-all ${
                         formData.create_firm
-                          ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/20"
-                          : "border-border hover:border-emerald-300"
+                          ? "border-[#5BC4A0] bg-[#F4F8F7] ring-2 ring-[#5BC4A0]/20"
+                          : "border-border hover:border-[#5BC4A0]"
                       }`}
                     >
-                      <Building2 className="h-8 w-8 mx-auto mb-2 text-emerald-600" />
+                      <Building2 className="h-8 w-8 mx-auto mb-2 text-[#3DAA8A]" />
                       <p className="font-medium">Create a Firm</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Start your own practice
@@ -407,8 +407,8 @@ export default function ProfessionalOnboardingPage() {
                       }
                       className={`p-4 rounded-lg border text-center transition-all ${
                         !formData.create_firm
-                          ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/20"
-                          : "border-border hover:border-emerald-300"
+                          ? "border-[#5BC4A0] bg-[#F4F8F7] ring-2 ring-[#5BC4A0]/20"
+                          : "border-border hover:border-[#5BC4A0]"
                       }`}
                     >
                       <User className="h-8 w-8 mx-auto mb-2 text-blue-600" />
@@ -460,7 +460,7 @@ export default function ProfessionalOnboardingPage() {
             {/* Step 4: Complete */}
             {currentStep === "complete" && (
               <div className="text-center space-y-6 py-8">
-                <div className="inline-flex items-center justify-center p-4 bg-emerald-100 text-emerald-600 rounded-full">
+                <div className="inline-flex items-center justify-center p-4 bg-[#E8F4F0] text-[#3DAA8A] rounded-full">
                   <CheckCircle2 className="h-12 w-12" />
                 </div>
                 <div>
@@ -473,7 +473,7 @@ export default function ProfessionalOnboardingPage() {
                 <div className="space-y-3 pt-4">
                   <Button
                     onClick={() => router.push("/professional/dashboard")}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700"
+                    className="w-full bg-[#3DAA8A] hover:bg-[#2D8A6E]"
                   >
                     Go to Dashboard
                     <ArrowRight className="h-4 w-4 ml-2" />
@@ -512,7 +512,7 @@ export default function ProfessionalOnboardingPage() {
                 <Button
                   onClick={nextStep}
                   disabled={!canProceed() || isSubmitting}
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-[#3DAA8A] hover:bg-[#2D8A6E]"
                 >
                   {isSubmitting ? (
                     "Creating..."

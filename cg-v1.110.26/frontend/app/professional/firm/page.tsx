@@ -195,24 +195,24 @@ export default function FirmSettingsPage() {
       />
 
       {/* Header */}
-      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#D4AF37] to-[#2D6A8F]" />
         <div className="flex items-center justify-between">
           <div className="flex items-start gap-5">
-            <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
-              <Building2 className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+            <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
+              <Building2 className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
             </div>
             <div>
               <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
                 Firm Settings
               </h1>
-              <p className="sans text-sm text-amber-100 mt-2">
+              <p className="sans text-sm text-[#E8F4F0] mt-2">
                 Manage your firm profile and preferences
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 sans font-semibold">
+            <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans font-semibold">
               {firm?.subscription_tier === "professional" ? "Professional" : firm?.subscription_tier}
             </Badge>
             <Badge
@@ -227,7 +227,7 @@ export default function FirmSettingsPage() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link href="/professional/firm/team">
-          <Card className="border-2 border-amber-900/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-amber-50/20 to-white">
+          <Card className="border-2 border-[#1E3A4A]/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-50 border-2 border-blue-900/20 rounded-sm">
@@ -238,12 +238,12 @@ export default function FirmSettingsPage() {
                   <p className="sans text-sm text-slate-600">{firm?.member_count || 0} members</p>
                 </div>
               </div>
-              <ArrowRight className="h-5 w-5 text-amber-900/40" />
+              <ArrowRight className="h-5 w-5 text-[#1E3A4A]/40" />
             </CardContent>
           </Card>
         </Link>
         <Link href="/professional/firm/templates">
-          <Card className="border-2 border-amber-900/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-amber-50/20 to-white">
+          <Card className="border-2 border-[#1E3A4A]/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-purple-50 border-2 border-purple-900/20 rounded-sm">
@@ -254,12 +254,12 @@ export default function FirmSettingsPage() {
                   <p className="sans text-sm text-slate-600">Intake & agreement templates</p>
                 </div>
               </div>
-              <ArrowRight className="h-5 w-5 text-amber-900/40" />
+              <ArrowRight className="h-5 w-5 text-[#1E3A4A]/40" />
             </CardContent>
           </Card>
         </Link>
         <Link href="/professional/firm/analytics">
-          <Card className="border-2 border-amber-900/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-amber-50/20 to-white">
+          <Card className="border-2 border-[#1E3A4A]/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-emerald-50 border-2 border-emerald-900/20 rounded-sm">
@@ -270,23 +270,23 @@ export default function FirmSettingsPage() {
                   <p className="sans text-sm text-slate-600">Firm performance & trends</p>
                 </div>
               </div>
-              <ArrowRight className="h-5 w-5 text-amber-900/40" />
+              <ArrowRight className="h-5 w-5 text-[#1E3A4A]/40" />
             </CardContent>
           </Card>
         </Link>
         <Link href="/professional/firm/queue">
-          <Card className="border-2 border-amber-900/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-amber-50/20 to-white">
+          <Card className="border-2 border-[#1E3A4A]/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
             <CardContent className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-50 border-2 border-amber-900/20 rounded-sm">
-                  <Inbox className="h-5 w-5 text-amber-900" strokeWidth={2} />
+                <div className="p-2 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm">
+                  <Inbox className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
                 </div>
                 <div>
                   <p className="serif font-bold text-slate-900">Case Queue</p>
                   <p className="sans text-sm text-slate-600">Assign incoming cases</p>
                 </div>
               </div>
-              <ArrowRight className="h-5 w-5 text-amber-900/40" />
+              <ArrowRight className="h-5 w-5 text-[#1E3A4A]/40" />
             </CardContent>
           </Card>
         </Link>
@@ -294,17 +294,17 @@ export default function FirmSettingsPage() {
 
       {/* Integrations (Coming Soon) */}
       <div className="mb-6">
-        <h2 className="sans text-sm font-bold text-amber-900/60 uppercase tracking-widest flex items-center gap-2 mb-4">
-          <div className="h-1 w-8 bg-amber-900 rounded-full" />
+        <h2 className="sans text-sm font-bold text-[#1E3A4A]/60 uppercase tracking-widest flex items-center gap-2 mb-4">
+          <div className="h-1 w-8 bg-[#1E3A4A] rounded-full" />
           External Integrations
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="bg-gradient-to-br from-amber-50/30 to-white border-dashed border-2 border-amber-900/20 opacity-80 overflow-hidden relative group">
+          <Card className="bg-gradient-to-br from-[#F4F8F7]/30 to-white border-dashed border-2 border-[#1E3A4A]/20 opacity-80 overflow-hidden relative group">
             <div className="absolute top-2 right-2 flex gap-1">
-              <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 sans text-[10px]">COMING SOON</Badge>
+              <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans text-[10px]">COMING SOON</Badge>
             </div>
             <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-sm bg-white border-2 border-amber-900/20 flex items-center justify-center p-2">
+              <div className="h-10 w-10 rounded-sm bg-white border-2 border-[#1E3A4A]/20 flex items-center justify-center p-2">
                 <img src="/integrations/mycase.svg" alt="MyCase" className="w-full h-full grayscale opacity-50" onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   e.currentTarget.parentElement!.innerHTML = '<span className="serif font-bold text-slate-300">MC</span>';
@@ -317,12 +317,12 @@ export default function FirmSettingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-amber-50/30 to-white border-dashed border-2 border-amber-900/20 opacity-80 overflow-hidden relative group">
+          <Card className="bg-gradient-to-br from-[#F4F8F7]/30 to-white border-dashed border-2 border-[#1E3A4A]/20 opacity-80 overflow-hidden relative group">
             <div className="absolute top-2 right-2 flex gap-1">
-              <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 sans text-[10px]">COMING SOON</Badge>
+              <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans text-[10px]">COMING SOON</Badge>
             </div>
             <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-sm bg-white border-2 border-amber-900/20 flex items-center justify-center p-2">
+              <div className="h-10 w-10 rounded-sm bg-white border-2 border-[#1E3A4A]/20 flex items-center justify-center p-2">
                 <img src="/integrations/silo.svg" alt="Silo" className="w-full h-full grayscale opacity-50" onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   e.currentTarget.parentElement!.innerHTML = '<span className="serif font-bold text-slate-300">S</span>';
@@ -338,9 +338,9 @@ export default function FirmSettingsPage() {
       </div>
 
       {/* Basic Info */}
-      <Card className="mb-6 border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-        <CardHeader className="border-b-2 border-amber-900/10">
+      <Card className="mb-6 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+        <CardHeader className="border-b-2 border-[#1E3A4A]/10">
           <CardTitle className="serif text-slate-900">Basic Information</CardTitle>
           <CardDescription className="sans">Your firm's public profile information</CardDescription>
         </CardHeader>
@@ -419,11 +419,11 @@ export default function FirmSettingsPage() {
       </Card>
 
       {/* Address */}
-      <Card className="mb-6 border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-        <CardHeader className="border-b-2 border-amber-900/10">
+      <Card className="mb-6 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+        <CardHeader className="border-b-2 border-[#1E3A4A]/10">
           <CardTitle className="serif text-slate-900">
-            <MapPin className="h-5 w-5 inline mr-2 text-amber-900" />
+            <MapPin className="h-5 w-5 inline mr-2 text-[#1E3A4A]" />
             Address
           </CardTitle>
         </CardHeader>
@@ -480,11 +480,11 @@ export default function FirmSettingsPage() {
       </Card>
 
       {/* Branding & Visibility */}
-      <Card className="mb-6 border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-        <CardHeader className="border-b-2 border-amber-900/10">
+      <Card className="mb-6 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+        <CardHeader className="border-b-2 border-[#1E3A4A]/10">
           <CardTitle className="serif text-slate-900">
-            <Palette className="h-5 w-5 inline mr-2 text-amber-900" />
+            <Palette className="h-5 w-5 inline mr-2 text-[#1E3A4A]" />
             Branding & Visibility
           </CardTitle>
         </CardHeader>
@@ -525,11 +525,11 @@ export default function FirmSettingsPage() {
       </Card>
 
       {/* Activity Log */}
-      <Card className="mb-6 border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/30 to-white shadow-lg relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-900 via-amber-600 to-amber-900"></div>
-        <CardHeader className="border-b-2 border-amber-900/10">
+      <Card className="mb-6 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+        <CardHeader className="border-b-2 border-[#1E3A4A]/10">
           <CardTitle className="serif text-slate-900">
-            <Clock className="h-5 w-5 inline mr-2 text-amber-900" />
+            <Clock className="h-5 w-5 inline mr-2 text-[#1E3A4A]" />
             Recent Activity
           </CardTitle>
           <CardDescription className="sans">Audit log of firm actions for compliance</CardDescription>
@@ -541,7 +541,7 @@ export default function FirmSettingsPage() {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={isSaving} className="bg-amber-900 hover:bg-amber-800 text-white shadow-lg border-2 border-amber-900/40 sans font-semibold">
+        <Button onClick={handleSave} disabled={isSaving} className="bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white shadow-lg border-2 border-[#1E3A4A]/40 sans font-semibold">
           <Save className="h-4 w-4 mr-2" />
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>
