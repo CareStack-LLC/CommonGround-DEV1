@@ -1944,3 +1944,646 @@ async def send_monthly_reports(
         "failed": failed_count,
         "errors": errors[:10] if errors else [],
     }
+@router.get(
+    "/aria/insights",
+    summary="ARIA intervention analytics",
+)
+async def get_aria_insights(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Get ARIA intervention statistics: totals, daily counts, categories,
+    blocked count, acceptance rate, and sentiment distribution.
+    """
+    from app.models.message import MessageFlag
+
+    now = datetime.utcnow()
+    seven_days_ago = now - timedelta(days=7)
+    thirty_days_ago = now - timedelta(days=30)
+
+    # Total interventions (all time)
+    total_result = await db.execute(
+        select(func.count()).select_from(MessageFlag)
+    )
+    total_interventions = total_result.scalar() or 0
+
+    # Last 7 days
+    result_7d = await db.execute(
+        select(func.count()).select_from(MessageFlag).where(
+            MessageFlag.created_at >= seven_days_ago
+        )
+    )
+    last_7d = result_7d.scalar() or 0
+
+    # Last 30 days
+    result_30d = await db.execute(
+        select(func.count()).select_from(MessageFlag).where(
+            MessageFlag.created_at >= thirty_days_ago
+        )
+    )
+    last_30d = result_30d.scalar() or 0
+
+    # Daily interventions (last 30 days)
+    daily_result = await db.execute(
+        select(
+            cast(MessageFlag.created_at, Date).label("date"),
+            func.count().label("count"),
+        )
+        .where(MessageFlag.created_at >= thirty_days_ago)
+        .group_by(cast(MessageFlag.created_at, Date))
+        .order_by(cast(MessageFlag.created_at, Date))
+    )
+    daily_interventions = [
+        {"date": str(row.date), "count": row.count}
+        for row in daily_result.all()
+    ]
+
+    # Top categories - MessageFlag.categories is JSON array, count occurrences
+    # We group by severity as a proxy for category since categories is a JSON array
+    cat_result = await db.execute(
+        select(
+            MessageFlag.severity,
+            func.count().label("count"),
+        )
+        .group_by(MessageFlag.severity)
+        .order_by(func.count().desc())
+    )
+    top_categories = [
+        {"category": row.severity, "count": row.count}
+        for row in cat_result.all()
+    ]
+
+    # Blocked count (intervention_level 4 = block)
+    blocked_result = await db.execute(
+        select(func.count()).select_from(MessageFlag).where(
+            MessageFlag.intervention_level == 4
+        )
+    )
+    blocked_count = blocked_result.scalar() or 0
+
+    # Acceptance rate
+    accepted_result = await db.execute(
+        select(func.count()).select_from(MessageFlag).where(
+            MessageFlag.user_action.in_(["accepted", "modified"])
+        )
+    )
+    accepted_count = accepted_result.scalar() or 0
+    acceptance_rate = (
+        round(accepted_count / total_interventions * 100, 1)
+        if total_interventions > 0
+        else 0.0
+    )
+
+    # Sentiment distribution based on severity
+    sentiment_dist = {"positive": 0, "neutral": 0, "negative": 0}
+    for cat in top_categories:
+        if cat["category"] in ("low",):
+            sentiment_dist["neutral"] += cat["count"]
+        elif cat["category"] in ("medium",):
+            sentiment_dist["neutral"] += cat["count"]
+        elif cat["category"] in ("high", "severe"):
+            sentiment_dist["negative"] += cat["count"]
+
+    # Count messages that passed without flags as positive
+    from app.models.message import Message
+    total_msgs_result = await db.execute(
+        select(func.count()).select_from(Message).where(
+            Message.was_flagged == False
+        )
+    )
+    sentiment_dist["positive"] = total_msgs_result.scalar() or 0
+
+    return {
+        "total_interventions": total_interventions,
+        "last_7d": last_7d,
+        "last_30d": last_30d,
+        "daily_interventions": daily_interventions,
+        "top_categories": top_categories,
+        "blocked_count": blocked_count,
+        "acceptance_rate": acceptance_rate,
+        "sentiment_distribution": sentiment_dist,
+    }
+
+
+# =============================================================================
+# MODULE 14: KidSpace Stats
+# =============================================================================
+
+@router.get(
+    "/kidspace/stats",
+    summary="KidSpace usage statistics",
+)
+async def get_kidspace_stats(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Get KidSpace usage stats: active families, call minutes,
+    theater/arcade/stories sessions, and daily usage breakdown.
+    """
+    from app.models.kidcoms import KidComsSession, SessionType, SessionStatus
+    from app.models.child import Child
+
+    now = datetime.utcnow()
+    thirty_days_ago = now - timedelta(days=30)
+
+    # Active families (distinct family_file_ids with sessions)
+    active_fam_result = await db.execute(
+        select(func.count(func.distinct(KidComsSession.family_file_id)))
+    )
+    active_families = active_fam_result.scalar() or 0
+
+    # Total call minutes (all completed sessions)
+    total_minutes_result = await db.execute(
+        select(func.sum(KidComsSession.duration_seconds)).where(
+            KidComsSession.status == SessionStatus.COMPLETED.value
+        )
+    )
+    total_seconds = total_minutes_result.scalar() or 0
+    total_call_minutes = total_seconds // 60
+
+    # Call minutes last 30 days
+    minutes_30d_result = await db.execute(
+        select(func.sum(KidComsSession.duration_seconds)).where(
+            KidComsSession.status == SessionStatus.COMPLETED.value,
+            KidComsSession.created_at >= thirty_days_ago,
+        )
+    )
+    seconds_30d = minutes_30d_result.scalar() or 0
+    call_minutes_30d = seconds_30d // 60
+
+    # Session type breakdowns
+    async def _count_sessions(session_type: str):
+        count_result = await db.execute(
+            select(func.count()).select_from(KidComsSession).where(
+                KidComsSession.session_type == session_type
+            )
+        )
+        count = count_result.scalar() or 0
+
+        minutes_result = await db.execute(
+            select(func.sum(KidComsSession.duration_seconds)).where(
+                KidComsSession.session_type == session_type,
+                KidComsSession.status == SessionStatus.COMPLETED.value,
+            )
+        )
+        secs = minutes_result.scalar() or 0
+        return count, secs // 60
+
+    theater_sessions, theater_minutes = await _count_sessions(SessionType.THEATER.value)
+    arcade_sessions, arcade_minutes = await _count_sessions(SessionType.ARCADE.value)
+
+    # Stories: use MIXED or count video_call sessions with "stories" features
+    # For now, we count sessions that used the whiteboard feature as stories
+    stories_result = await db.execute(
+        select(func.count()).select_from(KidComsSession).where(
+            KidComsSession.session_type == SessionType.WHITEBOARD.value
+        )
+    )
+    stories_sessions = stories_result.scalar() or 0
+
+    # Pages turned: approximate from total_messages in whiteboard sessions
+    pages_result = await db.execute(
+        select(func.sum(KidComsSession.total_messages)).where(
+            KidComsSession.session_type == SessionType.WHITEBOARD.value
+        )
+    )
+    pages_turned = pages_result.scalar() or 0
+
+    # COPPA consented children - no coppa_consent field exists,
+    # count active children as proxy
+    coppa_result = await db.execute(
+        select(func.count()).select_from(Child).where(
+            Child.is_active == True
+        )
+    )
+    coppa_consented_children = coppa_result.scalar() or 0
+
+    # Daily usage (last 30 days)
+    daily_result = await db.execute(
+        select(
+            cast(KidComsSession.created_at, Date).label("date"),
+            func.sum(sql_case(
+                (KidComsSession.session_type == SessionType.VIDEO_CALL.value, 1),
+                else_=0
+            )).label("calls"),
+            func.sum(sql_case(
+                (KidComsSession.session_type == SessionType.THEATER.value, 1),
+                else_=0
+            )).label("theater"),
+            func.sum(sql_case(
+                (KidComsSession.session_type == SessionType.ARCADE.value, 1),
+                else_=0
+            )).label("arcade"),
+            func.sum(sql_case(
+                (KidComsSession.session_type == SessionType.WHITEBOARD.value, 1),
+                else_=0
+            )).label("stories"),
+        )
+        .where(KidComsSession.created_at >= thirty_days_ago)
+        .group_by(cast(KidComsSession.created_at, Date))
+        .order_by(cast(KidComsSession.created_at, Date))
+    )
+    daily_usage = [
+        {
+            "date": str(row.date),
+            "calls": row.calls or 0,
+            "theater": row.theater or 0,
+            "arcade": row.arcade or 0,
+            "stories": row.stories or 0,
+        }
+        for row in daily_result.all()
+    ]
+
+    return {
+        "active_families": active_families,
+        "total_call_minutes": total_call_minutes,
+        "call_minutes_30d": call_minutes_30d,
+        "theater_sessions": theater_sessions,
+        "theater_minutes": theater_minutes,
+        "arcade_sessions": arcade_sessions,
+        "arcade_minutes": arcade_minutes,
+        "stories_sessions": stories_sessions,
+        "pages_turned": pages_turned,
+        "coppa_consented_children": coppa_consented_children,
+        "daily_usage": daily_usage,
+    }
+
+
+# =============================================================================
+# MODULE 15: Platform Audit Feed
+# =============================================================================
+
+@router.get(
+    "/platform-audit",
+    summary="Unified platform audit event feed",
+)
+async def get_platform_audit(
+    event_type: Optional[str] = Query(None, description="Filter by event type"),
+    user_email: Optional[str] = Query(None, description="Filter by user email"),
+    days: int = Query(7, ge=1, le=90, description="Number of days to look back"),
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Build a unified audit event feed across multiple tables:
+    messages, exchanges, reports, agreements, payments, kidcoms sessions,
+    and ARIA interventions.
+    """
+    from app.models.message import Message, MessageFlag
+    from app.models.custody_exchange import CustodyExchange
+    from app.models.agreement import Agreement
+    from app.models.payment import Payment
+    from app.models.kidcoms import KidComsSession
+    from app.models.generated_report import GeneratedReport
+
+    since = datetime.utcnow() - timedelta(days=days)
+    events = []
+
+    # Helper to resolve user email from ID
+    async def _get_email(user_id: str) -> str:
+        if not user_id:
+            return "unknown"
+        result = await db.execute(
+            select(User.email).where(User.id == user_id)
+        )
+        email = result.scalar_one_or_none()
+        return email or "unknown"
+
+    # Filter function
+    def _matches(evt_type: str, email: str) -> bool:
+        if event_type and evt_type != event_type:
+            return False
+        if user_email and user_email.lower() not in email.lower():
+            return False
+        return True
+
+    # 1. Messages
+    if not event_type or event_type == "message_sent":
+        msg_result = await db.execute(
+            select(Message.created_at, Message.sender_id)
+            .where(Message.created_at >= since)
+            .order_by(desc(Message.created_at))
+            .limit(limit)
+        )
+        for row in msg_result.all():
+            email = await _get_email(row.sender_id)
+            if _matches("message_sent", email):
+                events.append({
+                    "timestamp": row.created_at.isoformat(),
+                    "event_type": "message_sent",
+                    "user_email": email,
+                })
+
+    # 2. Custody exchanges
+    if not event_type or event_type == "exchange_created":
+        ex_result = await db.execute(
+            select(CustodyExchange.created_at, CustodyExchange.family_file_id)
+            .where(CustodyExchange.created_at >= since)
+            .order_by(desc(CustodyExchange.created_at))
+            .limit(limit)
+        )
+        for row in ex_result.all():
+            events.append({
+                "timestamp": row.created_at.isoformat(),
+                "event_type": "exchange_created",
+                "user_email": f"family:{row.family_file_id[:8]}",
+            })
+
+    # 3. Generated reports
+    if not event_type or event_type == "report_generated":
+        rep_result = await db.execute(
+            select(GeneratedReport.created_at, GeneratedReport.family_file_id)
+            .where(GeneratedReport.created_at >= since)
+            .order_by(desc(GeneratedReport.created_at))
+            .limit(limit)
+        )
+        for row in rep_result.all():
+            events.append({
+                "timestamp": row.created_at.isoformat(),
+                "event_type": "report_generated",
+                "user_email": f"family:{row.family_file_id[:8] if row.family_file_id else 'n/a'}",
+            })
+
+    # 4. Agreements
+    if not event_type or event_type == "agreement_signed":
+        agr_result = await db.execute(
+            select(Agreement.created_at, Agreement.family_file_id)
+            .where(Agreement.created_at >= since)
+            .order_by(desc(Agreement.created_at))
+            .limit(limit)
+        )
+        for row in agr_result.all():
+            events.append({
+                "timestamp": row.created_at.isoformat(),
+                "event_type": "agreement_signed",
+                "user_email": f"family:{row.family_file_id[:8] if row.family_file_id else 'n/a'}",
+            })
+
+    # 5. Payments
+    if not event_type or event_type == "payment_made":
+        pay_result = await db.execute(
+            select(Payment.created_at, Payment.payer_id)
+            .where(Payment.created_at >= since)
+            .order_by(desc(Payment.created_at))
+            .limit(limit)
+        )
+        for row in pay_result.all():
+            email = await _get_email(row.payer_id)
+            if _matches("payment_made", email):
+                events.append({
+                    "timestamp": row.created_at.isoformat(),
+                    "event_type": "payment_made",
+                    "user_email": email,
+                })
+
+    # 6. KidComs sessions
+    if not event_type or event_type == "call_started":
+        kc_result = await db.execute(
+            select(KidComsSession.created_at, KidComsSession.initiated_by_id)
+            .where(KidComsSession.created_at >= since)
+            .order_by(desc(KidComsSession.created_at))
+            .limit(limit)
+        )
+        for row in kc_result.all():
+            events.append({
+                "timestamp": row.created_at.isoformat(),
+                "event_type": "call_started",
+                "user_email": row.initiated_by_id[:8] if row.initiated_by_id else "unknown",
+            })
+
+    # 7. ARIA interventions
+    if not event_type or event_type == "aria_intervention":
+        aria_result = await db.execute(
+            select(MessageFlag.created_at, MessageFlag.message_id)
+            .where(MessageFlag.created_at >= since)
+            .order_by(desc(MessageFlag.created_at))
+            .limit(limit)
+        )
+        for row in aria_result.all():
+            events.append({
+                "timestamp": row.created_at.isoformat(),
+                "event_type": "aria_intervention",
+                "user_email": "system",
+            })
+
+    # Sort all events by timestamp descending
+    events.sort(key=lambda e: e["timestamp"], reverse=True)
+
+    total_count = len(events)
+    paged_events = events[offset : offset + limit]
+
+    return {
+        "events": paged_events,
+        "total_count": total_count,
+    }
+
+
+# =============================================================================
+# MODULE 16: Billing Transactions (Stripe)
+# =============================================================================
+
+@router.get(
+    "/billing/transactions",
+    summary="Recent Stripe billing transactions",
+)
+async def get_billing_transactions(
+    limit: int = Query(100, ge=1, le=500),
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Fetch recent Stripe invoices/charges. Queries Stripe API directly.
+    """
+    import stripe
+    from app.core.config import settings
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    transactions = []
+    try:
+        invoices = stripe.Invoice.list(limit=limit)
+
+        for inv in invoices.data:
+            # Resolve user email from stripe customer
+            customer_email = None
+            if inv.customer_email:
+                customer_email = inv.customer_email
+            elif inv.customer:
+                try:
+                    cust = stripe.Customer.retrieve(inv.customer)
+                    customer_email = cust.email
+                except Exception:
+                    customer_email = None
+
+            transactions.append({
+                "date": datetime.fromtimestamp(inv.created).isoformat() if inv.created else None,
+                "user_email": customer_email or "unknown",
+                "amount": (inv.amount_paid or 0) / 100.0,
+                "type": "invoice",
+                "status": inv.status or "unknown",
+                "stripe_id": inv.id,
+            })
+
+    except Exception as e:
+        logger.error(f"Stripe transactions fetch failed: {e}")
+        return {
+            "transactions": [],
+            "error": "Failed to fetch Stripe data. Check API key.",
+        }
+
+    return {"transactions": transactions}
+
+
+# =============================================================================
+# MODULE 17: Retention Cohorts
+# =============================================================================
+
+@router.get(
+    "/stats/retention",
+    summary="User retention cohort analysis",
+)
+async def get_retention_stats(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Calculate retention cohorts for the last 4 weeks.
+    For each week: users who signed up, and their day-1, day-7, day-30 retention.
+    """
+    from sqlalchemy import text
+
+    now = datetime.utcnow()
+    cohorts = []
+
+    for week_offset in range(4):
+        week_start = now - timedelta(weeks=week_offset + 1)
+        week_end = now - timedelta(weeks=week_offset)
+
+        # Users who signed up in this week
+        signup_result = await db.execute(
+            select(User.id, User.created_at).where(
+                User.created_at >= week_start,
+                User.created_at < week_end,
+            )
+        )
+        signups = signup_result.all()
+        signup_count = len(signups)
+
+        if signup_count == 0:
+            cohorts.append({
+                "week": week_start.strftime("%Y-%m-%d"),
+                "signups": 0,
+                "day1_pct": 0,
+                "day7_pct": 0,
+                "day30_pct": 0,
+            })
+            continue
+
+        day1_count = 0
+        day7_count = 0
+        day30_count = 0
+
+        for user_id, created_at in signups:
+            # Check if user logged in after signup
+            if not created_at:
+                continue
+
+            # Day 1: logged in the next day
+            login_result = await db.execute(
+                select(func.count()).select_from(User).where(
+                    User.id == user_id,
+                    User.last_login >= created_at + timedelta(days=1),
+                    User.last_login < created_at + timedelta(days=2),
+                )
+            )
+            if (login_result.scalar() or 0) > 0:
+                day1_count += 1
+
+            # Day 7: logged in within 7 days
+            login7_result = await db.execute(
+                select(func.count()).select_from(User).where(
+                    User.id == user_id,
+                    User.last_login >= created_at + timedelta(days=1),
+                    User.last_login <= created_at + timedelta(days=7),
+                )
+            )
+            if (login7_result.scalar() or 0) > 0:
+                day7_count += 1
+
+            # Day 30: logged in within 30 days
+            login30_result = await db.execute(
+                select(func.count()).select_from(User).where(
+                    User.id == user_id,
+                    User.last_login >= created_at + timedelta(days=1),
+                    User.last_login <= created_at + timedelta(days=30),
+                )
+            )
+            if (login30_result.scalar() or 0) > 0:
+                day30_count += 1
+
+        cohorts.append({
+            "week": week_start.strftime("%Y-%m-%d"),
+            "signups": signup_count,
+            "day1_pct": round(day1_count / signup_count * 100, 1),
+            "day7_pct": round(day7_count / signup_count * 100, 1),
+            "day30_pct": round(day30_count / signup_count * 100, 1),
+        })
+
+    return {"cohorts": cohorts}
+
+
+# =============================================================================
+# MODULE 18: Conversion Funnel
+# =============================================================================
+
+@router.get(
+    "/stats/funnel",
+    summary="User conversion funnel statistics",
+)
+async def get_funnel_stats(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Calculate conversion funnel:
+    - total signups
+    - users who sent at least 1 message
+    - users who created at least 1 agreement
+    """
+    from app.models.message import Message
+    from app.models.agreement import Agreement
+
+    # Total signups
+    total_result = await db.execute(
+        select(func.count()).select_from(User)
+    )
+    total_signups = total_result.scalar() or 0
+
+    # Users who sent at least 1 message
+    msg_senders_result = await db.execute(
+        select(func.count(func.distinct(Message.sender_id)))
+    )
+    sent_first_message = msg_senders_result.scalar() or 0
+
+    # Users who created at least 1 agreement
+    # Agreements are per family_file; count distinct family_file_ids with agreements
+    agr_creators_result = await db.execute(
+        select(func.count(func.distinct(Agreement.family_file_id)))
+    )
+    created_first_agreement = agr_creators_result.scalar() or 0
+
+    # Calculate percentages
+    msg_pct = round(sent_first_message / total_signups * 100, 1) if total_signups > 0 else 0.0
+    agr_pct = round(created_first_agreement / total_signups * 100, 1) if total_signups > 0 else 0.0
+
+    return {
+        "total_signups": total_signups,
+        "sent_first_message": sent_first_message,
+        "sent_first_message_pct": msg_pct,
+        "created_first_agreement": created_first_agreement,
+        "created_first_agreement_pct": agr_pct,
+    }

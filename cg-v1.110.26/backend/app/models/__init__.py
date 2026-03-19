@@ -263,6 +263,13 @@ from app.models.report_request import (
     URGENCY_LEVELS,
 )
 from app.models.generated_report import GeneratedReport
+from app.models.blog import BlogPost
+from app.models.kidspace_media import (
+    KidSpaceGenre,
+    KidSpaceAuthor,
+    KidSpaceMovie,
+    KidSpaceBook,
+)
 
 __all__ = [
     "Base",
@@ -518,4 +525,11 @@ __all__ = [
     "VideoFrameAnalysis",
     "CallViolationTracker",
     "VideoViolationType",
+    # Blog
+    "BlogPost",
+    # KidSpace Media
+    "KidSpaceGenre",
+    "KidSpaceAuthor",
+    "KidSpaceMovie",
+    "KidSpaceBook",
 ]

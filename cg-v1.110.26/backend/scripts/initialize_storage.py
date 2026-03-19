@@ -43,6 +43,7 @@ async def initialize_storage():
         (StorageBucket.REPORTS, False),              # Private
         (StorageBucket.ARIA_FRAME_EVIDENCE, False),  # Private
         (StorageBucket.EMAIL_ASSETS, True),             # Public — email logos/icons
+        (StorageBucket.KIDSPACE_MEDIA, True),             # Public — KidSpace movies, books, author photos
     ]
 
     print("\n📦 Initializing Storage Buckets...")

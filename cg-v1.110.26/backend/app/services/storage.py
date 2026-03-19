@@ -36,6 +36,7 @@ class StorageBucket:
     PROFESSIONAL_MEDIA = "professional-media"  # Public bucket for firm logos, videos, and professional headshots
     REPORTS = "reports"  # Private bucket for generated PDF reports
     ARIA_FRAME_EVIDENCE = "aria-frame-evidence"  # Private bucket for ARIA video frame captures
+    KIDSPACE_MEDIA = "kidspace-media"  # Public bucket for KidSpace movies, books, author photos
 
 
 class SupabaseStorageService:
