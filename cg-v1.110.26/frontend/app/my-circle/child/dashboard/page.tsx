@@ -137,7 +137,7 @@ export default function ChildDashboardPage() {
   const [eventsLoading, setEventsLoading] = useState(true);
 
   // API-sourced content (merged with hardcoded fallback)
-  const [apiVideos, setApiVideos] = useState<VideoContent[]>(apiVideos);
+  const [apiVideos, setApiVideos] = useState<VideoContent[]>(theaterContent.videos);
   const [apiComingSoon, setApiComingSoon] = useState<{id: string; poster: string}[]>(COMING_SOON);
 
   // Fetch from KidSpace API
