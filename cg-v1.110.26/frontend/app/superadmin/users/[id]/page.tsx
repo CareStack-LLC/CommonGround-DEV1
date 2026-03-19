@@ -320,21 +320,25 @@ export default function UserDetailPage() {
       })()}
 
       {/* Transactions Tab */}
-      {activeTab === 'transactions' && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-zinc-300 mb-4">Payment History</h3>
-          {user?.subscription?.stripe_customer_id ? (
-            <div className="text-center py-8 text-zinc-600 text-xs">
-              View full transaction history in{' '}
-              <a href={`https://dashboard.stripe.com/customers/${user.subscription.stripe_customer_id}`} target="_blank" rel="noopener" className="text-violet-400 hover:underline">
-                Stripe Dashboard <ExternalLink className="w-3 h-3 inline" />
-              </a>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-zinc-600 text-xs">No Stripe customer linked to this account.</div>
-          )}
-        </div>
-      )}
+      {activeTab === 'transactions' && user && (() => {
+        const u = user as any;
+        const stripeId = u.subscription?.stripe_customer_id || u.stripe_customer_id;
+        return (
+          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-zinc-300 mb-4">Payment History</h3>
+            {stripeId ? (
+              <div className="text-center py-8 text-zinc-600 text-xs">
+                View full transaction history in{' '}
+                <a href={`https://dashboard.stripe.com/customers/${stripeId}`} target="_blank" rel="noopener" className="text-violet-400 hover:underline">
+                  Stripe Dashboard <ExternalLink className="w-3 h-3 inline" />
+                </a>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-zinc-600 text-xs">No Stripe customer linked to this account.</div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ARIA Tab */}
       {activeTab === 'aria' && user && (() => {
