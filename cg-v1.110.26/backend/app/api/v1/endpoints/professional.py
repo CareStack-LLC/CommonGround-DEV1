@@ -2668,6 +2668,46 @@ async def mark_thread_read(
     return {"marked_read": count}
 
 
+@router.post(
+    "/messages/{message_id}/archive",
+    summary="Archive a message",
+)
+async def archive_message(
+    message_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Archive a professional message."""
+    service = ProfessionalMessagingService(db)
+    message = await service.get_message(message_id, current_user.id)
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    message.archived_at = datetime.utcnow()
+    await db.commit()
+    return {"archived": True, "message_id": message_id}
+
+
+@router.post(
+    "/messages/{message_id}/unarchive",
+    summary="Unarchive a message",
+)
+async def unarchive_message(
+    message_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Unarchive a professional message."""
+    service = ProfessionalMessagingService(db)
+    message = await service.get_message(message_id, current_user.id)
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    message.archived_at = None
+    await db.commit()
+    return {"archived": False, "message_id": message_id}
+
+
 # =============================================================================
 # ARIA PRO INTAKE CENTER
 # =============================================================================
