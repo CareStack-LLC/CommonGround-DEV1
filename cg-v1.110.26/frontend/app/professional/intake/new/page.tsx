@@ -72,7 +72,7 @@ function TemplateCard({
       className={`
         relative w-full text-left rounded-xl border-2 p-4 transition-all duration-200
         ${isSelected
-          ? "border-emerald-500 bg-emerald-50/80 shadow-md ring-1 ring-emerald-200"
+          ? "border-[#3DAA8A] bg-[#E8F4F0]/80 shadow-md ring-1 ring-[#3DAA8A]/30"
           : isLocked
             ? "border-gray-200 bg-gray-50 opacity-70 cursor-not-allowed"
             : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/50 cursor-pointer"
@@ -92,7 +92,7 @@ function TemplateCard({
       {/* Selected indicator */}
       {isSelected && (
         <div className="absolute top-3 right-3">
-          <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+          <CheckCircle2 className="h-5 w-5 text-[#3DAA8A]" />
         </div>
       )}
 
@@ -126,10 +126,10 @@ function TemplateCard({
 
           {/* Expandable sections preview */}
           {isSelected && (
-            <div className="mt-3 pt-3 border-t border-emerald-200">
+            <div className="mt-3 pt-3 border-t border-[#3DAA8A]/30">
               <button
                 type="button"
-                className="flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-800"
+                className="flex items-center gap-1 text-xs font-medium text-[#2D8A6E] hover:text-[#247058]"
                 onClick={(e) => {
                   e.stopPropagation();
                   setExpanded(!expanded);
@@ -148,11 +148,11 @@ function TemplateCard({
               {expanded && (
                 <ul className="mt-2 space-y-1">
                   {template.sections.map((s) => (
-                    <li key={s.id} className="flex items-center gap-2 text-xs text-emerald-900">
-                      <span className="w-1 h-1 rounded-full bg-emerald-400 flex-shrink-0" />
+                    <li key={s.id} className="flex items-center gap-2 text-xs text-[#1a6b55]">
+                      <span className="w-1 h-1 rounded-full bg-[#3DAA8A] flex-shrink-0" />
                       <span>{s.title}</span>
                       {s.required ? (
-                        <Badge variant="outline" className="text-[10px] py-0 px-1 h-4 border-emerald-300 text-emerald-700">
+                        <Badge variant="outline" className="text-[10px] py-0 px-1 h-4 border-[#3DAA8A]/40 text-[#2D8A6E]">
                           Required
                         </Badge>
                       ) : (
@@ -287,10 +287,10 @@ export default function NewIntakePage() {
           Back to Intake Center
         </Link>
 
-        <Card className="border-emerald-200 bg-emerald-50/50">
+        <Card className="border-[#3DAA8A]/30 bg-[#E8F4F0]/50">
           <CardContent className="pt-6">
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-[#E8F4F0] text-[#3DAA8A] rounded-full flex items-center justify-center mb-4">
                 <CheckCircle2 className="h-8 w-8" />
               </div>
               <h2 className="text-xl font-bold text-foreground mb-2">Intake Created Successfully</h2>
@@ -300,7 +300,7 @@ export default function NewIntakePage() {
                   : "Share the link below with your client to begin the intake process"}
               </p>
               {selectedTemplate && (
-                <p className="text-sm text-emerald-700 mb-6">
+                <p className="text-sm text-[#2D8A6E] mb-6">
                   Template: <strong>{selectedTemplate.icon} {selectedTemplate.name}</strong> (~{selectedTemplate.estimatedTime} min)
                 </p>
               )}
@@ -332,7 +332,7 @@ export default function NewIntakePage() {
                 </Button>
                 <Button
                   onClick={() => router.push(`/professional/intake/${createdSession.id}`)}
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-[#3DAA8A] hover:bg-[#2D8A6E]"
                 >
                   View Session
                 </Button>
@@ -378,7 +378,7 @@ export default function NewIntakePage() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-emerald-600" />
+              <Sparkles className="h-4 w-4 text-[#3DAA8A]" />
               Intake Templates
             </CardTitle>
             <CardDescription>
@@ -405,7 +405,7 @@ export default function NewIntakePage() {
           <Card className={!isPaid ? "border-amber-200" : ""}>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Crown className="h-4 w-4 text-amber-500" />
+                <Crown className="h-4 w-4 text-[#3DAA8A]" />
                 Professional Templates
                 {!isPaid && (
                   <Badge variant="outline" className="text-xs text-amber-600 border-amber-200 bg-amber-50">
@@ -446,7 +446,7 @@ export default function NewIntakePage() {
           </Button>
           <Button
             onClick={() => setStep(2)}
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="bg-[#3DAA8A] hover:bg-[#2D8A6E]"
           >
             Continue
             <ArrowRight className="h-4 w-4 ml-2" />
@@ -484,7 +484,7 @@ export default function NewIntakePage() {
 
       {/* Selected Template Summary */}
       {selectedTemplate && (
-        <Card className="border-emerald-200 bg-emerald-50/30">
+        <Card className="border-[#3DAA8A]/30 bg-[#E8F4F0]/30">
           <CardContent className="py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -501,7 +501,7 @@ export default function NewIntakePage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setStep(1)}
-                className="text-xs text-emerald-700 hover:text-emerald-800"
+                className="text-xs text-[#2D8A6E] hover:text-[#247058]"
               >
                 Change
               </Button>
@@ -627,7 +627,7 @@ export default function NewIntakePage() {
           <Button
             type="submit"
             disabled={isSubmitting || !formData.client_name || !formData.client_email}
-            className="bg-emerald-600 hover:bg-emerald-700"
+            className="bg-[#3DAA8A] hover:bg-[#2D8A6E]"
           >
             {isSubmitting ? (
               "Creating..."
