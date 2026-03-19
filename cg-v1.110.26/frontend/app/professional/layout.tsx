@@ -20,8 +20,10 @@ import {
   Settings,
   Building2,
   User,
+  UserPlus,
   ChevronDown,
   FileText,
+  FileBarChart,
   CreditCard,
   MoreHorizontal,
   HelpCircle,
@@ -428,14 +430,19 @@ function ProfessionalNavigation({
     {
       href: "/professional/cases",
       label: "Cases",
-      icon: <FolderOpen className="h-4 w-4" />,
+      icon: <Briefcase className="h-4 w-4" />,
       badge: dashboardData?.case_count?.toString(),
     },
     {
       href: "/professional/intake",
       label: "Intake",
-      icon: <Bot className="h-4 w-4" />,
+      icon: <UserPlus className="h-4 w-4" />,
       badge: intakeAndInvitationsBadge,
+    },
+    {
+      href: "/professional/reports",
+      label: "Reports",
+      icon: <FileBarChart className="h-4 w-4" />,
     },
     {
       href: "/professional/calendar",
@@ -448,39 +455,24 @@ function ProfessionalNavigation({
       icon: <MessageSquare className="h-4 w-4" />,
       badge: dashboardData?.unread_messages > 0 ? dashboardData.unread_messages.toString() : undefined,
     },
-    {
-      href: "/professional/reports",
-      label: "Reports",
-      icon: <FileText className="h-4 w-4" />,
-    },
   ];
 
-  // Secondary items in overflow menu
+  // Secondary items in settings dropdown
   const moreMenuItems: { href: string; label: string; icon: React.ReactNode; badge?: string; dividerAfter?: boolean }[] = [
     {
       href: "/professional/profile",
-      label: "Profile",
-      icon: <User className="h-4 w-4" />,
+      label: "Profile & Settings",
+      icon: <Settings className="h-4 w-4" />,
     },
     ...(activeFirm ? [{
       href: "/professional/firm",
-      label: "Firm Settings",
+      label: "Firm Management",
       icon: <Building2 className="h-4 w-4" />,
-    }] : []),
-    ...(isFirmOwner ? [{
-      href: "/professional/firm/queue",
-      label: "Case Queue",
-      icon: <FolderOpen className="h-4 w-4" />,
-    }] : []),
-    {
-      href: "/professional/settings/subscription",
-      label: "Subscription",
-      icon: <CreditCard className="h-4 w-4" />,
       dividerAfter: true,
-    },
+    }] : []),
     {
       href: "/professional/help",
-      label: "Help & Support",
+      label: "Help",
       icon: <HelpCircle className="h-4 w-4" />,
     },
   ];
