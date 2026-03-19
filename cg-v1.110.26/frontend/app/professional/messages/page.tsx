@@ -9,9 +9,7 @@ import {
   Filter,
   Clock,
   CheckCircle2,
-  AlertCircle,
   ChevronRight,
-  Calendar,
   User,
   RefreshCw,
   MoreVertical,
@@ -20,16 +18,20 @@ import {
   Archive,
   Mail,
   MailOpen,
-  Users,
   Inbox,
   Send,
-  FileText,
   Scale,
+  Plus,
+  Loader2,
+  X,
+  Briefcase,
 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -38,14 +40,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useProfessionalAuth } from "../layout";
+import { useToast } from "@/hooks/use-toast";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -72,51 +83,35 @@ interface Message {
   message_count?: number;
 }
 
-interface MessageThread {
-  id: string;
-  participant_name: string;
-  participant_email?: string;
-  family_file_id?: string;
-  case_name?: string;
-  last_message_preview: string;
-  last_message_at: string;
-  unread_count: number;
-  total_messages: number;
-}
-
 export default function MessagesPage() {
   const { token, profile, activeFirm } = useProfessionalAuth();
+  const router = useRouter();
+  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [threads, setThreads] = useState<MessageThread[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [readFilter, setReadFilter] = useState("all");
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [showCompose, setShowCompose] = useState(false);
+  const [cases, setCases] = useState<{ id: string; title: string; family_file_id: string }[]>([]);
 
   useEffect(() => {
     if (token) {
       fetchMessages();
-      fetchUnreadCount();
+      fetchCases();
     }
   }, [token, activeFirm, readFilter]);
 
   const fetchMessages = async () => {
     if (!token) return;
-
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (readFilter === "unread") params.append("is_read", "false");
       if (readFilter === "read") params.append("is_read", "true");
       if (activeFirm) params.append("firm_id", activeFirm.id);
-
-      const response = await fetch(
-        `${API_BASE}/api/v1/professional/messages?${params.toString()}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
+      const response = await fetch(`${API_BASE}/api/v1/professional/messages?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (response.ok) {
         const data = await response.json();
         setMessages(data.items || data || []);
@@ -128,86 +123,50 @@ export default function MessagesPage() {
     }
   };
 
-  const fetchUnreadCount = async () => {
+  const fetchCases = async () => {
     if (!token) return;
-
     try {
-      const response = await fetch(
-        `${API_BASE}/api/v1/professional/messages/unread-count`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
+      const response = await fetch(`${API_BASE}/api/v1/professional/cases?status=active&limit=50`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (response.ok) {
         const data = await response.json();
-        setUnreadCount(data.unread_count || 0);
+        setCases(data.items || data || []);
       }
-    } catch (error) {
-      console.error("Error fetching unread count:", error);
-    }
+    } catch { /* silent */ }
   };
 
   const markAsRead = async (messageId: string) => {
     if (!token) return;
-
     try {
-      await fetch(
-        `${API_BASE}/api/v1/professional/messages/${messageId}/read`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      // Update local state
-      setMessages(prev =>
-        prev.map(m => m.id === messageId ? { ...m, is_read: true } : m)
-      );
-      setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error("Error marking message as read:", error);
-    }
+      await fetch(`${API_BASE}/api/v1/professional/messages/${messageId}/read`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, is_read: true } : m));
+    } catch { /* silent */ }
   };
 
   const archiveMessage = async (messageId: string) => {
     if (!token) return;
-
     try {
-      await fetch(
-        `${API_BASE}/api/v1/professional/messages/${messageId}/archive`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      setMessages(prev =>
-        prev.map(m => m.id === messageId ? { ...m, is_archived: true } : m)
-      );
-    } catch (error) {
-      console.error("Error archiving message:", error);
-    }
+      await fetch(`${API_BASE}/api/v1/professional/messages/${messageId}/archive`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, is_archived: true } : m));
+    } catch { /* silent */ }
   };
 
   const unarchiveMessage = async (messageId: string) => {
     if (!token) return;
-
     try {
-      await fetch(
-        `${API_BASE}/api/v1/professional/messages/${messageId}/unarchive`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      setMessages(prev =>
-        prev.map(m => m.id === messageId ? { ...m, is_archived: false } : m)
-      );
-    } catch (error) {
-      console.error("Error unarchiving message:", error);
-    }
+      await fetch(`${API_BASE}/api/v1/professional/messages/${messageId}/unarchive`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, is_archived: false } : m));
+    } catch { /* silent */ }
   };
 
   const filteredMessages = messages.filter(
@@ -226,20 +185,13 @@ export default function MessagesPage() {
     const minutes = Math.floor(diff / (1000 * 60));
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
-
-    if (days > 7) {
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      });
-    }
+    if (days > 7) return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
     if (days > 0) return `${days}d ago`;
     if (hours > 0) return `${hours}h ago`;
     if (minutes > 0) return `${minutes}m ago`;
     return "Just now";
   };
 
-  // Stats
   const stats = {
     total: messages.length,
     unread: messages.filter((m) => !m.is_read).length,
@@ -248,71 +200,69 @@ export default function MessagesPage() {
 
   return (
     <div className="space-y-6">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap');
-        .serif { font-family: 'Crimson Pro', serif; }
-        .sans { font-family: 'Outfit', sans-serif; }
-      `}</style>
-
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Messages
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Secure client communications
-          </p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Messages</h1>
+          <p className="text-sm text-slate-500 mt-1">Secure client communications</p>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchMessages} className="border-slate-200 text-slate-700 hover:bg-[#F4F8F7] rounded-xl h-9">
-          <RefreshCw className="h-3.5 w-3.5 mr-2" />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={fetchMessages} className="border-slate-200 text-slate-700 hover:bg-[#F4F8F7] rounded-xl h-9">
+            <RefreshCw className="h-3.5 w-3.5 mr-2" />
+            Refresh
+          </Button>
+          <Button onClick={() => setShowCompose(true)} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl h-9 shadow-sm font-semibold">
+            <Plus className="h-4 w-4 mr-2" />
+            New Message
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <StatCard
-          label="All Messages"
-          value={stats.total}
-          icon={<Inbox className="h-5 w-5" />}
-          active={readFilter === "all"}
-          onClick={() => setReadFilter("all")}
-        />
-        <StatCard
-          label="Unread"
-          value={stats.unread}
-          icon={<Mail className="h-5 w-5" />}
-          color="amber"
-          active={readFilter === "unread"}
-          onClick={() => setReadFilter("unread")}
-        />
-        <StatCard
-          label="Read"
-          value={stats.read}
-          icon={<MailOpen className="h-5 w-5" />}
-          color="teal"
-          active={readFilter === "read"}
-          onClick={() => setReadFilter("read")}
-        />
+        {[
+          { key: "all", label: "All Messages", value: stats.total, icon: Inbox },
+          { key: "unread", label: "Unread", value: stats.unread, icon: Mail },
+          { key: "read", label: "Read", value: stats.read, icon: MailOpen },
+        ].map((stat) => (
+          <button
+            key={stat.key}
+            onClick={() => setReadFilter(stat.key)}
+            className={`p-4 rounded-2xl text-left transition-all ${
+              readFilter === stat.key
+                ? "bg-white border-2 border-[#3DAA8A]/30 shadow-sm"
+                : "bg-white border border-slate-200 hover:border-slate-300"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                <p className="text-xs text-slate-500 uppercase font-semibold tracking-wide mt-1">{stat.label}</p>
+              </div>
+              <div className={`p-2.5 rounded-xl ${readFilter === stat.key ? "bg-[#3DAA8A]/10 text-[#3DAA8A]" : "bg-slate-100 text-slate-400"}`}>
+                <stat.icon className="h-5 w-5" />
+              </div>
+            </div>
+          </button>
+        ))}
       </div>
 
-      {/* Search and Filters */}
-      <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-        <CardContent className="py-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+      {/* Search */}
+      <Card className="border border-slate-200 bg-white shadow-sm rounded-2xl">
+        <CardContent className="py-3 flex items-center">
+          <div className="flex flex-col sm:flex-row gap-3 w-full">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#1E3A4A]/60" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
-                placeholder="Search correspondence..."
+                placeholder="Search messages..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 border-2 border-slate-300 focus:border-[#1E3A4A] focus:ring-[#1E3A4A] sans"
+                className="pl-10 border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
               />
             </div>
             <Select value={readFilter} onValueChange={setReadFilter}>
-              <SelectTrigger className="w-full sm:w-40 border-2 border-slate-300 sans">
-                <Filter className="h-4 w-4 mr-2 text-[#1E3A4A]/60" />
+              <SelectTrigger className="w-full sm:w-40 border-slate-200">
+                <Filter className="h-4 w-4 mr-2 text-slate-400" />
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
               <SelectContent>
@@ -327,274 +277,259 @@ export default function MessagesPage() {
 
       {/* Message List */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1E3A4A]" />
-        </div>
-      ) : filteredMessages.length > 0 ? (
         <div className="space-y-3">
-          {filteredMessages.map((message) => (
-            <MessageCard
-              key={message.id}
-              message={message}
-              onMarkRead={() => markAsRead(message.id)}
-              onArchive={() => archiveMessage(message.id)}
-              onUnarchive={() => unarchiveMessage(message.id)}
-            />
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-24 bg-slate-100 rounded-2xl animate-pulse" />
           ))}
         </div>
+      ) : filteredMessages.length > 0 ? (
+        <div className="space-y-2">
+          {filteredMessages.map((message) => {
+            const isSentByMe = message.sender_type === "professional";
+            const contactName = isSentByMe ? message.recipient_name : message.sender_name;
+            const contactInitials = contactName ? contactName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() : "?";
+
+            return (
+              <div
+                key={message.id}
+                className={`group flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
+                  !message.is_read && !isSentByMe
+                    ? "bg-[#F4F8F7]/50 border-[#3DAA8A]/20 hover:border-[#3DAA8A]/40 shadow-sm"
+                    : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm"
+                }`}
+                onClick={() => message.family_file_id && router.push(`/professional/cases/${message.family_file_id}/messages`)}
+              >
+                <Avatar className={`h-10 w-10 shrink-0 ${!message.is_read && !isSentByMe ? "ring-2 ring-[#3DAA8A]/20" : ""}`}>
+                  <AvatarFallback className={`text-xs font-semibold ${!message.is_read && !isSentByMe ? "bg-[#1E3A4A] text-white" : "bg-slate-100 text-slate-600"}`}>
+                    {contactInitials}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h3 className={`text-sm truncate ${!message.is_read && !isSentByMe ? "font-bold text-slate-900" : "font-medium text-slate-700"}`}>
+                        {contactName || "Unknown"}
+                      </h3>
+                      {isSentByMe && (
+                        <Badge className="bg-[#F4F8F7] text-[#3DAA8A] border border-[#3DAA8A]/20 shrink-0 text-[10px] font-semibold">
+                          <Send className="h-2.5 w-2.5 mr-1" />
+                          Sent
+                        </Badge>
+                      )}
+                      {!message.is_read && !isSentByMe && (
+                        <span className="w-2 h-2 rounded-full bg-[#3DAA8A] shrink-0" />
+                      )}
+                    </div>
+                    <span className="text-xs text-slate-400 shrink-0">
+                      {formatRelativeTime(message.sent_at || message.created_at)}
+                    </span>
+                  </div>
+
+                  {message.subject && (
+                    <p className={`text-sm mt-0.5 truncate ${!message.is_read && !isSentByMe ? "font-semibold text-slate-800" : "text-slate-600"}`}>
+                      {message.subject}
+                    </p>
+                  )}
+
+                  <p className="text-sm text-slate-500 mt-1 line-clamp-1">
+                    {isSentByMe && <span className="text-slate-400">You: </span>}
+                    {message.content}
+                  </p>
+
+                  {message.case_name && (
+                    <div className="flex items-center gap-1.5 mt-2">
+                      <Briefcase className="h-3 w-3 text-slate-400" />
+                      <span className="text-[11px] text-slate-500 font-medium">{message.case_name}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                        <MoreVertical className="h-4 w-4 text-slate-400" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); message.family_file_id && router.push(`/professional/cases/${message.family_file_id}/messages`); }}>
+                        <Eye className="h-4 w-4 mr-2" /> View Thread
+                      </DropdownMenuItem>
+                      {!message.is_read && !isSentByMe && (
+                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); markAsRead(message.id); }}>
+                          <CheckCircle2 className="h-4 w-4 mr-2" /> Mark Read
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={(e) => { e.stopPropagation(); message.is_archived ? unarchiveMessage(message.id) : archiveMessage(message.id); }}>
+                        <Archive className="h-4 w-4 mr-2" /> {message.is_archived ? "Unarchive" : "Archive"}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
       ) : (
-        <Card className="border-2 border-dashed border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-          <CardContent className="py-16 text-center">
-            <div className="p-4 bg-[#1E3A4A]/10 border-2 border-[#1E3A4A]/20 rounded-sm w-fit mx-auto mb-6">
-              <MessageSquare className="h-10 w-10 text-[#1E3A4A]" strokeWidth={1.5} />
+        <Card className="border border-dashed border-slate-200 bg-white rounded-2xl">
+          <CardContent className="py-20 flex flex-col items-center justify-center text-center">
+            <div className="p-4 bg-[#F4F8F7] rounded-2xl mb-5">
+              <MessageSquare className="h-10 w-10 text-[#3DAA8A]" />
             </div>
-            <h3 className="serif text-lg font-bold text-slate-900 mb-2">No Messages</h3>
-            <p className="sans text-slate-600 max-w-sm mx-auto">
+            <p className="text-lg font-semibold text-slate-900 mb-1.5">No Messages</p>
+            <p className="text-sm text-slate-500 max-w-sm">
               {searchQuery || readFilter !== "all"
-                ? "Try adjusting your filters to find what you're looking for"
-                : "Correspondence from your cases will appear here"}
+                ? "Try adjusting your search or filters"
+                : "Messages from your cases will appear here. Start a conversation with a client below."}
             </p>
+            {!searchQuery && readFilter === "all" && (
+              <Button onClick={() => setShowCompose(true)} className="mt-5 bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
+                <Plus className="h-4 w-4 mr-2" /> New Message
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
+
+      {/* Compose Dialog */}
+      <ComposeDialog
+        open={showCompose}
+        onClose={() => setShowCompose(false)}
+        cases={cases}
+        token={token}
+        onSent={() => { setShowCompose(false); fetchMessages(); toast({ title: "Message sent" }); }}
+      />
     </div>
   );
 }
 
-// Stat Card Component
-function StatCard({
-  label,
-  value,
-  icon,
-  color,
-  active,
-  onClick,
+// ─── Compose Dialog ──────────────────────────────────────────────────────────
+
+function ComposeDialog({
+  open,
+  onClose,
+  cases,
+  token,
+  onSent,
 }: {
-  label: string;
-  value: number;
-  icon: React.ReactNode;
-  color?: "blue" | "teal" | "amber";
-  active: boolean;
-  onClick: () => void;
+  open: boolean;
+  onClose: () => void;
+  cases: { id: string; title: string; family_file_id: string }[];
+  token: string;
+  onSent: () => void;
 }) {
-  const colorConfig = {
-    blue: {
-      text: "text-slate-900",
-      activeBg: "bg-gradient-to-br from-white to-[#F4F8F7]/50",
-      iconBg: "bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] border-2 border-[#1E3A4A]/40 text-[#F4F8F7] shadow-lg",
-      ring: "border-2 border-[#1E3A4A]/40 shadow-xl",
-    },
-    teal: {
-      text: "text-emerald-900",
-      activeBg: "bg-gradient-to-br from-emerald-50 to-emerald-100/50",
-      iconBg: "bg-gradient-to-br from-emerald-900 to-emerald-800 border-2 border-emerald-900/40 text-emerald-50 shadow-lg",
-      ring: "border-2 border-emerald-900/30 shadow-md",
-    },
-    amber: {
-      text: "text-[#1E3A4A]",
-      activeBg: "bg-gradient-to-br from-[#F4F8F7] to-[#E8F4F0]/50",
-      iconBg: "bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] border-2 border-[#1E3A4A]/40 text-[#F4F8F7] shadow-lg",
-      ring: "border-2 border-[#1E3A4A]/30 shadow-md",
-    },
-  };
+  const [selectedCaseId, setSelectedCaseId] = useState("");
+  const [subject, setSubject] = useState("");
+  const [content, setContent] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
-  const config = color ? colorConfig[color] : {
-    text: "text-slate-900",
-    activeBg: "bg-gradient-to-br from-white to-[#F4F8F7]/50",
-    iconBg: "bg-[#1E3A4A]/10 border-2 border-[#1E3A4A]/20 text-[#1E3A4A]",
-    ring: "border-2 border-[#1E3A4A]/40 shadow-xl",
-  };
-
-  return (
-    <button
-      onClick={onClick}
-      className={`p-4 rounded-sm text-left transition-all duration-200 ${
-        active
-          ? `${config.activeBg} ${config.ring}`
-          : "bg-white border-2 border-slate-300 hover:bg-[#F4F8F7] hover:border-[#1E3A4A]/20"
-      }`}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className={`serif text-2xl font-bold ${config.text}`}>{value}</p>
-          <p className="sans text-xs text-slate-600 mt-0.5 tracking-[0.1em] uppercase font-bold">{label}</p>
-        </div>
-        <div className={`p-2.5 rounded-sm ${active ? config.iconBg : "bg-[#1E3A4A]/10 border border-[#1E3A4A]/20 text-[#1E3A4A]"}`}>
-          {icon}
-        </div>
-      </div>
-    </button>
-  );
-}
-
-// Message Card Component
-function MessageCard({
-  message,
-  onMarkRead,
-  onArchive,
-  onUnarchive,
-}: {
-  message: Message;
-  onMarkRead: () => void;
-  onArchive: () => void;
-  onUnarchive: () => void;
-}) {
-  const router = useRouter();
-
-  const formatRelativeTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(hours / 24);
-
-    if (days > 7) {
-      return date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
+  const handleSend = async () => {
+    if (!token || !content.trim()) return;
+    setIsSending(true);
+    try {
+      const caseItem = cases.find((c) => c.id === selectedCaseId || c.family_file_id === selectedCaseId);
+      const response = await fetch(`${API_BASE}/api/v1/professional/messages`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          family_file_id: caseItem?.family_file_id || selectedCaseId,
+          subject: subject.trim() || undefined,
+          content: content.trim(),
+        }),
       });
-    }
-    if (days > 0) return `${days}d ago`;
-    if (hours > 0) return `${hours}h ago`;
-    if (minutes > 0) return `${minutes}m ago`;
-    return "Just now";
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  };
-
-  const truncateContent = (content: string, maxLength: number = 120) => {
-    if (content.length <= maxLength) return content;
-    return content.slice(0, maxLength).trim() + "...";
-  };
-
-  // Determine if this message was sent by the professional (us) or received
-  const isSentByMe = message.sender_type === "professional";
-
-  // The contact is the OTHER party in the conversation
-  const contactName = isSentByMe ? message.recipient_name : message.sender_name;
-  const contactInitials = contactName
-    ? contactName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
-    : "?";
-
-  const handleCardClick = () => {
-    if (message.family_file_id) {
-      router.push(`/professional/cases/${message.family_file_id}/messages`);
+      if (response.ok) {
+        setSubject("");
+        setContent("");
+        setSelectedCaseId("");
+        onSent();
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setIsSending(false);
     }
   };
 
   return (
-    <Card
-      className={`group hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden ${!message.is_read && !isSentByMe ? "border-2 border-[#1E3A4A]/40 bg-gradient-to-r from-[#F4F8F7]/50 to-white shadow-md" : "border-2 border-slate-300 bg-white hover:border-[#1E3A4A]/30"}`}
-      onClick={handleCardClick}
-    >
-      {/* Top accent bar for unread received messages */}
-      {!message.is_read && !isSentByMe && (
-        <div className="h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]" />
-      )}
-      <CardContent className="p-4">
-        <div className="flex items-start gap-4">
-          <Avatar className="h-11 w-11 shrink-0 ring-2 ring-white shadow-md border-2 border-[#1E3A4A]/20">
-            <AvatarFallback className={`serif font-bold ${!message.is_read && !isSentByMe ? "bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-[#F4F8F7]" : "bg-[#1E3A4A]/10 text-[#1E3A4A]"}`}>
-              {contactInitials}
-            </AvatarFallback>
-          </Avatar>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <h3 className={`serif font-bold truncate ${!message.is_read && !isSentByMe ? "text-slate-900" : "text-slate-700"}`}>
-                  {contactName || "Unknown"}
-                </h3>
-                {isSentByMe ? (
-                  <Badge className="bg-emerald-50 text-emerald-900 border-2 border-emerald-200 shrink-0 sans">
-                    <Send className="h-3 w-3 mr-1" strokeWidth={2} />
-                    Sent
-                  </Badge>
-                ) : !message.is_read ? (
-                  <Badge className="bg-amber-100 text-amber-900 border-2 border-amber-200 shrink-0 sans">
-                    New
-                  </Badge>
-                ) : null}
-              </div>
-              <span className="sans text-xs text-slate-500 shrink-0">
-                {formatRelativeTime(message.sent_at || message.created_at)}
-              </span>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg border border-slate-200 rounded-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+            <div className="w-8 h-8 rounded-lg bg-[#3DAA8A]/10 flex items-center justify-center">
+              <Send className="h-4 w-4 text-[#3DAA8A]" />
             </div>
+            New Message
+          </DialogTitle>
+          <DialogDescription>
+            Send a secure message to a client on one of your active cases
+          </DialogDescription>
+        </DialogHeader>
 
-            {message.subject && (
-              <p className={`sans text-sm mt-0.5 ${!message.is_read && !isSentByMe ? "font-bold text-slate-800" : "text-slate-600"}`}>
-                {message.subject}
-              </p>
-            )}
-
-            <p className="sans text-sm text-slate-600 mt-1.5 line-clamp-2">
-              {isSentByMe && <span className="text-slate-500">You: </span>}
-              {truncateContent(message.content)}
-            </p>
-
-            {message.family_file_id && (
-              <div className="flex items-center gap-2 mt-3">
-                <Badge variant="outline" className="text-xs bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 text-[#1E3A4A] sans">
-                  <Scale className="h-3 w-3 mr-1" strokeWidth={2} />
-                  Case {message.family_file_id.slice(0, 8)}...
-                </Badge>
-              </div>
-            )}
+        <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-slate-700">Case</Label>
+            <Select value={selectedCaseId} onValueChange={setSelectedCaseId}>
+              <SelectTrigger className="border-slate-200 focus:border-[#3DAA8A]">
+                <SelectValue placeholder="Select a case..." />
+              </SelectTrigger>
+              <SelectContent>
+                {cases.length === 0 ? (
+                  <SelectItem value="_none" disabled>No active cases</SelectItem>
+                ) : (
+                  cases.map((c) => (
+                    <SelectItem key={c.id} value={c.family_file_id || c.id}>
+                      {c.title || `Case ${c.id.slice(0, 8)}`}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                <Button variant="ghost" size="icon" className="hover:bg-slate-100">
-                  <MoreVertical className="h-4 w-4 text-slate-400" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={(e) => {
-                  e.stopPropagation();
-                  handleCardClick();
-                }}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Conversation
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => {
-                  e.stopPropagation();
-                  handleCardClick();
-                }}>
-                  <Reply className="h-4 w-4 mr-2" />
-                  Reply
-                </DropdownMenuItem>
-                {!message.is_read && !isSentByMe && (
-                  <DropdownMenuItem onClick={(e) => {
-                    e.stopPropagation();
-                    onMarkRead();
-                  }}>
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                    Mark as Read
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={(e) => {
-                  e.stopPropagation();
-                  message.is_archived ? onUnarchive() : onArchive();
-                }}>
-                  <Archive className="h-4 w-4 mr-2" />
-                  {message.is_archived ? "Unarchive" : "Archive"}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-slate-500 transition-colors" />
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-slate-700">Subject <span className="text-slate-400 font-normal">(optional)</span></Label>
+            <Input
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Message subject..."
+              className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-slate-700">Message</Label>
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Type your message..."
+              className="min-h-[140px] border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 text-sm leading-relaxed resize-y"
+            />
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} className="rounded-xl border-slate-200">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSend}
+            disabled={!content.trim() || !selectedCaseId || isSending}
+            className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
+          >
+            {isSending ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending...</>
+            ) : (
+              <><Send className="h-4 w-4 mr-2" /> Send Message</>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
