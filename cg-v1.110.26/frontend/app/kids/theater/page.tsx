@@ -413,19 +413,25 @@ function VideoPlayer({
 // Category tabs
 function CategoryTabs({
   selected,
-  onSelect
+  onSelect,
+  genres = [],
 }: {
   selected: string
   onSelect: (category: string) => void
+  genres?: { id: string; name: string; icon_emoji?: string }[]
 }) {
-  const categories = [
+  const baseCategories = [
     { id: 'all', label: 'All Movies', emoji: '🎬' },
     { id: 'favorites', label: 'Favorites', emoji: '❤️' },
     { id: 'new', label: 'New', emoji: '✨' },
-    { id: 'adventure', label: 'Adventure', emoji: '🏔️' },
-    { id: 'comedy', label: 'Comedy', emoji: '😂' },
-    { id: 'animation', label: 'Animation', emoji: '🎨' },
   ]
+  // Merge real genres from API
+  const genreTabs = genres.map(g => ({
+    id: g.name.toLowerCase(),
+    label: g.name,
+    emoji: g.icon_emoji || '🎭',
+  }))
+  const categories = [...baseCategories, ...genreTabs]
 
   return (
     <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
@@ -463,6 +469,9 @@ export default function TheaterPage() {
 
   const [movies, setMovies] = useState<Movie[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  // Extract unique genres from loaded movies for category tabs
+  const movieGenres = Array.from(new Set(movies.map(m => m.genre).filter(Boolean)))
+    .map(name => ({ id: name.toLowerCase(), name, icon_emoji: '🎭' }))
 
   // Fetch real movies from API, fall back to sample data if endpoint not available
   useEffect(() => {
@@ -575,8 +584,8 @@ export default function TheaterPage() {
           </motion.div>
         </motion.div>
 
-        {/* Category tabs */}
-        <CategoryTabs selected={category} onSelect={setCategory} />
+        {/* Category tabs — includes genres from loaded movies */}
+        <CategoryTabs selected={category} onSelect={setCategory} genres={movieGenres} />
 
         {/* Movies grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">

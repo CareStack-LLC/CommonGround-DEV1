@@ -318,6 +318,15 @@ function StoriesPageContent() {
   const [stories, setStories] = useState<Story[]>(sampleStories);
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [featuredAuthor, setFeaturedAuthor] = useState<{ name: string; bio?: string; photo_url?: string; showcase_book_title?: string } | null>(null);
+
+  // Fetch featured author
+  useEffect(() => {
+    fetch(`${API_BASE}/api/v1/kidspace/authors/featured`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.author) setFeaturedAuthor(d.author); })
+      .catch(() => {});
+  }, []);
 
   // Fetch real books from API
   useEffect(() => {
@@ -392,6 +401,35 @@ function StoriesPageContent() {
           </motion.div>
         </div>
       </header>
+
+      {/* Featured Author Spotlight */}
+      {featuredAuthor && (
+        <div className="px-6 mb-4 relative z-10">
+          <div className="max-w-lg mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white/20 backdrop-blur-sm rounded-3xl p-4 flex items-center gap-4"
+            >
+              <div className="w-14 h-14 rounded-full overflow-hidden bg-white/30 flex-shrink-0 shadow-lg">
+                {featuredAuthor.photo_url ? (
+                  <img src={featuredAuthor.photo_url} alt={featuredAuthor.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-2xl">✍️</div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-yellow-200 uppercase tracking-wider">✨ Author Spotlight</p>
+                <h3 className="text-white font-bold truncate">{featuredAuthor.name}</h3>
+                {featuredAuthor.showcase_book_title && (
+                  <p className="text-white/70 text-xs truncate">📖 {featuredAuthor.showcase_book_title}</p>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      )}
 
       {/* Create New Story Button */}
       <div className="px-6 mb-6 relative z-10">

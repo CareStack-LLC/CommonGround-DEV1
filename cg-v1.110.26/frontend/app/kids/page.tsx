@@ -17,6 +17,24 @@ import {
 } from 'lucide-react';
 import { familyFilesAPI, circleAPI, CircleContact } from '@/lib/api';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+interface FeaturedMovie {
+  id: string;
+  title: string;
+  poster_url?: string;
+  genre_name?: string;
+  duration_minutes?: number;
+}
+
+interface FeaturedAuthor {
+  id: string;
+  name: string;
+  bio?: string;
+  photo_url?: string;
+  showcase_book_title?: string;
+}
+
 /* =============================================================================
    KIDCOMS - Child Gaming Hub
    A fun, playful interface for kids to connect with family
@@ -319,6 +337,8 @@ function KidsHubPageContent() {
   const [child, setChild] = useState<Child | null>(null);
   const [contacts, setContacts] = useState<CircleContact[]>([]);
   const [activeSection, setActiveSection] = useState<'home' | 'call'>('home');
+  const [featuredMovie, setFeaturedMovie] = useState<FeaturedMovie | null>(null);
+  const [featuredAuthor, setFeaturedAuthor] = useState<FeaturedAuthor | null>(null);
 
   useEffect(() => {
     if (familyFileId) {
@@ -340,6 +360,23 @@ function KidsHubPageContent() {
         });
         setContacts(contactsData.items);
       }
+      // Load featured content from KidSpace API (non-blocking)
+      try {
+        const [moviesRes, authorRes] = await Promise.all([
+          fetch(`${API_BASE}/api/v1/kidspace/movies?limit=10`).catch(() => null),
+          fetch(`${API_BASE}/api/v1/kidspace/authors/featured`).catch(() => null),
+        ]);
+        if (moviesRes?.ok) {
+          const md = await moviesRes.json();
+          const items = md.movies || md || [];
+          const featured = items.find((m: any) => m.is_featured) || items[0];
+          if (featured) setFeaturedMovie(featured);
+        }
+        if (authorRes?.ok) {
+          const ad = await authorRes.json();
+          if (ad?.author) setFeaturedAuthor(ad.author);
+        }
+      } catch { /* Featured content is optional */ }
     } catch (err) {
       console.error('Error loading data:', err);
     } finally {
@@ -571,6 +608,70 @@ function KidsHubPageContent() {
                       </motion.button>
                     ))}
                   </div>
+                </motion.div>
+              )}
+
+              {/* Featured Content from Superadmin */}
+              {(featuredMovie || featuredAuthor) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                  className="space-y-4"
+                >
+                  {/* Featured Movie */}
+                  {featuredMovie && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleFeatureClick('theater')}
+                      className="w-full bg-white/20 backdrop-blur-sm rounded-3xl p-4 flex items-center gap-4 text-left"
+                    >
+                      <div className="w-16 h-20 rounded-xl overflow-hidden bg-white/30 flex-shrink-0">
+                        {featuredMovie.poster_url ? (
+                          <img src={featuredMovie.poster_url} alt={featuredMovie.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-3xl">🎬</div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-yellow-200 uppercase tracking-wider">★ Featured</span>
+                        </div>
+                        <h3 className="text-white font-bold text-lg truncate">{featuredMovie.title}</h3>
+                        <p className="text-white/70 text-sm">{featuredMovie.genre_name || 'Movie'} • {featuredMovie.duration_minutes || '?'}min</p>
+                      </div>
+                      <span className="text-3xl">▶️</span>
+                    </motion.button>
+                  )}
+
+                  {/* Featured Author */}
+                  {featuredAuthor && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleFeatureClick('stories')}
+                      className="w-full bg-white/20 backdrop-blur-sm rounded-3xl p-4 flex items-center gap-4 text-left"
+                    >
+                      <div className="w-14 h-14 rounded-full overflow-hidden bg-white/30 flex-shrink-0">
+                        {featuredAuthor.photo_url ? (
+                          <img src={featuredAuthor.photo_url} alt={featuredAuthor.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-2xl">✍️</div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-purple-200 uppercase tracking-wider">✨ Author Spotlight</span>
+                        </div>
+                        <h3 className="text-white font-bold truncate">{featuredAuthor.name}</h3>
+                        {featuredAuthor.showcase_book_title && (
+                          <p className="text-white/70 text-sm truncate">📖 {featuredAuthor.showcase_book_title}</p>
+                        )}
+                      </div>
+                      <span className="text-2xl">📚</span>
+                    </motion.button>
+                  )}
                 </motion.div>
               )}
             </motion.div>
