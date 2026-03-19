@@ -847,7 +847,7 @@ function IntegrationsTab() {
     { name: "MyCase", description: "Sync cases and client data with MyCase", icon: FolderOpen, status: "coming_soon" },
     { name: "Clio", description: "Connect your Clio practice management", icon: FolderOpen, status: "coming_soon" },
     { name: "Google Calendar", description: "Sync events with Google Calendar", icon: Calendar, status: "coming_soon" },
-    { name: "QuickBooks", description: "Financial tracking and invoicing", icon: CreditCard, status: "coming_soon" },
+    { name: "Apple Calendar", description: "Sync events with iCal", icon: Calendar, status: "coming_soon" },
   ];
 
   return (
